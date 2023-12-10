@@ -5,18 +5,33 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.game.Game;
 import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
+import com.jordanbunke.delta_time.text.Text;
+import com.jordanbunke.delta_time.text.TextBuilder;
+import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.Segment;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class StippleEffect implements ProgramContext {
     private static final StippleEffect INSTANCE;
 
     public final Game game;
     public final GameWindow window;
+
+    private final List<ImageContext> contexts;
+    private int contextIndex;
+
+    private Coord2D mousePosition;
+    private Segment segment;
 
     static {
         INSTANCE = new StippleEffect();
@@ -26,12 +41,16 @@ public class StippleEffect implements ProgramContext {
         window = new GameWindow(Constants.PROGRAM_NAME,
                 Constants.CANVAS_W * Constants.SCALE_UP,
                 Constants.CANVAS_H * Constants.SCALE_UP,
-                /* TODO */ GameImage.dummy(),
+                /* TODO - program icon */ GameImage.dummy(),
                 true, false, false);
         final GameManager manager = new GameManager(0, this);
 
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
         game.setCanvasSize(Constants.CANVAS_W, Constants.CANVAS_H);
+        game.getDebugger().muteChannel(GameDebugger.FRAME_RATE);
+
+        contexts = new ArrayList<>();
+        contextIndex = 0;
     }
 
     public static StippleEffect get() {
@@ -48,16 +67,19 @@ public class StippleEffect implements ProgramContext {
     }
 
     private static void launchWithoutFile() {
-        // TODO
+        get().contexts.add(new ImageContext(Constants.DEFAULT_IMAGE_WIDTH,
+                Constants.DEFAULT_IMAGE_HEIGHT));
     }
 
     private static void launchWithFile(final Path fp) {
-        // TODO
+        final GameImage image = GameImageIO.readImage(fp);
+        get().contexts.add(new ImageContext(image));
     }
 
     @Override
     public void process(final InputEventLogger eventLogger) {
-
+        // workspace
+        contexts.get(contextIndex).process(eventLogger);
     }
 
     @Override
@@ -67,7 +89,52 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void render(final GameImage canvas) {
+        // workspace
+        final GameImage workspace = contexts.get(contextIndex).drawWorkspace();
+        canvas.draw(workspace, Constants.TOOLS_W, Constants.CONTEXTS_H);
+        // tools
+        // TODO
+        // layers
+        // TODO
+        // color picker
+        // TODO
+        // contexts
+        // TODO
+        // bottom bar - zoom, animation, canvas size info
+        final GameImage bottomBar = drawBottomBar();
+        canvas.draw(bottomBar, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
 
+        // borders
+        canvas.setColor(Constants.BLACK);
+        canvas.drawLine(1f, 0, Constants.CONTEXTS_H,
+                Constants.CANVAS_W, Constants.CONTEXTS_H);
+        canvas.drawLine(1f, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H,
+                Constants.CANVAS_W, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
+        canvas.drawLine(1f, Constants.TOOLS_W + Constants.WORKSPACE_W,
+                Constants.CONTEXTS_H + Constants.LAYERS_H, Constants.CANVAS_W,
+                Constants.CONTEXTS_H + Constants.LAYERS_H);
+        canvas.drawLine(1f, Constants.TOOLS_W, Constants.CONTEXTS_H,
+                Constants.TOOLS_W, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
+        canvas.drawLine(1f, Constants.TOOLS_W + Constants.WORKSPACE_W,
+                Constants.CONTEXTS_H, Constants.TOOLS_W + Constants.WORKSPACE_W,
+                Constants.CONTEXTS_H + Constants.WORKSPACE_H);
+    }
+
+    private GameImage drawBottomBar() {
+        final GameImage bottomBar = new GameImage(Constants.CANVAS_W, Constants.BOTTOM_BAR_H);
+        bottomBar.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+                Constants.CANVAS_W, Constants.BOTTOM_BAR_H);
+
+        final GameImage targetPixel = GraphicsUtils.uiText()
+                .addText(contexts.get(contextIndex).getTargetPixelText())
+                .build().draw();
+        bottomBar.draw(targetPixel, Constants.TP_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        final GameImage size = GraphicsUtils.uiText()
+                .addText(contexts.get(contextIndex).getCanvasSizeText())
+                .build().draw();
+        bottomBar.draw(size, Constants.SIZE_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+
+        return bottomBar.submit();
     }
 
     @Override
