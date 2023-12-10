@@ -5,7 +5,7 @@ import java.awt.*;
 public class Constants {
     public static final String PROGRAM_NAME = "Stipple Effect";
 
-    public static final int CANVAS_W = 900, CANVAS_H = 500, SCALE_UP = 2;
+    public static final int CANVAS_W = 900, CANVAS_H = 500, SCREEN_HEIGHT_BUFFER = 80;
 
     public static final double TICK_HZ = 50d, FPS = 30d;
 

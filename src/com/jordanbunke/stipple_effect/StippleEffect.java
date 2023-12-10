@@ -16,6 +16,7 @@ import com.jordanbunke.stipple_effect.context.Segment;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
+import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,9 +39,9 @@ public class StippleEffect implements ProgramContext {
     }
 
     public StippleEffect() {
+        final Coord2D size = determineWindowSize();
         window = new GameWindow(Constants.PROGRAM_NAME,
-                Constants.CANVAS_W * Constants.SCALE_UP,
-                Constants.CANVAS_H * Constants.SCALE_UP,
+                size.x, size.y,
                 /* TODO - program icon */ GameImage.dummy(),
                 true, false, false);
         final GameManager manager = new GameManager(0, this);
@@ -51,6 +52,12 @@ public class StippleEffect implements ProgramContext {
 
         contexts = new ArrayList<>();
         contextIndex = 0;
+    }
+
+    private Coord2D determineWindowSize() {
+        final int h = Toolkit.getDefaultToolkit().getScreenSize().height - Constants.SCREEN_HEIGHT_BUFFER;
+        final double scaleUp = h / (double)Constants.CANVAS_H;
+        return new Coord2D((int)(scaleUp * Constants.CANVAS_W), h);
     }
 
     public static StippleEffect get() {
