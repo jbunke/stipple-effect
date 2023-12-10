@@ -39,17 +39,6 @@ public class ImageState {
     public GameImage draw() {
         final GameImage image = new GameImage(imageWidth, imageHeight);
 
-        for (int x = 0; x < imageWidth; x += Constants.CHECKER_INCREMENT) {
-            for (int y = 0; y < imageHeight; y += Constants.CHECKER_INCREMENT) {
-                final Color c = ((x / Constants.CHECKER_INCREMENT) +
-                        (y / Constants.CHECKER_INCREMENT)) % 2 == 0
-                        ? Constants.WHITE : Constants.LIGHT_GREY;
-
-                image.fillRectangle(c, x, y, Constants.CHECKER_INCREMENT,
-                        Constants.CHECKER_INCREMENT);
-            }
-        }
-
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
                 if (layer.getOpacity() == Constants.OPAQUE)

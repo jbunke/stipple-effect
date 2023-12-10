@@ -10,10 +10,10 @@ public class SEFonts {
 
     public static final FontFamily CLASSIC = new FontFamily("Classic",
             Font.loadFromSource(FONT_FOLDER, true, "font-classic",
-                    false, 0.6, 1, true, false),
+                    false, 0.6, 1, false, false),
             null,
             Font.loadFromSource(FONT_FOLDER, true, "font-classic-italics",
-                    false, 0.6, 0, true, false));
+                    false, 0.6, 0, false, false));
 
     public static final Font SMALL = Font.loadFromSource(FONT_FOLDER, true,
             "font-arcade", false, 1, false);

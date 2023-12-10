@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.context;
 
+import com.jordanbunke.delta_time.events.GameKeyEvent;
+import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.InputEventLogger;
@@ -10,6 +12,7 @@ import com.jordanbunke.stipple_effect.state.ImageState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +50,7 @@ public class ImageContext {
         final int scaleUp = renderInfo.getScaleUp();
         final Coord2D render = getImageRenderPositionInWorkspace();
         final GameImage image = ImageProcessing.scale(states.getState().draw(), scaleUp);
+        workspace.draw(generateCheckers(), render.x, render.y);
         workspace.draw(image, render.x, render.y);
 
         return workspace.submit();
@@ -54,6 +58,68 @@ public class ImageContext {
 
     public void process(final InputEventLogger eventLogger) {
         setTargetPixel(eventLogger);
+        processSingleKeyInputs(eventLogger);
+        // TODO
+    }
+
+    private void processCompoundKeyInputs(final InputEventLogger eventLogger) {
+        // CTRL but not SHIFT
+        if (eventLogger.isPressed(Key.CTRL) && !eventLogger.isPressed(Key.SHIFT)) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
+                    states::undo
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
+                    states::redo
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - context needs a field for a save path and a save mode ->
+                    // PNG, static vs animated,
+                    // animated can be frame by frame alongside, saved as separate files, or as GIF
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - select all
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - deselect
+            );
+        }
+
+        // SHIFT but not CTRL
+        if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+            // TODO - populate with SHIFT + ? shortcuts
+        }
+
+        // CTRL and SHIFT
+        if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - save as
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - crop to selection
+            );
+        }
+    }
+
+    private void processSingleKeyInputs(final InputEventLogger eventLogger) {
+        if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(/* TODO - assignment not final */ Key.Z, GameKeyEvent.Action.PRESS),
+                    renderInfo::scaleUp
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(/* TODO - assignment not final */ Key.X, GameKeyEvent.Action.PRESS),
+                    renderInfo::scaleDown
+            );
+            // TODO
+
+        }
     }
 
     private void setTargetPixel(final InputEventLogger eventLogger) {
@@ -70,8 +136,8 @@ public class ImageContext {
             final Coord2D render = getImageRenderPositionInWorkspace(),
                     bottomLeft = new Coord2D(render.x + (scaleUp * w),
                             render.y + (scaleUp * h));
-            final int targetX = (int)((double)((workshopM.x - render.x) / (bottomLeft.x - render.x)) * w),
-                    targetY = (int)((double)((workshopM.y - render.y) / (bottomLeft.y - render.y)) * h);
+            final int targetX = (int)(((workshopM.x - render.x) / (double)(bottomLeft.x - render.x)) * w),
+                    targetY = (int)(((workshopM.y - render.y) / (double)(bottomLeft.y - render.y)) * h);
 
             targetPixel = (targetX >= 0 && targetX < w && targetY >= 0 && targetY < h)
                     ? new Coord2D(targetX, targetY) : UNTARGETED;
@@ -86,6 +152,27 @@ public class ImageContext {
 
         return new Coord2D(middle.x - (scaleUp * anchor.x),
                 middle.y - (scaleUp * anchor.y));
+    }
+
+    private GameImage generateCheckers() {
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight(),
+                scaleUp = renderInfo.getScaleUp();
+
+        final GameImage image = new GameImage(w * scaleUp, h * scaleUp);
+
+        for (int x = 0; x < image.getWidth(); x += Constants.CHECKER_INCREMENT) {
+            for (int y = 0; y < image.getHeight(); y += Constants.CHECKER_INCREMENT) {
+                final Color c = ((x / Constants.CHECKER_INCREMENT) +
+                        (y / Constants.CHECKER_INCREMENT)) % 2 == 0
+                        ? Constants.WHITE : Constants.LIGHT_GREY;
+
+                image.fillRectangle(c, x, y, Constants.CHECKER_INCREMENT,
+                        Constants.CHECKER_INCREMENT);
+            }
+        }
+
+        return image.submit();
     }
 
     // TODO - process all actions here and feed through state manager
@@ -188,11 +275,10 @@ public class ImageContext {
     // GETTERS
     public String getTargetPixelText() {
         return targetPixel == UNTARGETED
-                ? "--" : "TARGET: " + targetPixel.toString();
+                ? "--" : targetPixel.toString();
     }
 
     public String getCanvasSizeText() {
-        return "SIZE: " + states.getState().getImageWidth() +
-                " x " + states.getState().getImageHeight();
+        return states.getState().getImageWidth() + " x " + states.getState().getImageHeight();
     }
 }

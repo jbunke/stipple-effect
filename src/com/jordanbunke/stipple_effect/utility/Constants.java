@@ -5,16 +5,16 @@ import java.awt.*;
 public class Constants {
     public static final String PROGRAM_NAME = "Stipple Effect";
 
-    public static final int CANVAS_W = 480, CANVAS_H = 270, SCALE_UP = 3;
+    public static final int CANVAS_W = 900, CANVAS_H = 500, SCALE_UP = 2;
 
     public static final double TICK_HZ = 50d, FPS = 30d;
 
     public static final double OPAQUE = 1d, TRANSPARENT = 0d;
 
-    public static final int WORKSPACE_W = 360, TOOLS_W = 20, COLOR_PICKER_W = 100,
-            WORKSPACE_H = 210, COLOR_PICKER_H = 105, LAYERS_H = 105, CONTEXTS_H = 48, BOTTOM_BAR_H = 12;
+    public static final int WORKSPACE_W = 650, TOOLS_W = 36, COLOR_PICKER_W = 214,
+            WORKSPACE_H = 400, COLOR_PICKER_H = 200, LAYERS_H = 200, CONTEXTS_H = 76, BOTTOM_BAR_H = 24;
 
-    public static final int BOTTOM_BAR_TEXT_Y_OFFSET = -1, TP_X = (int)(CANVAS_W * 0.01), SIZE_X = (int)(CANVAS_W * 0.26);
+    public static final int BOTTOM_BAR_TEXT_Y_OFFSET = -4, TP_X = (int)(CANVAS_W * 0.01), SIZE_X = (int)(CANVAS_W * 0.16);
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),

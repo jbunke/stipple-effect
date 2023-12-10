@@ -100,7 +100,7 @@ public class StippleEffect implements ProgramContext {
         // TODO
         // contexts
         // TODO
-        // bottom bar - zoom, animation, canvas size info
+        // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
         canvas.draw(bottomBar, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
 
@@ -133,6 +133,9 @@ public class StippleEffect implements ProgramContext {
                 .addText(contexts.get(contextIndex).getCanvasSizeText())
                 .build().draw();
         bottomBar.draw(size, Constants.SIZE_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+
+        // TODO - zoom
+        // TODO - animation frames
 
         return bottomBar.submit();
     }
