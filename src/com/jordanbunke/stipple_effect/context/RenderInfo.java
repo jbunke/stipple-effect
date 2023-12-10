@@ -6,33 +6,37 @@ public class RenderInfo {
     private static final int MIN_SCALE = 1, MAX_SCALE = 20;
 
     private Coord2D anchor;
-    private int scaleUp;
+    private int zoomFactor;
 
     public RenderInfo(final int imageWidth, final int imageHeight) {
         this.anchor = new Coord2D(imageWidth / 2, imageHeight / 2);
-        this.scaleUp = MIN_SCALE;
+        this.zoomFactor = MIN_SCALE;
     }
 
-    public void setScaleUp(int scaleUp) {
-        this.scaleUp = scaleUp;
+    public void setZoomFactor(int zoomFactor) {
+        this.zoomFactor = zoomFactor;
     }
 
-    public void scaleUp() {
-        if (scaleUp < MAX_SCALE)
-            scaleUp++;
+    public void zoomIn() {
+        if (zoomFactor < MAX_SCALE)
+            zoomFactor++;
     }
 
-    public void scaleDown() {
-        if (scaleUp > MIN_SCALE)
-            scaleUp--;
+    public void zoomOut() {
+        if (zoomFactor > MIN_SCALE)
+            zoomFactor--;
     }
 
-    public void setAnchor(Coord2D anchor) {
+    public void setAnchor(final Coord2D anchor) {
         this.anchor = anchor;
     }
 
-    public int getScaleUp() {
-        return scaleUp;
+    public void incrementAnchor(final Coord2D delta) {
+        this.anchor = new Coord2D(anchor.x + delta.x, anchor.y + delta.y);
+    }
+
+    public int getZoomFactor() {
+        return zoomFactor;
     }
 
     public Coord2D getAnchor() {

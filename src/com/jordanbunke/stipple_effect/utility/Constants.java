@@ -11,10 +11,14 @@ public class Constants {
 
     public static final double OPAQUE = 1d, TRANSPARENT = 0d;
 
-    public static final int WORKSPACE_W = 650, TOOLS_W = 36, COLOR_PICKER_W = 214,
+    public static final int WORKSPACE_W = 630, TOOLS_W = 50, COLOR_PICKER_W = 220,
             WORKSPACE_H = 400, COLOR_PICKER_H = 200, LAYERS_H = 200, CONTEXTS_H = 76, BOTTOM_BAR_H = 24;
 
-    public static final int BOTTOM_BAR_TEXT_Y_OFFSET = -4, TP_X = (int)(CANVAS_W * 0.01), SIZE_X = (int)(CANVAS_W * 0.16);
+    public static final int BOTTOM_BAR_TEXT_Y_OFFSET = -4,
+            TOOL_NAME_X = (int)(CANVAS_W * 0.01),
+            TP_X = (int)(CANVAS_W * 0.16),
+            SIZE_X = (int)(CANVAS_W * 0.31),
+            ZOOM_PCT_X = (int)(CANVAS_W * 0.46);
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),

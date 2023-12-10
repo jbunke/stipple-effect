@@ -1,15 +1,18 @@
 package com.jordanbunke.stipple_effect.context;
 
-import com.jordanbunke.delta_time.events.GameKeyEvent;
-import com.jordanbunke.delta_time.events.Key;
+import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerCombiner;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.state.ImageState;
 import com.jordanbunke.stipple_effect.state.StateManager;
+import com.jordanbunke.stipple_effect.tools.Hand;
+import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.tools.Zoom;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -47,19 +50,39 @@ public class ImageContext {
         workspace.fillRectangle(Constants.BACKGROUND, 0, 0,
                 Constants.WORKSPACE_W, Constants.WORKSPACE_H);
 
-        final int scaleUp = renderInfo.getScaleUp();
+        final int zoomFactor = renderInfo.getZoomFactor();
         final Coord2D render = getImageRenderPositionInWorkspace();
-        final GameImage image = ImageProcessing.scale(states.getState().draw(), scaleUp);
+        final GameImage image = ImageProcessing.scale(states.getState().draw(), zoomFactor);
         workspace.draw(generateCheckers(), render.x, render.y);
         workspace.draw(image, render.x, render.y);
 
         return workspace.submit();
     }
 
-    public void process(final InputEventLogger eventLogger) {
+    public void process(final InputEventLogger eventLogger, final Tool tool) {
         setTargetPixel(eventLogger);
+        processTools(eventLogger, tool);
         processSingleKeyInputs(eventLogger);
+        processCompoundKeyInputs(eventLogger);
         // TODO
+    }
+
+    private void processTools(
+            final InputEventLogger eventLogger, final Tool tool
+    ) {
+        for (GameEvent e : eventLogger.getUnprocessedEvents()) {
+            if (e instanceof GameMouseEvent me) {
+                if (me.matchesAction(GameMouseEvent.Action.DOWN) && isInWorkshopBounds(eventLogger)) {
+                    tool.onMouseDown(this, me);
+                    me.markAsProcessed();
+                } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
+                    tool.onMouseUp(this, me);
+                    me.markAsProcessed();
+                }
+            }
+        }
+
+        tool.update(this, eventLogger.getAdjustedMousePosition());
     }
 
     private void processCompoundKeyInputs(final InputEventLogger eventLogger) {
@@ -109,33 +132,38 @@ public class ImageContext {
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
+            // set tools
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(/* TODO - assignment not final */ Key.Z, GameKeyEvent.Action.PRESS),
-                    renderInfo::scaleUp
+                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Zoom.get())
             );
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(/* TODO - assignment not final */ Key.X, GameKeyEvent.Action.PRESS),
-                    renderInfo::scaleDown
+                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Hand.get())
             );
             // TODO
 
         }
     }
 
+    private boolean isInWorkshopBounds(final InputEventLogger eventLogger) {
+        final Coord2D m = eventLogger.getAdjustedMousePosition();
+        final Coord2D workshopM = new Coord2D(m.x - Constants.TOOLS_W, m.y - Constants.CONTEXTS_H);
+        return workshopM.x > 0 && workshopM.x < Constants.WORKSPACE_W &&
+                        workshopM.y > 0 && workshopM.y < Constants.WORKSPACE_H;
+    }
+
     private void setTargetPixel(final InputEventLogger eventLogger) {
         final Coord2D m = eventLogger.getAdjustedMousePosition();
         final Coord2D workshopM = new Coord2D(m.x - Constants.TOOLS_W, m.y - Constants.CONTEXTS_H);
-        final boolean inWorkshopBounds =
-                workshopM.x > 0 && workshopM.x < Constants.WORKSPACE_W &&
-                        workshopM.y > 0 && workshopM.y < Constants.WORKSPACE_H;
 
-        if (inWorkshopBounds) {
+        if (isInWorkshopBounds(eventLogger)) {
             final int w = states.getState().getImageWidth(),
                     h = states.getState().getImageHeight(),
-                    scaleUp = renderInfo.getScaleUp();
+                    zoomFactor = renderInfo.getZoomFactor();
             final Coord2D render = getImageRenderPositionInWorkspace(),
-                    bottomLeft = new Coord2D(render.x + (scaleUp * w),
-                            render.y + (scaleUp * h));
+                    bottomLeft = new Coord2D(render.x + (zoomFactor * w),
+                            render.y + (zoomFactor * h));
             final int targetX = (int)(((workshopM.x - render.x) / (double)(bottomLeft.x - render.x)) * w),
                     targetY = (int)(((workshopM.y - render.y) / (double)(bottomLeft.y - render.y)) * h);
 
@@ -146,20 +174,20 @@ public class ImageContext {
     }
 
     private Coord2D getImageRenderPositionInWorkspace() {
-        final int scaleUp = renderInfo.getScaleUp();
+        final int zoomFactor = renderInfo.getZoomFactor();
         final Coord2D anchor = renderInfo.getAnchor(),
                 middle = new Coord2D(Constants.WORKSPACE_W / 2, Constants.WORKSPACE_H / 2);
 
-        return new Coord2D(middle.x - (scaleUp * anchor.x),
-                middle.y - (scaleUp * anchor.y));
+        return new Coord2D(middle.x - (zoomFactor * anchor.x),
+                middle.y - (zoomFactor * anchor.y));
     }
 
     private GameImage generateCheckers() {
         final int w = states.getState().getImageWidth(),
                 h = states.getState().getImageHeight(),
-                scaleUp = renderInfo.getScaleUp();
+                zoomFactor = renderInfo.getZoomFactor();
 
-        final GameImage image = new GameImage(w * scaleUp, h * scaleUp);
+        final GameImage image = new GameImage(w * zoomFactor, h * zoomFactor);
 
         for (int x = 0; x < image.getWidth(); x += Constants.CHECKER_INCREMENT) {
             for (int y = 0; y < image.getHeight(); y += Constants.CHECKER_INCREMENT) {
@@ -280,5 +308,9 @@ public class ImageContext {
 
     public String getCanvasSizeText() {
         return states.getState().getImageWidth() + " x " + states.getState().getImageHeight();
+    }
+
+    public RenderInfo getRenderInfo() {
+        return renderInfo;
     }
 }
