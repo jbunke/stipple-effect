@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.ImageContext;
 
-public final class Hand implements Tool {
+public final class Hand extends Tool {
     private static final Hand INSTANCE;
 
     private boolean panning;

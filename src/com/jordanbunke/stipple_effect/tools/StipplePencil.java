@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.ImageContext;
 
-public final class StipplePencil implements Tool {
+public final class StipplePencil extends Tool {
     @Override
     public String getName() {
         return "Stipple Pencil";
