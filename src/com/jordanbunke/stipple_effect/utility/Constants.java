@@ -30,7 +30,7 @@ public class Constants {
             LIGHT_GREY = new Color(170, 170, 170),
             HIGHLIGHT_1 = new Color(100, 100, 255),
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
-            ACCENT_BACKGROUND = new Color(50, 50, 120);
+            ACCENT_BACKGROUND = new Color(30, 30, 90);
 
     public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
 

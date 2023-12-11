@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class GraphicsUtils {
     public static TextBuilder uiText() {
-        return uiText(Constants.BLACK);
+        return uiText(Constants.WHITE);
     }
 
     public static TextBuilder uiText(final Color color) {

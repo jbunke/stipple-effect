@@ -197,6 +197,8 @@ public class StippleEffect implements ProgramContext {
         final GameImage workspace = contexts.get(contextIndex).drawWorkspace();
         canvas.draw(workspace, Constants.TOOLS_W, Constants.CONTEXTS_H);
         // tools
+        final GameImage tools = drawTools();
+        canvas.draw(tools, 0, Constants.CONTEXTS_H);
         toolButtonMenu.render(canvas);
         // layers
         final GameImage layers = drawLayers();
@@ -254,6 +256,14 @@ public class StippleEffect implements ProgramContext {
         // TODO
 
         return colors.submit();
+    }
+
+    private GameImage drawTools() {
+        final GameImage tools = new GameImage(Constants.TOOLS_W, Constants.WORKSPACE_H);
+        tools.fillRectangle(Constants.LIGHT_GREY, 0, 0,
+                Constants.TOOLS_W, Constants.WORKSPACE_H);
+
+        return tools.submit();
     }
 
     private GameImage drawLayers() {
