@@ -40,15 +40,14 @@ public abstract class Tool {
         return ResourceLoader.loadImageResource(iconFile);
     }
 
-    // TODO - icons
     // TODO - cursors
 
-    // TODO tools - stippler, pencil, pen, eraser,
+    // TODO tools - pen, eraser,
     //  color picker,
     //  stipple select, box select, move selection, move selected pixels, magic wand select
 
     // DONE tools
-    // zoom, hand
+    // zoom, hand, stippler, pencil
 
 
     public GameImage getIcon() {

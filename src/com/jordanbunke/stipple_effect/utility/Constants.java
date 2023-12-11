@@ -9,11 +9,11 @@ public class Constants {
 
     public static final int CANVAS_W = 900, CANVAS_H = 500, SCREEN_HEIGHT_BUFFER = 80;
 
-    public static final double TICK_HZ = 150d, FPS = 30d;
+    public static final double TICK_HZ = 100d, FPS = 30d;
 
     public static final double OPAQUE = 1d, TRANSPARENT = 0d;
 
-    public static final int WORKSPACE_W = 630, TOOLS_W = 50, COLOR_PICKER_W = 220,
+    public static final int WORKSPACE_W = 650, TOOLS_W = 24, COLOR_PICKER_W = 226,
             WORKSPACE_H = 400, COLOR_PICKER_H = 200, LAYERS_H = 200, CONTEXTS_H = 76, BOTTOM_BAR_H = 24;
 
     public static final int BOTTOM_BAR_TEXT_Y_OFFSET = -4,
@@ -33,5 +33,8 @@ public class Constants {
     public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
 
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(20, 20);
-    public static final int TOOL_ICON_OFFSET = 3, TOOL_ICON_INC = 24;
+    public static final int TOOL_ICON_OFFSET = 2, TOOL_ICON_INC = 22;
+
+    // specific tools
+    public static final int DEFAULT_BRUSH_RADIUS = 2;
 }

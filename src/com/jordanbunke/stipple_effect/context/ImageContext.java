@@ -50,11 +50,13 @@ public class ImageContext {
         workspace.fillRectangle(Constants.BACKGROUND, 0, 0,
                 Constants.WORKSPACE_W, Constants.WORKSPACE_H);
 
-        final int zoomFactor = renderInfo.getZoomFactor();
+        final float zoomFactor = renderInfo.getZoomFactor();
         final Coord2D render = getImageRenderPositionInWorkspace();
-        final GameImage image = ImageProcessing.scale(states.getState().draw(), zoomFactor);
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight();
         workspace.draw(generateCheckers(), render.x, render.y);
-        workspace.draw(image, render.x, render.y);
+        workspace.draw(states.getState().draw(), render.x, render.y,
+                (int)(w * zoomFactor), (int)(h * zoomFactor));
 
         return workspace.submit();
     }
@@ -93,7 +95,7 @@ public class ImageContext {
                     states::undo
             );
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
+                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
                     states::redo
             );
             eventLogger.checkForMatchingKeyStroke(
@@ -159,11 +161,11 @@ public class ImageContext {
 
         if (isInWorkshopBounds(eventLogger)) {
             final int w = states.getState().getImageWidth(),
-                    h = states.getState().getImageHeight(),
-                    zoomFactor = renderInfo.getZoomFactor();
+                    h = states.getState().getImageHeight();
+            final float zoomFactor = renderInfo.getZoomFactor();
             final Coord2D render = getImageRenderPositionInWorkspace(),
-                    bottomLeft = new Coord2D(render.x + (zoomFactor * w),
-                            render.y + (zoomFactor * h));
+                    bottomLeft = new Coord2D(render.x + (int)(zoomFactor * w),
+                            render.y + (int)(zoomFactor * h));
             final int targetX = (int)(((workshopM.x - render.x) / (double)(bottomLeft.x - render.x)) * w),
                     targetY = (int)(((workshopM.y - render.y) / (double)(bottomLeft.y - render.y)) * h);
 
@@ -174,20 +176,20 @@ public class ImageContext {
     }
 
     private Coord2D getImageRenderPositionInWorkspace() {
-        final int zoomFactor = renderInfo.getZoomFactor();
+        final float zoomFactor = renderInfo.getZoomFactor();
         final Coord2D anchor = renderInfo.getAnchor(),
                 middle = new Coord2D(Constants.WORKSPACE_W / 2, Constants.WORKSPACE_H / 2);
 
-        return new Coord2D(middle.x - (zoomFactor * anchor.x),
-                middle.y - (zoomFactor * anchor.y));
+        return new Coord2D(middle.x - (int)(zoomFactor * anchor.x),
+                middle.y - (int)(zoomFactor * anchor.y));
     }
 
     private GameImage generateCheckers() {
         final int w = states.getState().getImageWidth(),
-                h = states.getState().getImageHeight(),
-                zoomFactor = renderInfo.getZoomFactor();
+                h = states.getState().getImageHeight();
+        final float zoomFactor = renderInfo.getZoomFactor();
 
-        final GameImage image = new GameImage(w * zoomFactor, h * zoomFactor);
+        final GameImage image = new GameImage((int)(w * zoomFactor), (int)(h * zoomFactor));
 
         for (int x = 0; x < image.getWidth(); x += Constants.CHECKER_INCREMENT) {
             for (int y = 0; y < image.getHeight(); y += Constants.CHECKER_INCREMENT) {

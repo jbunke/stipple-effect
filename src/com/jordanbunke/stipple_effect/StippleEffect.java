@@ -2,6 +2,8 @@ package com.jordanbunke.stipple_effect;
 
 import com.jordanbunke.delta_time.contexts.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
+import com.jordanbunke.delta_time.events.GameKeyEvent;
+import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
 import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
@@ -27,14 +29,15 @@ import java.util.List;
 public class StippleEffect implements ProgramContext {
     private static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
-            StipplePencil.get(), Pencil.get(),
+            StipplePencil.get(), Pencil.get(), Brush.get(),
             // TODO - populate
     };
 
     private static final StippleEffect INSTANCE;
 
     public final Game game;
-    public final GameWindow window;
+    public GameWindow window;
+    private boolean windowed;
 
     // contexts
     private final List<ImageContext> contexts;
@@ -64,11 +67,8 @@ public class StippleEffect implements ProgramContext {
         primary = Constants.BLACK;
         secondary = Constants.WHITE;
 
-        final Coord2D size = determineWindowSize();
-        window = new GameWindow(Constants.PROGRAM_NAME,
-                size.x, size.y,
-                /* TODO - program icon */ GameImage.dummy(),
-                true, false, false);
+        windowed = true;
+        window = makeWindow();
         final GameManager manager = new GameManager(0, this);
 
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
@@ -92,10 +92,21 @@ public class StippleEffect implements ProgramContext {
         get().contexts.remove(0);
     }
 
+    private GameWindow makeWindow() {
+        final Coord2D size = determineWindowSize();
+        return new GameWindow(Constants.PROGRAM_NAME,
+                size.x, size.y,
+                /* TODO - program icon */ GameImage.dummy(),
+                true, false, !windowed);
+    }
+
     private Coord2D determineWindowSize() {
-        final int h = Toolkit.getDefaultToolkit().getScreenSize().height - Constants.SCREEN_HEIGHT_BUFFER;
+        final int screenW = Toolkit.getDefaultToolkit().getScreenSize().width,
+                screenH = Toolkit.getDefaultToolkit().getScreenSize().height;
+
+        final int h = screenH - Constants.SCREEN_HEIGHT_BUFFER;
         final double scaleUp = h / (double)Constants.CANVAS_H;
-        return new Coord2D((int)(scaleUp * Constants.CANVAS_W), h);
+        return windowed ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h) : new Coord2D(screenW, screenH);
     }
 
     private Menu buildToolButtonMenu() {
@@ -111,11 +122,9 @@ public class StippleEffect implements ProgramContext {
     private SimpleMenuButton toolButtonFromTool(
             final Tool tool, final int index
     ) {
-        final Coord2D position = new Coord2D(
-                Constants.TOOL_ICON_OFFSET +
-                        (index % 2 == 0 ? 0 : Constants.TOOL_ICON_INC),
+        final Coord2D position = new Coord2D(Constants.TOOL_ICON_OFFSET,
                 Constants.CONTEXTS_H + Constants.TOOL_ICON_OFFSET +
-                        (Constants.TOOL_ICON_INC * (index / 2)));
+                        (Constants.TOOL_ICON_INC * index));
 
         return new SimpleMenuButton(position, Constants.TOOL_ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, true, () -> setTool(tool),
@@ -129,6 +138,13 @@ public class StippleEffect implements ProgramContext {
         contexts.get(contextIndex).process(eventLogger, tool);
         // tools
         toolButtonMenu.process(eventLogger);
+
+        if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
+                    this::toggleFullscreen
+            );
+        }
     }
 
     @Override
@@ -199,7 +215,7 @@ public class StippleEffect implements ProgramContext {
 
         // zoom
         final GameImage zoom = GraphicsUtils.uiText()
-                .addText((contexts.get(contextIndex).getRenderInfo().getZoomFactor() * 100) + "%")
+                .addText((contexts.get(contextIndex).getRenderInfo().getZoomText()))
                 .build().draw();
         bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
 
@@ -214,6 +230,13 @@ public class StippleEffect implements ProgramContext {
 
     public Color getSecondary() {
         return secondary;
+    }
+
+    private void toggleFullscreen() {
+        windowed = !windowed;
+
+        window = makeWindow();
+        game.replaceWindow(window);
     }
 
     public void setTool(final Tool tool) {

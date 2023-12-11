@@ -43,12 +43,11 @@ public final class Hand extends Tool {
             final ImageContext context, final Coord2D mousePosition
     ) {
         if (panning) {
-            final int zoomFactor = context.getRenderInfo().getZoomFactor();
+            final float zoomFactor = context.getRenderInfo().getZoomFactor();
 
-            // TODO - validate calculation (1: start - pos instead of vice versa, and 2: * zoomFactor instead of / zoomFactor)
             final Coord2D shift = new Coord2D(
-                    (startMousePosition.x - mousePosition.x) / zoomFactor,
-                    (startMousePosition.y - mousePosition.y) / zoomFactor
+                    (int)((startMousePosition.x - mousePosition.x) / zoomFactor),
+                    (int)((startMousePosition.y - mousePosition.y) / zoomFactor)
             );
             context.getRenderInfo().setAnchor(new Coord2D(
                     startAnchor.x + shift.x, startAnchor.y + shift.y));

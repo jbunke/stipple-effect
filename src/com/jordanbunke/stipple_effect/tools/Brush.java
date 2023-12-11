@@ -9,30 +9,32 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 
-public final class Pencil extends Tool {
-    private static final Pencil INSTANCE;
+public final class Brush extends Tool {
+    private static final Brush INSTANCE;
 
-    private boolean drawing;
+    private boolean painting;
     private Color c;
     private Coord2D lastTP;
+    private int radius;
 
     static {
-        INSTANCE = new Pencil();
+        INSTANCE = new Brush();
     }
 
-    private Pencil() {
-        drawing = false;
+    private Brush() {
+        painting = false;
         c = Constants.BLACK;
         lastTP = new Coord2D(-1, -1);
+        radius = Constants.DEFAULT_BRUSH_RADIUS;
     }
 
-    public static Pencil get() {
+    public static Brush get() {
         return INSTANCE;
     }
 
     @Override
     public String getName() {
-        return "Pencil";
+        return "Brush";
     }
 
     @Override
@@ -40,7 +42,7 @@ public final class Pencil extends Tool {
             final ImageContext context, final GameMouseEvent me
     ) {
         if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
-            drawing = true;
+            painting = true;
             c = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
@@ -52,7 +54,7 @@ public final class Pencil extends Tool {
     public void update(
             final ImageContext context, final Coord2D mousePosition
     ) {
-        if (drawing) {
+        if (painting) {
             if (context.hasTargetPixel()) {
                 final int w = context.getStates().getState().getImageWidth(),
                         h = context.getStates().getState().getImageHeight();
@@ -62,7 +64,7 @@ public final class Pencil extends Tool {
                     return;
 
                 final GameImage edit = new GameImage(w, h);
-                edit.dot(c, tp.x, tp.y);
+                populateAround(edit, tp.x, tp.y);
 
                 final int xDiff = tp.x - lastTP.x, yDiff = tp.y - lastTP.y,
                         xUnit = (int)Math.signum(xDiff),
@@ -72,12 +74,12 @@ public final class Pencil extends Tool {
                     if (Math.abs(xDiff) > Math.abs(yDiff)) {
                         for (int x = 1; x < Math.abs(xDiff); x++) {
                             final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                            edit.dot(lastTP.x + (xUnit * x), lastTP.y + (yUnit * y));
+                            populateAround(edit, lastTP.x + (xUnit * x), lastTP.y + (yUnit * y));
                         }
                     } else {
                         for (int y = 1; y < Math.abs(yDiff); y++) {
                             final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                            edit.dot(lastTP.x + (xUnit * x), lastTP.y + (yUnit * y));
+                            populateAround(edit, lastTP.x + (xUnit * x), lastTP.y + (yUnit * y));
                         }
                     }
                 }
@@ -85,7 +87,16 @@ public final class Pencil extends Tool {
                 context.editImage(edit.submit());
                 lastTP = tp;
             } else
-                drawing = false;
+                lastTP = new Coord2D(-1, -1);
+        }
+    }
+
+    private void populateAround(final GameImage edit, final int tx, final int ty) {
+        for (int x = tx - radius; x <= tx + radius; x++) {
+            for (int y = ty - radius; y <= ty + radius; y++) {
+                if (Coord2D.unitDistanceBetween(new Coord2D(x, y), new Coord2D(tx, ty)) <= radius)
+                    edit.dot(c, x, y);
+            }
         }
     }
 
@@ -93,6 +104,6 @@ public final class Pencil extends Tool {
     public void onMouseUp(
             final ImageContext context, final GameMouseEvent me
     ) {
-        drawing = false;
+        painting = false;
     }
 }
