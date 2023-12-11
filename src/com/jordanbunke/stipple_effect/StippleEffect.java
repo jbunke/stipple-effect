@@ -19,6 +19,7 @@ import com.jordanbunke.stipple_effect.context.ImageContext;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.MenuHelper;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -27,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StippleEffect implements ProgramContext {
+    private static final int PRIMARY = 0, SECONDARY = 1;
+
     private static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get()
@@ -47,8 +50,10 @@ public class StippleEffect implements ProgramContext {
     private Menu toolButtonMenu;
     private Tool tool;
 
-    // color picker
-    private Color primary, secondary;
+    // colors
+    private final Color[] colors;
+    private int colorIndex;
+    private Menu colorsMenu;
 
     static {
         INSTANCE = new StippleEffect();
@@ -64,8 +69,11 @@ public class StippleEffect implements ProgramContext {
         tool = Hand.get();
         toolButtonMenu = buildToolButtonMenu();
 
-        primary = Constants.BLACK;
-        secondary = Constants.HIGHLIGHT_1;
+        colors = new Color[2];
+        colors[PRIMARY] = Constants.BLACK;
+        colors[SECONDARY] = Constants.WHITE;
+        colorIndex = PRIMARY;
+        colorsMenu = buildColorsMenu();
 
         windowed = true;
         window = makeWindow();
@@ -109,6 +117,32 @@ public class StippleEffect implements ProgramContext {
         return windowed ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h) : new Coord2D(screenW, screenH);
     }
 
+    private Menu buildColorsMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        for (int i = 0; i < colors.length; i++) {
+            final int width = Constants.STD_TEXT_BUTTON_W;
+            final int x = (Constants.TOOLS_W + Constants.WORKSPACE_W + Constants.COLOR_PICKER_W) -
+                    (Constants.TOOL_NAME_X + ((colors.length - i) * (width + Constants.BUTTON_OFFSET)));
+            final int y = Constants.CONTEXTS_H + Constants.LAYERS_H + Constants.BUTTON_OFFSET;
+
+            final String text = switch (i) {
+                case PRIMARY -> "1st";
+                case SECONDARY -> "2nd";
+                default -> "?";
+            };
+
+            final int index = i;
+            mb.add(MenuHelper.makeTextButton(new Coord2D(x, y), width,
+                    text, () -> setColorIndex(index), i == colorIndex,
+                    colors[i]));
+        }
+
+        // TODO
+
+        return mb.build();
+    }
+
     private Menu buildToolButtonMenu() {
         final MenuBuilder mb = new MenuBuilder();
 
@@ -122,9 +156,9 @@ public class StippleEffect implements ProgramContext {
     private SimpleMenuButton toolButtonFromTool(
             final Tool tool, final int index
     ) {
-        final Coord2D position = new Coord2D(Constants.TOOL_ICON_OFFSET,
-                Constants.CONTEXTS_H + Constants.TOOL_ICON_OFFSET +
-                        (Constants.TOOL_ICON_INC * index));
+        final Coord2D position = new Coord2D(Constants.BUTTON_OFFSET,
+                Constants.CONTEXTS_H + Constants.BUTTON_OFFSET +
+                        (Constants.BUTTON_INC * index));
 
         return new SimpleMenuButton(position, Constants.TOOL_ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, true, () -> setTool(tool),
@@ -138,6 +172,8 @@ public class StippleEffect implements ProgramContext {
         contexts.get(contextIndex).process(eventLogger, tool);
         // tools
         toolButtonMenu.process(eventLogger);
+        // colors
+        colorsMenu.process(eventLogger);
 
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
             eventLogger.checkForMatchingKeyStroke(
@@ -151,6 +187,8 @@ public class StippleEffect implements ProgramContext {
     public void update(final double deltaTime) {
         // tools
         toolButtonMenu.update(deltaTime);
+        // colors
+        colorsMenu.update(deltaTime);
     }
 
     @Override
@@ -161,15 +199,22 @@ public class StippleEffect implements ProgramContext {
         // tools
         toolButtonMenu.render(canvas);
         // layers
-        // TODO
-        // color picker
-        // TODO
+        final GameImage layers = drawLayers();
+        canvas.draw(layers, Constants.TOOLS_W + Constants.WORKSPACE_W,
+                Constants.CONTEXTS_H);
+        // colors
+        final GameImage colors = drawColorsSegment();
+        canvas.draw(colors, Constants.TOOLS_W + Constants.WORKSPACE_W,
+                Constants.CONTEXTS_H + Constants.LAYERS_H);
+        colorsMenu.render(canvas);
         // contexts
         final GameImage contexts = drawContexts();
         canvas.draw(contexts, 0, 0);
+        // TODO - menu
         // frames
         final GameImage frames = drawFrames();
         canvas.draw(frames, Constants.CONTEXTS_W, 0);
+        // TODO - menu
         // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
         canvas.draw(bottomBar, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
@@ -197,6 +242,34 @@ public class StippleEffect implements ProgramContext {
 
     }
 
+    private GameImage drawColorsSegment() {
+        final GameImage colors = new GameImage(Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
+        colors.fillRectangle(Constants.LIGHT_GREY, 0, 0,
+                Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
+
+        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
+                .addText("Colors").build().draw();
+        colors.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+
+        // TODO
+
+        return colors.submit();
+    }
+
+    private GameImage drawLayers() {
+        final GameImage layers = new GameImage(Constants.COLOR_PICKER_W, Constants.LAYERS_H);
+        layers.fillRectangle(Constants.LIGHT_GREY, 0, 0,
+                Constants.COLOR_PICKER_W, Constants.LAYERS_H);
+
+        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
+                .addText("Layers").build().draw();
+        layers.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+
+        // TODO
+
+        return layers.submit();
+    }
+
     private GameImage drawContexts() {
         final GameImage contexts = new GameImage(Constants.CONTEXTS_W, Constants.CONTEXTS_H);
         contexts.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
@@ -204,7 +277,7 @@ public class StippleEffect implements ProgramContext {
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
                 .addText("Projects").build().draw();
-        contexts.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        contexts.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
         // TODO
 
@@ -218,7 +291,7 @@ public class StippleEffect implements ProgramContext {
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
                 .addText("Frames").build().draw();
-        frames.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        frames.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
         // TODO
 
@@ -234,40 +307,49 @@ public class StippleEffect implements ProgramContext {
         final GameImage targetPixel = GraphicsUtils.uiText()
                 .addText(contexts.get(contextIndex).getTargetPixelText())
                 .build().draw();
-        bottomBar.draw(targetPixel, Constants.TP_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        bottomBar.draw(targetPixel, Constants.TP_X, Constants.TEXT_Y_OFFSET);
 
         // image size
         final GameImage size = GraphicsUtils.uiText()
                 .addText(contexts.get(contextIndex).getCanvasSizeText())
                 .build().draw();
-        bottomBar.draw(size, Constants.SIZE_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        bottomBar.draw(size, Constants.SIZE_X, Constants.TEXT_Y_OFFSET);
 
         // active tool
         final GameImage activeToolName = GraphicsUtils.uiText()
                 .addText(tool.getBottomBarText()).build().draw();
-        bottomBar.draw(activeToolName, Constants.TOOL_NAME_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        bottomBar.draw(activeToolName, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
         // zoom
         final GameImage zoom = GraphicsUtils.uiText()
                 .addText((contexts.get(contextIndex).getRenderInfo().getZoomText()))
                 .build().draw();
-        bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+        bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.TEXT_Y_OFFSET);
 
         // TODO - selection
 
         return bottomBar.submit();
     }
 
+    private boolean isPrimary() {
+        return colorIndex == PRIMARY;
+    }
+
     public Color getPrimary() {
-        return primary;
+        return colors[PRIMARY];
     }
 
     public Color getSecondary() {
-        return secondary;
+        return colors[SECONDARY];
     }
 
     public Tool getTool() {
         return tool;
+    }
+
+    public void setColorIndex(final int colorIndex) {
+        this.colorIndex = colorIndex;
+        colorsMenu = buildColorsMenu();
     }
 
     private void toggleFullscreen() {
