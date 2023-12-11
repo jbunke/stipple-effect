@@ -98,7 +98,8 @@ public final class Brush extends ToolWithRadius {
     private void populateAround(final GameImage edit, final int tx, final int ty) {
         for (int x = tx - getRadius(); x <= tx + getRadius(); x++) {
             for (int y = ty - getRadius(); y <= ty + getRadius(); y++) {
-                if (Coord2D.unitDistanceBetween(new Coord2D(x, y), new Coord2D(tx, ty)) <= getRadius())
+                if (Math.round(Coord2D.unitDistanceBetween(
+                        new Coord2D(x, y), new Coord2D(tx, ty))) <= getRadius())
                     edit.dot(c, x, y);
             }
         }

@@ -165,13 +165,19 @@ public class StippleEffect implements ProgramContext {
         // color picker
         // TODO
         // contexts
-        // TODO
+        final GameImage contexts = drawContexts();
+        canvas.draw(contexts, 0, 0);
+        // frames
+        final GameImage frames = drawFrames();
+        canvas.draw(frames, Constants.CONTEXTS_W, 0);
         // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
         canvas.draw(bottomBar, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
 
         // borders
         canvas.setColor(Constants.BLACK);
+        canvas.drawLine(1f, Constants.CONTEXTS_W, 0,
+                Constants.CONTEXTS_W, Constants.CONTEXTS_H);
         canvas.drawLine(1f, 0, Constants.CONTEXTS_H,
                 Constants.CANVAS_W, Constants.CONTEXTS_H);
         canvas.drawLine(1f, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H,
@@ -189,6 +195,34 @@ public class StippleEffect implements ProgramContext {
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {
 
+    }
+
+    private GameImage drawContexts() {
+        final GameImage contexts = new GameImage(Constants.CONTEXTS_W, Constants.CONTEXTS_H);
+        contexts.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+                Constants.CONTEXTS_W, Constants.CONTEXTS_H);
+
+        final GameImage sectionTitle = GraphicsUtils.uiText()
+                .addText("Projects").build().draw();
+        contexts.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+
+        // TODO
+
+        return contexts.submit();
+    }
+
+    private GameImage drawFrames() {
+        final GameImage frames = new GameImage(Constants.FRAMES_W, Constants.CONTEXTS_H);
+        frames.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+                Constants.FRAMES_W, Constants.CONTEXTS_H);
+
+        final GameImage sectionTitle = GraphicsUtils.uiText()
+                .addText("Frames").build().draw();
+        frames.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
+
+        // TODO
+
+        return frames.submit();
     }
 
     private GameImage drawBottomBar() {

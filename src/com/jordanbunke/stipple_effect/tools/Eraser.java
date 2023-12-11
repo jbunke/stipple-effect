@@ -84,7 +84,8 @@ public final class Eraser extends ToolWithRadius {
     private void populateAround(final boolean[][] eraseMask, final int tx, final int ty) {
         for (int x = Math.max(tx - getRadius(), 0); x <= Math.min(tx + getRadius(), eraseMask.length - 1); x++) {
             for (int y = Math.max(ty - getRadius(), 0); y <= Math.min(ty + getRadius(), eraseMask[x].length - 1); y++) {
-                if (Coord2D.unitDistanceBetween(new Coord2D(x, y), new Coord2D(tx, ty)) <= getRadius())
+                if (Math.round(Coord2D.unitDistanceBetween(
+                        new Coord2D(x, y), new Coord2D(tx, ty))) <= getRadius())
                     eraseMask[x][y] = true;
             }
         }
