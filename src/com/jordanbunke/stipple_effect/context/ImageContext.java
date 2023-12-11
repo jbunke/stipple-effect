@@ -207,6 +207,21 @@ public class ImageContext {
 
     // TODO - TOOL
 
+    // IMAGE EDITING
+    public void editImage(final GameImage edit) {
+        // build resultant state
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight();
+        final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
+        final SELayer replacement = states.getState().getEditingLayer().returnEdit(edit);
+        final int index = states.getState().getLayerEditIndex();
+        layers.remove(index);
+        layers.add(index, replacement);
+
+        final ImageState result = new ImageState(w, h, layers, index);
+        states.performAction(result);
+    }
+
     // LAYER MANIPULATION
     // add layer
     public void addLayer() {
@@ -301,9 +316,16 @@ public class ImageContext {
     }
 
     // GETTERS
+    public boolean hasTargetPixel() {
+        return targetPixel != UNTARGETED;
+    }
+
+    public Coord2D getTargetPixel() {
+        return targetPixel;
+    }
+
     public String getTargetPixelText() {
-        return targetPixel == UNTARGETED
-                ? "--" : targetPixel.toString();
+        return hasTargetPixel() ? targetPixel.toString() : "--";
     }
 
     public String getCanvasSizeText() {
@@ -312,5 +334,9 @@ public class ImageContext {
 
     public RenderInfo getRenderInfo() {
         return renderInfo;
+    }
+
+    public StateManager<ImageState> getStates() {
+        return states;
     }
 }

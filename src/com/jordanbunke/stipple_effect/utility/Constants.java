@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.utility.Coord2D;
+
 import java.awt.*;
 
 public class Constants {
@@ -7,7 +9,7 @@ public class Constants {
 
     public static final int CANVAS_W = 900, CANVAS_H = 500, SCREEN_HEIGHT_BUFFER = 80;
 
-    public static final double TICK_HZ = 50d, FPS = 30d;
+    public static final double TICK_HZ = 150d, FPS = 30d;
 
     public static final double OPAQUE = 1d, TRANSPARENT = 0d;
 
@@ -16,9 +18,9 @@ public class Constants {
 
     public static final int BOTTOM_BAR_TEXT_Y_OFFSET = -4,
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
-            TP_X = (int)(CANVAS_W * 0.16),
-            SIZE_X = (int)(CANVAS_W * 0.31),
-            ZOOM_PCT_X = (int)(CANVAS_W * 0.46);
+            TP_X = (int)(CANVAS_W * 0.21),
+            SIZE_X = (int)(CANVAS_W * 0.36),
+            ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
@@ -29,4 +31,7 @@ public class Constants {
             ACCENT_BACKGROUND = new Color(30, 30, 90);
 
     public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
+
+    public static final Coord2D TOOL_ICON_DIMS = new Coord2D(20, 20);
+    public static final int TOOL_ICON_OFFSET = 3, TOOL_ICON_INC = 24;
 }

@@ -7,11 +7,14 @@ import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
+import com.jordanbunke.delta_time.menus.Menu;
+import com.jordanbunke.delta_time.menus.MenuBuilder;
+import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.context.ImageContext;
-import com.jordanbunke.stipple_effect.tools.Hand;
-import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
@@ -22,15 +25,27 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StippleEffect implements ProgramContext {
+    private static final Tool[] ALL_TOOLS = new Tool[] {
+            Hand.get(), Zoom.get(),
+            StipplePencil.get(), Pencil.get(),
+            // TODO - populate
+    };
+
     private static final StippleEffect INSTANCE;
 
     public final Game game;
     public final GameWindow window;
 
+    // contexts
     private final List<ImageContext> contexts;
     private int contextIndex;
 
+    // tools
+    private Menu toolButtonMenu;
     private Tool tool;
+
+    // color picker
+    private Color primary, secondary;
 
     static {
         INSTANCE = new StippleEffect();
@@ -44,6 +59,10 @@ public class StippleEffect implements ProgramContext {
 
         // default tool is the hand
         tool = Hand.get();
+        toolButtonMenu = buildToolButtonMenu();
+
+        primary = Constants.BLACK;
+        secondary = Constants.WHITE;
 
         final Coord2D size = determineWindowSize();
         window = new GameWindow(Constants.PROGRAM_NAME,
@@ -55,12 +74,6 @@ public class StippleEffect implements ProgramContext {
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
         game.setCanvasSize(Constants.CANVAS_W, Constants.CANVAS_H);
         game.getDebugger().muteChannel(GameDebugger.FRAME_RATE);
-    }
-
-    private Coord2D determineWindowSize() {
-        final int h = Toolkit.getDefaultToolkit().getScreenSize().height - Constants.SCREEN_HEIGHT_BUFFER;
-        final double scaleUp = h / (double)Constants.CANVAS_H;
-        return new Coord2D((int)(scaleUp * Constants.CANVAS_W), h);
     }
 
     public static StippleEffect get() {
@@ -79,15 +92,49 @@ public class StippleEffect implements ProgramContext {
         get().contexts.remove(0);
     }
 
+    private Coord2D determineWindowSize() {
+        final int h = Toolkit.getDefaultToolkit().getScreenSize().height - Constants.SCREEN_HEIGHT_BUFFER;
+        final double scaleUp = h / (double)Constants.CANVAS_H;
+        return new Coord2D((int)(scaleUp * Constants.CANVAS_W), h);
+    }
+
+    private Menu buildToolButtonMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        for (int i = 0; i < ALL_TOOLS.length; i++) {
+            mb.add(toolButtonFromTool(ALL_TOOLS[i], i));
+        }
+
+        return mb.build();
+    }
+
+    private SimpleMenuButton toolButtonFromTool(
+            final Tool tool, final int index
+    ) {
+        final Coord2D position = new Coord2D(
+                Constants.TOOL_ICON_OFFSET +
+                        (index % 2 == 0 ? 0 : Constants.TOOL_ICON_INC),
+                Constants.CONTEXTS_H + Constants.TOOL_ICON_OFFSET +
+                        (Constants.TOOL_ICON_INC * (index / 2)));
+
+        return new SimpleMenuButton(position, Constants.TOOL_ICON_DIMS,
+                MenuElement.Anchor.LEFT_TOP, true, () -> setTool(tool),
+                this.tool.equals(tool) ? tool.getSelectedIcon() : tool.getIcon(),
+                tool.getHighlightedIcon());
+    }
+
     @Override
     public void process(final InputEventLogger eventLogger) {
         // workspace
         contexts.get(contextIndex).process(eventLogger, tool);
+        // tools
+        toolButtonMenu.process(eventLogger);
     }
 
     @Override
     public void update(final double deltaTime) {
-
+        // tools
+        toolButtonMenu.update(deltaTime);
     }
 
     @Override
@@ -96,7 +143,7 @@ public class StippleEffect implements ProgramContext {
         final GameImage workspace = contexts.get(contextIndex).drawWorkspace();
         canvas.draw(workspace, Constants.TOOLS_W, Constants.CONTEXTS_H);
         // tools
-        // TODO
+        toolButtonMenu.render(canvas);
         // layers
         // TODO
         // color picker
@@ -121,6 +168,11 @@ public class StippleEffect implements ProgramContext {
         canvas.drawLine(1f, Constants.TOOLS_W + Constants.WORKSPACE_W,
                 Constants.CONTEXTS_H, Constants.TOOLS_W + Constants.WORKSPACE_W,
                 Constants.CONTEXTS_H + Constants.WORKSPACE_H);
+    }
+
+    @Override
+    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
+
     }
 
     private GameImage drawBottomBar() {
@@ -156,12 +208,16 @@ public class StippleEffect implements ProgramContext {
         return bottomBar.submit();
     }
 
-    @Override
-    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
+    public Color getPrimary() {
+        return primary;
+    }
 
+    public Color getSecondary() {
+        return secondary;
     }
 
     public void setTool(final Tool tool) {
         this.tool = tool;
+        toolButtonMenu = buildToolButtonMenu();
     }
 }

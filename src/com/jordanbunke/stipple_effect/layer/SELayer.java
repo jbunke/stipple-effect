@@ -26,6 +26,13 @@ public final class SELayer {
         this.enabled = enabled;
     }
 
+    public SELayer returnEdit(final GameImage edit) {
+        final GameImage composed = new GameImage(content);
+        composed.draw(edit);
+
+        return new SELayer(composed.submit(), opacity, enabled);
+    }
+
     public GameImage getContent() {
         return content;
     }
