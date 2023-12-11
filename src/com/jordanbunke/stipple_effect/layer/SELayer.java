@@ -33,6 +33,19 @@ public final class SELayer {
         return new SELayer(composed.submit(), opacity, enabled);
     }
 
+    public SELayer returnEdit(final boolean[][] eraserMask) {
+        final GameImage after = new GameImage(content);
+
+        for (int x = 0; x < after.getWidth(); x++) {
+            for (int y = 0; y < after.getHeight(); y++) {
+                if (eraserMask[x][y])
+                    after.setRGB(x, y, new Color(0, 0, 0, 0).getRGB());
+            }
+        }
+
+        return new SELayer(after.submit(), opacity, enabled);
+    }
+
     public GameImage getContent() {
         return content;
     }

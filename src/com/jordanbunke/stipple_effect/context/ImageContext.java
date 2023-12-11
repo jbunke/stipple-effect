@@ -1,8 +1,10 @@
 package com.jordanbunke.stipple_effect.context;
 
-import com.jordanbunke.delta_time.events.*;
+import com.jordanbunke.delta_time.events.GameEvent;
+import com.jordanbunke.delta_time.events.GameKeyEvent;
+import com.jordanbunke.delta_time.events.GameMouseEvent;
+import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -10,9 +12,7 @@ import com.jordanbunke.stipple_effect.layer.LayerCombiner;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.state.ImageState;
 import com.jordanbunke.stipple_effect.state.StateManager;
-import com.jordanbunke.stipple_effect.tools.Hand;
-import com.jordanbunke.stipple_effect.tools.Tool;
-import com.jordanbunke.stipple_effect.tools.Zoom;
+import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ImageContext {
     private static final Coord2D UNTARGETED = new Coord2D(-1, -1);
 
-    private final StateManager<ImageState> states;
+    private final StateManager states;
     private final RenderInfo renderInfo;
 
     private Coord2D targetPixel;
@@ -40,7 +40,7 @@ public class ImageContext {
     private ImageContext(
             final ImageState imageState, final int imageWidth, final int imageHeight
     ) {
-        this.states = new StateManager<>(imageState);
+        this.states = new StateManager(imageState);
         this.renderInfo = new RenderInfo(imageWidth, imageHeight);
         this.targetPixel = UNTARGETED;
     }
@@ -92,11 +92,11 @@ public class ImageContext {
         if (eventLogger.isPressed(Key.CTRL) && !eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    states::undo
+                    states::undoToCheckpoint
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    states::redo
+                    states::redoToCheckpoint
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
@@ -122,6 +122,14 @@ public class ImageContext {
         // CTRL and SHIFT
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
+                    states::undo
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
+                    states::redo
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     () -> {} // TODO - save as
             );
@@ -143,8 +151,62 @@ public class ImageContext {
                     GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
                     () -> StippleEffect.get().setTool(Hand.get())
             );
-            // TODO
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(StipplePencil.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Pencil.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Brush.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Eraser.get())
+            );
 
+            // tool modifications
+            if (StippleEffect.get().getTool() instanceof ToolWithRadius twr) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        twr::increaseRadius
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        twr::decreaseRadius
+                );
+            } else if (StippleEffect.get().getTool() instanceof Hand) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> getRenderInfo().incrementAnchor(new Coord2D(0, 1))
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> getRenderInfo().incrementAnchor(new Coord2D(0, -1))
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> getRenderInfo().incrementAnchor(new Coord2D(1, 0))
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> getRenderInfo().incrementAnchor(new Coord2D(-1, 0))
+                );
+            } else if (StippleEffect.get().getTool() instanceof Zoom) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> getRenderInfo().zoomIn()
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> getRenderInfo().zoomOut()
+                );
+            }
+
+            // TODO
         }
     }
 
@@ -220,7 +282,22 @@ public class ImageContext {
         layers.remove(index);
         layers.add(index, replacement);
 
-        final ImageState result = new ImageState(w, h, layers, index);
+        final ImageState result = new ImageState(w, h, layers, index, false);
+        states.performAction(result);
+    }
+
+    // ERASING
+    public void erase(final boolean[][] eraseMask) {
+        // build resultant state
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight();
+        final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
+        final SELayer replacement = states.getState().getEditingLayer().returnEdit(eraseMask);
+        final int index = states.getState().getLayerEditIndex();
+        layers.remove(index);
+        layers.add(index, replacement);
+
+        final ImageState result = new ImageState(w, h, layers, index, false);
         states.performAction(result);
     }
 
@@ -338,7 +415,7 @@ public class ImageContext {
         return renderInfo;
     }
 
-    public StateManager<ImageState> getStates() {
-        return states;
+    public ImageState getState() {
+        return states.getState();
     }
 }

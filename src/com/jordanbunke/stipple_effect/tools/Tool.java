@@ -49,6 +49,9 @@ public abstract class Tool {
     // DONE tools
     // zoom, hand, stippler, pencil
 
+    public String getBottomBarText() {
+        return getName();
+    }
 
     public GameImage getIcon() {
         return icon;

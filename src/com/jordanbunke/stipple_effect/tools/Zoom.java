@@ -30,6 +30,8 @@ public final class Zoom extends Tool {
             case LEFT -> context.getRenderInfo().zoomIn();
             case RIGHT -> context.getRenderInfo().zoomOut();
         }
+
+        context.getRenderInfo().setAnchor(context.getTargetPixel());
     }
 
     @Override

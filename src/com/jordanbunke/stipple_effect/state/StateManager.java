@@ -3,11 +3,11 @@ package com.jordanbunke.stipple_effect.state;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StateManager<T> {
+public class StateManager {
     private int index;
-    private final List<T> states;
+    private final List<ImageState> states;
 
-    public StateManager(final T initialState) {
+    public StateManager(final ImageState initialState) {
         this.states = new ArrayList<>(List.of(initialState));
         index = 0;
     }
@@ -21,6 +21,12 @@ public class StateManager<T> {
             index--;
     }
 
+    public void undoToCheckpoint() {
+        do {
+            undo();
+        } while (canUndo() && !getState().isCheckpoint());
+    }
+
     public boolean canRedo() {
         return index + 1 < states.size();
     }
@@ -30,7 +36,13 @@ public class StateManager<T> {
             index++;
     }
 
-    public void performAction(final T resultantState) {
+    public void redoToCheckpoint() {
+        do {
+            redo();
+        } while (canRedo() && !getState().isCheckpoint());
+    }
+
+    public void performAction(final ImageState resultantState) {
         // clear REDO stack
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
@@ -39,7 +51,7 @@ public class StateManager<T> {
         index = states.size() - 1;
     }
 
-    public T getState() {
+    public ImageState getState() {
         return states.get(index);
     }
 }

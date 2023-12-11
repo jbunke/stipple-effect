@@ -9,13 +9,12 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 
-public final class Brush extends Tool {
+public final class Brush extends ToolWithRadius {
     private static final Brush INSTANCE;
 
     private boolean painting;
     private Color c;
     private Coord2D lastTP;
-    private int radius;
 
     static {
         INSTANCE = new Brush();
@@ -25,7 +24,6 @@ public final class Brush extends Tool {
         painting = false;
         c = Constants.BLACK;
         lastTP = new Coord2D(-1, -1);
-        radius = Constants.DEFAULT_BRUSH_RADIUS;
     }
 
     public static Brush get() {
@@ -38,6 +36,11 @@ public final class Brush extends Tool {
     }
 
     @Override
+    public String getBottomBarText() {
+        return getName() + " (" + (1 + (2 * getRadius())) + " px)";
+    }
+
+    @Override
     public void onMouseDown(
             final ImageContext context, final GameMouseEvent me
     ) {
@@ -47,6 +50,7 @@ public final class Brush extends Tool {
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
             lastTP = new Coord2D(-1, -1);
+            context.getState().markAsCheckpoint();
         }
     }
 
@@ -56,8 +60,8 @@ public final class Brush extends Tool {
     ) {
         if (painting) {
             if (context.hasTargetPixel()) {
-                final int w = context.getStates().getState().getImageWidth(),
-                        h = context.getStates().getState().getImageHeight();
+                final int w = context.getState().getImageWidth(),
+                        h = context.getState().getImageHeight();
                 final Coord2D tp = context.getTargetPixel();
 
                 if (tp.equals(lastTP))
@@ -92,9 +96,9 @@ public final class Brush extends Tool {
     }
 
     private void populateAround(final GameImage edit, final int tx, final int ty) {
-        for (int x = tx - radius; x <= tx + radius; x++) {
-            for (int y = ty - radius; y <= ty + radius; y++) {
-                if (Coord2D.unitDistanceBetween(new Coord2D(x, y), new Coord2D(tx, ty)) <= radius)
+        for (int x = tx - getRadius(); x <= tx + getRadius(); x++) {
+            for (int y = ty - getRadius(); y <= ty + getRadius(); y++) {
+                if (Coord2D.unitDistanceBetween(new Coord2D(x, y), new Coord2D(tx, ty)) <= getRadius())
                     edit.dot(c, x, y);
             }
         }
@@ -105,5 +109,6 @@ public final class Brush extends Tool {
             final ImageContext context, final GameMouseEvent me
     ) {
         painting = false;
+        context.getState().markAsCheckpoint();
     }
 }

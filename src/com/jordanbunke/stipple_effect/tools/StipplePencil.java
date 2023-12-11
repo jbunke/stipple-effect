@@ -33,8 +33,8 @@ public final class StipplePencil extends Tool {
             final ImageContext context, final GameMouseEvent me
     ) {
         if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
-            final int w = context.getStates().getState().getImageWidth(),
-                    h = context.getStates().getState().getImageHeight();
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
             final Coord2D tp = context.getTargetPixel();
             final Color c = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.get().getPrimary()
@@ -43,6 +43,7 @@ public final class StipplePencil extends Tool {
             final GameImage edit = new GameImage(w, h);
             edit.dot(c, tp.x, tp.y);
             context.editImage(edit.submit());
+            context.getState().markAsCheckpoint();
         }
     }
 

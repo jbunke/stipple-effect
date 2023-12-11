@@ -13,10 +13,6 @@ public class RenderInfo {
         this.zoomFactor = DEF_ZOOM;
     }
 
-    public void setZoomFactor(final float zoomFactor) {
-        this.zoomFactor = zoomFactor;
-    }
-
     public void zoomIn() {
         if (zoomFactor < MAX_ZOOM)
             zoomFactor *= 2f;
@@ -32,7 +28,7 @@ public class RenderInfo {
     }
 
     public void incrementAnchor(final Coord2D delta) {
-        this.anchor = new Coord2D(anchor.x + delta.x, anchor.y + delta.y);
+        this.anchor = anchor.displace(delta);
     }
 
     public String getZoomText() {

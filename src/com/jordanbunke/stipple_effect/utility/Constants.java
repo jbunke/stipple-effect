@@ -36,5 +36,5 @@ public class Constants {
     public static final int TOOL_ICON_OFFSET = 2, TOOL_ICON_INC = 22;
 
     // specific tools
-    public static final int DEFAULT_BRUSH_RADIUS = 2;
+    public static final int DEFAULT_BRUSH_RADIUS = 2, MIN_RADIUS = 0, MAX_RADIUS = 200;
 }

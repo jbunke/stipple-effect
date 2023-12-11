@@ -29,7 +29,7 @@ import java.util.List;
 public class StippleEffect implements ProgramContext {
     private static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
-            StipplePencil.get(), Pencil.get(), Brush.get(),
+            StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get()
             // TODO - populate
     };
 
@@ -65,7 +65,7 @@ public class StippleEffect implements ProgramContext {
         toolButtonMenu = buildToolButtonMenu();
 
         primary = Constants.BLACK;
-        secondary = Constants.WHITE;
+        secondary = Constants.HIGHLIGHT_1;
 
         windowed = true;
         window = makeWindow();
@@ -210,7 +210,7 @@ public class StippleEffect implements ProgramContext {
 
         // active tool
         final GameImage activeToolName = GraphicsUtils.uiText()
-                .addText(tool.getName()).build().draw();
+                .addText(tool.getBottomBarText()).build().draw();
         bottomBar.draw(activeToolName, Constants.TOOL_NAME_X, Constants.BOTTOM_BAR_TEXT_Y_OFFSET);
 
         // zoom
@@ -230,6 +230,10 @@ public class StippleEffect implements ProgramContext {
 
     public Color getSecondary() {
         return secondary;
+    }
+
+    public Tool getTool() {
+        return tool;
     }
 
     private void toggleFullscreen() {

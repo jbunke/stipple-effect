@@ -4,11 +4,12 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImageState {
+    private boolean checkpoint;
+
     private final int imageWidth, imageHeight;
 
     // LAYER
@@ -29,11 +30,21 @@ public class ImageState {
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex
     ) {
+        this(imageWidth, imageHeight, layers, layerEditIndex, true);
+    }
+
+    public ImageState(
+            final int imageWidth, final int imageHeight,
+            final List<SELayer> layers, final int layerEditIndex,
+            final boolean checkpoint
+    ) {
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
 
         this.layers = layers;
         this.layerEditIndex = layerEditIndex;
+
+        this.checkpoint = checkpoint;
     }
 
     public GameImage draw() {
@@ -56,6 +67,10 @@ public class ImageState {
             this.layerEditIndex = layerEditIndex;
     }
 
+    public void markAsCheckpoint() {
+        this.checkpoint = true;
+    }
+
     public boolean canRemoveLayer() {
         return layers.size() > 1;
     }
@@ -66,6 +81,10 @@ public class ImageState {
 
     public boolean canMoveLayerUp() {
         return layerEditIndex + 1 < layers.size();
+    }
+
+    public boolean isCheckpoint() {
+        return checkpoint;
     }
 
     public SELayer getEditingLayer() {

@@ -45,6 +45,7 @@ public final class Pencil extends Tool {
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
             lastTP = new Coord2D(-1, -1);
+            context.getState().markAsCheckpoint();
         }
     }
 
@@ -54,8 +55,8 @@ public final class Pencil extends Tool {
     ) {
         if (drawing) {
             if (context.hasTargetPixel()) {
-                final int w = context.getStates().getState().getImageWidth(),
-                        h = context.getStates().getState().getImageHeight();
+                final int w = context.getState().getImageWidth(),
+                        h = context.getState().getImageHeight();
                 final Coord2D tp = context.getTargetPixel();
 
                 if (tp.equals(lastTP))
@@ -94,5 +95,6 @@ public final class Pencil extends Tool {
             final ImageContext context, final GameMouseEvent me
     ) {
         drawing = false;
+        context.getState().markAsCheckpoint();
     }
 }
