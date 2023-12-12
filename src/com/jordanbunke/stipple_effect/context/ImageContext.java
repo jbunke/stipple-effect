@@ -166,6 +166,10 @@ public class ImageContext {
                     GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
                     () -> StippleEffect.get().setTool(Eraser.get())
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(ColorPicker.get())
+            );
 
             // tool modifications
             if (StippleEffect.get().getTool() instanceof ToolWithRadius twr) {

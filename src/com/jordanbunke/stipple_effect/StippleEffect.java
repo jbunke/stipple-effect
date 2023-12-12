@@ -29,11 +29,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StippleEffect implements ProgramContext {
-    private static final int PRIMARY = 0, SECONDARY = 1;
+    public static final int PRIMARY = 0, SECONDARY = 1;
 
     private static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
-            StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get()
+            StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
+            ColorPicker.get()
             // TODO - populate
     };
 
@@ -361,6 +362,12 @@ public class StippleEffect implements ProgramContext {
 
     public void setColorIndex(final int colorIndex) {
         this.colorIndex = colorIndex;
+        colorsMenu = buildColorsMenu();
+    }
+
+    public void setColorIndexAndColor(final int colorIndex, final Color color) {
+        this.colorIndex = colorIndex;
+        setSelectedColor(color);
         colorsMenu = buildColorsMenu();
     }
 
