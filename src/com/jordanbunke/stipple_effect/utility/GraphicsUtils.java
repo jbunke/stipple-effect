@@ -35,7 +35,7 @@ public class GraphicsUtils {
         final int height = Constants.STD_TEXT_BUTTON_H;
 
         final Color textColor = (backgroundColor.getRed() + backgroundColor.getGreen() +
-                backgroundColor.getBlue()) / 3 > 127
+                backgroundColor.getBlue()) / 3 > Constants.COLOR_BUTTON_AVG_C_THRESHOLD
                 ? Constants.BLACK : Constants.WHITE;
 
         final GameImage nhi = new GameImage(width, height);

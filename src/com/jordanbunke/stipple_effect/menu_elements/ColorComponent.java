@@ -6,7 +6,6 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
-import com.jordanbunke.delta_time.menus.menu_elements.invisible.PlaceholderMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -55,9 +54,12 @@ public class ColorComponent extends MenuElementContainer {
         menuElements[LABEL_INDEX] = TextLabel.make(
                 startingPosition.displace(Constants.TOOL_NAME_X, Constants.COLOR_LABEL_OFFSET_Y),
                 label, Constants.BLACK);
-        menuElements[VALUE_INDEX] = new PlaceholderMenuElement();
-
-        // TODO - menu elements: value
+        menuElements[VALUE_INDEX] = new DynamicLabel(
+                startingPosition.displace(Constants.COLOR_PICKER_W - Constants.TOOL_NAME_X,
+                        Constants.COLOR_LABEL_OFFSET_Y),
+                Anchor.RIGHT_TOP, Constants.BLACK, () -> String.valueOf(initialValueGetter.call()),
+                Constants.DYNAMIC_LABEL_W_ALLOWANCE
+        );
     }
 
     @Override

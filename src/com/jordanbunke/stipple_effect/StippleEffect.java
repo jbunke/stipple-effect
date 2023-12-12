@@ -134,8 +134,6 @@ public class StippleEffect implements ProgramContext {
 
         mb.add(ColorSelector.make());
 
-        // TODO: potentially complete
-
         return mb.build();
     }
 

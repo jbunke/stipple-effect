@@ -17,7 +17,7 @@ public class DynamicLabel extends MenuElement {
 
     private final Color c;
 
-    private String label = "";
+    private String label;
     private GameImage labelImage;
 
     public DynamicLabel(
@@ -47,7 +47,15 @@ public class DynamicLabel extends MenuElement {
         final GameImage l = GraphicsUtils.uiText(c).addText(label).build().draw();
         labelImage = new GameImage(getWidth(), getHeight());
 
-        // TODO
+        final Coord2D offset = switch (getAnchor()) {
+            case RIGHT_TOP, RIGHT_CENTRAL, RIGHT_BOTTOM ->
+                    new Coord2D((labelImage.getWidth() - l.getWidth()), 0);
+            case CENTRAL, CENTRAL_BOTTOM, CENTRAL_TOP ->
+                    new Coord2D((labelImage.getWidth() - l.getWidth()) / 2, 0);
+            default -> new Coord2D();
+        };
+
+        labelImage.draw(l, offset.x, offset.y);
 
         labelImage.free();
     }
