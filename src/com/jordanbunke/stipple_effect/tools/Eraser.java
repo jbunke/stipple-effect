@@ -93,7 +93,10 @@ public final class Eraser extends ToolWithRadius {
 
     @Override
     public void onMouseUp(final ImageContext context, final GameMouseEvent me) {
-        erasing = false;
-        context.getState().markAsCheckpoint();
+        if (erasing) {
+            erasing = false;
+            context.getState().markAsCheckpoint();
+            me.markAsProcessed();
+        }
     }
 }

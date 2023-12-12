@@ -79,7 +79,6 @@ public class ImageContext {
                     me.markAsProcessed();
                 } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
                     tool.onMouseUp(this, me);
-                    me.markAsProcessed();
                 }
             }
         }

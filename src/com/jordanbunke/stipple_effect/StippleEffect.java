@@ -16,6 +16,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.menu_elements.ColorSelector;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
@@ -57,6 +58,8 @@ public class StippleEffect implements ProgramContext {
 
     static {
         INSTANCE = new StippleEffect();
+
+        INSTANCE.colorsMenu = INSTANCE.buildColorsMenu();
     }
 
     public StippleEffect() {
@@ -73,7 +76,7 @@ public class StippleEffect implements ProgramContext {
         colors[PRIMARY] = Constants.BLACK;
         colors[SECONDARY] = Constants.WHITE;
         colorIndex = PRIMARY;
-        colorsMenu = buildColorsMenu();
+        colorsMenu = new MenuBuilder().build();
 
         windowed = true;
         window = makeWindow();
@@ -138,7 +141,9 @@ public class StippleEffect implements ProgramContext {
                     colors[i]));
         }
 
-        // TODO
+        mb.add(ColorSelector.make());
+
+        // TODO: potentially complete
 
         return mb.build();
     }
@@ -345,6 +350,10 @@ public class StippleEffect implements ProgramContext {
         return colorIndex == PRIMARY;
     }
 
+    public Color getSelectedColor() {
+        return colors[colorIndex];
+    }
+
     public Color getPrimary() {
         return colors[PRIMARY];
     }
@@ -355,6 +364,10 @@ public class StippleEffect implements ProgramContext {
 
     public Tool getTool() {
         return tool;
+    }
+
+    public void setSelectedColor(final Color color) {
+        colors[colorIndex] = color;
     }
 
     public void setColorIndex(final int colorIndex) {

@@ -94,7 +94,10 @@ public final class Pencil extends Tool {
     public void onMouseUp(
             final ImageContext context, final GameMouseEvent me
     ) {
-        drawing = false;
-        context.getState().markAsCheckpoint();
+        if (drawing) {
+            drawing = false;
+            context.getState().markAsCheckpoint();
+            me.markAsProcessed();
+        }
     }
 }

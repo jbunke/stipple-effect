@@ -34,7 +34,9 @@ public class Constants {
 
     public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
 
-    public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 80, STD_TEXT_BUTTON_H = 24;
+    public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 80, STD_TEXT_BUTTON_H = 24,
+            COLOR_SELECTOR_OFFSET_Y = 40, COLOR_SELECTOR_INC_Y = 30,
+            SLIDER_W = 160, SLIDER_H = 20, SLIDER_BALL_W = 8;
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
     public static final int BUTTON_OFFSET = 2, BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2;
 

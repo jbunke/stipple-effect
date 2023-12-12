@@ -109,7 +109,10 @@ public final class Brush extends ToolWithRadius {
     public void onMouseUp(
             final ImageContext context, final GameMouseEvent me
     ) {
-        painting = false;
-        context.getState().markAsCheckpoint();
+        if (painting) {
+            painting = false;
+            context.getState().markAsCheckpoint();
+            me.markAsProcessed();
+        }
     }
 }

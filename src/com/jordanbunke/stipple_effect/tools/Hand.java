@@ -58,6 +58,9 @@ public final class Hand extends Tool {
     public void onMouseUp(
             final ImageContext context, final GameMouseEvent me
     ) {
-        panning = false;
+        if (panning) {
+            panning = false;
+            me.markAsProcessed();
+        }
     }
 }
