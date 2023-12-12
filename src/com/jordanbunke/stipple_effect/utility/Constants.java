@@ -36,7 +36,8 @@ public class Constants {
 
     public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 80, STD_TEXT_BUTTON_H = 24,
             COLOR_SELECTOR_OFFSET_Y = 40, COLOR_SELECTOR_INC_Y = 44,
-            SLIDER_W = 256, SLIDER_H = 20, SLIDER_BALL_W = 20, COLOR_LABEL_OFFSET_Y = -18;
+            SLIDER_W = 256, SLIDER_H = 20, SLIDER_BALL_W = 20, COLOR_LABEL_OFFSET_Y = -18,
+            DYNAMIC_LABEL_H = 40;
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
     public static final int BUTTON_OFFSET = 2, BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2;
 
