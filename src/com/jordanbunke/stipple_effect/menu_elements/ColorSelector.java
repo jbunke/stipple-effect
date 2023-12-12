@@ -19,7 +19,7 @@ public class ColorSelector extends MenuElementGrouping {
         final List<MenuElement> menuElements = new ArrayList<>();
 
         // red
-        menuElements.add(new ValueElement(0, 255, "R",
+        menuElements.add(new ColorComponent(0, 255, "Red",
                 r -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(r, c.getGreen(), c.getBlue(), c.getAlpha());
@@ -30,7 +30,7 @@ public class ColorSelector extends MenuElementGrouping {
                         Constants.CONTEXTS_H + Constants.LAYERS_H +
                                 Constants.COLOR_SELECTOR_OFFSET_Y)));
         // green
-        menuElements.add(new ValueElement(0, 255, "G",
+        menuElements.add(new ColorComponent(0, 255, "Green",
                 g -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(c.getRed(), g, c.getBlue(), c.getAlpha());
@@ -42,7 +42,7 @@ public class ColorSelector extends MenuElementGrouping {
                                 Constants.COLOR_SELECTOR_OFFSET_Y +
                                 Constants.COLOR_SELECTOR_INC_Y)));
         // blue
-        menuElements.add(new ValueElement(0, 255, "B",
+        menuElements.add(new ColorComponent(0, 255, "Blue",
                 b -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(c.getRed(), c.getGreen(), b, c.getAlpha());
@@ -54,7 +54,7 @@ public class ColorSelector extends MenuElementGrouping {
                                 Constants.COLOR_SELECTOR_OFFSET_Y +
                                 (2 * Constants.COLOR_SELECTOR_INC_Y))));
         // alpha
-        menuElements.add(new ValueElement(0, 255, "A",
+        menuElements.add(new ColorComponent(0, 255, "Opacity",
                 a -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);

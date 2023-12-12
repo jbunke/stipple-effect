@@ -13,8 +13,8 @@ public class Constants {
 
     public static final double OPAQUE = 1d, TRANSPARENT = 0d;
 
-    public static final int WORKSPACE_W = 680, CONTEXTS_W = CANVAS_W / 2,
-            FRAMES_W = CANVAS_W / 2, TOOLS_W = 24, COLOR_PICKER_W = 256,
+    public static final int WORKSPACE_W = 650, CONTEXTS_W = CANVAS_W / 2,
+            FRAMES_W = CANVAS_W / 2, TOOLS_W = 24, COLOR_PICKER_W = 286,
             WORKSPACE_H = 432, COLOR_PICKER_H = WORKSPACE_H / 2, LAYERS_H = WORKSPACE_H / 2,
             CONTEXTS_H = 84, BOTTOM_BAR_H = 24;
 
@@ -35,8 +35,8 @@ public class Constants {
     public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
 
     public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 80, STD_TEXT_BUTTON_H = 24,
-            COLOR_SELECTOR_OFFSET_Y = 40, COLOR_SELECTOR_INC_Y = 30,
-            SLIDER_W = 160, SLIDER_H = 20, SLIDER_BALL_W = 8;
+            COLOR_SELECTOR_OFFSET_Y = 40, COLOR_SELECTOR_INC_Y = 44,
+            SLIDER_W = 256, SLIDER_H = 20, SLIDER_BALL_W = 20, COLOR_LABEL_OFFSET_Y = -18;
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
     public static final int BUTTON_OFFSET = 2, BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2;
 

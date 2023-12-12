@@ -16,11 +16,11 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.menu_elements.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.ColorSelector;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
-import com.jordanbunke.stipple_effect.utility.MenuHelper;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -129,16 +129,7 @@ public class StippleEffect implements ProgramContext {
                     (Constants.TOOL_NAME_X + ((colors.length - i) * (width + Constants.BUTTON_OFFSET)));
             final int y = Constants.CONTEXTS_H + Constants.LAYERS_H + Constants.BUTTON_OFFSET;
 
-            final String text = switch (i) {
-                case PRIMARY -> "1st";
-                case SECONDARY -> "2nd";
-                default -> "?";
-            };
-
-            final int index = i;
-            mb.add(MenuHelper.makeTextButton(new Coord2D(x, y), width,
-                    text, () -> setColorIndex(index), i == colorIndex,
-                    colors[i]));
+            mb.add(new ColorButton(new Coord2D(x, y), i));
         }
 
         mb.add(ColorSelector.make());
@@ -346,8 +337,8 @@ public class StippleEffect implements ProgramContext {
         return bottomBar.submit();
     }
 
-    private boolean isPrimary() {
-        return colorIndex == PRIMARY;
+    public int getColorIndex() {
+        return colorIndex;
     }
 
     public Color getSelectedColor() {

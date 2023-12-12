@@ -7,26 +7,29 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Slider extends MenuElement {
+public class ColorSlider extends MenuElement {
     private final int minValue, maxValue;
     private int value;
 
     private final Function<Integer, Color> spectralFunction;
     private final Consumer<Integer> setter;
+    private Color cLastUpdate;
 
-    private boolean sliding;
+    private boolean sliding, isHighlighted;
     private int onClickDiffX;
 
-    private GameImage spectrum;
+    private GameImage base, highlighted, selected;
 
-    public Slider(
+    public ColorSlider(
             final Coord2D position, final Coord2D dimensions,
             final int minValue, final int maxValue, final int initialValue,
             final Function<Integer, Color> spectralFunction,
@@ -41,6 +44,8 @@ public class Slider extends MenuElement {
 
         this.spectralFunction = spectralFunction;
         this.setter = setter;
+
+        cLastUpdate = StippleEffect.get().getSelectedColor();
 
         sliding = false;
         onClickDiffX = 0;
@@ -60,8 +65,7 @@ public class Slider extends MenuElement {
                     case DOWN -> {
                         if (mouseInBounds) {
                             me.markAsProcessed();
-                            final boolean validX = Math.abs(mp.x - getSliderBallX()) <=
-                                    Constants.SLIDER_BALL_W / 2;
+                            final boolean validX = isValidXForHighlight(mp.x);
 
                             if (validX) {
                                 sliding = true;
@@ -79,6 +83,8 @@ public class Slider extends MenuElement {
             }
         }
 
+        isHighlighted = mouseIsWithinBounds(mp) && isValidXForHighlight(mp.x);
+
         if (sliding) {
             final int sliderBallX = mp.x - onClickDiffX;
             setValueFromSliderBallX(sliderBallX);
@@ -86,14 +92,26 @@ public class Slider extends MenuElement {
         }
     }
 
+    private boolean isValidXForHighlight(final int mouseX) {
+        return Math.abs(mouseX - getSliderBallX()) <= Constants.SLIDER_BALL_W / 2;
+    }
+
     @Override
     public void update(final double deltaTime) {
+        final Color c = StippleEffect.get().getSelectedColor();
 
+        if (!c.equals(cLastUpdate)) {
+            updateAssets();
+            cLastUpdate = c;
+        }
     }
 
     @Override
     public void render(final GameImage canvas) {
-        draw(spectrum, canvas);
+        final GameImage asset = sliding ? selected
+                : (isHighlighted ? highlighted : base);
+
+        draw(asset, canvas);
     }
 
     @Override
@@ -108,14 +126,17 @@ public class Slider extends MenuElement {
 
     private int getSliderBallX() {
         final Coord2D rp = getRenderPosition();
-        return rp.x + (int)(getSliderFraction() * getWidth());
+        final int sbw = Constants.SLIDER_BALL_W;
+        return rp.x + (sbw / 2) + (int)(getSliderFraction() * (getWidth() - sbw));
     }
 
     private void setValueFromSliderBallX(final int sliderBallX) {
         final int valueWas = value;
 
         final Coord2D rp = getRenderPosition();
-        final double sliderFraction = (sliderBallX - rp.x) / (double) getWidth();
+        final int sbw = Constants.SLIDER_BALL_W, sw = getWidth() - sbw,
+                startX = rp.x + (sbw / 2);
+        final double sliderFraction = (sliderBallX - startX) / (double) sw;
 
         final int prospect = getValueFromSliderFraction(sliderFraction);
         this.value = Math.max(minValue, Math.min(prospect, maxValue));
@@ -129,20 +150,59 @@ public class Slider extends MenuElement {
     }
 
     private void updateAssets() {
-        spectrum = new GameImage(getWidth(), getHeight());
+        final GameImage spectrum = new GameImage(getWidth(), getHeight());
+        final int sw = getWidth() - Constants.SLIDER_BALL_W;
 
-        for (int x = 0; x < spectrum.getWidth(); x++) {
+        for (int x = 0; x < sw; x++) {
             spectrum.fillRectangle(
-                    spectralFunction.apply(getValueFromSliderFraction(x / (double) getWidth())),
-                    x, 0, 1, getHeight());
+                    spectralFunction.apply(getValueFromSliderFraction(x / (double) sw)),
+                    (Constants.SLIDER_BALL_W / 2) + x, 0, 1, getHeight());
         }
 
-        // TODO
-        spectrum.fillRectangle(Constants.WHITE,
-                (int)(getSliderFraction() * getWidth()) -
-                        (Constants.SLIDER_BALL_W / 2),
-                0, Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+        spectrum.drawRectangle(Constants.BLACK, Constants.BUTTON_BORDER_PX,
+                Constants.SLIDER_BALL_W / 2, Constants.BUTTON_BORDER_PX / 2,
+                sw, getHeight() - Constants.BUTTON_BORDER_PX);
+
+        final GameImage baseSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H),
+                highlightedSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H),
+                selectedSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+        final GameImage[] sliderBalls = new GameImage[] {
+                baseSliderBall, highlightedSliderBall, selectedSliderBall
+        };
+
+        baseSliderBall.fillRectangle(
+                GraphicsUtils.buttonBorderColor(false), 0, 0,
+                Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+        highlightedSliderBall.fillRectangle(
+                GraphicsUtils.buttonBorderColorAlt(false), 0, 0,
+                Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+        selectedSliderBall.fillRectangle(
+                GraphicsUtils.buttonBorderColor(true), 0, 0,
+                Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+
+        for (GameImage sliderBall : sliderBalls) {
+            sliderBall.fillRectangle(
+                    spectralFunction.apply(value),
+                    Constants.BUTTON_BORDER_PX, Constants.BUTTON_BORDER_PX,
+                    Constants.SLIDER_BALL_W - (2 * Constants.BUTTON_BORDER_PX),
+                    Constants.SLIDER_H - (2 * Constants.BUTTON_BORDER_PX)
+            );
+        }
 
         spectrum.free();
+
+        base = new GameImage(spectrum);
+        highlighted = new GameImage(spectrum);
+        selected = new GameImage(spectrum);
+
+        final int sliderBallRenderX = (int)(getSliderFraction() * sw);
+
+        base.draw(baseSliderBall.submit(), sliderBallRenderX, 0);
+        highlighted.draw(highlightedSliderBall.submit(), sliderBallRenderX, 0);
+        selected.draw(selectedSliderBall.submit(), sliderBallRenderX, 0);
+
+        base.free();
+        highlighted.free();
+        selected.free();
     }
 }

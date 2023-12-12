@@ -15,12 +15,10 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ValueElement extends MenuElementContainer {
-    private static final int NUM_ELEMENTS = 5, SLIDER_INDEX = 0,
-            LABEL_INDEX = 1, VALUE_INDEX = 2,
-            INCREMENT_INDEX = 3, DECREMENT_INDEX = 4;
+public class ColorComponent extends MenuElementContainer {
+    private static final int NUM_ELEMENTS = 3, SLIDER_INDEX = 0,
+            LABEL_INDEX = 1, VALUE_INDEX = 2;
 
-    private final int minValue, maxValue;
     private int value;
 
     private final Consumer<Color> setter;
@@ -28,15 +26,12 @@ public class ValueElement extends MenuElementContainer {
 
     private final MenuElement[] menuElements;
 
-    public ValueElement(
+    public ColorComponent(
             final int minValue, final int maxValue, final String label,
             final Function<Integer, Color> spectralFunction, final Consumer<Color> setter,
             final Callable<Integer> initialValueGetter, final Coord2D startingPosition
     ) {
         super(new Coord2D(), new Coord2D(), Anchor.LEFT_TOP, false);
-
-        this.minValue = minValue;
-        this.maxValue = maxValue;
 
         this.setter = setter;
         converter = spectralFunction;
@@ -50,18 +45,19 @@ public class ValueElement extends MenuElementContainer {
 
         menuElements = new MenuElement[NUM_ELEMENTS];
 
-        menuElements[SLIDER_INDEX] = new Slider(
-                startingPosition.displace(Constants.COLOR_PICKER_W / 2, 0 /* TODO */),
-                new Coord2D(Constants.SLIDER_W, Constants.SLIDER_H),
-                this.minValue, this.maxValue, this.value,
+        menuElements[SLIDER_INDEX] = new ColorSlider(
+                startingPosition.displace(Constants.COLOR_PICKER_W / 2,
+                        Constants.COLOR_SELECTOR_INC_Y / 2),
+                new Coord2D(Constants.SLIDER_W + Constants.SLIDER_BALL_W, Constants.SLIDER_H),
+                minValue, maxValue, this.value,
                 spectralFunction, this::setValue
         );
-        menuElements[LABEL_INDEX] = new PlaceholderMenuElement();
+        menuElements[LABEL_INDEX] = TextLabel.make(
+                startingPosition.displace(Constants.TOOL_NAME_X, Constants.COLOR_LABEL_OFFSET_Y),
+                label, Constants.BLACK);
         menuElements[VALUE_INDEX] = new PlaceholderMenuElement();
-        menuElements[INCREMENT_INDEX] = new PlaceholderMenuElement();
-        menuElements[DECREMENT_INDEX] = new PlaceholderMenuElement();
 
-        // TODO - menu elements: up button, down button, label, value
+        // TODO - menu elements: value
     }
 
     @Override
