@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.menu_elements;
+package com.jordanbunke.stipple_effect.menu_elements.colors;
 
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;

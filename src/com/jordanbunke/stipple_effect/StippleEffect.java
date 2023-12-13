@@ -2,7 +2,6 @@ package com.jordanbunke.stipple_effect;
 
 import com.jordanbunke.delta_time.contexts.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
@@ -11,17 +10,14 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.Menu;
-import com.jordanbunke.delta_time.menus.MenuBuilder;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.context.ImageContext;
-import com.jordanbunke.stipple_effect.menu_elements.ColorButton;
-import com.jordanbunke.stipple_effect.menu_elements.ColorSelector;
-import com.jordanbunke.stipple_effect.tools.*;
+import com.jordanbunke.stipple_effect.tools.Hand;
+import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.MenuAssembly;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -31,13 +27,6 @@ import java.util.List;
 
 public class StippleEffect implements ProgramContext {
     public static final int PRIMARY = 0, SECONDARY = 1;
-
-    private static final Tool[] ALL_TOOLS = new Tool[] {
-            Hand.get(), Zoom.get(),
-            StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
-            ColorPicker.get()
-            // TODO - populate
-    };
 
     private static final StippleEffect INSTANCE;
 
@@ -70,7 +59,12 @@ public class StippleEffect implements ProgramContext {
 
         // initially declared as empty method because
         // builders rely on calls to INSTANCE object
-        INSTANCE.colorsMenu = INSTANCE.buildColorsMenu();
+        INSTANCE.toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+        INSTANCE.colorsMenu = MenuAssembly.buildColorsMenu();
+        INSTANCE.layersMenu = MenuAssembly.buildLayersMenu();
+        INSTANCE.framesMenu = MenuAssembly.buildFramesMenu();
+        INSTANCE.projectsMenu = MenuAssembly.buildProjectsMenu();
+
     }
 
     public StippleEffect() {
@@ -81,19 +75,19 @@ public class StippleEffect implements ProgramContext {
 
         // default tool is the hand
         tool = Hand.get();
-        toolButtonMenu = buildToolButtonMenu();
+        toolButtonMenu = MenuAssembly.stub();
 
         colors = new Color[2];
         colors[PRIMARY] = Constants.BLACK;
         colors[SECONDARY] = Constants.WHITE;
         colorIndex = PRIMARY;
-        colorsMenu = new MenuBuilder().build();
+        colorsMenu = MenuAssembly.stub();
 
-        layersMenu = buildLayersMenu();
+        layersMenu = MenuAssembly.stub();
 
-        framesMenu = buildFramesMenu();
+        framesMenu = MenuAssembly.stub();
 
-        projectsMenu = buildProjectsMenu();
+        projectsMenu = MenuAssembly.stub();
 
         windowed = true; // TODO - read from settings on startup
         window = makeWindow();
@@ -140,194 +134,13 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void rebuildStateDependentMenus() {
-        layersMenu = buildLayersMenu();
-        framesMenu = buildFramesMenu();
-        projectsMenu = buildProjectsMenu();
+        layersMenu = MenuAssembly.buildLayersMenu();
+        framesMenu = MenuAssembly.buildFramesMenu();
+        projectsMenu = MenuAssembly.buildProjectsMenu();
     }
 
     public void rebuildLayersMenu() {
-        layersMenu = buildLayersMenu();
-    }
-
-    private Menu buildProjectsMenu() {
-        final MenuBuilder mb = new MenuBuilder();
-
-        final String[] iconIDs = new String[] {
-                "new_project",
-                "open_file",
-                "save",
-                "save_as",
-                "wip", // TODO - resize
-                "wip" // TODO - pad
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                true, true, true, true, true, true
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                () -> {}, // TODO all
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {}
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Constants.getProjectsPosition());
-
-        // TODO - project previews themselves
-
-        return mb.build();
-    }
-
-    private Menu buildFramesMenu() {
-        final MenuBuilder mb = new MenuBuilder();
-
-        final String[] iconIDs = new String[] {
-                "new_frame",
-                "duplicate_frame",
-                "remove_frame",
-                "play",
-                "pause",
-                "previous",
-                "next"
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                true, // TODO - consider a setting check ... if frames are enabled for project
-                true, // TODO rest
-                true,
-                true,
-                true,
-                true,
-                true
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                () -> {}, // TODO all
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {}
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Constants.getFramesPosition());
-
-        // TODO - frames themselves
-
-        return mb.build();
-    }
-
-    private Menu buildLayersMenu() {
-        final MenuBuilder mb = new MenuBuilder();
-
-        final String[] iconIDs = new String[] {
-                "new_layer",
-                "duplicate_layer",
-                "remove_layer",
-                "move_layer_up",
-                "move_layer_down",
-                "combine_with_layer_below"
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                true,
-                true,
-                getContext().getState().canRemoveLayer(),
-                getContext().getState().canMoveLayerUp(),
-                getContext().getState().canMoveLayerDown(),
-                // identical precondition for combine case
-                getContext().getState().canMoveLayerDown()
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                () -> getContext().addLayer(),
-                () -> getContext().duplicateLayer(),
-                () -> getContext().removeLayer(),
-                () -> getContext().moveLayerUp(),
-                () -> getContext().moveLayerDown(),
-                () -> getContext().combineWithLayerBelow()
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Constants.getLayersPosition());
-
-        // TODO - layers themselves
-
-        return mb.build();
-    }
-
-    private void populateButtonsIntoBuilder(
-            final MenuBuilder mb, final String[] iconIDs,
-            final boolean[] preconditions, final Runnable[] behaviours,
-            final Coord2D segmentPosition
-    ) {
-        if (iconIDs.length != preconditions.length || iconIDs.length != behaviours.length) {
-            GameError.send("Lengths of button assembly argument arrays did not match; " +
-                    "buttons were not populated into menu builder.");
-            return;
-        }
-
-        for (int i = 0; i < iconIDs.length; i++) {
-            final Coord2D pos = segmentPosition
-                    .displace(Constants.SEGMENT_TITLE_BUTTON_OFFSET_X,
-                            Constants.BUTTON_OFFSET)
-                    .displace(i * Constants.BUTTON_INC, 0);
-            mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
-                    pos, preconditions[i], behaviours[i]));
-        }
-    }
-
-    private Menu buildColorsMenu() {
-        final MenuBuilder mb = new MenuBuilder();
-
-        populateButtonsIntoBuilder(
-                mb, new String[] { "swap_colors" }, new boolean[] { true },
-                new Runnable[] { this::swapColors }, Constants.getColorsPosition()
-        );
-
-        for (int i = 0; i < colors.length; i++) {
-            final int width = Constants.STD_TEXT_BUTTON_W;
-            final Coord2D pos = Constants.getColorsPosition().displace(
-                    Constants.COLOR_PICKER_W - (Constants.TOOL_NAME_X +
-                            ((colors.length - i) * (width + Constants.BUTTON_OFFSET))),
-                    Constants.BUTTON_OFFSET);
-
-            mb.add(new ColorButton(pos, i));
-        }
-
-        mb.add(ColorSelector.make());
-
-        return mb.build();
-    }
-
-    private Menu buildToolButtonMenu() {
-        final MenuBuilder mb = new MenuBuilder();
-
-        for (int i = 0; i < ALL_TOOLS.length; i++) {
-            mb.add(toolButtonFromTool(ALL_TOOLS[i], i));
-        }
-
-        return mb.build();
-    }
-
-    private SimpleMenuButton toolButtonFromTool(
-            final Tool tool, final int index
-    ) {
-        final Coord2D position = Constants.getToolsPosition().displace(
-                Constants.BUTTON_OFFSET,
-                Constants.BUTTON_OFFSET + (Constants.BUTTON_INC * index)
-        );
-
-        return new SimpleMenuButton(position, Constants.TOOL_ICON_DIMS,
-                MenuElement.Anchor.LEFT_TOP, true, () -> setTool(tool),
-                this.tool.equals(tool) ? tool.getSelectedIcon() : tool.getIcon(),
-                tool.getHighlightedIcon());
+        layersMenu = MenuAssembly.buildLayersMenu();
     }
 
     @Override
@@ -543,21 +356,21 @@ public class StippleEffect implements ProgramContext {
 
     public void setColorIndex(final int colorIndex) {
         this.colorIndex = colorIndex;
-        colorsMenu = buildColorsMenu();
+        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     public void setColorIndexAndColor(final int colorIndex, final Color color) {
         this.colorIndex = colorIndex;
         setSelectedColor(color);
-        colorsMenu = buildColorsMenu();
+        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
-    private void swapColors() {
+    public void swapColors() {
         final Color temp = colors[PRIMARY];
         colors[PRIMARY] = colors[SECONDARY];
         colors[SECONDARY] = temp;
 
-        colorsMenu = buildColorsMenu();
+        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     private void toggleFullscreen() {
@@ -569,6 +382,6 @@ public class StippleEffect implements ProgramContext {
 
     public void setTool(final Tool tool) {
         this.tool = tool;
-        toolButtonMenu = buildToolButtonMenu();
+        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
     }
 }
