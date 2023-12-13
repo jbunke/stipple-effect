@@ -42,13 +42,15 @@ public class StateManager {
         } while (canRedo() && !getState().isCheckpoint());
     }
 
-    public void performAction(final ImageState resultantState) {
+    public void performAction(final ImageState resultantState, final ActionType actionType) {
         // clear REDO stack
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
 
         states.add(resultantState);
         index = states.size() - 1;
+
+        actionType.consequence();
     }
 
     public ImageState getState() {

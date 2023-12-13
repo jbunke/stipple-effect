@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect;
 
 import com.jordanbunke.delta_time.contexts.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
+import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
@@ -44,9 +45,10 @@ public class StippleEffect implements ProgramContext {
     public GameWindow window;
     private boolean windowed;
 
-    // contexts
+    // projects / contexts
     private final List<ImageContext> contexts;
     private int contextIndex;
+    private Menu projectsMenu;
 
     // tools
     private Menu toolButtonMenu;
@@ -57,9 +59,17 @@ public class StippleEffect implements ProgramContext {
     private int colorIndex;
     private Menu colorsMenu;
 
+    // layers
+    private Menu layersMenu;
+
+    // frames
+    private Menu framesMenu;
+
     static {
         INSTANCE = new StippleEffect();
 
+        // initially declared as empty method because
+        // builders rely on calls to INSTANCE object
         INSTANCE.colorsMenu = INSTANCE.buildColorsMenu();
     }
 
@@ -79,7 +89,13 @@ public class StippleEffect implements ProgramContext {
         colorIndex = PRIMARY;
         colorsMenu = new MenuBuilder().build();
 
-        windowed = true;
+        layersMenu = buildLayersMenu();
+
+        framesMenu = buildFramesMenu();
+
+        projectsMenu = buildProjectsMenu();
+
+        windowed = true; // TODO - read from settings on startup
         window = makeWindow();
         final GameManager manager = new GameManager(0, this);
 
@@ -118,19 +134,171 @@ public class StippleEffect implements ProgramContext {
 
         final int h = screenH - Constants.SCREEN_HEIGHT_BUFFER;
         final double scaleUp = h / (double)Constants.CANVAS_H;
-        return windowed ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h) : new Coord2D(screenW, screenH);
+        return windowed
+                ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h)
+                : new Coord2D(screenW, screenH);
+    }
+
+    public void rebuildStateDependentMenus() {
+        layersMenu = buildLayersMenu();
+        framesMenu = buildFramesMenu();
+        projectsMenu = buildProjectsMenu();
+    }
+
+    public void rebuildLayersMenu() {
+        layersMenu = buildLayersMenu();
+    }
+
+    private Menu buildProjectsMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        final String[] iconIDs = new String[] {
+                "new_project",
+                "open_file",
+                "save",
+                "save_as",
+                "wip", // TODO - resize
+                "wip" // TODO - pad
+        };
+
+        final boolean[] preconditions = new boolean[] {
+                true, true, true, true, true, true
+        };
+
+        final Runnable[] behaviours = new Runnable[] {
+                () -> {}, // TODO all
+                () -> {},
+                () -> {},
+                () -> {},
+                () -> {},
+                () -> {}
+        };
+
+        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
+                behaviours, Constants.getProjectsPosition());
+
+        // TODO - project previews themselves
+
+        return mb.build();
+    }
+
+    private Menu buildFramesMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        final String[] iconIDs = new String[] {
+                "new_frame",
+                "duplicate_frame",
+                "remove_frame",
+                "play",
+                "pause",
+                "previous",
+                "next"
+        };
+
+        final boolean[] preconditions = new boolean[] {
+                true, // TODO - consider a setting check ... if frames are enabled for project
+                true, // TODO rest
+                true,
+                true,
+                true,
+                true,
+                true
+        };
+
+        final Runnable[] behaviours = new Runnable[] {
+                () -> {}, // TODO all
+                () -> {},
+                () -> {},
+                () -> {},
+                () -> {},
+                () -> {},
+                () -> {}
+        };
+
+        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
+                behaviours, Constants.getFramesPosition());
+
+        // TODO - frames themselves
+
+        return mb.build();
+    }
+
+    private Menu buildLayersMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        final String[] iconIDs = new String[] {
+                "new_layer",
+                "duplicate_layer",
+                "remove_layer",
+                "move_layer_up",
+                "move_layer_down",
+                "combine_with_layer_below"
+        };
+
+        final boolean[] preconditions = new boolean[] {
+                true,
+                true,
+                getContext().getState().canRemoveLayer(),
+                getContext().getState().canMoveLayerUp(),
+                getContext().getState().canMoveLayerDown(),
+                // identical precondition for combine case
+                getContext().getState().canMoveLayerDown()
+        };
+
+        final Runnable[] behaviours = new Runnable[] {
+                () -> getContext().addLayer(),
+                () -> getContext().duplicateLayer(),
+                () -> getContext().removeLayer(),
+                () -> getContext().moveLayerUp(),
+                () -> getContext().moveLayerDown(),
+                () -> getContext().combineWithLayerBelow()
+        };
+
+        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
+                behaviours, Constants.getLayersPosition());
+
+        // TODO - layers themselves
+
+        return mb.build();
+    }
+
+    private void populateButtonsIntoBuilder(
+            final MenuBuilder mb, final String[] iconIDs,
+            final boolean[] preconditions, final Runnable[] behaviours,
+            final Coord2D segmentPosition
+    ) {
+        if (iconIDs.length != preconditions.length || iconIDs.length != behaviours.length) {
+            GameError.send("Lengths of button assembly argument arrays did not match; " +
+                    "buttons were not populated into menu builder.");
+            return;
+        }
+
+        for (int i = 0; i < iconIDs.length; i++) {
+            final Coord2D pos = segmentPosition
+                    .displace(Constants.SEGMENT_TITLE_BUTTON_OFFSET_X,
+                            Constants.BUTTON_OFFSET)
+                    .displace(i * Constants.BUTTON_INC, 0);
+            mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
+                    pos, preconditions[i], behaviours[i]));
+        }
     }
 
     private Menu buildColorsMenu() {
         final MenuBuilder mb = new MenuBuilder();
 
+        populateButtonsIntoBuilder(
+                mb, new String[] { "swap_colors" }, new boolean[] { true },
+                new Runnable[] { this::swapColors }, Constants.getColorsPosition()
+        );
+
         for (int i = 0; i < colors.length; i++) {
             final int width = Constants.STD_TEXT_BUTTON_W;
-            final int x = (Constants.TOOLS_W + Constants.WORKSPACE_W + Constants.COLOR_PICKER_W) -
-                    (Constants.TOOL_NAME_X + ((colors.length - i) * (width + Constants.BUTTON_OFFSET)));
-            final int y = Constants.CONTEXTS_H + Constants.LAYERS_H + Constants.BUTTON_OFFSET;
+            final Coord2D pos = Constants.getColorsPosition().displace(
+                    Constants.COLOR_PICKER_W - (Constants.TOOL_NAME_X +
+                            ((colors.length - i) * (width + Constants.BUTTON_OFFSET))),
+                    Constants.BUTTON_OFFSET);
 
-            mb.add(new ColorButton(new Coord2D(x, y), i));
+            mb.add(new ColorButton(pos, i));
         }
 
         mb.add(ColorSelector.make());
@@ -151,9 +319,10 @@ public class StippleEffect implements ProgramContext {
     private SimpleMenuButton toolButtonFromTool(
             final Tool tool, final int index
     ) {
-        final Coord2D position = new Coord2D(Constants.BUTTON_OFFSET,
-                Constants.CONTEXTS_H + Constants.BUTTON_OFFSET +
-                        (Constants.BUTTON_INC * index));
+        final Coord2D position = Constants.getToolsPosition().displace(
+                Constants.BUTTON_OFFSET,
+                Constants.BUTTON_OFFSET + (Constants.BUTTON_INC * index)
+        );
 
         return new SimpleMenuButton(position, Constants.TOOL_ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, true, () -> setTool(tool),
@@ -163,12 +332,19 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void process(final InputEventLogger eventLogger) {
-        // workspace
-        contexts.get(contextIndex).process(eventLogger, tool);
         // tools
         toolButtonMenu.process(eventLogger);
         // colors
         colorsMenu.process(eventLogger);
+        // layers
+        layersMenu.process(eventLogger);
+        // frames
+        framesMenu.process(eventLogger);
+        // projects
+        projectsMenu.process(eventLogger);
+
+        // workspace
+        getContext().process(eventLogger, tool);
 
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
             eventLogger.checkForMatchingKeyStroke(
@@ -184,54 +360,61 @@ public class StippleEffect implements ProgramContext {
         toolButtonMenu.update(deltaTime);
         // colors
         colorsMenu.update(deltaTime);
+        // layers
+        layersMenu.update(deltaTime);
+        // frames
+        framesMenu.update(deltaTime);
+        // projects
+        projectsMenu.update(deltaTime);
     }
 
     @Override
     public void render(final GameImage canvas) {
+        final Coord2D wp = Constants.getWorkspacePosition(),
+                tp = Constants.getToolsPosition(),
+                lp = Constants.getLayersPosition(),
+                cp = Constants.getColorsPosition(),
+                pp = Constants.getProjectsPosition(),
+                fp = Constants.getFramesPosition(),
+                bbp = Constants.getBottomBarPosition();
+
         // workspace
-        final GameImage workspace = contexts.get(contextIndex).drawWorkspace();
-        canvas.draw(workspace, Constants.TOOLS_W, Constants.CONTEXTS_H);
+        final GameImage workspace = getContext().drawWorkspace();
+        canvas.draw(workspace, wp.x, wp.y);
         // tools
         final GameImage tools = drawTools();
-        canvas.draw(tools, 0, Constants.CONTEXTS_H);
+        canvas.draw(tools, tp.x, tp.y);
         toolButtonMenu.render(canvas);
         // layers
         final GameImage layers = drawLayers();
-        canvas.draw(layers, Constants.TOOLS_W + Constants.WORKSPACE_W,
-                Constants.CONTEXTS_H);
+        canvas.draw(layers, lp.x, lp.y);
+        layersMenu.render(canvas);
         // colors
         final GameImage colors = drawColorsSegment();
-        canvas.draw(colors, Constants.TOOLS_W + Constants.WORKSPACE_W,
-                Constants.CONTEXTS_H + Constants.LAYERS_H);
+        canvas.draw(colors, cp.x, cp.y);
         colorsMenu.render(canvas);
-        // contexts
-        final GameImage contexts = drawContexts();
-        canvas.draw(contexts, 0, 0);
-        // TODO - menu
+        // projects / contexts
+        final GameImage projects = drawProjects();
+        canvas.draw(projects, pp.x, pp.y);
+        projectsMenu.render(canvas);
         // frames
         final GameImage frames = drawFrames();
-        canvas.draw(frames, Constants.CONTEXTS_W, 0);
-        // TODO - menu
+        canvas.draw(frames, fp.x, fp.y);
+        framesMenu.render(canvas);
         // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
-        canvas.draw(bottomBar, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
+        canvas.draw(bottomBar, bbp.x, bbp.y);
 
         // borders
+        final float strokeWidth = 2f;
+
         canvas.setColor(Constants.BLACK);
-        canvas.drawLine(1f, Constants.CONTEXTS_W, 0,
-                Constants.CONTEXTS_W, Constants.CONTEXTS_H);
-        canvas.drawLine(1f, 0, Constants.CONTEXTS_H,
-                Constants.CANVAS_W, Constants.CONTEXTS_H);
-        canvas.drawLine(1f, 0, Constants.CONTEXTS_H + Constants.WORKSPACE_H,
-                Constants.CANVAS_W, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
-        canvas.drawLine(1f, Constants.TOOLS_W + Constants.WORKSPACE_W,
-                Constants.CONTEXTS_H + Constants.LAYERS_H, Constants.CANVAS_W,
-                Constants.CONTEXTS_H + Constants.LAYERS_H);
-        canvas.drawLine(1f, Constants.TOOLS_W, Constants.CONTEXTS_H,
-                Constants.TOOLS_W, Constants.CONTEXTS_H + Constants.WORKSPACE_H);
-        canvas.drawLine(1f, Constants.TOOLS_W + Constants.WORKSPACE_W,
-                Constants.CONTEXTS_H, Constants.TOOLS_W + Constants.WORKSPACE_W,
-                Constants.CONTEXTS_H + Constants.WORKSPACE_H);
+        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, wp.y); // projects and frame separation
+        canvas.drawLine(strokeWidth, pp.x, tp.y, Constants.CANVAS_W, tp.y); // top segments and middle separation
+        canvas.drawLine(strokeWidth, bbp.x, bbp.y, Constants.CANVAS_W, bbp.y); // middle segments and bottom bar separation
+        canvas.drawLine(strokeWidth, cp.x, cp.y, Constants.CANVAS_W, cp.y); // layers and colors separation
+        canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
+        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace and right segments separation
     }
 
     @Override
@@ -247,8 +430,6 @@ public class StippleEffect implements ProgramContext {
         final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
                 .addText("Colors").build().draw();
         colors.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
-
-        // TODO
 
         return colors.submit();
     }
@@ -270,23 +451,19 @@ public class StippleEffect implements ProgramContext {
                 .addText("Layers").build().draw();
         layers.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
-        // TODO
-
         return layers.submit();
     }
 
-    private GameImage drawContexts() {
-        final GameImage contexts = new GameImage(Constants.CONTEXTS_W, Constants.CONTEXTS_H);
-        contexts.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+    private GameImage drawProjects() {
+        final GameImage projects = new GameImage(Constants.CONTEXTS_W, Constants.CONTEXTS_H);
+        projects.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
                 Constants.CONTEXTS_W, Constants.CONTEXTS_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
-                .addText("Projects").build().draw();
-        contexts.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+                .addText("Project").build().draw();
+        projects.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
-        // TODO
-
-        return contexts.submit();
+        return projects.submit();
     }
 
     private GameImage drawFrames() {
@@ -298,8 +475,6 @@ public class StippleEffect implements ProgramContext {
                 .addText("Frames").build().draw();
         frames.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
-        // TODO
-
         return frames.submit();
     }
 
@@ -310,13 +485,13 @@ public class StippleEffect implements ProgramContext {
 
         // target pixel
         final GameImage targetPixel = GraphicsUtils.uiText()
-                .addText(contexts.get(contextIndex).getTargetPixelText())
+                .addText(getContext().getTargetPixelText())
                 .build().draw();
         bottomBar.draw(targetPixel, Constants.TP_X, Constants.TEXT_Y_OFFSET);
 
         // image size
         final GameImage size = GraphicsUtils.uiText()
-                .addText(contexts.get(contextIndex).getCanvasSizeText())
+                .addText(getContext().getCanvasSizeText())
                 .build().draw();
         bottomBar.draw(size, Constants.SIZE_X, Constants.TEXT_Y_OFFSET);
 
@@ -327,13 +502,19 @@ public class StippleEffect implements ProgramContext {
 
         // zoom
         final GameImage zoom = GraphicsUtils.uiText()
-                .addText((contexts.get(contextIndex).getRenderInfo().getZoomText()))
+                .addText((getContext().getRenderInfo().getZoomText()))
                 .build().draw();
         bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.TEXT_Y_OFFSET);
 
         // TODO - selection
 
+        // TODO - help shortcut (Ctrl + H) once behaviour implemented
+
         return bottomBar.submit();
+    }
+
+    public ImageContext getContext() {
+        return contexts.get(contextIndex);
     }
 
     public int getColorIndex() {
@@ -368,6 +549,14 @@ public class StippleEffect implements ProgramContext {
     public void setColorIndexAndColor(final int colorIndex, final Color color) {
         this.colorIndex = colorIndex;
         setSelectedColor(color);
+        colorsMenu = buildColorsMenu();
+    }
+
+    private void swapColors() {
+        final Color temp = colors[PRIMARY];
+        colors[PRIMARY] = colors[SECONDARY];
+        colors[SECONDARY] = temp;
+
         colorsMenu = buildColorsMenu();
     }
 

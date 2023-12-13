@@ -156,12 +156,13 @@ public class ColorSlider extends MenuElement {
         for (int x = 0; x < sw; x++) {
             spectrum.fillRectangle(
                     spectralFunction.apply(getValueFromSliderFraction(x / (double) sw)),
-                    (Constants.SLIDER_BALL_W / 2) + x, 0, 1, getHeight());
+                    (Constants.SLIDER_BALL_W / 2) + x, Constants.SLIDER_THINNING,
+                    1, getHeight() - (2 * Constants.SLIDER_THINNING));
         }
 
-        spectrum.drawRectangle(Constants.BLACK, Constants.BUTTON_BORDER_PX,
-                Constants.SLIDER_BALL_W / 2, Constants.BUTTON_BORDER_PX / 2,
-                sw, getHeight() - Constants.BUTTON_BORDER_PX);
+        spectrum.drawRectangle(Constants.BLACK, Constants.BUTTON_BORDER_PX, Constants.SLIDER_BALL_W / 2,
+                Constants.SLIDER_THINNING + (Constants.BUTTON_BORDER_PX / 2), sw,
+                getHeight() - (Constants.BUTTON_BORDER_PX + (2 * Constants.SLIDER_THINNING)));
 
         final GameImage baseSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H),
                 highlightedSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H),

@@ -6,6 +6,7 @@ public class LayerCombiner {
     public static SELayer combine(final SELayer above, final SELayer below) {
         final GameImage content = new GameImage(below.getContent());
         content.draw(above.renderContent());
-        return new SELayer(content.submit(), below.getOpacity(), below.isEnabled());
+        return new SELayer(content.submit(), below.getOpacity(),
+                below.isEnabled(), below.getName());
     }
 }

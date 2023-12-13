@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerCombiner;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ImageState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
@@ -74,7 +75,7 @@ public class ImageContext {
     ) {
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
             if (e instanceof GameMouseEvent me) {
-                if (me.matchesAction(GameMouseEvent.Action.DOWN) && isInWorkshopBounds(eventLogger)) {
+                if (me.matchesAction(GameMouseEvent.Action.DOWN) && isInWorkspaceBounds(eventLogger)) {
                     tool.onMouseDown(this, me);
                     me.markAsProcessed();
                 } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
@@ -110,6 +111,14 @@ public class ImageContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
                     () -> {} // TODO - deselect
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - previous frame
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - next frame
             );
         }
 
@@ -213,18 +222,23 @@ public class ImageContext {
         }
     }
 
-    private boolean isInWorkshopBounds(final InputEventLogger eventLogger) {
-        final Coord2D m = eventLogger.getAdjustedMousePosition();
-        final Coord2D workshopM = new Coord2D(m.x - Constants.TOOLS_W, m.y - Constants.CONTEXTS_H);
+    private Coord2D getMouseOffsetInWorkspace(final InputEventLogger eventLogger) {
+        final Coord2D
+                m = eventLogger.getAdjustedMousePosition(),
+                wp = Constants.getWorkspacePosition();
+        return new Coord2D(m.x - wp.x, m.y - wp.y);
+    }
+
+    private boolean isInWorkspaceBounds(final InputEventLogger eventLogger) {
+        final Coord2D workshopM = getMouseOffsetInWorkspace(eventLogger);
         return workshopM.x > 0 && workshopM.x < Constants.WORKSPACE_W &&
                         workshopM.y > 0 && workshopM.y < Constants.WORKSPACE_H;
     }
 
     private void setTargetPixel(final InputEventLogger eventLogger) {
-        final Coord2D m = eventLogger.getAdjustedMousePosition();
-        final Coord2D workshopM = new Coord2D(m.x - Constants.TOOLS_W, m.y - Constants.CONTEXTS_H);
+        final Coord2D workshopM = getMouseOffsetInWorkspace(eventLogger);
 
-        if (isInWorkshopBounds(eventLogger)) {
+        if (isInWorkspaceBounds(eventLogger)) {
             final int w = states.getState().getImageWidth(),
                     h = states.getState().getImageHeight();
             final float zoomFactor = renderInfo.getZoomFactor();
@@ -280,13 +294,13 @@ public class ImageContext {
         final int w = states.getState().getImageWidth(),
                 h = states.getState().getImageHeight();
         final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
-        final SELayer replacement = states.getState().getEditingLayer().returnEdit(edit);
+        final SELayer replacement = states.getState().getEditingLayer().returnEdited(edit);
         final int index = states.getState().getLayerEditIndex();
         layers.remove(index);
         layers.add(index, replacement);
 
         final ImageState result = new ImageState(w, h, layers, index, false);
-        states.performAction(result);
+        states.performAction(result, ActionType.CANVAS);
     }
 
     // ERASING
@@ -295,13 +309,13 @@ public class ImageContext {
         final int w = states.getState().getImageWidth(),
                 h = states.getState().getImageHeight();
         final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
-        final SELayer replacement = states.getState().getEditingLayer().returnEdit(eraseMask);
+        final SELayer replacement = states.getState().getEditingLayer().returnEdited(eraseMask);
         final int index = states.getState().getLayerEditIndex();
         layers.remove(index);
         layers.add(index, replacement);
 
         final ImageState result = new ImageState(w, h, layers, index, false);
-        states.performAction(result);
+        states.performAction(result, ActionType.CANVAS);
     }
 
     // LAYER MANIPULATION
@@ -315,7 +329,20 @@ public class ImageContext {
         layers.add(addIndex, new SELayer(w, h));
 
         final ImageState result = new ImageState(w, h, layers, addIndex);
-        states.performAction(result);
+        states.performAction(result, ActionType.LAYER);
+    }
+
+    // add layer
+    public void duplicateLayer() {
+        // build resultant state
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight();
+        final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
+        final int addIndex = states.getState().getLayerEditIndex() + 1;
+        layers.add(addIndex, states.getState().getEditingLayer().duplicate());
+
+        final ImageState result = new ImageState(w, h, layers, addIndex);
+        states.performAction(result, ActionType.LAYER);
     }
 
     // remove layer
@@ -330,7 +357,7 @@ public class ImageContext {
             layers.remove(index);
 
             final ImageState result = new ImageState(w, h, layers, index > 0 ? index - 1 : index);
-            states.performAction(result);
+            states.performAction(result, ActionType.LAYER);
         }
     }
 
@@ -350,7 +377,7 @@ public class ImageContext {
             layers.add(reinsertionIndex, toMove);
 
             final ImageState result = new ImageState(w, h, layers, reinsertionIndex);
-            states.performAction(result);
+            states.performAction(result, ActionType.LAYER);
         }
     }
 
@@ -370,7 +397,7 @@ public class ImageContext {
             layers.add(reinsertionIndex, toMove);
 
             final ImageState result = new ImageState(w, h, layers, reinsertionIndex);
-            states.performAction(result);
+            states.performAction(result, ActionType.LAYER);
         }
     }
 
@@ -393,7 +420,7 @@ public class ImageContext {
             layers.add(belowIndex, combined);
 
             final ImageState result = new ImageState(w, h, layers, belowIndex);
-            states.performAction(result);
+            states.performAction(result, ActionType.LAYER);
         }
     }
 

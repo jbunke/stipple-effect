@@ -3,9 +3,12 @@ package com.jordanbunke.stipple_effect.utility;
 import com.jordanbunke.delta_time.utility.Coord2D;
 
 import java.awt.*;
+import java.nio.file.Path;
 
 public class Constants {
     public static final String PROGRAM_NAME = "Stipple Effect";
+
+    public static final Path ICON_FOLDER = Path.of("icons");
 
     public static final int CANVAS_W = 960, CANVAS_H = 540, SCREEN_HEIGHT_BUFFER = 80;
 
@@ -17,6 +20,34 @@ public class Constants {
             FRAMES_W = CANVAS_W / 2, TOOLS_W = 24, COLOR_PICKER_W = 286,
             WORKSPACE_H = 432, COLOR_PICKER_H = WORKSPACE_H / 2, LAYERS_H = WORKSPACE_H / 2,
             CONTEXTS_H = 84, BOTTOM_BAR_H = 24;
+
+    public static Coord2D getProjectsPosition() {
+        return new Coord2D();
+    }
+
+    public static Coord2D getFramesPosition() {
+        return getProjectsPosition().displace(CONTEXTS_W, 0);
+    }
+
+    public static Coord2D getToolsPosition() {
+        return getProjectsPosition().displace(0, CONTEXTS_H);
+    }
+
+    public static Coord2D getWorkspacePosition() {
+        return getToolsPosition().displace(TOOLS_W, 0);
+    }
+
+    public static Coord2D getLayersPosition() {
+        return getWorkspacePosition().displace(WORKSPACE_W, 0);
+    }
+
+    public static Coord2D getColorsPosition() {
+        return getLayersPosition().displace(0, LAYERS_H);
+    }
+
+    public static Coord2D getBottomBarPosition() {
+        return getToolsPosition().displace(0, WORKSPACE_H);
+    }
 
     public static final int TEXT_Y_OFFSET = -4,
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
@@ -34,12 +65,14 @@ public class Constants {
 
     public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
 
-    public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 80, STD_TEXT_BUTTON_H = 24,
+    public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = BUTTON_DIM,
+            BUTTON_TEXT_OFFSET_Y = -6,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,
-            SLIDER_W = 256, SLIDER_H = 20, SLIDER_BALL_W = 20, COLOR_LABEL_OFFSET_Y = -18,
+            SLIDER_W = 256, SLIDER_H = 20, SLIDER_BALL_W = 20, SLIDER_THINNING = 4, COLOR_LABEL_OFFSET_Y = -18,
             DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100;
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
-    public static final int BUTTON_OFFSET = 2, BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2;
+    public static final int BUTTON_OFFSET = 2, BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET,
+            BUTTON_BORDER_PX = 2, SEGMENT_TITLE_BUTTON_OFFSET_X = 74;
 
     // specific tools
     public static final int DEFAULT_BRUSH_RADIUS = 2, MIN_RADIUS = 0, MAX_RADIUS = 200;

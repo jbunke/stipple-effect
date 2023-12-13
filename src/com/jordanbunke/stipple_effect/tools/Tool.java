@@ -5,27 +5,24 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.nio.file.Path;
 
 public abstract class Tool {
-    private static final Path ICON_FOLDER = Path.of("tool_icons");
-    private static final GameImage
-            HIGHLIGHT_OVERLAY = ResourceLoader.loadImageResource(
-                    ICON_FOLDER.resolve("highlighted.png")),
-            SELECT_OVERLAY = ResourceLoader.loadImageResource(
-                    ICON_FOLDER.resolve("selected.png"));
-
     private final GameImage icon, highlightedIcon, selectedIcon;
 
     Tool() {
         this.icon = fetchIcon();
 
         this.highlightedIcon = new GameImage(icon);
-        highlightedIcon.draw(HIGHLIGHT_OVERLAY);
+        highlightedIcon.draw(GraphicsUtils.HIGHLIGHT_OVERLAY);
+        highlightedIcon.free();
 
         this.selectedIcon = new GameImage(icon);
-        selectedIcon.draw(SELECT_OVERLAY);
+        selectedIcon.draw(GraphicsUtils.SELECT_OVERLAY);
+        selectedIcon.free();
     }
 
     public abstract String getName();
@@ -34,7 +31,7 @@ public abstract class Tool {
     public abstract void onMouseUp(final ImageContext context, final GameMouseEvent me);
 
     private GameImage fetchIcon() {
-        final Path iconFile = ICON_FOLDER.resolve(getName()
+        final Path iconFile = Constants.ICON_FOLDER.resolve(getName()
                 .replace(" ", "_").toLowerCase() + ".png");
 
         return ResourceLoader.loadImageResource(iconFile);

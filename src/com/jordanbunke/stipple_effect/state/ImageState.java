@@ -18,7 +18,7 @@ public class ImageState {
 
     public ImageState(final GameImage image) {
         this(image.getWidth(), image.getHeight(), new ArrayList<>(List.of(
-                new SELayer(image, Constants.OPAQUE, true))), 0);
+                new SELayer(image))), 0);
     }
 
     public ImageState(final int imageWidth, final int imageHeight) {
