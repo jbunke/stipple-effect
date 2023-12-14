@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.ImageContext;
 
-public final class Eraser extends ToolWithRadius {
+public final class Eraser extends ToolWithBreadth {
     private static final Eraser INSTANCE;
 
     private boolean erasing;
@@ -29,11 +29,6 @@ public final class Eraser extends ToolWithRadius {
     }
 
     @Override
-    public String getBottomBarText() {
-        return getName() + " (" + (1 + (2 * getRadius())) + " px)";
-    }
-
-    @Override
     public void onMouseDown(final ImageContext context, final GameMouseEvent me) {
         if (context.hasTargetPixel()) {
             erasing = true;
@@ -54,7 +49,7 @@ public final class Eraser extends ToolWithRadius {
                     return;
 
                 final boolean[][] eraseMask = new boolean[w][h];
-                populateAround(eraseMask, tp.x, tp.y);
+                populateAround(eraseMask, tp);
 
                 final int xDiff = tp.x - lastTP.x, yDiff = tp.y - lastTP.y,
                         xUnit = (int) Math.signum(xDiff),
@@ -64,12 +59,12 @@ public final class Eraser extends ToolWithRadius {
                     if (Math.abs(xDiff) > Math.abs(yDiff)) {
                         for (int x = 1; x < Math.abs(xDiff); x++) {
                             final int y = (int) (x * Math.abs(yDiff / (double) xDiff));
-                            populateAround(eraseMask, lastTP.x + (xUnit * x), lastTP.y + (yUnit * y));
+                            populateAround(eraseMask, lastTP.displace(xUnit * x, yUnit * y));
                         }
                     } else {
                         for (int y = 1; y < Math.abs(yDiff); y++) {
                             final int x = (int) (y * Math.abs(xDiff / (double) yDiff));
-                            populateAround(eraseMask, lastTP.x + (xUnit * x), lastTP.y + (yUnit * y));
+                            populateAround(eraseMask, lastTP.displace(xUnit * x, yUnit * y));
                         }
                     }
                 }
@@ -81,14 +76,25 @@ public final class Eraser extends ToolWithRadius {
         }
     }
 
-    private void populateAround(final boolean[][] eraseMask, final int tx, final int ty) {
-        for (int x = Math.max(tx - getRadius(), 0); x <= Math.min(tx + getRadius(), eraseMask.length - 1); x++) {
-            for (int y = Math.max(ty - getRadius(), 0); y <= Math.min(ty + getRadius(), eraseMask[x].length - 1); y++) {
-                if (Math.round(Coord2D.unitDistanceBetween(
-                        new Coord2D(x, y), new Coord2D(tx, ty))) <= getRadius())
+    private void populateAround(final boolean[][] eraseMask, final Coord2D tp) {
+        final int remainder = getBreadth() % 2, halfB = (getBreadth() / 2) + remainder;
+
+        for (int x = tp.x - halfB; x < tp.x + halfB; x++)
+            for (int y = tp.y - halfB; y < tp.y + halfB; y++) {
+                if (x < 0 || y < 0 || x >= eraseMask.length || y >= eraseMask[x].length)
+                    continue;
+
+                final double distance = remainder == 1
+                        ? Coord2D.unitDistanceBetween(new Coord2D(x, y), tp)
+                        : Coord2D.unitDistanceBetween(
+                        new Coord2D((2 * x) + 1, (2 * y) + 1),
+                        new Coord2D(tp.x * 2, tp.y * 2)),
+                        threshold = remainder == 1
+                                ? getBreadth() / 2. : (double) getBreadth();
+
+                if (distance <= threshold)
                     eraseMask[x][y] = true;
             }
-        }
     }
 
     @Override

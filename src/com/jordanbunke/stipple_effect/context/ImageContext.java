@@ -102,7 +102,7 @@ public class ImageContext {
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     () -> {} // TODO - context needs a field for a save path and a save mode ->
                     // PNG, static vs animated,
-                    // animated can be frame by frame alongside, saved as separate files, or as GIF
+                    // animated can be frame-by-frame alongside, saved as separate files, or as GIF
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
@@ -181,7 +181,7 @@ public class ImageContext {
             );
 
             // tool modifications
-            if (StippleEffect.get().getTool() instanceof ToolWithRadius twr) {
+            if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         twr::increaseRadius
