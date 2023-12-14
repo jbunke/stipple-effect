@@ -64,12 +64,12 @@ public class Constants {
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
             WHITE = new Color(255, 255, 255),
-            LIGHT_GREY = new Color(170, 170, 170),
+            ACCENT_BACKGROUND_LIGHT = new Color(180, 180, 231),
             GREY = new Color(127, 127, 127),
             DARK = new Color(55, 55, 55),
             HIGHLIGHT_1 = new Color(100, 100, 255),
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
-            ACCENT_BACKGROUND = new Color(30, 30, 90);
+            ACCENT_BACKGROUND_DARK = new Color(30, 30, 90);
 
     public static final int DEFAULT_IMAGE_W = 48, DEFAULT_IMAGE_H = 48, CHECKER_INCREMENT = 4;
 

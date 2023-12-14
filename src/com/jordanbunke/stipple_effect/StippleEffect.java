@@ -243,7 +243,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawColorsSegment() {
         final GameImage colors = new GameImage(Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
-        colors.fillRectangle(Constants.LIGHT_GREY, 0, 0,
+        colors.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0,
                 Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
@@ -255,7 +255,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawTools() {
         final GameImage tools = new GameImage(Constants.TOOLS_W, Constants.WORKSPACE_H);
-        tools.fillRectangle(Constants.LIGHT_GREY, 0, 0,
+        tools.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0,
                 Constants.TOOLS_W, Constants.WORKSPACE_H);
 
         return tools.submit();
@@ -263,7 +263,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawLayers() {
         final GameImage layers = new GameImage(Constants.COLOR_PICKER_W, Constants.LAYERS_H);
-        layers.fillRectangle(Constants.LIGHT_GREY, 0, 0,
+        layers.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0,
                 Constants.COLOR_PICKER_W, Constants.LAYERS_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
@@ -275,7 +275,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawProjects() {
         final GameImage projects = new GameImage(Constants.CONTEXTS_W, Constants.CONTEXTS_H);
-        projects.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+        projects.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Constants.CONTEXTS_W, Constants.CONTEXTS_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
@@ -287,7 +287,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawFrames() {
         final GameImage frames = new GameImage(Constants.FRAMES_W, Constants.CONTEXTS_H);
-        frames.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+        frames.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Constants.FRAMES_W, Constants.CONTEXTS_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
@@ -299,7 +299,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawBottomBar() {
         final GameImage bottomBar = new GameImage(Constants.CANVAS_W, Constants.BOTTOM_BAR_H);
-        bottomBar.fillRectangle(Constants.ACCENT_BACKGROUND, 0, 0,
+        bottomBar.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Constants.CANVAS_W, Constants.BOTTOM_BAR_H);
 
         // target pixel

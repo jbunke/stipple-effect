@@ -160,7 +160,7 @@ public class MenuAssembly {
 
         // frame content
 
-        final int amount = /* TODO - temp */ Constants.MAX_NUM_FRAMES, elementsPerFrame = 1;
+        final int amount = StippleEffect.get().getContext().getState().getFrameCount(), elementsPerFrame = 1;
 
         final ScrollableMenuElement[] frameElements = new ScrollableMenuElement[amount * elementsPerFrame];
 
@@ -181,11 +181,8 @@ public class MenuAssembly {
 
             frameElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
-                    i, () -> /* TODO */ 0,
-                    s -> {
-                        // TODO -  frame index setter w/ rebuild included so can be removed below
-                        StippleEffect.get().rebuildFramesMenu();
-                    }
+                    i, () -> StippleEffect.get().getContext().getState().getFrameIndex(),
+                    s -> StippleEffect.get().getContext().getState().setFrameIndex(s)
             ));
 
             realRightX = pos.x + dims.x;

@@ -45,7 +45,7 @@ public final class Pencil extends Tool {
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
             lastTP = new Coord2D(-1, -1);
-            context.getState().markAsCheckpoint(false);
+            context.getState().markAsCheckpoint(false, context);
         }
     }
 
@@ -96,7 +96,7 @@ public final class Pencil extends Tool {
     ) {
         if (drawing) {
             drawing = false;
-            context.getState().markAsCheckpoint(true);
+            context.getState().markAsCheckpoint(true, context);
             me.markAsProcessed();
         }
     }

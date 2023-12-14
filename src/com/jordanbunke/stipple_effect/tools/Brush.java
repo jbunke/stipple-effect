@@ -45,7 +45,7 @@ public final class Brush extends ToolWithBreadth {
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
             lastTP = new Coord2D(-1, -1);
-            context.getState().markAsCheckpoint(false);
+            context.getState().markAsCheckpoint(false, context);
         }
     }
 
@@ -114,7 +114,7 @@ public final class Brush extends ToolWithBreadth {
     ) {
         if (painting) {
             painting = false;
-            context.getState().markAsCheckpoint(true);
+            context.getState().markAsCheckpoint(true, context);
             me.markAsProcessed();
         }
     }

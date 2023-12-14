@@ -43,7 +43,7 @@ public final class StipplePencil extends Tool {
             final GameImage edit = new GameImage(w, h);
             edit.dot(c, tp.x, tp.y);
             context.editImage(edit.submit());
-            context.getState().markAsCheckpoint(true);
+            context.getState().markAsCheckpoint(true, context);
         }
     }
 

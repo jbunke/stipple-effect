@@ -33,7 +33,7 @@ public final class Eraser extends ToolWithBreadth {
         if (context.hasTargetPixel()) {
             erasing = true;
             lastTP = new Coord2D(-1, -1);
-            context.getState().markAsCheckpoint(false);
+            context.getState().markAsCheckpoint(false, context);
         }
     }
 
@@ -101,7 +101,7 @@ public final class Eraser extends ToolWithBreadth {
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
         if (erasing) {
             erasing = false;
-            context.getState().markAsCheckpoint(true);
+            context.getState().markAsCheckpoint(true, context);
             me.markAsProcessed();
         }
     }
