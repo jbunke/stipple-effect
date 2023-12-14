@@ -65,9 +65,9 @@ public class ProjectState {
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
                 if (layer.getOpacity() == Constants.OPAQUE)
-                    image.draw(layer.getContent());
+                    image.draw(layer.getFrame(frameIndex));
                 else
-                    image.draw(layer.renderContent());
+                    image.draw(layer.renderFrame(frameIndex));
             }
         }
 

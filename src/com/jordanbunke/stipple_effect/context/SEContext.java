@@ -27,9 +27,9 @@ public class SEContext {
     private static final Coord2D UNTARGETED = new Coord2D(-1, -1);
 
     private final ProjectInfo projectInfo;
-
     private final StateManager stateManager;
     private final RenderInfo renderInfo;
+    private final PlaybackInfo playbackInfo;
 
     private Coord2D targetPixel;
 
@@ -51,9 +51,10 @@ public class SEContext {
             final int imageWidth, final int imageHeight
     ) {
         this.projectInfo = projectInfo;
-
         this.stateManager = new StateManager(projectState);
         this.renderInfo = new RenderInfo(imageWidth, imageHeight);
+        this.playbackInfo = new PlaybackInfo();
+
         this.targetPixel = UNTARGETED;
     }
 
@@ -71,6 +72,15 @@ public class SEContext {
                 (int)(w * zoomFactor), (int)(h * zoomFactor));
 
         return workspace.submit();
+    }
+
+    public void animate(final double deltaTime) {
+        if (playbackInfo.isPlaying()) {
+            final boolean nextFrameDue = playbackInfo.checkIfNextFrameDue(deltaTime);
+
+            if (nextFrameDue)
+                getState().nextFrame();
+        }
     }
 
     public void process(final InputEventLogger eventLogger, final Tool tool) {
@@ -125,11 +135,11 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - previous frame
+                    () -> getState().previousFrame()
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - next frame
+                    () -> getState().nextFrame()
             );
         }
 
@@ -161,6 +171,12 @@ public class SEContext {
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
+            // playback
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
+                    () -> getPlaybackInfo().togglePlaying()
+            );
+
             // set tools
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
@@ -303,9 +319,11 @@ public class SEContext {
     public void editImage(final GameImage edit) {
         // build resultant state
         final int w = getState().getImageWidth(),
-                h = getState().getImageHeight();
+                h = getState().getImageHeight(),
+                frameIndex = getState().getFrameIndex();
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer().returnEdited(edit);
+        final SELayer replacement = getState().getEditingLayer()
+                .returnEdited(edit, frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
         layers.remove(layerEditIndex);
         layers.add(layerEditIndex, replacement);
@@ -320,9 +338,11 @@ public class SEContext {
     public void erase(final boolean[][] eraseMask) {
         // build resultant state
         final int w = getState().getImageWidth(),
-                h = getState().getImageHeight();
+                h = getState().getImageHeight(),
+                frameIndex = getState().getFrameIndex();
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer().returnEdited(eraseMask);
+        final SELayer replacement = getState().getEditingLayer()
+                .returnEdited(eraseMask, frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
         layers.remove(layerEditIndex);
         layers.add(layerEditIndex, replacement);
@@ -334,8 +354,64 @@ public class SEContext {
     }
 
     // FRAME MANIPULATION
-    // TODO - addFrame()
-    // TODO - removeFrame()
+    // add frame
+    public void addFrame() {
+        // pre-check
+        if (getState().canAddFrame()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+            final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+            final int addIndex = getState().getFrameIndex() + 1;
+            layers.replaceAll(l -> l.returnAddedFrame(addIndex, w, h));
+
+            final ProjectState result = new ProjectState(w, h,
+                    layers, getState().getLayerEditIndex(),
+                    getState().getFrameCount() + 1, addIndex);
+            stateManager.performAction(result, ActionType.FRAME);
+        }
+    }
+
+    // duplicate frame
+    public void duplicateFrame() {
+        // pre-check
+        if (getState().canAddFrame()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight(),
+                    frameIndex = getState().getFrameIndex();
+            final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+            layers.replaceAll(l -> l.returnDuplicatedFrame(frameIndex));
+
+            final ProjectState result = new ProjectState(w, h,
+                    layers, getState().getLayerEditIndex(),
+                    getState().getFrameCount() + 1,
+                    frameIndex + 1);
+            stateManager.performAction(result, ActionType.FRAME);
+        }
+    }
+
+    // remove frame
+    public void removeFrame() {
+        // pre-check
+        if (getState().canRemoveFrame()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight(),
+                    frameIndex = getState().getFrameIndex();
+            final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+            layers.replaceAll(l -> l.returnRemovedFrame(frameIndex));
+
+            final ProjectState result = new ProjectState(w, h,
+                    layers, getState().getLayerEditIndex(),
+                    getState().getFrameCount() - 1,
+                    frameIndex);
+            stateManager.performAction(result, ActionType.FRAME);
+        }
+    }
 
     // LAYER MANIPULATION
     // enable all layers
@@ -447,7 +523,7 @@ public class SEContext {
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
-            layers.add(addIndex, new SELayer(w, h));
+            layers.add(addIndex, SELayer.newLayer(w, h, getState().getFrameCount()));
 
             final ProjectState result = new ProjectState(w, h, layers,
                     addIndex, getState().getFrameCount(),
@@ -549,7 +625,8 @@ public class SEContext {
 
             final SELayer above = layers.get(aboveIndex),
                     below = layers.get(belowIndex);
-            final SELayer combined = LayerCombiner.combine(above, below);
+            final SELayer combined = LayerCombiner.combine(above, below,
+                    getState().getFrameCount());
             layers.remove(above);
             layers.remove(below);
             layers.add(belowIndex, combined);
@@ -576,6 +653,10 @@ public class SEContext {
 
     public String getCanvasSizeText() {
         return getState().getImageWidth() + " x " + getState().getImageHeight();
+    }
+
+    public PlaybackInfo getPlaybackInfo() {
+        return playbackInfo;
     }
 
     public RenderInfo getRenderInfo() {

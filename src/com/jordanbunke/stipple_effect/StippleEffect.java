@@ -175,6 +175,8 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void update(final double deltaTime) {
+        getContext().animate(deltaTime);
+
         // tools
         toolButtonMenu.update(deltaTime);
         // colors

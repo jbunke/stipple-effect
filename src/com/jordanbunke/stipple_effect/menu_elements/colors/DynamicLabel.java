@@ -15,18 +15,18 @@ import java.util.concurrent.Callable;
 public class DynamicLabel extends MenuElement {
     private final Callable<String> getter;
 
-    private final Color c;
+    private final Color textColor;
 
     private String label;
     private GameImage labelImage;
 
     public DynamicLabel(
-            final Coord2D position, Anchor anchor, final Color c,
+            final Coord2D position, Anchor anchor, final Color textColor,
             final Callable<String> getter, final int widthAllowance
     ) {
         super(position, new Coord2D(widthAllowance, Constants.DYNAMIC_LABEL_H), anchor, true);
 
-        this.c = c;
+        this.textColor = textColor;
 
         this.getter = getter;
         label = fetchLabel();
@@ -44,7 +44,7 @@ public class DynamicLabel extends MenuElement {
     }
 
     private void updateAssets() {
-        final GameImage l = GraphicsUtils.uiText(c).addText(label).build().draw();
+        final GameImage l = GraphicsUtils.uiText(textColor).addText(label).build().draw();
         labelImage = new GameImage(getWidth(), getHeight());
 
         final Coord2D offset = switch (getAnchor()) {

@@ -13,6 +13,7 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
+import com.jordanbunke.stipple_effect.menu_elements.colors.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.*;
 import com.jordanbunke.stipple_effect.tools.*;
 
@@ -134,38 +135,75 @@ public class MenuAssembly {
                 "remove_frame",
                 "to_first_frame",
                 "previous",
-                "play", // TODO - composite button with stop depending on scenario
+                Constants.ICON_ID_GAP_CODE, // gap for play/stop button
                 "next",
                 "to_last_frame"
         };
 
         final boolean[] preconditions = new boolean[] {
-                // TODO - all false while unimplemented .. first two are universally true
-                false, false, false, false, false, false, false, false
+                StippleEffect.get().getContext().getState().canAddFrame(),
+                StippleEffect.get().getContext().getState().canAddFrame(),
+                StippleEffect.get().getContext().getState().canRemoveFrame(),
+                true,
+                true,
+                false,
+                true,
+                true
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> {}, // TODO all
+                () -> StippleEffect.get().getContext().addFrame(),
+                () -> StippleEffect.get().getContext().duplicateFrame(),
+                () -> StippleEffect.get().getContext().removeFrame(),
+                () -> StippleEffect.get().getContext().getState().setFrameIndex(0),
+                () -> StippleEffect.get().getContext().getState().previousFrame(),
                 () -> {},
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {}
+                () -> StippleEffect.get().getContext().getState().nextFrame(),
+                () -> StippleEffect.get().getContext().getState().setFrameIndex(
+                        StippleEffect.get().getContext().getState().getFrameCount() - 1
+                )
         };
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getFramesPosition());
 
-        // frame content
-
-        final int amount = StippleEffect.get().getContext().getState().getFrameCount(), elementsPerFrame = 1;
-
-        final ScrollableMenuElement[] frameElements = new ScrollableMenuElement[amount * elementsPerFrame];
-
         final Coord2D firstPos = Constants.getFramesPosition()
                 .displace(Constants.getSegmentContentDisplacement());
+
+        // TODO - play/stop as toggle
+
+        // playback speed slider and dynamic label for playback speed
+
+        final Coord2D pssPos = firstPos.displace(
+                Constants.FRAME_PLAYBACK_SLIDER_OFFSET_X,
+                -Constants.SEGMENT_TITLE_CONTENT_OFFSET_Y + Constants.ICON_BUTTON_OFFSET_Y);
+
+        final HorizontalSlider slider = new HorizontalSlider(pssPos,
+                Constants.FRAME_PLAYBACK_SLIDER_W, MenuElement.Anchor.LEFT_TOP,
+                Constants.MIN_MILLIS_PER_FRAME, Constants.MAX_MILLIS_PER_FRAME,
+                StippleEffect.get().getContext().getPlaybackInfo().getMillisPerFrame(),
+                mpf -> StippleEffect.get().getContext()
+                        .getPlaybackInfo().setMillisPerFrame(mpf));
+        slider.updateAssets();
+        mb.add(slider);
+
+        final Coord2D labelPos = Constants.getFramesPosition().displace(
+                Constants.FRAMES_W - Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+
+        mb.add(new DynamicLabel(labelPos,
+                MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
+                () -> (1000 / StippleEffect.get().getContext()
+                        .getPlaybackInfo().getMillisPerFrame()) + " fps",
+                Constants.DYNAMIC_LABEL_W_ALLOWANCE));
+
+        // frame content
+
+        final int amount = StippleEffect.get().getContext().getState().getFrameCount(),
+                elementsPerFrame = 1;
+
+        final ScrollableMenuElement[] frameElements =
+                new ScrollableMenuElement[amount * elementsPerFrame];
+
         int realRightX = firstPos.x;
 
         for (int i = 0; i < amount; i++) {
@@ -190,9 +228,15 @@ public class MenuAssembly {
 
         mb.add(new HorizontalScrollingMenuElement(firstPos,
                 new Coord2D(Constants.FRAME_SCROLL_WINDOW_W, Constants.FRAME_SCROLL_WINDOW_H),
-                frameElements, realRightX, /* TODO - temp */ 0));
+                frameElements, realRightX, frameButtonXDisplacement()));
 
         return mb.build();
+    }
+
+    private static int frameButtonXDisplacement() {
+        return (StippleEffect.get().getContext().getState().getFrameIndex() -
+                Constants.FRAMES_BEFORE_TO_DISPLAY) *
+                (Constants.FRAME_BUTTON_W + Constants.BUTTON_OFFSET);
     }
 
     public static Menu buildLayersMenu() {
@@ -301,9 +345,7 @@ public class MenuAssembly {
             realBottomY = pos.y + dims.y;
         }
 
-        final int
-                selectedIndex = StippleEffect.get().getContext().getState().getLayerEditIndex(),
-                initialOffsetY = layerButtonDisplacement(selectedIndex, amount).y;
+        final int initialOffsetY = layerButtonYDisplacement(amount);
 
         mb.add(new VerticalScrollingMenuElement(firstPos,
                 new Coord2D(Constants.VERT_SCROLL_WINDOW_W, Constants.VERT_SCROLL_WINDOW_H),
@@ -337,11 +379,9 @@ public class MenuAssembly {
                 () -> {});
     }
 
-    private static Coord2D layerButtonDisplacement(final int index, final int amount) {
-        // by default, selecting a layer should display the two layers above it
-        return new Coord2D(0, (amount - ((index +
-                Constants.LAYERS_ABOVE_TO_DISPLAY) + 1)) *
-                Constants.STD_TEXT_BUTTON_INC);
+    private static int layerButtonYDisplacement(final int amount) {
+        return (amount - ((StippleEffect.get().getContext().getState().getLayerEditIndex() +
+                Constants.LAYERS_ABOVE_TO_DISPLAY) + 1)) * Constants.STD_TEXT_BUTTON_INC;
     }
 
     private static void populateButtonsIntoBuilder(
@@ -356,9 +396,12 @@ public class MenuAssembly {
         }
 
         for (int i = 0; i < iconIDs.length; i++) {
+            if (iconIDs[i].equals(Constants.ICON_ID_GAP_CODE))
+                continue;
+
             final Coord2D pos = segmentPosition
                     .displace(Constants.SEGMENT_TITLE_BUTTON_OFFSET_X,
-                            Constants.BUTTON_OFFSET)
+                            Constants.ICON_BUTTON_OFFSET_Y)
                     .displace(i * Constants.BUTTON_INC, 0);
             mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
                     pos, preconditions[i], behaviours[i]));
