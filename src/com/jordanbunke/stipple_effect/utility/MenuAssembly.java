@@ -119,7 +119,8 @@ public class MenuAssembly {
                 "remove_layer",
                 "move_layer_up",
                 "move_layer_down",
-                "combine_with_layer_below"
+                "combine_with_layer_below",
+                "enable_all_layers"
         };
 
         final boolean[] preconditions = new boolean[] {
@@ -129,7 +130,8 @@ public class MenuAssembly {
                 StippleEffect.get().getContext().getState().canMoveLayerUp(),
                 StippleEffect.get().getContext().getState().canMoveLayerDown(),
                 // identical precondition for combine case
-                StippleEffect.get().getContext().getState().canMoveLayerDown()
+                StippleEffect.get().getContext().getState().canMoveLayerDown(),
+                true
         };
 
         final Runnable[] behaviours = new Runnable[] {
@@ -138,14 +140,15 @@ public class MenuAssembly {
                 () -> StippleEffect.get().getContext().removeLayer(),
                 () -> StippleEffect.get().getContext().moveLayerUp(),
                 () -> StippleEffect.get().getContext().moveLayerDown(),
-                () -> StippleEffect.get().getContext().combineWithLayerBelow()
+                () -> StippleEffect.get().getContext().combineWithLayerBelow(),
+                () -> StippleEffect.get().getContext().enableAllLayers()
         };
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getLayersPosition());
 
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 3; // TODO - 4: isolate button
+        final int amount = layers.size(), elementsPerLayer = 4;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -200,9 +203,16 @@ public class MenuAssembly {
                     Constants.BUTTON_OFFSET, 0);
 
             layerButtons[(2 * amount) + i] =
-                    new ScrollableMenuElement(generateVisibilityToggle(i, vtPos));
+                    new ScrollableMenuElement(generateVisibilityToggle(index, vtPos));
 
-            // TODO - isolate layer
+            // isolate layer
+
+            final Coord2D ilPos = vtPos.displace(Constants.BUTTON_INC,
+                    (int)(Constants.BUTTON_DIM * -0.5));
+
+            layerButtons[(3 * amount) + i] = new ScrollableMenuElement(
+                    GraphicsUtils.generateIconButton("isolate_layer", ilPos, true,
+                    () -> StippleEffect.get().getContext().isolateLayer(index)));
 
             realBottomY = pos.y + dims.y;
         }

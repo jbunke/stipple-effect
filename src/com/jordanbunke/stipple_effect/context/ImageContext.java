@@ -19,6 +19,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ImageContext {
     private static final Coord2D UNTARGETED = new Coord2D(-1, -1);
@@ -319,6 +320,44 @@ public class ImageContext {
     }
 
     // LAYER MANIPULATION
+    // enable all layers
+    public void enableAllLayers() {
+        // build resultant state
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight();
+
+        final ImageState result = new ImageState(w, h,
+                states.getState().getLayers().stream().map(SELayer::returnEnabled)
+                        .collect(Collectors.toList()),
+                states.getState().getLayerEditIndex());
+        states.performAction(result, ActionType.CANVAS);
+    }
+
+    // isolate layer
+    public void isolateLayer(final int layerIndex) {
+        final List<SELayer> layers = states.getState().getLayers(),
+                newLayers = new ArrayList<>();
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size()) {
+            // build resultant state
+            final int w = states.getState().getImageWidth(),
+                    h = states.getState().getImageHeight();
+
+            for (int i = 0; i < layers.size(); i++) {
+                final SELayer layer = i == layerIndex
+                        ? layers.get(i).returnEnabled()
+                        : layers.get(i).returnDisabled();
+
+                newLayers.add(layer);
+            }
+
+            final ImageState result = new ImageState(w, h, newLayers,
+                    states.getState().getLayerEditIndex());
+            states.performAction(result, ActionType.CANVAS);
+        }
+    }
+
     // disable layer
     public void disableLayer(final int layerIndex) {
         final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
