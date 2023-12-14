@@ -93,7 +93,7 @@ public class ColorSlider extends MenuElement {
     }
 
     private boolean isValidXForHighlight(final int mouseX) {
-        return Math.abs(mouseX - getSliderBallX()) <= Constants.SLIDER_BALL_W / 2;
+        return Math.abs(mouseX - getSliderBallX()) <= Constants.SLIDER_BALL_DIM / 2;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ColorSlider extends MenuElement {
 
     private int getSliderBallX() {
         final Coord2D rp = getRenderPosition();
-        final int sbw = Constants.SLIDER_BALL_W;
+        final int sbw = Constants.SLIDER_BALL_DIM;
         return rp.x + (sbw / 2) + (int)(getSliderFraction() * (getWidth() - sbw));
     }
 
@@ -134,7 +134,7 @@ public class ColorSlider extends MenuElement {
         final int valueWas = value;
 
         final Coord2D rp = getRenderPosition();
-        final int sbw = Constants.SLIDER_BALL_W, sw = getWidth() - sbw,
+        final int sbw = Constants.SLIDER_BALL_DIM, sw = getWidth() - sbw,
                 startX = rp.x + (sbw / 2);
         final double sliderFraction = (sliderBallX - startX) / (double) sw;
 
@@ -151,42 +151,42 @@ public class ColorSlider extends MenuElement {
 
     private void updateAssets() {
         final GameImage spectrum = new GameImage(getWidth(), getHeight());
-        final int sw = getWidth() - Constants.SLIDER_BALL_W;
+        final int sw = getWidth() - Constants.SLIDER_BALL_DIM;
 
         for (int x = 0; x < sw; x++) {
             spectrum.fillRectangle(
                     spectralFunction.apply(getValueFromSliderFraction(x / (double) sw)),
-                    (Constants.SLIDER_BALL_W / 2) + x, Constants.SLIDER_THINNING,
+                    (Constants.SLIDER_BALL_DIM / 2) + x, Constants.SLIDER_THINNING,
                     1, getHeight() - (2 * Constants.SLIDER_THINNING));
         }
 
-        spectrum.drawRectangle(Constants.BLACK, Constants.BUTTON_BORDER_PX, Constants.SLIDER_BALL_W / 2,
+        spectrum.drawRectangle(Constants.BLACK, Constants.BUTTON_BORDER_PX, Constants.SLIDER_BALL_DIM / 2,
                 Constants.SLIDER_THINNING + (Constants.BUTTON_BORDER_PX / 2), sw,
                 getHeight() - (Constants.BUTTON_BORDER_PX + (2 * Constants.SLIDER_THINNING)));
 
-        final GameImage baseSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H),
-                highlightedSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H),
-                selectedSliderBall = new GameImage(Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+        final GameImage baseSliderBall = new GameImage(Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM),
+                highlightedSliderBall = new GameImage(Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM),
+                selectedSliderBall = new GameImage(Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM);
         final GameImage[] sliderBalls = new GameImage[] {
                 baseSliderBall, highlightedSliderBall, selectedSliderBall
         };
 
         baseSliderBall.fillRectangle(
                 GraphicsUtils.buttonBorderColor(false), 0, 0,
-                Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+                Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM);
         highlightedSliderBall.fillRectangle(
                 GraphicsUtils.buttonBorderColorAlt(false), 0, 0,
-                Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+                Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM);
         selectedSliderBall.fillRectangle(
                 GraphicsUtils.buttonBorderColor(true), 0, 0,
-                Constants.SLIDER_BALL_W, Constants.SLIDER_H);
+                Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM);
 
         for (GameImage sliderBall : sliderBalls) {
             sliderBall.fillRectangle(
                     spectralFunction.apply(value),
                     Constants.BUTTON_BORDER_PX, Constants.BUTTON_BORDER_PX,
-                    Constants.SLIDER_BALL_W - (2 * Constants.BUTTON_BORDER_PX),
-                    Constants.SLIDER_H - (2 * Constants.BUTTON_BORDER_PX)
+                    Constants.SLIDER_BALL_DIM - (2 * Constants.BUTTON_BORDER_PX),
+                    Constants.SLIDER_OFF_DIM - (2 * Constants.BUTTON_BORDER_PX)
             );
         }
 

@@ -153,7 +153,7 @@ public class MenuAssembly {
                 .displace(Constants.TOOL_NAME_X, Constants.LAYERS_BUTTONS_OFFSET_Y);
         int realBottomY = firstPos.y;
 
-        for (int i = 0; i < amount; i++) {
+        for (int i = amount - 1; i >= 0; i--) {
             final SELayer layer = layers.get(i);
 
             final GameImage baseImage = GraphicsUtils.drawTextButton(Constants.LAYERS_BUTTON_W,

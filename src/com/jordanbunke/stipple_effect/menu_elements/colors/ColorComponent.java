@@ -47,7 +47,7 @@ public class ColorComponent extends MenuElementContainer {
         menuElements[SLIDER_INDEX] = new ColorSlider(
                 startingPosition.displace(Constants.COLOR_PICKER_W / 2,
                         (int)(Constants.COLOR_SELECTOR_INC_Y * 0.45)),
-                new Coord2D(Constants.SLIDER_W + Constants.SLIDER_BALL_W, Constants.SLIDER_H),
+                new Coord2D(Constants.COLOR_SLIDER_W + Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM),
                 minValue, maxValue, this.value,
                 spectralFunction, this::setValue
         );
