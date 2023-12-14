@@ -69,7 +69,13 @@ public final class SELayer {
         return new SELayer(content, opacity, enabled, name);
     }
 
-    // TODO - enable / disable implementation
+    public SELayer returnDisabled() {
+        return new SELayer(content, opacity, false, name);
+    }
+
+    public SELayer returnEnabled() {
+        return new SELayer(content, opacity, true, name);
+    }
 
     public SELayer returnRenamed(final String name) {
         return new SELayer(content, opacity, enabled, name);

@@ -72,6 +72,19 @@ public class GraphicsUtils {
         return hi.submit();
     }
 
+    public static GameImage getIcon(final String iconID) {
+        final Path iconFile = Constants.ICON_FOLDER.resolve(
+                iconID.toLowerCase() + ".png");
+        return ResourceLoader.loadImageResource(iconFile);
+    }
+
+    public static GameImage highlightIconButton(final GameImage icon) {
+        final GameImage highlighted = new GameImage(icon);
+        highlighted.draw(HIGHLIGHT_OVERLAY);
+
+        return highlighted.submit();
+    }
+
     public static MenuElement generateIconButton(
             final String iconID, final Coord2D position,
             final boolean precondition, final Runnable behaviour
@@ -80,20 +93,16 @@ public class GraphicsUtils {
 
         final Coord2D dims = new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM);
 
-        final Path iconFile = Constants.ICON_FOLDER.resolve(
-                iconID.toLowerCase() + ".png");
-        final GameImage icon = ResourceLoader.loadImageResource(iconFile);
+        final GameImage icon = getIcon(iconID);
 
         if (stub)
             return new StaticMenuElement(position, dims,
                     MenuElement.Anchor.LEFT_TOP, greyscaleVersionOf(icon));
 
-        final GameImage highlighted = new GameImage(icon);
-        highlighted.draw(HIGHLIGHT_OVERLAY);
+        final GameImage highlighted = highlightIconButton(icon);
 
-        return new SimpleMenuButton(position, dims,
-                MenuElement.Anchor.LEFT_TOP, true, behaviour,
-                icon, highlighted.submit());
+        return new SimpleMenuButton(position, dims, MenuElement.Anchor.LEFT_TOP,
+                true, behaviour, icon, highlighted);
     }
 
     private static GameImage greyscaleVersionOf(final GameImage image) {

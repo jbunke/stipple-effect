@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.state;
 
+import com.jordanbunke.stipple_effect.utility.Constants;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +66,10 @@ public class StateManager {
         // clear REDO stack
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
+
+        // trim to max state size allowed
+        while (states.size() > Constants.MAX_NUM_STATES)
+            states.remove(0);
 
         states.add(resultantState);
         index = states.size() - 1;

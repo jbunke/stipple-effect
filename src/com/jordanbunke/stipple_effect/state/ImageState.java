@@ -71,6 +71,10 @@ public class ImageState {
         this.checkpoint = true;
     }
 
+    public boolean canAddLayer() {
+        return layers.size() < Constants.MAX_NUM_LAYERS;
+    }
+
     public boolean canRemoveLayer() {
         return layers.size() > 1;
     }

@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.menus.MenuBuilder;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
@@ -122,8 +123,8 @@ public class MenuAssembly {
         };
 
         final boolean[] preconditions = new boolean[] {
-                true,
-                true,
+                StippleEffect.get().getContext().getState().canAddLayer(),
+                StippleEffect.get().getContext().getState().canAddLayer(),
                 StippleEffect.get().getContext().getState().canRemoveLayer(),
                 StippleEffect.get().getContext().getState().canMoveLayerUp(),
                 StippleEffect.get().getContext().getState().canMoveLayerDown(),
@@ -144,7 +145,7 @@ public class MenuAssembly {
                 behaviours, Constants.getLayersPosition());
 
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 2; // TODO - 3 or 4: visibility and potentially isolate button
+        final int amount = layers.size(), elementsPerLayer = 3; // TODO - 4: isolate button
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -193,7 +194,15 @@ public class MenuAssembly {
             opacitySlider.updateAssets();
             layerButtons[amount + i] = new ScrollableMenuElement(opacitySlider);
 
-            // TODO - visibility toggle
+            // visibility toggle
+
+            final Coord2D vtPos = osPos.displace(Constants.LAYER_OPACITY_SLIDER_W +
+                    Constants.BUTTON_OFFSET, 0);
+
+            layerButtons[(2 * amount) + i] =
+                    new ScrollableMenuElement(generateVisibilityToggle(i, vtPos));
+
+            // TODO - isolate layer
 
             realBottomY = pos.y + dims.y;
         }
@@ -209,9 +218,36 @@ public class MenuAssembly {
         return mb.build();
     }
 
+    private static SimpleToggleMenuButton generateVisibilityToggle(
+            final int index, final Coord2D pos
+    ) {
+        // 0: is enabled, button click should DISABLE; 1: vice-versa
+
+        final GameImage enabled = GraphicsUtils.getIcon("layer_enabled"),
+                disabled = GraphicsUtils.getIcon("layer_disabled");
+
+        return new SimpleToggleMenuButton(pos,
+                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_CENTRAL, true,
+                new GameImage[] { enabled, disabled },
+                new GameImage[] {
+                        GraphicsUtils.highlightIconButton(enabled),
+                        GraphicsUtils.highlightIconButton(disabled)
+                },
+                new Runnable[] {
+                        () -> StippleEffect.get().getContext().disableLayer(index),
+                        () -> StippleEffect.get().getContext().enableLayer(index)
+                },
+                () -> StippleEffect.get().getContext().getState()
+                        .getLayers().get(index).isEnabled() ? 0 : 1,
+                () -> {});
+    }
+
     private static Coord2D layerButtonDisplacement(final int index, final int amount) {
         // by default, selecting a layer should display the two layers above it
-        return new Coord2D(0, (amount - ((index + Constants.LAYERS_ABOVE_TO_DISPLAY) + 1)) * Constants.STD_TEXT_BUTTON_INC);
+        return new Coord2D(0, (amount - ((index +
+                Constants.LAYERS_ABOVE_TO_DISPLAY) + 1)) *
+                Constants.STD_TEXT_BUTTON_INC);
     }
 
     private static void populateButtonsIntoBuilder(

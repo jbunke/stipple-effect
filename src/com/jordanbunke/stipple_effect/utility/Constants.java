@@ -72,9 +72,9 @@ public class Constants {
     public static final int BUTTON_DIM = 20, BUTTON_OFFSET = 2,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74,
-            LAYERS_BUTTONS_OFFSET_Y = 30, LAYER_BUTTON_W = 110, LAYER_OPACITY_SLIDER_W = 100,
+            LAYERS_BUTTONS_OFFSET_Y = 30, LAYER_BUTTON_W = 110, LAYER_OPACITY_SLIDER_W = 92,
             LAYERS_ABOVE_TO_DISPLAY = 2,
-            VERT_SCROLL_BAR_W = 20, VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X),
+            VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X),
             VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -6,
@@ -85,5 +85,6 @@ public class Constants {
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
 
     // specific tools
-    public static final int DEFAULT_BRUSH_BREADTH = 3, MIN_BREADTH = 1, MAX_BREADTH = 200;
+    public static final int DEFAULT_BRUSH_BREADTH = 3, MIN_BREADTH = 1, MAX_BREADTH = 200,
+            MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, /* TODO: test and tweak */ MAX_NUM_STATES = 5000;
 }
