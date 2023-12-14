@@ -10,12 +10,10 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuBut
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.SelectableListItemButton;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.*;
 import com.jordanbunke.stipple_effect.tools.*;
 
 import java.util.List;
@@ -46,12 +44,14 @@ public class MenuAssembly {
         };
 
         final boolean[] preconditions = new boolean[] {
-                true, true, true, true, true, true
+                true,
+                // TODO - while unimplemented ... should all be true eventually
+                false, false, false, false, false
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> {}, // TODO all
-                () -> {},
+                () -> StippleEffect.get().newProject(),
+                () -> {}, // TODO rest
                 () -> {},
                 () -> {},
                 () -> {},
@@ -61,7 +61,66 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getProjectsPosition());
 
-        // TODO - project previews themselves
+        // project previews
+
+        final int amount = StippleEffect.get().getContexts().size(), elementsPerProject = 2,
+                selectedIndex = StippleEffect.get().getContextIndex();
+
+        final ScrollableMenuElement[] projectElements = new ScrollableMenuElement[amount * elementsPerProject];
+
+        final Coord2D firstPos = Constants.getProjectsPosition()
+                .displace(Constants.getSegmentContentDisplacement());
+        int realRightX = firstPos.x, cumulativeWidth = 0, initialOffsetX = 0;
+
+        for (int i = 0; i < amount; i++) {
+            final String text = StippleEffect.get().getContexts().get(i)
+                    .getProjectInfo().toString();
+            final int paddedTextWidth = GraphicsUtils.uiText()
+                    .addText(text).build().draw().getWidth() +
+                    Constants.PROJECT_NAME_BUTTON_PADDING_W;
+
+            final GameImage baseImage = GraphicsUtils.drawTextButton(paddedTextWidth,
+                    text, false, Constants.GREY),
+                    highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
+                    selectedImage = GraphicsUtils.drawTextButton(paddedTextWidth,
+                            text, true, Constants.GREY);
+
+            int offsetX = 0;
+
+            final Coord2D pos = firstPos.displace(cumulativeWidth, 0),
+                    dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
+
+            offsetX += paddedTextWidth + Constants.BUTTON_OFFSET;
+
+            projectElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
+                    MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
+                    i, () -> StippleEffect.get().getContextIndex(),
+                    s -> StippleEffect.get().setContextIndex(s)
+            ));
+
+            // close project button
+
+            final Coord2D cpPos = pos.displace(offsetX,
+                    (Constants.STD_TEXT_BUTTON_H - Constants.BUTTON_DIM) / 2);
+
+            offsetX += Constants.BUTTON_DIM + Constants.SPACE_BETWEEN_PROJECT_BUTTONS_X;
+
+            final int index = i;
+
+            projectElements[amount + i] = new ScrollableMenuElement(
+                    GraphicsUtils.generateIconButton("close_project", cpPos,
+                            true, () -> StippleEffect.get().removeContext(index)));
+
+            cumulativeWidth += offsetX;
+            realRightX = cpPos.x + Constants.BUTTON_DIM;
+
+            if (i == selectedIndex - Constants.PROJECTS_BEFORE_TO_DISPLAY)
+                initialOffsetX = pos.x - firstPos.x;
+        }
+
+        mb.add(new HorizontalScrollingMenuElement(firstPos,
+                new Coord2D(Constants.FRAME_SCROLL_WINDOW_W, Constants.FRAME_SCROLL_WINDOW_H),
+                projectElements, realRightX, initialOffsetX));
 
         return mb.build();
     }
@@ -81,14 +140,8 @@ public class MenuAssembly {
         };
 
         final boolean[] preconditions = new boolean[] {
-                true, // TODO - consider a setting check ... if frames are enabled for project
-                true, // TODO rest
-                true,
-                true,
-                true,
-                true,
-                true,
-                true
+                // TODO - all false while unimplemented .. first two are universally true
+                false, false, false, false, false, false, false, false
         };
 
         final Runnable[] behaviours = new Runnable[] {
@@ -105,7 +158,42 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getFramesPosition());
 
-        // TODO - frames themselves
+        // frame content
+
+        final int amount = /* TODO - temp */ Constants.MAX_NUM_FRAMES, elementsPerFrame = 1;
+
+        final ScrollableMenuElement[] frameElements = new ScrollableMenuElement[amount * elementsPerFrame];
+
+        final Coord2D firstPos = Constants.getFramesPosition()
+                .displace(Constants.getSegmentContentDisplacement());
+        int realRightX = firstPos.x;
+
+        for (int i = 0; i < amount; i++) {
+            final GameImage baseImage = GraphicsUtils.drawTextButton(Constants.FRAME_BUTTON_W,
+                    String.valueOf(i + 1), false, Constants.GREY),
+                    highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
+                    selectedImage = GraphicsUtils.drawTextButton(Constants.FRAME_BUTTON_W,
+                            String.valueOf(i + 1), true, Constants.GREY);
+
+            final Coord2D pos = firstPos.displace(
+                    i * (Constants.FRAME_BUTTON_W + Constants.BUTTON_OFFSET), 0),
+                    dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
+
+            frameElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
+                    MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
+                    i, () -> /* TODO */ 0,
+                    s -> {
+                        // TODO -  frame index setter w/ rebuild included so can be removed below
+                        StippleEffect.get().rebuildFramesMenu();
+                    }
+            ));
+
+            realRightX = pos.x + dims.x;
+        }
+
+        mb.add(new HorizontalScrollingMenuElement(firstPos,
+                new Coord2D(Constants.FRAME_SCROLL_WINDOW_W, Constants.FRAME_SCROLL_WINDOW_H),
+                frameElements, realRightX, /* TODO - temp */ 0));
 
         return mb.build();
     }
@@ -147,13 +235,15 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getLayersPosition());
 
+        // layer content
+
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
         final int amount = layers.size(), elementsPerLayer = 4;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
         final Coord2D firstPos = Constants.getLayersPosition()
-                .displace(Constants.TOOL_NAME_X, Constants.LAYERS_BUTTONS_OFFSET_Y);
+                .displace(Constants.getSegmentContentDisplacement());
         int realBottomY = firstPos.y;
 
         for (int i = amount - 1; i >= 0; i--) {
@@ -172,10 +262,7 @@ public class MenuAssembly {
             layerButtons[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
                     i, () -> StippleEffect.get().getContext().getState().getLayerEditIndex(),
-                    s -> {
-                        StippleEffect.get().getContext().getState().setLayerEditIndex(s);
-                        StippleEffect.get().rebuildLayersMenu();
-                    }
+                    s -> StippleEffect.get().getContext().getState().setLayerEditIndex(s)
             ));
 
             // opacity slider

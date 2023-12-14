@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -37,7 +37,7 @@ public final class Brush extends ToolWithBreadth {
 
     @Override
     public void onMouseDown(
-            final ImageContext context, final GameMouseEvent me
+            final SEContext context, final GameMouseEvent me
     ) {
         if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
             painting = true;
@@ -45,13 +45,13 @@ public final class Brush extends ToolWithBreadth {
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
             lastTP = new Coord2D(-1, -1);
-            context.getState().markAsCheckpoint();
+            context.getState().markAsCheckpoint(false);
         }
     }
 
     @Override
     public void update(
-            final ImageContext context, final Coord2D mousePosition
+            final SEContext context, final Coord2D mousePosition
     ) {
         if (painting) {
             if (context.hasTargetPixel()) {
@@ -110,11 +110,11 @@ public final class Brush extends ToolWithBreadth {
 
     @Override
     public void onMouseUp(
-            final ImageContext context, final GameMouseEvent me
+            final SEContext context, final GameMouseEvent me
     ) {
         if (painting) {
             painting = false;
-            context.getState().markAsCheckpoint();
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

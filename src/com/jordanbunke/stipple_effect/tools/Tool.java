@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
@@ -26,9 +26,9 @@ public abstract class Tool {
     }
 
     public abstract String getName();
-    public abstract void onMouseDown(final ImageContext context, final GameMouseEvent me);
-    public abstract void update(final ImageContext context, final Coord2D mousePosition);
-    public abstract void onMouseUp(final ImageContext context, final GameMouseEvent me);
+    public abstract void onMouseDown(final SEContext context, final GameMouseEvent me);
+    public abstract void update(final SEContext context, final Coord2D mousePosition);
+    public abstract void onMouseUp(final SEContext context, final GameMouseEvent me);
 
     private GameImage fetchIcon() {
         final Path iconFile = Constants.ICON_FOLDER.resolve(getName()

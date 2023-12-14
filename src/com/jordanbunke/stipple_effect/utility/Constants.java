@@ -49,13 +49,17 @@ public class Constants {
         return getToolsPosition().displace(0, WORKSPACE_H);
     }
 
+    public static Coord2D getSegmentContentDisplacement() {
+        return new Coord2D(Constants.TOOL_NAME_X, Constants.SEGMENT_TITLE_CONTENT_OFFSET_Y);
+    }
+
     public static final int TEXT_Y_OFFSET = -4,
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
             TP_X = (int)(CANVAS_W * 0.21),
             SIZE_X = (int)(CANVAS_W * 0.36),
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
-    public static final String BASE_LAYER_NAME = "Background";
+    public static final String BASE_LAYER_NAME = "Background", UNTITLED_PROJECT_NAME = "[ Untitled ]";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
@@ -71,11 +75,12 @@ public class Constants {
 
     public static final int BUTTON_DIM = 20, BUTTON_OFFSET = 2,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
-            SEGMENT_TITLE_BUTTON_OFFSET_X = 74,
-            LAYERS_BUTTONS_OFFSET_Y = 30, LAYER_BUTTON_W = 110, LAYER_OPACITY_SLIDER_W = 90,
-            LAYERS_ABOVE_TO_DISPLAY = 2,
-            VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X),
-            VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
+            SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
+            LAYER_BUTTON_W = 110, LAYER_OPACITY_SLIDER_W = 90, LAYERS_ABOVE_TO_DISPLAY = 2,
+            FRAME_BUTTON_W = 40,
+            PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8, PROJECTS_BEFORE_TO_DISPLAY = 1,
+            VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X), VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
+            FRAME_SCROLL_WINDOW_W = FRAMES_W - (2 * TOOL_NAME_X), FRAME_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -6,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,

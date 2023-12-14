@@ -1,13 +1,14 @@
 package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageState {
+public class ProjectState {
     private boolean checkpoint;
 
     private final int imageWidth, imageHeight;
@@ -16,24 +17,24 @@ public class ImageState {
     private final List<SELayer> layers;
     private int layerEditIndex;
 
-    public ImageState(final GameImage image) {
+    public ProjectState(final GameImage image) {
         this(image.getWidth(), image.getHeight(), new ArrayList<>(List.of(
                 new SELayer(image))), 0);
     }
 
-    public ImageState(final int imageWidth, final int imageHeight) {
+    public ProjectState(final int imageWidth, final int imageHeight) {
         this(imageWidth, imageHeight, new ArrayList<>(List.of(
                 new SELayer(imageWidth, imageHeight))), 0);
     }
 
-    public ImageState(
+    public ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex
     ) {
         this(imageWidth, imageHeight, layers, layerEditIndex, true);
     }
 
-    public ImageState(
+    public ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex,
             final boolean checkpoint
@@ -63,12 +64,19 @@ public class ImageState {
     }
 
     public void setLayerEditIndex(final int layerEditIndex) {
-        if (layerEditIndex >= 0 && layerEditIndex < layers.size())
+        if (this.layerEditIndex != layerEditIndex &&
+                layerEditIndex >= 0 && layerEditIndex < layers.size()) {
             this.layerEditIndex = layerEditIndex;
+            StippleEffect.get().rebuildLayersMenu();
+        }
     }
 
-    public void markAsCheckpoint() {
+    public void markAsCheckpoint(final boolean processLastConsequence) {
         this.checkpoint = true;
+
+        if (processLastConsequence)
+            StippleEffect.get().getContext().getStateManager()
+                    .processLastConsequence();
     }
 
     public boolean canAddLayer() {

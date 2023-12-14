@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect;
 
+import com.jordanbunke.delta_time.OnStartup;
 import com.jordanbunke.delta_time.contexts.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
@@ -7,12 +8,11 @@ import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
 import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.tools.Hand;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -35,7 +35,7 @@ public class StippleEffect implements ProgramContext {
     private boolean windowed;
 
     // projects / contexts
-    private final List<ImageContext> contexts;
+    private final List<SEContext> contexts;
     private int contextIndex;
     private Menu projectsMenu;
 
@@ -55,21 +55,20 @@ public class StippleEffect implements ProgramContext {
     private Menu framesMenu;
 
     static {
+        OnStartup.run();
+
         INSTANCE = new StippleEffect();
 
         // initially declared as empty method because
         // builders rely on calls to INSTANCE object
         INSTANCE.toolButtonMenu = MenuAssembly.buildToolButtonMenu();
         INSTANCE.colorsMenu = MenuAssembly.buildColorsMenu();
-        INSTANCE.layersMenu = MenuAssembly.buildLayersMenu();
-        INSTANCE.framesMenu = MenuAssembly.buildFramesMenu();
-        INSTANCE.projectsMenu = MenuAssembly.buildProjectsMenu();
-
+        INSTANCE.rebuildStateDependentMenus();
     }
 
     public StippleEffect() {
         contexts = new ArrayList<>(List.of(
-                new ImageContext(Constants.DEFAULT_IMAGE_W,
+                new SEContext(Constants.DEFAULT_IMAGE_W,
                         Constants.DEFAULT_IMAGE_H)));
         contextIndex = 0;
 
@@ -109,8 +108,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     private static void launchWithFile(final Path fp) {
-        final GameImage image = GameImageIO.readImage(fp);
-        get().contexts.add(new ImageContext(image));
+        get().contexts.add(SEContext.fromFile(fp));
         get().contexts.remove(0);
     }
 
@@ -134,13 +132,21 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void rebuildStateDependentMenus() {
-        layersMenu = MenuAssembly.buildLayersMenu();
-        framesMenu = MenuAssembly.buildFramesMenu();
-        projectsMenu = MenuAssembly.buildProjectsMenu();
+        rebuildLayersMenu();
+        rebuildFramesMenu();
+        rebuildProjectsMenu();
     }
 
     public void rebuildLayersMenu() {
         layersMenu = MenuAssembly.buildLayersMenu();
+    }
+
+    public void rebuildFramesMenu() {
+        framesMenu = MenuAssembly.buildFramesMenu();
+    }
+
+    public void rebuildProjectsMenu() {
+        projectsMenu = MenuAssembly.buildProjectsMenu();
     }
 
     @Override
@@ -326,8 +332,16 @@ public class StippleEffect implements ProgramContext {
         return bottomBar.submit();
     }
 
-    public ImageContext getContext() {
+    public SEContext getContext() {
         return contexts.get(contextIndex);
+    }
+
+    public List<SEContext> getContexts() {
+        return contexts;
+    }
+
+    public int getContextIndex() {
+        return contextIndex;
     }
 
     public int getColorIndex() {
@@ -348,6 +362,48 @@ public class StippleEffect implements ProgramContext {
 
     public Tool getTool() {
         return tool;
+    }
+
+    public void newProject() {
+        // TODO - reimplement once dialogs have been added - query for size
+        final SEContext context = new SEContext(Constants.DEFAULT_IMAGE_W,
+                Constants.DEFAULT_IMAGE_H);
+        addContext(context, true);
+    }
+
+    public void addContext(final SEContext context, final boolean setActive) {
+        contexts.add(context);
+
+        if (setActive) {
+            setContextIndex(contexts.size() - 1);
+            rebuildStateDependentMenus();
+        } else {
+            rebuildProjectsMenu();
+        }
+    }
+
+    public void removeContext(final int index) {
+        if (index >= 0 && index < contexts.size()) {
+            contexts.remove(index);
+
+            if (contextIndex >= contexts.size())
+                setContextIndex(contexts.size() - 1);
+
+            if (contexts.size() == 0) {
+                // TODO - close program properly - solution is temp
+                System.exit(0);
+            }
+
+            rebuildStateDependentMenus();
+        }
+    }
+
+    public void setContextIndex(final int contextIndex) {
+        if (this.contextIndex != contextIndex &&
+                contextIndex >= 0 && contextIndex < contexts.size()) {
+            this.contextIndex = contextIndex;
+            rebuildStateDependentMenus();
+        }
     }
 
     public void setSelectedColor(final Color color) {

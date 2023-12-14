@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.state;
 
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.ArrayList;
@@ -7,11 +8,13 @@ import java.util.List;
 
 public class StateManager {
     private int index;
-    private final List<ImageState> states;
+    private final List<ProjectState> states;
+    private ActionType lastActionType;
 
-    public StateManager(final ImageState initialState) {
+    public StateManager(final ProjectState initialState) {
         this.states = new ArrayList<>(List.of(initialState));
         index = 0;
+        lastActionType = ActionType.MAJOR;
     }
 
     public boolean canUndo() {
@@ -21,6 +24,8 @@ public class StateManager {
     public void undo(final boolean redraw) {
         if (canUndo()) {
             index--;
+
+            StippleEffect.get().getContext().getProjectInfo().markAsEdited();
 
             if (redraw)
                 ActionType.MAJOR.consequence();
@@ -46,6 +51,8 @@ public class StateManager {
         if (canRedo()) {
             index++;
 
+            StippleEffect.get().getContext().getProjectInfo().markAsEdited();
+
             if (redraw)
                 ActionType.MAJOR.consequence();
         }
@@ -62,7 +69,9 @@ public class StateManager {
             ActionType.MAJOR.consequence();
     }
 
-    public void performAction(final ImageState resultantState, final ActionType actionType) {
+    public void performAction(final ProjectState resultantState, final ActionType actionType) {
+        lastActionType = actionType;
+
         // clear REDO stack
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
@@ -74,10 +83,17 @@ public class StateManager {
         states.add(resultantState);
         index = states.size() - 1;
 
-        actionType.consequence();
+        StippleEffect.get().getContext().getProjectInfo().markAsEdited();
+
+        if (resultantState.isCheckpoint())
+            actionType.consequence();
     }
 
-    public ImageState getState() {
+    public void processLastConsequence() {
+        lastActionType.consequence();
+    }
+
+    public ProjectState getState() {
         return states.get(index);
     }
 }

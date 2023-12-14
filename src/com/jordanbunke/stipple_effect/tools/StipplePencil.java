@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 
 import java.awt.*;
 
@@ -30,7 +30,7 @@ public final class StipplePencil extends Tool {
 
     @Override
     public void onMouseDown(
-            final ImageContext context, final GameMouseEvent me
+            final SEContext context, final GameMouseEvent me
     ) {
         if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
             final int w = context.getState().getImageWidth(),
@@ -43,20 +43,20 @@ public final class StipplePencil extends Tool {
             final GameImage edit = new GameImage(w, h);
             edit.dot(c, tp.x, tp.y);
             context.editImage(edit.submit());
-            context.getState().markAsCheckpoint();
+            context.getState().markAsCheckpoint(true);
         }
     }
 
     @Override
     public void update(
-            final ImageContext context, final Coord2D mousePosition
+            final SEContext context, final Coord2D mousePosition
     ) {
 
     }
 
     @Override
     public void onMouseUp(
-            final ImageContext context, final GameMouseEvent me
+            final SEContext context, final GameMouseEvent me
     ) {
 
     }

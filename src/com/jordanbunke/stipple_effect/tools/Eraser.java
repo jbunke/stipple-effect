@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 
 public final class Eraser extends ToolWithBreadth {
     private static final Eraser INSTANCE;
@@ -29,16 +29,16 @@ public final class Eraser extends ToolWithBreadth {
     }
 
     @Override
-    public void onMouseDown(final ImageContext context, final GameMouseEvent me) {
+    public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         if (context.hasTargetPixel()) {
             erasing = true;
             lastTP = new Coord2D(-1, -1);
-            context.getState().markAsCheckpoint();
+            context.getState().markAsCheckpoint(false);
         }
     }
 
     @Override
-    public void update(final ImageContext context, final Coord2D mousePosition) {
+    public void update(final SEContext context, final Coord2D mousePosition) {
         if (erasing) {
             if (context.hasTargetPixel()) {
                 final int w = context.getState().getImageWidth(),
@@ -98,10 +98,10 @@ public final class Eraser extends ToolWithBreadth {
     }
 
     @Override
-    public void onMouseUp(final ImageContext context, final GameMouseEvent me) {
+    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
         if (erasing) {
             erasing = false;
-            context.getState().markAsCheckpoint();
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

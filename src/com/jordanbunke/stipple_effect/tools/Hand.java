@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 
 public final class Hand extends Tool {
     private static final Hand INSTANCE;
@@ -31,7 +31,7 @@ public final class Hand extends Tool {
 
     @Override
     public void onMouseDown(
-            final ImageContext context, final GameMouseEvent me
+            final SEContext context, final GameMouseEvent me
     ) {
         panning = true;
         startMousePosition = me.mousePosition;
@@ -40,7 +40,7 @@ public final class Hand extends Tool {
 
     @Override
     public void update(
-            final ImageContext context, final Coord2D mousePosition
+            final SEContext context, final Coord2D mousePosition
     ) {
         if (panning) {
             final float zoomFactor = context.getRenderInfo().getZoomFactor();
@@ -56,7 +56,7 @@ public final class Hand extends Tool {
 
     @Override
     public void onMouseUp(
-            final ImageContext context, final GameMouseEvent me
+            final SEContext context, final GameMouseEvent me
     ) {
         if (panning) {
             panning = false;

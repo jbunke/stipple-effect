@@ -1,11 +1,10 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.ImageContext;
+import com.jordanbunke.stipple_effect.context.SEContext;
 
 import java.awt.*;
 
@@ -30,7 +29,7 @@ public final class ColorPicker extends Tool {
     }
 
     @Override
-    public void onMouseDown(final ImageContext context, final GameMouseEvent me) {
+    public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
             final Coord2D tp = context.getTargetPixel();
             final int index = me.button == GameMouseEvent.Button.LEFT
@@ -45,12 +44,12 @@ public final class ColorPicker extends Tool {
     }
 
     @Override
-    public void update(final ImageContext context, final Coord2D mousePosition) {
+    public void update(final SEContext context, final Coord2D mousePosition) {
 
     }
 
     @Override
-    public void onMouseUp(final ImageContext context, final GameMouseEvent me) {
+    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
 
     }
 }
