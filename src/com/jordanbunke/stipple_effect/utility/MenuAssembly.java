@@ -11,6 +11,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.SelectableListItemButton;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
@@ -142,10 +143,8 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getLayersPosition());
 
-        // TODO - temp
-
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 1; // TODO - 3: visibility and opacity slider as well
+        final int amount = layers.size(), elementsPerLayer = 2; // TODO - 3 or 4: visibility and potentially isolate button
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -156,10 +155,10 @@ public class MenuAssembly {
         for (int i = amount - 1; i >= 0; i--) {
             final SELayer layer = layers.get(i);
 
-            final GameImage baseImage = GraphicsUtils.drawTextButton(Constants.LAYERS_BUTTON_W,
+            final GameImage baseImage = GraphicsUtils.drawTextButton(Constants.LAYER_BUTTON_W,
                     layer.getName(), false, Constants.GREY),
                     highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils.drawTextButton(Constants.LAYERS_BUTTON_W,
+                    selectedImage = GraphicsUtils.drawTextButton(Constants.LAYER_BUTTON_W,
                             layer.getName(), true, Constants.GREY);
 
             final Coord2D pos = firstPos.displace(0,
@@ -175,7 +174,26 @@ public class MenuAssembly {
                     }
             ));
 
-            // TODO - visibility toggle and opacity slider
+            // opacity slider
+
+            final int MAX_OPACITY = 255, index = i;
+
+            final Coord2D osPos = pos.displace(
+                    Constants.LAYER_BUTTON_W + Constants.BUTTON_OFFSET,
+                    Constants.STD_TEXT_BUTTON_H / 2);
+
+            final HorizontalSlider opacitySlider = new HorizontalSlider(osPos,
+                    Constants.LAYER_OPACITY_SLIDER_W, MenuElement.Anchor.LEFT_CENTRAL,
+                    0, MAX_OPACITY,
+                    (int)(StippleEffect.get().getContext().getState().getLayers()
+                            .get(index).getOpacity() * MAX_OPACITY),
+                    o -> StippleEffect.get().getContext()
+                            .changeLayerOpacity(o / (double) MAX_OPACITY, index));
+
+            opacitySlider.updateAssets();
+            layerButtons[amount + i] = new ScrollableMenuElement(opacitySlider);
+
+            // TODO - visibility toggle
 
             realBottomY = pos.y + dims.y;
         }
