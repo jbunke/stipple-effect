@@ -10,7 +10,7 @@ public class Constants {
 
     public static final Path ICON_FOLDER = Path.of("icons");
 
-    public static final int CANVAS_W = 960, CANVAS_H = 540, SCREEN_HEIGHT_BUFFER = 80;
+    public static final int CANVAS_W = 960, CANVAS_H = 540, SCREEN_H_BUFFER = 80;
 
     public static final double TICK_HZ = 100d, FPS = 30d;
 
@@ -59,20 +59,27 @@ public class Constants {
             BLACK = new Color(0, 0, 0),
             WHITE = new Color(255, 255, 255),
             LIGHT_GREY = new Color(170, 170, 170),
+            GREY = new Color(127, 127, 127),
+            DARK = new Color(55, 55, 55),
             HIGHLIGHT_1 = new Color(100, 100, 255),
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
             ACCENT_BACKGROUND = new Color(30, 30, 90);
 
-    public static final int DEFAULT_IMAGE_WIDTH = 48, DEFAULT_IMAGE_HEIGHT = 48, CHECKER_INCREMENT = 4;
+    public static final int DEFAULT_IMAGE_W = 48, DEFAULT_IMAGE_H = 48, CHECKER_INCREMENT = 4;
 
-    public static final int BUTTON_DIM = 20, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = BUTTON_DIM,
-            BUTTON_TEXT_OFFSET_Y = -6,
+    public static final int BUTTON_DIM = 20, BUTTON_OFFSET = 2,
+            BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
+            SEGMENT_TITLE_BUTTON_OFFSET_X = 74,
+            LAYERS_BUTTONS_OFFSET_Y = 30, LAYERS_BUTTON_W = 150,
+            VERT_SCROLL_BAR_W = 20, VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X),
+            VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
+            STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
+            STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -6,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,
             SLIDER_W = 256, SLIDER_H = 20, SLIDER_BALL_W = 20, SLIDER_THINNING = 4, COLOR_LABEL_OFFSET_Y = -18,
             DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100;
+
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
-    public static final int BUTTON_OFFSET = 2, BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET,
-            BUTTON_BORDER_PX = 2, SEGMENT_TITLE_BUTTON_OFFSET_X = 74;
 
     // specific tools
     public static final int DEFAULT_BRUSH_RADIUS = 2, MIN_RADIUS = 0, MAX_RADIUS = 200;

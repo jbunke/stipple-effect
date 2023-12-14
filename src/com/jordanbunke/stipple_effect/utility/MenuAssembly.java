@@ -1,15 +1,22 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.error.GameError;
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.menus.MenuBuilder;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.SelectableListItemButton;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.tools.*;
+
+import java.util.List;
 
 public class MenuAssembly {
 
@@ -134,6 +141,47 @@ public class MenuAssembly {
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Constants.getLayersPosition());
+
+        // TODO - temp
+
+        final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
+        final int amount = layers.size();
+
+        final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount];
+
+        final Coord2D firstPos = Constants.getLayersPosition()
+                .displace(Constants.TOOL_NAME_X, Constants.LAYERS_BUTTONS_OFFSET_Y);
+        int realBottomY = firstPos.y;
+
+        for (int i = 0; i < amount; i++) {
+            final SELayer layer = layers.get(i);
+
+            final GameImage baseImage = GraphicsUtils.drawTextButton(Constants.LAYERS_BUTTON_W,
+                    layer.getName(), false, Constants.GREY),
+                    highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
+                    selectedImage = GraphicsUtils.drawTextButton(Constants.LAYERS_BUTTON_W,
+                            layer.getName(), true, Constants.GREY);
+
+            final Coord2D pos = firstPos.displace(0,
+                    (amount - (i + 1)) * Constants.STD_TEXT_BUTTON_INC),
+                    dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
+
+            layerButtons[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
+                    MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
+                    i, () -> StippleEffect.get().getContext().getState().getLayerEditIndex(),
+                    s -> {
+                        StippleEffect.get().getContext().getState().setLayerEditIndex(s);
+                        StippleEffect.get().rebuildLayersMenu();
+                    }
+            ));
+
+            realBottomY = pos.y + dims.y;
+        }
+
+        mb.add(new VerticalScrollingMenuElement(
+                firstPos, new Coord2D(Constants.VERT_SCROLL_WINDOW_W, Constants.VERT_SCROLL_WINDOW_H),
+                layerButtons, realBottomY
+        ));
 
         // TODO - layers themselves
 

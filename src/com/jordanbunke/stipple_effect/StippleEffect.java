@@ -69,8 +69,8 @@ public class StippleEffect implements ProgramContext {
 
     public StippleEffect() {
         contexts = new ArrayList<>(List.of(
-                new ImageContext(Constants.DEFAULT_IMAGE_WIDTH,
-                        Constants.DEFAULT_IMAGE_HEIGHT)));
+                new ImageContext(Constants.DEFAULT_IMAGE_W,
+                        Constants.DEFAULT_IMAGE_H)));
         contextIndex = 0;
 
         // default tool is the hand
@@ -126,7 +126,7 @@ public class StippleEffect implements ProgramContext {
         final int screenW = Toolkit.getDefaultToolkit().getScreenSize().width,
                 screenH = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-        final int h = screenH - Constants.SCREEN_HEIGHT_BUFFER;
+        final int h = screenH - Constants.SCREEN_H_BUFFER;
         final double scaleUp = h / (double)Constants.CANVAS_H;
         return windowed
                 ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h)

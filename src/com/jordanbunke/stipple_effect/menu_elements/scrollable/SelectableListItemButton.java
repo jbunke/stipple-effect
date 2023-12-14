@@ -19,14 +19,12 @@ public class SelectableListItemButton extends MenuButton {
     private boolean selected = false;
 
     public SelectableListItemButton(
-            final Coord2D position, final Coord2D dimensions,
-            final Anchor anchor, final boolean visible,
+            final Coord2D position, final Coord2D dimensions, final Anchor anchor,
             final GameImage baseImage, final GameImage highlightedImage, final GameImage selectedImage,
-            final int index,
-            final Callable<Integer> selectedIndexGetter,
+            final int index, final Callable<Integer> selectedIndexGetter,
             final Consumer<Integer> selectFunction
     ) {
-        super(position, dimensions, anchor, visible, () -> selectFunction.accept(index));
+        super(position, dimensions, anchor, true, () -> selectFunction.accept(index));
 
         this.baseImage = baseImage;
         this.highlightedImage = highlightedImage;
