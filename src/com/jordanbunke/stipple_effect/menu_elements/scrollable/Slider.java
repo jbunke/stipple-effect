@@ -49,8 +49,6 @@ public abstract class Slider extends MenuElement {
 
         this.coordDimFunction = coordDimFunction;
         this.sliderDimFunction = sliderDimFunction;
-
-        updateAssets();
     }
 
     @Override
@@ -134,15 +132,13 @@ public abstract class Slider extends MenuElement {
     public GameImage drawSliderCore(final int w, final int h) {
         final GameImage sliderCore = new GameImage(w, h);
 
-        // TODO - single color fill
+        sliderCore.fillRectangle(Constants.WHITE, 0, 0, w, h);
 
         return sliderCore.submit();
     }
 
     public Color getSliderBallCoreColor() {
-        // TODO - default color
-
-        return Constants.ACCENT_BACKGROUND;
+        return Constants.GREY;
     }
 
     // helper
@@ -218,7 +214,7 @@ public abstract class Slider extends MenuElement {
         selectedImage = s.submit();
     }
 
-    // GET / SET
+    // GETTERS
 
     public boolean isHighlighted() {
         return highlighted;
@@ -230,51 +226,5 @@ public abstract class Slider extends MenuElement {
 
     public int getValue() {
         return value;
-    }
-
-    public int getOnClickDiffDim() {
-        return onClickDiffDim;
-    }
-
-    // TODO - image getters may be unnecessary
-
-    public GameImage getBaseImage() {
-        return baseImage;
-    }
-
-    public GameImage getHighlightedImage() {
-        return highlightedImage;
-    }
-
-    public GameImage getSelectedImage() {
-        return selectedImage;
-    }
-
-    public void setHighlighted(final boolean highlighted) {
-        this.highlighted = highlighted;
-    }
-
-    public void setSliding(final boolean sliding) {
-        this.sliding = sliding;
-    }
-
-    public void setValue(final int value) {
-        this.value = value;
-    }
-
-    public void setOnClickDiffDim(final int onClickDiffDim) {
-        this.onClickDiffDim = onClickDiffDim;
-    }
-
-    public void setBaseImage(final GameImage baseImage) {
-        this.baseImage = baseImage;
-    }
-
-    public void setHighlightedImage(final GameImage highlightedImage) {
-        this.highlightedImage = highlightedImage;
-    }
-
-    public void setSelectedImage(final GameImage selectedImage) {
-        this.selectedImage = selectedImage;
     }
 }

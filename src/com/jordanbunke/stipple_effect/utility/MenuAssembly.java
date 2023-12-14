@@ -145,9 +145,9 @@ public class MenuAssembly {
         // TODO - temp
 
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size();
+        final int amount = layers.size(), elementsPerLayer = 1; // TODO - 3: visibility and opacity slider as well
 
-        final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount];
+        final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
         final Coord2D firstPos = Constants.getLayersPosition()
                 .displace(Constants.TOOL_NAME_X, Constants.LAYERS_BUTTONS_OFFSET_Y);
@@ -175,17 +175,25 @@ public class MenuAssembly {
                     }
             ));
 
+            // TODO - visibility toggle and opacity slider
+
             realBottomY = pos.y + dims.y;
         }
 
-        mb.add(new VerticalScrollingMenuElement(
-                firstPos, new Coord2D(Constants.VERT_SCROLL_WINDOW_W, Constants.VERT_SCROLL_WINDOW_H),
-                layerButtons, realBottomY
-        ));
+        final int
+                selectedIndex = StippleEffect.get().getContext().getState().getLayerEditIndex(),
+                initialOffsetY = layerButtonDisplacement(selectedIndex, amount).y;
 
-        // TODO - layers themselves
+        mb.add(new VerticalScrollingMenuElement(firstPos,
+                new Coord2D(Constants.VERT_SCROLL_WINDOW_W, Constants.VERT_SCROLL_WINDOW_H),
+                layerButtons, realBottomY, initialOffsetY));
 
         return mb.build();
+    }
+
+    private static Coord2D layerButtonDisplacement(final int index, final int amount) {
+        // by default, selecting a layer should display the two layers above it
+        return new Coord2D(0, (amount - ((index + Constants.LAYERS_ABOVE_TO_DISPLAY) + 1)) * Constants.STD_TEXT_BUTTON_INC);
     }
 
     private static void populateButtonsIntoBuilder(

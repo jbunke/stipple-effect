@@ -131,11 +131,11 @@ public class ImageContext {
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    states::undo
+                    () -> states.undo(true)
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    states::redo
+                    () -> states.redo(true)
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
@@ -319,6 +319,21 @@ public class ImageContext {
     }
 
     // LAYER MANIPULATION
+    // change layer opacity
+    public void changeLayerOpacity(final double opacity, final int layerIndex) {
+        // build resultant state
+        final int w = states.getState().getImageWidth(),
+                h = states.getState().getImageHeight();
+        final List<SELayer> layers = new ArrayList<>(states.getState().getLayers());
+        final SELayer layer = layers.get(layerIndex).returnChangedOpacity(opacity);
+        layers.remove(layerIndex);
+        layers.add(layerIndex, layer);
+
+        final ImageState result = new ImageState(w, h, layers,
+                states.getState().getLayerEditIndex(), false);
+        states.performAction(result, ActionType.CANVAS);
+    }
+
     // add layer
     public void addLayer() {
         // build resultant state

@@ -15,25 +15,29 @@ public class VerticalScrollingMenuElement extends ScrollingMenuElement {
     public VerticalScrollingMenuElement(
             final Coord2D position, final Coord2D dimensions,
             final ScrollableMenuElement[] menuElements,
-            final int realBottomY
+            final int realBottomY, final int initialOffsetY
     ) {
         super(position, dimensions, menuElements);
 
         this.realBottomY = realBottomY;
-        offsetY = 0;
+
+        final int minOffsetY = 0, maxOffsetY = (realBottomY - getY()) - getHeight();
+
+        offsetY = -Math.max(minOffsetY, Math.min(initialOffsetY, maxOffsetY));
 
         final boolean canScroll = realBottomY > position.y + dimensions.y;
-        slider = canScroll ? makeSlider() : null;
+        slider = canScroll ? makeSlider(maxOffsetY) : null;
     }
 
-    private VerticalSlider makeSlider() {
+    private VerticalSlider makeSlider(final int maxOffsetY) {
         final Coord2D position = new Coord2D(getX(), getY())
                 .displace(getWidth(), 0)
                 .displace(-Constants.SLIDER_OFF_DIM, 0);
 
-        return new VerticalSlider(position, getHeight(), Anchor.LEFT_TOP,
-                0, (realBottomY - getY()) - getHeight(), offsetY,
-                o -> setOffsetY(-o));
+        final VerticalSlider slider = new VerticalSlider(position, getHeight(), Anchor.LEFT_TOP,
+                0, maxOffsetY, -offsetY, o -> setOffsetY(-o));
+        slider.updateAssets();
+        return slider;
     }
 
     public void setOffsetY(final int offsetY) {

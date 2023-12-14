@@ -37,7 +37,7 @@ public final class SELayer {
             final int size = StippleEffect.get().getContext().getState().getLayers().size();
             return "Layer " + (size + 1);
         } catch (NullPointerException e) {
-            return "Base Layer";
+            return Constants.BASE_LAYER_NAME;
         }
     }
 

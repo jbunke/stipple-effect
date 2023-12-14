@@ -55,6 +55,8 @@ public class Constants {
             SIZE_X = (int)(CANVAS_W * 0.36),
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
+    public static final String BASE_LAYER_NAME = "Background";
+
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
             WHITE = new Color(255, 255, 255),
@@ -70,7 +72,7 @@ public class Constants {
     public static final int BUTTON_DIM = 20, BUTTON_OFFSET = 2,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74,
-            LAYERS_BUTTONS_OFFSET_Y = 30, LAYERS_BUTTON_W = 150,
+            LAYERS_BUTTONS_OFFSET_Y = 30, LAYERS_BUTTON_W = 110, LAYERS_ABOVE_TO_DISPLAY = 2,
             VERT_SCROLL_BAR_W = 20, VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X),
             VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,

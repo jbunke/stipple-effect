@@ -47,10 +47,8 @@ public class ColorComponent extends MenuElementContainer {
         menuElements[SLIDER_INDEX] = new ColorSlider(
                 startingPosition.displace(Constants.COLOR_PICKER_W / 2,
                         (int)(Constants.COLOR_SELECTOR_INC_Y * 0.45)),
-                new Coord2D(Constants.COLOR_SLIDER_W + Constants.SLIDER_BALL_DIM, Constants.SLIDER_OFF_DIM),
-                minValue, maxValue, this.value,
-                spectralFunction, this::setValue
-        );
+                Constants.COLOR_SLIDER_W + Constants.SLIDER_BALL_DIM,
+                minValue, maxValue, this.value, spectralFunction, this::setValue);
         menuElements[LABEL_INDEX] = TextLabel.make(
                 startingPosition.displace(Constants.TOOL_NAME_X, Constants.COLOR_LABEL_OFFSET_Y),
                 label, Constants.BLACK);

@@ -16,30 +16,48 @@ public class StateManager {
         return index > 0;
     }
 
-    public void undo() {
-        if (canUndo())
+    public void undo(final boolean redraw) {
+        if (canUndo()) {
             index--;
+
+            if (redraw)
+                ActionType.MAJOR.consequence();
+        }
     }
 
     public void undoToCheckpoint() {
+        final int was = index;
+
         do {
-            undo();
+            undo(false);
         } while (canUndo() && !getState().isCheckpoint());
+
+        if (was != index)
+            ActionType.MAJOR.consequence();
     }
 
     public boolean canRedo() {
         return index + 1 < states.size();
     }
 
-    public void redo() {
-        if (canRedo())
+    public void redo(final boolean redraw) {
+        if (canRedo()) {
             index++;
+
+            if (redraw)
+                ActionType.MAJOR.consequence();
+        }
     }
 
     public void redoToCheckpoint() {
+        final int was = index;
+
         do {
-            redo();
+            redo(false);
         } while (canRedo() && !getState().isCheckpoint());
+
+        if (was != index)
+            ActionType.MAJOR.consequence();
     }
 
     public void performAction(final ImageState resultantState, final ActionType actionType) {
