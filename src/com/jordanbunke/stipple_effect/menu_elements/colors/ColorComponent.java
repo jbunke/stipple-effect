@@ -7,6 +7,8 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
+import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;

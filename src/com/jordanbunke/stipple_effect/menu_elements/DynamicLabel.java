@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.menu_elements.colors;
+package com.jordanbunke.stipple_effect.menu_elements;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.error.GameError;

@@ -54,6 +54,9 @@ public class StippleEffect implements ProgramContext {
     // frames
     private Menu framesMenu;
 
+    // dialog
+    private Menu dialog;
+
     static {
         OnStartup.run();
 
@@ -87,6 +90,8 @@ public class StippleEffect implements ProgramContext {
         framesMenu = MenuAssembly.stub();
 
         projectsMenu = MenuAssembly.stub();
+
+        dialog = null;
 
         windowed = true; // TODO - read from settings on startup
         window = makeWindow();
@@ -151,42 +156,50 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void process(final InputEventLogger eventLogger) {
-        // tools
-        toolButtonMenu.process(eventLogger);
-        // colors
-        colorsMenu.process(eventLogger);
-        // layers
-        layersMenu.process(eventLogger);
-        // frames
-        framesMenu.process(eventLogger);
-        // projects
-        projectsMenu.process(eventLogger);
-
-        // workspace
-        getContext().process(eventLogger, tool);
-
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     this::toggleFullscreen
             );
         }
+
+        if (dialog == null) {
+            // tools
+            toolButtonMenu.process(eventLogger);
+            // colors
+            colorsMenu.process(eventLogger);
+            // layers
+            layersMenu.process(eventLogger);
+            // frames
+            framesMenu.process(eventLogger);
+            // projects
+            projectsMenu.process(eventLogger);
+
+            // workspace
+            getContext().process(eventLogger, tool);
+        } else {
+            dialog.process(eventLogger);
+        }
     }
 
     @Override
     public void update(final double deltaTime) {
-        getContext().animate(deltaTime);
+        if (dialog == null) {
+            getContext().animate(deltaTime);
 
-        // tools
-        toolButtonMenu.update(deltaTime);
-        // colors
-        colorsMenu.update(deltaTime);
-        // layers
-        layersMenu.update(deltaTime);
-        // frames
-        framesMenu.update(deltaTime);
-        // projects
-        projectsMenu.update(deltaTime);
+            // tools
+            toolButtonMenu.update(deltaTime);
+            // colors
+            colorsMenu.update(deltaTime);
+            // layers
+            layersMenu.update(deltaTime);
+            // frames
+            framesMenu.update(deltaTime);
+            // projects
+            projectsMenu.update(deltaTime);
+        } else {
+            dialog.update(deltaTime);
+        }
     }
 
     @Override
@@ -236,6 +249,12 @@ public class StippleEffect implements ProgramContext {
         canvas.drawLine(strokeWidth, cp.x, cp.y, Constants.CANVAS_W, cp.y); // layers and colors separation
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
         canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace and right segments separation
+
+        if (dialog != null) {
+            canvas.fillRectangle(Constants.VEIL, 0, 0,
+                    Constants.CANVAS_W, Constants.CANVAS_H);
+            dialog.render(canvas);
+        }
     }
 
     @Override
@@ -441,5 +460,13 @@ public class StippleEffect implements ProgramContext {
     public void setTool(final Tool tool) {
         this.tool = tool;
         toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+    }
+
+    public void clearDialog() {
+        dialog = null;
+    }
+
+    public void setDialog(final Menu dialog) {
+        this.dialog = dialog;
     }
 }

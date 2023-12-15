@@ -14,7 +14,7 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
-import com.jordanbunke.stipple_effect.menu_elements.colors.DynamicLabel;
+import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
@@ -45,23 +45,26 @@ public class MenuAssembly {
                 "open_file",
                 "save",
                 "save_as",
-                "wip", // TODO - resize
-                "wip" // TODO - pad
+                "resize",
+                "pad"
         };
 
         final boolean[] preconditions = new boolean[] {
                 true,
-                // TODO - while unimplemented ... should all be true eventually
-                false, false, false, false, false
+                true,
+                true,
+                true,
+                true,
+                true
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().newProject(),
-                () -> {}, // TODO rest
-                () -> {},
-                () -> {},
-                () -> {},
-                () -> {}
+                () -> StippleEffect.get().newProject(), // TODO
+                () -> {}, // TODO - check Translation for open file dialog implementation
+                () -> {}, // TODO - check project info if save association exists; save automatically if yes, defer to save as dialog if no
+                DialogAssembly::setDialogToSave,
+                DialogAssembly::setDialogToResize,
+                DialogAssembly::setDialogToPad
         };
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
@@ -400,7 +403,7 @@ public class MenuAssembly {
 
             layerButtons[(5 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton("settings", lsPos, true,
-                            /* TODO: once dialogs are implemented; for renaming and manually setting opacity */ null));
+                            () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + dims.y;
         }

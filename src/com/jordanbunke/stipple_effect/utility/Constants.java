@@ -52,7 +52,11 @@ public class Constants {
     }
 
     public static Coord2D getSegmentContentDisplacement() {
-        return new Coord2D(Constants.TOOL_NAME_X, Constants.SEGMENT_TITLE_CONTENT_OFFSET_Y);
+        return new Coord2D(TOOL_NAME_X, SEGMENT_TITLE_CONTENT_OFFSET_Y);
+    }
+
+    public static Coord2D getCanvasMiddle() {
+        return new Coord2D(CANVAS_W / 2, CANVAS_H / 2);
     }
 
     public static final int TEXT_Y_OFFSET = -4,
@@ -69,11 +73,14 @@ public class Constants {
             BLACK = new Color(0, 0, 0),
             WHITE = new Color(255, 255, 255),
             ACCENT_BACKGROUND_LIGHT = new Color(180, 180, 231),
+            ACCENT_BACKGROUND_DARK = new Color(30, 30, 90),
             GREY = new Color(127, 127, 127),
             DARK = new Color(55, 55, 55),
+            VEIL = new Color(ACCENT_BACKGROUND_LIGHT.getRed(),
+                    ACCENT_BACKGROUND_LIGHT.getGreen(),
+                    ACCENT_BACKGROUND_LIGHT.getBlue(), 200),
             HIGHLIGHT_1 = new Color(100, 100, 255),
-            HIGHLIGHT_2 = new Color(50, 80, 255, 100),
-            ACCENT_BACKGROUND_DARK = new Color(30, 30, 90);
+            HIGHLIGHT_2 = new Color(50, 80, 255, 100);
 
     public static final int DEFAULT_IMAGE_W = 48, DEFAULT_IMAGE_H = 48, CHECKER_INCREMENT = 4;
 
@@ -87,6 +94,7 @@ public class Constants {
             VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X), VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
             FRAME_SCROLL_WINDOW_W = FRAMES_W - (2 * TOOL_NAME_X), FRAME_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
             FRAME_PLAYBACK_SLIDER_W = 155, FRAME_PLAYBACK_SLIDER_OFFSET_X = 241,
+            DIALOG_W = CANVAS_W / 2, DIALOG_H = CANVAS_H / 2,
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -6,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,
