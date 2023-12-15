@@ -170,15 +170,21 @@ public class MenuAssembly {
         final Coord2D firstPos = Constants.getFramesPosition()
                 .displace(Constants.getSegmentContentDisplacement());
 
-        // TODO - play/stop as toggle
+        // play/stop as toggle
+
+        final Coord2D playStopTogglePos = Constants.getFramesPosition().displace(
+                Constants.SEGMENT_TITLE_BUTTON_OFFSET_X + (5 * Constants.BUTTON_INC),
+                Constants.ICON_BUTTON_OFFSET_Y);
+
+        mb.add(generatePlayStopToggle(playStopTogglePos));
 
         // playback speed slider and dynamic label for playback speed
 
-        final Coord2D pssPos = firstPos.displace(
+        final Coord2D playbackSliderPos = firstPos.displace(
                 Constants.FRAME_PLAYBACK_SLIDER_OFFSET_X,
                 -Constants.SEGMENT_TITLE_CONTENT_OFFSET_Y + Constants.ICON_BUTTON_OFFSET_Y);
 
-        final HorizontalSlider slider = new HorizontalSlider(pssPos,
+        final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
                 Constants.FRAME_PLAYBACK_SLIDER_W, MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_MILLIS_PER_FRAME, Constants.MAX_MILLIS_PER_FRAME,
                 StippleEffect.get().getContext().getPlaybackInfo().getMillisPerFrame(),
@@ -192,8 +198,15 @@ public class MenuAssembly {
 
         mb.add(new DynamicLabel(labelPos,
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
-                () -> (1000 / StippleEffect.get().getContext()
-                        .getPlaybackInfo().getMillisPerFrame()) + " fps",
+                () -> {
+                    final int MILLIS_PER_SECOND = 1000;
+
+                    final double fps = (MILLIS_PER_SECOND /
+                            (double) StippleEffect.get().getContext()
+                                    .getPlaybackInfo().getMillisPerFrame());
+
+                    return (fps < 10d ? ((int)(fps * 10)) / 10d : String.valueOf((int) fps)) + " fps";
+                },
                 Constants.DYNAMIC_LABEL_W_ALLOWANCE));
 
         // frame content
@@ -231,6 +244,28 @@ public class MenuAssembly {
                 frameElements, realRightX, frameButtonXDisplacement()));
 
         return mb.build();
+    }
+
+    private static SimpleToggleMenuButton generatePlayStopToggle(final Coord2D pos) {
+        // 0: is playing, button click should STOP; 1: vice-versa
+
+        final GameImage playing = GraphicsUtils.getIcon("stop"),
+                notPlaying = GraphicsUtils.getIcon("play");
+
+        return new SimpleToggleMenuButton(pos,
+                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_TOP, true,
+                new GameImage[] { playing, notPlaying },
+                new GameImage[] {
+                        GraphicsUtils.highlightIconButton(playing),
+                        GraphicsUtils.highlightIconButton(notPlaying)
+                },
+                new Runnable[] {
+                        () -> StippleEffect.get().getContext().getPlaybackInfo().stop(),
+                        () -> StippleEffect.get().getContext().getPlaybackInfo().play()
+                },
+                () -> StippleEffect.get().getContext().getPlaybackInfo()
+                        .isPlaying() ? 0 : 1, () -> {});
     }
 
     private static int frameButtonXDisplacement() {

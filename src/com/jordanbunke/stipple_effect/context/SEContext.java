@@ -133,6 +133,10 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
                     () -> {} // TODO - deselect
             );
+        }
+
+        // SHIFT but not CTRL
+        if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                     () -> getState().previousFrame()
@@ -141,11 +145,14 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                     () -> getState().nextFrame()
             );
-        }
-
-        // SHIFT but not CTRL
-        if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-            // TODO - populate with SHIFT + ? shortcuts
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> getState().setFrameIndex(0)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> getState().setFrameIndex(getState().getFrameCount() - 1)
+            );
         }
 
         // CTRL and SHIFT
