@@ -319,7 +319,7 @@ public class MenuAssembly {
         // layer content
 
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 5;
+        final int amount = layers.size(), elementsPerLayer = 6;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -330,11 +330,16 @@ public class MenuAssembly {
         for (int i = amount - 1; i >= 0; i--) {
             final SELayer layer = layers.get(i);
 
+            final String name = layer.getName(),
+                    text = name.length() > Constants.LAYER_NAME_LENGTH_CUTOFF
+                            ? name.substring(0, Constants.LAYER_NAME_LENGTH_CUTOFF) + "..."
+                            : name;
+
             final GameImage baseImage = GraphicsUtils.drawTextButton(Constants.LAYER_BUTTON_W,
-                    layer.getName(), false, Constants.GREY),
+                    text, false, Constants.GREY),
                     highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
                     selectedImage = GraphicsUtils.drawTextButton(Constants.LAYER_BUTTON_W,
-                            layer.getName(), true, Constants.GREY);
+                            text, true, Constants.GREY);
 
             final Coord2D pos = firstPos.displace(0,
                     (amount - (i + 1)) * Constants.STD_TEXT_BUTTON_INC),
@@ -388,6 +393,14 @@ public class MenuAssembly {
 
             layerButtons[(4 * amount) + i] =
                     new ScrollableMenuElement(generateOnionSkinToggle(index, onionPos));
+
+            // layer settings
+
+            final Coord2D lsPos = ilPos.displace(Constants.BUTTON_INC * 2, 0);
+
+            layerButtons[(5 * amount) + i] = new ScrollableMenuElement(
+                    GraphicsUtils.generateIconButton("settings", lsPos, true,
+                            /* TODO: once dialogs are implemented; for renaming and manually setting opacity */ null));
 
             realBottomY = pos.y + dims.y;
         }

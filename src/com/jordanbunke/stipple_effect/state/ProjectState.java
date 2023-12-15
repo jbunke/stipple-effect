@@ -59,15 +59,29 @@ public class ProjectState {
         this.checkpoint = checkpoint;
     }
 
-    public GameImage draw() {
+    // TODO: use draw(false) for image flattening when saving to PNG
+    public GameImage draw(final boolean includeOnionSkins) {
         final GameImage image = new GameImage(imageWidth, imageHeight);
 
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
+                // onion skin previous
+                if (includeOnionSkins && layer.getOnionSkinMode()
+                        .doPrevious() && frameIndex > 0)
+                    image.draw(layer.renderFrame(frameIndex - 1,
+                            Constants.ONION_SKIN_OPACITY));
+
+                // this layer
                 if (layer.getOpacity() == Constants.OPAQUE)
                     image.draw(layer.getFrame(frameIndex));
                 else
                     image.draw(layer.renderFrame(frameIndex));
+
+                // onion skin next
+                if (includeOnionSkins && layer.getOnionSkinMode()
+                        .doNext() && frameIndex + 1 < frameCount)
+                    image.draw(layer.renderFrame(frameIndex + 1,
+                            Constants.ONION_SKIN_OPACITY));
             }
         }
 

@@ -14,7 +14,7 @@ public class Constants {
 
     public static final double TICK_HZ = 100d, FPS = 30d;
 
-    public static final double OPAQUE = 1d, TRANSPARENT = 0d;
+    public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5;
 
     public static final int CONTEXTS_W = CANVAS_W / 2,
             FRAMES_W = CANVAS_W / 2, TOOLS_W = 25, COLOR_PICKER_W = 286,
@@ -61,7 +61,7 @@ public class Constants {
             SIZE_X = (int)(CANVAS_W * 0.36),
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
-    public static final String BASE_LAYER_NAME = "Background",
+    public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]",
             ICON_ID_GAP_CODE = "";
 
@@ -80,7 +80,8 @@ public class Constants {
     public static final int BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
-            LAYER_BUTTON_W = 110, LAYER_OPACITY_SLIDER_W = 68, LAYERS_ABOVE_TO_DISPLAY = 2,
+            LAYER_BUTTON_W = 88, LAYER_OPACITY_SLIDER_W = 68,
+            LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 6,
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
             PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8, PROJECTS_BEFORE_TO_DISPLAY = 1,
             VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X), VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),

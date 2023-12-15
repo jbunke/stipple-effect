@@ -53,12 +53,8 @@ public final class SELayer {
     }
 
     private static String giveLayerDefaultName() {
-        try {
-            final int size = StippleEffect.get().getContext().getState().getLayers().size();
-            return "Layer " + (size + 1);
-        } catch (NullPointerException e) {
-            return Constants.BASE_LAYER_NAME;
-        }
+        final int size = StippleEffect.get().getContext().getState().getLayers().size();
+        return Constants.SUBSEQUENT_LAYER_PREFIX + (size + 1);
     }
 
     public SELayer duplicate() {
@@ -147,6 +143,10 @@ public final class SELayer {
     }
 
     public GameImage renderFrame(final int frameIndex) {
+        return renderFrame(frameIndex, opacity);
+    }
+
+    public GameImage renderFrame(final int frameIndex, final double opacity) {
         final GameImage frame = getFrame(frameIndex);
 
         final GameImage render = new GameImage(frame.getWidth(), frame.getHeight());
