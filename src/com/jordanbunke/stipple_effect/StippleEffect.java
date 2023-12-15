@@ -99,7 +99,7 @@ public class StippleEffect implements ProgramContext {
 
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
         game.setCanvasSize(Constants.CANVAS_W, Constants.CANVAS_H);
-        // game.getDebugger().muteChannel(GameDebugger.FRAME_RATE);
+        game.getDebugger().muteChannel(GameDebugger.FRAME_RATE);
     }
 
     public static StippleEffect get() {
