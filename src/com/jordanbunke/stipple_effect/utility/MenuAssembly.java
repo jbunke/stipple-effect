@@ -9,14 +9,19 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.menu_elements.colors.DynamicLabel;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.*;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.tools.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MenuAssembly {
@@ -314,7 +319,7 @@ public class MenuAssembly {
         // layer content
 
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 4;
+        final int amount = layers.size(), elementsPerLayer = 5;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -377,6 +382,13 @@ public class MenuAssembly {
                     GraphicsUtils.generateIconButton("isolate_layer", ilPos, true,
                     () -> StippleEffect.get().getContext().isolateLayer(index)));
 
+            // onion skin toggle
+
+            final Coord2D onionPos = vtPos.displace(Constants.BUTTON_INC * 2, 0);
+
+            layerButtons[(4 * amount) + i] =
+                    new ScrollableMenuElement(generateOnionSkinToggle(index, onionPos));
+
             realBottomY = pos.y + dims.y;
         }
 
@@ -411,6 +423,34 @@ public class MenuAssembly {
                 },
                 () -> StippleEffect.get().getContext().getState()
                         .getLayers().get(index).isEnabled() ? 0 : 1,
+                () -> {});
+    }
+
+    private static SimpleToggleMenuButton generateOnionSkinToggle(
+            final int index, final Coord2D pos
+    ) {
+        final GameImage[]
+                baseSet = Arrays.stream(OnionSkinMode.values())
+                .map(osm -> GraphicsUtils.getIcon("onion_skin_" +
+                        osm.name().toLowerCase()))
+                .toArray(GameImage[]::new),
+                highlightedSet = Arrays.stream(baseSet).map(GraphicsUtils::highlightIconButton)
+                        .toArray(GameImage[]::new);
+        final Runnable[] behaviours = Arrays.stream(OnionSkinMode.values()).map(
+                osm -> (Runnable) () -> {
+                    final int nextIndex = (osm.ordinal() + 1) %
+                            OnionSkinMode.values().length;
+                    StippleEffect.get().getContext().getState()
+                            .getLayers().get(index).setOnionSkinMode(
+                                    OnionSkinMode.values()[nextIndex]);
+                }).toArray(Runnable[]::new);
+
+        return new SimpleToggleMenuButton(pos,
+                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_CENTRAL, true,
+                baseSet, highlightedSet, behaviours,
+                () -> StippleEffect.get().getContext().getState()
+                        .getLayers().get(index).getOnionSkinMode().ordinal(),
                 () -> {});
     }
 

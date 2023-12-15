@@ -19,7 +19,7 @@ public class LayerCombiner {
             frames.add(frame.submit());
         }
 
-        return new SELayer(frames, below.getOpacity(),
-                below.isEnabled(), below.getName());
+        return new SELayer(frames, below.getOpacity(), below.isEnabled(),
+                below.getOnionSkinMode(), below.getName());
     }
 }

@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerCombiner;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -498,6 +499,28 @@ public class SEContext {
                     getState().getLayerEditIndex(), getState().getFrameCount(),
                     getState().getFrameIndex());
             stateManager.performAction(result, ActionType.CANVAS);
+        }
+    }
+
+    // enable layer
+    public void setOnionSkinMode(
+            final int layerIndex, final OnionSkinMode onionSkinMode
+    ) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size() &&
+                !layers.get(layerIndex).getOnionSkinMode().equals(onionSkinMode)) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+            final SELayer layer = layers.get(layerIndex).returnEnabled();
+            layers.remove(layerIndex);
+            layers.add(layerIndex, layer);
+
+            final ProjectState result = new ProjectState(w, h, layers,
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex());
         }
     }
 
