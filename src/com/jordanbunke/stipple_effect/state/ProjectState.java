@@ -60,7 +60,7 @@ public class ProjectState {
     }
 
     // TODO: use draw(false) for image flattening when saving to PNG
-    public GameImage draw(final boolean includeOnionSkins) {
+    public GameImage draw(final boolean includeOnionSkins, final int frameIndex) {
         final GameImage image = new GameImage(imageWidth, imageHeight);
 
         for (SELayer layer : layers) {

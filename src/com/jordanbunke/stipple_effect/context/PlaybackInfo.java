@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.context;
 
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 public class PlaybackInfo {
@@ -46,9 +47,15 @@ public class PlaybackInfo {
     }
 
     public void setMillisPerFrame(final int millisPerFrame) {
-        this.millisPerFrame = millisPerFrame;
+        this.millisPerFrame = Math.max(Constants.MIN_MILLIS_PER_FRAME,
+                Math.min(millisPerFrame, Constants.MAX_MILLIS_PER_FRAME));
         millisAccumulated = 0;
         nanosAccumulated = 0d;
+    }
+
+    public void incrementMillisPerFrame(final int delta) {
+        setMillisPerFrame(millisPerFrame + delta);
+        StippleEffect.get().rebuildFramesMenu();
     }
 
     public boolean isPlaying() {

@@ -61,7 +61,7 @@ public class MenuAssembly {
         final Runnable[] behaviours = new Runnable[] {
                 () -> StippleEffect.get().newProject(), // TODO
                 () -> {}, // TODO - check Translation for open file dialog implementation
-                () -> {}, // TODO - check project info if save association exists; save automatically if yes, defer to save as dialog if no
+                () -> StippleEffect.get().getContext().getProjectInfo().save(),
                 DialogAssembly::setDialogToSave,
                 DialogAssembly::setDialogToResize,
                 DialogAssembly::setDialogToPad
@@ -115,10 +115,17 @@ public class MenuAssembly {
             offsetX += Constants.BUTTON_DIM + Constants.SPACE_BETWEEN_PROJECT_BUTTONS_X;
 
             final int index = i;
+            final Runnable closeBehaviour = () -> {
+                if (StippleEffect.get().getContexts().get(index).getProjectInfo().hasUnsavedChanges()) {
+                    DialogAssembly.setDialogToCheckCloseProject(index);
+                } else {
+                    StippleEffect.get().removeContext(index);
+                }
+            };
 
             projectElements[amount + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton("close_project", cpPos,
-                            true, () -> StippleEffect.get().removeContext(index)));
+                            true, closeBehaviour));
 
             cumulativeWidth += offsetX;
             realRightX = cpPos.x + Constants.BUTTON_DIM;
@@ -301,7 +308,6 @@ public class MenuAssembly {
                 StippleEffect.get().getContext().getState().canRemoveLayer(),
                 StippleEffect.get().getContext().getState().canMoveLayerUp(),
                 StippleEffect.get().getContext().getState().canMoveLayerDown(),
-                // identical precondition for combine case
                 StippleEffect.get().getContext().getState().canMoveLayerDown(),
                 true
         };

@@ -16,6 +16,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.DialogAssembly;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -68,7 +69,7 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
         workspace.draw(generateCheckers(), render.x, render.y);
-        workspace.draw(getState().draw(true), render.x, render.y,
+        workspace.draw(getState().draw(true, getState().getFrameIndex()), render.x, render.y,
                 (int)(w * zoomFactor), (int)(h * zoomFactor));
 
         return workspace.submit();
@@ -120,10 +121,12 @@ public class SEContext {
                     stateManager::redoToCheckpoint
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToNewProject
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - context needs a field for a save path and a save mode ->
-                    // PNG, static vs animated,
-                    // animated can be frame-by-frame alongside, saved as separate files, or as GIF
+                    () -> getProjectInfo().save()
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
@@ -132,6 +135,14 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
                     () -> {} // TODO - deselect
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> getPlaybackInfo().incrementMillisPerFrame(-Constants.MILLIS_PER_FRAME_INC)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> getPlaybackInfo().incrementMillisPerFrame(Constants.MILLIS_PER_FRAME_INC)
             );
         }
 
@@ -167,7 +178,7 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - save as
+                    DialogAssembly::setDialogToSave
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),

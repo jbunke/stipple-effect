@@ -59,6 +59,13 @@ public class Constants {
         return new Coord2D(CANVAS_W / 2, CANVAS_H / 2);
     }
 
+    public static Coord2D getDialogContentInitial() {
+        return getCanvasMiddle().displace(-DIALOG_W / 2, -DIALOG_H / 2)
+                .displace(Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
+                        Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX +
+                                (2 * STD_TEXT_BUTTON_INC));
+    }
+
     public static final int TEXT_Y_OFFSET = -4,
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
             TP_X = (int)(CANVAS_W * 0.21),
@@ -66,8 +73,8 @@ public class Constants {
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
-            UNTITLED_PROJECT_NAME = "[ Untitled ]",
-            ICON_ID_GAP_CODE = "";
+            UNTITLED_PROJECT_NAME = "[ Untitled ]", NATIVE_FILE_SUFFIX = ".stef",
+            ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
@@ -94,7 +101,9 @@ public class Constants {
             VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X), VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
             FRAME_SCROLL_WINDOW_W = FRAMES_W - (2 * TOOL_NAME_X), FRAME_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
             FRAME_PLAYBACK_SLIDER_W = 155, FRAME_PLAYBACK_SLIDER_OFFSET_X = 241,
-            DIALOG_W = CANVAS_W / 2, DIALOG_H = CANVAS_H / 2,
+            DIALOG_W = CANVAS_W / 2, DIALOG_H = CANVAS_H / 2, DIALOG_CONTENT_INC_Y = 32,
+            DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
+            DIALOG_CONTENT_OFFSET_X = 125, DIALOG_CONTENT_W_ALLOWANCE = 290,
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -6,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,
@@ -106,5 +115,7 @@ public class Constants {
     // specific tools
     public static final int DEFAULT_BRUSH_BREADTH = 3, MIN_BREADTH = 1, MAX_BREADTH = 200,
             MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, /* TODO: test and tweak */ MAX_NUM_STATES = 5000,
-            MIN_MILLIS_PER_FRAME = 30, MAX_MILLIS_PER_FRAME = 500, DEFAULT_MILLIS_PER_FRAME = 100;
+            MIN_MILLIS_PER_FRAME = 33, MAX_MILLIS_PER_FRAME = 500,
+            MILLIS_PER_FRAME_INC = 40, DEFAULT_MILLIS_PER_FRAME = 100,
+            MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP;
 }
