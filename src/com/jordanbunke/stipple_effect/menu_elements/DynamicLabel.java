@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.menu_elements;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;

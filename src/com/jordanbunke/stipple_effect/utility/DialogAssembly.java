@@ -8,6 +8,8 @@ import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.PlaceholderMenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -25,7 +27,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.function.Supplier;
 
 public class DialogAssembly {
     public static void setDialogToSave() {
@@ -34,7 +35,9 @@ public class DialogAssembly {
                 folderLabel = makeDialogLeftLabel(0, "Folder: "),
                 nameLabel = makeDialogLeftLabel(1, "Name: "),
                 scaleUpLabel = makeDialogLeftLabel(2, "Scale Factor: "),
-                saveAsTypeLabel = makeDialogLeftLabel(3, "Save As: ");
+                saveAsTypeLabel = makeDialogLeftLabel(3, "Save As: "),
+                xDivsLabel = makeDialogLeftLabel(4, "X frames: "),
+                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: ");
 
         // folder selection button
         final DynamicTextButton folderButton = new DynamicTextButton(
@@ -147,24 +150,45 @@ public class DialogAssembly {
                 MenuElement.Anchor.LEFT_TOP, true, baseSet,
                 highlightedSet, behaviours, updateIndexLogic, () -> {});
 
-        // TODO - frameDims iff PNG_STITCHED
+        // frameDims iff PNG_STITCHED
+        final TextBox xDivsTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(xDivsLabel),
+                Constants.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                String.valueOf(StippleEffect.get().getContext()
+                        .getProjectInfo().getFrameDimsX()),
+                TextBox.getIntTextValidator(1, Constants.MAX_NUM_FRAMES),
+                s -> StippleEffect.get().getContext().getProjectInfo()
+                        .setFrameDimsX(Integer.parseInt(s)), 3);
+        final TextBox yDivsTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(yDivsLabel),
+                Constants.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                String.valueOf(StippleEffect.get().getContext()
+                        .getProjectInfo().getFrameDimsY()),
+                TextBox.getIntTextValidator(1, Constants.MAX_NUM_FRAMES),
+                s -> StippleEffect.get().getContext().getProjectInfo()
+                        .setFrameDimsY(Integer.parseInt(s)), 3);
+
+        final MenuElementGrouping pngStitchedContents = new MenuElementGrouping(
+                xDivsLabel, yDivsLabel, xDivsTextBox, yDivsTextBox);
+
+        // TODO - other additionals
+
+        final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
+                switch (StippleEffect.get().getContext().getProjectInfo().getSaveType()) {
+            case PNG_STITCHED -> pngStitchedContents;
+            case GIF -> null; // TODO
+            default -> new PlaceholderMenuElement();
+        });
 
         // content assembly
         final MenuElementGrouping contents = new MenuElementGrouping(
-                folderLabel,
-                nameLabel,
-                scaleUpLabel,
-                saveAsTypeLabel,
-                folderButton,
-                nameTextBox,
-                scaleUpSlider,
-                scaleUpValue,
-                saveAsToggle
-                // TODO - rest
-        );
+                folderLabel, nameLabel, scaleUpLabel, saveAsTypeLabel,
+                folderButton, nameTextBox, scaleUpSlider, scaleUpValue,
+                saveAsToggle, basedOnSaveType);
         setDialog(assembleDialog("Save Project...", contents,
                 () -> StippleEffect.get().getContext().getProjectInfo()
-                        .hasSaveAssociation(), "Save",
+                        .hasSaveAssociation() && xDivsTextBox.isValid() &&
+                        yDivsTextBox.isValid(), "Save",
                 () -> StippleEffect.get().getContext().getProjectInfo().save()));
     }
 
@@ -188,16 +212,16 @@ public class DialogAssembly {
         // dim textboxes
         final TextBox widthTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(widthLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(w),
                 TextBox.getIntTextValidator(Constants.MIN_IMAGE_W, Constants.MAX_IMAGE_W),
-                s -> DialogVals.setResizeWidth(Integer.parseInt(s)), 3),
-                heightTextBox = new TextBox(
-                        getDialogContentOffsetFromLabel(heightLabel),
-                        Constants.DIALOG_CONTENT_W_ALLOWANCE,
-                        MenuElement.Anchor.LEFT_TOP, String.valueOf(h),
-                        TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H),
-                        s -> DialogVals.setResizeHeight(Integer.parseInt(s)), 3);
+                s -> DialogVals.setResizeWidth(Integer.parseInt(s)), 3);
+        final TextBox heightTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(heightLabel),
+                Constants.SMALL_TEXT_BOX_W,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(h),
+                TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H),
+                s -> DialogVals.setResizeHeight(Integer.parseInt(s)), 3);
 
         // dynamic scale checker
         final DynamicLabel scaleChecker = new DynamicLabel(
@@ -258,7 +282,7 @@ public class DialogAssembly {
         // pad textboxes
         final TextBox leftTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(leftLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
                 TextBox.getIntTextValidator(
                         i -> i + DialogVals.getPadRight() + w <= Constants.MAX_IMAGE_W
@@ -266,7 +290,7 @@ public class DialogAssembly {
                 s -> DialogVals.setPadLeft(Integer.parseInt(s)), 3);
         final TextBox topTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(topLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
                 TextBox.getIntTextValidator(
                         i -> i + DialogVals.getPadBottom() + h <= Constants.MAX_IMAGE_H
@@ -274,7 +298,7 @@ public class DialogAssembly {
                 s -> DialogVals.setPadTop(Integer.parseInt(s)), 3);
         final TextBox rightTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(rightLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
                 TextBox.getIntTextValidator(
                         i -> i + DialogVals.getPadLeft() + w <= Constants.MAX_IMAGE_W
@@ -282,7 +306,7 @@ public class DialogAssembly {
                 s -> DialogVals.setPadRight(Integer.parseInt(s)), 3);
         final TextBox bottomTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(bottomLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
                 TextBox.getIntTextValidator(
                         i -> i + DialogVals.getPadTop() + h <= Constants.MAX_IMAGE_H
@@ -332,34 +356,34 @@ public class DialogAssembly {
                 instruction = makeDialogLeftLabel(1,
                         "Scale down and/or split into more frames"),
                 widthLabel = makeDialogLeftLabel(2, "Width in px: "),
-                heightLabel = makeDialogLeftLabel(3, "Height in px: "),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height in px: "),
                 xDivsLabel = makeDialogLeftLabel(4 - (tooBig ? 0 : 2), "X frames: "),
-                yDivsLabel = makeDialogLeftLabel(5 - (tooBig ? 0 : 2), "Y frames: ");
+                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: ");
 
         // downscale textboxes
         final TextBox widthTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(widthLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(w),
                 TextBox.getIntTextValidator(Constants.MIN_IMAGE_W, w),
-                s -> DialogVals.setResizeWidth(Integer.parseInt(s)), 5);
+                s -> DialogVals.setResizeWidth(Integer.parseInt(s)), 4);
         final TextBox heightTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(heightLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(h),
                 TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, h),
-                s -> DialogVals.setResizeHeight(Integer.parseInt(s)), 5);
+                s -> DialogVals.setResizeHeight(Integer.parseInt(s)), 4);
 
         // division textboxes
         final TextBox xDivsTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(xDivsLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(1),
                 TextBox.getIntTextValidator(1, Constants.MAX_NUM_FRAMES),
                 s -> DialogVals.setNewProjectXDivs(Integer.parseInt(s)), 3);
         final TextBox yDivsTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(yDivsLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                Constants.SMALL_TEXT_BOX_W,
                 MenuElement.Anchor.LEFT_TOP, String.valueOf(1),
                 TextBox.getIntTextValidator(1, Constants.MAX_NUM_FRAMES),
                 s -> DialogVals.setNewProjectYDivs(Integer.parseInt(s)), 3);
@@ -404,14 +428,14 @@ public class DialogAssembly {
         // dim textboxes
         final TextBox widthTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(widthLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
-                MenuElement.Anchor.LEFT_TOP, String.valueOf(Constants.DEFAULT_IMAGE_W),
+                Constants.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                String.valueOf(Constants.DEFAULT_IMAGE_W),
                 TextBox.getIntTextValidator(Constants.MIN_IMAGE_W, Constants.MAX_IMAGE_W),
                 s -> DialogVals.setNewProjectWidth(Integer.parseInt(s)), 3);
         final TextBox heightTextBox = new TextBox(
                 getDialogContentOffsetFromLabel(heightLabel),
-                Constants.DIALOG_CONTENT_W_ALLOWANCE,
-                MenuElement.Anchor.LEFT_TOP, String.valueOf(Constants.DEFAULT_IMAGE_H),
+                Constants.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                String.valueOf(Constants.DEFAULT_IMAGE_H),
                 TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H),
                 s -> DialogVals.setNewProjectHeight(Integer.parseInt(s)), 3);
 
@@ -497,6 +521,11 @@ public class DialogAssembly {
     private static TextLabel makeDialogLeftLabel(final int index, final String text) {
         return TextLabel.make(Constants.getDialogContentInitial()
                 .displace(0, index * Constants.DIALOG_CONTENT_INC_Y),
+                text, Constants.WHITE);
+    }
+
+    private static TextLabel makeDialogRightLabel(final TextLabel leftLabel, final String text) {
+        return TextLabel.make(leftLabel.getRenderPosition().displace(Constants.DIALOG_W / 2, 0),
                 text, Constants.WHITE);
     }
 

@@ -202,6 +202,14 @@ public class ProjectInfo {
         return scaleUp;
     }
 
+    public int getFrameDimsX() {
+        return frameDims[X];
+    }
+
+    public int getFrameDimsY() {
+        return frameDims[Y];
+    }
+
     public SaveType getSaveType() {
         return saveType;
     }
