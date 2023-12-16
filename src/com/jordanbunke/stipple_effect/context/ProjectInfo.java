@@ -56,8 +56,7 @@ public class ProjectInfo {
 
     public ProjectInfo(final Path filepath) {
         if (filepath == null) {
-            folder = // TODO - null;
-                    Path.of("test_out");
+            folder = null;
             name = "";
         } else {
             folder = filepath.getParent();

@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.menus.MenuBuilder;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
@@ -13,13 +14,16 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.ProjectInfo;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
+import com.jordanbunke.stipple_effect.menu_elements.DynamicTextButton;
 import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.menu_elements.dialog.TextBox;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 public class DialogAssembly {
@@ -31,8 +35,54 @@ public class DialogAssembly {
                 scaleUpLabel = makeDialogLeftLabel(2, "Scale Factor: "),
                 saveAsTypeLabel = makeDialogLeftLabel(3, "Save As: ");
 
-        // TODO - folder selection file dialog opener
+        // folder selection button
+        final DynamicTextButton folderButton = new DynamicTextButton(
+                getDialogContentOffsetFromLabel(folderLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP,
+                () -> {
+                    FileIO.setDialogToFoldersOnly();
+                    final Optional<File> opened = FileIO.openFileFromSystem();
 
+                    if (opened.isEmpty())
+                        return;
+
+                    final Path folder = opened.get().toPath();
+                    StippleEffect.get().getContext().getProjectInfo()
+                            .setFolder(folder);
+                },
+                () -> {
+                    final StringBuilder folderPathName = new StringBuilder();
+                    final String ELLIPSE = "...";
+
+                    Path folder = StippleEffect.get().getContext()
+                            .getProjectInfo().getFolder();
+                    int placements = 0;
+
+                    if (folder == null)
+                        return Constants.NO_FOLDER_SELECTED;
+
+                    do {
+                        final String level = folder.getFileName().toString();
+
+                        if (placements == 0)
+                            folderPathName.insert(0, level);
+                        else if (folderPathName.length() + File.separator.length() +
+                                level.length() <= Constants.MAX_NAME_LENGTH) {
+                            folderPathName.insert(0, File.separator);
+                            folderPathName.insert(0, level);
+                        } else {
+                            folderPathName.insert(0, File.separator);
+                            folderPathName.insert(0, ELLIPSE);
+                            break;
+                        }
+
+                        placements++;
+                        folder = folder.getParent();
+                    } while (folder != null);
+
+                    return folderPathName.toString();
+                });
 
         // name text box
         final TextBox nameTextBox = new TextBox(
@@ -104,7 +154,7 @@ public class DialogAssembly {
                 nameLabel,
                 scaleUpLabel,
                 saveAsTypeLabel,
-                // TODO - folder selection dialog opener
+                folderButton,
                 nameTextBox,
                 scaleUpSlider,
                 scaleUpValue,

@@ -80,7 +80,8 @@ public class Constants {
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
-            UNTITLED_PROJECT_NAME = "[ Untitled ]", NATIVE_FILE_SUFFIX = "stef",
+            UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
+            NATIVE_FILE_SUFFIX = "stef",
             ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
