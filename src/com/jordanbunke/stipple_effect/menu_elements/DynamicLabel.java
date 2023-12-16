@@ -10,10 +10,10 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.awt.*;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 public class DynamicLabel extends MenuElement {
-    private final Callable<String> getter;
+    private final Supplier<String> getter;
 
     private final Color textColor;
 
@@ -22,25 +22,16 @@ public class DynamicLabel extends MenuElement {
 
     public DynamicLabel(
             final Coord2D position, Anchor anchor, final Color textColor,
-            final Callable<String> getter, final int widthAllowance
+            final Supplier<String> getter, final int widthAllowance
     ) {
         super(position, new Coord2D(widthAllowance, Constants.DYNAMIC_LABEL_H), anchor, true);
 
         this.textColor = textColor;
 
         this.getter = getter;
-        label = fetchLabel();
+        label = getter.get();
 
         updateAssets();
-    }
-
-    private String fetchLabel() {
-        try {
-            return getter.call();
-        } catch (Exception e) {
-            GameError.send("Failed to fetch an updated label");
-            return label;
-        }
     }
 
     private void updateAssets() {
@@ -67,7 +58,7 @@ public class DynamicLabel extends MenuElement {
 
     @Override
     public void update(final double deltaTime) {
-        final String fetched = fetchLabel();
+        final String fetched = getter.get();
 
         if (!label.equals(fetched)) {
             label = fetched;

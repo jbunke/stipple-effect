@@ -8,10 +8,10 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 public class ApproveDialogButton extends MenuButtonStub {
-    private final Callable<Boolean> precondition;
+    private final Supplier<Boolean> precondition;
     private final Runnable onApproval;
 
     private final GameImage base, notMet, highlighted;
@@ -21,7 +21,7 @@ public class ApproveDialogButton extends MenuButtonStub {
     public ApproveDialogButton(
             final Coord2D position, final Coord2D dimensions,
             final Anchor anchor, final Runnable onApproval,
-            final Callable<Boolean> precondition, final String text
+            final Supplier<Boolean> precondition, final String text
     ) {
         super(position, dimensions, anchor, true);
 
@@ -43,11 +43,7 @@ public class ApproveDialogButton extends MenuButtonStub {
     }
 
     private void checkPrecondition() {
-        try {
-            met = precondition.call();
-        } catch (Exception e) {
-            met = false;
-        }
+        met = precondition.get();
     }
 
     @Override

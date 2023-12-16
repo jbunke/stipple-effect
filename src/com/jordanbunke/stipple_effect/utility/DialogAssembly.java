@@ -24,7 +24,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import java.util.function.Supplier;
 
 public class DialogAssembly {
     public static void setDialogToSave() {
@@ -129,7 +130,7 @@ public class DialogAssembly {
                     .getProjectInfo().setSaveType(next);
         }
 
-        final Callable<Integer> updateIndexLogic = () -> {
+        final Supplier<Integer> updateIndexLogic = () -> {
             final ProjectInfo.SaveType saveType = StippleEffect.get()
                     .getContext().getProjectInfo().getSaveType();
 
@@ -370,7 +371,7 @@ public class DialogAssembly {
                 : new MenuElementGrouping();
 
         // precondition
-        final Callable<Boolean> precondition = () -> {
+        final Supplier<Boolean> precondition = () -> {
             final int fw = DialogVals.getResizeWidth() / DialogVals.getNewProjectXDivs(),
                     fh = DialogVals.getResizeHeight() / DialogVals.getNewProjectYDivs();
 
@@ -484,7 +485,7 @@ public class DialogAssembly {
     }
 
     private static DynamicLabel makeDynamicFromLeftLabel(
-            final TextLabel label, final Callable<String> getter
+            final TextLabel label, final Supplier<String> getter
     ) {
         final Coord2D pos = new Coord2D(Constants.CANVAS_W - label.getX(),
                 label.getY());
@@ -507,7 +508,7 @@ public class DialogAssembly {
 
     private static Menu assembleDialog(
             final String title, final MenuElementGrouping contents,
-            final Callable<Boolean> precondition,
+            final Supplier<Boolean> precondition,
             final String approveText, final Runnable onApproval
     ) {
         final MenuBuilder mb = new MenuBuilder();

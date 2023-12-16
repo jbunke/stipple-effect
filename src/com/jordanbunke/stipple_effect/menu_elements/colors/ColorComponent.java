@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.menu_elements.colors;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
@@ -12,9 +11,9 @@ import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ColorComponent extends MenuElementContainer {
     private static final int NUM_ELEMENTS = 3, SLIDER_INDEX = 0,
@@ -30,19 +29,14 @@ public class ColorComponent extends MenuElementContainer {
     public ColorComponent(
             final int minValue, final int maxValue, final String label,
             final Function<Integer, Color> spectralFunction, final Consumer<Color> setter,
-            final Callable<Integer> initialValueGetter, final Coord2D startingPosition
+            final Supplier<Integer> initialValueGetter, final Coord2D startingPosition
     ) {
         super(new Coord2D(), new Coord2D(), Anchor.LEFT_TOP, false);
 
         this.setter = setter;
         converter = spectralFunction;
 
-        try {
-            value = initialValueGetter.call();
-        } catch (Exception e) {
-            GameError.send("Couldn't assign value from initialValueGetter function.");
-            value = minValue;
-        }
+        value = initialValueGetter.get();
 
         menuElements = new MenuElement[NUM_ELEMENTS];
 
@@ -57,7 +51,7 @@ public class ColorComponent extends MenuElementContainer {
         menuElements[VALUE_INDEX] = new DynamicLabel(
                 startingPosition.displace(Constants.COLOR_PICKER_W - Constants.TOOL_NAME_X,
                         Constants.COLOR_LABEL_OFFSET_Y),
-                Anchor.RIGHT_TOP, Constants.BLACK, () -> String.valueOf(initialValueGetter.call()),
+                Anchor.RIGHT_TOP, Constants.BLACK, () -> String.valueOf(initialValueGetter.get()),
                 Constants.DYNAMIC_LABEL_W_ALLOWANCE
         );
     }
