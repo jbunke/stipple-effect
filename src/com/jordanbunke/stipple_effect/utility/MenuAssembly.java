@@ -59,8 +59,8 @@ public class MenuAssembly {
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().newProject(), // TODO
-                () -> {}, // TODO - check Translation for open file dialog implementation
+                DialogAssembly::setDialogToNewProject,
+                () -> StippleEffect.get().openProject(),
                 () -> StippleEffect.get().getContext().getProjectInfo().save(),
                 DialogAssembly::setDialogToSave,
                 DialogAssembly::setDialogToResize,
@@ -83,7 +83,7 @@ public class MenuAssembly {
 
         for (int i = 0; i < amount; i++) {
             final String text = StippleEffect.get().getContexts().get(i)
-                    .getProjectInfo().toString();
+                    .getProjectInfo().getFormattedName(true, true);
             final int paddedTextWidth = GraphicsUtils.uiText()
                     .addText(text).build().draw().getWidth() +
                     Constants.PROJECT_NAME_BUTTON_PADDING_W;

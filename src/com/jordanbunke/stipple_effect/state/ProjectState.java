@@ -59,7 +59,6 @@ public class ProjectState {
         this.checkpoint = checkpoint;
     }
 
-    // TODO: use draw(false) for image flattening when saving to PNG
     public GameImage draw(final boolean includeOnionSkins, final int frameIndex) {
         final GameImage image = new GameImage(imageWidth, imageHeight);
 
@@ -69,7 +68,7 @@ public class ProjectState {
                 if (includeOnionSkins && layer.getOnionSkinMode()
                         .doPrevious() && frameIndex > 0)
                     image.draw(layer.renderFrame(frameIndex - 1,
-                            Constants.ONION_SKIN_OPACITY));
+                            layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
 
                 // this layer
                 if (layer.getOpacity() == Constants.OPAQUE)
@@ -81,7 +80,7 @@ public class ProjectState {
                 if (includeOnionSkins && layer.getOnionSkinMode()
                         .doNext() && frameIndex + 1 < frameCount)
                     image.draw(layer.renderFrame(frameIndex + 1,
-                            Constants.ONION_SKIN_OPACITY));
+                            layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
             }
         }
 

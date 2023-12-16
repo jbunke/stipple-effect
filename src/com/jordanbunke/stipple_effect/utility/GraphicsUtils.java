@@ -39,6 +39,39 @@ public class GraphicsUtils {
         return selected ? Constants.HIGHLIGHT_1 : Constants.WHITE;
     }
 
+    public static GameImage drawTextBox(
+            final int width, final String text, final int cursorIndex,
+            final boolean isHighlighted, final Color accentColor
+    ) {
+        final int height = Constants.STD_TEXT_BUTTON_H, px = Constants.BUTTON_BORDER_PX;
+
+        final GameImage nhi = new GameImage(width, height);
+        nhi.fillRectangle(Constants.GREY, 0, 0, width, height);
+
+        // text and cursor
+
+        final String a = text.substring(0, cursorIndex), b = text.substring(cursorIndex);
+        final GameImage
+                aImage = uiText(Constants.BLACK).addText(a).build().draw(),
+                bImage = uiText(Constants.BLACK).addText(b).build().draw();
+
+        final Coord2D textPos = new Coord2D(2 * px, Constants.BUTTON_TEXT_OFFSET_Y);
+        nhi.draw(aImage, textPos.x, textPos.y);
+        nhi.fillRectangle(accentColor, textPos.x + aImage.getWidth() + px, 0, px, height);
+        nhi.draw(bImage, textPos.x + aImage.getWidth() + (3 * px), textPos.y);
+
+        // border
+
+        nhi.drawRectangle(accentColor, 2f * px,
+                0, 0, width, height);
+
+        if (isHighlighted) {
+            return drawHighlightedButton(nhi.submit());
+        }
+
+        return nhi.submit();
+    }
+
     public static GameImage drawTextButton(
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor

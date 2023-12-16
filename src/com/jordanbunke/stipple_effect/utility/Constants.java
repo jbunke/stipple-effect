@@ -63,7 +63,7 @@ public class Constants {
         return getCanvasMiddle().displace(-DIALOG_W / 2, -DIALOG_H / 2)
                 .displace(Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
                         Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX +
-                                (2 * STD_TEXT_BUTTON_INC));
+                                (int)(1.5 * STD_TEXT_BUTTON_INC));
     }
 
     public static final int TEXT_Y_OFFSET = -4,
@@ -73,7 +73,7 @@ public class Constants {
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
-            UNTITLED_PROJECT_NAME = "[ Untitled ]", NATIVE_FILE_SUFFIX = ".stef",
+            UNTITLED_PROJECT_NAME = "[ Untitled ]", NATIVE_FILE_SUFFIX = "stef",
             ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
@@ -83,15 +83,18 @@ public class Constants {
             ACCENT_BACKGROUND_DARK = new Color(30, 30, 90),
             GREY = new Color(127, 127, 127),
             DARK = new Color(55, 55, 55),
+            INVALID = new Color(100, 20, 20),
             VEIL = new Color(ACCENT_BACKGROUND_LIGHT.getRed(),
                     ACCENT_BACKGROUND_LIGHT.getGreen(),
                     ACCENT_BACKGROUND_LIGHT.getBlue(), 200),
             HIGHLIGHT_1 = new Color(100, 100, 255),
             HIGHLIGHT_2 = new Color(50, 80, 255, 100);
 
-    public static final int DEFAULT_IMAGE_W = 48, DEFAULT_IMAGE_H = 48, CHECKER_INCREMENT = 4;
+    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32,
+            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360;
 
-    public static final int BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
+    public static final int CHECKER_INCREMENT = 4,
+            BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
             LAYER_BUTTON_W = 88, LAYER_OPACITY_SLIDER_W = 68,
@@ -103,7 +106,7 @@ public class Constants {
             FRAME_PLAYBACK_SLIDER_W = 155, FRAME_PLAYBACK_SLIDER_OFFSET_X = 241,
             DIALOG_W = CANVAS_W / 2, DIALOG_H = CANVAS_H / 2, DIALOG_CONTENT_INC_Y = 32,
             DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
-            DIALOG_CONTENT_OFFSET_X = 125, DIALOG_CONTENT_W_ALLOWANCE = 290,
+            DIALOG_CONTENT_OFFSET_X = 135, DIALOG_CONTENT_W_ALLOWANCE = 280,
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -6,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,
@@ -117,5 +120,6 @@ public class Constants {
             MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, /* TODO: test and tweak */ MAX_NUM_STATES = 5000,
             MIN_MILLIS_PER_FRAME = 33, MAX_MILLIS_PER_FRAME = 500,
             MILLIS_PER_FRAME_INC = 40, DEFAULT_MILLIS_PER_FRAME = 100,
-            MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP;
+            MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
+            MAX_NAME_LENGTH = 25;
 }

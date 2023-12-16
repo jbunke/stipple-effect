@@ -11,11 +11,14 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.ProjectInfo;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.menu_elements.dialog.ApproveDialogButton;
+import com.jordanbunke.stipple_effect.menu_elements.dialog.TextBox;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 
@@ -29,7 +32,16 @@ public class DialogAssembly {
                 saveAsTypeLabel = makeDialogLeftLabel(3, "Save As: ");
 
         // TODO - folder selection file dialog opener
-        // TODO - name text box
+
+
+        // name text box
+        final TextBox nameTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(nameLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE, MenuElement.Anchor.LEFT_TOP,
+                StippleEffect.get().getContext().getProjectInfo().getName(),
+                TextBox.getFileNameTextValidator(),
+                s -> StippleEffect.get().getContext().getProjectInfo().setName(s),
+                Constants.MAX_NAME_LENGTH);
 
         // scale up slider
         final HorizontalSlider scaleUpSlider = new HorizontalSlider(
@@ -92,7 +104,8 @@ public class DialogAssembly {
                 nameLabel,
                 scaleUpLabel,
                 saveAsTypeLabel,
-
+                // TODO - folder selection dialog opener
+                nameTextBox,
                 scaleUpSlider,
                 scaleUpValue,
                 saveAsToggle
@@ -105,24 +118,257 @@ public class DialogAssembly {
     }
 
     public static void setDialogToResize() {
-        // TODO
-        final MenuElementGrouping contents = new MenuElementGrouping();
+        final int w = StippleEffect.get().getContext().getState().getImageWidth(),
+                h = StippleEffect.get().getContext().getState().getImageHeight();
+
+        DialogVals.setResizeWidth(w);
+        DialogVals.setResizeHeight(h);
+
+        // text labels
+        final TextLabel
+                widthLabel = makeDialogLeftLabel(1, "Width in px: "),
+                heightLabel = makeDialogLeftLabel(2, "Height in px: "),
+                context = makeDialogLeftLabel(0, "Current size: " + w + " x " + h),
+                explanation = makeDialogLeftLabel(5,
+                        "Valid image sizes run from " + Constants.MIN_IMAGE_W +
+                                " x " + Constants.MIN_IMAGE_H + " to " +
+                                Constants.MAX_IMAGE_W + " x " + Constants.MAX_IMAGE_H + ".");
+
+        // dim textboxes
+        final TextBox widthTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(widthLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(w),
+                TextBox.getIntTextValidator(Constants.MIN_IMAGE_W, Constants.MAX_IMAGE_W),
+                s -> DialogVals.setResizeWidth(Integer.parseInt(s)), 3),
+                heightTextBox = new TextBox(
+                        getDialogContentOffsetFromLabel(heightLabel),
+                        Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                        MenuElement.Anchor.LEFT_TOP, String.valueOf(h),
+                        TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H),
+                        s -> DialogVals.setResizeHeight(Integer.parseInt(s)), 3);
+
+        // dynamic scale checker
+        final DynamicLabel scaleChecker = new DynamicLabel(
+                heightLabel.getRenderPosition().displace(0,
+                        Constants.DIALOG_CONTENT_INC_Y),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                () -> {
+                    final int rw = DialogVals.getResizeWidth(),
+                            rh = DialogVals.getResizeHeight();
+
+                    final double initialRatio = w / (double) h,
+                            previewRatio = rw / (double) rh;
+
+                    final StringBuilder sb = new StringBuilder();
+
+                    sb.append("Ratio ").append(initialRatio == previewRatio
+                            ? "preserved" : "changed");
+
+                    if (w == rw)
+                        sb.append("; X: no change");
+                    else if (rw % w == 0)
+                        sb.append("; X: ").append(rw / w).append("x bigger");
+                    else if (w % rw == 0)
+                        sb.append("; X: ").append(w / rw).append("x smaller");
+
+                    if (h == rh)
+                        sb.append("; Y: no change");
+                    else if (rh % h == 0)
+                        sb.append("; Y: ").append(rh / h).append("x bigger");
+                    else if (h % rh == 0)
+                        sb.append("; Y: ").append(h / rh).append("x smaller");
+
+                    return sb.toString();
+                }, Constants.DIALOG_W - (2 * Constants.TOOL_NAME_X)
+        );
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                context, widthLabel, heightLabel, scaleChecker, explanation,
+                widthTextBox, heightTextBox);
         setDialog(assembleDialog("Resize Canvas...", contents,
-                () -> true, Constants.GENERIC_APPROVAL_TEXT, () -> {}));
+                () -> widthTextBox.isValid() && heightTextBox.isValid(),
+                Constants.GENERIC_APPROVAL_TEXT,
+                () -> StippleEffect.get().resizeProject()));
     }
 
     public static void setDialogToPad() {
-        // TODO
-        final MenuElementGrouping contents = new MenuElementGrouping();
+        final int w = StippleEffect.get().getContext().getState().getImageWidth(),
+                h = StippleEffect.get().getContext().getState().getImageHeight();
+
+        // text labels
+        final TextLabel
+                leftLabel = makeDialogLeftLabel(1, "Pad left: "),
+                rightLabel = makeDialogLeftLabel(2, "Pad right: "),
+                topLabel = makeDialogLeftLabel(3, "Pad top: "),
+                bottomLabel = makeDialogLeftLabel(4, "Pad bottom: "),
+                context = makeDialogLeftLabel(0, "Current size: " + w + " x " + h);
+
+        // pad textboxes
+        final TextBox leftTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(leftLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
+                TextBox.getIntTextValidator(
+                        i -> i + DialogVals.getPadRight() + w <= Constants.MAX_IMAGE_W
+                ),
+                s -> DialogVals.setPadLeft(Integer.parseInt(s)), 3);
+        final TextBox topTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(topLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
+                TextBox.getIntTextValidator(
+                        i -> i + DialogVals.getPadBottom() + h <= Constants.MAX_IMAGE_H
+                ),
+                s -> DialogVals.setPadTop(Integer.parseInt(s)), 3);
+        final TextBox rightTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(rightLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
+                TextBox.getIntTextValidator(
+                        i -> i + DialogVals.getPadLeft() + w <= Constants.MAX_IMAGE_W
+                ),
+                s -> DialogVals.setPadRight(Integer.parseInt(s)), 3);
+        final TextBox bottomTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(bottomLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(0),
+                TextBox.getIntTextValidator(
+                        i -> i + DialogVals.getPadTop() + h <= Constants.MAX_IMAGE_H
+                ),
+                s -> DialogVals.setPadBottom(Integer.parseInt(s)), 3);
+
+        // size preview
+        final DynamicLabel preview = new DynamicLabel(
+                bottomLabel.getRenderPosition().displace(0,
+                        Constants.DIALOG_CONTENT_INC_Y),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                () -> {
+                    final int pw = DialogVals.getPadLeft() +
+                            DialogVals.getPadRight() + w,
+                            ph = DialogVals.getPadTop() +
+                                    DialogVals.getPadBottom() + h;
+
+                    return "Preview size: " + pw + " x " + ph;
+                }, Constants.DIALOG_W - (2 * Constants.TOOL_NAME_X)
+        );
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                context, leftLabel, rightLabel, topLabel, bottomLabel, preview,
+                leftTextBox, rightTextBox, topTextBox, bottomTextBox
+        );
         setDialog(assembleDialog("Pad Canvas...", contents,
-                () -> true, Constants.GENERIC_APPROVAL_TEXT, () -> {}));
+                () -> leftTextBox.isValid() && rightTextBox.isValid() &&
+                        topTextBox.isValid() && bottomTextBox.isValid(),
+                Constants.GENERIC_APPROVAL_TEXT,
+                () -> StippleEffect.get().padProject()));
+    }
+
+    public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {
+        final int w = image.getWidth(), h = image.getHeight();
+        final boolean tooBig = w > Constants.MAX_IMAGE_W || h > Constants.MAX_IMAGE_H;
+
+        DialogVals.setResizeWidth(w);
+        DialogVals.setResizeHeight(h);
+
+        DialogVals.setNewProjectXDivs(1);
+        DialogVals.setNewProjectYDivs(1);
+
+        // text labels
+        final TextLabel context = makeDialogLeftLabel(0,
+                "Current size: " + w + " x " + h + (tooBig
+                        ? " ... too big as singleton" : "")),
+                instruction = makeDialogLeftLabel(1,
+                        "Scale down and/or split into more frames"),
+                widthLabel = makeDialogLeftLabel(2, "Width in px: "),
+                heightLabel = makeDialogLeftLabel(3, "Height in px: "),
+                xDivsLabel = makeDialogLeftLabel(4 - (tooBig ? 0 : 2), "X frames: "),
+                yDivsLabel = makeDialogLeftLabel(5 - (tooBig ? 0 : 2), "Y frames: ");
+
+        // downscale textboxes
+        final TextBox widthTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(widthLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(w),
+                TextBox.getIntTextValidator(Constants.MIN_IMAGE_W, w),
+                s -> DialogVals.setResizeWidth(Integer.parseInt(s)), 5);
+        final TextBox heightTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(heightLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(h),
+                TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, h),
+                s -> DialogVals.setResizeHeight(Integer.parseInt(s)), 5);
+
+        // division textboxes
+        final TextBox xDivsTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(xDivsLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(1),
+                TextBox.getIntTextValidator(1, Constants.MAX_NUM_FRAMES),
+                s -> DialogVals.setNewProjectXDivs(Integer.parseInt(s)), 3);
+        final TextBox yDivsTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(yDivsLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(1),
+                TextBox.getIntTextValidator(1, Constants.MAX_NUM_FRAMES),
+                s -> DialogVals.setNewProjectYDivs(Integer.parseInt(s)), 3);
+
+        // wrap downscale components in optional group in case N/A
+        final MenuElementGrouping optional = tooBig
+                ? new MenuElementGrouping(instruction, widthLabel, heightLabel,
+                widthTextBox, heightTextBox)
+                : new MenuElementGrouping();
+
+        // precondition
+        final Callable<Boolean> precondition = () -> {
+            final int fw = DialogVals.getResizeWidth() / DialogVals.getNewProjectXDivs(),
+                    fh = DialogVals.getResizeHeight() / DialogVals.getNewProjectYDivs();
+
+            final boolean boxesValid = widthTextBox.isValid() &&
+                    heightTextBox.isValid() && xDivsTextBox.isValid() &&
+                    yDivsTextBox.isValid();
+
+            return boxesValid && fw <= Constants.MAX_IMAGE_W &&
+                    fh <= Constants.MAX_IMAGE_H;
+        };
+
+        final MenuElementGrouping contents = new MenuElementGrouping(context,
+                xDivsLabel, yDivsLabel, xDivsTextBox, yDivsTextBox, optional);
+        setDialog(assembleDialog("Open from file " +
+                        filepath.getFileName().toString(), contents,
+                precondition, "Import",
+                () -> StippleEffect.get().newProjectFromFile(image, filepath)));
     }
 
     public static void setDialogToNewProject() {
-        // TODO
-        final MenuElementGrouping contents = new MenuElementGrouping();
+        // text labels
+        final TextLabel
+                widthLabel = makeDialogLeftLabel(1, "Width in px: "),
+                heightLabel = makeDialogLeftLabel(2, "Height in px: "),
+                explanation = makeDialogLeftLabel(4,
+                        "Valid image sizes run from " + Constants.MIN_IMAGE_W +
+                                " x " + Constants.MIN_IMAGE_H + " to " +
+                                Constants.MAX_IMAGE_W + " x " + Constants.MAX_IMAGE_H + ".");
+
+        // dim textboxes
+        final TextBox widthTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(widthLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(Constants.DEFAULT_IMAGE_W),
+                TextBox.getIntTextValidator(Constants.MIN_IMAGE_W, Constants.MAX_IMAGE_W),
+                s -> DialogVals.setNewProjectWidth(Integer.parseInt(s)), 3);
+        final TextBox heightTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(heightLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(Constants.DEFAULT_IMAGE_H),
+                TextBox.getIntTextValidator(Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H),
+                s -> DialogVals.setNewProjectHeight(Integer.parseInt(s)), 3);
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                widthLabel, heightLabel, explanation, widthTextBox, heightTextBox);
         setDialog(assembleDialog("New Project...", contents,
-                () -> true, "Create", () -> {}));
+                () -> widthTextBox.isValid() && heightTextBox.isValid(),
+                "Create", () -> StippleEffect.get().newProject()));
     }
 
     public static void setDialogToCheckCloseProject(final int index) {
@@ -134,18 +380,53 @@ public class DialogAssembly {
 
         final MenuElementGrouping contents = new MenuElementGrouping(warning);
         setDialog(assembleDialog("Close the project " +
-                        StippleEffect.get().getContexts().get(index)
-                                .getProjectInfo() + "?", contents,
+                        StippleEffect.get().getContexts().get(index).getProjectInfo()
+                                .getFormattedName(false, true)
+                        + "?", contents,
                 () -> true, Constants.GENERIC_APPROVAL_TEXT,
                 () -> StippleEffect.get().removeContext(index)));
     }
 
     public static void setDialogToLayerSettings(final int index) {
-        // TODO: for renaming and manually setting opacity
-        final MenuElementGrouping contents = new MenuElementGrouping();
-        setDialog(assembleDialog(StippleEffect.get().getContext().getState()
-                .getLayers().get(index).getName() + "  |  Layer Settings",
-                contents, () -> true, Constants.GENERIC_APPROVAL_TEXT, () -> {}));
+        final SELayer layer = StippleEffect.get().getContext()
+                .getState().getLayers().get(index);
+
+        DialogVals.setLayerOpacity(layer.getOpacity());
+        DialogVals.setLayerName(layer.getName());
+
+        // text labels
+        final TextLabel layerNameLabel = makeDialogLeftLabel(1, "Name: "),
+                opacityLabel = makeDialogLeftLabel(2, "Opacity: ");
+
+        // name textbox
+        final TextBox layerNameTextBox = new TextBox(
+                getDialogContentOffsetFromLabel(layerNameLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, String.valueOf(layer.getName()),
+                TextBox.getFileNameTextValidator(),
+                DialogVals::setLayerName, Constants.MAX_NAME_LENGTH);
+
+        // opacity slider
+        final int MAX_OPACITY = 255;
+
+        final HorizontalSlider opacitySlider = new HorizontalSlider(
+                getDialogContentOffsetFromLabel(opacityLabel),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
+                (int)(layer.getOpacity() * MAX_OPACITY),
+                o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
+        opacitySlider.updateAssets();
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                layerNameLabel, opacityLabel, layerNameTextBox, opacitySlider);
+        setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
+                contents, layerNameTextBox::isValid,
+                Constants.GENERIC_APPROVAL_TEXT, () -> {
+            StippleEffect.get().getContext().changeLayerOpacity(
+                    DialogVals.getLayerOpacity(), index);
+            StippleEffect.get().getContext().changeLayerName(
+                    DialogVals.getLayerName(), index);
+        }));
     }
 
     private static void setDialog(final Menu dialog) {
@@ -179,12 +460,9 @@ public class DialogAssembly {
             final Callable<Boolean> precondition,
             final String approveText, final Runnable onApproval
     ) {
-        // TODO - precondition, text, and behaviour for OK / approval button
-
         final MenuBuilder mb = new MenuBuilder();
 
         // background
-
         final GameImage backgroundImage = new GameImage(
                 Constants.DIALOG_W, Constants.DIALOG_H);
         backgroundImage.fillRectangle(Constants.ACCENT_BACKGROUND_DARK,
@@ -200,14 +478,12 @@ public class DialogAssembly {
         mb.add(background);
 
         // title
-
         mb.add(TextLabel.make(background.getRenderPosition().displace(
                 Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
                         Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX),
                 title, Constants.WHITE));
 
         // cancel button
-
         final GameImage baseImage = GraphicsUtils.drawTextButton(
                 Constants.STD_TEXT_BUTTON_W, "Cancel", false, Constants.GREY),
                 highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
@@ -222,6 +498,7 @@ public class DialogAssembly {
                 () -> StippleEffect.get().clearDialog(),
                 baseImage, highlightedImage));
 
+        // approve button
         final Coord2D approvePos = cancelPos.displace(-(baseImage.getWidth() +
                 Constants.BUTTON_OFFSET), 0);
 

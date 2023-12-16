@@ -8,22 +8,29 @@ import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
 import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.image.ImageProcessing;
+import com.jordanbunke.delta_time.io.FileIO;
+import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.context.ProjectInfo;
 import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.Hand;
 import com.jordanbunke.stipple_effect.tools.Tool;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
-import com.jordanbunke.stipple_effect.utility.MenuAssembly;
+import com.jordanbunke.stipple_effect.utility.*;
 
 import java.awt.*;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class StippleEffect implements ProgramContext {
     public static final int PRIMARY = 0, SECONDARY = 1;
@@ -70,9 +77,8 @@ public class StippleEffect implements ProgramContext {
     }
 
     public StippleEffect() {
-        contexts = new ArrayList<>(List.of(
-                new SEContext(Constants.DEFAULT_IMAGE_W,
-                        Constants.DEFAULT_IMAGE_H)));
+        contexts = new ArrayList<>(List.of(new SEContext(
+                DialogVals.getNewProjectWidth(), DialogVals.getNewProjectHeight())));
         contextIndex = 0;
 
         // default tool is the hand
@@ -386,10 +392,80 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void newProject() {
-        // TODO - reimplement once dialogs have been added - query for size
-        final SEContext context = new SEContext(Constants.DEFAULT_IMAGE_W,
-                Constants.DEFAULT_IMAGE_H);
-        addContext(context, true);
+        addContext(new SEContext(DialogVals.getNewProjectWidth(),
+                DialogVals.getNewProjectHeight()), true);
+    }
+
+    public void openProject() {
+        final String[] acceptedSuffixes = new String[] {
+                "jpg",
+                ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix(),
+                ProjectInfo.SaveType.NATIVE.getFileSuffix()
+        };
+
+        FileIO.setDialogToFilesOnly();
+        final Optional<File> opened = FileIO.openFileFromSystem(
+                new String[] { "Accepted image types" },
+                new String[][] { acceptedSuffixes });
+
+        if (opened.isEmpty())
+            return;
+
+        final Path filepath = opened.get().toPath();
+        final String fileName = filepath.getFileName().toString();
+
+        if (endsWithOneOf(fileName, acceptedSuffixes)) {
+            final GameImage image = GameImageIO.readImage(filepath);
+
+            DialogAssembly.setDialogToOpenPNG(image, filepath);
+        }
+        // TODO - extend with else-ifs for additional file types (.stef, potentially .jpg)
+    }
+
+    private boolean endsWithOneOf(final String toCheck, final String[] suffixes) {
+        for (String suffix : suffixes)
+            if (toCheck.endsWith(suffix))
+                return true;
+
+        return false;
+    }
+
+    public void newProjectFromFile(
+            final GameImage image, final Path filepath
+    ) {
+        final int w = DialogVals.getResizeWidth(),
+                h = DialogVals.getResizeHeight(),
+                xDivs = DialogVals.getNewProjectXDivs(),
+                yDivs = DialogVals.getNewProjectYDivs(),
+                fw = w / xDivs, fh = h /  yDivs,
+                frameCount = Math.min(Constants.MAX_NUM_FRAMES, xDivs * yDivs);
+
+        final GameImage resized = ImageProcessing.scale(image, w, h);
+        final List<GameImage> frames = new ArrayList<>();
+
+        for (int y = 0; y < yDivs; y++)
+            for (int x = 0; x < xDivs; x++)
+                frames.add(new GameImage(resized.getSubimage(
+                        x * fw, y * fh, fw, fh)));
+
+        final SELayer firstLayer = new SELayer(frames,
+                Constants.OPAQUE, true,
+                OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
+        final ProjectState initialState = new ProjectState(fw, fh,
+                new ArrayList<>(List.of(firstLayer)), 0, frameCount, 0);
+
+        final SEContext project = new SEContext(
+                new ProjectInfo(filepath), initialState, fw, fh);
+
+        addContext(project, true);
+    }
+
+    public void resizeProject() {
+        // TODO
+    }
+
+    public void padProject() {
+        // TODO
     }
 
     public void addContext(final SEContext context, final boolean setActive) {
@@ -411,7 +487,7 @@ public class StippleEffect implements ProgramContext {
                 setContextIndex(contexts.size() - 1);
 
             if (contexts.size() == 0) {
-                // TODO - close program properly - solution is temp
+                // TODO - global on close here
                 System.exit(0);
             }
 
@@ -464,6 +540,7 @@ public class StippleEffect implements ProgramContext {
 
     public void clearDialog() {
         dialog = null;
+        rebuildStateDependentMenus();
     }
 
     public void setDialog(final Menu dialog) {

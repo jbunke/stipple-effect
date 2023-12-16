@@ -92,6 +92,14 @@ public final class SELayer {
         return new SELayer(frames, opacity, enabled, onionSkinMode, name);
     }
 
+    // TODO: link frames in layer
+    /*
+    * boolean field framesLinked
+    * public SELayer returnLinkedFrames
+    * public SELayer returnUnlinkedFrames
+    * getter areFramesLinked
+    */
+
     public SELayer returnChangedOpacity(final double opacity) {
         return new SELayer(new ArrayList<>(frames), opacity, enabled,
                 onionSkinMode, name);

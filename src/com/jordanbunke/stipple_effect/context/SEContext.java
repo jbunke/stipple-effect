@@ -35,6 +35,7 @@ public class SEContext {
     private Coord2D targetPixel;
 
     public static SEContext fromFile(final Path filepath) {
+        // TODO - refactor from dialog open PNG
         final GameImage image = GameImageIO.readImage(filepath);
 
         return new SEContext(new ProjectInfo(filepath), new ProjectState(image),
@@ -47,7 +48,7 @@ public class SEContext {
         this(new ProjectInfo(), new ProjectState(imageWidth, imageHeight), imageWidth, imageHeight);
     }
 
-    private SEContext(
+    public SEContext(
             final ProjectInfo projectInfo, final ProjectState projectState,
             final int imageWidth, final int imageHeight
     ) {
@@ -144,25 +145,25 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                     () -> getPlaybackInfo().incrementMillisPerFrame(Constants.MILLIS_PER_FRAME_INC)
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
+                    () -> getState().nextFrame()
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
+                    () -> getState().setFrameIndex(getState().getFrameCount() - 1)
+            );
         }
 
         // SHIFT but not CTRL
         if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
                     () -> getState().previousFrame()
             );
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().nextFrame()
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
                     () -> getState().setFrameIndex(0)
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(getState().getFrameCount() - 1)
             );
         }
 
@@ -508,6 +509,26 @@ public class SEContext {
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
                     getState().getFrameIndex());
+            stateManager.performAction(result, ActionType.CANVAS);
+        }
+    }
+
+    // change layer name
+    public void changeLayerName(final String name, final int layerIndex) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+            final SELayer layer = layers.get(layerIndex).returnRenamed(name);
+            layers.remove(layerIndex);
+            layers.add(layerIndex, layer);
+
+            final ProjectState result = new ProjectState(w, h, layers,
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex(), false);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
