@@ -20,7 +20,7 @@ public class ProjectInfo {
     private boolean editedSinceLastSave;
 
     private final int[] frameDims;
-    private int scaleUp;
+    private int millisPerFrame, scaleUp;
 
     public enum SaveType {
         PNG_STITCHED, PNG_SEPARATE, GIF, NATIVE;
@@ -72,6 +72,7 @@ public class ProjectInfo {
                 DialogVals.getNewProjectXDivs(),
                 DialogVals.getNewProjectYDivs()
         };
+        millisPerFrame = Constants.DEFAULT_MILLIS_PER_FRAME;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
     }
 
@@ -100,8 +101,7 @@ public class ProjectInfo {
                         images[i] = ImageProcessing.scale(images[i], scaleUp);
                 }
 
-                GameImageIO.writeGif(buildFilepath(), images, StippleEffect.get()
-                        .getContext().getPlaybackInfo().getMillisPerFrame());
+                GameImageIO.writeGif(buildFilepath(), images, millisPerFrame);
             }
             case PNG_SEPARATE -> {
                 for (int i = 0; i < frameCount; i++) {
@@ -198,6 +198,10 @@ public class ProjectInfo {
         return sb.toString();
     }
 
+    public int getMillisPerFrame() {
+        return millisPerFrame;
+    }
+
     public int getScaleUp() {
         return scaleUp;
     }
@@ -223,6 +227,10 @@ public class ProjectInfo {
     }
     public void setSaveType(final SaveType saveType) {
         this.saveType = saveType;
+    }
+
+    public void setMillisPerFrame(int millisPerFrame) {
+        this.millisPerFrame = millisPerFrame;
     }
 
     public void setScaleUp(final int scaleUp) {
