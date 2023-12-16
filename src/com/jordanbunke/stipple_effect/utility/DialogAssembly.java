@@ -189,7 +189,7 @@ public class DialogAssembly {
         setDialog(assembleDialog("Resize Canvas...", contents,
                 () -> widthTextBox.isValid() && heightTextBox.isValid(),
                 Constants.GENERIC_APPROVAL_TEXT,
-                () -> StippleEffect.get().resizeProject()));
+                () -> StippleEffect.get().getContext().resize()));
     }
 
     public static void setDialogToPad() {
@@ -261,7 +261,7 @@ public class DialogAssembly {
                 () -> leftTextBox.isValid() && rightTextBox.isValid() &&
                         topTextBox.isValid() && bottomTextBox.isValid(),
                 Constants.GENERIC_APPROVAL_TEXT,
-                () -> StippleEffect.get().padProject()));
+                () -> StippleEffect.get().getContext().pad()));
     }
 
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {

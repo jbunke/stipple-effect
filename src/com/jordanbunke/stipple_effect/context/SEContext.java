@@ -5,7 +5,6 @@ import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -17,9 +16,9 @@ import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogAssembly;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
 
 import java.awt.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,14 +32,6 @@ public class SEContext {
     private final PlaybackInfo playbackInfo;
 
     private Coord2D targetPixel;
-
-    public static SEContext fromFile(final Path filepath) {
-        // TODO - refactor from dialog open PNG
-        final GameImage image = GameImageIO.readImage(filepath);
-
-        return new SEContext(new ProjectInfo(filepath), new ProjectState(image),
-                image.getWidth(), image.getHeight());
-    }
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -186,6 +177,8 @@ public class SEContext {
                     () -> {} // TODO - crop to selection
             );
         }
+
+        // TODO - somewhere - snap to center of image
     }
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
@@ -333,6 +326,40 @@ public class SEContext {
     // TODO - process all actions here and feed through state manager
 
     // TODO - TOOL
+
+    public void pad() {
+        // build resultant state
+        final int left = DialogVals.getPadLeft(),
+                right = DialogVals.getPadRight(),
+                top = DialogVals.getPadTop(),
+                bottom = DialogVals.getPadBottom(),
+                w = left + getState().getImageWidth() + right,
+                h = top + getState().getImageHeight() + bottom,
+                frameCount = getState().getFrameCount();
+
+        final List<SELayer> layers = getState().getLayers().stream()
+                .map(layer -> layer.returnPadded(left, top, w, h)).toList();
+
+        final ProjectState result = new ProjectState(w, h,
+                layers, getState().getLayerEditIndex(),
+                frameCount, getState().getFrameIndex());
+        stateManager.performAction(result, ActionType.CANVAS);
+    }
+
+    public void resize() {
+        // build resultant state
+        final int w = DialogVals.getResizeWidth(),
+                h = DialogVals.getResizeHeight(),
+                frameCount = getState().getFrameCount();
+
+        final List<SELayer> layers = getState().getLayers().stream()
+                .map(layer -> layer.returnResized(w, h)).toList();
+
+        final ProjectState result = new ProjectState(w, h,
+                layers, getState().getLayerEditIndex(),
+                frameCount, getState().getFrameIndex());
+        stateManager.performAction(result, ActionType.CANVAS);
+    }
 
     // IMAGE EDITING
     public void editImage(final GameImage edit) {

@@ -146,6 +146,9 @@ public class ProjectInfo {
                         : stitched.submit());
             }
         }
+
+        editedSinceLastSave = false;
+        StippleEffect.get().rebuildProjectsMenu();
     }
 
     public void markAsEdited() {

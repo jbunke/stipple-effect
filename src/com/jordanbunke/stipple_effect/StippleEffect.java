@@ -118,9 +118,12 @@ public class StippleEffect implements ProgramContext {
                     .reduce("", (a, b) -> a + b)));
     }
 
-    private static void launchWithFile(final Path fp) {
-        get().contexts.add(SEContext.fromFile(fp));
-        get().contexts.remove(0);
+    private static void launchWithFile(final Path filepath) {
+        verifyFilepath(filepath);
+
+        if (get().contexts.size() > 1) {
+            get().removeContext(0);
+        }
     }
 
     private GameWindow makeWindow() {
@@ -397,24 +400,22 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void openProject() {
-        final String[] acceptedSuffixes = new String[] {
-                "jpg",
-                ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix(),
-                ProjectInfo.SaveType.NATIVE.getFileSuffix()
-        };
-
         FileIO.setDialogToFilesOnly();
         final Optional<File> opened = FileIO.openFileFromSystem(
                 new String[] { "Accepted image types" },
-                new String[][] { acceptedSuffixes });
+                new String[][] { Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES });
 
         if (opened.isEmpty())
             return;
 
         final Path filepath = opened.get().toPath();
+        verifyFilepath(filepath);
+    }
+
+    private static void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (endsWithOneOf(fileName, acceptedSuffixes)) {
+        if (endsWithOneOf(fileName)) {
             final GameImage image = GameImageIO.readImage(filepath);
 
             DialogAssembly.setDialogToOpenPNG(image, filepath);
@@ -422,8 +423,8 @@ public class StippleEffect implements ProgramContext {
         // TODO - extend with else-ifs for additional file types (.stef, potentially .jpg)
     }
 
-    private boolean endsWithOneOf(final String toCheck, final String[] suffixes) {
-        for (String suffix : suffixes)
+    private static boolean endsWithOneOf(final String toCheck) {
+        for (String suffix : Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES)
             if (toCheck.endsWith(suffix))
                 return true;
 
@@ -458,14 +459,6 @@ public class StippleEffect implements ProgramContext {
                 new ProjectInfo(filepath), initialState, fw, fh);
 
         addContext(project, true);
-    }
-
-    public void resizeProject() {
-        // TODO
-    }
-
-    public void padProject() {
-        // TODO
     }
 
     public void addContext(final SEContext context, final boolean setActive) {

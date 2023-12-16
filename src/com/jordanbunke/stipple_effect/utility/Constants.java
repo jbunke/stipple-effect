@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.context.ProjectInfo;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -9,6 +10,12 @@ public class Constants {
     public static final String PROGRAM_NAME = "Stipple Effect";
 
     public static final Path ICON_FOLDER = Path.of("icons");
+
+    public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
+            "jpg",
+            ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix(),
+            ProjectInfo.SaveType.NATIVE.getFileSuffix()
+    };
 
     public static final int CANVAS_W = 960, CANVAS_H = 540, SCREEN_H_BUFFER = 80;
 

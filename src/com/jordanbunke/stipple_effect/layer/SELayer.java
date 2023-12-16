@@ -92,6 +92,33 @@ public final class SELayer {
         return new SELayer(frames, opacity, enabled, onionSkinMode, name);
     }
 
+    public SELayer returnResized(final int w, final int h) {
+        final List<GameImage> resizedFrames = new ArrayList<>();
+
+        for (int i = 0; i < frames.size(); i++)
+            resizedFrames.add(ImageProcessing.scale(
+                    getFrame(i), w, h));
+
+        return new SELayer(resizedFrames, opacity,
+                enabled, onionSkinMode, name);
+    }
+
+    public SELayer returnPadded(
+            final int left, final int top, final int w, final int h
+    ) {
+        final List<GameImage> paddedFrames = new ArrayList<>();
+
+        for (int i = 0; i < frames.size(); i++) {
+            final GameImage frame = new GameImage(w, h);
+            frame.draw(getFrame(i), left, top);
+
+            paddedFrames.add(frame.submit());
+        }
+
+        return new SELayer(paddedFrames, opacity,
+                enabled, onionSkinMode, name);
+    }
+
     // TODO: link frames in layer
     /*
     * boolean field framesLinked
