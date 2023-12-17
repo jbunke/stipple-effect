@@ -450,7 +450,7 @@ public class StippleEffect implements ProgramContext {
                         x * fw, y * fh, fw, fh)));
 
         final SELayer firstLayer = new SELayer(frames,
-                Constants.OPAQUE, true,
+                new GameImage(fw, fh), Constants.OPAQUE, true, false,
                 OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
         final ProjectState initialState = new ProjectState(fw, fh,
                 new ArrayList<>(List.of(firstLayer)), 0, frameCount, 0);

@@ -22,11 +22,6 @@ public class ProjectState {
     private final List<SELayer> layers;
     private int layerEditIndex;
 
-    public ProjectState(final GameImage image) {
-        this(image.getWidth(), image.getHeight(), new ArrayList<>(List.of(
-                new SELayer(image))), 0, 1, 0);
-    }
-
     public ProjectState(final int imageWidth, final int imageHeight) {
         this(imageWidth, imageHeight, new ArrayList<>(List.of(
                 new SELayer(imageWidth, imageHeight))), 0, 1, 0);

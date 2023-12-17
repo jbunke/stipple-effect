@@ -8,7 +8,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.LayerCombiner;
+import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -500,6 +500,49 @@ public class SEContext {
         }
     }
 
+    // unlink frames in layer
+    public void unlinkFramesInLayer(final int layerIndex) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size() &&
+                layers.get(layerIndex).areFramesLinked()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+            final SELayer layer = layers.get(layerIndex).returnUnlinkedFrames();
+            layers.remove(layerIndex);
+            layers.add(layerIndex, layer);
+
+            final ProjectState result = new ProjectState(w, h, layers,
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex());
+            stateManager.performAction(result, ActionType.CANVAS);
+        }
+    }
+
+    // link frames in layer
+    public void linkFramesInLayer(final int layerIndex) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size() &&
+                !layers.get(layerIndex).areFramesLinked()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+            final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
+                    getState().getFrameIndex());
+            layers.remove(layerIndex);
+            layers.add(layerIndex, layer);
+
+            final ProjectState result = new ProjectState(w, h, layers,
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex());
+            stateManager.performAction(result, ActionType.CANVAS);
+        }
+    }
+
     // disable layer
     public void disableLayer(final int layerIndex) {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
@@ -678,8 +721,8 @@ public class SEContext {
         }
     }
 
-    // combine with layer below
-    public void combineWithLayerBelow() {
+    // merge with layer below
+    public void mergeWithLayerBelow() {
         // pre-check - identical pass case as can move layer down
         if (getState().canMoveLayerDown()) {
             // build resultant state
@@ -691,11 +734,11 @@ public class SEContext {
 
             final SELayer above = layers.get(aboveIndex),
                     below = layers.get(belowIndex);
-            final SELayer combined = LayerCombiner.combine(above, below,
-                    getState().getFrameCount());
+            final SELayer merged = LayerMerger.merge(above, below,
+                    getState().getFrameIndex(), getState().getFrameCount());
             layers.remove(above);
             layers.remove(below);
-            layers.add(belowIndex, combined);
+            layers.add(belowIndex, merged);
 
             final ProjectState result = new ProjectState(w, h, layers,
                     belowIndex, getState().getFrameCount(),
