@@ -3,12 +3,12 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.utility.Constants;
 
 public final class Eraser extends ToolWithBreadth {
     private static final Eraser INSTANCE;
 
     private boolean erasing;
-    private Coord2D lastTP;
 
     static {
         INSTANCE = new Eraser();
@@ -16,7 +16,6 @@ public final class Eraser extends ToolWithBreadth {
 
     private Eraser() {
         erasing = false;
-        lastTP = new Coord2D(-1, -1);
     }
 
     public static Eraser get() {
@@ -30,9 +29,9 @@ public final class Eraser extends ToolWithBreadth {
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        if (context.hasTargetPixel()) {
+        if (context.isTargetingPixelOnCanvas()) {
             erasing = true;
-            lastTP = new Coord2D(-1, -1);
+            reset();
             context.getState().markAsCheckpoint(false, context);
         }
     }
@@ -40,39 +39,39 @@ public final class Eraser extends ToolWithBreadth {
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         if (erasing) {
-            if (context.hasTargetPixel()) {
+            if (context.isTargetingPixelOnCanvas()) {
                 final int w = context.getState().getImageWidth(),
                         h = context.getState().getImageHeight();
                 final Coord2D tp = context.getTargetPixel();
 
-                if (tp.equals(lastTP))
+                if (isUnchanged(context))
                     return;
 
                 final boolean[][] eraseMask = new boolean[w][h];
                 populateAround(eraseMask, tp);
 
-                final int xDiff = tp.x - lastTP.x, yDiff = tp.y - lastTP.y,
+                final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
                         xUnit = (int) Math.signum(xDiff),
                         yUnit = (int) Math.signum(yDiff);
-                if (!lastTP.equals(new Coord2D(-1, -1)) &&
+                if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
                         (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
                     if (Math.abs(xDiff) > Math.abs(yDiff)) {
                         for (int x = 1; x < Math.abs(xDiff); x++) {
                             final int y = (int) (x * Math.abs(yDiff / (double) xDiff));
-                            populateAround(eraseMask, lastTP.displace(xUnit * x, yUnit * y));
+                            populateAround(eraseMask, getLastTP().displace(xUnit * x, yUnit * y));
                         }
                     } else {
                         for (int y = 1; y < Math.abs(yDiff); y++) {
                             final int x = (int) (y * Math.abs(xDiff / (double) yDiff));
-                            populateAround(eraseMask, lastTP.displace(xUnit * x, yUnit * y));
+                            populateAround(eraseMask, getLastTP().displace(xUnit * x, yUnit * y));
                         }
                     }
                 }
 
                 context.erase(eraseMask);
-                lastTP = tp;
+                updateLast(context);
             } else
-                lastTP = new Coord2D(-1, -1);
+                reset();
         }
     }
 

@@ -14,7 +14,6 @@ public final class Brush extends ToolWithBreadth {
 
     private boolean painting;
     private Color c;
-    private Coord2D lastTP;
 
     static {
         INSTANCE = new Brush();
@@ -23,7 +22,6 @@ public final class Brush extends ToolWithBreadth {
     private Brush() {
         painting = false;
         c = Constants.BLACK;
-        lastTP = new Coord2D(-1, -1);
     }
 
     public static Brush get() {
@@ -39,12 +37,13 @@ public final class Brush extends ToolWithBreadth {
     public void onMouseDown(
             final SEContext context, final GameMouseEvent me
     ) {
-        if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
+        if (context.isTargetingPixelOnCanvas() &&
+                me.button != GameMouseEvent.Button.MIDDLE) {
             painting = true;
             c = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
-            lastTP = new Coord2D(-1, -1);
+            reset();
             context.getState().markAsCheckpoint(false, context);
         }
     }
@@ -54,39 +53,39 @@ public final class Brush extends ToolWithBreadth {
             final SEContext context, final Coord2D mousePosition
     ) {
         if (painting) {
-            if (context.hasTargetPixel()) {
+            if (context.isTargetingPixelOnCanvas()) {
                 final int w = context.getState().getImageWidth(),
                         h = context.getState().getImageHeight();
                 final Coord2D tp = context.getTargetPixel();
 
-                if (tp.equals(lastTP))
+                if (tp.equals(getLastTP()))
                     return;
 
                 final GameImage edit = new GameImage(w, h);
                 populateAround(edit, tp);
 
-                final int xDiff = tp.x - lastTP.x, yDiff = tp.y - lastTP.y,
+                final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
                         xUnit = (int)Math.signum(xDiff),
                         yUnit = (int)Math.signum(yDiff);
-                if (!lastTP.equals(new Coord2D(-1, -1)) &&
+                if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
                         (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
                     if (Math.abs(xDiff) > Math.abs(yDiff)) {
                         for (int x = 1; x < Math.abs(xDiff); x++) {
                             final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                            populateAround(edit, lastTP.displace(xUnit * x, yUnit* y));
+                            populateAround(edit, getLastTP().displace(xUnit * x, yUnit* y));
                         }
                     } else {
                         for (int y = 1; y < Math.abs(yDiff); y++) {
                             final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                            populateAround(edit, lastTP.displace(xUnit * x, yUnit* y));
+                            populateAround(edit, getLastTP().displace(xUnit * x, yUnit* y));
                         }
                     }
                 }
 
                 context.editImage(edit.submit());
-                lastTP = tp;
+                updateLast(context);
             } else
-                lastTP = new Coord2D(-1, -1);
+                reset();
         }
     }
 

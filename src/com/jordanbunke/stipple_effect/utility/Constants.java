@@ -17,6 +17,8 @@ public class Constants {
             ProjectInfo.SaveType.NATIVE.getFileSuffix()
     };
 
+    public static final Coord2D NO_VALID_TARGET = new Coord2D(-1, -1);
+
     public static final int CANVAS_W = 960, CANVAS_H = 540, SCREEN_H_BUFFER = 80;
 
     public static final double TICK_HZ = 100d, FPS = 30d;

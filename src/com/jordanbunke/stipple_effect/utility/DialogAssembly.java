@@ -183,7 +183,8 @@ public class DialogAssembly {
 
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
                 switch (c.getProjectInfo().getSaveType()) {
-            case PNG_STITCHED -> pngStitchedContents;
+            case PNG_STITCHED -> c.getState().getFrameCount() > 1
+                    ? pngStitchedContents : new PlaceholderMenuElement();
             case GIF -> gifContents;
             default -> new PlaceholderMenuElement();
         });
@@ -194,10 +195,13 @@ public class DialogAssembly {
                 folderButton, nameTextBox, scaleUpSlider, scaleUpValue,
                 saveAsToggle, basedOnSaveType);
         setDialog(assembleDialog("Save Project...", contents,
-                () -> c.getProjectInfo()
-                        .hasSaveAssociation() && xDivsTextBox.isValid() &&
-                        yDivsTextBox.isValid(), "Save",
-                () -> c.getProjectInfo().save()));
+                () -> {
+            final boolean enoughFrames = c.getProjectInfo().getFrameDimsX() *
+                    c.getProjectInfo().getFrameDimsY() >= c.getState().getFrameCount();
+            return c.getProjectInfo().hasSaveAssociation() &&
+                    xDivsTextBox.isValid() && yDivsTextBox.isValid() &&
+                    enoughFrames;
+            }, "Save", () -> c.getProjectInfo().save()));
     }
 
     public static void setDialogToResize() {

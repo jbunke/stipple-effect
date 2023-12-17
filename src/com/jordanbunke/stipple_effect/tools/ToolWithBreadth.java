@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-public abstract class ToolWithBreadth extends Tool {
+public abstract class ToolWithBreadth extends ToolThatDraws {
     private int breadth;
 
     ToolWithBreadth() {

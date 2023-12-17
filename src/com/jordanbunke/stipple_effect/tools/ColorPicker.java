@@ -30,7 +30,8 @@ public final class ColorPicker extends Tool {
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
+        if (context.isTargetingPixelOnCanvas() &&
+                me.button != GameMouseEvent.Button.MIDDLE) {
             final Coord2D tp = context.getTargetPixel();
             final int index = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.PRIMARY : StippleEffect.SECONDARY;

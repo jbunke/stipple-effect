@@ -33,7 +33,8 @@ public final class Fill extends ToolThatSearches {
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        if (context.hasTargetPixel() && me.button != GameMouseEvent.Button.MIDDLE) {
+        if (context.isTargetingPixelOnCanvas() &&
+                me.button != GameMouseEvent.Button.MIDDLE) {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
             final Coord2D tp = context.getTargetPixel();

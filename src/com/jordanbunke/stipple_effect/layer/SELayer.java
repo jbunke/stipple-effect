@@ -63,20 +63,20 @@ public final class SELayer {
 
     public SELayer returnEdited(final GameImage edit, final int frameIndex) {
         final List<GameImage> frames = new ArrayList<>(this.frames);
-        final GameImage content = frames.get(frameIndex);
+        final GameImage content = getFrame(frameIndex);
 
         final GameImage composed = new GameImage(content);
         composed.draw(edit);
+        composed.free();
+        frames.set(frameIndex, composed);
 
-        frames.set(frameIndex, composed.submit());
-
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
+        return new SELayer(frames, composed, opacity, enabled,
                 framesLinked, onionSkinMode, name);
     }
 
     public SELayer returnEdited(final boolean[][] eraserMask, final int frameIndex) {
         final List<GameImage> frames = new ArrayList<>(this.frames);
-        final GameImage content = frames.get(frameIndex);
+        final GameImage content = getFrame(frameIndex);
 
         final GameImage after = new GameImage(content);
 
@@ -87,9 +87,10 @@ public final class SELayer {
             }
         }
 
-        frames.set(frameIndex, after.submit());
+        after.free();
+        frames.set(frameIndex, after);
 
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
+        return new SELayer(frames, after, opacity, enabled,
                 framesLinked, onionSkinMode, name);
     }
 
@@ -100,7 +101,10 @@ public final class SELayer {
             resizedFrames.add(ImageProcessing.scale(
                     getFrame(i), w, h));
 
-        return new SELayer(resizedFrames, frameLinkedContent, opacity,
+        final GameImage resizedFLC = ImageProcessing.scale(
+                frameLinkedContent, w, h);
+
+        return new SELayer(resizedFrames, resizedFLC, opacity,
                 enabled, framesLinked, onionSkinMode, name);
     }
 
@@ -116,7 +120,10 @@ public final class SELayer {
             paddedFrames.add(frame.submit());
         }
 
-        return new SELayer(paddedFrames, frameLinkedContent, opacity,
+        final GameImage paddedFLC = new GameImage(w, h);
+        paddedFLC.draw(frameLinkedContent, left, top);
+
+        return new SELayer(paddedFrames, paddedFLC.submit(), opacity,
                 enabled, framesLinked, onionSkinMode, name);
     }
 

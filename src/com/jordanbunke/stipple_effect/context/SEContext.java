@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SEContext {
-    private static final Coord2D UNTARGETED = new Coord2D(-1, -1);
-
     private final ProjectInfo projectInfo;
     private final StateManager stateManager;
     private final RenderInfo renderInfo;
@@ -48,7 +46,7 @@ public class SEContext {
         this.renderInfo = new RenderInfo(imageWidth, imageHeight);
         this.playbackInfo = new PlaybackInfo();
 
-        this.targetPixel = UNTARGETED;
+        this.targetPixel = Constants.NO_VALID_TARGET;
     }
 
     public GameImage drawWorkspace() {
@@ -198,6 +196,13 @@ public class SEContext {
                     () -> getPlaybackInfo().togglePlaying()
             );
 
+            // center anchor point
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
+                    () -> getRenderInfo().setAnchor(new Coord2D(
+                            getState().getImageWidth() / 2,
+                            getState().getImageHeight() / 2)));
+
             // set tools
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
@@ -325,10 +330,9 @@ public class SEContext {
             final int targetX = (int)(((workshopM.x - render.x) / (double)(bottomLeft.x - render.x)) * w),
                     targetY = (int)(((workshopM.y - render.y) / (double)(bottomLeft.y - render.y)) * h);
 
-            targetPixel = (targetX >= 0 && targetX < w && targetY >= 0 && targetY < h)
-                    ? new Coord2D(targetX, targetY) : UNTARGETED;
+            targetPixel = new Coord2D(targetX, targetY);
         } else
-            targetPixel = UNTARGETED;
+            targetPixel = Constants.NO_VALID_TARGET;
     }
 
     private Coord2D getImageRenderPositionInWorkspace() {
@@ -786,8 +790,10 @@ public class SEContext {
     }
 
     // GETTERS
-    public boolean hasTargetPixel() {
-        return targetPixel != UNTARGETED;
+    public boolean isTargetingPixelOnCanvas() {
+        return targetPixel.x >= 0 && targetPixel.y >= 0 &&
+                targetPixel.x < getState().getImageWidth() &&
+                targetPixel.y < getState().getImageHeight();
     }
 
     public Coord2D getTargetPixel() {
@@ -795,7 +801,7 @@ public class SEContext {
     }
 
     public String getTargetPixelText() {
-        return hasTargetPixel() ? targetPixel.toString() : "--";
+        return isTargetingPixelOnCanvas() ? targetPixel.toString() : "--";
     }
 
     public String getCanvasSizeText() {
