@@ -123,11 +123,15 @@ public class Constants {
 
     public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
 
-    // specific tools
-    public static final int DEFAULT_BRUSH_BREADTH = 3, MIN_BREADTH = 1, MAX_BREADTH = 200,
-            MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, /* TODO: test and tweak */ MAX_NUM_STATES = 5000,
+    public static final int DEFAULT_BRUSH_BREADTH = 3,
+            MIN_BREADTH = 1, MAX_BREADTH = 200, BREADTH_INC = 5,
+            MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, MAX_NUM_STATES = 5000,
             MIN_MILLIS_PER_FRAME = 33, MAX_MILLIS_PER_FRAME = 500,
             MILLIS_PER_FRAME_INC = 40, DEFAULT_MILLIS_PER_FRAME = 100,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 25;
+
+    public static final double EXACT_COLOR_MATCH = 0d,
+            DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
+            SMALL_TOLERANCE_INC = 0.01, BIG_TOLERANCE_INC = SMALL_TOLERANCE_INC * 10d;
 }

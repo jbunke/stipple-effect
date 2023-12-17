@@ -87,6 +87,15 @@ public class SEContext {
     private void processTools(
             final InputEventLogger eventLogger, final Tool tool
     ) {
+        if (StippleEffect.get().getTool() instanceof ToolWithMode) {
+            if (eventLogger.isPressed(Key.SHIFT))
+                ToolWithMode.setMode(ToolWithMode.Mode.GLOBAL);
+            else if (eventLogger.isPressed(Key.CTRL))
+                ToolWithMode.setMode(ToolWithMode.Mode.ADDITIVE);
+            else
+                ToolWithMode.setMode(ToolWithMode.Mode.LOCAL);
+        }
+
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
             if (e instanceof GameMouseEvent me) {
                 if (me.matchesAction(GameMouseEvent.Action.DOWN) && isInWorkspaceBounds(eventLogger)) {
@@ -218,16 +227,45 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     () -> StippleEffect.get().setTool(ColorPicker.get())
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Fill.get())
+            );
 
             // tool modifications
             if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {
                 eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        twr::decreaseBreadth
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        twr::increaseBreadth
+                );
+                eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        twr::increaseRadius
+                        () -> twr.setBreadth(twr.getBreadth() + Constants.BREADTH_INC)
                 );
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        twr::decreaseRadius
+                        () -> twr.setBreadth(twr.getBreadth() - Constants.BREADTH_INC)
+                );
+            } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        tts::decreaseTolerance
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        tts::increaseTolerance
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC)
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC)
                 );
             } else if (StippleEffect.get().getTool() instanceof Hand) {
                 eventLogger.checkForMatchingKeyStroke(

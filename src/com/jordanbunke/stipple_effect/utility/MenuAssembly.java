@@ -29,7 +29,7 @@ public class MenuAssembly {
     private static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
-            ColorPicker.get()
+            Fill.get(), ColorPicker.get()
             // TODO - populate
     };
 

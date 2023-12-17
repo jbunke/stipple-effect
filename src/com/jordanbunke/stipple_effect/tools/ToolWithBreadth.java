@@ -19,16 +19,16 @@ public abstract class ToolWithBreadth extends Tool {
     }
 
     public void setBreadth(final int breadth) {
-        if (breadth >= Constants.MIN_BREADTH && breadth <= Constants.MAX_BREADTH)
-            this.breadth = breadth;
+        this.breadth = Math.max(Constants.MIN_BREADTH,
+                Math.min(breadth, Constants.MAX_BREADTH));
     }
 
-    public void increaseRadius() {
+    public void increaseBreadth() {
         if (breadth < Constants.MAX_BREADTH)
             breadth++;
     }
 
-    public void decreaseRadius() {
+    public void decreaseBreadth() {
         if (breadth > Constants.MIN_BREADTH)
             breadth--;
     }
