@@ -430,7 +430,6 @@ public class DialogAssembly {
 
     public static void setDialogToLayerSettings(final int index) {
         final SEContext c = StippleEffect.get().getContext();
-
         final SELayer layer = c.getState().getLayers().get(index);
 
         DialogVals.setLayerOpacity(layer.getOpacity());
@@ -455,8 +454,13 @@ public class DialogAssembly {
                 o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
         opacitySlider.updateAssets();
 
+        // opacity value
+        final DynamicLabel opacityValue = makeDynamicFromLeftLabel(opacityLabel,
+                () -> String.valueOf((int)(DialogVals.getLayerOpacity() * MAX_OPACITY)));
+
         final MenuElementGrouping contents = new MenuElementGrouping(
-                layerNameLabel, opacityLabel, layerNameTextBox, opacitySlider);
+                layerNameLabel, opacityLabel, layerNameTextBox,
+                opacitySlider, opacityValue);
         setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
                 contents, layerNameTextBox::isValid,
                 Constants.GENERIC_APPROVAL_TEXT, () -> {
