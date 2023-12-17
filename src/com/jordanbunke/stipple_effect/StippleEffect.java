@@ -120,10 +120,6 @@ public class StippleEffect implements ProgramContext {
 
     private static void launchWithFile(final Path filepath) {
         verifyFilepath(filepath);
-
-        if (get().contexts.size() > 1) {
-            get().removeContext(0);
-        }
     }
 
     private GameWindow makeWindow() {
@@ -462,6 +458,12 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void addContext(final SEContext context, final boolean setActive) {
+        // close unmodified untitled project
+        if (contexts.size() == 1 && !contexts.get(0).getProjectInfo()
+                .hasUnsavedChanges() &&
+                !contexts.get(0).getProjectInfo().hasSaveAssociation())
+            contexts.remove(0);
+
         contexts.add(context);
 
         if (setActive) {
