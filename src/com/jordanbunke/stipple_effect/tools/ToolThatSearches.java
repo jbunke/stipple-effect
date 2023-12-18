@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ToolThatSearches extends ToolWithMode {
     private double tolerance;
@@ -43,38 +43,51 @@ public abstract class ToolThatSearches extends ToolWithMode {
             setTolerance(tolerance - Constants.SMALL_TOLERANCE_INC);
     }
 
-    public void recursiveAdjacentSearch(
-            final GameImage image, final Color initial, final Coord2D target,
-            final Set<Coord2D> searched, final Set<Coord2D> matched
+    public Set<Coord2D> search(
+            final GameImage image, final Color initial, final Coord2D target
     ) {
-        final int w = image.getWidth(), h = image.getHeight();
-
-        searched.add(target);
-        final Color pixel = ImageProcessing.colorAtPixel(image, target.x, target.y);
-
-        if (pixelMatchesToleranceCondition(initial, pixel)) {
-            matched.add(target);
-
-            // neighbours
-            if (target.x > 0 && !searched.contains(target.displace(-1, 0)))
-                recursiveAdjacentSearch(image, initial, target.displace(-1, 0),
-                        searched, matched);
-            if (target.x + 1 < w && !searched.contains(target.displace(1, 0)))
-                recursiveAdjacentSearch(image, initial, target.displace(1, 0),
-                        searched, matched);
-            if (target.y > 0 && !searched.contains(target.displace(0, -1)))
-                recursiveAdjacentSearch(image, initial, target.displace(0, -1),
-                        searched, matched);
-            if (target.y + 1 < h && !searched.contains(target.displace(0, 1)))
-                recursiveAdjacentSearch(image, initial, target.displace(0, 1),
-                        searched, matched);
-        }
+        return ToolWithMode.isGlobal() ? globalSearch(image, initial)
+                : adjacentSearch(image, initial, target);
     }
 
-    public void globalSearch(
-            final GameImage image, final Color initial,
-            final Set<Coord2D> matched
+    private Set<Coord2D> adjacentSearch(
+            final GameImage image, final Color initial, final Coord2D target
     ) {
+        final Set<Coord2D> matched = new HashSet<>(), searched = new HashSet<>();
+        final int w = image.getWidth(), h = image.getHeight();
+
+        final Stack<Coord2D> searching = new Stack<>();
+        searching.push(target);
+
+        while (!searching.isEmpty()) {
+            final Coord2D active = searching.pop();
+            searched.add(active);
+
+            final Color pixel = ImageProcessing.colorAtPixel(
+                    image, active.x, active.y);
+
+            if (pixelMatchesToleranceCondition(initial, pixel)) {
+                matched.add(active);
+
+                // neighbours
+                if (active.x > 0 && !searched.contains(active.displace(-1, 0)))
+                    searching.add(active.displace(-1, 0));
+                if (active.x + 1 < w && !searched.contains(active.displace(1, 0)))
+                    searching.add(active.displace(1, 0));
+                if (active.y > 0 && !searched.contains(active.displace(0, -1)))
+                    searching.add(active.displace(0, -1));
+                if (active.y + 1 < h && !searched.contains(active.displace(0, 1)))
+                    searching.add(active.displace(0, 1));
+            }
+        }
+
+        return matched;
+    }
+
+    private Set<Coord2D> globalSearch(
+            final GameImage image, final Color initial
+    ) {
+        final Set<Coord2D> matched = new HashSet<>();
         final int w = image.getWidth(), h = image.getHeight();
 
         for (int x = 0; x < w; x++) {
@@ -85,6 +98,8 @@ public abstract class ToolThatSearches extends ToolWithMode {
                     matched.add(new Coord2D(x, y));
             }
         }
+
+        return matched;
     }
 
     public boolean pixelMatchesToleranceCondition(

@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.utility.SECursor;
 
 public final class Hand extends Tool {
     private static final Hand INSTANCE;
@@ -22,6 +23,11 @@ public final class Hand extends Tool {
 
     public static Hand get() {
         return INSTANCE;
+    }
+
+    @Override
+    public String getCursorCode() {
+        return panning ? SECursor.HAND_GRAB : SECursor.HAND_OPEN;
     }
 
     @Override

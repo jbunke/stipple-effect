@@ -22,6 +22,7 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.Hand;
 import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.*;
 
 import java.awt.*;
@@ -64,6 +65,9 @@ public class StippleEffect implements ProgramContext {
     // dialog
     private Menu dialog;
 
+    // cursor
+    private Coord2D mousePos;
+
     static {
         OnStartup.run();
 
@@ -74,9 +78,13 @@ public class StippleEffect implements ProgramContext {
         INSTANCE.toolButtonMenu = MenuAssembly.buildToolButtonMenu();
         INSTANCE.colorsMenu = MenuAssembly.buildColorsMenu();
         INSTANCE.rebuildStateDependentMenus();
+
+        ToolWithBreadth.drawAllToolOverlays();
     }
 
     public StippleEffect() {
+        mousePos = new Coord2D();
+
         contexts = new ArrayList<>(List.of(new SEContext(
                 DialogVals.getNewProjectWidth(), DialogVals.getNewProjectHeight())));
         contextIndex = 0;
@@ -124,10 +132,12 @@ public class StippleEffect implements ProgramContext {
 
     private GameWindow makeWindow() {
         final Coord2D size = determineWindowSize();
-        return new GameWindow(Constants.PROGRAM_NAME,
+        final GameWindow window = new GameWindow(Constants.PROGRAM_NAME,
                 size.x, size.y,
                 /* TODO - program icon */ GameImage.dummy(),
                 true, false, !windowed);
+        window.hideCursor();
+        return window;
     }
 
     private Coord2D determineWindowSize() {
@@ -147,6 +157,10 @@ public class StippleEffect implements ProgramContext {
         rebuildProjectsMenu();
     }
 
+    public void rebuildToolButtonMenu() {
+        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+    }
+
     public void rebuildLayersMenu() {
         layersMenu = MenuAssembly.buildLayersMenu();
     }
@@ -161,6 +175,8 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void process(final InputEventLogger eventLogger) {
+        mousePos = eventLogger.getAdjustedMousePosition();
+
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
@@ -220,6 +236,9 @@ public class StippleEffect implements ProgramContext {
         // workspace
         final GameImage workspace = getContext().drawWorkspace();
         canvas.draw(workspace, wp.x, wp.y);
+        // bottom bar - zoom, animation
+        final GameImage bottomBar = drawBottomBar();
+        canvas.draw(bottomBar, bbp.x, bbp.y);
         // tools
         final GameImage tools = drawTools();
         canvas.draw(tools, tp.x, tp.y);
@@ -240,9 +259,6 @@ public class StippleEffect implements ProgramContext {
         final GameImage frames = drawFrames();
         canvas.draw(frames, fp.x, fp.y);
         framesMenu.render(canvas);
-        // bottom bar - zoom, animation
-        final GameImage bottomBar = drawBottomBar();
-        canvas.draw(bottomBar, bbp.x, bbp.y);
 
         // borders
         final float strokeWidth = 2f;
@@ -260,6 +276,13 @@ public class StippleEffect implements ProgramContext {
                     Constants.CANVAS_W, Constants.CANVAS_H);
             dialog.render(canvas);
         }
+
+        // cursor
+        final GameImage cursor = SECursor.fetchCursor(
+                getContext().isInWorkspaceBounds()
+                        ? tool.getCursorCode() : SECursor.MAIN_CURSOR);
+        canvas.draw(cursor, mousePos.x - (Constants.CURSOR_DIM / 2),
+                mousePos.y - (Constants.CURSOR_DIM / 2));
     }
 
     @Override

@@ -88,7 +88,9 @@ public abstract class Slider extends MenuElement {
 
                             if (validDim) {
                                 sliding = true;
-                                onClickDiffDim = mpd - getSliderBallDim();
+                                // TODO: - 1 is a hotfix; investigate, understand,
+                                //  and document solution methodology later
+                                onClickDiffDim = (mpd - getSliderBallDim()) - 1;
                             }
                         }
                     }

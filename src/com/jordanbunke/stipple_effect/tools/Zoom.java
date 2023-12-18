@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 
 public final class Zoom extends Tool {
@@ -32,6 +33,8 @@ public final class Zoom extends Tool {
         }
 
         context.getRenderInfo().setAnchor(context.getTargetPixel());
+
+        StippleEffect.get().rebuildToolButtonMenu();
     }
 
     @Override

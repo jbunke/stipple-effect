@@ -76,23 +76,17 @@ public final class Eraser extends ToolWithBreadth {
     }
 
     private void populateAround(final boolean[][] eraseMask, final Coord2D tp) {
-        final int remainder = getBreadth() % 2, halfB = (getBreadth() / 2) + remainder;
+        final int halfB = breadthOffset();
+        final boolean[][] mask = breadthMask();
 
-        for (int x = tp.x - halfB; x < tp.x + halfB; x++)
-            for (int y = tp.y - halfB; y < tp.y + halfB; y++) {
-                if (x < 0 || y < 0 || x >= eraseMask.length || y >= eraseMask[x].length)
-                    continue;
+        for (int x = 0; x < mask.length; x++)
+            for (int y = 0; y < mask[x].length; y++) {
+                final Coord2D e = new Coord2D(x + (tp.x - halfB),
+                        y + (tp.y - halfB));
 
-                final double distance = remainder == 1
-                        ? Coord2D.unitDistanceBetween(new Coord2D(x, y), tp)
-                        : Coord2D.unitDistanceBetween(
-                        new Coord2D((2 * x) + 1, (2 * y) + 1),
-                        new Coord2D(tp.x * 2, tp.y * 2)),
-                        threshold = remainder == 1
-                                ? getBreadth() / 2. : (double) getBreadth();
-
-                if (distance <= threshold)
-                    eraseMask[x][y] = true;
+                if (mask[x][y] && e.x >= 0 && e.y >= 0 &&
+                        e.x < eraseMask.length && e.y < eraseMask.length)
+                    eraseMask[e.x][e.y] = true;
             }
     }
 

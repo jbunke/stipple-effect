@@ -1,26 +1,32 @@
 package com.jordanbunke.stipple_effect.context;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
+import com.jordanbunke.stipple_effect.utility.Constants;
 
 public class RenderInfo {
-    private static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 32f, DEF_ZOOM = 4f;
-
     private Coord2D anchor;
     private float zoomFactor;
 
     public RenderInfo(final int imageWidth, final int imageHeight) {
         this.anchor = new Coord2D(imageWidth / 2, imageHeight / 2);
-        this.zoomFactor = DEF_ZOOM;
+        this.zoomFactor = Constants.DEF_ZOOM;
     }
 
     public void zoomIn() {
-        if (zoomFactor < MAX_ZOOM)
-            zoomFactor *= 2f;
+        setZoomFactor(zoomFactor * 2f);
     }
 
     public void zoomOut() {
-        if (zoomFactor > MIN_ZOOM)
-            zoomFactor /= 2f;
+        setZoomFactor(zoomFactor / 2f);
+    }
+
+    public void setZoomFactor(final float zoomFactor) {
+        this.zoomFactor = Math.max(Constants.MIN_ZOOM,
+                Math.min(zoomFactor, Constants.MAX_ZOOM));
+
+        if (this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY)
+            ToolWithBreadth.drawAllToolOverlays();
     }
 
     public void setAnchor(final Coord2D anchor) {

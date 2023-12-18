@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public class Constants {
     public static final String PROGRAM_NAME = "Stipple Effect";
 
-    public static final Path ICON_FOLDER = Path.of("icons");
+    public static final Path ICON_FOLDER = Path.of("icons"), CURSOR_FOLDER = Path.of("cursors");
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
             "jpg",
@@ -79,7 +79,9 @@ public class Constants {
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
             TP_X = (int)(CANVAS_W * 0.21),
             SIZE_X = (int)(CANVAS_W * 0.36),
-            ZOOM_PCT_X = (int)(CANVAS_W * 0.51);
+            ZOOM_PCT_X = (int)(CANVAS_W * 0.51),
+            ZOOM_SLIDER_X = (int)(CANVAS_W * 0.575),
+            ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
@@ -100,10 +102,10 @@ public class Constants {
             HIGHLIGHT_1 = new Color(100, 100, 255),
             HIGHLIGHT_2 = new Color(50, 80, 255, 100);
 
-    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32,
+    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 1,
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360;
 
-    public static final int CHECKER_INCREMENT = 4,
+    public static final int CHECKER_INCREMENT = 4, CURSOR_DIM = 40,
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
@@ -132,6 +134,8 @@ public class Constants {
             MILLIS_PER_FRAME_INC = 40, DEFAULT_MILLIS_PER_FRAME = 100,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 25;
+
+    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 32f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

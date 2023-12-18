@@ -8,7 +8,6 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 
 import java.awt.*;
-import java.util.HashSet;
 import java.util.Set;
 
 public final class Fill extends ToolThatSearches {
@@ -46,14 +45,8 @@ public final class Fill extends ToolThatSearches {
                             ? StippleEffect.get().getPrimary()
                             : StippleEffect.get().getSecondary();
 
-            final Set<Coord2D> searched = new HashSet<>(),
-                    matched = new HashSet<>();
-
             // search
-            if (ToolWithMode.getMode() == Mode.GLOBAL)
-                globalSearch(image, initial, matched);
-            else
-                recursiveAdjacentSearch(image, initial, tp, searched, matched);
+            final Set<Coord2D> matched = search(image, initial, tp);
 
             // assemble edit mask
             final GameImage edit = new GameImage(w, h);

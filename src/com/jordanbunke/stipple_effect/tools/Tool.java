@@ -37,11 +37,11 @@ public abstract class Tool {
         return ResourceLoader.loadImageResource(iconFile);
     }
 
-    // TODO - cursors
+    public String getCursorCode() {
+        return getName().replace(" ", "_").toLowerCase();
+    }
 
-    // TODO tools - pen, eraser,
-    //  color picker,
-    //  stipple select, box select, move selection, move selected pixels, magic wand select
+    // TODO tools - stipple select, box select, move selection, move selected pixels, magic wand select
 
     // DONE tools
     // zoom, hand, stippler, pencil

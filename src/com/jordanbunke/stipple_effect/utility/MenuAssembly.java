@@ -569,6 +569,22 @@ public class MenuAssembly {
             mb.add(toolButtonFromTool(ALL_TOOLS[i], i));
         }
 
+        // zoom slider
+        final float base = 2f;
+        final HorizontalSlider zoomSlider = new HorizontalSlider(
+                Constants.getBottomBarPosition().displace(Constants.ZOOM_SLIDER_X,
+                        Constants.BUTTON_OFFSET), Constants.ZOOM_SLIDER_W,
+                MenuElement.Anchor.LEFT_TOP,
+                (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
+                (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
+                (int)(Math.log(StippleEffect.get().getContext().getRenderInfo()
+                        .getZoomFactor()) / Math.log(base)), i ->
+                StippleEffect.get().getContext().getRenderInfo()
+                        .setZoomFactor((float)Math.pow(base, i)));
+        zoomSlider.updateAssets();
+
+        mb.add(zoomSlider);
+
         return mb.build();
     }
 
