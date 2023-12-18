@@ -43,10 +43,11 @@ public class ProjectInfo {
         }
 
         public static SaveType[] validOptions() {
+            // TODO - omitting NATIVE while serializing/saving and loading are not yet implemented
             if (StippleEffect.get().getContext().getState().getFrameCount() == 1)
-                return new SaveType[] { PNG_STITCHED, NATIVE };
+                return new SaveType[] { PNG_STITCHED }; // , NATIVE };
 
-            return SaveType.values();
+            return new SaveType[] { PNG_STITCHED, PNG_SEPARATE, GIF }; // SaveType.values();
         }
     }
 

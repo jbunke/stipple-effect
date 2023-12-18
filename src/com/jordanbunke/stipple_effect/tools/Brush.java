@@ -8,6 +8,7 @@ import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
+import java.util.Set;
 
 public final class Brush extends ToolWithBreadth {
     private static final Brush INSTANCE;
@@ -57,12 +58,13 @@ public final class Brush extends ToolWithBreadth {
                 final int w = context.getState().getImageWidth(),
                         h = context.getState().getImageHeight();
                 final Coord2D tp = context.getTargetPixel();
+                final Set<Coord2D> selection = context.getState().getSelection();
 
                 if (tp.equals(getLastTP()))
                     return;
 
                 final GameImage edit = new GameImage(w, h);
-                populateAround(edit, tp);
+                populateAround(edit, tp, selection);
 
                 final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
                         xUnit = (int)Math.signum(xDiff),
@@ -72,12 +74,14 @@ public final class Brush extends ToolWithBreadth {
                     if (Math.abs(xDiff) > Math.abs(yDiff)) {
                         for (int x = 1; x < Math.abs(xDiff); x++) {
                             final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                            populateAround(edit, getLastTP().displace(xUnit * x, yUnit* y));
+                            populateAround(edit, getLastTP().displace(
+                                    xUnit * x, yUnit* y), selection);
                         }
                     } else {
                         for (int y = 1; y < Math.abs(yDiff); y++) {
                             final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                            populateAround(edit, getLastTP().displace(xUnit * x, yUnit* y));
+                            populateAround(edit, getLastTP().displace(
+                                    xUnit * x, yUnit* y), selection);
                         }
                     }
                 }
@@ -89,14 +93,23 @@ public final class Brush extends ToolWithBreadth {
         }
     }
 
-    private void populateAround(final GameImage edit, final Coord2D tp) {
+    private void populateAround(
+            final GameImage edit, final Coord2D tp, final Set<Coord2D> selection
+    ) {
         final int halfB = breadthOffset();
         final boolean[][] mask = breadthMask();
 
         for (int x = 0; x < mask.length; x++)
-            for (int y = 0; y < mask[x].length; y++)
+            for (int y = 0; y < mask[x].length; y++) {
+                final Coord2D b = new Coord2D(x + (tp.x - halfB),
+                        y + (tp.y - halfB));
+
+                if (!(selection.isEmpty() || selection.contains(b)))
+                    continue;
+
                 if (mask[x][y])
-                    edit.dot(c, x + (tp.x - halfB), y + (tp.y - halfB));
+                    edit.dot(c, b.x, b.y);
+            }
     }
 
     @Override

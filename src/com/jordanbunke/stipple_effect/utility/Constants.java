@@ -77,11 +77,12 @@ public class Constants {
 
     public static final int TEXT_Y_OFFSET = -4,
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
-            TP_X = (int)(CANVAS_W * 0.21),
+            TP_X = (int)(CANVAS_W * 0.24),
             SIZE_X = (int)(CANVAS_W * 0.36),
             ZOOM_PCT_X = (int)(CANVAS_W * 0.51),
             ZOOM_SLIDER_X = (int)(CANVAS_W * 0.575),
-            ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1);
+            ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1),
+            SELECTION_PCT_X = (int)(CANVAS_W * 0.69);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
@@ -100,7 +101,8 @@ public class Constants {
                     ACCENT_BACKGROUND_LIGHT.getGreen(),
                     ACCENT_BACKGROUND_LIGHT.getBlue(), 200),
             HIGHLIGHT_1 = new Color(100, 100, 255),
-            HIGHLIGHT_2 = new Color(50, 80, 255, 100);
+            HIGHLIGHT_2 = new Color(50, 80, 255, 100),
+            OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
     public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 1,
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360;

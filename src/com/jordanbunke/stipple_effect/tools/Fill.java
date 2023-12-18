@@ -46,13 +46,15 @@ public final class Fill extends ToolThatSearches {
                             : StippleEffect.get().getSecondary();
 
             // search
-            final Set<Coord2D> matched = search(image, initial, tp);
+            final Set<Coord2D> matched = search(image, initial, tp),
+                    selection = context.getState().getSelection();
 
             // assemble edit mask
             final GameImage edit = new GameImage(w, h);
 
             for (Coord2D m : matched)
-                edit.dot(fillColor, m.x, m.y);
+                if (selection.isEmpty() || selection.contains(m))
+                    edit.dot(fillColor, m.x, m.y);
 
             context.editImage(edit.submit());
             context.getState().markAsCheckpoint(true, context);

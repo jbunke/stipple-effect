@@ -17,10 +17,13 @@ import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogAssembly;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SEContext {
@@ -31,6 +34,8 @@ public class SEContext {
 
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
+
+    private GameImage selectionOverlay;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -43,12 +48,25 @@ public class SEContext {
             final int imageWidth, final int imageHeight
     ) {
         this.projectInfo = projectInfo;
-        this.stateManager = new StateManager(projectState);
-        this.renderInfo = new RenderInfo(imageWidth, imageHeight);
-        this.playbackInfo = new PlaybackInfo();
+        stateManager = new StateManager(projectState);
+        renderInfo = new RenderInfo(imageWidth, imageHeight);
+        playbackInfo = new PlaybackInfo();
 
-        this.targetPixel = Constants.NO_VALID_TARGET;
-        this.inWorkspaceBounds = false;
+        targetPixel = Constants.NO_VALID_TARGET;
+        inWorkspaceBounds = false;
+
+        redrawSelectionOverlay();
+    }
+
+    public void redrawSelectionOverlay() {
+        final int w = getState().getImageWidth(), h = getState().getImageHeight();
+        final Set<Coord2D> selection = getState().getSelection();
+
+        selectionOverlay = selection.isEmpty() ? GameImage.dummy()
+                : GraphicsUtils.drawOverlay(w, h,
+                (int) renderInfo.getZoomFactor(),
+                (x, y) -> selection.contains(new Coord2D(x, y)),
+                Constants.BLACK, Constants.HIGHLIGHT_1,false);
     }
 
     public GameImage drawWorkspace() {
@@ -79,6 +97,10 @@ public class SEContext {
             }
         }
 
+        workspace.draw(selectionOverlay,
+                render.x - Constants.OVERLAY_BORDER_PX,
+                render.y - Constants.OVERLAY_BORDER_PX);
+
         return workspace.submit();
     }
 
@@ -107,7 +129,7 @@ public class SEContext {
 
             if (eventLogger.isPressed(Key.CTRL))
                 ToolWithMode.setMode(ToolWithMode.Mode.ADDITIVE);
-            else if (eventLogger.isPressed(Key.TAB))
+            else if (eventLogger.isPressed(Key.S)) // TODO - Delta Time has an issue handling TAB and ALT
                 ToolWithMode.setMode(ToolWithMode.Mode.SUBTRACTIVE);
             else
                 ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
@@ -144,16 +166,24 @@ public class SEContext {
                     DialogAssembly::setDialogToNewProject
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().openProject()
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     () -> getProjectInfo().save()
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - select all
+                    this::selectAll
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - deselect
+                    this::deselect
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.I, GameKeyEvent.Action.PRESS),
+                    this::invertSelection
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -170,6 +200,18 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
                     () -> getState().setFrameIndex(getState().getFrameCount() - 1)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToResize
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().getContext().addFrame()
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().getContext().addLayer()
             );
         }
 
@@ -200,8 +242,20 @@ public class SEContext {
                     DialogAssembly::setDialogToSave
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToPad
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
                     () -> {} // TODO - crop to selection
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().getContext().duplicateFrame()
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().getContext().duplicateLayer()
             );
         }
     }
@@ -253,6 +307,14 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     () -> StippleEffect.get().setTool(Fill.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(Wand.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(StippleSelect.get())
             );
 
             // tool modifications
@@ -388,7 +450,100 @@ public class SEContext {
 
     // process all actions here and feed through state manager
 
-    // TODO - SELECTION
+    // SELECTION
+
+    // TODO - crop to selection
+
+    // TODO - cut
+
+    // TODO - copy
+
+    // TODO - delete selection cotents
+
+    // TODO - fill selection
+
+    // deselect
+    public void deselect() {
+        final Set<Coord2D> selection = getState().getSelection();
+
+        if (!selection.isEmpty()) {
+            // build resultant state
+            final ProjectState result = new ProjectState(
+                    getState().getImageWidth(), getState().getImageHeight(),
+                    new ArrayList<>(getState().getLayers()),
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex(), new HashSet<>());
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // select all
+    public void selectAll() {
+        // build resultant state
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        final Set<Coord2D> selection = getState().getSelection();
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                selection.add(new Coord2D(x, y));
+
+        final ProjectState result = new ProjectState(w, h,
+                new ArrayList<>(getState().getLayers()),
+                getState().getLayerEditIndex(), getState().getFrameCount(),
+                getState().getFrameIndex(), selection);
+        stateManager.performAction(result, ActionType.CANVAS);
+        redrawSelectionOverlay();
+    }
+
+    // invert selection
+    public void invertSelection() {
+        // build resultant state
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        final Set<Coord2D> willBe = new HashSet<>(),
+                was = getState().getSelection();
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                if (!was.contains(new Coord2D(x, y)))
+                    willBe.add(new Coord2D(x, y));
+
+        final ProjectState result = new ProjectState(w, h,
+                new ArrayList<>(getState().getLayers()),
+                getState().getLayerEditIndex(), getState().getFrameCount(),
+                getState().getFrameIndex(), willBe);
+        stateManager.performAction(result, ActionType.CANVAS);
+        redrawSelectionOverlay();
+    }
+
+    // edit selection
+    public void editSelection(final Set<Coord2D> edit) {
+        // build resultant state
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        final Set<Coord2D> selection = new HashSet<>();
+        final ToolWithMode.Mode mode = ToolWithMode.getMode();
+
+        if (mode == ToolWithMode.Mode.ADDITIVE || mode == ToolWithMode.Mode.SUBTRACTIVE)
+            selection.addAll(getState().getSelection());
+
+        if (mode == ToolWithMode.Mode.SUBTRACTIVE)
+            selection.removeAll(edit);
+        else
+            selection.addAll(edit);
+
+        final ProjectState result = new ProjectState(w, h,
+                new ArrayList<>(getState().getLayers()),
+                getState().getLayerEditIndex(), getState().getFrameCount(),
+                getState().getFrameIndex(), selection);
+        stateManager.performAction(result, ActionType.CANVAS);
+        redrawSelectionOverlay();
+    }
 
     public void pad() {
         // build resultant state
@@ -404,8 +559,8 @@ public class SEContext {
                 .map(layer -> layer.returnPadded(left, top, w, h)).toList();
 
         final ProjectState result = new ProjectState(w, h,
-                layers, getState().getLayerEditIndex(),
-                frameCount, getState().getFrameIndex());
+                layers, getState().getLayerEditIndex(), frameCount,
+                getState().getFrameIndex(), new HashSet<>());
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -419,8 +574,8 @@ public class SEContext {
                 .map(layer -> layer.returnResized(w, h)).toList();
 
         final ProjectState result = new ProjectState(w, h,
-                layers, getState().getLayerEditIndex(),
-                frameCount, getState().getFrameIndex());
+                layers, getState().getLayerEditIndex(), frameCount,
+                getState().getFrameIndex(), new HashSet<>());
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -439,7 +594,7 @@ public class SEContext {
 
         final ProjectState result = new ProjectState(w, h, layers,
                 layerEditIndex, getState().getFrameCount(),
-                getState().getFrameIndex(), false);
+                frameIndex, getState().getSelection(), false);
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -458,7 +613,7 @@ public class SEContext {
 
         final ProjectState result = new ProjectState(w, h, layers,
                 layerEditIndex, getState().getFrameCount(),
-                getState().getFrameIndex(), false);
+                getState().getFrameIndex(), getState().getSelection(), false);
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -475,9 +630,10 @@ public class SEContext {
             final int addIndex = getState().getFrameIndex() + 1;
             layers.replaceAll(l -> l.returnAddedFrame(addIndex, w, h));
 
-            final ProjectState result = new ProjectState(w, h,
-                    layers, getState().getLayerEditIndex(),
-                    getState().getFrameCount() + 1, addIndex);
+            final ProjectState result = new ProjectState(w, h, layers,
+                    getState().getLayerEditIndex(),
+                    getState().getFrameCount() + 1,
+                    addIndex, getState().getSelection());
             stateManager.performAction(result, ActionType.FRAME);
         }
     }
@@ -497,7 +653,7 @@ public class SEContext {
             final ProjectState result = new ProjectState(w, h,
                     layers, getState().getLayerEditIndex(),
                     getState().getFrameCount() + 1,
-                    frameIndex + 1);
+                    frameIndex + 1, getState().getSelection());
             stateManager.performAction(result, ActionType.FRAME);
         }
     }
@@ -517,7 +673,7 @@ public class SEContext {
             final ProjectState result = new ProjectState(w, h,
                     layers, getState().getLayerEditIndex(),
                     getState().getFrameCount() - 1,
-                    frameIndex);
+                    frameIndex, getState().getSelection());
             stateManager.performAction(result, ActionType.FRAME);
         }
     }
@@ -533,7 +689,7 @@ public class SEContext {
                 getState().getLayers().stream().map(SELayer::returnEnabled)
                         .collect(Collectors.toList()),
                 getState().getLayerEditIndex(), getState().getFrameCount(),
-                getState().getFrameIndex());
+                getState().getFrameIndex(), getState().getSelection());
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -558,7 +714,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, newLayers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -579,7 +735,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -601,7 +757,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -621,7 +777,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -641,7 +797,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -661,13 +817,16 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), false);
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
 
     // change layer opacity
-    public void changeLayerOpacity(final double opacity, final int layerIndex) {
+    public void changeLayerOpacity(
+            final double opacity, final int layerIndex,
+            final boolean markAsCheckpoint
+    ) {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
@@ -681,7 +840,8 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), false);
+                    getState().getFrameIndex(), getState().getSelection(),
+                    markAsCheckpoint);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -699,7 +859,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     addIndex, getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -717,7 +877,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     addIndex, getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -735,7 +895,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     index > 0 ? index - 1 : index, getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -757,7 +917,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     reinsertionIndex, getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -779,7 +939,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     reinsertionIndex, getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -805,7 +965,7 @@ public class SEContext {
 
             final ProjectState result = new ProjectState(w, h, layers,
                     belowIndex, getState().getFrameCount(),
-                    getState().getFrameIndex());
+                    getState().getFrameIndex(), getState().getSelection());
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -831,6 +991,13 @@ public class SEContext {
 
     public String getCanvasSizeText() {
         return getState().getImageWidth() + " x " + getState().getImageHeight();
+    }
+
+    public String getSelectionText() {
+        final Set<Coord2D> selection = getState().getSelection();
+
+        return selection.isEmpty() ? "--" : selection.size() + " pixel" +
+                (selection.size() > 1 ? "s" : "") + " selected";
     }
 
     public PlaybackInfo getPlaybackInfo() {

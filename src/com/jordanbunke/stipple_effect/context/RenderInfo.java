@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.context;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -26,7 +27,9 @@ public class RenderInfo {
                 Math.min(zoomFactor, Constants.MAX_ZOOM));
 
         if (this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY)
-            ToolWithBreadth.drawAllToolOverlays();
+            ToolWithBreadth.redrawToolOverlays();
+
+        StippleEffect.get().getContext().redrawSelectionOverlay();
     }
 
     public void setAnchor(final Coord2D anchor) {

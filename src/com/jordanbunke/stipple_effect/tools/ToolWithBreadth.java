@@ -1,10 +1,10 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.awt.*;
 
@@ -16,7 +16,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws permits Brush
         breadth = Constants.DEFAULT_BRUSH_BREADTH;
     }
 
-    public static void drawAllToolOverlays() {
+    public static void redrawToolOverlays() {
         Brush.get().drawOverlay();
         Eraser.get().drawOverlay();
     }
@@ -53,66 +53,14 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws permits Brush
     }
 
     public void drawOverlay() {
-        final int z = (int) StippleEffect.get().getContext()
-                .getRenderInfo().getZoomFactor();
-
         final boolean[][] mask = breadthMask();
-        final GameImage initialMaskFill = new GameImage(
-                mask.length * z, mask[0].length * z);
-
-        final Color marked = Constants.BLACK, outside = Constants.WHITE,
+        final Color outside = Constants.WHITE,
                 inside = Constants.ACCENT_BACKGROUND_DARK;
 
-        for (int x = 0; x < initialMaskFill.getWidth(); x += z)
-            for (int y = 0; y < initialMaskFill.getHeight(); y += z)
-                if (mask[x / z][y / z])
-                    initialMaskFill.fillRectangle(marked,
-                            x, y, z, z);
-        initialMaskFill.free();
-
-        final GameImage overlay = new GameImage(
-                initialMaskFill.getWidth() + (2 * Constants.OVERLAY_BORDER_PX),
-                initialMaskFill.getHeight() + (2 * Constants.OVERLAY_BORDER_PX));
-
-        for (int x = 0; x < initialMaskFill.getWidth(); x++)
-            for (int y = 0; y < initialMaskFill.getHeight(); y++) {
-                final Color c = ImageProcessing.colorAtPixel(initialMaskFill, x, y);
-
-                if (!c.equals(marked))
-                    continue;
-
-                final Coord2D o = new Coord2D(x + Constants.OVERLAY_BORDER_PX,
-                        y + Constants.OVERLAY_BORDER_PX);
-
-                // left is off canvas or not marked
-                if (x - 1 < 0 || !ImageProcessing.colorAtPixel(
-                        initialMaskFill, x - 1, y).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x - 1, o.y);
-                }
-                // right is off canvas or not marked
-                if (x + 1 >= initialMaskFill.getWidth() ||
-                        !ImageProcessing.colorAtPixel(initialMaskFill,
-                                x + 1, y).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x + 1, o.y);
-                }
-                // top is off canvas or not marked
-                if (y - 1 < 0 || !ImageProcessing.colorAtPixel(
-                        initialMaskFill, x, y - 1).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x, o.y - 1);
-                }
-                // bottom is off canvas or not marked
-                if (y + 1 >= initialMaskFill.getHeight() ||
-                        !ImageProcessing.colorAtPixel(initialMaskFill,
-                                x, y + 1).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x, o.y + 1);
-                }
-            }
-
-        this.overlay = overlay.submit();
+        this.overlay = GraphicsUtils.drawOverlay(mask.length, mask[0].length,
+                (int) StippleEffect.get().getContext()
+                        .getRenderInfo().getZoomFactor(),
+                (x, y) -> mask[x][y], inside, outside, false);
     }
 
     @Override

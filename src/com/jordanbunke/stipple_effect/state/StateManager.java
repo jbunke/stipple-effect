@@ -27,8 +27,10 @@ public class StateManager {
 
             StippleEffect.get().getContext().getProjectInfo().markAsEdited();
 
-            if (redraw)
+            if (redraw) {
                 ActionType.MAJOR.consequence();
+                StippleEffect.get().getContext().redrawSelectionOverlay();
+            }
         }
     }
 
@@ -39,8 +41,10 @@ public class StateManager {
             undo(false);
         } while (canUndo() && !getState().isCheckpoint());
 
-        if (was != index)
+        if (was != index) {
             ActionType.MAJOR.consequence();
+            StippleEffect.get().getContext().redrawSelectionOverlay();
+        }
     }
 
     public boolean canRedo() {
@@ -53,8 +57,10 @@ public class StateManager {
 
             StippleEffect.get().getContext().getProjectInfo().markAsEdited();
 
-            if (redraw)
+            if (redraw) {
                 ActionType.MAJOR.consequence();
+                StippleEffect.get().getContext().redrawSelectionOverlay();
+            }
         }
     }
 
@@ -65,8 +71,10 @@ public class StateManager {
             redo(false);
         } while (canRedo() && !getState().isCheckpoint());
 
-        if (was != index)
+        if (was != index) {
             ActionType.MAJOR.consequence();
+            StippleEffect.get().getContext().redrawSelectionOverlay();
+        }
     }
 
     public void performAction(final ProjectState resultantState, final ActionType actionType) {

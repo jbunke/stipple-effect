@@ -29,8 +29,8 @@ public class MenuAssembly {
     private static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
-            Fill.get(), ColorPicker.get()
-            // TODO - populate
+            Fill.get(), ColorPicker.get(),
+            Wand.get(), StippleSelect.get() // TODO - populate with remaining selection tools | , BoxSelect.get(), MoveSelection.get(), PickUpSelection.get()
     };
 
     public static Menu stub() {
@@ -374,7 +374,7 @@ public class MenuAssembly {
                     (int)(StippleEffect.get().getContext().getState().getLayers()
                             .get(index).getOpacity() * MAX_OPACITY),
                     o -> StippleEffect.get().getContext()
-                            .changeLayerOpacity(o / (double) MAX_OPACITY, index));
+                            .changeLayerOpacity(o / (double) MAX_OPACITY, index, false));
 
             opacitySlider.updateAssets();
             layerButtons[amount + i] = new ScrollableMenuElement(opacitySlider);

@@ -468,7 +468,7 @@ public class DialogAssembly {
         setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
                 contents, layerNameTextBox::isValid,
                 Constants.GENERIC_APPROVAL_TEXT, () -> {
-            c.changeLayerOpacity(DialogVals.getLayerOpacity(), index);
+            c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
             c.changeLayerName(DialogVals.getLayerName(), index);
         }));
     }

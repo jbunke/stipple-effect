@@ -1,13 +1,16 @@
 package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ProjectState {
     private boolean checkpoint;
@@ -22,24 +25,29 @@ public class ProjectState {
     private final List<SELayer> layers;
     private int layerEditIndex;
 
+    // SELECTION
+    private final Set<Coord2D> selection;
+
     public ProjectState(final int imageWidth, final int imageHeight) {
         this(imageWidth, imageHeight, new ArrayList<>(List.of(
-                new SELayer(imageWidth, imageHeight))), 0, 1, 0);
-    }
-
-    public ProjectState(
-            final int imageWidth, final int imageHeight,
-            final List<SELayer> layers, final int layerEditIndex,
-            final int frameCount, final int frameIndex
-    ) {
-        this(imageWidth, imageHeight, layers, layerEditIndex,
-                frameCount, frameIndex, true);
+                new SELayer(imageWidth, imageHeight))), 0, 1, 0, new HashSet<>());
     }
 
     public ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex,
             final int frameCount, final int frameIndex,
+            final Set<Coord2D> selection
+    ) {
+        this(imageWidth, imageHeight, layers, layerEditIndex,
+                frameCount, frameIndex, selection, true);
+    }
+
+    public ProjectState(
+            final int imageWidth, final int imageHeight,
+            final List<SELayer> layers, final int layerEditIndex,
+            final int frameCount, final int frameIndex,
+            final Set<Coord2D> selection,
             final boolean checkpoint
     ) {
         this.imageWidth = imageWidth;
@@ -50,6 +58,8 @@ public class ProjectState {
 
         this.frameCount = frameCount;
         this.frameIndex = Math.max(0, Math.min(frameIndex, frameCount - 1));
+
+        this.selection = selection;
 
         this.checkpoint = checkpoint;
     }
@@ -127,8 +137,14 @@ public class ProjectState {
         return frameCount > 1;
     }
 
+
+    // getters
     public boolean isCheckpoint() {
         return checkpoint;
+    }
+
+    public Set<Coord2D> getSelection() {
+        return selection;
     }
 
     public SELayer getEditingLayer() {
@@ -159,6 +175,8 @@ public class ProjectState {
         return imageHeight;
     }
 
+
+    // frame index manipulation
     public void setFrameIndex(final int frameIndex) {
         if (this.frameIndex != frameIndex &&
                 frameIndex >= 0 && frameIndex < frameCount) {

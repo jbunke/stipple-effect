@@ -28,10 +28,8 @@ import com.jordanbunke.stipple_effect.utility.*;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 public class StippleEffect implements ProgramContext {
     public static final int PRIMARY = 0, SECONDARY = 1;
@@ -79,7 +77,7 @@ public class StippleEffect implements ProgramContext {
         INSTANCE.colorsMenu = MenuAssembly.buildColorsMenu();
         INSTANCE.rebuildStateDependentMenus();
 
-        ToolWithBreadth.drawAllToolOverlays();
+        ToolWithBreadth.redrawToolOverlays();
     }
 
     public StippleEffect() {
@@ -279,7 +277,7 @@ public class StippleEffect implements ProgramContext {
 
         // cursor
         final GameImage cursor = SECursor.fetchCursor(
-                getContext().isInWorkspaceBounds()
+                getContext().isInWorkspaceBounds() && dialog == null
                         ? tool.getCursorCode() : SECursor.MAIN_CURSOR);
         canvas.draw(cursor, mousePos.x - (Constants.CURSOR_DIM / 2),
                 mousePos.y - (Constants.CURSOR_DIM / 2));
@@ -359,8 +357,7 @@ public class StippleEffect implements ProgramContext {
 
         // image size
         final GameImage size = GraphicsUtils.uiText()
-                .addText(getContext().getCanvasSizeText())
-                .build().draw();
+                .addText(getContext().getCanvasSizeText()).build().draw();
         bottomBar.draw(size, Constants.SIZE_X, Constants.TEXT_Y_OFFSET);
 
         // active tool
@@ -370,13 +367,15 @@ public class StippleEffect implements ProgramContext {
 
         // zoom
         final GameImage zoom = GraphicsUtils.uiText()
-                .addText((getContext().getRenderInfo().getZoomText()))
+                .addText(getContext().getRenderInfo().getZoomText())
                 .build().draw();
         bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.TEXT_Y_OFFSET);
 
-        // TODO - selection
-
-        // TODO - help shortcut (Ctrl + H) once behaviour implemented
+        // selection
+        final GameImage selection = GraphicsUtils.uiText()
+                .addText(getContext().getSelectionText()).build().draw();
+        bottomBar.draw(selection, Constants.SELECTION_PCT_X,
+                Constants.TEXT_Y_OFFSET);
 
         return bottomBar.submit();
     }
@@ -472,7 +471,8 @@ public class StippleEffect implements ProgramContext {
                 new GameImage(fw, fh), Constants.OPAQUE, true, false,
                 OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
         final ProjectState initialState = new ProjectState(fw, fh,
-                new ArrayList<>(List.of(firstLayer)), 0, frameCount, 0);
+                new ArrayList<>(List.of(firstLayer)), 0, frameCount, 0,
+                new HashSet<>());
 
         final SEContext project = new SEContext(
                 new ProjectInfo(filepath), initialState, fw, fh);

@@ -17,6 +17,10 @@ public class SECursor {
             FILL_SUBTRACTIVE = "fill_subtractive", FILL_SINGLE = "fill_single",
             WAND_GLOBAL = "wand_global", WAND_ADDITIVE = "wand_additive",
             WAND_SUBTRACTIVE = "wand_subtractive", WAND_SINGLE = "wand_single",
+            STIPPLE_SELECT_GLOBAL = "stipple_select_global",
+            STIPPLE_SELECT_ADDITIVE = "stipple_select_additive",
+            STIPPLE_SELECT_SUBTRACTIVE = "stipple_select_subtractive",
+            STIPPLE_SELECT_SINGLE = "stipple_select_single",
             ZOOM = "zoom";
 
     // TODO - fill out cursor codes
@@ -24,8 +28,10 @@ public class SECursor {
             MAIN_CURSOR, HAND_GRAB, HAND_OPEN,
             BRUSH, COLOR_PICKER, ERASER, PENCIL, STIPPLE_PENCIL,
             FILL_ADDITIVE, FILL_GLOBAL, FILL_SINGLE, FILL_SUBTRACTIVE,
-            ZOOM
-    );
+            WAND_ADDITIVE, WAND_GLOBAL, WAND_SINGLE, WAND_SUBTRACTIVE,
+            STIPPLE_SELECT_ADDITIVE, STIPPLE_SELECT_GLOBAL,
+            STIPPLE_SELECT_SINGLE, STIPPLE_SELECT_SUBTRACTIVE,
+            ZOOM);
 
     private static final Map<String, GameImage> CURSOR_MAP = new HashMap<>();
 

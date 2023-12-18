@@ -7,6 +7,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 
 import java.awt.*;
+import java.util.Set;
 
 public final class StipplePencil extends Tool {
     private static final StipplePencil INSTANCE;
@@ -37,12 +38,18 @@ public final class StipplePencil extends Tool {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
             final Coord2D tp = context.getTargetPixel();
+            final Set<Coord2D> selection = context.getState().getSelection();
+
             final Color c = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
 
             final GameImage edit = new GameImage(w, h);
-            edit.dot(c, tp.x, tp.y);
+
+
+            if (selection.isEmpty() || selection.contains(tp))
+                edit.dot(c, tp.x, tp.y);
+
             context.editImage(edit.submit());
             context.getState().markAsCheckpoint(true, context);
         }

@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import java.awt.*;
 import java.util.*;
 
-public abstract class ToolThatSearches extends ToolWithMode {
+public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill, Wand {
     private double tolerance;
 
     ToolThatSearches() {
