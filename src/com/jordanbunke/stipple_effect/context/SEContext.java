@@ -83,9 +83,9 @@ public class SEContext {
         workspace.draw(getState().draw(true, getState().getFrameIndex()), render.x, render.y,
                 (int)(w * zoomFactor), (int)(h * zoomFactor));
 
-        if (isTargetingPixelOnCanvas()) {
-            final Tool tool = StippleEffect.get().getTool();
+        final Tool tool = StippleEffect.get().getTool();
 
+        if (isTargetingPixelOnCanvas()) {
             if (tool instanceof ToolWithBreadth twb && zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
                 final GameImage overlay = twb.getOverlay();
                 final int offset = twb.breadthOffset();
@@ -96,6 +96,17 @@ public class SEContext {
                         (int)((targetPixel.y - offset) * zoomFactor) -
                         Constants.OVERLAY_BORDER_PX);
             }
+        }
+
+        if (tool instanceof BoxSelect boxSelect && boxSelect.isDrawing()) {
+            final Coord2D tl = boxSelect.getTopLeft();
+            final GameImage boxOverlay = boxSelect.getOverlay();
+
+            workspace.draw(boxOverlay,
+                    (render.x + (int)(tl.x * zoomFactor))
+                            - Constants.OVERLAY_BORDER_PX,
+                    (render.y + (int)(tl.y * zoomFactor))
+                            - Constants.OVERLAY_BORDER_PX);
         }
 
         workspace.draw(selectionOverlay,
@@ -332,6 +343,10 @@ public class SEContext {
                     () -> StippleEffect.get().setTool(PencilSelect.get())
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(BoxSelect.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
                     () -> StippleEffect.get().setTool(MoveSelection.get())
             );
@@ -537,7 +552,7 @@ public class SEContext {
 
     // TODO - copy
 
-    // delete selection cotents
+    // delete selection contents
     public void deleteSelectionContents() {
         final Set<Coord2D> selection = getState().getSelection();
 

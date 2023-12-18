@@ -27,7 +27,6 @@ public final class PencilSelect extends ToolWithMode {
         return INSTANCE;
     }
 
-
     @Override
     public String getName() {
         return "Pencil Select";
