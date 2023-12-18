@@ -30,7 +30,8 @@ public class MenuAssembly {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
             Fill.get(), ColorPicker.get(),
-            Wand.get(), StippleSelect.get() // TODO - populate with remaining selection tools | , BoxSelect.get(), MoveSelection.get(), PickUpSelection.get()
+            Wand.get(), PencilSelect.get(), // TODO - populate with remaining selection tools | BoxSelect.get(), PickUpSelection.get()
+            MoveSelection.get()
     };
 
     public static Menu stub() {

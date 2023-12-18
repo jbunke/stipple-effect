@@ -105,9 +105,11 @@ public abstract class Slider extends MenuElement {
         }
 
         if (sliding) {
-            final int sliderBallDim = mpd - onClickDiffDim;
+            final int sliderBallDim = mpd - onClickDiffDim, lastValue = value;
             setValueFromSliderBallDim(sliderBallDim);
-            setter.accept(value);
+
+            if (lastValue != value)
+                setter.accept(value);
         }
     }
 

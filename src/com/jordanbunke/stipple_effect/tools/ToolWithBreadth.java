@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.SECursor;
 
 import java.awt.*;
 
@@ -61,6 +62,11 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws permits Brush
                 (int) StippleEffect.get().getContext()
                         .getRenderInfo().getZoomFactor(),
                 (x, y) -> mask[x][y], inside, outside, false);
+    }
+
+    @Override
+    public String getCursorCode() {
+        return SECursor.RETICLE;
     }
 
     @Override

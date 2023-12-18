@@ -60,7 +60,7 @@ public final class Brush extends ToolWithBreadth {
                 final Coord2D tp = context.getTargetPixel();
                 final Set<Coord2D> selection = context.getState().getSelection();
 
-                if (tp.equals(getLastTP()))
+                if (isUnchanged(context))
                     return;
 
                 final GameImage edit = new GameImage(w, h);

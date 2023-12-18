@@ -113,67 +113,42 @@ public class GraphicsUtils {
         if (z == 0)
             return GameImage.dummy();
 
-        final GameImage initialMaskFill = new GameImage(
-                Math.max(1, w * z), Math.max(1, h * z));
-
-        final Color marked = Constants.BLACK;
-
-        for (int x = 0; x < initialMaskFill.getWidth(); x += z)
-            for (int y = 0; y < initialMaskFill.getHeight(); y += z)
-                if (maskValidator.apply(x / z, y / z))
-                    initialMaskFill.fillRectangle(marked,
-                            x, y, z, z);
-        initialMaskFill.free();
+        final int scaleUpW = Math.max(1, w * z), scaleUpH = Math.max(1, h * z);
 
         final GameImage overlay = new GameImage(
-                initialMaskFill.getWidth() + (2 * Constants.OVERLAY_BORDER_PX),
-                initialMaskFill.getHeight() + (2 * Constants.OVERLAY_BORDER_PX));
+                scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
+                scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
-        for (int x = 0; x < initialMaskFill.getWidth(); x++)
-            for (int y = 0; y < initialMaskFill.getHeight(); y++) {
-                final Color c = ImageProcessing.colorAtPixel(initialMaskFill, x, y);
-
-                if (!c.equals(marked))
+        for (int x = 0; x < scaleUpW; x += z)
+            for (int y = 0; y < scaleUpH; y += z) {
+                if (!maskValidator.apply(x / z, y / z))
                     continue;
 
                 final Coord2D o = new Coord2D(x + Constants.OVERLAY_BORDER_PX,
                         y + Constants.OVERLAY_BORDER_PX);
 
-                boolean matched = false;
+                if (fill)
+                    overlay.fillRectangle(Constants.OVERLAY_FILL_C, o.x, o.y, z, z);
 
                 // left is off canvas or not marked
-                if (x - 1 < 0 || !ImageProcessing.colorAtPixel(
-                        initialMaskFill, x - 1, y).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x - 1, o.y);
-                    matched = true;
+                if (x - z < 0 || !maskValidator.apply((x / z) - 1, y / z)) {
+                    overlay.fillRectangle(inside, o.x, o.y, 1, z);
+                    overlay.fillRectangle(outside, o.x - 1, o.y, 1, z);
                 }
                 // right is off canvas or not marked
-                if (x + 1 >= initialMaskFill.getWidth() ||
-                        !ImageProcessing.colorAtPixel(initialMaskFill,
-                                x + 1, y).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x + 1, o.y);
-                    matched = true;
+                if (x + z >= scaleUpW || !maskValidator.apply((x / z) + 1, y / z)) {
+                    overlay.fillRectangle(inside, (o.x + z) - 1, o.y, 1, z);
+                    overlay.fillRectangle(outside, o.x + z, o.y, 1, z);
                 }
                 // top is off canvas or not marked
-                if (y - 1 < 0 || !ImageProcessing.colorAtPixel(
-                        initialMaskFill, x, y - 1).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x, o.y - 1);
-                    matched = true;
+                if (y - z < 0 || !maskValidator.apply(x / z, (y / z) - 1)) {
+                    overlay.fillRectangle(inside, o.x, o.y, z, 1);
+                    overlay.fillRectangle(outside, o.x, o.y - 1, z, 1);
                 }
                 // bottom is off canvas or not marked
-                if (y + 1 >= initialMaskFill.getHeight() ||
-                        !ImageProcessing.colorAtPixel(initialMaskFill,
-                                x, y + 1).equals(marked)) {
-                    overlay.dot(inside, o.x, o.y);
-                    overlay.dot(outside, o.x, o.y + 1);
-                    matched = true;
-                }
-
-                if (fill && !matched) {
-                    overlay.dot(Constants.OVERLAY_FILL_C, o.x, o.y);
+                if (y + z >= scaleUpH || !maskValidator.apply(x / z, (y / z) + 1)) {
+                    overlay.fillRectangle(inside, o.x, (o.y + z) - 1, z, 1);
+                    overlay.fillRectangle(outside, o.x, o.y + z, z, 1);
                 }
             }
 

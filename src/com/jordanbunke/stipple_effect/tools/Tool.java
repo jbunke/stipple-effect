@@ -41,11 +41,6 @@ public abstract class Tool {
         return getName().replace(" ", "_").toLowerCase();
     }
 
-    // TODO tools - stipple select, box select, move selection, move selected pixels, magic wand select
-
-    // DONE tools
-    // zoom, hand, stippler, pencil
-
     public String getBottomBarText() {
         return getName();
     }

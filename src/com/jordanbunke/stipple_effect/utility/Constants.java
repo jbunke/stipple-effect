@@ -79,10 +79,10 @@ public class Constants {
             TOOL_NAME_X = (int)(CANVAS_W * 0.01),
             TP_X = (int)(CANVAS_W * 0.24),
             SIZE_X = (int)(CANVAS_W * 0.36),
-            ZOOM_PCT_X = (int)(CANVAS_W * 0.51),
-            ZOOM_SLIDER_X = (int)(CANVAS_W * 0.575),
+            ZOOM_PCT_X = (int)(CANVAS_W * 0.47),
+            ZOOM_SLIDER_X = (int)(CANVAS_W * 0.535),
             ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1),
-            SELECTION_PCT_X = (int)(CANVAS_W * 0.69);
+            SELECTION_PCT_X = (int)(CANVAS_W * 0.64);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",

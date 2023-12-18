@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
@@ -66,7 +67,7 @@ public class SEContext {
                 : GraphicsUtils.drawOverlay(w, h,
                 (int) renderInfo.getZoomFactor(),
                 (x, y) -> selection.contains(new Coord2D(x, y)),
-                Constants.BLACK, Constants.HIGHLIGHT_1,false);
+                Constants.BLACK, Constants.HIGHLIGHT_1,true);
     }
 
     public GameImage drawWorkspace() {
@@ -225,6 +226,10 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
                     () -> getState().setFrameIndex(0)
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
+                    () -> fillSelection(true)
+            );
         }
 
         // CTRL and SHIFT
@@ -247,7 +252,7 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    () -> {} // TODO - crop to selection
+                    this::cropToSelection
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
@@ -274,6 +279,16 @@ public class SEContext {
                     () -> getRenderInfo().setAnchor(new Coord2D(
                             getState().getImageWidth() / 2,
                             getState().getImageHeight() / 2)));
+
+            // fill selection
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
+                    () -> fillSelection(false));
+
+            // delete selection contents
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
+                    this::deleteSelectionContents);
 
             // set tools
             eventLogger.checkForMatchingKeyStroke(
@@ -314,7 +329,15 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(StippleSelect.get())
+                    () -> StippleEffect.get().setTool(PencilSelect.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().setTool(MoveSelection.get())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.U, GameKeyEvent.Action.PRESS),
+                    () -> {} // TODO - pick up selection
             );
 
             // tool modifications
@@ -352,7 +375,7 @@ public class SEContext {
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC)
                 );
-            } else if (StippleEffect.get().getTool() instanceof Hand) {
+            } else if (StippleEffect.get().getTool().equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> getRenderInfo().incrementAnchor(new Coord2D(0, 1))
@@ -368,6 +391,23 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> getRenderInfo().incrementAnchor(new Coord2D(-1, 0))
+                );
+            } else if (StippleEffect.get().getTool().equals(MoveSelection.get())) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelection(new Coord2D(0, -1))
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelection(new Coord2D(0, 1))
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelection(new Coord2D(-1, 0))
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelection(new Coord2D(1, 0))
                 );
             } else if (StippleEffect.get().getTool() instanceof Zoom) {
                 eventLogger.checkForMatchingKeyStroke(
@@ -452,15 +492,84 @@ public class SEContext {
 
     // SELECTION
 
-    // TODO - crop to selection
+    // move selection
+    public void moveSelection(final Coord2D displacement) {
+        final Set<Coord2D> selection = getState().getSelection();
+
+        if (!selection.isEmpty()) {
+            // build resultant state
+            final Set<Coord2D> moved = selection.stream().map(s ->
+                    s.displace(displacement)).collect(Collectors.toSet());
+
+            final ProjectState result = new ProjectState(
+                    getState().getImageWidth(), getState().getImageHeight(),
+                    new ArrayList<>(getState().getLayers()),
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex(), moved);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // crop to selection
+    public void cropToSelection() {
+        final Set<Coord2D> selection = getState().getSelection();
+
+        if (!selection.isEmpty()) {
+            // build resultant state
+            final Coord2D tl = Selection.topLeft(selection),
+                    br = Selection.bottomRight(selection);
+            final int w = br.x - tl.x, h = br.y - tl.y;
+
+            final List<SELayer> layers = getState().getLayers().stream()
+                    .map(layer -> layer.returnPadded(
+                            -tl.x, -tl.y, w, h)).toList();
+
+            final ProjectState result = new ProjectState(w, h, layers,
+                    getState().getLayerEditIndex(), getState().getFrameCount(),
+                    getState().getFrameIndex(), new HashSet<>());
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
 
     // TODO - cut
 
     // TODO - copy
 
-    // TODO - delete selection cotents
+    // delete selection cotents
+    public void deleteSelectionContents() {
+        final Set<Coord2D> selection = getState().getSelection();
 
-    // TODO - fill selection
+        if (!selection.isEmpty()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+
+            final boolean[][] eraseMask = new boolean[w][h];
+            selection.forEach(s -> eraseMask[s.x][s.y] = true);
+
+            erase(eraseMask);
+        }
+    }
+
+    // fill selection
+    public void fillSelection(final boolean secondary) {
+        final Set<Coord2D> selection = getState().getSelection();
+
+        if (!selection.isEmpty()) {
+            // build resultant state
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+
+            final GameImage edit = new GameImage(w, h);
+            final Color c = secondary ? StippleEffect.get().getSecondary()
+                    : StippleEffect.get().getPrimary();
+            selection.forEach(s -> edit.dot(c, s.x, s.y));
+
+            editImage(edit);
+        }
+    }
 
     // deselect
     public void deselect() {
@@ -996,8 +1105,7 @@ public class SEContext {
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
 
-        return selection.isEmpty() ? "--" : selection.size() + " pixel" +
-                (selection.size() > 1 ? "s" : "") + " selected";
+        return selection.isEmpty() ? "--" : selection.size() + " px selected from " + Selection.topLeft(selection);
     }
 
     public PlaybackInfo getPlaybackInfo() {
