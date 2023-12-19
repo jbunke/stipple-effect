@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.SECursor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,14 +43,21 @@ public final class BoxSelect extends ToolWithMode {
     }
 
     @Override
+    public String getCursorCode() {
+        return drawing ? SECursor.RETICLE : super.getCursorCode();
+    }
+
+    @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        if (context.isTargetingPixelOnCanvas()) {
+        final Coord2D tp = context.getTargetPixel();
+
+        // this condition instead of constants.isTargetingPixelOnCanvas()
+        // so that dragging can start off canvas
+        if (!tp.equals(Constants.NO_VALID_TARGET)) {
             drawing = true;
 
-            final Coord2D tp = context.getTargetPixel();
-
             if (ToolWithMode.getMode() == Mode.SINGLE)
-                context.deselect();
+                context.deselect(false);
 
             pivotTP = tp;
             endTP = tp;
@@ -66,7 +73,7 @@ public final class BoxSelect extends ToolWithMode {
         if (drawing) {
             final Coord2D tp = context.getTargetPixel();
 
-            if (tp.equals(endTP))
+            if (tp.equals(endTP) || tp.equals(Constants.NO_VALID_TARGET))
                 return;
 
             endTP = tp;
@@ -76,13 +83,8 @@ public final class BoxSelect extends ToolWithMode {
             topLeft = Selection.topLeft(bounds);
             bottomRight = Selection.bottomRight(bounds);
 
-            final int w = bottomRight.x - topLeft.x,
-                    h = bottomRight.y - topLeft.y;
-
-            overlay = GraphicsUtils.drawOverlay(w, h,
-                    (int) context.getRenderInfo().getZoomFactor(),
-                    (x, y) -> true, Constants.BLACK, Constants.HIGHLIGHT_1,
-                    true);
+            overlay = Selection.drawOverlay(bounds, (x, y) -> true,
+                    (int) context.getRenderInfo().getZoomFactor());
         }
     }
 
@@ -101,7 +103,7 @@ public final class BoxSelect extends ToolWithMode {
                 for (int y = topLeft.y; y < bottomRight.y; y++)
                     box.add(new Coord2D(x, y));
 
-            context.editSelection(box);
+            context.editSelection(box, true);
         }
     }
 

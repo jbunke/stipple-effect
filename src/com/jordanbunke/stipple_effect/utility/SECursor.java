@@ -18,19 +18,24 @@ public class SECursor {
             FILL_SUBTRACTIVE = "fill_subtractive", FILL_SINGLE = "fill_single",
             WAND_GLOBAL = "wand_global", WAND_ADDITIVE = "wand_additive",
             WAND_SUBTRACTIVE = "wand_subtractive", WAND_SINGLE = "wand_single",
+            BOX_SELECT_GLOBAL = "box_select_global",
+            BOX_SELECT_ADDITIVE = "box_select_additive",
+            BOX_SELECT_SUBTRACTIVE = "box_select_subtractive",
+            BOX_SELECT_SINGLE = "box_select_single",
             PENCIL_SELECT_GLOBAL = "pencil_select_global",
             PENCIL_SELECT_ADDITIVE = "pencil_select_additive",
             PENCIL_SELECT_SUBTRACTIVE = "pencil_select_subtractive",
             PENCIL_SELECT_SINGLE = "pencil_select_single",
             ZOOM = "zoom";
 
-    // TODO - fill out cursor codes
     private static final Set<String> CURSOR_CODES = Set.of(
             MAIN_CURSOR, RETICLE, HAND_GRAB, HAND_OPEN,
             BRUSH, COLOR_PICKER, ERASER, PENCIL, STIPPLE_PENCIL,
             MOVE_SELECTION,
             FILL_ADDITIVE, FILL_GLOBAL, FILL_SINGLE, FILL_SUBTRACTIVE,
             WAND_ADDITIVE, WAND_GLOBAL, WAND_SINGLE, WAND_SUBTRACTIVE,
+            BOX_SELECT_ADDITIVE, BOX_SELECT_GLOBAL,
+            BOX_SELECT_SINGLE, BOX_SELECT_SUBTRACTIVE,
             PENCIL_SELECT_ADDITIVE, PENCIL_SELECT_GLOBAL,
             PENCIL_SELECT_SINGLE, PENCIL_SELECT_SUBTRACTIVE,
             ZOOM);

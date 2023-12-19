@@ -143,6 +143,10 @@ public class ProjectState {
         return checkpoint;
     }
 
+    public boolean hasSelection() {
+        return !selection.isEmpty();
+    }
+
     public Set<Coord2D> getSelection() {
         return selection;
     }

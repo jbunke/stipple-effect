@@ -41,7 +41,7 @@ public final class Wand extends ToolThatSearches {
             // search
             final Set<Coord2D> matched = search(image, initial, tp);
 
-            context.editSelection(matched);
+            context.editSelection(matched, true);
         }
     }
 

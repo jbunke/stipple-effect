@@ -18,7 +18,6 @@ import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogAssembly;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
-import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -60,14 +59,12 @@ public class SEContext {
     }
 
     public void redrawSelectionOverlay() {
-        final int w = getState().getImageWidth(), h = getState().getImageHeight();
         final Set<Coord2D> selection = getState().getSelection();
 
-        selectionOverlay = selection.isEmpty() ? GameImage.dummy()
-                : GraphicsUtils.drawOverlay(w, h,
-                (int) renderInfo.getZoomFactor(),
-                (x, y) -> selection.contains(new Coord2D(x, y)),
-                Constants.BLACK, Constants.HIGHLIGHT_1,true);
+        selectionOverlay = getState().hasSelection()
+                ? Selection.drawOverlay(selection, (x, y) ->
+                        selection.contains(new Coord2D(x, y)),
+                (int) renderInfo.getZoomFactor()) : GameImage.dummy();
     }
 
     public GameImage drawWorkspace() {
@@ -109,9 +106,15 @@ public class SEContext {
                             - Constants.OVERLAY_BORDER_PX);
         }
 
-        workspace.draw(selectionOverlay,
-                render.x - Constants.OVERLAY_BORDER_PX,
-                render.y - Constants.OVERLAY_BORDER_PX);
+        if (getState().hasSelection()) {
+            final Coord2D tl = Selection.topLeft(getState().getSelection());
+
+            workspace.draw(selectionOverlay,
+                    (render.x + (int)(tl.x * zoomFactor))
+                            - Constants.OVERLAY_BORDER_PX,
+                    (render.y + (int)(tl.y * zoomFactor))
+                            - Constants.OVERLAY_BORDER_PX);
+        }
 
         return workspace.submit();
     }
@@ -191,7 +194,7 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    this::deselect
+                    () -> deselect(true)
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.I, GameKeyEvent.Action.PRESS),
@@ -583,11 +586,12 @@ public class SEContext {
             selection.forEach(s -> edit.dot(c, s.x, s.y));
 
             editImage(edit);
+            getState().markAsCheckpoint(true, this);
         }
     }
 
     // deselect
-    public void deselect() {
+    public void deselect(final boolean checkpoint) {
         final Set<Coord2D> selection = getState().getSelection();
 
         if (!selection.isEmpty()) {
@@ -596,7 +600,7 @@ public class SEContext {
                     getState().getImageWidth(), getState().getImageHeight(),
                     new ArrayList<>(getState().getLayers()),
                     getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), new HashSet<>());
+                    getState().getFrameIndex(), new HashSet<>(), checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
         }
@@ -608,7 +612,7 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final Set<Coord2D> selection = getState().getSelection();
+        final Set<Coord2D> selection = new HashSet<>();
 
         for (int x = 0; x < w; x++)
             for (int y = 0; y < h; y++)
@@ -645,7 +649,7 @@ public class SEContext {
     }
 
     // edit selection
-    public void editSelection(final Set<Coord2D> edit) {
+    public void editSelection(final Set<Coord2D> edit, final boolean checkpoint) {
         // build resultant state
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
@@ -664,7 +668,7 @@ public class SEContext {
         final ProjectState result = new ProjectState(w, h,
                 new ArrayList<>(getState().getLayers()),
                 getState().getLayerEditIndex(), getState().getFrameCount(),
-                getState().getFrameIndex(), selection);
+                getState().getFrameIndex(), selection, checkpoint);
         stateManager.performAction(result, ActionType.CANVAS);
         redrawSelectionOverlay();
     }
@@ -1114,13 +1118,17 @@ public class SEContext {
     }
 
     public String getCanvasSizeText() {
-        return getState().getImageWidth() + " x " + getState().getImageHeight();
+        return getState().getImageWidth() + "x" + getState().getImageHeight();
     }
 
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
+        final Coord2D tl = Selection.topLeft(selection),
+                br = Selection.bottomRight(selection);
+        final boolean multiple = selection.size() > 1;
 
-        return selection.isEmpty() ? "--" : selection.size() + " px selected from " + Selection.topLeft(selection);
+        return selection.isEmpty() ? "--" : selection.size() + "px " +
+                (multiple ? "from " : "at ") + tl + (multiple ? (" to " + br) : "");
     }
 
     public PlaybackInfo getPlaybackInfo() {

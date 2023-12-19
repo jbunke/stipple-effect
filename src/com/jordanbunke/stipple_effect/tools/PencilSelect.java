@@ -32,14 +32,17 @@ public final class PencilSelect extends ToolWithMode {
         return "Pencil Select";
     }
 
+    private void drawSelection(final SEContext context) {
+        final Coord2D tp = context.getTargetPixel();
+        context.editSelection(new HashSet<>(Set.of(tp)), false);
+        lastTP = tp;
+    }
+
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         if (context.isTargetingPixelOnCanvas()) {
             drawing = true;
-
-            final Coord2D tp = context.getTargetPixel();
-            context.editSelection(new HashSet<>(Set.of(tp)));
-            lastTP = tp;
+            drawSelection(context);
         }
     }
 
@@ -51,8 +54,7 @@ public final class PencilSelect extends ToolWithMode {
             if (tp.equals(lastTP))
                 return;
 
-            context.editSelection(new HashSet<>(Set.of(tp)));
-            lastTP = tp;
+            drawSelection(context);
         }
     }
 

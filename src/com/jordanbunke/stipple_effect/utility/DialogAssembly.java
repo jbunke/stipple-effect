@@ -217,11 +217,11 @@ public class DialogAssembly {
         final TextLabel
                 widthLabel = makeDialogLeftLabel(1, "Width in px: "),
                 heightLabel = makeDialogLeftLabel(2, "Height in px: "),
-                context = makeDialogLeftLabel(0, "Current size: " + w + " x " + h),
+                context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
                 explanation = makeDialogLeftLabel(5,
                         "Valid image sizes run from " + Constants.MIN_IMAGE_W +
-                                " x " + Constants.MIN_IMAGE_H + " to " +
-                                Constants.MAX_IMAGE_W + " x " + Constants.MAX_IMAGE_H + ".");
+                                "x" + Constants.MIN_IMAGE_H + " to " +
+                                Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
 
         // dim textboxes
         final TextBox widthTextBox = makeDialogNumericTextBox(
@@ -286,7 +286,7 @@ public class DialogAssembly {
                 rightLabel = makeDialogLeftLabel(2, "Pad right: "),
                 topLabel = makeDialogLeftLabel(3, "Pad top: "),
                 bottomLabel = makeDialogLeftLabel(4, "Pad bottom: "),
-                context = makeDialogLeftLabel(0, "Current size: " + w + " x " + h);
+                context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h);
 
         // pad textboxes
         final TextBox leftTextBox = makeDialogNumericTextBox(leftLabel,
@@ -313,7 +313,7 @@ public class DialogAssembly {
                             ph = DialogVals.getPadTop() +
                                     DialogVals.getPadBottom() + h;
 
-                    return "Preview size: " + pw + " x " + ph;
+                    return "Preview size: " + pw + "x" + ph;
                 }, Constants.DIALOG_W - (2 * Constants.TOOL_NAME_X)
         );
 
@@ -339,7 +339,7 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel context = makeDialogLeftLabel(0,
-                "Current size: " + w + " x " + h + (tooBig
+                "Current size: " + w + "x" + h + (tooBig
                         ? " ... too big as singleton" : "")),
                 instruction = makeDialogLeftLabel(1,
                         "Scale down and/or split into more frames"),
@@ -398,8 +398,8 @@ public class DialogAssembly {
                 heightLabel = makeDialogLeftLabel(2, "Height in px: "),
                 explanation = makeDialogLeftLabel(4,
                         "Valid image sizes run from " + Constants.MIN_IMAGE_W +
-                                " x " + Constants.MIN_IMAGE_H + " to " +
-                                Constants.MAX_IMAGE_W + " x " + Constants.MAX_IMAGE_H + ".");
+                                "x" + Constants.MIN_IMAGE_H + " to " +
+                                Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
 
         // dim textboxes
         final TextBox widthTextBox = makeDialogNumericTextBox(
