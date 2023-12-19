@@ -29,10 +29,7 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -438,8 +435,8 @@ public class DialogAssembly {
                 () -> StippleEffect.get().removeContext(index)));
     }
 
-    public static void setDialogToAbout() {
-        setDialog(assembleAboutDialog());
+    public static void setDialogToInfo() {
+        setDialog(assembleInfoDialog());
     }
 
     public static void setDialogToLayerSettings(final int index) {
@@ -553,24 +550,56 @@ public class DialogAssembly {
                 Constants.DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 
-    private static Menu assembleAboutDialog() {
-        // TODO - different dialog assembly without precondition, second button;
-        //  button says "Close" instead of cancel;
-        //  display version number, shortcuts, + ...
-
+    private static VerticalScrollingMenuElement assembleScroller(
+            final DialogVals.InfoScreen infoScreen
+    ) {
         final int dialogW = (int)(Constants.CANVAS_W * 0.7),
-                indent = (2 * Constants.BUTTON_INC);
+                incY = Constants.DIALOG_CONTENT_INC_Y;
 
         final Coord2D contentStart = new Coord2D(Constants.getCanvasMiddle().x -
                 (dialogW / 2) + Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
-                (2 * Constants.STD_TEXT_BUTTON_INC));
+                (4 * Constants.STD_TEXT_BUTTON_INC));
         final Set<MenuElement> contentAssembler = new HashSet<>();
 
-        int bottomY = -Constants.BUTTON_TEXT_OFFSET_Y;
+        int initialbottomY = 0;
 
-        // TODO - preceding info
+        final double titleSize = 2d;
+        final TextLabel headingLabel = TextLabel.make(contentStart.displace(
+                0, initialbottomY),
+                infoScreen.getTitle(), Constants.BLACK, titleSize);
+        initialbottomY += (int)(incY * titleSize) + Constants.BUTTON_INC;
 
-        // tools
+        contentAssembler.add(headingLabel);
+
+        final int deltaBottomY = switch (infoScreen) {
+            case TOOLS -> assembleToolsScreenContents(contentAssembler, contentStart, initialbottomY);
+            default -> 0; // TODO
+        };
+
+        final ScrollableMenuElement[] scrollingElements =
+                contentAssembler.stream().map(ScrollableMenuElement::new)
+                        .toArray(ScrollableMenuElement[]::new);
+
+        final Coord2D wrapperDims = new Coord2D(dialogW -
+                (2 * Constants.BUTTON_BORDER_PX),
+                (int)(Constants.CANVAS_H * 0.75) - Constants.STD_TEXT_BUTTON_INC);
+
+        // assemble contents into scrolling element
+        return new VerticalScrollingMenuElement(contentStart.displace(
+                -Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET), wrapperDims,
+                scrollingElements, initialbottomY + deltaBottomY +
+                contentStart.y, 0);
+    }
+
+    private static int assembleToolsScreenContents(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        final int indent = (2 * Constants.BUTTON_INC),
+                incY = Constants.DIALOG_CONTENT_INC_Y;
+
+        int bottomY = initialBottomY;
+
         for (Tool tool : Constants.ALL_TOOLS) {
             final String[] blurb = tool.getBlurb();
 
@@ -581,7 +610,7 @@ public class DialogAssembly {
                             Constants.BUTTON_INC + Constants.TOOL_NAME_X,
                             bottomY + Constants.BUTTON_TEXT_OFFSET_Y),
                     tool.getName(), Constants.HIGHLIGHT_1);
-            bottomY += Constants.DIALOG_CONTENT_INC_Y;
+            bottomY += incY;
 
             contentAssembler.add(icon);
             contentAssembler.add(name);
@@ -602,25 +631,17 @@ public class DialogAssembly {
                     offsetX += segmentText.getWidth();
                 }
 
-                bottomY += Constants.DIALOG_CONTENT_INC_Y;
+                bottomY += incY;
             }
 
-            bottomY += Constants.DIALOG_CONTENT_INC_Y;
+            bottomY += incY;
         }
 
-        final ScrollableMenuElement[] scrollingElements =
-                contentAssembler.stream().map(ScrollableMenuElement::new)
-                        .toArray(ScrollableMenuElement[]::new);
+        return bottomY - initialBottomY;
+    }
 
-        final Coord2D wrapperDims = new Coord2D(dialogW -
-                (2 * Constants.BUTTON_BORDER_PX), (int)(Constants.CANVAS_H * 0.8));
-
-        // assemble contents into scrolling element
-        final VerticalScrollingMenuElement wrapper = new VerticalScrollingMenuElement(
-                contentStart.displace(-Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET),
-                wrapperDims, scrollingElements, bottomY + contentStart.y, 0);
-
-        // end of contents
+    private static Menu assembleInfoDialog() {
+        final int dialogW = (int)(Constants.CANVAS_W * 0.7);
 
         final MenuBuilder mb = new MenuBuilder();
 
@@ -642,7 +663,13 @@ public class DialogAssembly {
         mb.add(TextLabel.make(background.getRenderPosition().displace(
                         Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
                         Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX),
-                Constants.PROGRAM_NAME + "  |  About", Constants.WHITE));
+                Constants.PROGRAM_NAME + "  |  Help & Information", Constants.WHITE));
+        // dev
+        mb.add(TextLabel.make(background.getRenderPosition().displace(
+                        Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
+                        background.getHeight() - (Constants.TOOL_NAME_X +
+                                Constants.STD_TEXT_BUTTON_H)),
+                "Jordan Bunke / Flinker Flitzer, 2023", Constants.GREY));
 
         // close button
         final GameImage baseImage = GraphicsUtils.drawTextButton(
@@ -659,7 +686,37 @@ public class DialogAssembly {
                 () -> StippleEffect.get().clearDialog(),
                 baseImage, highlightedImage));
 
-        mb.add(wrapper);
+        // contents
+        Arrays.stream(DialogVals.InfoScreen.values()).forEach(is -> {
+                    final GameImage baseIS = GraphicsUtils.drawTextButton(
+                            Constants.STD_TEXT_BUTTON_W, is.toString(),
+                            false, Constants.GREY),
+                            highlighedIS = GraphicsUtils.drawHighlightedButton(baseIS);
+
+                    final Coord2D isPos = background.getRenderPosition().displace(
+                            Constants.TOOL_NAME_X + (is.ordinal() *
+                                    (Constants.STD_TEXT_BUTTON_W + Constants.BUTTON_OFFSET)),
+                                    Constants.TOOL_NAME_X +
+                                            (int)(1.5 * Constants.STD_TEXT_BUTTON_INC));
+
+                    mb.add(new SimpleMenuButton(isPos,
+                            new Coord2D(baseIS.getWidth(), baseIS.getHeight()),
+                            MenuElement.Anchor.LEFT_TOP, true,
+                            () -> DialogVals.setInfoScreen(is),
+                            baseIS, highlighedIS));
+                });
+
+        final Map<DialogVals.InfoScreen, VerticalScrollingMenuElement>
+                infoScreens = new HashMap<>();
+
+        for (DialogVals.InfoScreen infoScreen : DialogVals.InfoScreen.values()) {
+            infoScreens.put(infoScreen, assembleScroller(infoScreen));
+        }
+
+        final ThinkingMenuElement screenDecider = new ThinkingMenuElement(
+                () -> infoScreens.get(DialogVals.getInfoScreen()));
+
+        mb.add(screenDecider);
         return mb.build();
     }
 

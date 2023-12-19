@@ -291,7 +291,7 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToAbout
+                    DialogAssembly::setDialogToInfo
             );
         }
 

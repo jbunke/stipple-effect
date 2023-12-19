@@ -25,6 +25,36 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MenuAssembly {
+    public static final String
+            // PROJECT
+            ICON_CODE_NEW_PROJECT = "new_project",
+            ICON_CODE_OPEN_FILE = "open_file",
+            ICON_CODE_SAVE = "save",
+            ICON_CODE_SAVE_AS = "save_as",
+            ICON_CODE_RESIZE = "resize",
+            ICON_CODE_PAD = "pad",
+            // FRAMES
+            ICON_CODE_NEW_FRAME = "new_frame",
+            ICON_CODE_DUPLICATE_FRAME = "duplicate_frame",
+            ICON_CODE_REMOVE_FRAME = "remove_frame",
+            ICON_CODE_MOVE_FRAME_FORWARD = "frame_forward",
+            ICON_CODE_MOVE_FRAME_BACK = "frame_back",
+            ICON_CODE_TO_FIRST_FRAME = "to_first_frame",
+            ICON_CODE_PREVIOUS = "previous",
+            ICON_CODE_NEXT = "next",
+            ICON_CODE_TO_LAST_FRAME = "to_last_frame",
+            ICON_CODE_PLAY = "play",
+            ICON_CODE_STOP = "stop",
+            ICON_CODE_LOOP = "loop",
+            ICON_CODE_FORWARDS = "forwards",
+            ICON_CODE_BACKWARDS = "backwards",
+            ICON_CODE_PONG = "pong",
+            // LAYERS
+            // TOOLS
+            // COLORS
+            // KEEP LAST
+            ICON_CODE_INFO = "info";
+
     public static Menu stub() {
         return new Menu();
     }
@@ -33,21 +63,14 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         final String[] iconIDs = new String[] {
-                "new_project",
-                "open_file",
-                "save",
-                "save_as",
-                "resize",
-                "pad"
+                // TODO - program settings
+                ICON_CODE_NEW_PROJECT, ICON_CODE_OPEN_FILE,
+                ICON_CODE_SAVE, ICON_CODE_SAVE_AS,
+                ICON_CODE_RESIZE, ICON_CODE_PAD
         };
 
         final boolean[] preconditions = new boolean[] {
-                true,
-                true,
-                true,
-                true,
-                true,
-                true
+                true, true, true, true, true, true
         };
 
         final Runnable[] behaviours = new Runnable[] {
@@ -137,23 +160,25 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         final String[] iconIDs = new String[] {
-                "new_frame",
-                "duplicate_frame",
-                "remove_frame",
-                "to_first_frame",
-                "previous",
+                ICON_CODE_NEW_FRAME,
+                ICON_CODE_DUPLICATE_FRAME,
+                ICON_CODE_REMOVE_FRAME,
+                // TODO - move frame forward and back
+                ICON_CODE_TO_FIRST_FRAME,
+                ICON_CODE_PREVIOUS,
                 Constants.ICON_ID_GAP_CODE, // gap for play/stop button
-                "next",
-                "to_last_frame"
+                ICON_CODE_NEXT,
+                ICON_CODE_TO_LAST_FRAME
         };
 
         final boolean[] preconditions = new boolean[] {
                 StippleEffect.get().getContext().getState().canAddFrame(),
                 StippleEffect.get().getContext().getState().canAddFrame(),
                 StippleEffect.get().getContext().getState().canRemoveFrame(),
+                // TODO
                 true,
                 true,
-                false,
+                false, // placeholder
                 true,
                 true
         };
@@ -164,7 +189,7 @@ public class MenuAssembly {
                 () -> StippleEffect.get().getContext().removeFrame(),
                 () -> StippleEffect.get().getContext().getState().setFrameIndex(0),
                 () -> StippleEffect.get().getContext().getState().previousFrame(),
-                () -> {},
+                () -> {}, // placeholder
                 () -> StippleEffect.get().getContext().getState().nextFrame(),
                 () -> StippleEffect.get().getContext().getState().setFrameIndex(
                         StippleEffect.get().getContext().getState().getFrameCount() - 1
@@ -184,6 +209,8 @@ public class MenuAssembly {
                 Constants.ICON_BUTTON_OFFSET_Y);
 
         mb.add(generatePlayStopToggle(playStopTogglePos));
+
+        // TODO - playback mode toggle button
 
         // playback speed slider and dynamic label for playback speed
 
@@ -253,11 +280,13 @@ public class MenuAssembly {
         return mb.build();
     }
 
+    // TODO - generate frame playback mode toggle here
+
     private static SimpleToggleMenuButton generatePlayStopToggle(final Coord2D pos) {
         // 0: is playing, button click should STOP; 1: vice-versa
 
-        final GameImage playing = GraphicsUtils.getIcon("stop"),
-                notPlaying = GraphicsUtils.getIcon("play");
+        final GameImage playing = GraphicsUtils.loadIcon(ICON_CODE_STOP),
+                notPlaying = GraphicsUtils.loadIcon(ICON_CODE_PLAY);
 
         return new SimpleToggleMenuButton(pos,
                 new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
@@ -427,8 +456,8 @@ public class MenuAssembly {
     ) {
         // 0: is enabled, button click should DISABLE; 1: vice-versa
 
-        final GameImage enabled = GraphicsUtils.getIcon("layer_enabled"),
-                disabled = GraphicsUtils.getIcon("layer_disabled");
+        final GameImage enabled = GraphicsUtils.loadIcon("layer_enabled"),
+                disabled = GraphicsUtils.loadIcon("layer_disabled");
 
         return new SimpleToggleMenuButton(pos,
                 new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
@@ -452,7 +481,7 @@ public class MenuAssembly {
     ) {
         final GameImage[]
                 baseSet = Arrays.stream(OnionSkinMode.values())
-                .map(osm -> GraphicsUtils.getIcon("onion_skin_" +
+                .map(osm -> GraphicsUtils.loadIcon("onion_skin_" +
                         osm.name().toLowerCase()))
                 .toArray(GameImage[]::new),
                 highlightedSet = Arrays.stream(baseSet).map(GraphicsUtils::highlightIconButton)
@@ -480,8 +509,8 @@ public class MenuAssembly {
     ) {
         // 0: is unlinked, button click should LINK; 1: vice-versa
 
-        final GameImage linked = GraphicsUtils.getIcon("frames_linked"),
-                unlinked = GraphicsUtils.getIcon("frames_unlinked");
+        final GameImage linked = GraphicsUtils.loadIcon("frames_linked"),
+                unlinked = GraphicsUtils.loadIcon("frames_unlinked");
 
         return new SimpleToggleMenuButton(pos,
                 new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
@@ -578,7 +607,7 @@ public class MenuAssembly {
         mb.add(zoomSlider);
 
         // help button
-        final GameImage helpIcon = GraphicsUtils.HELP_ICON,
+        final GameImage helpIcon = GraphicsUtils.loadIcon(MenuAssembly.ICON_CODE_INFO),
                 helpHighlighted = new GameImage(helpIcon);
         helpHighlighted.draw(GraphicsUtils.HIGHLIGHT_OVERLAY);
 
@@ -587,7 +616,7 @@ public class MenuAssembly {
                         Constants.CANVAS_W - Constants.BUTTON_DIM,
                         Constants.BUTTON_OFFSET), Constants.TOOL_ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, true,
-                DialogAssembly::setDialogToAbout,
+                DialogAssembly::setDialogToInfo,
                 helpIcon, helpHighlighted.submit()
         );
 

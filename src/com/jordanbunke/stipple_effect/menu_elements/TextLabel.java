@@ -13,8 +13,17 @@ public class TextLabel extends StaticMenuElement {
                 Anchor.LEFT_TOP, image);
     }
 
-    public static TextLabel make(final Coord2D position, final String text, final Color c) {
-        final GameImage label = GraphicsUtils.uiText(c).addText(text).build().draw();
+    public static TextLabel make(
+            final Coord2D position, final String text, final Color c
+    ) {
+        return make(position, text, c, 1d);
+    }
+
+    public static TextLabel make(
+            final Coord2D position, final String text,
+            final Color c, final double textSize
+    ) {
+        final GameImage label = GraphicsUtils.uiText(c, textSize).addText(text).build().draw();
         return new TextLabel(position, label);
     }
 }

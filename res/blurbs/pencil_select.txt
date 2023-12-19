@@ -1,6 +1,9 @@
 Shortcut: {T}
 
-TODO
+Use the pencil select tool for pixel-perfect selection.
+It can be used to select a single pixel by clicking on it,
+or clicked and dragged in additive or subtractive mode to act
+as a precise selection pencil or eraser.
 
 Simple selection: {Click}
 

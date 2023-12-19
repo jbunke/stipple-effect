@@ -1,6 +1,7 @@
 Shortcut: {X}
 
-TODO
+Use the box select tool to make rectangular selections. This is
+a convenient way to quickly enclose a desired selection area.
 
 Simple selection: {Click & Drag}
 

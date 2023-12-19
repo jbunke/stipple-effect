@@ -1,14 +1,15 @@
 Shortcut: {F}
 
-TODO
+Use fill to fill adjacent pixels of the same or
+similar color as the initial pixel that was clicked.
+Adjust the tolerance of fill to increase or decrease the
+threshold of the similarity of the colors.
 
 Primary color: {Left Click}
 Secondary color: {Right Click}
 
 Simple fill: {Click}
 
-Additive fill: {Ctrl + Click}
-TODO
-
 Global fill: {Shift + Click}
-TODO
+Fills all pixels in the image that satisfy the color
+tolerance of the initial pixel, regardless of adjacency.

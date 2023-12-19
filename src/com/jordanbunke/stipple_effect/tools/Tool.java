@@ -43,10 +43,7 @@ public abstract class Tool {
     }
 
     private GameImage fetchIcon() {
-        final Path iconFile = Constants.ICON_FOLDER.resolve(
-                convertNameToFilename() + ".png");
-
-        return ResourceLoader.loadImageResource(iconFile);
+        return GraphicsUtils.loadIcon(convertNameToFilename());
     }
 
     public final String[] getBlurb() {

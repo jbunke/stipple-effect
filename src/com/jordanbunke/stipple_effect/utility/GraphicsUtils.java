@@ -16,7 +16,6 @@ import java.util.function.BiFunction;
 
 public class GraphicsUtils {
     public static final GameImage
-            HELP_ICON = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("help.png")),
             HIGHLIGHT_OVERLAY = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("highlighted.png")),
             SELECT_OVERLAY = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("selected.png"));
 
@@ -77,19 +76,22 @@ public class GraphicsUtils {
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
     ) {
-        final int height = Constants.STD_TEXT_BUTTON_H;
-
         final Color textColor = (backgroundColor.getRed() + backgroundColor.getGreen() +
                 backgroundColor.getBlue()) / 3 > Constants.COLOR_BUTTON_AVG_C_THRESHOLD
                 ? Constants.BLACK : Constants.WHITE;
-
-        final GameImage nhi = new GameImage(width, height);
-        nhi.fillRectangle(backgroundColor, 0, 0, width, height);
         final GameImage textImage = GraphicsUtils.uiText(textColor)
                 .addText(text).build().draw();
-        nhi.draw(textImage, (width - textImage.getWidth()) / 2, Constants.BUTTON_TEXT_OFFSET_Y);
+
+        final int w = Math.max(width, textImage.getWidth() +
+                (4 * Constants.BUTTON_BORDER_PX)),
+                h = Constants.STD_TEXT_BUTTON_H;
+
+        final GameImage nhi = new GameImage(w, h);
+        nhi.fillRectangle(backgroundColor, 0, 0, w, h);
+
+        nhi.draw(textImage, (w - textImage.getWidth()) / 2, Constants.BUTTON_TEXT_OFFSET_Y);
         final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
-        nhi.drawRectangle(frame, 2f * Constants.BUTTON_BORDER_PX, 0, 0, width, height);
+        nhi.drawRectangle(frame, 2f * Constants.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return nhi.submit();
     }
@@ -156,7 +158,7 @@ public class GraphicsUtils {
         return overlay.submit();
     }
 
-    public static GameImage getIcon(final String iconID) {
+    public static GameImage loadIcon(final String iconID) {
         final Path iconFile = Constants.ICON_FOLDER.resolve(
                 iconID.toLowerCase() + ".png");
         return ResourceLoader.loadImageResource(iconFile);
@@ -177,7 +179,7 @@ public class GraphicsUtils {
 
         final Coord2D dims = new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM);
 
-        final GameImage icon = getIcon(iconID);
+        final GameImage icon = loadIcon(iconID);
 
         if (stub)
             return new StaticMenuElement(position, dims,

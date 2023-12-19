@@ -1,8 +1,6 @@
 Shortcut: {B}
 
-A pixel-perfect paint brush
-
-Painting with a color with partial transparency will
+A pixel-perfect paint brush with no anti-aliasing
 
 Primary color: {Left Click & Drag}
 Secondary color: {Right Click & Drag}

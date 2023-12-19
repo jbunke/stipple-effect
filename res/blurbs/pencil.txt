@@ -1,6 +1,6 @@
 Shortcut: {P}
 
-TODO
+A pixel-perfect pencil that draws one pixel at a time
 
 Primary color: {Left Click & Drag}
 Secondary color: {Right Click & Drag}

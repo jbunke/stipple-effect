@@ -14,6 +14,25 @@ public class DialogVals {
             padBottom = 0;
     private static double layerOpacity = Constants.OPAQUE;
     private static String layerName = "";
+    private static InfoScreen infoScreen = InfoScreen.PROJECT;
+
+    public enum InfoScreen {
+        PROJECT, TOOLS, LAYERS, FRAMES, QoL, CHANGELOG;
+
+        public String getTitle() {
+            return this == QoL ? "Quality of Life" : toString();
+        }
+
+        @Override
+        public String toString() {
+            return this == QoL ? QoL.name()
+                    : name().charAt(0) + name().substring(1).toLowerCase();
+        }
+    }
+
+    public static void setInfoScreen(final InfoScreen infoScreen) {
+        DialogVals.infoScreen = infoScreen;
+    }
 
     public static void setLayerName(final String layerName) {
         DialogVals.layerName = layerName;
@@ -62,6 +81,11 @@ public class DialogVals {
     public static void setNewProjectYDivs(final int newProjectYDivs) {
         DialogVals.newProjectYDivs = newProjectYDivs;
     }
+
+    public static InfoScreen getInfoScreen() {
+        return infoScreen;
+    }
+
     public static int getNewProjectHeight() {
         return newProjectHeight;
     }
