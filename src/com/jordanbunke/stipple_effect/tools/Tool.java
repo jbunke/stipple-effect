@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.SEContext;
@@ -12,6 +13,13 @@ import java.nio.file.Path;
 
 public abstract class Tool {
     private final GameImage icon, highlightedIcon, selectedIcon;
+
+    public static boolean canMoveSelection(
+            final Tool tool
+    ) {
+        return tool.equals(MoveSelection.get()) || tool.equals(PencilSelect.get()) ||
+                tool.equals(PickUpSelection.get()) || tool.equals(BoxSelect.get());
+    }
 
     Tool() {
         this.icon = fetchIcon();
@@ -30,15 +38,28 @@ public abstract class Tool {
     public abstract void update(final SEContext context, final Coord2D mousePosition);
     public abstract void onMouseUp(final SEContext context, final GameMouseEvent me);
 
+    private String convertNameToFilename() {
+        return getName().replace(" ", "_").toLowerCase();
+    }
+
     private GameImage fetchIcon() {
-        final Path iconFile = Constants.ICON_FOLDER.resolve(getName()
-                .replace(" ", "_").toLowerCase() + ".png");
+        final Path iconFile = Constants.ICON_FOLDER.resolve(
+                convertNameToFilename() + ".png");
 
         return ResourceLoader.loadImageResource(iconFile);
     }
 
+    public final String[] getBlurb() {
+        final Path blurbFile = Constants.BLURB_FOLDER.resolve(
+                convertNameToFilename() + ".txt");
+
+        return FileIO.readResource(
+                ResourceLoader.loadResource(blurbFile), getName() + " blurb"
+        ).split("\n");
+    }
+
     public String getCursorCode() {
-        return getName().replace(" ", "_").toLowerCase();
+        return convertNameToFilename();
     }
 
     public String getBottomBarText() {

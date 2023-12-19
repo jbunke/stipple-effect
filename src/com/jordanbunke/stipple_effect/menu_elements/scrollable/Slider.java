@@ -218,6 +218,16 @@ public abstract class Slider extends MenuElement {
         selectedImage = s.submit();
     }
 
+    public void setValue(final int value) {
+        this.value = Math.max(minValue, Math.min(value, maxValue));
+        setter.accept(this.value);
+        updateAssets();
+    }
+
+    public void incrementValue(final int delta) {
+        setValue(value + delta);
+    }
+
     // GETTERS
 
     public boolean isHighlighted() {

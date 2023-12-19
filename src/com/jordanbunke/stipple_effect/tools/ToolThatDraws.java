@@ -14,9 +14,7 @@ public abstract class ToolThatDraws extends Tool {
 
     public void updateLast(final SEContext context) {
         lastFrameIndex = context.getState().getFrameIndex();
-
-        if (context.isTargetingPixelOnCanvas())
-            lastTP = context.getTargetPixel();
+        lastTP = context.getTargetPixel();
     }
 
     public boolean isUnchanged(final SEContext context) {

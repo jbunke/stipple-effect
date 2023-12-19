@@ -31,7 +31,7 @@ public final class Eraser extends ToolWithBreadth {
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        if (context.isTargetingPixelOnCanvas()) {
+        if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET)) {
             erasing = true;
             reset();
             context.getState().markAsCheckpoint(false, context);
@@ -40,43 +40,41 @@ public final class Eraser extends ToolWithBreadth {
 
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
-        if (erasing) {
-            if (context.isTargetingPixelOnCanvas()) {
-                final int w = context.getState().getImageWidth(),
-                        h = context.getState().getImageHeight();
-                final Coord2D tp = context.getTargetPixel();
-                final Set<Coord2D> selection = context.getState().getSelection();
+        final Coord2D tp = context.getTargetPixel();
 
-                if (isUnchanged(context))
-                    return;
+        if (erasing && !tp.equals(Constants.NO_VALID_TARGET)) {
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
+            final Set<Coord2D> selection = context.getState().getSelection();
 
-                final boolean[][] eraseMask = new boolean[w][h];
-                populateAround(eraseMask, tp, selection);
+            if (isUnchanged(context))
+                return;
 
-                final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
-                        xUnit = (int) Math.signum(xDiff),
-                        yUnit = (int) Math.signum(yDiff);
-                if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
-                        (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
-                    if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                        for (int x = 1; x < Math.abs(xDiff); x++) {
-                            final int y = (int) (x * Math.abs(yDiff / (double) xDiff));
-                            populateAround(eraseMask, getLastTP().displace(
-                                    xUnit * x, yUnit * y), selection);
-                        }
-                    } else {
-                        for (int y = 1; y < Math.abs(yDiff); y++) {
-                            final int x = (int) (y * Math.abs(xDiff / (double) yDiff));
-                            populateAround(eraseMask, getLastTP().displace(
-                                    xUnit * x, yUnit * y), selection);
-                        }
+            final boolean[][] eraseMask = new boolean[w][h];
+            populateAround(eraseMask, tp, selection);
+
+            final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
+                    xUnit = (int) Math.signum(xDiff),
+                    yUnit = (int) Math.signum(yDiff);
+            if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
+                    (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
+                if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                    for (int x = 1; x < Math.abs(xDiff); x++) {
+                        final int y = (int) (x * Math.abs(yDiff / (double) xDiff));
+                        populateAround(eraseMask, getLastTP().displace(
+                                xUnit * x, yUnit * y), selection);
+                    }
+                } else {
+                    for (int y = 1; y < Math.abs(yDiff); y++) {
+                        final int x = (int) (y * Math.abs(xDiff / (double) yDiff));
+                        populateAround(eraseMask, getLastTP().displace(
+                                xUnit * x, yUnit * y), selection);
                     }
                 }
+            }
 
-                context.erase(eraseMask);
-                updateLast(context);
-            } else
-                reset();
+            context.erase(eraseMask, false);
+            updateLast(context);
         }
     }
 

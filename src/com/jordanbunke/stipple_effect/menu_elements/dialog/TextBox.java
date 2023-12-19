@@ -114,6 +114,8 @@ public class TextBox extends MenuButtonStub {
 
             for (GameEvent e : unprocessed)
                 if (e instanceof GameMouseEvent me && me.matchesAction(GameMouseEvent.Action.CLICK)) {
+                    // DO NOT MARK AS PROCESSED!
+
                     typing = false;
                     clickedOffBehaviour();
                     return;

@@ -1,0 +1,6 @@
+Shortcut: {O}
+
+TODO
+
+Primary color: {Left Click}
+Secondary color: {Right Click}

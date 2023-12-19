@@ -56,7 +56,7 @@ public final class Fill extends ToolThatSearches {
                 if (selection.isEmpty() || selection.contains(m))
                     edit.dot(fillColor, m.x, m.y);
 
-            context.editImage(edit.submit());
+            context.paintOverImage(edit.submit());
             context.getState().markAsCheckpoint(true, context);
         }
     }

@@ -1,0 +1,5 @@
+Shortcut: {H}
+
+Use the hand to move the image canvas around the workspace.
+
+Pan: {Click & Drag}

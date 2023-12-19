@@ -1,0 +1,6 @@
+Shortcut: {P}
+
+TODO
+
+Primary color: {Left Click & Drag}
+Secondary color: {Right Click & Drag}

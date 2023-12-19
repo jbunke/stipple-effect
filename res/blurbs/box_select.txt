@@ -1,0 +1,12 @@
+Shortcut: {X}
+
+TODO
+
+Simple selection: {Click & Drag}
+
+Additive selection: {Ctrl + Click & Drag}
+Adds the result of the selection to the existing selection.
+
+Subtractive selection: {Ctrl + Shift + Click & Drag}
+Removes the result of the selection from the existing
+selection.

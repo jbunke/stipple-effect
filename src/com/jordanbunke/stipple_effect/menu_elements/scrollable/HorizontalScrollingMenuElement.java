@@ -1,9 +1,13 @@
 package com.jordanbunke.stipple_effect.menu_elements.scrollable;
 
+import com.jordanbunke.delta_time.events.GameEvent;
+import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
+
+import java.util.List;
 
 public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
 
@@ -53,8 +57,21 @@ public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
     public void process(final InputEventLogger eventLogger) {
         super.process(eventLogger);
 
-        if (slider != null)
+        if (slider != null) {
             slider.process(eventLogger);
+
+            if (mouseIsWithinBounds(eventLogger.getAdjustedMousePosition())) {
+                final List<GameEvent> up = eventLogger.getUnprocessedEvents();
+
+                for (GameEvent e : up) {
+                    if (e instanceof GameMouseScrollEvent mse) {
+                        mse.markAsProcessed();
+
+                        slider.incrementValue(mse.clicksScrolled * Constants.PX_PER_SCROLL);
+                    }
+                }
+            }
+        }
     }
 
     @Override

@@ -41,7 +41,7 @@ public final class Hand extends Tool {
     ) {
         panning = true;
         startMousePosition = me.mousePosition;
-        startAnchor = context.getRenderInfo().getAnchor();
+        startAnchor = context.renderInfo.getAnchor();
     }
 
     @Override
@@ -49,13 +49,13 @@ public final class Hand extends Tool {
             final SEContext context, final Coord2D mousePosition
     ) {
         if (panning) {
-            final float zoomFactor = context.getRenderInfo().getZoomFactor();
+            final float zoomFactor = context.renderInfo.getZoomFactor();
 
             final Coord2D shift = new Coord2D(
                     (int)((startMousePosition.x - mousePosition.x) / zoomFactor),
                     (int)((startMousePosition.y - mousePosition.y) / zoomFactor)
             );
-            context.getRenderInfo().setAnchor(new Coord2D(
+            context.renderInfo.setAnchor(new Coord2D(
                     startAnchor.x + shift.x, startAnchor.y + shift.y));
         }
     }

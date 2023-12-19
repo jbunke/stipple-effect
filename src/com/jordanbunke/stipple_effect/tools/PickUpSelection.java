@@ -2,39 +2,40 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 
-public final class Zoom extends Tool {
-    private static final Zoom INSTANCE;
+public final class PickUpSelection extends Tool {
+    private static final PickUpSelection INSTANCE;
 
     static {
-        INSTANCE = new Zoom();
+        INSTANCE = new PickUpSelection();
     }
 
-    private Zoom() {
+    private PickUpSelection() {
 
     }
 
-    public static Zoom get() {
+    public static PickUpSelection get() {
         return INSTANCE;
     }
 
     @Override
     public String getName() {
-        return "Zoom";
+        return "Pick up selection";
+    }
+
+    // TODO: tool behaviour
+    public void engage(final SEContext context) {
+
+    }
+
+    public void disengage(final SEContext context) {
+
     }
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        switch (me.button) {
-            case LEFT -> context.renderInfo.zoomIn();
-            case RIGHT -> context.renderInfo.zoomOut();
-        }
 
-        context.renderInfo.setAnchor(context.getTargetPixel());
-
-        StippleEffect.get().rebuildToolButtonMenu();
     }
 
     @Override

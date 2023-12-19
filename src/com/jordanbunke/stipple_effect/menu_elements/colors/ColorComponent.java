@@ -19,24 +19,14 @@ public class ColorComponent extends MenuElementContainer {
     private static final int NUM_ELEMENTS = 3, SLIDER_INDEX = 0,
             LABEL_INDEX = 1, VALUE_INDEX = 2;
 
-    private int value;
-
-    private final Consumer<Color> setter;
-    private final Function<Integer, Color> converter;
-
     private final MenuElement[] menuElements;
 
     public ColorComponent(
             final int minValue, final int maxValue, final String label,
             final Function<Integer, Color> spectralFunction, final Consumer<Color> setter,
-            final Supplier<Integer> initialValueGetter, final Coord2D startingPosition
+            final Supplier<Integer> getter, final Coord2D startingPosition
     ) {
         super(new Coord2D(), new Coord2D(), Anchor.LEFT_TOP, false);
-
-        this.setter = setter;
-        converter = spectralFunction;
-
-        value = initialValueGetter.get();
 
         menuElements = new MenuElement[NUM_ELEMENTS];
 
@@ -44,14 +34,15 @@ public class ColorComponent extends MenuElementContainer {
                 startingPosition.displace(Constants.COLOR_PICKER_W / 2,
                         (int)(Constants.COLOR_SELECTOR_INC_Y * 0.45)),
                 Constants.COLOR_SLIDER_W + Constants.SLIDER_BALL_DIM,
-                minValue, maxValue, this.value, spectralFunction, this::setValue);
+                minValue, maxValue, getter, spectralFunction,
+                i -> setter.accept(spectralFunction.apply(i)));
         menuElements[LABEL_INDEX] = TextLabel.make(
                 startingPosition.displace(Constants.TOOL_NAME_X, Constants.COLOR_LABEL_OFFSET_Y),
                 label, Constants.BLACK);
         menuElements[VALUE_INDEX] = new DynamicLabel(
                 startingPosition.displace(Constants.COLOR_PICKER_W - Constants.TOOL_NAME_X,
                         Constants.COLOR_LABEL_OFFSET_Y),
-                Anchor.RIGHT_TOP, Constants.BLACK, () -> String.valueOf(initialValueGetter.get()),
+                Anchor.RIGHT_TOP, Constants.BLACK, () -> String.valueOf(getter.get()),
                 Constants.DYNAMIC_LABEL_W_ALLOWANCE
         );
     }
@@ -88,10 +79,5 @@ public class ColorComponent extends MenuElementContainer {
     @Override
     public boolean hasNonTrivialBehaviour() {
         return false;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-        setter.accept(converter.apply(this.value));
     }
 }

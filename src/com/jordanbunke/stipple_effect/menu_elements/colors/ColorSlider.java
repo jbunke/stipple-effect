@@ -10,20 +10,24 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ColorSlider extends HorizontalSlider {
     private final Function<Integer, Color> spectralFunction;
+    private final Supplier<Integer> getter;
     private Color cLastUpdate;
 
     public ColorSlider(
             final Coord2D position, final int width,
-            final int minValue, final int maxValue, final int initialValue,
+            final int minValue, final int maxValue, final Supplier<Integer> getter,
             final Function<Integer, Color> spectralFunction,
             final Consumer<Integer> setter
     ) {
-        super(position, width, Anchor.CENTRAL, minValue, maxValue, initialValue, setter);
+        super(position, width, Anchor.CENTRAL,
+                minValue, maxValue, getter.get(), setter);
 
         this.spectralFunction = spectralFunction;
+        this.getter = getter;
 
         cLastUpdate = StippleEffect.get().getSelectedColor();
 
@@ -32,6 +36,8 @@ public class ColorSlider extends HorizontalSlider {
 
     @Override
     public void update(final double deltaTime) {
+        setValue(getter.get());
+
         final Color c = StippleEffect.get().getSelectedColor();
 
         if (!c.equals(cLastUpdate)) {
@@ -40,6 +46,7 @@ public class ColorSlider extends HorizontalSlider {
         }
     }
 
+    @Override
     public GameImage drawSliderCore(final int w, final int h) {
         final GameImage sliderCore = new GameImage(w, h);
 
@@ -50,6 +57,7 @@ public class ColorSlider extends HorizontalSlider {
         return sliderCore.submit();
     }
 
+    @Override
     public Color getSliderBallCoreColor() {
         final GameImage core = new GameImage(1, 1);
         core.dot(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0);

@@ -1,0 +1,13 @@
+Shortcut: {B}
+
+A pixel-perfect paint brush
+
+Painting with a color with partial transparency will
+
+Primary color: {Left Click & Drag}
+Secondary color: {Right Click & Drag}
+
+Increment/decrement brush width:
+{Right/Left Arrow Keys}
+Major increment/decrement brush width:
+{Up/Down Arrow Keys}

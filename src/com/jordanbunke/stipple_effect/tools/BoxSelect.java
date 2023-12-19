@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.SEContext;
-import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.selection.SelectionBounds;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.SECursor;
 
@@ -80,11 +80,11 @@ public final class BoxSelect extends ToolWithMode {
 
             final Set<Coord2D> bounds = new HashSet<>(pivotTP.equals(endTP)
                     ? Set.of(pivotTP) : Set.of(pivotTP, endTP));
-            topLeft = Selection.topLeft(bounds);
-            bottomRight = Selection.bottomRight(bounds);
+            topLeft = SelectionBounds.topLeft(bounds);
+            bottomRight = SelectionBounds.bottomRight(bounds);
 
-            overlay = Selection.drawOverlay(bounds, (x, y) -> true,
-                    (int) context.getRenderInfo().getZoomFactor());
+            overlay = SelectionBounds.drawOverlay(bounds, (x, y) -> true,
+                    (int) context.renderInfo.getZoomFactor(), true);
         }
     }
 

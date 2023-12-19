@@ -50,7 +50,7 @@ public final class StipplePencil extends Tool {
             if (selection.isEmpty() || selection.contains(tp))
                 edit.dot(c, tp.x, tp.y);
 
-            context.editImage(edit.submit());
+            context.paintOverImage(edit.submit());
             context.getState().markAsCheckpoint(true, context);
         }
     }

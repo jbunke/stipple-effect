@@ -25,15 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MenuAssembly {
-
-    private static final Tool[] ALL_TOOLS = new Tool[] {
-            Hand.get(), Zoom.get(),
-            StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
-            Fill.get(), ColorPicker.get(),
-            Wand.get(), PencilSelect.get(), BoxSelect.get(), // TODO - populate with remaining selection tools | PickUpSelection.get()
-            MoveSelection.get()
-    };
-
     public static Menu stub() {
         return new Menu();
     }
@@ -62,7 +53,7 @@ public class MenuAssembly {
         final Runnable[] behaviours = new Runnable[] {
                 DialogAssembly::setDialogToNewProject,
                 () -> StippleEffect.get().openProject(),
-                () -> StippleEffect.get().getContext().getProjectInfo().save(),
+                () -> StippleEffect.get().getContext().projectInfo.save(),
                 DialogAssembly::setDialogToSave,
                 DialogAssembly::setDialogToResize,
                 DialogAssembly::setDialogToPad
@@ -84,7 +75,7 @@ public class MenuAssembly {
 
         for (int i = 0; i < amount; i++) {
             final String text = StippleEffect.get().getContexts().get(i)
-                    .getProjectInfo().getFormattedName(true, true);
+                    .projectInfo.getFormattedName(true, true);
             final int paddedTextWidth = GraphicsUtils.uiText()
                     .addText(text).build().draw().getWidth() +
                     Constants.PROJECT_NAME_BUTTON_PADDING_W;
@@ -117,7 +108,7 @@ public class MenuAssembly {
 
             final int index = i;
             final Runnable closeBehaviour = () -> {
-                if (StippleEffect.get().getContexts().get(index).getProjectInfo().hasUnsavedChanges()) {
+                if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges()) {
                     DialogAssembly.setDialogToCheckCloseProject(index);
                 } else {
                     StippleEffect.get().removeContext(index);
@@ -203,9 +194,9 @@ public class MenuAssembly {
         final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
                 Constants.FRAME_PLAYBACK_SLIDER_W, MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_MILLIS_PER_FRAME, Constants.MAX_MILLIS_PER_FRAME,
-                StippleEffect.get().getContext().getPlaybackInfo().getMillisPerFrame(),
+                StippleEffect.get().getContext().playbackInfo.getMillisPerFrame(),
                 mpf -> StippleEffect.get().getContext()
-                        .getPlaybackInfo().setMillisPerFrame(mpf));
+                        .playbackInfo.setMillisPerFrame(mpf));
         slider.updateAssets();
         mb.add(slider);
 
@@ -219,7 +210,7 @@ public class MenuAssembly {
 
                     final double fps = (MILLIS_PER_SECOND /
                             (double) StippleEffect.get().getContext()
-                                    .getPlaybackInfo().getMillisPerFrame());
+                                    .playbackInfo.getMillisPerFrame());
 
                     return (fps < 10d ? ((int)(fps * 10)) / 10d : String.valueOf((int) fps)) + " fps";
                 },
@@ -277,10 +268,10 @@ public class MenuAssembly {
                         GraphicsUtils.highlightIconButton(notPlaying)
                 },
                 new Runnable[] {
-                        () -> StippleEffect.get().getContext().getPlaybackInfo().stop(),
-                        () -> StippleEffect.get().getContext().getPlaybackInfo().play()
+                        () -> StippleEffect.get().getContext().playbackInfo.stop(),
+                        () -> StippleEffect.get().getContext().playbackInfo.play()
                 },
-                () -> StippleEffect.get().getContext().getPlaybackInfo()
+                () -> StippleEffect.get().getContext().playbackInfo
                         .isPlaying() ? 0 : 1, () -> {});
     }
 
@@ -566,8 +557,8 @@ public class MenuAssembly {
     public static Menu buildToolButtonMenu() {
         final MenuBuilder mb = new MenuBuilder();
 
-        for (int i = 0; i < ALL_TOOLS.length; i++) {
-            mb.add(toolButtonFromTool(ALL_TOOLS[i], i));
+        for (int i = 0; i < Constants.ALL_TOOLS.length; i++) {
+            mb.add(toolButtonFromTool(Constants.ALL_TOOLS[i], i));
         }
 
         // zoom slider
@@ -578,13 +569,29 @@ public class MenuAssembly {
                 MenuElement.Anchor.LEFT_TOP,
                 (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
                 (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
-                (int)(Math.log(StippleEffect.get().getContext().getRenderInfo()
+                (int)(Math.log(StippleEffect.get().getContext().renderInfo
                         .getZoomFactor()) / Math.log(base)), i ->
-                StippleEffect.get().getContext().getRenderInfo()
+                StippleEffect.get().getContext().renderInfo
                         .setZoomFactor((float)Math.pow(base, i)));
         zoomSlider.updateAssets();
 
         mb.add(zoomSlider);
+
+        // help button
+        final GameImage helpIcon = GraphicsUtils.HELP_ICON,
+                helpHighlighted = new GameImage(helpIcon);
+        helpHighlighted.draw(GraphicsUtils.HIGHLIGHT_OVERLAY);
+
+        final SimpleMenuButton helpButton = new SimpleMenuButton(
+                Constants.getBottomBarPosition().displace(
+                        Constants.CANVAS_W - Constants.BUTTON_DIM,
+                        Constants.BUTTON_OFFSET), Constants.TOOL_ICON_DIMS,
+                MenuElement.Anchor.LEFT_TOP, true,
+                DialogAssembly::setDialogToAbout,
+                helpIcon, helpHighlighted.submit()
+        );
+
+        mb.add(helpButton);
 
         return mb.build();
     }

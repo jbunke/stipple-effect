@@ -1,0 +1,6 @@
+Shortcut: {C}
+
+TODO
+
+Assign to primary: {Left Click}
+Assign to secondary: {Right Click}

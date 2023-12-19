@@ -25,7 +25,7 @@ public class StateManager {
         if (canUndo()) {
             index--;
 
-            StippleEffect.get().getContext().getProjectInfo().markAsEdited();
+            StippleEffect.get().getContext().projectInfo.markAsEdited();
 
             if (redraw) {
                 ActionType.MAJOR.consequence();
@@ -55,7 +55,7 @@ public class StateManager {
         if (canRedo()) {
             index++;
 
-            StippleEffect.get().getContext().getProjectInfo().markAsEdited();
+            StippleEffect.get().getContext().projectInfo.markAsEdited();
 
             if (redraw) {
                 ActionType.MAJOR.consequence();
@@ -91,7 +91,7 @@ public class StateManager {
         states.add(resultantState);
         index = states.size() - 1;
 
-        StippleEffect.get().getContext().getProjectInfo().markAsEdited();
+        StippleEffect.get().getContext().projectInfo.markAsEdited();
 
         if (resultantState.isCheckpoint())
             actionType.consequence();

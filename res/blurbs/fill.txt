@@ -1,0 +1,14 @@
+Shortcut: {F}
+
+TODO
+
+Primary color: {Left Click}
+Secondary color: {Right Click}
+
+Simple fill: {Click}
+
+Additive fill: {Ctrl + Click}
+TODO
+
+Global fill: {Shift + Click}
+TODO

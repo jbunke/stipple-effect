@@ -16,6 +16,7 @@ import java.util.function.BiFunction;
 
 public class GraphicsUtils {
     public static final GameImage
+            HELP_ICON = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("help.png")),
             HIGHLIGHT_OVERLAY = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("highlighted.png")),
             SELECT_OVERLAY = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("selected.png"));
 

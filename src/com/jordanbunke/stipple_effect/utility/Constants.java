@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.ProjectInfo;
+import com.jordanbunke.stipple_effect.tools.*;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -9,7 +10,9 @@ import java.nio.file.Path;
 public class Constants {
     public static final String PROGRAM_NAME = "Stipple Effect";
 
-    public static final Path ICON_FOLDER = Path.of("icons"), CURSOR_FOLDER = Path.of("cursors");
+    public static final Path ICON_FOLDER = Path.of("icons"),
+            CURSOR_FOLDER = Path.of("cursors"),
+            BLURB_FOLDER = Path.of("blurbs");
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
             "jpg",
@@ -81,12 +84,11 @@ public class Constants {
             SIZE_X = (int)(CANVAS_W * 0.36),
             ZOOM_PCT_X = (int)(CANVAS_W * 0.47),
             ZOOM_SLIDER_X = (int)(CANVAS_W * 0.535),
-            ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1),
-            SELECTION_PCT_X = (int)(CANVAS_W * 0.64);
+            ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1);
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
-            NATIVE_FILE_SUFFIX = "stef",
+            NATIVE_FILE_SUFFIX = "stef", OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
@@ -113,7 +115,7 @@ public class Constants {
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
             LAYER_BUTTON_W = 88, LAYER_OPACITY_SLIDER_W = 46,
             LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 6,
-            FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
+            FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5, PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
             PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8, PROJECTS_BEFORE_TO_DISPLAY = 1,
             VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X), VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
             FRAME_SCROLL_WINDOW_W = FRAMES_W - (2 * TOOL_NAME_X), FRAME_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
@@ -142,4 +144,12 @@ public class Constants {
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
             SMALL_TOLERANCE_INC = 0.01, BIG_TOLERANCE_INC = SMALL_TOLERANCE_INC * 10d;
+
+    public static final Tool[] ALL_TOOLS = new Tool[] {
+            Hand.get(), Zoom.get(),
+            StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
+            Fill.get(), ColorPicker.get(),
+            Wand.get(), PencilSelect.get(), BoxSelect.get(),
+            MoveSelection.get(), PickUpSelection.get()
+    };
 }

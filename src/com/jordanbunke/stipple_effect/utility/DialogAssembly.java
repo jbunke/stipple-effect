@@ -22,11 +22,17 @@ import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.menu_elements.dialog.TextBox;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
+import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.parse.ParserUtils;
+import com.jordanbunke.stipple_effect.tools.Tool;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -58,13 +64,13 @@ public class DialogAssembly {
                         return;
 
                     final Path folder = opened.get().toPath();
-                    c.getProjectInfo().setFolder(folder);
+                    c.projectInfo.setFolder(folder);
                 },
                 () -> {
                     final StringBuilder folderPathName = new StringBuilder();
                     final String ELLIPSE = "...";
 
-                    Path folder = c.getProjectInfo().getFolder();
+                    Path folder = c.projectInfo.getFolder();
                     int placements = 0;
 
                     if (folder == null)
@@ -94,19 +100,19 @@ public class DialogAssembly {
 
         // name text box
         final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
-                c.getProjectInfo().getName(), s -> c.getProjectInfo().setName(s));
+                c.projectInfo.getName(), c.projectInfo::setName);
 
         // scale up slider
         final HorizontalSlider scaleUpSlider = new HorizontalSlider(
                 getDialogContentOffsetFromLabel(scaleUpLabel),
                 Constants.DIALOG_CONTENT_W_ALLOWANCE, MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
-                c.getProjectInfo().getScaleUp(),
-                su -> c.getProjectInfo().setScaleUp(su));
+                c.projectInfo.getScaleUp(),
+                c.projectInfo::setScaleUp);
         scaleUpSlider.updateAssets();
 
         final DynamicLabel scaleUpValue = makeDynamicFromLeftLabel(
-                scaleUpLabel, () -> c.getProjectInfo().getScaleUp() + "x");
+                scaleUpLabel, () -> c.projectInfo.getScaleUp() + "x");
 
         // save as toggle
         final ProjectInfo.SaveType[] saveOptions = ProjectInfo.SaveType.validOptions();
@@ -126,12 +132,12 @@ public class DialogAssembly {
             final ProjectInfo.SaveType next =
                     saveOptions[(i + 1) % saveOptions.length];
 
-            behaviours[i] = () -> c.getProjectInfo().setSaveType(next);
+            behaviours[i] = () -> c.projectInfo.setSaveType(next);
         }
 
         final Supplier<Integer> updateIndexLogic = () -> {
             final ProjectInfo.SaveType saveType = StippleEffect.get()
-                    .getContext().getProjectInfo().getSaveType();
+                    .getContext().projectInfo.getSaveType();
 
             for (int i = 0; i < saveOptions.length; i++)
                 if (saveType == saveOptions[i])
@@ -148,11 +154,11 @@ public class DialogAssembly {
 
         // frameDims iff saveType is PNG_STITCHED
         final TextBox xDivsTextBox = makeDialogNumericTextBox(xDivsLabel,
-                c.getProjectInfo().getFrameDimsX(), 1, Constants.MAX_NUM_FRAMES,
-                i -> c.getProjectInfo().setFrameDimsX(i), 3);
+                c.projectInfo.getFrameDimsX(), 1, Constants.MAX_NUM_FRAMES,
+                c.projectInfo::setFrameDimsX, 3);
         final TextBox yDivsTextBox = makeDialogNumericTextBox(yDivsLabel,
-                c.getProjectInfo().getFrameDimsY(), 1, Constants.MAX_NUM_FRAMES,
-                i -> c.getProjectInfo().setFrameDimsY(i), 3);
+                c.projectInfo.getFrameDimsY(), 1, Constants.MAX_NUM_FRAMES,
+                c.projectInfo::setFrameDimsY, 3);
 
         final MenuElementGrouping pngStitchedContents = new MenuElementGrouping(
                 xDivsLabel, yDivsLabel, xDivsTextBox, yDivsTextBox);
@@ -163,8 +169,8 @@ public class DialogAssembly {
                 (int)(Constants.DIALOG_CONTENT_W_ALLOWANCE * 0.9),
                 MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_MILLIS_PER_FRAME, Constants.MAX_MILLIS_PER_FRAME,
-                c.getProjectInfo().getMillisPerFrame(),
-                i -> c.getProjectInfo().setMillisPerFrame(i));
+                c.projectInfo.getMillisPerFrame(),
+                c.projectInfo::setMillisPerFrame);
         playbackSpeedSlider.updateAssets();
 
         final DynamicLabel fpsValue = makeDynamicFromLeftLabel(
@@ -172,7 +178,7 @@ public class DialogAssembly {
                     final int MILLIS_PER_SECOND = 1000;
 
                     final double fps = (MILLIS_PER_SECOND /
-                            (double) c.getProjectInfo().getMillisPerFrame());
+                            (double) c.projectInfo.getMillisPerFrame());
 
                     return (fps < 10d ? ((int)(fps * 10)) / 10d : String.valueOf((int) fps)) + " fps";
                 });
@@ -182,7 +188,7 @@ public class DialogAssembly {
         );
 
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
-                switch (c.getProjectInfo().getSaveType()) {
+                switch (c.projectInfo.getSaveType()) {
             case PNG_STITCHED -> c.getState().getFrameCount() > 1
                     ? pngStitchedContents : new PlaceholderMenuElement();
             case GIF -> gifContents;
@@ -196,12 +202,12 @@ public class DialogAssembly {
                 saveAsToggle, basedOnSaveType);
         setDialog(assembleDialog("Save Project...", contents,
                 () -> {
-            final boolean enoughFrames = c.getProjectInfo().getFrameDimsX() *
-                    c.getProjectInfo().getFrameDimsY() >= c.getState().getFrameCount();
-            return c.getProjectInfo().hasSaveAssociation() &&
+            final boolean enoughFrames = c.projectInfo.getFrameDimsX() *
+                    c.projectInfo.getFrameDimsY() >= c.getState().getFrameCount();
+            return c.projectInfo.hasSaveAssociation() &&
                     xDivsTextBox.isValid() && yDivsTextBox.isValid() &&
                     enoughFrames;
-            }, "Save", () -> c.getProjectInfo().save()));
+            }, "Save", c.projectInfo::save));
     }
 
     public static void setDialogToResize() {
@@ -425,11 +431,15 @@ public class DialogAssembly {
 
         final MenuElementGrouping contents = new MenuElementGrouping(warning);
         setDialog(assembleDialog("Close the project " +
-                        StippleEffect.get().getContexts().get(index).getProjectInfo()
+                        StippleEffect.get().getContexts().get(index).projectInfo
                                 .getFormattedName(false, true)
                         + "?", contents,
                 () -> true, Constants.GENERIC_APPROVAL_TEXT,
                 () -> StippleEffect.get().removeContext(index)));
+    }
+
+    public static void setDialogToAbout() {
+        setDialog(assembleAboutDialog());
     }
 
     public static void setDialogToLayerSettings(final int index) {
@@ -541,6 +551,116 @@ public class DialogAssembly {
         return label.getRenderPosition().displace(
                 Constants.DIALOG_CONTENT_OFFSET_X,
                 Constants.DIALOG_CONTENT_COMP_OFFSET_Y);
+    }
+
+    private static Menu assembleAboutDialog() {
+        // TODO - different dialog assembly without precondition, second button;
+        //  button says "Close" instead of cancel;
+        //  display version number, shortcuts, + ...
+
+        final int dialogW = (int)(Constants.CANVAS_W * 0.7),
+                indent = (2 * Constants.BUTTON_INC);
+
+        final Coord2D contentStart = new Coord2D(Constants.getCanvasMiddle().x -
+                (dialogW / 2) + Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
+                (2 * Constants.STD_TEXT_BUTTON_INC));
+        final Set<MenuElement> contentAssembler = new HashSet<>();
+
+        int bottomY = -Constants.BUTTON_TEXT_OFFSET_Y;
+
+        // TODO - preceding info
+
+        // tools
+        for (Tool tool : Constants.ALL_TOOLS) {
+            final String[] blurb = tool.getBlurb();
+
+            final StaticMenuElement icon = new StaticMenuElement(
+                    contentStart.displace(0, bottomY),
+                    MenuElement.Anchor.LEFT_TOP, tool.getIcon());
+            final TextLabel name = TextLabel.make(contentStart.displace(
+                            Constants.BUTTON_INC + Constants.TOOL_NAME_X,
+                            bottomY + Constants.BUTTON_TEXT_OFFSET_Y),
+                    tool.getName(), Constants.HIGHLIGHT_1);
+            bottomY += Constants.DIALOG_CONTENT_INC_Y;
+
+            contentAssembler.add(icon);
+            contentAssembler.add(name);
+
+            for (String line : blurb) {
+                final String[] lineSegments = ParserUtils.extractHighlight(line);
+
+                int offsetX = 0;
+
+                for (int i = 0; i < lineSegments.length; i++) {
+                    final TextLabel segmentText = TextLabel.make(
+                            contentStart.displace(indent + offsetX,
+                                    bottomY + Constants.TEXT_Y_OFFSET),
+                            lineSegments[i], i == ParserUtils.HIGHLIGHTED_INDEX
+                                    ? Constants.HIGHLIGHT_1 : Constants.WHITE);
+
+                    contentAssembler.add(segmentText);
+                    offsetX += segmentText.getWidth();
+                }
+
+                bottomY += Constants.DIALOG_CONTENT_INC_Y;
+            }
+
+            bottomY += Constants.DIALOG_CONTENT_INC_Y;
+        }
+
+        final ScrollableMenuElement[] scrollingElements =
+                contentAssembler.stream().map(ScrollableMenuElement::new)
+                        .toArray(ScrollableMenuElement[]::new);
+
+        final Coord2D wrapperDims = new Coord2D(dialogW -
+                (2 * Constants.BUTTON_BORDER_PX), (int)(Constants.CANVAS_H * 0.8));
+
+        // assemble contents into scrolling element
+        final VerticalScrollingMenuElement wrapper = new VerticalScrollingMenuElement(
+                contentStart.displace(-Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET),
+                wrapperDims, scrollingElements, bottomY + contentStart.y, 0);
+
+        // end of contents
+
+        final MenuBuilder mb = new MenuBuilder();
+
+        // background
+        final GameImage backgroundImage = new GameImage(dialogW,
+                Constants.CANVAS_H - (2 * Constants.BUTTON_DIM));
+        backgroundImage.fillRectangle(Constants.ACCENT_BACKGROUND_DARK,
+                0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
+        backgroundImage.drawRectangle(Constants.BLACK,
+                2f * Constants.BUTTON_BORDER_PX, 0, 0,
+                backgroundImage.getWidth(), backgroundImage.getHeight());
+
+        final StaticMenuElement background =
+                new StaticMenuElement(Constants.getCanvasMiddle(),
+                        MenuElement.Anchor.CENTRAL, backgroundImage.submit());
+        mb.add(background);
+
+        // title
+        mb.add(TextLabel.make(background.getRenderPosition().displace(
+                        Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
+                        Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX),
+                Constants.PROGRAM_NAME + "  |  About", Constants.WHITE));
+
+        // close button
+        final GameImage baseImage = GraphicsUtils.drawTextButton(
+                Constants.STD_TEXT_BUTTON_W, "Close", false, Constants.GREY),
+                highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
+
+        final Coord2D cancelPos = background.getRenderPosition()
+                .displace(background.getWidth(), background.getHeight())
+                .displace(-Constants.TOOL_NAME_X, -Constants.TOOL_NAME_X);
+
+        mb.add(new SimpleMenuButton(cancelPos,
+                new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
+                MenuElement.Anchor.RIGHT_BOTTOM, true,
+                () -> StippleEffect.get().clearDialog(),
+                baseImage, highlightedImage));
+
+        mb.add(wrapper);
+        return mb.build();
     }
 
     private static Menu assembleDialog(

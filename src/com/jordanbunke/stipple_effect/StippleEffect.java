@@ -21,6 +21,7 @@ import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.Hand;
+import com.jordanbunke.stipple_effect.tools.PickUpSelection;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.*;
@@ -357,7 +358,7 @@ public class StippleEffect implements ProgramContext {
 
         // image size
         final GameImage size = GraphicsUtils.uiText()
-                .addText(getContext().getCanvasSizeText()).build().draw();
+                .addText(getContext().getImageSizeText()).build().draw();
         bottomBar.draw(size, Constants.SIZE_X, Constants.TEXT_Y_OFFSET);
 
         // active tool
@@ -367,14 +368,16 @@ public class StippleEffect implements ProgramContext {
 
         // zoom
         final GameImage zoom = GraphicsUtils.uiText()
-                .addText(getContext().getRenderInfo().getZoomText())
+                .addText(getContext().renderInfo.getZoomText())
                 .build().draw();
         bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.TEXT_Y_OFFSET);
 
         // selection
         final GameImage selection = GraphicsUtils.uiText()
                 .addText(getContext().getSelectionText()).build().draw();
-        bottomBar.draw(selection, Constants.SELECTION_PCT_X,
+        bottomBar.draw(selection, Constants.CANVAS_W -
+                        (Constants.TOOL_NAME_X + Constants.BUTTON_INC +
+                                selection.getWidth()),
                 Constants.TEXT_Y_OFFSET);
 
         return bottomBar.submit();
@@ -482,9 +485,9 @@ public class StippleEffect implements ProgramContext {
 
     public void addContext(final SEContext context, final boolean setActive) {
         // close unmodified untitled project
-        if (contexts.size() == 1 && !contexts.get(0).getProjectInfo()
+        if (contexts.size() == 1 && !contexts.get(0).projectInfo
                 .hasUnsavedChanges() &&
-                !contexts.get(0).getProjectInfo().hasSaveAssociation())
+                !contexts.get(0).projectInfo.hasSaveAssociation())
             contexts.remove(0);
 
         contexts.add(context);
@@ -521,6 +524,20 @@ public class StippleEffect implements ProgramContext {
         }
     }
 
+    public void incrementSelectedColorRGBA(
+            final int deltaR, final int deltaG,
+            final int deltaB, final int deltaAlpha
+    ) {
+        final Color c = colors[colorIndex];
+
+        setSelectedColor(new Color(
+                Math.max(0, Math.min(c.getRed() + deltaR, 255)),
+                Math.max(0, Math.min(c.getGreen() + deltaG, 255)),
+                Math.max(0, Math.min(c.getBlue() + deltaB, 255)),
+                Math.max(0, Math.min(c.getAlpha() + deltaAlpha, 255))
+        ));
+    }
+
     public void setSelectedColor(final Color color) {
         colors[colorIndex] = color;
     }
@@ -552,7 +569,15 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void setTool(final Tool tool) {
+        if (this.tool.equals(PickUpSelection.get()))
+            PickUpSelection.get().disengage(getContext());
+
         this.tool = tool;
+
+        if (tool.equals(PickUpSelection.get()))
+            PickUpSelection.get().engage(getContext());
+
+        getContext().redrawSelectionOverlay();
         toolButtonMenu = MenuAssembly.buildToolButtonMenu();
     }
 

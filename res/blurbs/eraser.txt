@@ -1,0 +1,10 @@
+Shortcut: {E}
+
+TODO
+
+Erase: {Click & Drag}
+
+Increment/decrement eraser width:
+{Right/Left Arrow Keys}
+Major increment/decrement eraser width:
+{Up/Down Arrow Keys}

@@ -1,0 +1,8 @@
+Shortcut: {M}
+
+Move: {Click & Drag / Arrow Keys}
+
+You can also move the selection with the arrow keys with the
+following tools selected:
+> {Pencil Select}
+> {Box Select}

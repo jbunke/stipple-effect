@@ -9,12 +9,13 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public final class Pencil extends ToolThatDraws {
     private static final Pencil INSTANCE;
 
     private boolean drawing;
-    private Color c;
+    private Supplier<Color> c;
 
     static {
         INSTANCE = new Pencil();
@@ -22,7 +23,7 @@ public final class Pencil extends ToolThatDraws {
 
     private Pencil() {
         drawing = false;
-        c = Constants.BLACK;
+        c = () -> Constants.BLACK;
     }
 
     public static Pencil get() {
@@ -42,8 +43,8 @@ public final class Pencil extends ToolThatDraws {
                 me.button != GameMouseEvent.Button.MIDDLE) {
             drawing = true;
             c = me.button == GameMouseEvent.Button.LEFT
-                    ? StippleEffect.get().getPrimary()
-                    : StippleEffect.get().getSecondary();
+                    ? () -> StippleEffect.get().getPrimary()
+                    : () -> StippleEffect.get().getSecondary();
             reset();
             context.getState().markAsCheckpoint(false, context);
         }
@@ -53,43 +54,41 @@ public final class Pencil extends ToolThatDraws {
     public void update(
             final SEContext context, final Coord2D mousePosition
     ) {
-        if (drawing) {
-            if (context.isTargetingPixelOnCanvas()) {
-                final int w = context.getState().getImageWidth(),
-                        h = context.getState().getImageHeight();
-                final Coord2D tp = context.getTargetPixel();
-                final Set<Coord2D> selection = context.getState().getSelection();
+        final Coord2D tp = context.getTargetPixel();
 
-                if (isUnchanged(context))
-                    return;
+        if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
+            final Set<Coord2D> selection = context.getState().getSelection();
 
-                final GameImage edit = new GameImage(w, h);
+            if (isUnchanged(context))
+                return;
 
-                if (selection.isEmpty() || selection.contains(tp))
-                    edit.dot(c, tp.x, tp.y);
+            final GameImage edit = new GameImage(w, h);
 
-                final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
-                        xUnit = (int)Math.signum(xDiff),
-                        yUnit = (int)Math.signum(yDiff);
-                if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
-                        (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
-                    if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                        for (int x = 1; x < Math.abs(xDiff); x++) {
-                            final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                            edit.dot(getLastTP().x + (xUnit * x), getLastTP().y + (yUnit * y));
-                        }
-                    } else {
-                        for (int y = 1; y < Math.abs(yDiff); y++) {
-                            final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                            edit.dot(getLastTP().x + (xUnit * x), getLastTP().y + (yUnit * y));
-                        }
+            if (selection.isEmpty() || selection.contains(tp))
+                edit.dot(c.get(), tp.x, tp.y);
+
+            final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
+                    xUnit = (int)Math.signum(xDiff),
+                    yUnit = (int)Math.signum(yDiff);
+            if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
+                    (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
+                if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                    for (int x = 1; x < Math.abs(xDiff); x++) {
+                        final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
+                        edit.dot(getLastTP().x + (xUnit * x), getLastTP().y + (yUnit * y));
+                    }
+                } else {
+                    for (int y = 1; y < Math.abs(yDiff); y++) {
+                        final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
+                        edit.dot(getLastTP().x + (xUnit * x), getLastTP().y + (yUnit * y));
                     }
                 }
+            }
 
-                context.editImage(edit.submit());
-                updateLast(context);
-            } else
-                drawing = false;
+            context.paintOverImage(edit.submit());
+            updateLast(context);
         }
     }
 

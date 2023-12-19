@@ -13,7 +13,7 @@ public class SECursor {
     private static final String
             BRUSH = "brush", COLOR_PICKER = "color_picker", ERASER = "eraser",
             PENCIL = "pencil", STIPPLE_PENCIL = "stipple_pencil",
-            MOVE_SELECTION = "move_selection",
+            MOVE_SELECTION = "move_selection", PICK_UP_SELECTION = "pick_up_selection",
             FILL_GLOBAL = "fill_global", FILL_ADDITIVE = "fill_additive",
             FILL_SUBTRACTIVE = "fill_subtractive", FILL_SINGLE = "fill_single",
             WAND_GLOBAL = "wand_global", WAND_ADDITIVE = "wand_additive",
@@ -31,7 +31,7 @@ public class SECursor {
     private static final Set<String> CURSOR_CODES = Set.of(
             MAIN_CURSOR, RETICLE, HAND_GRAB, HAND_OPEN,
             BRUSH, COLOR_PICKER, ERASER, PENCIL, STIPPLE_PENCIL,
-            MOVE_SELECTION,
+            MOVE_SELECTION, PICK_UP_SELECTION,
             FILL_ADDITIVE, FILL_GLOBAL, FILL_SINGLE, FILL_SUBTRACTIVE,
             WAND_ADDITIVE, WAND_GLOBAL, WAND_SINGLE, WAND_SUBTRACTIVE,
             BOX_SELECT_ADDITIVE, BOX_SELECT_GLOBAL,

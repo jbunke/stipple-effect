@@ -8,13 +8,16 @@ import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public final class Brush extends ToolWithBreadth {
     private static final Brush INSTANCE;
 
     private boolean painting;
-    private Color c;
+    private Supplier<Color> c;
+    private Set<Coord2D> painted;
 
     static {
         INSTANCE = new Brush();
@@ -22,7 +25,8 @@ public final class Brush extends ToolWithBreadth {
 
     private Brush() {
         painting = false;
-        c = Constants.BLACK;
+        c = () -> Constants.BLACK;
+        painted = new HashSet<>();
     }
 
     public static Brush get() {
@@ -38,12 +42,14 @@ public final class Brush extends ToolWithBreadth {
     public void onMouseDown(
             final SEContext context, final GameMouseEvent me
     ) {
-        if (context.isTargetingPixelOnCanvas() &&
+        if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET) &&
                 me.button != GameMouseEvent.Button.MIDDLE) {
             painting = true;
             c = me.button == GameMouseEvent.Button.LEFT
-                    ? StippleEffect.get().getPrimary()
-                    : StippleEffect.get().getSecondary();
+                    ? () -> StippleEffect.get().getPrimary()
+                    : () -> StippleEffect.get().getSecondary();
+            painted = new HashSet<>();
+
             reset();
             context.getState().markAsCheckpoint(false, context);
         }
@@ -53,48 +59,47 @@ public final class Brush extends ToolWithBreadth {
     public void update(
             final SEContext context, final Coord2D mousePosition
     ) {
-        if (painting) {
-            if (context.isTargetingPixelOnCanvas()) {
-                final int w = context.getState().getImageWidth(),
-                        h = context.getState().getImageHeight();
-                final Coord2D tp = context.getTargetPixel();
-                final Set<Coord2D> selection = context.getState().getSelection();
+        final Coord2D tp = context.getTargetPixel();
 
-                if (isUnchanged(context))
-                    return;
+        if (painting && !tp.equals(Constants.NO_VALID_TARGET)) {
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
+            final Set<Coord2D> selection = context.getState().getSelection();
 
-                final GameImage edit = new GameImage(w, h);
-                populateAround(edit, tp, selection);
+            if (isUnchanged(context))
+                return;
 
-                final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
-                        xUnit = (int)Math.signum(xDiff),
-                        yUnit = (int)Math.signum(yDiff);
-                if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
-                        (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
-                    if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                        for (int x = 1; x < Math.abs(xDiff); x++) {
-                            final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                            populateAround(edit, getLastTP().displace(
-                                    xUnit * x, yUnit* y), selection);
-                        }
-                    } else {
-                        for (int y = 1; y < Math.abs(yDiff); y++) {
-                            final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                            populateAround(edit, getLastTP().displace(
-                                    xUnit * x, yUnit* y), selection);
-                        }
+            final GameImage edit = new GameImage(w, h);
+            populateAround(edit, tp, selection);
+
+            final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
+                    xUnit = (int)Math.signum(xDiff),
+                    yUnit = (int)Math.signum(yDiff);
+            if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
+                    (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
+                if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                    for (int x = 1; x < Math.abs(xDiff); x++) {
+                        final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
+                        populateAround(edit, getLastTP().displace(
+                                xUnit * x, yUnit* y), selection);
+                    }
+                } else {
+                    for (int y = 1; y < Math.abs(yDiff); y++) {
+                        final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
+                        populateAround(edit, getLastTP().displace(
+                                xUnit * x, yUnit* y), selection);
                     }
                 }
+            }
 
-                context.editImage(edit.submit());
-                updateLast(context);
-            } else
-                reset();
+            context.paintOverImage(edit.submit());
+            updateLast(context);
         }
     }
 
     private void populateAround(
-            final GameImage edit, final Coord2D tp, final Set<Coord2D> selection
+            final GameImage edit, final Coord2D tp,
+            final Set<Coord2D> selection
     ) {
         final int halfB = breadthOffset();
         final boolean[][] mask = breadthMask();
@@ -107,8 +112,10 @@ public final class Brush extends ToolWithBreadth {
                 if (!(selection.isEmpty() || selection.contains(b)))
                     continue;
 
-                if (mask[x][y])
-                    edit.dot(c, b.x, b.y);
+                if (mask[x][y] && !painted.contains(b)) {
+                    edit.dot(c.get(), b.x, b.y);
+                    painted.add(b);
+                }
             }
     }
 
