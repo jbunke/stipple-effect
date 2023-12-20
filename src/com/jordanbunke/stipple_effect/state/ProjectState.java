@@ -28,12 +28,25 @@ public class ProjectState {
     // SELECTION
     private final Set<Coord2D> selection;
 
-    public ProjectState(final int imageWidth, final int imageHeight) {
-        this(imageWidth, imageHeight, new ArrayList<>(List.of(
-                new SELayer(imageWidth, imageHeight))), 0, 1, 0, new HashSet<>());
+    public static ProjectState makeNew(
+            final int imageWidth, final int imageHeight
+    ) {
+        return new ProjectState(
+                imageWidth, imageHeight, new ArrayList<>(List.of(
+                        new SELayer(imageWidth, imageHeight))),
+                0, 1, 0, new HashSet<>());
     }
 
-    public ProjectState(
+    public static ProjectState makeFromFile(
+            final int imageWidth, final int imageHeight,
+            final SELayer firstLayer, final int frameCount
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(List.of(firstLayer)), 0, frameCount, 0,
+                new HashSet<>());
+    }
+
+    private ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex,
             final int frameCount, final int frameIndex,
@@ -43,7 +56,7 @@ public class ProjectState {
                 frameCount, frameIndex, selection, true);
     }
 
-    public ProjectState(
+    private ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex,
             final int frameCount, final int frameIndex,
@@ -62,6 +75,56 @@ public class ProjectState {
         this.selection = selection;
 
         this.checkpoint = checkpoint;
+    }
+
+    public ProjectState changeIsCheckpoint(
+            final boolean checkpoint
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex, frameCount,
+                frameIndex, new HashSet<>(selection), checkpoint);
+    }
+
+    public ProjectState changeSelection(
+            final Set<Coord2D> selection
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                frameCount, frameIndex, selection, checkpoint);
+    }
+
+    public ProjectState changeLayers(
+            final List<SELayer> layers
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                frameCount, frameIndex, new HashSet<>(selection));
+    }
+
+    public ProjectState changeLayers(
+            final List<SELayer> layers, final int layerEditIndex
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                frameCount, frameIndex, new HashSet<>(selection));
+    }
+
+    public ProjectState changeFrames(
+            final List<SELayer> layers, final int frameIndex,
+            final int frameCount
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                frameCount, frameIndex, new HashSet<>(selection));
+    }
+
+    public ProjectState resize(
+            final int imageWidth, final int imageHeight,
+            final List<SELayer> layers
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                frameCount, frameIndex, new HashSet<>(selection));
     }
 
     public GameImage draw(final boolean includeOnionSkins, final int frameIndex) {

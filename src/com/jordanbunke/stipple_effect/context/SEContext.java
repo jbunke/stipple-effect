@@ -37,7 +37,8 @@ public class SEContext {
     public SEContext(
             final int imageWidth, final int imageHeight
     ) {
-        this(new ProjectInfo(), new ProjectState(imageWidth, imageHeight), imageWidth, imageHeight);
+        this(new ProjectInfo(), ProjectState.makeNew(imageWidth, imageHeight),
+                imageWidth, imageHeight);
     }
 
     public SEContext(
@@ -123,7 +124,7 @@ public class SEContext {
             final boolean nextFrameDue = playbackInfo.checkIfNextFrameDue(deltaTime);
 
             if (nextFrameDue)
-                getState().nextFrame();
+                playbackInfo.executeAnimation(getState());
         }
     }
 
@@ -144,12 +145,21 @@ public class SEContext {
                     !eventLogger.isPressed(Key.CTRL));
 
             if (eventLogger.isPressed(Key.CTRL) &&
-                    eventLogger.isPressed(Key.SHIFT))
+                    eventLogger.isPressed(Key.SHIFT)) {
                 ToolWithMode.setMode(ToolWithMode.Mode.SUBTRACTIVE);
-            else if (eventLogger.isPressed(Key.CTRL))
+            } else if (eventLogger.isPressed(Key.CTRL)) {
                 ToolWithMode.setMode(ToolWithMode.Mode.ADDITIVE);
-            else
+            } else {
                 ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
+            }
+        } else if (StippleEffect.get().getTool() instanceof ToolThatDraws) {
+            if (eventLogger.isPressed(Key.CTRL)) {
+                ToolThatDraws.setMode(ToolThatDraws.Mode.DITHERING);
+            } else if (eventLogger.isPressed(Key.SHIFT)) {
+                ToolThatDraws.setMode(ToolThatDraws.Mode.BLEND);
+            } else {
+                ToolThatDraws.setMode(ToolThatDraws.Mode.NORMAL);
+            }
         }
 
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
@@ -313,6 +323,10 @@ public class SEContext {
 
         // CTRL and SHIFT
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
+                    playbackInfo::toggleMode
+            );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
                     () -> stateManager.undo(true)
@@ -588,15 +602,11 @@ public class SEContext {
         final Set<Coord2D> selection = getState().getSelection();
 
         if (!selection.isEmpty()) {
-            // build resultant state
             final Set<Coord2D> moved = selection.stream().map(s ->
                     s.displace(displacement)).collect(Collectors.toSet());
 
-            final ProjectState result = new ProjectState(
-                    getState().getImageWidth(), getState().getImageHeight(),
-                    new ArrayList<>(getState().getLayers()),
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), moved, checkpoint);
+            final ProjectState result = getState().changeSelection(moved)
+                    .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
         }
@@ -607,7 +617,6 @@ public class SEContext {
         final Set<Coord2D> selection = getState().getSelection();
 
         if (!selection.isEmpty()) {
-            // build resultant state
             final Coord2D tl = SelectionBounds.topLeft(selection),
                     br = SelectionBounds.bottomRight(selection);
             final int w = br.x - tl.x, h = br.y - tl.y;
@@ -616,9 +625,7 @@ public class SEContext {
                     .map(layer -> layer.returnPadded(
                             -tl.x, -tl.y, w, h)).toList();
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), selection);
+            final ProjectState result = getState().resize(w, h, layers);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
 
@@ -637,7 +644,6 @@ public class SEContext {
         final Set<Coord2D> selection = getState().getSelection();
 
         if (!selection.isEmpty()) {
-            // build resultant state
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
 
@@ -656,7 +662,6 @@ public class SEContext {
         final Set<Coord2D> selection = getState().getSelection();
 
         if (!selection.isEmpty()) {
-            // build resultant state
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
 
@@ -672,15 +677,9 @@ public class SEContext {
 
     // deselect
     public void deselect(final boolean checkpoint) {
-        final Set<Coord2D> selection = getState().getSelection();
-
-        if (!selection.isEmpty()) {
-            // build resultant state
-            final ProjectState result = new ProjectState(
-                    getState().getImageWidth(), getState().getImageHeight(),
-                    new ArrayList<>(getState().getLayers()),
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), new HashSet<>(), checkpoint);
+        if (!getState().getSelection().isEmpty()) {
+            final ProjectState result = getState().changeSelection(
+                    new HashSet<>()).changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
         }
@@ -688,7 +687,6 @@ public class SEContext {
 
     // select all
     public void selectAll() {
-        // build resultant state
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
@@ -698,17 +696,13 @@ public class SEContext {
             for (int y = 0; y < h; y++)
                 selection.add(new Coord2D(x, y));
 
-        final ProjectState result = new ProjectState(w, h,
-                new ArrayList<>(getState().getLayers()),
-                getState().getLayerEditIndex(), getState().getFrameCount(),
-                getState().getFrameIndex(), selection);
+        final ProjectState result = getState().changeSelection(selection);
         stateManager.performAction(result, ActionType.CANVAS);
         redrawSelectionOverlay();
     }
 
     // invert selection
     public void invertSelection() {
-        // build resultant state
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
@@ -720,20 +714,13 @@ public class SEContext {
                 if (!was.contains(new Coord2D(x, y)))
                     willBe.add(new Coord2D(x, y));
 
-        final ProjectState result = new ProjectState(w, h,
-                new ArrayList<>(getState().getLayers()),
-                getState().getLayerEditIndex(), getState().getFrameCount(),
-                getState().getFrameIndex(), willBe);
+        final ProjectState result = getState().changeSelection(willBe);
         stateManager.performAction(result, ActionType.CANVAS);
         redrawSelectionOverlay();
     }
 
     // edit selection
     public void editSelection(final Set<Coord2D> edit, final boolean checkpoint) {
-        // build resultant state
-        final int w = getState().getImageWidth(),
-                h = getState().getImageHeight();
-
         final Set<Coord2D> selection = new HashSet<>();
         final ToolWithMode.Mode mode = ToolWithMode.getMode();
 
@@ -745,54 +732,43 @@ public class SEContext {
         else
             selection.addAll(edit);
 
-        final ProjectState result = new ProjectState(w, h,
-                new ArrayList<>(getState().getLayers()),
-                getState().getLayerEditIndex(), getState().getFrameCount(),
-                getState().getFrameIndex(), selection, checkpoint);
+        final ProjectState result = getState().changeSelection(
+                selection).changeIsCheckpoint(checkpoint);
         stateManager.performAction(result, ActionType.CANVAS);
         redrawSelectionOverlay();
     }
 
     public void pad() {
-        // build resultant state
         final int left = DialogVals.getPadLeft(),
                 right = DialogVals.getPadRight(),
                 top = DialogVals.getPadTop(),
                 bottom = DialogVals.getPadBottom(),
                 w = left + getState().getImageWidth() + right,
-                h = top + getState().getImageHeight() + bottom,
-                frameCount = getState().getFrameCount();
+                h = top + getState().getImageHeight() + bottom;
 
         final List<SELayer> layers = getState().getLayers().stream()
                 .map(layer -> layer.returnPadded(left, top, w, h)).toList();
 
-        final ProjectState result = new ProjectState(w, h,
-                layers, getState().getLayerEditIndex(), frameCount,
-                getState().getFrameIndex(), new HashSet<>());
+        final ProjectState result = getState().resize(w, h, layers)
+                .changeSelection(new HashSet<>()).changeIsCheckpoint(true);
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
     public void resize() {
-        // build resultant state
         final int w = DialogVals.getResizeWidth(),
-                h = DialogVals.getResizeHeight(),
-                frameCount = getState().getFrameCount();
+                h = DialogVals.getResizeHeight();
 
         final List<SELayer> layers = getState().getLayers().stream()
                 .map(layer -> layer.returnResized(w, h)).toList();
 
-        final ProjectState result = new ProjectState(w, h,
-                layers, getState().getLayerEditIndex(), frameCount,
-                getState().getFrameIndex(), new HashSet<>());
+        final ProjectState result = getState().resize(w, h, layers)
+                .changeSelection(new HashSet<>());
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
     // IMAGE EDITING
     public void stampImage(final GameImage edit) {
-        // build resultant state
-        final int w = getState().getImageWidth(),
-                h = getState().getImageHeight(),
-                frameIndex = getState().getFrameIndex();
+        final int frameIndex = getState().getFrameIndex();
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
         final SELayer replacement = getState().getEditingLayer()
                 .returnStamped(edit, frameIndex);
@@ -800,17 +776,13 @@ public class SEContext {
         layers.remove(layerEditIndex);
         layers.add(layerEditIndex, replacement);
 
-        final ProjectState result = new ProjectState(w, h, layers,
-                layerEditIndex, getState().getFrameCount(),
-                frameIndex, getState().getSelection(), true);
+        final ProjectState result = getState().changeLayers(layers);
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
     public void paintOverImage(final GameImage edit) {
-        // build resultant state
-        final int w = getState().getImageWidth(),
-                h = getState().getImageHeight(),
-                frameIndex = getState().getFrameIndex();
+        final int frameIndex = getState().getFrameIndex();
+
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
         final SELayer replacement = getState().getEditingLayer()
                 .returnPaintedOver(edit, frameIndex);
@@ -818,18 +790,14 @@ public class SEContext {
         layers.remove(layerEditIndex);
         layers.add(layerEditIndex, replacement);
 
-        final ProjectState result = new ProjectState(w, h, layers,
-                layerEditIndex, getState().getFrameCount(),
-                frameIndex, getState().getSelection(), false);
+        final ProjectState result = getState().changeLayers(layers)
+                .changeIsCheckpoint(false);
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
     // ERASING
     public void erase(final boolean[][] eraseMask, final boolean checkpoint) {
-        // build resultant state
-        final int w = getState().getImageWidth(),
-                h = getState().getImageHeight(),
-                frameIndex = getState().getFrameIndex();
+        final int frameIndex = getState().getFrameIndex();
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
         final SELayer replacement = getState().getEditingLayer()
                 .returnErased(eraseMask, frameIndex);
@@ -837,9 +805,8 @@ public class SEContext {
         layers.remove(layerEditIndex);
         layers.add(layerEditIndex, replacement);
 
-        final ProjectState result = new ProjectState(w, h, layers,
-                layerEditIndex, getState().getFrameCount(),
-                getState().getFrameIndex(), getState().getSelection(), checkpoint);
+        final ProjectState result = getState().changeLayers(layers)
+                .changeIsCheckpoint(checkpoint);
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -848,7 +815,6 @@ public class SEContext {
     public void addFrame() {
         // pre-check
         if (getState().canAddFrame()) {
-            // build resultant state
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
@@ -856,10 +822,8 @@ public class SEContext {
             final int addIndex = getState().getFrameIndex() + 1;
             layers.replaceAll(l -> l.returnAddedFrame(addIndex, w, h));
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(),
-                    getState().getFrameCount() + 1,
-                    addIndex, getState().getSelection());
+            final ProjectState result = getState().changeFrames(layers,
+                    addIndex, getState().getFrameCount() + 1);
             stateManager.performAction(result, ActionType.FRAME);
         }
     }
@@ -868,18 +832,14 @@ public class SEContext {
     public void duplicateFrame() {
         // pre-check
         if (getState().canAddFrame()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight(),
-                    frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnDuplicatedFrame(frameIndex));
 
-            final ProjectState result = new ProjectState(w, h,
-                    layers, getState().getLayerEditIndex(),
-                    getState().getFrameCount() + 1,
-                    frameIndex + 1, getState().getSelection());
+            final ProjectState result = getState().changeFrames(
+                    layers, frameIndex + 1,
+                    getState().getFrameCount() + 1);
             stateManager.performAction(result, ActionType.FRAME);
         }
     }
@@ -888,18 +848,13 @@ public class SEContext {
     public void removeFrame() {
         // pre-check
         if (getState().canRemoveFrame()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight(),
-                    frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnRemovedFrame(frameIndex));
 
-            final ProjectState result = new ProjectState(w, h,
-                    layers, getState().getLayerEditIndex(),
-                    getState().getFrameCount() - 1,
-                    frameIndex, getState().getSelection());
+            final ProjectState result = getState().changeFrames(layers,
+                    frameIndex - 1, getState().getFrameCount() - 1);
             stateManager.performAction(result, ActionType.FRAME);
         }
     }
@@ -907,15 +862,9 @@ public class SEContext {
     // LAYER MANIPULATION
     // enable all layers
     public void enableAllLayers() {
-        // build resultant state
-        final int w = getState().getImageWidth(),
-                h = getState().getImageHeight();
-
-        final ProjectState result = new ProjectState(w, h,
+        final ProjectState result = getState().changeLayers(
                 getState().getLayers().stream().map(SELayer::returnEnabled)
-                        .collect(Collectors.toList()),
-                getState().getLayerEditIndex(), getState().getFrameCount(),
-                getState().getFrameIndex(), getState().getSelection());
+                        .collect(Collectors.toList()));
         stateManager.performAction(result, ActionType.CANVAS);
     }
 
@@ -926,10 +875,6 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
-
             for (int i = 0; i < layers.size(); i++) {
                 final SELayer layer = i == layerIndex
                         ? layers.get(i).returnEnabled()
@@ -938,9 +883,7 @@ public class SEContext {
                 newLayers.add(layer);
             }
 
-            final ProjectState result = new ProjectState(w, h, newLayers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(newLayers);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -952,16 +895,11 @@ public class SEContext {
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 layers.get(layerIndex).areFramesLinked()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final SELayer layer = layers.get(layerIndex).returnUnlinkedFrames();
             layers.remove(layerIndex);
             layers.add(layerIndex, layer);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -973,17 +911,12 @@ public class SEContext {
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 !layers.get(layerIndex).areFramesLinked()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
                     getState().getFrameIndex());
             layers.remove(layerIndex);
             layers.add(layerIndex, layer);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -993,17 +926,13 @@ public class SEContext {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
-        if (layerIndex >= 0 && layerIndex < layers.size() && layers.get(layerIndex).isEnabled()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
+        if (layerIndex >= 0 && layerIndex < layers.size() &&
+                layers.get(layerIndex).isEnabled()) {
             final SELayer layer = layers.get(layerIndex).returnDisabled();
             layers.remove(layerIndex);
             layers.add(layerIndex, layer);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -1013,17 +942,13 @@ public class SEContext {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
-        if (layerIndex >= 0 && layerIndex < layers.size() && !layers.get(layerIndex).isEnabled()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
+        if (layerIndex >= 0 && layerIndex < layers.size() &&
+                !layers.get(layerIndex).isEnabled()) {
             final SELayer layer = layers.get(layerIndex).returnEnabled();
             layers.remove(layerIndex);
             layers.add(layerIndex, layer);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -1034,16 +959,11 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final SELayer layer = layers.get(layerIndex).returnRenamed(name);
             layers.remove(layerIndex);
             layers.add(layerIndex, layer);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -1057,17 +977,12 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final SELayer layer = layers.get(layerIndex).returnChangedOpacity(opacity);
             layers.remove(layerIndex);
             layers.add(layerIndex, layer);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    getState().getLayerEditIndex(), getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection(),
-                    markAsCheckpoint);
+            final ProjectState result = getState().changeLayers(layers)
+                    .changeIsCheckpoint(markAsCheckpoint);
             stateManager.performAction(result, ActionType.CANVAS);
         }
     }
@@ -1076,16 +991,14 @@ public class SEContext {
     public void addLayer() {
         // pre-check
         if (getState().canAddLayer()) {
-            // build resultant state
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
             layers.add(addIndex, SELayer.newLayer(w, h, getState().getFrameCount()));
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    addIndex, getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(
+                    layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -1094,16 +1007,12 @@ public class SEContext {
     public void duplicateLayer() {
         // pre-check
         if (getState().canAddLayer()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
             layers.add(addIndex, getState().getEditingLayer().duplicate());
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    addIndex, getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState()
+                    .changeLayers(layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -1112,16 +1021,12 @@ public class SEContext {
     public void removeLayer() {
         // pre-check
         if (getState().canRemoveLayer()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int index = getState().getLayerEditIndex();
             layers.remove(index);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    index > 0 ? index - 1 : index, getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(
+                    layers, index > 0 ? index - 1 : index);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -1130,9 +1035,6 @@ public class SEContext {
     public void moveLayerDown() {
         // pre-check
         if (getState().canMoveLayerDown()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int removalIndex = getState().getLayerEditIndex(),
                     reinsertionIndex = removalIndex - 1;
@@ -1141,9 +1043,8 @@ public class SEContext {
             layers.remove(removalIndex);
             layers.add(reinsertionIndex, toMove);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    reinsertionIndex, getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(
+                    layers, reinsertionIndex);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -1152,9 +1053,6 @@ public class SEContext {
     public void moveLayerUp() {
         // pre-check
         if (getState().canMoveLayerUp()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int removalIndex = getState().getLayerEditIndex(),
                     reinsertionIndex = removalIndex + 1;
@@ -1163,9 +1061,8 @@ public class SEContext {
             layers.remove(removalIndex);
             layers.add(reinsertionIndex, toMove);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    reinsertionIndex, getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(
+                    layers, reinsertionIndex);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }
@@ -1174,9 +1071,6 @@ public class SEContext {
     public void mergeWithLayerBelow() {
         // pre-check - identical pass case as can move layer down
         if (getState().canMoveLayerDown()) {
-            // build resultant state
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int aboveIndex = getState().getLayerEditIndex(),
                     belowIndex = aboveIndex - 1;
@@ -1189,9 +1083,8 @@ public class SEContext {
             layers.remove(below);
             layers.add(belowIndex, merged);
 
-            final ProjectState result = new ProjectState(w, h, layers,
-                    belowIndex, getState().getFrameCount(),
-                    getState().getFrameIndex(), getState().getSelection());
+            final ProjectState result = getState().changeLayers(
+                    layers, belowIndex);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }

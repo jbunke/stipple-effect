@@ -3,19 +3,18 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 
 public final class Pencil extends ToolThatDraws {
     private static final Pencil INSTANCE;
 
     private boolean drawing;
-    private Supplier<Color> c;
+    private BiFunction<Integer, Integer, Color> c;
 
     static {
         INSTANCE = new Pencil();
@@ -23,7 +22,7 @@ public final class Pencil extends ToolThatDraws {
 
     private Pencil() {
         drawing = false;
-        c = () -> Constants.BLACK;
+        c = (x, y) -> Constants.BLACK;
     }
 
     public static Pencil get() {
@@ -42,9 +41,7 @@ public final class Pencil extends ToolThatDraws {
         if (context.isTargetingPixelOnCanvas() &&
                 me.button != GameMouseEvent.Button.MIDDLE) {
             drawing = true;
-            c = me.button == GameMouseEvent.Button.LEFT
-                    ? () -> StippleEffect.get().getPrimary()
-                    : () -> StippleEffect.get().getSecondary();
+            c = ToolThatDraws.getColorMode(me);
             reset();
             context.getState().markAsCheckpoint(false, context);
         }
@@ -67,7 +64,7 @@ public final class Pencil extends ToolThatDraws {
             final GameImage edit = new GameImage(w, h);
 
             if (selection.isEmpty() || selection.contains(tp))
-                edit.dot(c.get(), tp.x, tp.y);
+                edit.dot(c.apply(tp.x, tp.y), tp.x, tp.y);
 
             final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
                     xUnit = (int)Math.signum(xDiff),

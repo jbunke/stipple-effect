@@ -3,20 +3,19 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 
 public final class Brush extends ToolWithBreadth {
     private static final Brush INSTANCE;
 
     private boolean painting;
-    private Supplier<Color> c;
+    private BiFunction<Integer, Integer, Color> c;
     private Set<Coord2D> painted;
 
     static {
@@ -25,7 +24,7 @@ public final class Brush extends ToolWithBreadth {
 
     private Brush() {
         painting = false;
-        c = () -> Constants.BLACK;
+        c = (x, y) -> Constants.BLACK;
         painted = new HashSet<>();
     }
 
@@ -45,9 +44,7 @@ public final class Brush extends ToolWithBreadth {
         if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET) &&
                 me.button != GameMouseEvent.Button.MIDDLE) {
             painting = true;
-            c = me.button == GameMouseEvent.Button.LEFT
-                    ? () -> StippleEffect.get().getPrimary()
-                    : () -> StippleEffect.get().getSecondary();
+            c = ToolThatDraws.getColorMode(me);
             painted = new HashSet<>();
 
             reset();
@@ -113,7 +110,7 @@ public final class Brush extends ToolWithBreadth {
                     continue;
 
                 if (mask[x][y] && !painted.contains(b)) {
-                    edit.dot(c.get(), b.x, b.y);
+                    edit.dot(c.apply(b.x, b.y), b.x, b.y);
                     painted.add(b);
                 }
             }

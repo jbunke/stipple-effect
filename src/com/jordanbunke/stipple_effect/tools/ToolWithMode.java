@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.tools;
 
 public abstract class ToolWithMode extends Tool {
-    private static Mode mode;
+    private static Mode mode = Mode.SINGLE;
 
     private static boolean global = false;
 
