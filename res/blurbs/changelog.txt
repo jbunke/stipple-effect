@@ -1,0 +1,29 @@
+{Upcoming}
+
+To add:
+> Status updates inside workspace window with timeout from
+    manually defined Delta Time debugger channel in
+    StippleEffect.java
+> Granular plus regular undo & redo buttons in "Project"
+> Working pick up selection tool
+> Adjustable windows
+> HSV sliders
+> Palettes
+> Settings, including:
+    - Toggle for rendering at true pixel size
+    - Delta Time canvas size
+    - Windowed or maximized on startup
+
+To change:
+> TODO
+
+To fix:
+> TODO
+
+To remove:
+> TODO
+
+{0.0.1} - 2023-12-21
+
+Added:
+> First available version of Stipple Effect

@@ -9,6 +9,8 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.context.PlaybackInfo;
+import com.jordanbunke.stipple_effect.context.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
@@ -25,35 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MenuAssembly {
-    public static final String
-            // PROJECT
-            ICON_CODE_NEW_PROJECT = "new_project",
-            ICON_CODE_OPEN_FILE = "open_file",
-            ICON_CODE_SAVE = "save",
-            ICON_CODE_SAVE_AS = "save_as",
-            ICON_CODE_RESIZE = "resize",
-            ICON_CODE_PAD = "pad",
-            // FRAMES
-            ICON_CODE_NEW_FRAME = "new_frame",
-            ICON_CODE_DUPLICATE_FRAME = "duplicate_frame",
-            ICON_CODE_REMOVE_FRAME = "remove_frame",
-            ICON_CODE_MOVE_FRAME_FORWARD = "frame_forward",
-            ICON_CODE_MOVE_FRAME_BACK = "frame_back",
-            ICON_CODE_TO_FIRST_FRAME = "to_first_frame",
-            ICON_CODE_PREVIOUS = "previous",
-            ICON_CODE_NEXT = "next",
-            ICON_CODE_TO_LAST_FRAME = "to_last_frame",
-            ICON_CODE_PLAY = "play",
-            ICON_CODE_STOP = "stop",
-            ICON_CODE_LOOP = "loop",
-            ICON_CODE_FORWARDS = "forwards",
-            ICON_CODE_BACKWARDS = "backwards",
-            ICON_CODE_PONG = "pong",
-            // LAYERS
-            // TOOLS
-            // COLORS
-            // KEEP LAST
-            ICON_CODE_INFO = "info";
 
     public static Menu stub() {
         return new Menu();
@@ -61,25 +34,36 @@ public class MenuAssembly {
 
     public static Menu buildProjectsMenu() {
         final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
 
         final String[] iconIDs = new String[] {
                 // TODO - program settings
-                ICON_CODE_NEW_PROJECT, ICON_CODE_OPEN_FILE,
-                ICON_CODE_SAVE, ICON_CODE_SAVE_AS,
-                ICON_CODE_RESIZE, ICON_CODE_PAD
+                IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
+                IconCodes.SAVE, IconCodes.SAVE_AS,
+                IconCodes.RESIZE, IconCodes.PAD,
+                IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
+                IconCodes.GRANULAR_REDO, IconCodes.REDO
         };
 
         final boolean[] preconditions = new boolean[] {
-                true, true, true, true, true, true
+                true, true, true, true, true, true,
+                c.getStateManager().canUndo(),
+                c.getStateManager().canUndo(),
+                c.getStateManager().canRedo(),
+                c.getStateManager().canRedo()
         };
 
         final Runnable[] behaviours = new Runnable[] {
                 DialogAssembly::setDialogToNewProject,
                 () -> StippleEffect.get().openProject(),
-                () -> StippleEffect.get().getContext().projectInfo.save(),
+                c.projectInfo::save,
                 DialogAssembly::setDialogToSave,
                 DialogAssembly::setDialogToResize,
-                DialogAssembly::setDialogToPad
+                DialogAssembly::setDialogToPad,
+                () -> c.getStateManager().undoToCheckpoint(),
+                () -> c.getStateManager().undo(true),
+                () -> c.getStateManager().redo(true),
+                () -> c.getStateManager().redoToCheckpoint()
         };
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
@@ -158,24 +142,27 @@ public class MenuAssembly {
 
     public static Menu buildFramesMenu() {
         final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
 
         final String[] iconIDs = new String[] {
-                ICON_CODE_NEW_FRAME,
-                ICON_CODE_DUPLICATE_FRAME,
-                ICON_CODE_REMOVE_FRAME,
-                // TODO - move frame forward and back
-                ICON_CODE_TO_FIRST_FRAME,
-                ICON_CODE_PREVIOUS,
+                IconCodes.NEW_FRAME,
+                IconCodes.DUPLICATE_FRAME,
+                IconCodes.REMOVE_FRAME,
+                IconCodes.MOVE_FRAME_BACK,
+                IconCodes.MOVE_FRAME_FORWARD,
+                IconCodes.TO_FIRST_FRAME,
+                IconCodes.PREVIOUS,
                 Constants.ICON_ID_GAP_CODE, // gap for play/stop button
-                ICON_CODE_NEXT,
-                ICON_CODE_TO_LAST_FRAME
+                IconCodes.NEXT,
+                IconCodes.TO_LAST_FRAME
         };
 
         final boolean[] preconditions = new boolean[] {
-                StippleEffect.get().getContext().getState().canAddFrame(),
-                StippleEffect.get().getContext().getState().canAddFrame(),
-                StippleEffect.get().getContext().getState().canRemoveFrame(),
-                // TODO
+                c.getState().canAddFrame(),
+                c.getState().canAddFrame(),
+                c.getState().canRemoveFrame(),
+                c.getState().canMoveFrameBack(),
+                c.getState().canMoveFrameForward(),
                 true,
                 true,
                 false, // placeholder
@@ -187,6 +174,8 @@ public class MenuAssembly {
                 () -> StippleEffect.get().getContext().addFrame(),
                 () -> StippleEffect.get().getContext().duplicateFrame(),
                 () -> StippleEffect.get().getContext().removeFrame(),
+                () -> StippleEffect.get().getContext().moveFrameBack(),
+                () -> StippleEffect.get().getContext().moveFrameForward(),
                 () -> StippleEffect.get().getContext().getState().setFrameIndex(0),
                 () -> StippleEffect.get().getContext().getState().previousFrame(),
                 () -> {}, // placeholder
@@ -205,12 +194,17 @@ public class MenuAssembly {
         // play/stop as toggle
 
         final Coord2D playStopTogglePos = Constants.getFramesPosition().displace(
-                Constants.SEGMENT_TITLE_BUTTON_OFFSET_X + (5 * Constants.BUTTON_INC),
+                Constants.SEGMENT_TITLE_BUTTON_OFFSET_X + (7 * Constants.BUTTON_INC),
                 Constants.ICON_BUTTON_OFFSET_Y);
 
         mb.add(generatePlayStopToggle(playStopTogglePos));
 
-        // TODO - playback mode toggle button
+        // playback mode toggle button
+
+        final Coord2D playbackModeTogglePos = Constants.getFramesPosition().displace(
+                Constants.SEGMENT_TITLE_BUTTON_OFFSET_X + (10 * Constants.BUTTON_INC),
+                Constants.ICON_BUTTON_OFFSET_Y);
+        mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
 
         // playback speed slider and dynamic label for playback speed
 
@@ -220,10 +214,10 @@ public class MenuAssembly {
 
         final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
                 Constants.FRAME_PLAYBACK_SLIDER_W, MenuElement.Anchor.LEFT_TOP,
-                Constants.MIN_MILLIS_PER_FRAME, Constants.MAX_MILLIS_PER_FRAME,
-                StippleEffect.get().getContext().playbackInfo.getMillisPerFrame(),
+                Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                StippleEffect.get().getContext().playbackInfo.getFps(),
                 mpf -> StippleEffect.get().getContext()
-                        .playbackInfo.setMillisPerFrame(mpf));
+                        .playbackInfo.setFps(mpf));
         slider.updateAssets();
         mb.add(slider);
 
@@ -232,15 +226,7 @@ public class MenuAssembly {
 
         mb.add(new DynamicLabel(labelPos,
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
-                () -> {
-                    final int MILLIS_PER_SECOND = 1000;
-
-                    final double fps = (MILLIS_PER_SECOND /
-                            (double) StippleEffect.get().getContext()
-                                    .playbackInfo.getMillisPerFrame());
-
-                    return (fps < 10d ? ((int)(fps * 10)) / 10d : String.valueOf((int) fps)) + " fps";
-                },
+                () -> StippleEffect.get().getContext().playbackInfo.getFps() + " fps",
                 Constants.DYNAMIC_LABEL_W_ALLOWANCE));
 
         // frame content
@@ -280,13 +266,35 @@ public class MenuAssembly {
         return mb.build();
     }
 
-    // TODO - generate frame playback mode toggle here
+    private static SimpleToggleMenuButton generatePlaybackModeToggle(final Coord2D pos) {
+        final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
+                PlaybackInfo.Mode.FORWARDS,
+                PlaybackInfo.Mode.BACKWARDS,
+                PlaybackInfo.Mode.LOOP,
+                PlaybackInfo.Mode.PONG_FORWARDS
+        };
+
+        final GameImage[] baseIcons = Arrays.stream(validModes).map(
+                mode -> GraphicsUtils.loadIcon(mode.getIconCode())
+        ).toArray(GameImage[]::new);
+
+        return new SimpleToggleMenuButton(pos,
+                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_TOP, true,
+                baseIcons,
+                Arrays.stream(baseIcons).map(GraphicsUtils::highlightIconButton)
+                        .toArray(GameImage[]::new),
+                new Runnable[validModes.length],
+                () -> StippleEffect.get().getContext().playbackInfo
+                        .getMode().buttonIndex(),
+                () -> StippleEffect.get().getContext().playbackInfo.toggleMode());
+    }
 
     private static SimpleToggleMenuButton generatePlayStopToggle(final Coord2D pos) {
         // 0: is playing, button click should STOP; 1: vice-versa
 
-        final GameImage playing = GraphicsUtils.loadIcon(ICON_CODE_STOP),
-                notPlaying = GraphicsUtils.loadIcon(ICON_CODE_PLAY);
+        final GameImage playing = GraphicsUtils.loadIcon(IconCodes.STOP),
+                notPlaying = GraphicsUtils.loadIcon(IconCodes.PLAY);
 
         return new SimpleToggleMenuButton(pos,
                 new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
@@ -607,7 +615,7 @@ public class MenuAssembly {
         mb.add(zoomSlider);
 
         // help button
-        final GameImage helpIcon = GraphicsUtils.loadIcon(MenuAssembly.ICON_CODE_INFO),
+        final GameImage helpIcon = GraphicsUtils.loadIcon(IconCodes.INFO),
                 helpHighlighted = new GameImage(helpIcon);
         helpHighlighted.draw(GraphicsUtils.HIGHLIGHT_OVERLAY);
 

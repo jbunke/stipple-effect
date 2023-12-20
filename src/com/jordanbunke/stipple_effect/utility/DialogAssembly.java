@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.menus.Menu;
@@ -165,20 +166,13 @@ public class DialogAssembly {
                 getDialogContentOffsetFromLabel(fpsLabel),
                 (int)(Constants.DIALOG_CONTENT_W_ALLOWANCE * 0.9),
                 MenuElement.Anchor.LEFT_TOP,
-                Constants.MIN_MILLIS_PER_FRAME, Constants.MAX_MILLIS_PER_FRAME,
-                c.projectInfo.getMillisPerFrame(),
-                c.projectInfo::setMillisPerFrame);
+                Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                c.projectInfo.getFps(),
+                c.projectInfo::setFps);
         playbackSpeedSlider.updateAssets();
 
         final DynamicLabel fpsValue = makeDynamicFromLeftLabel(
-                fpsLabel, () -> {
-                    final int MILLIS_PER_SECOND = 1000;
-
-                    final double fps = (MILLIS_PER_SECOND /
-                            (double) c.projectInfo.getMillisPerFrame());
-
-                    return (fps < 10d ? ((int)(fps * 10)) / 10d : String.valueOf((int) fps)) + " fps";
-                });
+                fpsLabel, () -> c.projectInfo.getFps() + " fps");
 
         final MenuElementGrouping gifContents = new MenuElementGrouping(
                 fpsLabel, playbackSpeedSlider, fpsValue
@@ -388,7 +382,7 @@ public class DialogAssembly {
 
         final MenuElementGrouping contents = new MenuElementGrouping(context,
                 xDivsLabel, yDivsLabel, xDivsTextBox, yDivsTextBox, optional);
-        setDialog(assembleDialog("Open from file " +
+        setDialog(assembleDialog("Import file " +
                         filepath.getFileName().toString(), contents,
                 precondition, "Import",
                 () -> StippleEffect.get().newProjectFromFile(image, filepath)));
@@ -572,7 +566,19 @@ public class DialogAssembly {
         contentAssembler.add(headingLabel);
 
         final int deltaBottomY = switch (infoScreen) {
-            case TOOLS -> assembleToolsScreenContents(contentAssembler, contentStart, initialbottomY);
+            case ABOUT -> assembleInfoScreenContents(
+                    new String[] { Constants.ABOUT }, new String[] { "" },
+                    contentAssembler, contentStart, initialbottomY
+            );
+            case PROJECT -> assembleProjectInfoScreenContents(
+                    contentAssembler, contentStart, initialbottomY);
+            case TOOLS -> assembleToolsInfoScreenContents(
+                    contentAssembler, contentStart, initialbottomY);
+            case CHANGELOG -> assembleInfoScreenContents(
+                    new String[] { Constants.CHANGELOG },
+                    new String[] { "" },
+                    contentAssembler, contentStart, initialbottomY
+            );
             default -> 0; // TODO
         };
 
@@ -591,25 +597,33 @@ public class DialogAssembly {
                 contentStart.y, 0);
     }
 
-    private static int assembleToolsScreenContents(
+    private static int assembleInfoScreenContents(
+            final String[] iconAndBlurbCodes, final String[] headings,
             final Set<MenuElement> contentAssembler, final Coord2D contentStart,
             final int initialBottomY
     ) {
+        if (iconAndBlurbCodes.length != headings.length) {
+            GameError.send("Length of file codes and headings arrays did not match...");
+            return 0;
+        }
+
         final int indent = (2 * Constants.BUTTON_INC),
                 incY = Constants.DIALOG_CONTENT_INC_Y;
 
         int bottomY = initialBottomY;
 
-        for (Tool tool : Constants.ALL_TOOLS) {
-            final String[] blurb = tool.getBlurb();
+        for (int i = 0; i < iconAndBlurbCodes.length; i++) {
+            final String code = iconAndBlurbCodes[i];
+
+            final String[] blurb = ParserUtils.getBlurb(code);
 
             final StaticMenuElement icon = new StaticMenuElement(
                     contentStart.displace(0, bottomY),
-                    MenuElement.Anchor.LEFT_TOP, tool.getIcon());
+                    MenuElement.Anchor.LEFT_TOP, GraphicsUtils.loadIcon(code));
             final TextLabel name = TextLabel.make(contentStart.displace(
                             Constants.BUTTON_INC + Constants.TOOL_NAME_X,
-                            bottomY + Constants.BUTTON_TEXT_OFFSET_Y),
-                    tool.getName(), Constants.HIGHLIGHT_1);
+                            bottomY + Constants.TEXT_Y_OFFSET - Constants.BUTTON_BORDER_PX),
+                    headings[i], Constants.HIGHLIGHT_1);
             bottomY += incY;
 
             contentAssembler.add(icon);
@@ -620,15 +634,15 @@ public class DialogAssembly {
 
                 int offsetX = 0;
 
-                for (int i = 0; i < lineSegments.length; i++) {
+                for (int j = 0; j < lineSegments.length; j++) {
                     final TextLabel segmentText = TextLabel.make(
                             contentStart.displace(indent + offsetX,
                                     bottomY + Constants.TEXT_Y_OFFSET),
-                            lineSegments[i], i == ParserUtils.HIGHLIGHTED_INDEX
+                            lineSegments[j], j % 2 == 1
                                     ? Constants.HIGHLIGHT_1 : Constants.WHITE);
 
                     contentAssembler.add(segmentText);
-                    offsetX += segmentText.getWidth();
+                    offsetX += segmentText.getWidth() + Constants.BUTTON_BORDER_PX;
                 }
 
                 bottomY += incY;
@@ -638,6 +652,45 @@ public class DialogAssembly {
         }
 
         return bottomY - initialBottomY;
+    }
+
+    private static int assembleProjectInfoScreenContents(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        return assembleInfoScreenContents(
+                new String[] {
+                        IconCodes.INFO,
+                        IconCodes.NEW_PROJECT,
+                        IconCodes.OPEN_FILE,
+                        IconCodes.SAVE,
+                        IconCodes.SAVE_AS,
+                        IconCodes.RESIZE,
+                        IconCodes.PAD,
+                        IconCodes.UNDO,
+                        IconCodes.GRANULAR_UNDO,
+                        IconCodes.GRANULAR_REDO,
+                        IconCodes.REDO
+                },
+                new String[] {
+                        "Info",
+                        "New Project", "Import", "Save", "Save As...",
+                        "Resize", "Pad",
+                        "Undo", "Granular Undo", "Granular Redo", "Redo"
+                }, contentAssembler, contentStart, initialBottomY
+        );
+    }
+
+    private static int assembleToolsInfoScreenContents(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        return assembleInfoScreenContents(
+                Arrays.stream(Constants.ALL_TOOLS)
+                        .map(Tool::convertNameToFilename).toArray(String[]::new),
+                Arrays.stream(Constants.ALL_TOOLS)
+                        .map(Tool::getName).toArray(String[]::new),
+                contentAssembler, contentStart, initialBottomY);
     }
 
     private static Menu assembleInfoDialog() {
@@ -664,12 +717,6 @@ public class DialogAssembly {
                         Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
                         Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX),
                 Constants.PROGRAM_NAME + "  |  Help & Information", Constants.WHITE));
-        // dev
-        mb.add(TextLabel.make(background.getRenderPosition().displace(
-                        Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
-                        background.getHeight() - (Constants.TOOL_NAME_X +
-                                Constants.STD_TEXT_BUTTON_H)),
-                "Jordan Bunke / Flinker Flitzer, 2023", Constants.GREY));
 
         // close button
         final GameImage baseImage = GraphicsUtils.drawTextButton(

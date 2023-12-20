@@ -1,6 +1,6 @@
 Shortcut: {M}
 
-Move: {Click & Drag / Arrow Keys}
+Move: {Click & Drag} or {Arrow Keys}
 
 You can also move the selection with the arrow keys with the
 following tools selected:

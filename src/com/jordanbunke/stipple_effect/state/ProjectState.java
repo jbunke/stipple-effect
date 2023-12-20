@@ -163,6 +163,14 @@ public class ProjectState {
         }
     }
 
+    public void editLayerBelow() {
+        setLayerEditIndex(layerEditIndex - 1);
+    }
+
+    public void editLayerAbove() {
+        setLayerEditIndex(layerEditIndex + 1);
+    }
+
     public void markAsCheckpoint(
             final boolean processLastConsequence, final SEContext context
     ) {
@@ -200,6 +208,13 @@ public class ProjectState {
         return frameCount > 1;
     }
 
+    public boolean canMoveFrameBack() {
+        return frameIndex > 0;
+    }
+
+    public boolean canMoveFrameForward() {
+        return frameIndex + 1 < frameCount;
+    }
 
     // getters
     public boolean isCheckpoint() {

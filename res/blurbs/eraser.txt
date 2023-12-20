@@ -6,6 +6,4 @@ Sets the color of an erased pixel to {RGBA [0, 0, 0, 0]}
 Erase: {Click & Drag}
 
 Increment/decrement eraser width:
-{Right/Left Arrow Keys}
-Major increment/decrement eraser width:
-{Up/Down Arrow Keys}
+{Arrow Keys} or {Shift + Scroll Wheel}

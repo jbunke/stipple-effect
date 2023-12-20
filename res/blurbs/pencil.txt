@@ -4,3 +4,15 @@ A pixel-perfect pencil that draws one pixel at a time
 
 Primary color: {Left Click & Drag}
 Secondary color: {Right Click & Drag}
+
+Dither mode: {Ctrl + Click & Drag}
+Alternates on drawn pixels between the primary and
+secondary colors in a checkerboard pattern
+
+Blend mode: {Shift + Click & Drag}
+Draws with a color that is the RGBA average of the
+primary and secondary colors
+
+Random bounded mode: {Ctrl + Shift + Click & Drag}
+Draws each pixel with a random color that lies between
+the RGBA bounds of the primary and secondary colors.

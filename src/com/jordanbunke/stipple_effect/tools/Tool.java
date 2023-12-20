@@ -2,14 +2,10 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.io.FileIO;
-import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.context.SEContext;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.parse.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
-
-import java.nio.file.Path;
 
 public abstract class Tool {
     private final GameImage icon, highlightedIcon, selectedIcon;
@@ -38,7 +34,7 @@ public abstract class Tool {
     public abstract void update(final SEContext context, final Coord2D mousePosition);
     public abstract void onMouseUp(final SEContext context, final GameMouseEvent me);
 
-    private String convertNameToFilename() {
+    public String convertNameToFilename() {
         return getName().replace(" ", "_").toLowerCase();
     }
 
@@ -47,12 +43,7 @@ public abstract class Tool {
     }
 
     public final String[] getBlurb() {
-        final Path blurbFile = Constants.BLURB_FOLDER.resolve(
-                convertNameToFilename() + ".txt");
-
-        return FileIO.readResource(
-                ResourceLoader.loadResource(blurbFile), getName() + " blurb"
-        ).split("\n");
+        return ParserUtils.getBlurb(convertNameToFilename());
     }
 
     public String getCursorCode() {

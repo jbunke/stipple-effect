@@ -3,12 +3,13 @@ package com.jordanbunke.stipple_effect.context;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 public class PlaybackInfo {
     private static final double NANOS_IN_MILLI = 1e6;
 
     private boolean playing;
-    private int millisPerFrame, millisAccumulated;
+    private int fps, millisPerFrame, millisAccumulated;
     private double nanosAccumulated;
     private Mode mode;
 
@@ -21,11 +22,28 @@ public class PlaybackInfo {
                 default -> Mode.values()[ordinal() + 1];
             };
         }
+
+        public int buttonIndex() {
+            if (this == PONG_BACKWARDS)
+                return PONG_FORWARDS.ordinal();
+
+            return ordinal();
+        }
+
+        public String getIconCode() {
+            return switch (this) {
+                case PONG_FORWARDS, PONG_BACKWARDS -> IconCodes.PONG;
+                case LOOP -> IconCodes.LOOP;
+                case FORWARDS -> IconCodes.FORWARDS;
+                case BACKWARDS -> IconCodes.BACKWARDS;
+            };
+        }
     }
 
     public PlaybackInfo() {
         this.playing = false;
-        this.millisPerFrame = Constants.DEFAULT_MILLIS_PER_FRAME;
+        this.fps = Constants.DEFAULT_PLAYBACK_FPS;
+        updateMillisPerFrame();
         this.mode = Mode.FORWARDS;
 
         millisAccumulated = 0;
@@ -76,6 +94,10 @@ public class PlaybackInfo {
         }
     }
 
+    private void updateMillisPerFrame() {
+        millisPerFrame = Constants.MILLIS_IN_SECOND / fps;
+    }
+
     public boolean checkIfNextFrameDue(final double deltaTime) {
         nanosAccumulated += deltaTime;
 
@@ -92,9 +114,10 @@ public class PlaybackInfo {
         return false;
     }
 
-    public void setMillisPerFrame(final int millisPerFrame) {
-        this.millisPerFrame = Math.max(Constants.MIN_MILLIS_PER_FRAME,
-                Math.min(millisPerFrame, Constants.MAX_MILLIS_PER_FRAME));
+    public void setFps(final int fps) {
+        this.fps = Math.max(Constants.MIN_PLAYBACK_FPS,
+                Math.min(fps, Constants.MAX_PLAYBACK_FPS));
+        updateMillisPerFrame();
         millisAccumulated = 0;
         nanosAccumulated = 0d;
     }
@@ -107,8 +130,8 @@ public class PlaybackInfo {
         this.mode = mode.next();
     }
 
-    public void incrementMillisPerFrame(final int delta) {
-        setMillisPerFrame(millisPerFrame + delta);
+    public void incrementFps(final int delta) {
+        setFps(fps + delta);
         StippleEffect.get().rebuildFramesMenu();
     }
 
@@ -116,8 +139,8 @@ public class PlaybackInfo {
         return playing;
     }
 
-    public int getMillisPerFrame() {
-        return millisPerFrame;
+    public int getFps() {
+        return fps;
     }
 
     public Mode getMode() {

@@ -14,19 +14,18 @@ public class DialogVals {
             padBottom = 0;
     private static double layerOpacity = Constants.OPAQUE;
     private static String layerName = "";
-    private static InfoScreen infoScreen = InfoScreen.PROJECT;
+    private static InfoScreen infoScreen = InfoScreen.ABOUT;
 
     public enum InfoScreen {
-        PROJECT, TOOLS, LAYERS, FRAMES, QoL, CHANGELOG;
+        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, MORE, CHANGELOG;
 
         public String getTitle() {
-            return this == QoL ? "Quality of Life" : toString();
+            return this == MORE ? "More Shortcuts & Quality of Life" : toString();
         }
 
         @Override
         public String toString() {
-            return this == QoL ? QoL.name()
-                    : name().charAt(0) + name().substring(1).toLowerCase();
+            return name().charAt(0) + name().substring(1).toLowerCase();
         }
     }
 
