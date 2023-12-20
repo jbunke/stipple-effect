@@ -31,6 +31,10 @@ public class StateManager {
                 ActionType.MAJOR.consequence();
                 StippleEffect.get().getContext().redrawSelectionOverlay();
             }
+        } else {
+            StippleEffect.get().sendStatusUpdate(
+                    "Cannot undo; reached beginning of project state stack"
+            );
         }
     }
 
@@ -61,6 +65,10 @@ public class StateManager {
                 ActionType.MAJOR.consequence();
                 StippleEffect.get().getContext().redrawSelectionOverlay();
             }
+        } else {
+            StippleEffect.get().sendStatusUpdate(
+                    "Cannot redo; reached end of project state stack"
+            );
         }
     }
 

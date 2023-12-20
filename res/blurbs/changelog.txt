@@ -1,29 +1,32 @@
 {Upcoming}
 
 To add:
-> Status updates inside workspace window with timeout from
-    manually defined Delta Time debugger channel in
-    StippleEffect.java
-> Granular plus regular undo & redo buttons in "Project"
-> Working pick up selection tool
+> Scripting language, system and scripted previews
 > Adjustable windows
 > HSV sliders
 > Palettes
-> Settings, including:
+> Settings read from file on startup, including:
     - Toggle for rendering at true pixel size
     - Delta Time canvas size
     - Windowed or maximized on startup
 
 To change:
-> TODO
+> Remap subtractive mode from S to ALT key once correctly
+    implemented in Delta Time
 
 To fix:
-> TODO
 
 To remove:
-> TODO
 
-{0.0.1} - 2023-12-21
+{TODO for 0.0.1} - 2023-12-2?
+
+To add:
+> Versioning system
+> Textboxes with immutable prefixes and suffixes
+> Working pick up selection tool
+> HSV sliders
+
+{0.0.1} - 2023-12-2?
 
 Added:
 > First available version of Stipple Effect

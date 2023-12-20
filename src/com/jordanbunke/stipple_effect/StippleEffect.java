@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect;
 
 import com.jordanbunke.delta_time.OnStartup;
 import com.jordanbunke.delta_time.contexts.ProgramContext;
+import com.jordanbunke.delta_time.debug.DebugChannel;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.Key;
@@ -35,6 +36,8 @@ import java.util.List;
 public class StippleEffect implements ProgramContext {
     public static final int PRIMARY = 0, SECONDARY = 1;
 
+    private static final String STATUS_UPDATE_CHANNEL = "Status";
+
     private static final StippleEffect INSTANCE;
 
     public final Game game;
@@ -66,6 +69,10 @@ public class StippleEffect implements ProgramContext {
 
     // cursor
     private Coord2D mousePos;
+
+    // status update
+    private int millisSinceStatusUpdate;
+    private GameImage statusUpdate;
 
     static {
         OnStartup.run();
@@ -112,7 +119,11 @@ public class StippleEffect implements ProgramContext {
 
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
         game.setCanvasSize(Constants.CANVAS_W, Constants.CANVAS_H);
-        game.getDebugger().muteChannel(GameDebugger.FRAME_RATE);
+
+        millisSinceStatusUpdate = 0;
+        statusUpdate = GameImage.dummy();
+
+        configureDebugger();
     }
 
     public static StippleEffect get() {
@@ -127,6 +138,35 @@ public class StippleEffect implements ProgramContext {
 
     private static void launchWithFile(final Path filepath) {
         verifyFilepath(filepath);
+    }
+
+    private void configureDebugger() {
+        final GameDebugger debugger = game.getDebugger();
+
+        debugger.muteChannel(GameDebugger.FRAME_RATE);
+        debugger.addChannel(new DebugChannel(STATUS_UPDATE_CHANNEL,
+                this::updateStatus, false, false));
+    }
+
+    public void sendStatusUpdate(final String message) {
+        game.getDebugger().getChannel(STATUS_UPDATE_CHANNEL)
+                .printMessage(message);
+    }
+
+    private void updateStatus(final String message) {
+        millisSinceStatusUpdate = 0;
+
+        final GameImage text = GraphicsUtils.uiText(Constants.WHITE)
+                .addText(message).build().draw();
+        final int w = text.getWidth() + (4 * Constants.BUTTON_BORDER_PX),
+                h = text.getHeight() - (4 * Constants.BUTTON_BORDER_PX);
+
+        final GameImage statusUpdate = new GameImage(w, h);
+        statusUpdate.fillRectangle(Constants.BACKGROUND, 0, 0, w, h);
+        statusUpdate.draw(text, 2 * Constants.BUTTON_BORDER_PX,
+                Constants.TEXT_Y_OFFSET);
+
+        this.statusUpdate = statusUpdate.submit();
     }
 
     private GameWindow makeWindow() {
@@ -207,6 +247,10 @@ public class StippleEffect implements ProgramContext {
         if (dialog == null) {
             getContext().animate(deltaTime);
 
+            // status update
+            millisSinceStatusUpdate +=
+                    (int) (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
+
             // tools
             toolButtonMenu.update(deltaTime);
             // colors
@@ -235,6 +279,10 @@ public class StippleEffect implements ProgramContext {
         // workspace
         final GameImage workspace = getContext().drawWorkspace();
         canvas.draw(workspace, wp.x, wp.y);
+
+        if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
+            canvas.draw(statusUpdate, wp.x, wp.y);
+
         // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
         canvas.draw(bottomBar, bbp.x, bbp.y);
