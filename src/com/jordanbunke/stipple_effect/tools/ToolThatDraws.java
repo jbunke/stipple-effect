@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.RNG;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -30,7 +30,7 @@ public abstract class ToolThatDraws extends Tool {
     }
 
     public boolean isUnchanged(final SEContext context) {
-        final boolean sameFrame = lastFrameIndex == context.getState().getFrameIndex(),
+        final boolean sameFrame = stillSameFrame(context),
                 sameTP = lastTP.equals(context.getTargetPixel());
 
         return sameFrame && sameTP;
@@ -43,6 +43,10 @@ public abstract class ToolThatDraws extends Tool {
 
     public Coord2D getLastTP() {
         return lastTP;
+    }
+
+    public boolean stillSameFrame(final SEContext context) {
+        return lastFrameIndex == context.getState().getFrameIndex();
     }
 
     public static void setMode(final Mode mode) {

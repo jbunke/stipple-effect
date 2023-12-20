@@ -14,8 +14,8 @@ import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElem
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.ProjectInfo;
-import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicTextButton;
@@ -151,12 +151,12 @@ public class DialogAssembly {
                 highlightedSet, behaviours, updateIndexLogic, () -> {});
 
         // frameDims iff saveType is PNG_STITCHED
-        final TextBox xDivsTextBox = makeDialogNumericTextBox(xDivsLabel,
+        final TextBox xDivsTextBox = DialogAssembly.makeDialogNumericalTextBox(xDivsLabel,
                 c.projectInfo.getFrameDimsX(), 1, Constants.MAX_NUM_FRAMES,
-                c.projectInfo::setFrameDimsX, 3);
-        final TextBox yDivsTextBox = makeDialogNumericTextBox(yDivsLabel,
+                "", c.projectInfo::setFrameDimsX, 3);
+        final TextBox yDivsTextBox = DialogAssembly.makeDialogNumericalTextBox(yDivsLabel,
                 c.projectInfo.getFrameDimsY(), 1, Constants.MAX_NUM_FRAMES,
-                c.projectInfo::setFrameDimsY, 3);
+                "", c.projectInfo::setFrameDimsY, 3);
 
         final MenuElementGrouping pngStitchedContents = new MenuElementGrouping(
                 xDivsLabel, yDivsLabel, xDivsTextBox, yDivsTextBox);
@@ -212,8 +212,8 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                widthLabel = makeDialogLeftLabel(1, "Width in px: "),
-                heightLabel = makeDialogLeftLabel(2, "Height in px: "),
+                widthLabel = makeDialogLeftLabel(1, "Width: "),
+                heightLabel = makeDialogLeftLabel(2, "Height: "),
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
                 explanation = makeDialogLeftLabel(5,
                         "Valid image sizes run from " + Constants.MIN_IMAGE_W +
@@ -221,12 +221,12 @@ public class DialogAssembly {
                                 Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
 
         // dim textboxes
-        final TextBox widthTextBox = makeDialogNumericTextBox(
+        final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 widthLabel, w, Constants.MIN_IMAGE_W, Constants.MAX_IMAGE_W,
-                DialogVals::setResizeWidth, 3);
-        final TextBox heightTextBox = makeDialogNumericTextBox(
+                "px", DialogVals::setResizeWidth, 3);
+        final TextBox heightTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 heightLabel, h, Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H,
-                DialogVals::setResizeHeight, 3);
+                "px", DialogVals::setResizeHeight, 3);
 
         // dynamic scale checker
         final DynamicLabel scaleChecker = new DynamicLabel(
@@ -279,23 +279,23 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                leftLabel = makeDialogLeftLabel(1, "Pad left: "),
-                rightLabel = makeDialogLeftLabel(2, "Pad right: "),
-                topLabel = makeDialogLeftLabel(3, "Pad top: "),
-                bottomLabel = makeDialogLeftLabel(4, "Pad bottom: "),
+                leftLabel = makeDialogLeftLabel(1, "Left: "),
+                rightLabel = makeDialogLeftLabel(2, "Right: "),
+                topLabel = makeDialogLeftLabel(3, "Top: "),
+                bottomLabel = makeDialogLeftLabel(4, "Bottom: "),
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h);
 
         // pad textboxes
-        final TextBox leftTextBox = makeDialogNumericTextBox(leftLabel,
+        final TextBox leftTextBox = makeDialogPadTextBox(leftLabel,
                 i -> i + DialogVals.getPadRight() + w <= Constants.MAX_IMAGE_W,
                 DialogVals::setPadLeft);
-        final TextBox topTextBox = makeDialogNumericTextBox(topLabel,
+        final TextBox topTextBox = makeDialogPadTextBox(topLabel,
                 i -> i + DialogVals.getPadBottom() + h <= Constants.MAX_IMAGE_H,
                 DialogVals::setPadTop);
-        final TextBox rightTextBox = makeDialogNumericTextBox(rightLabel,
+        final TextBox rightTextBox = makeDialogPadTextBox(rightLabel,
                 i -> i + DialogVals.getPadLeft() + w <= Constants.MAX_IMAGE_W,
                 DialogVals::setPadRight);
-        final TextBox bottomTextBox = makeDialogNumericTextBox(bottomLabel,
+        final TextBox bottomTextBox = makeDialogPadTextBox(bottomLabel,
                 i -> i + DialogVals.getPadTop() + h <= Constants.MAX_IMAGE_H,
                 DialogVals::setPadBottom);
 
@@ -340,26 +340,26 @@ public class DialogAssembly {
                         ? " ... too big as singleton" : "")),
                 instruction = makeDialogLeftLabel(1,
                         "Scale down and/or split into more frames"),
-                widthLabel = makeDialogLeftLabel(2, "Width in px: "),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height in px: "),
+                widthLabel = makeDialogLeftLabel(2, "Width: "),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height: "),
                 xDivsLabel = makeDialogLeftLabel(4 - (tooBig ? 0 : 2), "X frames: "),
                 yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: ");
 
         // downscale textboxes
-        final TextBox widthTextBox = makeDialogNumericTextBox(
+        final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 widthLabel, w, Constants.MIN_IMAGE_W, w,
-                DialogVals::setResizeWidth, 4);
-        final TextBox heightTextBox = makeDialogNumericTextBox(
+                "px", DialogVals::setResizeWidth, 4);
+        final TextBox heightTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 heightLabel, h, Constants.MIN_IMAGE_H, h,
-                DialogVals::setResizeHeight, 4);
+                "px", DialogVals::setResizeHeight, 4);
 
         // division textboxes
-        final TextBox xDivsTextBox = makeDialogNumericTextBox(
+        final TextBox xDivsTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 xDivsLabel, 1, 1, Constants.MAX_NUM_FRAMES,
-                DialogVals::setNewProjectXDivs, 3);
-        final TextBox yDivsTextBox = makeDialogNumericTextBox(
+                "", DialogVals::setNewProjectXDivs, 3);
+        final TextBox yDivsTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 yDivsLabel, 1, 1, Constants.MAX_NUM_FRAMES,
-                DialogVals::setNewProjectYDivs, 3);
+                "", DialogVals::setNewProjectYDivs, 3);
 
         // wrap downscale components in optional group in case N/A
         final MenuElementGrouping optional = tooBig
@@ -391,20 +391,20 @@ public class DialogAssembly {
     public static void setDialogToNewProject() {
         // text labels
         final TextLabel
-                widthLabel = makeDialogLeftLabel(1, "Width in px: "),
-                heightLabel = makeDialogLeftLabel(2, "Height in px: "),
+                widthLabel = makeDialogLeftLabel(1, "Width: "),
+                heightLabel = makeDialogLeftLabel(2, "Height: "),
                 explanation = makeDialogLeftLabel(4,
                         "Valid image sizes run from " + Constants.MIN_IMAGE_W +
                                 "x" + Constants.MIN_IMAGE_H + " to " +
                                 Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
 
         // dim textboxes
-        final TextBox widthTextBox = makeDialogNumericTextBox(
+        final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 widthLabel, Constants.DEFAULT_IMAGE_W, Constants.MIN_IMAGE_W,
-                Constants.MAX_IMAGE_W, DialogVals::setNewProjectWidth, 3);
-        final TextBox heightTextBox = makeDialogNumericTextBox(
+                Constants.MAX_IMAGE_W, "px", DialogVals::setNewProjectWidth, 3);
+        final TextBox heightTextBox = DialogAssembly.makeDialogNumericalTextBox(
                 heightLabel, Constants.DEFAULT_IMAGE_H, Constants.MIN_IMAGE_H,
-                Constants.MAX_IMAGE_H, DialogVals::setNewProjectHeight, 3);
+                Constants.MAX_IMAGE_H, "px", DialogVals::setNewProjectHeight, 3);
 
         final MenuElementGrouping contents = new MenuElementGrouping(
                 widthLabel, heightLabel, explanation, widthTextBox, heightTextBox);
@@ -488,43 +488,44 @@ public class DialogAssembly {
                 Constants.WHITE, getter, Constants.DIALOG_DYNAMIC_W_ALLOWANCE);
     }
 
-    private static TextBox makeDialogNumericTextBox(
+    private static TextBox makeDialogPadTextBox(
             final TextLabel label,
             final Function<Integer, Boolean> validatorLogic,
             final Consumer<Integer> setter
     ) {
-        return makeDialogTextBox(label, Constants.SMALL_TEXT_BOX_W,
-                String.valueOf(0), TextBox.getIntTextValidator(validatorLogic),
+        return makeDialogNumericalTextBox(label,
+                String.valueOf(0), "px", TextBox.getIntTextValidator(validatorLogic),
                 s -> setter.accept(Integer.parseInt(s)), 3);
     }
 
-    private static TextBox makeDialogNumericTextBox(
+    private static TextBox makeDialogNumericalTextBox(
             final TextLabel label, final int initial,
-            final int min, final int max,
+            final int min, final int max, final String suffix,
             final Consumer<Integer> setter, final int maxLength
     ) {
-        return makeDialogTextBox(label, Constants.SMALL_TEXT_BOX_W,
-                String.valueOf(initial), TextBox.getIntTextValidator(min, max),
+        return makeDialogNumericalTextBox(label, String.valueOf(initial),
+                suffix, TextBox.getIntTextValidator(min, max),
                 s -> setter.accept(Integer.parseInt(s)), maxLength);
+    }
+
+    private static TextBox makeDialogNumericalTextBox(
+            final TextLabel label, final String initial, final String suffix,
+            final Function<String, Boolean> textValidator,
+            final Consumer<String> setter, final int maxLength
+    ) {
+        return new TextBox(getDialogContentOffsetFromLabel(label),
+                Constants.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                "", initial, suffix, textValidator, setter, maxLength);
     }
 
     private static TextBox makeDialogNameTextBox(
             final TextLabel label, final String initial,
             final Consumer<String> setter
     ) {
-        return makeDialogTextBox(label, Constants.DIALOG_CONTENT_W_ALLOWANCE,
+        return new TextBox(getDialogContentOffsetFromLabel(label),
+                Constants.DIALOG_CONTENT_W_ALLOWANCE, MenuElement.Anchor.LEFT_TOP,
                 initial, TextBox.getFileNameTextValidator(), setter,
                 Constants.MAX_NAME_LENGTH);
-    }
-
-    private static TextBox makeDialogTextBox(
-            final TextLabel label, final int width, final String initial,
-            final Function<String, Boolean> textValidator,
-            final Consumer<String> setter, final int maxLength
-    ) {
-        return new TextBox(getDialogContentOffsetFromLabel(label),
-                width, MenuElement.Anchor.LEFT_TOP, initial,
-                textValidator, setter, maxLength);
     }
 
     private static TextLabel makeDialogLeftLabel(final int index, final String text) {

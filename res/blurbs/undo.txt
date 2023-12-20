@@ -1,3 +1,4 @@
 Shortcut: {Ctrl + Z}
 
-TODO
+Return to the project state of the previous completed
+operation.

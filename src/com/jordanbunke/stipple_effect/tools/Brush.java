@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -65,6 +65,9 @@ public final class Brush extends ToolWithBreadth {
 
             if (isUnchanged(context))
                 return;
+
+            if (!stillSameFrame(context))
+                painted.clear();
 
             final GameImage edit = new GameImage(w, h);
             populateAround(edit, tp, selection);

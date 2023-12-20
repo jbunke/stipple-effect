@@ -9,8 +9,8 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.PlaybackInfo;
-import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.project.PlaybackInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
@@ -37,7 +37,7 @@ public class MenuAssembly {
         final SEContext c = StippleEffect.get().getContext();
 
         final String[] iconIDs = new String[] {
-                // TODO - program settings
+                IconCodes.SETTINGS, // TODO - program settings
                 IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
                 IconCodes.SAVE, IconCodes.SAVE_AS,
                 IconCodes.RESIZE, IconCodes.PAD,
@@ -46,6 +46,7 @@ public class MenuAssembly {
         };
 
         final boolean[] preconditions = new boolean[] {
+                false, // TODO
                 true, true, true, true, true, true,
                 c.getStateManager().canUndo(),
                 c.getStateManager().canUndo(),
@@ -54,6 +55,7 @@ public class MenuAssembly {
         };
 
         final Runnable[] behaviours = new Runnable[] {
+                () -> {}, // TODO
                 DialogAssembly::setDialogToNewProject,
                 () -> StippleEffect.get().openProject(),
                 c.projectInfo::save,
@@ -123,7 +125,7 @@ public class MenuAssembly {
             };
 
             projectElements[amount + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton("close_project", cpPos,
+                    GraphicsUtils.generateIconButton(IconCodes.CLOSE_PROJECT, cpPos,
                             true, closeBehaviour));
 
             cumulativeWidth += offsetX;
@@ -284,7 +286,8 @@ public class MenuAssembly {
                 baseIcons,
                 Arrays.stream(baseIcons).map(GraphicsUtils::highlightIconButton)
                         .toArray(GameImage[]::new),
-                new Runnable[validModes.length],
+                Arrays.stream(validModes).map(mode ->
+                        (Runnable) () -> {}).toArray(Runnable[]::new),
                 () -> StippleEffect.get().getContext().playbackInfo
                         .getMode().buttonIndex(),
                 () -> StippleEffect.get().getContext().playbackInfo.toggleMode());
@@ -322,13 +325,13 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         final String[] iconIDs = new String[] {
-                "new_layer",
-                "duplicate_layer",
-                "remove_layer",
-                "move_layer_up",
-                "move_layer_down",
-                "merge_with_layer_below",
-                "enable_all_layers"
+                IconCodes.NEW_LAYER,
+                IconCodes.DUPLICATE_LAYER,
+                IconCodes.REMOVE_LAYER,
+                IconCodes.MOVE_LAYER_UP,
+                IconCodes.MOVE_LAYER_DOWN,
+                IconCodes.MERGE_WITH_LAYER_BELOW,
+                IconCodes.ENABLE_ALL_LAYERS
         };
 
         final boolean[] preconditions = new boolean[] {
@@ -422,7 +425,7 @@ public class MenuAssembly {
                     (int)(Constants.BUTTON_DIM * -0.5));
 
             layerButtons[(3 * amount) + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton("isolate_layer", ilPos, true,
+                    GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER, ilPos, true,
                     () -> StippleEffect.get().getContext().isolateLayer(index)));
 
             // onion skin toggle
@@ -444,7 +447,8 @@ public class MenuAssembly {
             final Coord2D lsPos = ilPos.displace(Constants.BUTTON_INC * 3, 0);
 
             layerButtons[(6 * amount) + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton("settings", lsPos, true,
+                    GraphicsUtils.generateIconButton(IconCodes.LAYER_SETTINGS,
+                            lsPos, true,
                             () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + dims.y;
@@ -464,8 +468,8 @@ public class MenuAssembly {
     ) {
         // 0: is enabled, button click should DISABLE; 1: vice-versa
 
-        final GameImage enabled = GraphicsUtils.loadIcon("layer_enabled"),
-                disabled = GraphicsUtils.loadIcon("layer_disabled");
+        final GameImage enabled = GraphicsUtils.loadIcon(IconCodes.LAYER_ENABLED),
+                disabled = GraphicsUtils.loadIcon(IconCodes.LAYER_DISABLED);
 
         return new SimpleToggleMenuButton(pos,
                 new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
@@ -489,8 +493,7 @@ public class MenuAssembly {
     ) {
         final GameImage[]
                 baseSet = Arrays.stream(OnionSkinMode.values())
-                .map(osm -> GraphicsUtils.loadIcon("onion_skin_" +
-                        osm.name().toLowerCase()))
+                .map(osm -> GraphicsUtils.loadIcon(osm.getIconCode()))
                 .toArray(GameImage[]::new),
                 highlightedSet = Arrays.stream(baseSet).map(GraphicsUtils::highlightIconButton)
                         .toArray(GameImage[]::new);
@@ -517,8 +520,8 @@ public class MenuAssembly {
     ) {
         // 0: is unlinked, button click should LINK; 1: vice-versa
 
-        final GameImage linked = GraphicsUtils.loadIcon("frames_linked"),
-                unlinked = GraphicsUtils.loadIcon("frames_unlinked");
+        final GameImage linked = GraphicsUtils.loadIcon(IconCodes.FRAMES_LINKED),
+                unlinked = GraphicsUtils.loadIcon(IconCodes.FRAMES_UNLINKED);
 
         return new SimpleToggleMenuButton(pos,
                 new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
@@ -570,8 +573,10 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         populateButtonsIntoBuilder(
-                mb, new String[] { "swap_colors" }, new boolean[] { true },
-                new Runnable[] { () -> StippleEffect.get().swapColors() }, Constants.getColorsPosition()
+                mb, new String[] { IconCodes.SWAP_COLORS },
+                new boolean[] { true },
+                new Runnable[] { () -> StippleEffect.get().swapColors() },
+                Constants.getColorsPosition()
         );
 
         final int NUM_COLORS = 2;

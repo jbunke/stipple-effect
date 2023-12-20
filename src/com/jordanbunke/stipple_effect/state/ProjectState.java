@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.state;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.context.SEContext;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -138,17 +138,17 @@ public class ProjectState {
                     image.draw(layer.renderFrame(frameIndex - 1,
                             layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
 
-                // this layer
-                if (layer.getOpacity() == Constants.OPAQUE)
-                    image.draw(layer.getFrame(frameIndex));
-                else
-                    image.draw(layer.renderFrame(frameIndex));
-
                 // onion skin next
                 if (includeOnionSkins && layer.getOnionSkinMode()
                         .doNext() && frameIndex + 1 < frameCount)
                     image.draw(layer.renderFrame(frameIndex + 1,
                             layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
+
+                // this layer
+                if (layer.getOpacity() == Constants.OPAQUE)
+                    image.draw(layer.getFrame(frameIndex));
+                else
+                    image.draw(layer.renderFrame(frameIndex));
             }
         }
 

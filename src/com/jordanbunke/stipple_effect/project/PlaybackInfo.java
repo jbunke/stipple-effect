@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.context;
+package com.jordanbunke.stipple_effect.project;
 
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;

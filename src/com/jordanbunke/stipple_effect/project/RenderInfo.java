@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.context;
+package com.jordanbunke.stipple_effect.project;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;

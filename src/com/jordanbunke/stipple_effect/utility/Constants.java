@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.context.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.tools.*;
 
 import java.awt.*;
@@ -123,7 +123,7 @@ public class Constants {
             FRAME_PLAYBACK_SLIDER_W = 87, FRAME_PLAYBACK_SLIDER_OFFSET_X = 309,
             DIALOG_W = CANVAS_W / 2, DIALOG_H = CANVAS_H / 2, DIALOG_CONTENT_INC_Y = 32,
             DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
-            DIALOG_CONTENT_OFFSET_X = 135, DIALOG_CONTENT_W_ALLOWANCE = 280, SMALL_TEXT_BOX_W = 60,
+            DIALOG_CONTENT_OFFSET_X = 115, DIALOG_CONTENT_W_ALLOWANCE = 300, SMALL_TEXT_BOX_W = 80,
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -4,
             COLOR_SELECTOR_OFFSET_Y = 44, COLOR_SELECTOR_INC_Y = 44, COLOR_BUTTON_AVG_C_THRESHOLD = 100,
@@ -137,6 +137,7 @@ public class Constants {
             MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, MAX_NUM_STATES = 5000,
             MILLIS_IN_SECOND = 1000, MIN_PLAYBACK_FPS = 1, MAX_PLAYBACK_FPS = 30,
             PLAYBACK_FPS_INC = 1, DEFAULT_PLAYBACK_FPS = 10,
+            COLOR_SET_RGB_INC = 5,
             STATUS_UPDATE_DURATION_MILLIS = 5000,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 25;

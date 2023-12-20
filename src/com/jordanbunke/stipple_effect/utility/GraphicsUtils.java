@@ -40,25 +40,47 @@ public class GraphicsUtils {
     }
 
     public static GameImage drawTextBox(
-            final int width, final String text, final int cursorIndex,
-            final boolean isHighlighted, final Color accentColor
+            final int width,
+            final String prefix, final String text, final String suffix,
+            final int cursorIndex,
+            final boolean isHighlighted, final Color accentColor,
+            final Color backgroundColor
     ) {
         final int height = Constants.STD_TEXT_BUTTON_H, px = Constants.BUTTON_BORDER_PX;
 
         final GameImage nhi = new GameImage(width, height);
-        nhi.fillRectangle(Constants.GREY, 0, 0, width, height);
+        nhi.fillRectangle(backgroundColor, 0, 0, width, height);
 
         // text and cursor
 
         final String a = text.substring(0, cursorIndex), b = text.substring(cursorIndex);
         final GameImage
+                prefixImage = uiText(Constants.BACKGROUND).addText(prefix).build().draw(),
+                suffixImage = uiText(Constants.BACKGROUND).addText(suffix).build().draw(),
                 aImage = uiText(Constants.BLACK).addText(a).build().draw(),
                 bImage = uiText(Constants.BLACK).addText(b).build().draw();
 
-        final Coord2D textPos = new Coord2D(2 * px, Constants.BUTTON_TEXT_OFFSET_Y);
+        Coord2D textPos = new Coord2D(2 * px, Constants.BUTTON_TEXT_OFFSET_Y);
+
+        nhi.draw(prefixImage, textPos.x, textPos.y);
+
+        if (!prefix.isEmpty())
+            textPos = textPos.displace(prefixImage.getWidth() + px, 0);
+
         nhi.draw(aImage, textPos.x, textPos.y);
-        nhi.fillRectangle(accentColor, textPos.x + aImage.getWidth() + px, 0, px, height);
-        nhi.draw(bImage, textPos.x + aImage.getWidth() + (3 * px), textPos.y);
+
+        if (!a.isEmpty())
+            textPos = textPos.displace(aImage.getWidth() + px, 0);
+
+        nhi.fillRectangle(accentColor, textPos.x, 0, px, height);
+        textPos = textPos.displace(2 * px, 0);
+
+        nhi.draw(bImage, textPos.x, textPos.y);
+
+        if (!b.isEmpty())
+            textPos = textPos.displace(bImage.getWidth() + px, 0);
+
+        nhi.draw(suffixImage, textPos.x, textPos.y);
 
         // border
 

@@ -11,16 +11,20 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class TextBox extends MenuButtonStub {
     private String text, lastText;
     private int cursorIndex, lastCursorIndex;
     private boolean typing;
 
+    private final String prefix, suffix;
+    private final Supplier<Color> backgroundColorGetter;
     private final Function<String, Boolean> textValidator;
     private final Consumer<String> setter;
     private final int maxLength;
@@ -34,13 +38,40 @@ public class TextBox extends MenuButtonStub {
             final Consumer<String> setter,
             final int maxLength
     ) {
+        this(position, width, anchor, "", initialText, "",
+                textValidator, setter, () -> Constants.GREY, maxLength);
+    }
+
+    public TextBox(
+            final Coord2D position, final int width, final Anchor anchor,
+            final String prefix, final String initialText, final String suffix,
+            final Function<String, Boolean> textValidator,
+            final Consumer<String> setter,
+            final int maxLength
+    ) {
+        this(position, width, anchor, prefix, initialText, suffix,
+                textValidator, setter, () -> Constants.GREY, maxLength);
+    }
+
+    public TextBox(
+            final Coord2D position, final int width, final Anchor anchor,
+            final String prefix, final String initialText, final String suffix,
+            final Function<String, Boolean> textValidator,
+            final Consumer<String> setter,
+            final Supplier<Color> backgroundColorGetter,
+            final int maxLength
+    ) {
         super(position, new Coord2D(width, Constants.STD_TEXT_BUTTON_H),
                 anchor, true);
+
+        this.prefix = prefix;
+        this.suffix = suffix;
 
         text = initialText;
         cursorIndex = text.length();
         typing = false;
 
+        this.backgroundColorGetter = backgroundColorGetter;
         this.textValidator = textValidator;
         this.setter = setter;
         this.maxLength = maxLength;
@@ -87,15 +118,19 @@ public class TextBox extends MenuButtonStub {
         };
     }
 
-    private void updateAssets() {
-        validImage = GraphicsUtils.drawTextBox(getWidth(), text,
-                cursorIndex, false, Constants.BLACK);
-        invalidImage = GraphicsUtils.drawTextBox(getWidth(), text,
-                cursorIndex, false, Constants.INVALID);
-        highlightedImage = GraphicsUtils.drawTextBox(getWidth(), text,
-                cursorIndex, true, Constants.BLACK);
-        typingImage = GraphicsUtils.drawTextBox(getWidth(), text,
-                cursorIndex, false, Constants.HIGHLIGHT_1);
+    protected void updateAssets() {
+        validImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
+                text, suffix, cursorIndex, false, Constants.BLACK,
+                backgroundColorGetter.get());
+        invalidImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
+                text, suffix, cursorIndex, false, Constants.INVALID,
+                backgroundColorGetter.get());
+        highlightedImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
+                text, suffix, cursorIndex, true, Constants.BLACK,
+                backgroundColorGetter.get());
+        typingImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
+                text, suffix, cursorIndex, false, Constants.HIGHLIGHT_1,
+                backgroundColorGetter.get());
 
         lastText = text;
         lastCursorIndex = cursorIndex;

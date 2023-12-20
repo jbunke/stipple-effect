@@ -1,3 +1,3 @@
 Shortcut: {Ctrl + Shift + Y}
 
-TODO
+Return to a more advanced state within a single operation.

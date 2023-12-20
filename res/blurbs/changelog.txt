@@ -1,14 +1,16 @@
 {Upcoming}
 
 To add:
+> Native file type (.stef)
+> Larger canvas sizes and necessary performance
+    optimizations to facilitate them
 > Scripting language, system and scripted previews
 > Adjustable windows
 > HSV sliders
 > Palettes
-> Settings read from file on startup, including:
+> More settings read from file on startup, including:
     - Toggle for rendering at true pixel size
     - Delta Time canvas size
-    - Windowed or maximized on startup
 
 To change:
 > Remap subtractive mode from S to ALT key once correctly
@@ -21,10 +23,12 @@ To remove:
 {TODO for 0.0.1} - 2023-12-2?
 
 To add:
+> Settings read from file on startup, including:
+    - Windowed or maximized on startup
 > Versioning system
 > Textboxes with immutable prefixes and suffixes
 > Working pick up selection tool
-> HSV sliders
+> [Maybe] HSV sliders
 
 {0.0.1} - 2023-12-2?
 
