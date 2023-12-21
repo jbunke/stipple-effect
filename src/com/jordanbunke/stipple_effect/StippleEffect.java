@@ -79,6 +79,8 @@ public class StippleEffect implements ProgramContext {
 
         INSTANCE = new StippleEffect();
 
+        DialogAssembly.setDialogToSplashScreen();
+
         // initially declared as empty method because
         // builders rely on calls to INSTANCE object
         INSTANCE.toolButtonMenu = MenuAssembly.buildToolButtonMenu();
@@ -162,7 +164,7 @@ public class StippleEffect implements ProgramContext {
                 h = text.getHeight() - (4 * Constants.BUTTON_BORDER_PX);
 
         final GameImage statusUpdate = new GameImage(w, h);
-        statusUpdate.fillRectangle(Constants.BACKGROUND, 0, 0, w, h);
+        statusUpdate.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0, w, h);
         statusUpdate.draw(text, 2 * Constants.BUTTON_BORDER_PX,
                 Constants.TEXT_Y_OFFSET);
 

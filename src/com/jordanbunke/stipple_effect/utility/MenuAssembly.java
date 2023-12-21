@@ -56,7 +56,7 @@ public class MenuAssembly {
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> {}, // TODO
+                DialogAssembly::setDialogToProgramSettings,
                 DialogAssembly::setDialogToNewProject,
                 () -> StippleEffect.get().openProject(),
                 c.projectInfo::save,

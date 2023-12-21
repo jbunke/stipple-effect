@@ -1,0 +1,12 @@
+Shortcut to toggle: {Ctrl + 1}
+
+Enabling one of the onion skin modes will render translucent
+previews of {one or both of the frames adjacent} to the
+active frame under the editing layer. Note that the onion
+skins may not be visible if there are no changes between
+frames, or there is no transparency on the active layer at
+the active frame for the onion skins to show up through.
+
+This feature is an animation aid only. Onion skins are not
+exported when the image is saved. Thus, toggling the onion
+skin mode does not constitute a state change.

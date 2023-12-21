@@ -142,11 +142,11 @@ public class TextBox extends MenuButtonStub {
     }
 
     private void processClickOff(final InputEventLogger eventLogger) {
-        if (!isHighlighted()) {
+        if (typing && !isHighlighted()) {
             final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
 
             for (GameEvent e : unprocessed)
-                if (e instanceof GameMouseEvent me && me.matchesAction(GameMouseEvent.Action.CLICK)) {
+                if (e instanceof GameMouseEvent me && me.matchesAction(GameMouseEvent.Action.DOWN)) {
                     // DO NOT MARK AS PROCESSED!
 
                     typing = false;

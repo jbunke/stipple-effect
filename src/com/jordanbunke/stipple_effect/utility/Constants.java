@@ -108,7 +108,8 @@ public class Constants {
             OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
     public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 1,
-            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360;
+            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360,
+            SPLASH_DURATION_SECS = 5;
 
     public static final int CHECKER_INCREMENT = 4, CURSOR_DIM = 40,
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,

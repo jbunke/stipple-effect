@@ -15,6 +15,7 @@ import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogAssembly;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -298,15 +299,24 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().getContext().addFrame()
+                    this::addFrame
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().getContext().addLayer()
+                    this::addLayer
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
                     this::toggleLayerLinking
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
+                    () -> getState().getEditingLayer().setOnionSkinMode(
+                            getState().getEditingLayer().getOnionSkinMode().next())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
+                    this::removeFrame
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
@@ -328,7 +338,27 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
                     () -> fillSelection(true)
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        final int index = getState().getLayerEditIndex();
 
+                        if (getState().getEditingLayer().isEnabled())
+                            disableLayer(index);
+                        else
+                            enableLayer(index);
+                    }
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
+                    () -> isolateLayer(getState().getLayerEditIndex())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
+                    this::enableAllLayers
+            );
+
+            // arrow keys only in these branches
             if (eventLogger.isPressed(Key.R)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -429,11 +459,15 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().getContext().duplicateFrame()
+                    this::duplicateFrame
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().getContext().duplicateLayer()
+                    this::duplicateLayer
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
+                    this::removeLayer
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
@@ -895,14 +929,16 @@ public class SEContext {
     public void moveFrameForward() {
         // pre-check
         if (getState().canMoveFrameForward()) {
-            final int frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex(),
+                    toIndex = frameIndex + 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedForward(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    frameIndex + 1, getState().getFrameCount());
+                    toIndex, getState().getFrameCount());
             stateManager.performAction(result, ActionType.FRAME);
+            StatusUpdates.movedFrame(frameIndex, toIndex);
         }
     }
 
@@ -910,14 +946,16 @@ public class SEContext {
     public void moveFrameBack() {
         // pre-check
         if (getState().canMoveFrameBack()) {
-            final int frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex(),
+                    toIndex = frameIndex - 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedBack(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    frameIndex - 1, getState().getFrameCount());
+                    toIndex, getState().getFrameCount());
             stateManager.performAction(result, ActionType.FRAME);
+            StatusUpdates.movedFrame(frameIndex, toIndex);
         }
     }
 
@@ -1171,6 +1209,8 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
             stateManager.performAction(result, ActionType.LAYER);
+            StatusUpdates.movedLayer(toMove.getName(), removalIndex,
+                    reinsertionIndex);
         }
     }
 
@@ -1189,6 +1229,8 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
             stateManager.performAction(result, ActionType.LAYER);
+            StatusUpdates.movedLayer(toMove.getName(), removalIndex,
+                    reinsertionIndex);
         }
     }
 

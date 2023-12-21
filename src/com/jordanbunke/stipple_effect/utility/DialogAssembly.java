@@ -11,11 +11,10 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuBut
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.PlaceholderMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.TimedMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicTextButton;
@@ -26,6 +25,8 @@ import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.parse.ParserUtils;
+import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.tools.Tool;
 
 import java.io.File;
@@ -478,6 +479,58 @@ public class DialogAssembly {
         }));
     }
 
+    public static void setDialogToProgramSettings() {
+        // text labels
+        final TextLabel screenModeLabel = makeDialogLeftLabel(1, "On startup: ");
+
+        // TODO
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                screenModeLabel);
+        setDialog(assembleDialog("Program Settings",
+                contents, () -> true, "Apply", () -> {}));
+    }
+
+    public static void setDialogToSplashScreen() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        // timer
+        mb.add(new TimedMenuElement(
+                (int)(Constants.SPLASH_DURATION_SECS * Constants.TICK_HZ),
+                () -> StippleEffect.get().clearDialog()));
+
+        final int w = Constants.CANVAS_W, h = Constants.CANVAS_H;
+
+        // background
+        final GameImage background = new GameImage(w, h);
+        background.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0, w, h);
+        mb.add(new StaticMenuElement(new Coord2D(), new Coord2D(w, h),
+                MenuElement.Anchor.LEFT_TOP, background.submit()));
+
+        // title
+        final GameImage title = GraphicsUtils.uiText(Constants.BLACK, 3d)
+                .addText(Constants.PROGRAM_NAME).build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.6)),
+                new Coord2D(title.getWidth(), title.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, title));
+
+        // subtitle
+        final GameImage subA = GraphicsUtils.uiText(
+                Constants.ACCENT_BACKGROUND_DARK)
+                .addText("Pixel art editor and animator").addLineBreak()
+                .addText("built on Delta Time by Flinker Flitzer")
+                .build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.75)),
+                new Coord2D(subA.getWidth(), subA.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, subA));
+
+        // TODO - mb.add(new AnimationMenuElement());
+
+        setDialog(mb.build());
+    }
+
     private static void setDialog(final Menu dialog) {
         StippleEffect.get().setDialog(dialog);
     }
@@ -577,14 +630,21 @@ public class DialogAssembly {
             );
             case PROJECT -> assembleProjectInfoScreenContents(
                     contentAssembler, contentStart, initialbottomY);
-            case TOOLS -> assembleToolsInfoScreenContents(
-                    contentAssembler, contentStart, initialbottomY);
+            case FRAMES -> assembleFramesInfoScreen(contentAssembler,
+                    contentStart, initialbottomY);
+            case LAYERS -> assembleLayersInfoScreen(contentAssembler,
+                    contentStart, initialbottomY);
+            case TOOLS -> assembleToolsInfoScreenContents(contentAssembler,
+                    contentStart, initialbottomY);
+            case MORE -> assembleInfoScreenContents(
+                    new String[] { "more" }, new String[] { "" },
+                    contentAssembler, contentStart, initialbottomY
+            );
             case CHANGELOG -> assembleInfoScreenContents(
                     new String[] { Constants.CHANGELOG },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY
             );
-            default -> 0; // TODO
         };
 
         final ScrollableMenuElement[] scrollingElements =
@@ -619,20 +679,24 @@ public class DialogAssembly {
 
         for (int i = 0; i < iconAndBlurbCodes.length; i++) {
             final String code = iconAndBlurbCodes[i];
+            final boolean hasIcon = !code.startsWith(IconCodes.NO_ICON_PREFIX);
 
-            final String[] blurb = ParserUtils.getBlurb(code);
+            if (hasIcon) {
+                final StaticMenuElement icon = new StaticMenuElement(
+                        contentStart.displace(0, bottomY),
+                        MenuElement.Anchor.LEFT_TOP, GraphicsUtils.loadIcon(code));
+                contentAssembler.add(icon);
+            }
 
-            final StaticMenuElement icon = new StaticMenuElement(
-                    contentStart.displace(0, bottomY),
-                    MenuElement.Anchor.LEFT_TOP, GraphicsUtils.loadIcon(code));
             final TextLabel name = TextLabel.make(contentStart.displace(
-                            Constants.BUTTON_INC + Constants.TOOL_NAME_X,
+                            (hasIcon ? Constants.BUTTON_INC : 0) + Constants.TOOL_NAME_X,
                             bottomY + Constants.TEXT_Y_OFFSET - Constants.BUTTON_BORDER_PX),
-                    headings[i], Constants.HIGHLIGHT_1);
+                    headings[i], hasIcon ? Constants.HIGHLIGHT_1 : Constants.GREY);
+            contentAssembler.add(name);
+
             bottomY += incY;
 
-            contentAssembler.add(icon);
-            contentAssembler.add(name);
+            final String[] blurb = ParserUtils.getBlurb(code);
 
             for (String line : blurb) {
                 final String[] lineSegments = ParserUtils.extractHighlight(line);
@@ -682,6 +746,100 @@ public class DialogAssembly {
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"
+                }, contentAssembler, contentStart, initialBottomY
+        );
+    }
+
+    private static int assembleLayersInfoScreen(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        return assembleInfoScreenContents(
+                new String[] {
+                        IconCodes.NEW_LAYER,
+                        IconCodes.DUPLICATE_LAYER,
+                        IconCodes.REMOVE_LAYER,
+                        IconCodes.MOVE_LAYER_UP,
+                        IconCodes.MOVE_LAYER_DOWN,
+                        IconCodes.MERGE_WITH_LAYER_BELOW,
+                        IconCodes.LAYER_VISIBILITY,
+                        IconCodes.LAYER_ENABLED,
+                        IconCodes.LAYER_DISABLED,
+                        IconCodes.ISOLATE_LAYER,
+                        IconCodes.ENABLE_ALL_LAYERS,
+                        IconCodes.ONION_SKIN,
+                        IconCodes.ONION_SKIN_NONE,
+                        IconCodes.ONION_SKIN_PREVIOUS,
+                        IconCodes.ONION_SKIN_NEXT,
+                        IconCodes.ONION_SKIN_BOTH,
+                        IconCodes.FRAME_LOCKING,
+                        IconCodes.FRAMES_LINKED,
+                        IconCodes.FRAMES_UNLINKED,
+                        IconCodes.LAYER_SETTINGS
+                },
+                new String[] {
+                        "New layer",
+                        "Duplicate layer",
+                        "Remove layer",
+                        "Move layer up",
+                        "Move layer down",
+                        "Merge with layer below",
+                        "Layer visibility controls",
+                        "Layer is visible/enabled",
+                        "Layer is invisible/disabled",
+                        "Isolate layer",
+                        "Enable all layers",
+                        "Onion skin modes",
+                        "Disabled",
+                        "Previous frame",
+                        "Next frame",
+                        "Previous and next frame",
+                        "Frame locking / layer dynamism",
+                        "Frames are linked / layer is static",
+                        "Frames are free / layer is dynamic",
+                        "Layer settings"
+                }, contentAssembler, contentStart, initialBottomY
+        );
+    }
+
+    private static int assembleFramesInfoScreen(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        return assembleInfoScreenContents(
+                new String[] {
+                        IconCodes.NEW_FRAME,
+                        IconCodes.DUPLICATE_FRAME,
+                        IconCodes.REMOVE_FRAME,
+                        IconCodes.MOVE_FRAME_FORWARD,
+                        IconCodes.MOVE_FRAME_BACK,
+                        IconCodes.TO_FIRST_FRAME,
+                        IconCodes.PREVIOUS,
+                        IconCodes.NEXT,
+                        IconCodes.TO_LAST_FRAME,
+                        IconCodes.PLAY,
+                        IconCodes.PLAYBACK_MODES,
+                        IconCodes.FORWARDS,
+                        IconCodes.BACKWARDS,
+                        IconCodes.LOOP,
+                        IconCodes.PONG
+                },
+                new String[] {
+                        "New frame",
+                        "Duplicate frame",
+                        "Remove frame",
+                        "Move frame forward",
+                        "Move frame back",
+                        "Navigate to first frame",
+                        "To previous frame",
+                        "To next frame",
+                        "Navigate to last frame",
+                        "Play animation / Stop animation playback",
+                        "Playback modes",
+                        "Forwards",
+                        "Backwards",
+                        "Looping",
+                        "Oscillating"
                 }, contentAssembler, contentStart, initialBottomY
         );
     }

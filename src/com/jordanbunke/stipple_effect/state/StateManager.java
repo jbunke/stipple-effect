@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +32,8 @@ public class StateManager {
                 ActionType.MAJOR.consequence();
                 StippleEffect.get().getContext().redrawSelectionOverlay();
             }
-        } else {
-            StippleEffect.get().sendStatusUpdate(
-                    "Cannot undo; reached beginning of project state stack"
-            );
-        }
+        } else
+            StatusUpdates.stateChangeFailed(true);
     }
 
     public void undoToCheckpoint() {
@@ -65,11 +63,8 @@ public class StateManager {
                 ActionType.MAJOR.consequence();
                 StippleEffect.get().getContext().redrawSelectionOverlay();
             }
-        } else {
-            StippleEffect.get().sendStatusUpdate(
-                    "Cannot redo; reached end of project state stack"
-            );
-        }
+        } else
+            StatusUpdates.stateChangeFailed(false);
     }
 
     public void redoToCheckpoint() {

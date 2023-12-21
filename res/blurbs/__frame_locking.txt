@@ -1,0 +1,6 @@
+Shortcut to toggle: {Ctrl + Q}
+
+When a layer is locked, its contents are linked together
+across every frame. This means that a locked layer can be
+edited on any selected frame, and the changes made will
+persist on all frames in the animation.

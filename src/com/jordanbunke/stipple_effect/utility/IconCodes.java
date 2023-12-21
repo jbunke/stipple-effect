@@ -51,4 +51,12 @@ public class IconCodes {
             SETTINGS = "settings",
             BULLET_POINT = "bullet_point",
             INFO = "info";
+
+    public static final String NO_ICON_PREFIX = "__";
+
+    public static final String
+            PLAYBACK_MODES = NO_ICON_PREFIX + "playback",
+            LAYER_VISIBILITY = NO_ICON_PREFIX + "visibility",
+            ONION_SKIN = NO_ICON_PREFIX + "onion_skin",
+            FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking";
 }

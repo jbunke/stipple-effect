@@ -13,3 +13,5 @@ Simple fill: {Click}
 Global fill: {Shift + Click}
 Fills all pixels in the image that satisfy the color
 tolerance of the initial pixel, regardless of adjacency.
+
+Adjust tolerance: {Arrow Keys}
