@@ -107,15 +107,13 @@ public class TextBox extends MenuButtonStub {
         };
     }
 
-    public static Function<String, Boolean> getFileNameTextValidator() {
-        return s -> {
-            final Set<Character> illegalCharSet = Set.of(
-                    '/', '\\', ':', '*', '?', '"', '<', '>', '|');
+    public static boolean validateAsFileName(final String text) {
+        final Set<Character> illegalCharSet = Set.of(
+                '/', '\\', ':', '*', '?', '"', '<', '>', '|');
 
-            return !s.isEmpty() && illegalCharSet.stream()
-                    .map(c -> s.indexOf(c) == -1)
-                    .reduce((a, b) -> a && b).orElse(false);
-        };
+        return !text.isEmpty() && illegalCharSet.stream()
+                .map(c -> text.indexOf(c) == -1)
+                .reduce((a, b) -> a && b).orElse(false);
     }
 
     protected void updateAssets() {
@@ -259,5 +257,13 @@ public class TextBox extends MenuButtonStub {
 
     public boolean isValid() {
         return textValidator.apply(text);
+    }
+
+    public boolean isTyping() {
+        return typing;
+    }
+
+    public void setText(final String text) {
+        this.text = text;
     }
 }

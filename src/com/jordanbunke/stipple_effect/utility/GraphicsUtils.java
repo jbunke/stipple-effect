@@ -46,7 +46,13 @@ public class GraphicsUtils {
             final boolean isHighlighted, final Color accentColor,
             final Color backgroundColor
     ) {
-        final int height = Constants.STD_TEXT_BUTTON_H, px = Constants.BUTTON_BORDER_PX;
+        final Color mainTextC = textButtonColorFromBackgroundColor(
+                        backgroundColor, true),
+                affixTextC = textButtonColorFromBackgroundColor(
+                        backgroundColor, false);
+
+        final int height = Constants.STD_TEXT_BUTTON_H,
+                px = Constants.BUTTON_BORDER_PX;
 
         final GameImage nhi = new GameImage(width, height);
         nhi.fillRectangle(backgroundColor, 0, 0, width, height);
@@ -55,10 +61,10 @@ public class GraphicsUtils {
 
         final String a = text.substring(0, cursorIndex), b = text.substring(cursorIndex);
         final GameImage
-                prefixImage = uiText(Constants.BACKGROUND).addText(prefix).build().draw(),
-                suffixImage = uiText(Constants.BACKGROUND).addText(suffix).build().draw(),
-                aImage = uiText(Constants.BLACK).addText(a).build().draw(),
-                bImage = uiText(Constants.BLACK).addText(b).build().draw();
+                prefixImage = uiText(affixTextC).addText(prefix).build().draw(),
+                suffixImage = uiText(affixTextC).addText(suffix).build().draw(),
+                aImage = uiText(mainTextC).addText(a).build().draw(),
+                bImage = uiText(mainTextC).addText(b).build().draw();
 
         Coord2D textPos = new Coord2D(2 * px, Constants.BUTTON_TEXT_OFFSET_Y);
 
@@ -72,7 +78,7 @@ public class GraphicsUtils {
         if (!a.isEmpty())
             textPos = textPos.displace(aImage.getWidth() + px, 0);
 
-        nhi.fillRectangle(accentColor, textPos.x, 0, px, height);
+        nhi.fillRectangle(mainTextC, textPos.x, 0, px, height);
         textPos = textPos.displace(2 * px, 0);
 
         nhi.draw(bImage, textPos.x, textPos.y);
@@ -98,9 +104,8 @@ public class GraphicsUtils {
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
     ) {
-        final Color textColor = (backgroundColor.getRed() + backgroundColor.getGreen() +
-                backgroundColor.getBlue()) / 3 > Constants.COLOR_TEXTBOX_AVG_C_THRESHOLD
-                ? Constants.BLACK : Constants.WHITE;
+        final Color textColor = textButtonColorFromBackgroundColor(
+                backgroundColor, true);
         final GameImage textImage = GraphicsUtils.uiText(textColor)
                 .addText(text).build().draw();
 
@@ -116,6 +121,26 @@ public class GraphicsUtils {
         nhi.drawRectangle(frame, 2f * Constants.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return nhi.submit();
+    }
+
+    private static Color textButtonColorFromBackgroundColor(
+            final Color b, final boolean main
+    ) {
+        return (b.getRed() + b.getGreen() + b.getBlue()) / 3 >
+                Constants.COLOR_TEXTBOX_AVG_C_THRESHOLD
+                ? (main ? Constants.BLACK : Constants.BACKGROUND)
+                : (main ? Constants.WHITE : Constants.GREY);
+    }
+
+    public static GameImage drawSelectedTextBox(
+            final GameImage bounds
+    ) {
+        final GameImage selected = new GameImage(bounds);
+        final int w = selected.getWidth();
+        selected.draw(loadIcon(IconCodes.BULLET_POINT),
+                w - Constants.BUTTON_INC, Constants.BUTTON_BORDER_PX);
+
+        return selected.submit();
     }
 
     public static GameImage drawHighlightedButton(

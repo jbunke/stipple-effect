@@ -286,18 +286,22 @@ public class DialogAssembly {
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h);
 
         // pad textboxes
-        final TextBox leftTextBox = makeDialogPadTextBox(leftLabel,
-                i -> i + DialogVals.getPadRight() + w <= Constants.MAX_IMAGE_W,
-                DialogVals::setPadLeft);
-        final TextBox topTextBox = makeDialogPadTextBox(topLabel,
-                i -> i + DialogVals.getPadBottom() + h <= Constants.MAX_IMAGE_H,
-                DialogVals::setPadTop);
-        final TextBox rightTextBox = makeDialogPadTextBox(rightLabel,
-                i -> i + DialogVals.getPadLeft() + w <= Constants.MAX_IMAGE_W,
-                DialogVals::setPadRight);
-        final TextBox bottomTextBox = makeDialogPadTextBox(bottomLabel,
-                i -> i + DialogVals.getPadTop() + h <= Constants.MAX_IMAGE_H,
-                DialogVals::setPadBottom);
+        final TextBox leftTextBox = makeDialogPadTextBox(leftLabel, i -> {
+            final int pw = i + DialogVals.getPadRight() + w;
+            return pw <= Constants.MAX_IMAGE_W && pw > 0;
+        }, DialogVals::setPadLeft);
+        final TextBox topTextBox = makeDialogPadTextBox(topLabel, i -> {
+            final int ph = i + DialogVals.getPadBottom() + h;
+            return ph <= Constants.MAX_IMAGE_H && ph > 0;
+        }, DialogVals::setPadTop);
+        final TextBox rightTextBox = makeDialogPadTextBox(rightLabel, i -> {
+            final int pw = i + DialogVals.getPadLeft() + w;
+            return pw <= Constants.MAX_IMAGE_W && pw > 0;
+        }, DialogVals::setPadRight);
+        final TextBox bottomTextBox = makeDialogPadTextBox(bottomLabel, i -> {
+            final int ph = i + DialogVals.getPadTop() + h;
+            return ph <= Constants.MAX_IMAGE_W && ph > 0;
+        }, DialogVals::setPadBottom);
 
         // size preview
         final DynamicLabel preview = new DynamicLabel(
@@ -495,7 +499,7 @@ public class DialogAssembly {
     ) {
         return makeDialogNumericalTextBox(label,
                 String.valueOf(0), "px", TextBox.getIntTextValidator(validatorLogic),
-                s -> setter.accept(Integer.parseInt(s)), 3);
+                s -> setter.accept(Integer.parseInt(s)), 4);
     }
 
     private static TextBox makeDialogNumericalTextBox(
@@ -524,7 +528,7 @@ public class DialogAssembly {
     ) {
         return new TextBox(getDialogContentOffsetFromLabel(label),
                 Constants.DIALOG_CONTENT_W_ALLOWANCE, MenuElement.Anchor.LEFT_TOP,
-                initial, TextBox.getFileNameTextValidator(), setter,
+                initial, TextBox::validateAsFileName, setter,
                 Constants.MAX_NAME_LENGTH);
     }
 

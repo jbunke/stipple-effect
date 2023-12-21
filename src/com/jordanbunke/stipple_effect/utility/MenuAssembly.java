@@ -7,6 +7,8 @@ import com.jordanbunke.delta_time.menus.MenuBuilder;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
@@ -14,7 +16,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
-import com.jordanbunke.stipple_effect.menu_elements.colors.ColorButton;
+import com.jordanbunke.stipple_effect.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalScrollingMenuElement;
@@ -586,10 +588,22 @@ public class MenuAssembly {
                     (Constants.COLOR_PICKER_W / 4) +
                             (i * (Constants.COLOR_PICKER_W / 2)), offsetY);
 
-            mb.add(new ColorButton(pos, i));
+            final ColorTextBox colorTextBox = ColorTextBox.make(pos, i);
+
+            mb.add(colorTextBox);
+
+            final int index = i;
+            final Coord2D dims = new Coord2D(colorTextBox.getWidth(),
+                    colorTextBox.getHeight());
+            final GatewayMenuElement highlight = new GatewayMenuElement(
+                    new StaticMenuElement(pos, dims, MenuElement.Anchor.CENTRAL_TOP,
+                            GraphicsUtils.drawSelectedTextBox(
+                                    new GameImage(dims.x, dims.y))),
+                    () -> StippleEffect.get().getColorIndex() == index);
+            mb.add(highlight);
         }
 
-        mb.add(ColorSelector.make());
+        mb.add(new ColorSelector());
 
         return mb.build();
     }

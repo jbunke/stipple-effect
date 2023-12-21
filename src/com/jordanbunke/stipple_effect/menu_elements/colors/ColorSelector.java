@@ -1,7 +1,10 @@
 package com.jordanbunke.stipple_effect.menu_elements.colors;
 
+import com.jordanbunke.delta_time.debug.GameDebugger;
+import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.InvisibleMenuElement;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -10,12 +13,48 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ColorSelector extends MenuElementGrouping {
-    private ColorSelector(final MenuElement... menuElements) {
-        super(menuElements);
+public class ColorSelector extends InvisibleMenuElement {
+    private MenuElement[] contents;
+    private int lastIndex;
+
+    public ColorSelector() {
+        super();
+
+        lastIndex = StippleEffect.get().getColorIndex();
+        contents = makeContents();
     }
 
-    public static ColorSelector make() {
+    @Override
+    public void update(final double deltaTime) {
+        final int index = StippleEffect.get().getColorIndex();
+
+        if (index != lastIndex) {
+            contents = makeContents();
+            lastIndex = index;
+        }
+
+        for (MenuElement element : contents)
+            element.update(deltaTime);
+    }
+
+    @Override
+    public void render(final GameImage canvas) {
+        for (MenuElement element : contents)
+            element.render(canvas);
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
+        for (MenuElement element : contents)
+            element.process(eventLogger);
+    }
+
+    @Override
+    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
+
+    }
+
+    private static MenuElement[] makeContents() {
         final List<MenuElement> menuElements = new ArrayList<>();
 
         // red
@@ -68,7 +107,7 @@ public class ColorSelector extends MenuElementGrouping {
                 }, c -> StippleEffect.get().setSelectedColor(c),
                 () -> StippleEffect.get().getSelectedColor().getAlpha()));
 
-        return new ColorSelector(menuElements.toArray(new MenuElement[0]));
+        return menuElements.toArray(new MenuElement[0]);
     }
 
     // HSV helpers

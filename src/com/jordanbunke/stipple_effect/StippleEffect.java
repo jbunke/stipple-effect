@@ -459,6 +459,10 @@ public class StippleEffect implements ProgramContext {
         return colors[SECONDARY];
     }
 
+    public Color getColorAtIndex(final int index) {
+        return colors[index];
+    }
+
     public Tool getTool() {
         return tool;
     }
@@ -591,21 +595,17 @@ public class StippleEffect implements ProgramContext {
 
     public void setColorIndex(final int colorIndex) {
         this.colorIndex = colorIndex;
-        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     public void setColorIndexAndColor(final int colorIndex, final Color color) {
-        this.colorIndex = colorIndex;
+        setColorIndex(colorIndex);
         setSelectedColor(color);
-        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     public void swapColors() {
         final Color temp = colors[PRIMARY];
         colors[PRIMARY] = colors[SECONDARY];
         colors[SECONDARY] = temp;
-
-        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     private void toggleFullscreen() {

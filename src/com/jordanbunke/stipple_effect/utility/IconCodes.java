@@ -49,5 +49,6 @@ public class IconCodes {
             DECREMENT = "decrement",
             INCREMENT = "increment",
             SETTINGS = "settings",
+            BULLET_POINT = "bullet_point",
             INFO = "info";
 }
