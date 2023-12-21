@@ -2,12 +2,14 @@ package com.jordanbunke.stipple_effect.layer;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
+import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public final class SELayer {
     private final List<GameImage> frames;
@@ -62,20 +64,20 @@ public final class SELayer {
                 enabled, framesLinked, onionSkinMode, name + " (copy)");
     }
 
-    public SELayer returnStamped(final GameImage edit, final int frameIndex) {
+    public SELayer returnStamped(
+            final GameImage edit, final Set<Coord2D> pixels, final int frameIndex
+    ) {
         final List<GameImage> frames = new ArrayList<>(this.frames);
         final GameImage content = getFrame(frameIndex);
 
         final GameImage composed = new GameImage(content);
 
-        for (int x = 0; x < composed.getWidth(); x++) {
-            for (int y = 0; y < composed.getHeight(); y++) {
-                final Color c = ImageProcessing.colorAtPixel(edit, x, y);
-
-                if (c.getAlpha() > 0)
+        for (int x = 0; x < composed.getWidth(); x++)
+            for (int y = 0; y < composed.getHeight(); y++)
+                if (pixels.contains(new Coord2D(x, y))) {
+                    final Color c = ImageProcessing.colorAtPixel(edit, x, y);
                     composed.setRGB(x, y, c.getRGB());
-            }
-        }
+                }
 
         composed.free();
         frames.set(frameIndex, composed);

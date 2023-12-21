@@ -1,0 +1,5 @@
+Shortcut: {Ctrl + Shift + M}
+
+Draws the contents of this layer onto the layer below it
+and removes the layer above. The merged layer inherits all
+the lower layer's properties.

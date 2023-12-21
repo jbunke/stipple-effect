@@ -115,7 +115,7 @@ public class StippleEffect implements ProgramContext {
 
         dialog = null;
 
-        windowed = true; // TODO - read from settings on startup
+        windowed = false; // TODO - read from settings on startup
         window = makeWindow();
         final GameManager manager = new GameManager(0, this);
 
@@ -532,6 +532,8 @@ public class StippleEffect implements ProgramContext {
 
         final SEContext project = new SEContext(
                 new ProjectInfo(filepath), initialState, fw, fh);
+        project.snapToCenterOfImage();
+        project.renderInfo.setZoomFactor(Constants.DEF_ZOOM);
 
         addContext(project, true);
     }

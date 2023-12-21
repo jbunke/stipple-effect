@@ -246,6 +246,10 @@ public class SEContext {
                     DialogAssembly::setDialogToInfo
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToProgramSettings
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToNewProject
             );
@@ -337,6 +341,14 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
                     () -> fillSelection(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
+                    () -> StippleEffect.get().swapColors()
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
+                    () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex())
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
@@ -466,6 +478,10 @@ public class SEContext {
                     this::duplicateLayer
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    this::mergeWithLayerBelow
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
                     this::removeLayer
             );
@@ -478,18 +494,15 @@ public class SEContext {
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
-            // playback
+            // toggle playback
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    playbackInfo::togglePlaying
-            );
+                    playbackInfo::togglePlaying);
 
             // snap to center of image
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                    () -> renderInfo.setAnchor(new Coord2D(
-                            getState().getImageWidth() / 2,
-                            getState().getImageHeight() / 2)));
+                    this::snapToCenterOfImage);
 
             // fill selection
             eventLogger.checkForMatchingKeyStroke(
@@ -504,56 +517,43 @@ public class SEContext {
             // set tools
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Zoom.get())
-            );
+                    () -> StippleEffect.get().setTool(Zoom.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Hand.get())
-            );
+                    () -> StippleEffect.get().setTool(Hand.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(StipplePencil.get())
-            );
+                    () -> StippleEffect.get().setTool(StipplePencil.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Pencil.get())
-            );
+                    () -> StippleEffect.get().setTool(Pencil.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Brush.get())
-            );
+                    () -> StippleEffect.get().setTool(Brush.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Eraser.get())
-            );
+                    () -> StippleEffect.get().setTool(Eraser.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(ColorPicker.get())
-            );
+                    () -> StippleEffect.get().setTool(ColorPicker.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Fill.get())
-            );
+                    () -> StippleEffect.get().setTool(Fill.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Wand.get())
-            );
+                    () -> StippleEffect.get().setTool(Wand.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(PencilSelect.get())
-            );
+                    () -> StippleEffect.get().setTool(PencilSelect.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(BoxSelect.get())
-            );
+                    () -> StippleEffect.get().setTool(BoxSelect.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(MoveSelection.get())
-            );
+                    () -> StippleEffect.get().setTool(MoveSelection.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.U, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(PickUpSelection.get())
-            );
+                    () -> StippleEffect.get().setTool(PickUpSelection.get()));
 
             // tool modifications
             if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {
@@ -705,6 +705,13 @@ public class SEContext {
         }
 
         return image.submit();
+    }
+
+    // non-state changes
+    public void snapToCenterOfImage() {
+        renderInfo.setAnchor(new Coord2D(
+                getState().getImageWidth() / 2,
+                getState().getImageHeight() / 2));
     }
 
     // process all actions here and feed through state manager
@@ -881,11 +888,11 @@ public class SEContext {
     }
 
     // IMAGE EDITING
-    public void stampImage(final GameImage edit) {
+    public void stampImage(final GameImage edit, final Set<Coord2D> pixels) {
         final int frameIndex = getState().getFrameIndex();
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
         final SELayer replacement = getState().getEditingLayer()
-                .returnStamped(edit, frameIndex);
+                .returnStamped(edit, pixels, frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
         layers.remove(layerEditIndex);
         layers.add(layerEditIndex, replacement);

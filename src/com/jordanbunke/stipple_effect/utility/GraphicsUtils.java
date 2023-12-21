@@ -28,7 +28,7 @@ public class GraphicsUtils {
     }
 
     public static TextBuilder uiText(final Color color, final double textSize) {
-        return new TextBuilder(textSize, Text.Orientation.CENTER, color, SEFonts.CLASSIC.getStandard());
+        return new TextBuilder(textSize, Text.Orientation.CENTER, color, SEFonts.BASIC);
     }
 
     public static Color buttonBorderColor(final boolean selected) {

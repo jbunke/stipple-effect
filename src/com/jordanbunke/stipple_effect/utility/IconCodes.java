@@ -55,6 +55,11 @@ public class IconCodes {
     public static final String NO_ICON_PREFIX = "__";
 
     public static final String
+            ON_RESOLUTION = NO_ICON_PREFIX + "on_resolution",
+            GENERAL = NO_ICON_PREFIX + "general",
+            CLIPBOARD_SHORTCUTS = NO_ICON_PREFIX + "clipboard_shortcuts",
+            SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",
+            COLOR_SHORTCUTS = NO_ICON_PREFIX + "color_shortcuts",
             PLAYBACK_MODES = NO_ICON_PREFIX + "playback",
             LAYER_VISIBILITY = NO_ICON_PREFIX + "visibility",
             ONION_SKIN = NO_ICON_PREFIX + "onion_skin",

@@ -4,8 +4,8 @@ To add:
 > Native file type (.stef)
 > Larger canvas sizes and necessary performance
     optimizations to facilitate them
-> Scripting language, system and scripted previews
-> Adjustable windows
+> Scripting language, system and previews
+> Adjustable panels
 > Palettes
 > More settings read from file on startup, including:
     - Toggle for rendering at true pixel size
@@ -22,6 +22,8 @@ To remove:
 {TODO for 0.0.1} - 2023-12-2?
 
 To add:
+> Logo animation on splash screen
+> Program icon
 > Settings read from file on startup, including:
     - Windowed or maximized on startup
 > Versioning system

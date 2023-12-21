@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Shift + L}
+
+Creates a new layer above by duplicating the previously
+selected one.

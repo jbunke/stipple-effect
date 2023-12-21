@@ -1,3 +1,5 @@
 Shortcut: {Ctrl + Shift + R}
 
-TODO
+Displays a dialog that allows the user to either pad the
+boundaries of the canvas with blank pixels, or to trim the
+boundaries by typing in negative values.

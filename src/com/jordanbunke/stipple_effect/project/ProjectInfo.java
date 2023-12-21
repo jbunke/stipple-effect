@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.project;
 
+import com.jordanbunke.anim.GIFWriter;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
@@ -102,7 +103,7 @@ public class ProjectInfo {
                         images[i] = ImageProcessing.scale(images[i], scaleUp);
                 }
 
-                GameImageIO.writeGif(buildFilepath(), images,
+                GIFWriter.get().write(buildFilepath(), images,
                         Constants.MILLIS_IN_SECOND / fps);
             }
             case PNG_SEPARATE -> {

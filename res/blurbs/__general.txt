@@ -1,0 +1,3 @@
+Toggle fullscreen / windowed mode: {Escape}
+Navigate to layer above: {Ctrl + Up Arrow Key}
+Navigate to layer below: {Ctrl + Down Arrow Key}

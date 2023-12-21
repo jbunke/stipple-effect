@@ -12,6 +12,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGroup
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.PlaceholderMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.TimedMenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.visual.AnimationMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -194,11 +195,15 @@ public class DialogAssembly {
                 saveAsToggle, basedOnSaveType);
         setDialog(assembleDialog("Save Project...", contents,
                 () -> {
-            final boolean enoughFrames = c.projectInfo.getFrameDimsX() *
-                    c.projectInfo.getFrameDimsY() >= c.getState().getFrameCount();
-            return c.projectInfo.hasSaveAssociation() &&
-                    xDivsTextBox.isValid() && yDivsTextBox.isValid() &&
-                    enoughFrames;
+            if (c.projectInfo.getSaveType() == ProjectInfo.SaveType.PNG_STITCHED) {
+                final boolean enoughFrames = c.projectInfo.getFrameDimsX() *
+                        c.projectInfo.getFrameDimsY() >= c.getState().getFrameCount();
+                return c.projectInfo.hasSaveAssociation() &&
+                        xDivsTextBox.isValid() && yDivsTextBox.isValid() &&
+                        enoughFrames;
+            }
+
+            return c.projectInfo.hasSaveAssociation();
             }, "Save", c.projectInfo::save));
     }
 
@@ -496,16 +501,19 @@ public class DialogAssembly {
 
         // timer
         mb.add(new TimedMenuElement(
-                (int)(Constants.SPLASH_DURATION_SECS * Constants.TICK_HZ),
+                (int)(Constants.SPLASH_TIMEOUT_SECS * Constants.TICK_HZ),
                 () -> StippleEffect.get().clearDialog()));
 
         final int w = Constants.CANVAS_W, h = Constants.CANVAS_H;
 
         // background
         final GameImage background = new GameImage(w, h);
+        background.free();
+
         background.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0, w, h);
-        mb.add(new StaticMenuElement(new Coord2D(), new Coord2D(w, h),
-                MenuElement.Anchor.LEFT_TOP, background.submit()));
+        mb.add(new SimpleMenuButton(new Coord2D(), new Coord2D(w, h),
+                MenuElement.Anchor.LEFT_TOP, true,
+                () -> StippleEffect.get().clearDialog(), background, background));
 
         // title
         final GameImage title = GraphicsUtils.uiText(Constants.BLACK, 3d)
@@ -516,15 +524,24 @@ public class DialogAssembly {
                 MenuElement.Anchor.CENTRAL_TOP, title));
 
         // subtitle
-        final GameImage subA = GraphicsUtils.uiText(
+        final GameImage subtitle = GraphicsUtils.uiText(
                 Constants.ACCENT_BACKGROUND_DARK)
                 .addText("Pixel art editor and animator").addLineBreak()
                 .addText("built on Delta Time by Flinker Flitzer")
                 .build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.75)),
-                new Coord2D(subA.getWidth(), subA.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, subA));
+                new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, subtitle));
+
+        // gateway
+        final GameImage ctc = GraphicsUtils.uiText(Constants.GREY)
+                .addText("Click anywhere to continue").build().draw();
+
+        mb.add(new AnimationMenuElement(new Coord2D(w - Constants.TOOL_NAME_X, h),
+                new Coord2D(ctc.getWidth(), ctc.getHeight()),
+                MenuElement.Anchor.RIGHT_BOTTOM, (int)(Constants.TICK_HZ / 2),
+                ctc, GameImage.dummy()));
 
         // TODO - mb.add(new AnimationMenuElement());
 
@@ -637,7 +654,23 @@ public class DialogAssembly {
             case TOOLS -> assembleToolsInfoScreenContents(contentAssembler,
                     contentStart, initialbottomY);
             case MORE -> assembleInfoScreenContents(
-                    new String[] { "more" }, new String[] { "" },
+                    new String[] {
+                            IconCodes.SWAP_COLORS,
+                            IconCodes.GENERAL,
+                            IconCodes.ON_RESOLUTION,
+                            IconCodes.CLIPBOARD_SHORTCUTS,
+                            IconCodes.SELECTION_SHORTCUTS,
+                            IconCodes.COLOR_SHORTCUTS
+                    },
+                    new String[] {
+                            "Swap primary and secondary color",
+                            "General",
+                            "On resolution",
+                            // TODO - icon color shortcuts: swap colors, toggle slider vs. palette mode
+                            "Clipboard shortcuts",
+                            "Selection shortcuts",
+                            "Advanced color shortcuts"
+                    },
                     contentAssembler, contentStart, initialbottomY
             );
             case CHANGELOG -> assembleInfoScreenContents(
@@ -730,6 +763,7 @@ public class DialogAssembly {
         return assembleInfoScreenContents(
                 new String[] {
                         IconCodes.INFO,
+                        IconCodes.SETTINGS,
                         IconCodes.NEW_PROJECT,
                         IconCodes.OPEN_FILE,
                         IconCodes.SAVE,
@@ -742,7 +776,7 @@ public class DialogAssembly {
                         IconCodes.REDO
                 },
                 new String[] {
-                        "Info",
+                        "Info", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"
@@ -794,7 +828,7 @@ public class DialogAssembly {
                         "Previous frame",
                         "Next frame",
                         "Previous and next frame",
-                        "Frame locking / layer dynamism",
+                        "Layer frame status",
                         "Frames are linked / layer is static",
                         "Frames are free / layer is dynamic",
                         "Layer settings"

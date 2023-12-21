@@ -1,0 +1,11 @@
+Stipple Effect's screen contents render at {960 x 540} pixels.
+This canvas is then scaled up to the window size. As such,
+the program is optimized to run fullscreen on {16:9} aspect
+ratio screens with {1080p or 4K (2160p)} resolutions.
+
+Note that the zoom percentage that is displayed in the bottom
+bar also refers to the internal program resolution. That is
+to say, a 32 x 32 canvas on 100% zoom on a 1080p screen is
+actually being displayed at 200%, and will only be half as
+big when the file is viewed at normal size in a program other
+than Stipple Effect.

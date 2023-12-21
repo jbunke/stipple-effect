@@ -1,3 +1,4 @@
 Shortcut: {Ctrl + S}
 
-TODO
+Saves the project with the established save settings. If
+none exist, attempting to save will display the Save As menu.

@@ -17,4 +17,6 @@ public class SEFonts {
 
     public static final Font SMALL = Font.loadFromSource(FONT_FOLDER, true,
             "font-arcade", false, 1, false);
+    public static final Font BASIC = Font.loadFromSource(FONT_FOLDER, true,
+            "font-basic-bold", true, 0.6, 2, false, true);
 }

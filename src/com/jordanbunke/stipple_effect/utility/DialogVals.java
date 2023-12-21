@@ -20,7 +20,7 @@ public class DialogVals {
         ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, MORE, CHANGELOG;
 
         public String getTitle() {
-            return this == MORE ? "More Shortcuts & Quality of Life" : toString();
+            return this == MORE ? "More Shortcuts & Advanced Info" : toString();
         }
 
         @Override

@@ -1,3 +1,5 @@
 Shortcut: {Ctrl + Shift + S}
 
-TODO
+Displays a dialog allowing the user to define the folder,
+name, file type, and additional properties of the project's
+save association.
