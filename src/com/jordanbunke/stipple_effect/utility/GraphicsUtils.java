@@ -99,7 +99,7 @@ public class GraphicsUtils {
             final boolean isSelected, final Color backgroundColor
     ) {
         final Color textColor = (backgroundColor.getRed() + backgroundColor.getGreen() +
-                backgroundColor.getBlue()) / 3 > Constants.COLOR_BUTTON_AVG_C_THRESHOLD
+                backgroundColor.getBlue()) / 3 > Constants.COLOR_TEXTBOX_AVG_C_THRESHOLD
                 ? Constants.BLACK : Constants.WHITE;
         final GameImage textImage = GraphicsUtils.uiText(textColor)
                 .addText(text).build().draw();

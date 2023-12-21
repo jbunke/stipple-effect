@@ -581,11 +581,10 @@ public class MenuAssembly {
         final int NUM_COLORS = 2;
 
         for (int i = 0; i < NUM_COLORS; i++) {
-            final int width = Constants.STD_TEXT_BUTTON_W;
+            final int offsetY = Constants.getSegmentContentDisplacement().y;
             final Coord2D pos = Constants.getColorsPosition().displace(
-                    Constants.COLOR_PICKER_W - (Constants.TOOL_NAME_X +
-                            ((NUM_COLORS - i) * (width + Constants.BUTTON_OFFSET))),
-                    Constants.BUTTON_OFFSET);
+                    (Constants.COLOR_PICKER_W / 4) +
+                            (i * (Constants.COLOR_PICKER_W / 2)), offsetY);
 
             mb.add(new ColorButton(pos, i));
         }

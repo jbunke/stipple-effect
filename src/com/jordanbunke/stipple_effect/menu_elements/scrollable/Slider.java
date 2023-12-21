@@ -22,16 +22,17 @@ public abstract class Slider extends MenuElement {
     private final Function<Coord2D, Integer> coordDimFunction;
     private final Function<Slider, Integer> sliderDimFunction;
 
-    public final Consumer<Integer> setter;
+    private final Consumer<Integer> setter;
+    private final boolean canSetImplicitly;
 
     private boolean sliding, highlighted;
 
     private GameImage baseImage, highlightedImage, selectedImage;
 
     public Slider(
-            final Coord2D position, final Coord2D dimensions,
-            final Anchor anchor, final int minValue, final int maxValue,
-            final int initialValue, final Consumer<Integer> setter,
+            final Coord2D position, final Coord2D dimensions, final Anchor anchor,
+            final int minValue, final int maxValue, final int initialValue,
+            final Consumer<Integer> setter, final boolean canSetImplicitly,
             final Function<Coord2D, Integer> coordDimFunction,
             final Function<Slider, Integer> sliderDimFunction
     ) {
@@ -43,6 +44,7 @@ public abstract class Slider extends MenuElement {
         value = initialValue;
 
         this.setter = setter;
+        this.canSetImplicitly = canSetImplicitly;
 
         sliding = false;
         onClickDiffDim = 0;
@@ -220,7 +222,10 @@ public abstract class Slider extends MenuElement {
 
     public void setValue(final int value) {
         this.value = Math.max(minValue, Math.min(value, maxValue));
-        setter.accept(this.value);
+
+        if (canSetImplicitly)
+            setter.accept(this.value);
+
         updateAssets();
     }
 

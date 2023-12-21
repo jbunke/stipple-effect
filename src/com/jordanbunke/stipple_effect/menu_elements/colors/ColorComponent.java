@@ -63,23 +63,25 @@ public class ColorComponent extends MenuElementContainer {
                 Constants.DYNAMIC_LABEL_W_ALLOWANCE));
 
         // increment and decrement buttons
-        final GameImage baseDec = GraphicsUtils.loadIcon(IconCodes.DECREMENT),
-                highlightDec = GraphicsUtils.highlightIconButton(baseDec),
-                baseInc = GraphicsUtils.loadIcon(IconCodes.INCREMENT),
-                highlightInc = GraphicsUtils.highlightIconButton(baseInc);
+        if (alignment != Alignment.RIGHT) {
+            final GameImage baseDec = GraphicsUtils.loadIcon(IconCodes.DECREMENT),
+                    highlightDec = GraphicsUtils.highlightIconButton(baseDec),
+                    baseInc = GraphicsUtils.loadIcon(IconCodes.INCREMENT),
+                    highlightInc = GraphicsUtils.highlightIconButton(baseInc);
 
-        elements.add(new SimpleMenuButton(startingPos.displace((width / 2) -
-                (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
-                buttonDims, Anchor.CENTRAL, true,
-                () -> setter.accept(spectralFunction
-                        .apply(Math.max(getter.get() - 1, 0))),
-                baseDec, highlightDec));
-        elements.add(new SimpleMenuButton(startingPos.displace((width / 2) +
-                (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
-                buttonDims, Anchor.CENTRAL, true,
-                () -> setter.accept(spectralFunction
-                        .apply(Math.min(getter.get() + 1, 255))),
-                baseInc, highlightInc));
+            elements.add(new SimpleMenuButton(startingPos.displace((width / 2) -
+                    (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
+                    buttonDims, Anchor.CENTRAL, true,
+                    () -> setter.accept(spectralFunction
+                            .apply(Math.max(getter.get() - 1, 0))),
+                    baseDec, highlightDec));
+            elements.add(new SimpleMenuButton(startingPos.displace((width / 2) +
+                    (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
+                    buttonDims, Anchor.CENTRAL, true,
+                    () -> setter.accept(spectralFunction
+                            .apply(Math.min(getter.get() + 1, maxValue))),
+                    baseInc, highlightInc));
+        }
 
         // slider
         elements.add(new ColorSlider(startingPos.displace(width / 2,

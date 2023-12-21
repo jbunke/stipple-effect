@@ -15,7 +15,7 @@ public class VerticalSlider extends Slider {
     ) {
         super(position, new Coord2D(Constants.SLIDER_OFF_DIM, height), anchor,
                 minValue, maxValue, initialValue,
-                setter, c -> c.y, MenuElement::getHeight);
+                setter, true, c -> c.y, MenuElement::getHeight);
     }
 
     @Override

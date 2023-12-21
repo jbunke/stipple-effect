@@ -6,7 +6,6 @@ To add:
     optimizations to facilitate them
 > Scripting language, system and scripted previews
 > Adjustable windows
-> HSV sliders
 > Palettes
 > More settings read from file on startup, including:
     - Toggle for rendering at true pixel size
@@ -26,9 +25,7 @@ To add:
 > Settings read from file on startup, including:
     - Windowed or maximized on startup
 > Versioning system
-> Textboxes with immutable prefixes and suffixes
 > Working pick up selection tool
-> [Maybe] HSV sliders
 
 {0.0.1} - 2023-12-2?
 

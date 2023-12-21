@@ -12,11 +12,20 @@ public class HorizontalSlider extends Slider {
     public HorizontalSlider(
             final Coord2D position, final int width, final Anchor anchor,
             final int minValue, final int maxValue, final int initialValue,
-            final Consumer<Integer> setter
+            final Consumer<Integer> setter, final boolean canSetImplicitly
     ) {
         super(position, new Coord2D(width, Constants.SLIDER_OFF_DIM), anchor,
                 minValue, maxValue, initialValue,
-                setter, c -> c.x, MenuElement::getWidth);
+                setter, canSetImplicitly, c -> c.x, MenuElement::getWidth);
+    }
+
+    public HorizontalSlider(
+            final Coord2D position, final int width, final Anchor anchor,
+            final int minValue, final int maxValue, final int initialValue,
+            final Consumer<Integer> setter
+    ) {
+        this(position, width, anchor, minValue, maxValue, initialValue,
+                setter, true);
     }
 
     @Override

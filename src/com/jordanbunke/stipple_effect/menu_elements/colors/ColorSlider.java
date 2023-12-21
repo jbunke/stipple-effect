@@ -23,8 +23,8 @@ public class ColorSlider extends HorizontalSlider {
             final Function<Integer, Color> spectralFunction,
             final Consumer<Integer> setter
     ) {
-        super(position, width, Anchor.CENTRAL,
-                minValue, maxValue, getter.get(), setter);
+        super(position, width, Anchor.CENTRAL, minValue, maxValue,
+                getter.get(), setter, false);
 
         this.spectralFunction = spectralFunction;
         this.getter = getter;

@@ -17,8 +17,9 @@ public class ColorButton extends MenuButton {
     private GameImage nh, h;
 
     public ColorButton(final Coord2D position, final int index) {
-        super(position, new Coord2D(Constants.STD_TEXT_BUTTON_W, Constants.STD_TEXT_BUTTON_H),
-                Anchor.LEFT_TOP, true, () -> StippleEffect.get().setColorIndex(index));
+        super(position, new Coord2D(Constants.COLOR_TEXTBOX_W,
+                        Constants.STD_TEXT_BUTTON_H), Anchor.CENTRAL_TOP,
+                true, () -> StippleEffect.get().setColorIndex(index));
 
         this.index = index;
         cAtLastCheck = fetchColor();
