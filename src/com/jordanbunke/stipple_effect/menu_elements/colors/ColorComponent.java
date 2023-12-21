@@ -4,47 +4,92 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ColorComponent extends MenuElementContainer {
-    private static final int NUM_ELEMENTS = 3, SLIDER_INDEX = 0,
-            LABEL_INDEX = 1, VALUE_INDEX = 2;
-
     private final MenuElement[] menuElements;
+
+    enum Alignment {
+        LEFT, RIGHT, FULL
+    }
 
     public ColorComponent(
             final int minValue, final int maxValue, final String label,
-            final Function<Integer, Color> spectralFunction, final Consumer<Color> setter,
-            final Supplier<Integer> getter, final Coord2D startingPosition
+            final Alignment alignment, final int indexY,
+            final Function<Integer, Color> spectralFunction,
+            final Consumer<Color> setter, final Supplier<Integer> getter
     ) {
         super(new Coord2D(), new Coord2D(), Anchor.LEFT_TOP, false);
 
-        menuElements = new MenuElement[NUM_ELEMENTS];
+        final boolean isFull = alignment == Alignment.FULL;
 
-        menuElements[SLIDER_INDEX] = new ColorSlider(
-                startingPosition.displace(Constants.COLOR_PICKER_W / 2,
-                        (int)(Constants.COLOR_SELECTOR_INC_Y * 0.45)),
-                Constants.COLOR_SLIDER_W + Constants.SLIDER_BALL_DIM,
+        final int globalOffsetX = alignment == Alignment.RIGHT
+                ? Constants.COLOR_PICKER_W / 2 : 0,
+                globalOffsetY = Constants.COLOR_SELECTOR_OFFSET_Y +
+                        (indexY * Constants.COLOR_SELECTOR_INC_Y),
+                width = isFull
+                        ? Constants.COLOR_PICKER_W : Constants.COLOR_PICKER_W / 2,
+                indent = Constants.TOOL_NAME_X;
+        final Coord2D startingPos = Constants.getColorsPosition().displace(
+                globalOffsetX, globalOffsetY),
+                buttonDims = new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM);
+
+        final List<MenuElement> elements = new ArrayList<>();
+
+        // label
+        elements.add(TextLabel.make(
+                startingPos.displace(indent, Constants.COLOR_LABEL_OFFSET_Y),
+                label, Constants.WHITE));
+
+        // value
+        elements.add(new DynamicLabel(startingPos.displace(
+                width - indent, Constants.COLOR_LABEL_OFFSET_Y),
+                Anchor.RIGHT_TOP, Constants.WHITE,
+                () -> String.valueOf(getter.get()),
+                Constants.DYNAMIC_LABEL_W_ALLOWANCE));
+
+        // increment and decrement buttons
+        final GameImage baseDec = GraphicsUtils.loadIcon(IconCodes.DECREMENT),
+                highlightDec = GraphicsUtils.highlightIconButton(baseDec),
+                baseInc = GraphicsUtils.loadIcon(IconCodes.INCREMENT),
+                highlightInc = GraphicsUtils.highlightIconButton(baseInc);
+
+        elements.add(new SimpleMenuButton(startingPos.displace((width / 2) -
+                (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
+                buttonDims, Anchor.CENTRAL, true,
+                () -> setter.accept(spectralFunction
+                        .apply(Math.max(getter.get() - 1, 0))),
+                baseDec, highlightDec));
+        elements.add(new SimpleMenuButton(startingPos.displace((width / 2) +
+                (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
+                buttonDims, Anchor.CENTRAL, true,
+                () -> setter.accept(spectralFunction
+                        .apply(Math.min(getter.get() + 1, 255))),
+                baseInc, highlightInc));
+
+        // slider
+        elements.add(new ColorSlider(startingPos.displace(width / 2,
+                (int)(Constants.COLOR_SELECTOR_INC_Y * 0.45)),
+                (isFull ? Constants.FULL_COLOR_SLIDER_W :
+                        Constants.HALF_COLOR_SLIDER_W) + Constants.SLIDER_BALL_DIM,
                 minValue, maxValue, getter, spectralFunction,
-                i -> setter.accept(spectralFunction.apply(i)));
-        menuElements[LABEL_INDEX] = TextLabel.make(
-                startingPosition.displace(Constants.TOOL_NAME_X, Constants.COLOR_LABEL_OFFSET_Y),
-                label, Constants.BLACK);
-        menuElements[VALUE_INDEX] = new DynamicLabel(
-                startingPosition.displace(Constants.COLOR_PICKER_W - Constants.TOOL_NAME_X,
-                        Constants.COLOR_LABEL_OFFSET_Y),
-                Anchor.RIGHT_TOP, Constants.BLACK, () -> String.valueOf(getter.get()),
-                Constants.DYNAMIC_LABEL_W_ALLOWANCE
-        );
+                i -> setter.accept(spectralFunction.apply(i))));
+
+        menuElements = elements.toArray(MenuElement[]::new);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class MenuAssembly {
         final SEContext c = StippleEffect.get().getContext();
 
         final String[] iconIDs = new String[] {
-                IconCodes.SETTINGS, // TODO - program settings
+                IconCodes.SETTINGS,
                 IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
                 IconCodes.SAVE, IconCodes.SAVE_AS,
                 IconCodes.RESIZE, IconCodes.PAD,
@@ -46,8 +46,7 @@ public class MenuAssembly {
         };
 
         final boolean[] preconditions = new boolean[] {
-                false, // TODO
-                true, true, true, true, true, true,
+                true, true, true, true, true, true, true,
                 c.getStateManager().canUndo(),
                 c.getStateManager().canUndo(),
                 c.getStateManager().canRedo(),

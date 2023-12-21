@@ -195,22 +195,22 @@ public class SEContext {
                         mse.markAsProcessed();
 
                         StippleEffect.get().incrementSelectedColorRGBA(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGB_INC, 0, 0, 0);
+                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0, 0);
                     } else if (eventLogger.isPressed(Key.G)) {
                         mse.markAsProcessed();
 
                         StippleEffect.get().incrementSelectedColorRGBA(
-                                0, mse.clicksScrolled * Constants.COLOR_SET_RGB_INC, 0, 0);
+                                0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0);
                     } else if (eventLogger.isPressed(Key.B)) {
                         mse.markAsProcessed();
 
                         StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGB_INC, 0);
+                                0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0);
                     } else if (eventLogger.isPressed(Key.A)) {
                         mse.markAsProcessed();
 
                         StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGB_INC);
+                                0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
                     } else if (StippleEffect.get().getTool() instanceof ToolWithBreadth twb) {
                         mse.markAsProcessed();
 
@@ -333,45 +333,45 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                -Constants.COLOR_SET_RGB_INC, 0, 0, 0)
+                                -Constants.COLOR_SET_RGBA_INC, 0, 0, 0)
                 );
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                Constants.COLOR_SET_RGB_INC, 0, 0, 0)
+                                Constants.COLOR_SET_RGBA_INC, 0, 0, 0)
                 );
             } else if (eventLogger.isPressed(Key.G)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, -Constants.COLOR_SET_RGB_INC, 0, 0)
+                                0, -Constants.COLOR_SET_RGBA_INC, 0, 0)
                 );
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, Constants.COLOR_SET_RGB_INC, 0, 0)
+                                0, Constants.COLOR_SET_RGBA_INC, 0, 0)
                 );
             } else if (eventLogger.isPressed(Key.B)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, -Constants.COLOR_SET_RGB_INC, 0)
+                                0, 0, -Constants.COLOR_SET_RGBA_INC, 0)
                 );
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, Constants.COLOR_SET_RGB_INC, 0)
+                                0, 0, Constants.COLOR_SET_RGBA_INC, 0)
                 );
             } else if (eventLogger.isPressed(Key.A)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, -Constants.COLOR_SET_RGB_INC)
+                                0, 0, 0, -Constants.COLOR_SET_RGBA_INC)
                 );
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, Constants.COLOR_SET_RGB_INC)
+                                0, 0, 0, Constants.COLOR_SET_RGBA_INC)
                 );
             } else {
                 eventLogger.checkForMatchingKeyStroke(

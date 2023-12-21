@@ -339,10 +339,10 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawColorsSegment() {
         final GameImage colors = new GameImage(Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
-        colors.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0,
+        colors.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
 
-        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
+        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.WHITE)
                 .addText("Colors").build().draw();
         colors.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 
@@ -351,7 +351,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawTools() {
         final GameImage tools = new GameImage(Constants.TOOLS_W, Constants.WORKSPACE_H);
-        tools.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0,
+        tools.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Constants.TOOLS_W, Constants.WORKSPACE_H);
 
         return tools.submit();
@@ -359,10 +359,10 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawLayers() {
         final GameImage layers = new GameImage(Constants.COLOR_PICKER_W, Constants.LAYERS_H);
-        layers.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0,
+        layers.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Constants.COLOR_PICKER_W, Constants.LAYERS_H);
 
-        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.BLACK)
+        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.WHITE)
                 .addText("Layers").build().draw();
         layers.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
 

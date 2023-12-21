@@ -60,7 +60,7 @@ public class ColorSlider extends HorizontalSlider {
     @Override
     public Color getSliderBallCoreColor() {
         final GameImage core = new GameImage(1, 1);
-        core.dot(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0);
+        core.dot(Constants.GREY, 0, 0);
         core.dot(spectralFunction.apply(getValue()), 0, 0);
         core.free();
 
