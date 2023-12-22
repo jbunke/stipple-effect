@@ -21,7 +21,6 @@ public final class PickUpSelection extends MoverTool {
         return "Pick up selection";
     }
 
-    // TODO: tool behaviour
     public void engage(final SEContext context) {
         context.raiseSelectionToContents(false);
     }

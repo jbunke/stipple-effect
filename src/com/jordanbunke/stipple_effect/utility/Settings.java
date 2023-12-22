@@ -12,12 +12,15 @@ public class Settings {
     private static final Path SETTINGS_FILE = Path.of("data", ".settings");
 
     // codes
-    private static final String FULLSCREEN_ON_STARTUP = "fullscreen_on_startup";
-    private static final String CHECKERBOARD_PX = "checkerboard_px";
+    private static final String
+            FULLSCREEN_ON_STARTUP = "fullscreen_on_startup",
+            FONT = "program_font",
+            CHECKERBOARD_PX = "checkerboard_px";
 
     // code-function associations
-    private static final Map<String, Supplier<Object>> getterMap = Map.ofEntries(
+    private static final Map<String, Supplier<Object>> writerGetterMap = Map.ofEntries(
             Map.entry(FULLSCREEN_ON_STARTUP, Settings::isFullscreenOnStartup),
+            Map.entry(FONT, Settings::getProgramFont),
             Map.entry(CHECKERBOARD_PX, Settings::getCheckerboardPixels)
     );
 
@@ -27,6 +30,9 @@ public class Settings {
 
     // int
     private static int checkerboardPixels = Constants.DEFAULT_CHECKERBOARD_DIM;
+
+    // object
+    private static SEFonts.Code programFont = SEFonts.Code.CLASSIC;
 
     public static void read() {
         final String[] settingsLines = FileIO.readFile(SETTINGS_FILE).split("\n");
@@ -46,6 +52,7 @@ public class Settings {
                 case CHECKERBOARD_PX -> setIntSettingSafely(value,
                         Constants.DEFAULT_CHECKERBOARD_DIM,
                         i -> setCheckerboardPixels(i, true));
+                case FONT -> setProgramFont(value, true);
             }
         }
     }
@@ -53,10 +60,10 @@ public class Settings {
     public static void write() {
         final StringBuilder sb = new StringBuilder();
 
-        for (String code : getterMap.keySet())
+        for (String code : writerGetterMap.keySet())
             sb.append(code).append(Constants.SETTING_SEPARATOR)
                     .append(Constants.OPEN_SETTING_VAL)
-                    .append(getterMap.get(code))
+                    .append(writerGetterMap.get(code).get())
                     .append(Constants.CLOSE_SETTING_VAL)
                     .append("\n");
 
@@ -92,6 +99,22 @@ public class Settings {
             StippleEffect.get().getContext().redrawCheckerboard();
     }
 
+    public static void setProgramFont(final String fontCode, final boolean isStartup) {
+        try {
+            Settings.programFont = SEFonts.Code.valueOf(fontCode);
+        } catch (IllegalArgumentException e) {
+            if (!isStartup)
+                StatusUpdates.invalidFontCode(fontCode);
+
+            Settings.programFont = SEFonts.Code.CLASSIC;
+        }
+
+        if (!isStartup) {
+            DialogAssembly.setDialogToProgramSettings();
+            StippleEffect.get().rebuildStateDependentMenus();
+        }
+    }
+
     // getters
     public static boolean isFullscreenOnStartup() {
         return fullscreenOnStartup;
@@ -99,5 +122,9 @@ public class Settings {
 
     public static int getCheckerboardPixels() {
         return checkerboardPixels;
+    }
+
+    public static SEFonts.Code getProgramFont() {
+        return programFont;
     }
 }

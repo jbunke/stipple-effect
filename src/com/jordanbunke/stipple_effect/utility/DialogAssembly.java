@@ -485,12 +485,65 @@ public class DialogAssembly {
 
     public static void setDialogToProgramSettings() {
         // text labels
-        final TextLabel screenModeLabel = makeDialogLeftLabel(1, "On startup: ");
+        final TextLabel screenModeLabel = makeDialogLeftLabel(1, "Fullscreen on startup: "),
+                checkerboardLabel = makeDialogLeftLabel(2, "Checkerboard size: "),
+                fontLabel = makeDialogLeftLabel(3, "Program font: ");
 
-        // TODO
+        // toggle buttons
+        final GameImage[] smBases = makeBooleanToggleButtonSet();
+        final SimpleToggleMenuButton screenModeButton = new SimpleToggleMenuButton(
+                getDialogContentBigOffsetFromLabel(screenModeLabel),
+                new Coord2D(Constants.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        Constants.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, true,
+                smBases, Arrays.stream(smBases)
+                .map(GraphicsUtils::drawHighlightedButton)
+                .toArray(GameImage[]::new),
+                new Runnable[] {
+                        () -> Settings.setFullscreenOnStartup(false),
+                        () -> Settings.setFullscreenOnStartup(true)
+                }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {});
+
+        final GameImage[] fontBases = makeToggleButtonSet(
+                Arrays.stream(SEFonts.Code.values())
+                        .map(SEFonts.Code::forButtonText)
+                        .toArray(String[]::new));
+        final SimpleToggleMenuButton fontButton = new SimpleToggleMenuButton(
+                getDialogContentBigOffsetFromLabel(fontLabel),
+                new Coord2D(Constants.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        Constants.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, true,
+                fontBases, Arrays.stream(fontBases)
+                .map(GraphicsUtils::drawHighlightedButton)
+                .toArray(GameImage[]::new),
+                Arrays.stream(SEFonts.Code.values()).map(
+                        code -> (Runnable) () -> Settings.setProgramFont(
+                                code.next().name(), false)
+                ).toArray(Runnable[]::new),
+                () -> Settings.getProgramFont().ordinal(), () -> {});
+
+        // sliders
+        final HorizontalSlider checkerboardSlider = new HorizontalSlider(
+                getDialogContentBigOffsetFromLabel(checkerboardLabel),
+                Constants.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                MenuElement.Anchor.LEFT_TOP, 0, 5,
+                (int)Math.round(Math.log(Settings.getCheckerboardPixels())
+                        / Math.log(2d)),
+                exp -> Settings.setCheckerboardPixels(
+                        (int)Math.pow(2d, exp), false));
+        checkerboardSlider.updateAssets();
+        final DynamicLabel checkerboardValue = makeDynamicFromLeftLabel(
+                checkerboardLabel,
+                () -> String.valueOf(Settings.getCheckerboardPixels()));
+
+        // textboxes
+
 
         final MenuElementGrouping contents = new MenuElementGrouping(
-                screenModeLabel);
+                screenModeLabel, screenModeButton,
+                checkerboardLabel, checkerboardSlider, checkerboardValue,
+                fontLabel, fontButton
+        );
         setDialog(assembleDialog("Program Settings",
                 contents, () -> true, "Apply", () -> {}));
     }
@@ -533,6 +586,15 @@ public class DialogAssembly {
                 new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
                 MenuElement.Anchor.CENTRAL_TOP, subtitle));
 
+        // version
+        final GameImage version = GraphicsUtils.uiText(
+                Constants.ACCENT_BACKGROUND_DARK)
+                .addText(StippleEffect.VERSION).build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
+                new Coord2D(version.getWidth(), version.getHeight()),
+                MenuElement.Anchor.CENTRAL_BOTTOM, version));
+
         // gateway
         final GameImage ctc = GraphicsUtils.uiText(Constants.GREY)
                 .addText("Click anywhere to continue").build().draw();
@@ -558,6 +620,20 @@ public class DialogAssembly {
 
     private static void setDialog(final Menu dialog) {
         StippleEffect.get().setDialog(dialog);
+    }
+
+    private static GameImage[] makeBooleanToggleButtonSet() {
+        return makeToggleButtonSet("Yes", "No");
+    }
+
+    private static GameImage[] makeToggleButtonSet(
+            final String... buttonTexts
+    ) {
+        return Arrays.stream(buttonTexts).map(
+                t -> GraphicsUtils.drawTextButton(
+                        Constants.DIALOG_CONTENT_SMALL_W_ALLOWANCE, t,
+                        false, Constants.GREY)
+        ).toArray(GameImage[]::new);
     }
 
     private static DynamicLabel makeDynamicFromLeftLabel(
@@ -627,6 +703,12 @@ public class DialogAssembly {
                 Constants.DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 
+    private static Coord2D getDialogContentBigOffsetFromLabel(final TextLabel label) {
+        return label.getRenderPosition().displace(
+                Constants.DIALOG_CONTENT_BIG_OFFSET_X,
+                Constants.DIALOG_CONTENT_COMP_OFFSET_Y);
+    }
+
     private static VerticalScrollingMenuElement assembleScroller(
             final DialogVals.InfoScreen infoScreen
     ) {
@@ -672,9 +754,9 @@ public class DialogAssembly {
                     },
                     new String[] {
                             "Swap primary and secondary color",
+                            // TODO - icon color shortcuts: toggle slider vs. palette mode
                             "General",
                             "On resolution",
-                            // TODO - icon color shortcuts: swap colors, toggle slider vs. palette mode
                             "Clipboard shortcuts",
                             "Selection shortcuts",
                             "Advanced color shortcuts"

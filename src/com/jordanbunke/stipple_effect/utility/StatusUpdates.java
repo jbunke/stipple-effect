@@ -48,4 +48,10 @@ public class StatusUpdates {
         StippleEffect.get().sendStatusUpdate("Cannot paste; the " +
                 StippleEffect.PROGRAM_NAME + " clipboard is empty");
     }
+
+    public static void invalidFontCode(final String attempt) {
+        StippleEffect.get().sendStatusUpdate("The font code \"" + attempt +
+                "\" is invalid; assigned to \"" + SEFonts.Code.CLASSIC.forButtonText() +
+                "\" instead");
+    }
 }

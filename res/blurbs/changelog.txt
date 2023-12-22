@@ -25,9 +25,6 @@ To remove:
 To add:
 > Logo animation on splash screen
 > Program icon
-> Settings read from file on startup, including:
-    - Windowed or maximized on startup
-> Versioning system
 
 {0.0.1} - 2023-12-2?
 
