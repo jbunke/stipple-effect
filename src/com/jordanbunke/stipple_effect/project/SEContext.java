@@ -21,13 +21,13 @@ import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SEContext {
+    private static final int TL = 0, BR = 1, DIM = 2, TRP = 3, BOUNDS = 4;
+
     public final ProjectInfo projectInfo;
     private final StateManager stateManager;
     public final RenderInfo renderInfo;
@@ -69,30 +69,72 @@ public class SEContext {
                 getState().getSelectionMode() == SelectionMode.BOUNDS) : GameImage.dummy();
     }
 
+    private Coord2D[] getImageRenderBounds(
+            final Coord2D render, final int w, final int h, final float z
+    ) {
+        final Coord2D[] bounds = new Coord2D[BOUNDS];
+
+        if (render.x > Constants.WORKSPACE_W || render.y > Constants.WORKSPACE_H ||
+                render.x + (int)(w * z) <= 0 || render.y + (int)(h * z) <= 0)
+            return new Coord2D[] {};
+
+        final int tlx, tly, brx, bry;
+
+        final float modX = render.x % z, modY = render.y % z;
+
+        tlx = Math.max((int)(-render.x / z), 0);
+        tly = Math.max((int)(-render.y / z), 0);
+        brx = Math.min((int)((Constants.WORKSPACE_W - render.x) / z) + 1, w);
+        bry = Math.min((int)((Constants.WORKSPACE_H - render.y) / z) + 1, h);
+
+        bounds[TL] = new Coord2D(tlx, tly);
+        bounds[BR] = new Coord2D(brx, bry);
+        bounds[DIM] = new Coord2D(brx - tlx, bry - tly);
+        bounds[TRP] = new Coord2D(
+                tlx == 0 ? render.x : (int) modX,
+                tly == 0 ? render.y : (int) modY
+        );
+
+        return bounds;
+    }
+
     public GameImage drawWorkspace() {
         final GameImage workspace = new GameImage(Constants.WORKSPACE_W, Constants.WORKSPACE_H);
+
+        // background
         workspace.fillRectangle(Constants.BACKGROUND, 0, 0,
                 Constants.WORKSPACE_W, Constants.WORKSPACE_H);
 
+        // math
         final float zoomFactor = renderInfo.getZoomFactor();
         final Coord2D render = getImageRenderPositionInWorkspace();
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
+        final Coord2D[] bounds = getImageRenderBounds(render, w, h, zoomFactor);
 
-        // TODO - improve performance by drawing subimages that appear on workspace with GameImage::section
+        if (bounds.length == BOUNDS) {
+            // canvas
+            // workspace.draw(generateCheckers(), render.x, render.y);
 
-        // canvas
-        workspace.draw(generateCheckers(), render.x, render.y);
-        workspace.draw(getState().draw(true, getState().getFrameIndex()),
-                render.x, render.y, (int)(w * zoomFactor), (int)(h * zoomFactor));
+            final GameImage canvas = getState().draw(true,
+                    getState().getFrameIndex());
 
-        // preview
-        if (getState().getSelectionMode() == SelectionMode.CONTENTS &&
-                getState().hasSelection()) {
-            final SelectionContents contents = getState().getSelectionContents();
+            workspace.draw(canvas.section(bounds[TL], bounds[BR]),
+                    bounds[TRP].x, bounds[TRP].y,
+                    (int)(bounds[DIM].x * zoomFactor),
+                    (int)(bounds[DIM].y * zoomFactor));
 
-            workspace.draw(contents.getContentForCanvas(w, h), render.x,
-                    render.y, (int)(w * zoomFactor), (int)(h * zoomFactor));
+            // preview
+            if (getState().getSelectionMode() == SelectionMode.CONTENTS &&
+                    getState().hasSelection()) {
+                final SelectionContents contents = getState().getSelectionContents();
+                final GameImage preview = contents.getContentForCanvas(w, h);
+
+                workspace.draw(preview.section(bounds[TL], bounds[BR]),
+                        bounds[TRP].x, bounds[TRP].y,
+                        (int)(bounds[DIM].x * zoomFactor),
+                        (int)(bounds[DIM].y * zoomFactor));
+            }
         }
 
         // OVERLAYS
