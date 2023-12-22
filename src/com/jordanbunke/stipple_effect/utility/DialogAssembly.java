@@ -545,7 +545,7 @@ public class DialogAssembly {
                 fontLabel, fontButton
         );
         setDialog(assembleDialog("Program Settings",
-                contents, () -> true, "Apply", () -> {}));
+                contents, () -> true, "Apply", Settings::write));
     }
 
     public static void setDialogToSplashScreen() {
