@@ -1,6 +1,7 @@
 {Upcoming}
 
 To add:
+> Rotating and stretching selections
 > Native file type (.stef)
 > Larger canvas sizes and necessary performance
     optimizations to facilitate them
@@ -27,7 +28,6 @@ To add:
 > Settings read from file on startup, including:
     - Windowed or maximized on startup
 > Versioning system
-> Working pick up selection tool
 
 {0.0.1} - 2023-12-2?
 

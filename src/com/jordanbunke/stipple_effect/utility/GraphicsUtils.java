@@ -28,7 +28,7 @@ public class GraphicsUtils {
     }
 
     public static TextBuilder uiText(final Color color, final double textSize) {
-        return new TextBuilder(textSize, Text.Orientation.CENTER, color, SEFonts.BASIC);
+        return new TextBuilder(textSize, Text.Orientation.CENTER, color, SEFonts.CLASSIC.getStandard());
     }
 
     public static Color buttonBorderColor(final boolean selected) {
@@ -212,8 +212,8 @@ public class GraphicsUtils {
     }
 
     public static GameImage highlightIconButton(final GameImage icon) {
-        final GameImage highlighted = new GameImage(icon);
-        highlighted.draw(HIGHLIGHT_OVERLAY);
+        final GameImage highlighted = new GameImage(HIGHLIGHT_OVERLAY);
+        highlighted.draw(icon);
 
         return highlighted.submit();
     }

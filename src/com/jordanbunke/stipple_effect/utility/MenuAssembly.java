@@ -633,8 +633,8 @@ public class MenuAssembly {
 
         // help button
         final GameImage helpIcon = GraphicsUtils.loadIcon(IconCodes.INFO),
-                helpHighlighted = new GameImage(helpIcon);
-        helpHighlighted.draw(GraphicsUtils.HIGHLIGHT_OVERLAY);
+                helpHighlighted = new GameImage(GraphicsUtils.HIGHLIGHT_OVERLAY);
+        helpHighlighted.draw(helpIcon);
 
         final SimpleMenuButton helpButton = new SimpleMenuButton(
                 Constants.getBottomBarPosition().displace(

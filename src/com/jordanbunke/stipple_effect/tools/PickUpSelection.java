@@ -1,18 +1,15 @@
 package com.jordanbunke.stipple_effect.tools;
 
-import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
-public final class PickUpSelection extends Tool {
+import java.util.function.BiConsumer;
+
+public final class PickUpSelection extends MoverTool {
     private static final PickUpSelection INSTANCE;
 
     static {
         INSTANCE = new PickUpSelection();
-    }
-
-    private PickUpSelection() {
-
     }
 
     public static PickUpSelection get() {
@@ -34,17 +31,7 @@ public final class PickUpSelection extends Tool {
     }
 
     @Override
-    public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-
-    }
-
-    @Override
-    public void update(final SEContext context, final Coord2D mousePosition) {
-
-    }
-
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-
+    BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context) {
+        return context::moveSelectionContents;
     }
 }

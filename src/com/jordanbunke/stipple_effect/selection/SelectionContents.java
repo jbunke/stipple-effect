@@ -16,18 +16,27 @@ public class SelectionContents {
     public SelectionContents(
             final GameImage canvas, final Set<Coord2D> selection
     ) {
-        pixels = selection.stream().filter(
-                s -> s.x >= 0 && s.y >= 0 && s.x < canvas.getWidth() && s.y < canvas.getHeight()
-        ).collect(Collectors.toSet());
+        pixels = selection.stream().filter(s -> s.x >= 0 && s.y >= 0 &&
+                s.x < canvas.getWidth() &&
+                s.y < canvas.getHeight()).collect(Collectors.toSet());
 
-        topLeft = SelectionBounds.topLeft(pixels);
+        topLeft = SelectionUtils.topLeft(pixels);
         content = makeContentFromSelection(canvas, pixels);
+    }
+
+    private SelectionContents(
+            final GameImage content, final Coord2D topLeft,
+            final Set<Coord2D> pixels
+    ) {
+        this.content = content;
+        this.topLeft = topLeft;
+        this.pixels = pixels;
     }
     private GameImage makeContentFromSelection(
             final GameImage canvas, final Set<Coord2D> pixels
     ) {
-        final Coord2D tl = SelectionBounds.topLeft(pixels),
-                br = SelectionBounds.bottomRight(pixels);
+        final Coord2D tl = SelectionUtils.topLeft(pixels),
+                br = SelectionUtils.bottomRight(pixels);
 
         final int w = br.x - tl.x, h = br.y - tl.y;
         final GameImage content = new GameImage(w, h);
@@ -45,18 +54,18 @@ public class SelectionContents {
         return content.submit();
     }
 
-    public GameImage getContent() {
-        return content;
+    public SelectionContents returnDisplaced(final Coord2D displacement) {
+        final Set<Coord2D> displacedPixels = pixels.stream().map(px ->
+                px.displace(displacement)).collect(Collectors.toSet());
+
+        return new SelectionContents(new GameImage(content),
+                topLeft.displace(displacement), displacedPixels);
     }
 
     public GameImage getContentForCanvas(final int w, final int h) {
         final GameImage contentForCanvas = new GameImage(w, h);
         contentForCanvas.draw(content, topLeft.x, topLeft.y);
         return contentForCanvas.submit();
-    }
-
-    public Coord2D getTopLeft() {
-        return topLeft;
     }
 
     public Set<Coord2D> getPixels() {

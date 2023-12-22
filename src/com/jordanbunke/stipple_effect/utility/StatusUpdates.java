@@ -33,7 +33,7 @@ public class StatusUpdates {
         StippleEffect.get().sendStatusUpdate((copied ? "Copied" : "Cut") + " " +
                         selection.size() + " pixels " +
                         (copied ? "" : "from the canvas ") +
-                "to " + Constants.PROGRAM_NAME + "'s clipboard!"
+                "to " + StippleEffect.PROGRAM_NAME + "'s clipboard"
         );
     }
 
@@ -46,6 +46,6 @@ public class StatusUpdates {
 
     public static void pasteFailed() {
         StippleEffect.get().sendStatusUpdate("Cannot paste; the " +
-                Constants.PROGRAM_NAME + " clipboard is empty");
+                StippleEffect.PROGRAM_NAME + " clipboard is empty");
     }
 }

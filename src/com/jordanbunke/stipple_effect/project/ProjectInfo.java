@@ -39,7 +39,7 @@ public class ProjectInfo {
                 case PNG_STITCHED -> "Single PNG";
                 case PNG_SEPARATE -> "Separate PNGs per frame";
                 case GIF -> "Animated GIF";
-                case NATIVE -> Constants.PROGRAM_NAME + " file (." + getFileSuffix() + ")";
+                case NATIVE -> StippleEffect.PROGRAM_NAME + " file (." + getFileSuffix() + ")";
             };
         }
 
@@ -97,7 +97,7 @@ public class ProjectInfo {
 
                 for (int i = 0; i < frameCount; i++) {
                     images[i] = StippleEffect.get().getContext()
-                            .getState().draw(false, i);
+                            .getState().draw(false, false, i);
 
                     if (scaleUp > 1)
                         images[i] = ImageProcessing.scale(images[i], scaleUp);
@@ -109,7 +109,7 @@ public class ProjectInfo {
             case PNG_SEPARATE -> {
                 for (int i = 0; i < frameCount; i++) {
                     final GameImage image = StippleEffect.get().getContext()
-                            .getState().draw(false, i);
+                            .getState().draw(false, false, i);
 
                     GameImageIO.writeImage(buildFilepath("_" + i),
                             scaleUp > 1 ? ImageProcessing.scale(image, scaleUp) : image);
@@ -140,7 +140,7 @@ public class ProjectInfo {
                             y = i / frameDims[X];
 
                     stitched.draw(StippleEffect.get().getContext().getState().draw(
-                            false, i), w * x, h * y);
+                            false, false, i), w * x, h * y);
                 }
 
                 GameImageIO.writeImage(buildFilepath(), scaleUp > 1

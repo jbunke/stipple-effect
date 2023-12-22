@@ -9,6 +9,7 @@ import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -159,7 +160,10 @@ public class ProjectState {
                 new HashSet<>(selection), selectionContents);
     }
 
-    public GameImage draw(final boolean includeOnionSkins, final int frameIndex) {
+    public GameImage draw(
+            final boolean includeOnionSkins, final boolean inProjectRender,
+            final int frameIndex
+    ) {
         final GameImage image = new GameImage(imageWidth, imageHeight);
 
         for (SELayer layer : layers) {
@@ -177,10 +181,25 @@ public class ProjectState {
                             layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
 
                 // this layer
-                if (layer.getOpacity() == Constants.OPAQUE)
-                    image.draw(layer.getFrame(frameIndex));
-                else
-                    image.draw(layer.renderFrame(frameIndex));
+                GameImage layerImage = new GameImage(
+                        layer.getOpacity() == Constants.OPAQUE
+                                ? layer.getFrame(frameIndex)
+                                : layer.renderFrame(frameIndex));
+
+                // edge case where pixels on editing layer behind transparent
+                // pixel that is part of selection must be unrendered when selection
+                // is being moved
+                if (inProjectRender && layer.equals(getEditingLayer()) &&
+                        hasSelection() && selectionMode == SelectionMode.CONTENTS) {
+                    final Set<Coord2D> pixels = selectionContents.getPixels();
+
+                    pixels.stream().filter(px -> px.x >= 0 && px.y >= 0 &&
+                                    px.x < imageWidth && px.y < imageHeight
+                    ).forEach(px -> layerImage.setRGB(px.x, px.y,
+                            new Color(0, 0, 0, 0).getRGB()));
+                }
+
+                image.draw(layerImage);
             }
         }
 

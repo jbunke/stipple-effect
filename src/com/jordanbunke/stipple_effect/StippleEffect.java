@@ -13,6 +13,7 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
+import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
@@ -34,6 +35,10 @@ import java.util.*;
 import java.util.List;
 
 public class StippleEffect implements ProgramContext {
+    public static String
+            PROGRAM_NAME = "Stipple Effect",
+            VERSION = "dev_build";
+
     public static final int PRIMARY = 0, SECONDARY = 1;
 
     private static final String STATUS_UPDATE_CHANNEL = "Status";
@@ -76,6 +81,8 @@ public class StippleEffect implements ProgramContext {
 
     static {
         OnStartup.run();
+        Settings.read();
+        readProgramFile();
 
         INSTANCE = new StippleEffect();
 
@@ -88,6 +95,26 @@ public class StippleEffect implements ProgramContext {
         INSTANCE.rebuildStateDependentMenus();
 
         ToolWithBreadth.redrawToolOverlays();
+    }
+
+    private static void readProgramFile() {
+        final String[] programFile = FileIO.readResource(ResourceLoader
+                .loadResource(Constants.PROGRAM_FILE), "prg").split("\n");
+
+        for (String line : programFile) {
+            final String[] codeAndValue = ParserUtils.splitIntoCodeAndValue(line);
+
+            if (codeAndValue.length != ParserUtils.DESIRED)
+                continue;
+
+            final String code = codeAndValue[ParserUtils.CODE],
+                    value = codeAndValue[ParserUtils.VALUE];
+
+            switch (code) {
+                case Constants.NAME_CODE -> PROGRAM_NAME = value;
+                case Constants.VERSION_CODE -> VERSION = value;
+            }
+        }
     }
 
     public StippleEffect() {
@@ -115,7 +142,7 @@ public class StippleEffect implements ProgramContext {
 
         dialog = null;
 
-        windowed = false; // TODO - read from settings on startup
+        windowed = !Settings.isFullscreenOnStartup();
         window = makeWindow();
         final GameManager manager = new GameManager(0, this);
 
@@ -173,7 +200,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameWindow makeWindow() {
         final Coord2D size = determineWindowSize();
-        final GameWindow window = new GameWindow(Constants.PROGRAM_NAME,
+        final GameWindow window = new GameWindow(PROGRAM_NAME,
                 size.x, size.y,
                 /* TODO - program icon */ GameImage.dummy(),
                 true, false, !windowed);
@@ -563,7 +590,7 @@ public class StippleEffect implements ProgramContext {
                 setContextIndex(contexts.size() - 1);
 
             if (contexts.size() == 0) {
-                // TODO - global on close here
+                Settings.write();
                 System.exit(0);
             }
 

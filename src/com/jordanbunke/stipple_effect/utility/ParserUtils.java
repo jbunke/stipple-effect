@@ -1,14 +1,15 @@
-package com.jordanbunke.stipple_effect.parse;
+package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ParserUtils {
+    public static final int CODE = 0, VALUE = 1, DESIRED = 2;
+
     public static String[] extractHighlight(final String inputLine) {
         final String O = Constants.OPEN_HIGHLIGHT, C = Constants.CLOSE_HIGHLIGHT;
 
@@ -41,4 +42,21 @@ public class ParserUtils {
         ).split("\n");
     }
 
+    public static String[] splitIntoCodeAndValue(final String line) {
+        final String sep = Constants.SETTING_SEPARATOR,
+                o = Constants.OPEN_SETTING_VAL,
+                c = Constants.CLOSE_SETTING_VAL;
+        final int oi = line.indexOf(o), ol = o.length(),
+                ci = line.indexOf(c), si = line.indexOf(sep);
+
+        final boolean hasValue = oi > si && oi < ci, valid = si > 0 && hasValue;
+
+        if (!valid)
+            return new String[] {};
+
+        final String code = line.substring(0, si),
+                value = line.substring(oi + ol, ci);
+
+        return new String[] { code, value };
+    }
 }

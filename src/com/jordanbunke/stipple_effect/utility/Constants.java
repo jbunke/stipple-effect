@@ -8,10 +8,11 @@ import java.awt.*;
 import java.nio.file.Path;
 
 public class Constants {
-    public static final String PROGRAM_NAME = "Stipple Effect",
-            ABOUT = "about", CHANGELOG = "changelog";
+    public static final String ABOUT = "about", CHANGELOG = "changelog",
+            NAME_CODE = "name", VERSION_CODE = "version";
 
-    public static final Path ICON_FOLDER = Path.of("icons"),
+    public static final Path PROGRAM_FILE = Path.of("program"),
+            ICON_FOLDER = Path.of("icons"),
             CURSOR_FOLDER = Path.of("cursors"),
             BLURB_FOLDER = Path.of("blurbs");
 
@@ -90,6 +91,7 @@ public class Constants {
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stef", OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
+            OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
             ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
@@ -109,9 +111,9 @@ public class Constants {
 
     public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 1,
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360,
-            SPLASH_TIMEOUT_SECS = 15;
+            SPLASH_TIMEOUT_SECS = 30;
 
-    public static final int CHECKER_INCREMENT = 4, CURSOR_DIM = 40,
+    public static final int DEFAULT_CHECKERBOARD_DIM = 4, CURSOR_DIM = 40,
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
@@ -147,7 +149,7 @@ public class Constants {
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 25;
 
-    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 32f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;
+    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

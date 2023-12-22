@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-public class SelectionBounds {
+public class SelectionUtils {
     public static GameImage drawOverlay(
             final Set<Coord2D> selection,
             final BiFunction<Integer, Integer, Boolean> maskValidator,

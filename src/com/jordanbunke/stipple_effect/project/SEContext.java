@@ -8,17 +8,14 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
-import com.jordanbunke.stipple_effect.selection.SelectionBounds;
+import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.DialogAssembly;
-import com.jordanbunke.stipple_effect.utility.DialogVals;
-import com.jordanbunke.stipple_effect.utility.StatusUpdates;
+import com.jordanbunke.stipple_effect.utility.*;
 
 import java.awt.*;
 import java.util.*;
@@ -64,11 +61,11 @@ public class SEContext {
         final Set<Coord2D> selection = getState().getSelection();
 
         final boolean moveable =
-                Tool.canMoveSelection(StippleEffect.get().getTool()) ||
+                Tool.canMoveSelectionBounds(StippleEffect.get().getTool()) ||
                 StippleEffect.get().getTool().equals(Wand.get());
 
         selectionOverlay = getState().hasSelection()
-                ? SelectionBounds.drawOverlay(selection, (x, y) ->
+                ? SelectionUtils.drawOverlay(selection, (x, y) ->
                         selection.contains(new Coord2D(x, y)),
                 renderInfo.getZoomFactor(), moveable) : GameImage.dummy();
     }
@@ -124,8 +121,9 @@ public class SEContext {
                     (int)(bounds[DIM].y * zoomFactor));
 
             // canvas
-            final GameImage canvas = getState().draw(true,
-                    getState().getFrameIndex());
+            GameImage canvas = getState().draw(true,
+                    true, getState().getFrameIndex());
+
             workspace.draw(canvas.section(bounds[TL], bounds[BR]),
                     bounds[TRP].x, bounds[TRP].y,
                     (int)(bounds[DIM].x * zoomFactor),
@@ -175,7 +173,7 @@ public class SEContext {
 
         // persistent selection overlay
         if (getState().hasSelection()) {
-            final Coord2D tl = SelectionBounds.topLeft(getState().getSelection());
+            final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
 
             workspace.draw(selectionOverlay,
                     (render.x + (int)(tl.x * zoomFactor))
@@ -674,7 +672,24 @@ public class SEContext {
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> renderInfo.incrementAnchor(new Coord2D(-1, 0))
                 );
-            } else if (Tool.canMoveSelection(StippleEffect.get().getTool())) {
+            } else if (StippleEffect.get().getTool().equals(PickUpSelection.get())) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelectionContents(new Coord2D(0, -1), true)
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelectionContents(new Coord2D(0, 1), true)
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelectionContents(new Coord2D(-1, 0), true)
+                );
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> moveSelectionContents(new Coord2D(1, 0), true)
+                );
+            } else if (Tool.canMoveSelectionBounds(StippleEffect.get().getTool())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> moveSelectionBounds(new Coord2D(0, -1), true)
@@ -691,7 +706,7 @@ public class SEContext {
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> moveSelectionBounds(new Coord2D(1, 0), true)
                 );
-            } else if (StippleEffect.get().getTool() instanceof Zoom) {
+            } else if (StippleEffect.get().getTool().equals(Zoom.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> {
@@ -759,14 +774,14 @@ public class SEContext {
 
         final GameImage image = new GameImage(w, h);
 
-        for (int x = 0; x < image.getWidth(); x += Constants.CHECKER_INCREMENT) {
-            for (int y = 0; y < image.getHeight(); y += Constants.CHECKER_INCREMENT) {
-                final Color c = ((x / Constants.CHECKER_INCREMENT) +
-                        (y / Constants.CHECKER_INCREMENT)) % 2 == 0
+        final int cb = Settings.getCheckerboardPixels();
+
+        for (int x = 0; x < image.getWidth(); x += cb) {
+            for (int y = 0; y < image.getHeight(); y += cb) {
+                final Color c = ((x / cb) + (y / cb)) % 2 == 0
                         ? Constants.WHITE : Constants.ACCENT_BACKGROUND_LIGHT;
 
-                image.fillRectangle(c, x, y, Constants.CHECKER_INCREMENT,
-                        Constants.CHECKER_INCREMENT);
+                image.fillRectangle(c, x, y, cb, cb);
             }
         }
 
@@ -784,7 +799,21 @@ public class SEContext {
 
     // SELECTION
 
-    // TODO - move selection contents
+    // move selection contents
+    public void moveSelectionContents(
+            final Coord2D displacement, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents moved = getState()
+                    .getSelectionContents().returnDisplaced(displacement);
+
+            final ProjectState result = getState().changeSelectionContents(moved)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
 
     // TODO - stretch selection contents
 
@@ -817,8 +846,8 @@ public class SEContext {
 
             final Set<Coord2D> selection = getState().getSelection();
 
-            final Coord2D tl = SelectionBounds.topLeft(selection),
-                    br = SelectionBounds.bottomRight(selection);
+            final Coord2D tl = SelectionUtils.topLeft(selection),
+                    br = SelectionUtils.bottomRight(selection);
             final int w = br.x - tl.x, h = br.y - tl.y;
 
             final List<SELayer> layers = getState().getLayers().stream()
@@ -861,7 +890,7 @@ public class SEContext {
             final SelectionContents toPaste = SEClipboard.get().getContents();
 
             if (newLayer)
-                addLayer(false);
+                addLayer(true);
 
             stateManager.performAction(getState()
                     .changeSelectionContents(toPaste), ActionType.CANVAS);
@@ -890,6 +919,13 @@ public class SEContext {
                 .getFrame(getState().getFrameIndex());
         final SelectionContents selectionContents =
                 new SelectionContents(canvas, selection);
+
+        final boolean[][] eraseMask = new boolean[w][h];
+
+        selection.stream().filter(s -> s.x >= 0 && s.y >= 0 &&
+                s.x < w && s.y < h).forEach(s -> eraseMask[s.x][s.y] = true);
+
+        erase(eraseMask, false);
 
         final ProjectState result = getState()
                 .changeSelectionContents(selectionContents)
@@ -1003,7 +1039,7 @@ public class SEContext {
                 .changeIsCheckpoint(!dropAndRaise);
         stateManager.performAction(result, ActionType.CANVAS);
 
-        if (dropAndRaise)
+        if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
 
         redrawSelectionOverlay();
@@ -1033,7 +1069,7 @@ public class SEContext {
                 .changeIsCheckpoint(!dropAndRaise);
         stateManager.performAction(result, ActionType.CANVAS);
 
-        if (dropAndRaise)
+        if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
 
         redrawSelectionOverlay();
@@ -1498,8 +1534,8 @@ public class SEContext {
 
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
-        final Coord2D tl = SelectionBounds.topLeft(selection),
-                br = SelectionBounds.bottomRight(selection);
+        final Coord2D tl = SelectionUtils.topLeft(selection),
+                br = SelectionUtils.bottomRight(selection);
         final boolean multiple = selection.size() > 1;
 
         return selection.isEmpty() ? "--" : selection.size() + "px " +

@@ -1,6 +1,5 @@
 package com.jordanbunke.stipple_effect.selection;
 
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 
 public class SEClipboard {
@@ -22,9 +21,11 @@ public class SEClipboard {
     }
 
     public void sendSelectionToClipboard(final ProjectState state) {
-        contents = new SelectionContents(
-                state.getEditingLayer().getFrame(state.getFrameIndex()),
-                state.getSelection());
+        contents = switch (state.getSelectionMode()) {
+            case BOUNDS -> new SelectionContents(state.getEditingLayer()
+                    .getFrame(state.getFrameIndex()), state.getSelection());
+            case CONTENTS -> state.getSelectionContents();
+        };
     }
 
     public boolean hasContents() {

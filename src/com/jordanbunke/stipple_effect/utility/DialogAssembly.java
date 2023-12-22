@@ -25,7 +25,6 @@ import com.jordanbunke.stipple_effect.menu_elements.dialog.TextBox;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.parse.ParserUtils;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.tools.Tool;
@@ -517,7 +516,7 @@ public class DialogAssembly {
 
         // title
         final GameImage title = GraphicsUtils.uiText(Constants.BLACK, 3d)
-                .addText(Constants.PROGRAM_NAME).build().draw();
+                .addText(StippleEffect.PROGRAM_NAME).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.6)),
                 new Coord2D(title.getWidth(), title.getHeight()),
@@ -542,6 +541,15 @@ public class DialogAssembly {
                 new Coord2D(ctc.getWidth(), ctc.getHeight()),
                 MenuElement.Anchor.RIGHT_BOTTOM, (int)(Constants.TICK_HZ / 2),
                 ctc, GameImage.dummy()));
+
+        // windowed
+        final GameImage win = GraphicsUtils.uiText(Constants.GREY)
+                .addText("Press [Escape] to toggle fullscreen").build().draw();
+
+        mb.add(new AnimationMenuElement(new Coord2D(Constants.TOOL_NAME_X, h),
+                new Coord2D(ctc.getWidth(), ctc.getHeight()),
+                MenuElement.Anchor.LEFT_BOTTOM, (int)(Constants.TICK_HZ / 2),
+                win, GameImage.dummy()));
 
         // TODO - mb.add(new AnimationMenuElement());
 
@@ -913,7 +921,8 @@ public class DialogAssembly {
         mb.add(TextLabel.make(background.getRenderPosition().displace(
                         Constants.TOOL_NAME_X + Constants.BUTTON_BORDER_PX,
                         Constants.TEXT_Y_OFFSET + Constants.BUTTON_BORDER_PX),
-                Constants.PROGRAM_NAME + "  |  Help & Information", Constants.WHITE));
+                StippleEffect.PROGRAM_NAME + " v" + StippleEffect.VERSION +
+                        "  |  Help & Information", Constants.WHITE));
 
         // close button
         final GameImage baseImage = GraphicsUtils.drawTextButton(
