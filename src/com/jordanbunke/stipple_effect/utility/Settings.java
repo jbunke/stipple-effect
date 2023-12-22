@@ -35,6 +35,11 @@ public class Settings {
     private static SEFonts.Code programFont = SEFonts.Code.CLASSIC;
 
     public static void read() {
+        final String file = FileIO.readFile(SETTINGS_FILE);
+
+        if (file == null)
+            return;
+
         final String[] settingsLines = FileIO.readFile(SETTINGS_FILE).split("\n");
 
         for (String line : settingsLines) {
@@ -58,6 +63,8 @@ public class Settings {
     }
 
     public static void write() {
+        FileIO.safeMakeDirectory(SETTINGS_FILE.getParent());
+
         final StringBuilder sb = new StringBuilder();
 
         for (String code : writerGetterMap.keySet())
