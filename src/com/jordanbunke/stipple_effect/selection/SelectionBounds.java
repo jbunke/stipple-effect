@@ -12,7 +12,7 @@ public class SelectionBounds {
     public static GameImage drawOverlay(
             final Set<Coord2D> selection,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final int z, final boolean fill
+            final double z, final boolean fill
     ) {
         final Coord2D topLeft = topLeft(selection),
                 bottomRight = bottomRight(selection);

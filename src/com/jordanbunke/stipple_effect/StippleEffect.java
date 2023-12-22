@@ -619,13 +619,23 @@ public class StippleEffect implements ProgramContext {
         game.replaceWindow(window);
     }
 
+    public void autoAssignPickUpSelection() {
+        this.tool = PickUpSelection.get();
+        getContext().redrawSelectionOverlay();
+        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+    }
+
     public void setTool(final Tool tool) {
-        if (this.tool.equals(PickUpSelection.get()))
+        final Tool was = this.tool;
+
+        if (was.equals(PickUpSelection.get()) &&
+                !tool.equals(PickUpSelection.get()))
             PickUpSelection.get().disengage(getContext());
 
         this.tool = tool;
 
-        if (tool.equals(PickUpSelection.get()))
+        if (!was.equals(PickUpSelection.get()) &&
+                tool.equals(PickUpSelection.get()))
             PickUpSelection.get().engage(getContext());
 
         getContext().redrawSelectionOverlay();

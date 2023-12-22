@@ -26,11 +26,11 @@ public final class PickUpSelection extends Tool {
 
     // TODO: tool behaviour
     public void engage(final SEContext context) {
-
+        context.raiseSelectionToContents(false);
     }
 
     public void disengage(final SEContext context) {
-
+        context.dropContentsToLayer(false, false);
     }
 
     @Override

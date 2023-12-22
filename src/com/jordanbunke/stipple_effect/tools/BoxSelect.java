@@ -84,7 +84,7 @@ public final class BoxSelect extends ToolWithMode {
             bottomRight = SelectionBounds.bottomRight(bounds);
 
             overlay = SelectionBounds.drawOverlay(bounds, (x, y) -> true,
-                    (int) context.renderInfo.getZoomFactor(), true);
+                    context.renderInfo.getZoomFactor(), true);
         }
     }
 

@@ -346,7 +346,7 @@ public class MenuAssembly {
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().getContext().addLayer(),
+                () -> StippleEffect.get().getContext().addLayer(true),
                 () -> StippleEffect.get().getContext().duplicateLayer(),
                 () -> StippleEffect.get().getContext().removeLayer(),
                 () -> StippleEffect.get().getContext().moveLayerUp(),

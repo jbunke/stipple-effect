@@ -55,7 +55,7 @@ public final class MoveSelection extends Tool {
                     -(int)((startMousePosition.y - mousePosition.y) / zoomFactor)
             ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
 
-            context.moveSelection(displacement, false);
+            context.moveSelectionBounds(displacement, false);
             lastMousePosition = mousePosition;
         }
     }
