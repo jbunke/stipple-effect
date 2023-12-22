@@ -158,7 +158,7 @@ public class GraphicsUtils {
     public static GameImage drawOverlay(
             final int w, final int h, final double z,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final Color inside, final Color outside, final boolean fill
+            final Color inside, final Color outside, final boolean moveable
     ) {
         final int scaleUpW = (int)Math.max(1, w * z),
                 scaleUpH = (int)Math.max(1, h * z),
@@ -176,7 +176,7 @@ public class GraphicsUtils {
                 final Coord2D o = new Coord2D(x + Constants.OVERLAY_BORDER_PX,
                         y + Constants.OVERLAY_BORDER_PX);
 
-                if (fill)
+                if (moveable)
                     overlay.fillRectangle(Constants.OVERLAY_FILL_C,
                             o.x, o.y, zoomInc, zoomInc);
 

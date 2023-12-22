@@ -83,7 +83,11 @@ public final class BoxSelect extends ToolWithMode {
             topLeft = SelectionBounds.topLeft(bounds);
             bottomRight = SelectionBounds.bottomRight(bounds);
 
-            overlay = SelectionBounds.drawOverlay(bounds, (x, y) -> true,
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
+
+            overlay = SelectionBounds.drawOverlay(bounds,
+                    (x, y) -> x >= 0 && x < w && y >= 0 && y < h,
                     context.renderInfo.getZoomFactor(), true);
         }
     }
@@ -97,11 +101,15 @@ public final class BoxSelect extends ToolWithMode {
             if (pivotTP.equals(endTP))
                 return;
 
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
+
             final Set<Coord2D> box = new HashSet<>();
 
             for (int x = topLeft.x; x < bottomRight.x; x++)
                 for (int y = topLeft.y; y < bottomRight.y; y++)
-                    box.add(new Coord2D(x, y));
+                    if (x >= 0 && x < w && y >= 0 && y < h)
+                        box.add(new Coord2D(x, y));
 
             context.editSelection(box, true);
         }

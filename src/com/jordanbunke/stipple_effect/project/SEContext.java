@@ -36,7 +36,7 @@ public class SEContext {
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
 
-    private GameImage selectionOverlay;
+    private GameImage selectionOverlay, checkerboard;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -57,16 +57,20 @@ public class SEContext {
         targetPixel = Constants.NO_VALID_TARGET;
         inWorkspaceBounds = false;
 
-        redrawSelectionOverlay();
+        redrawCheckerboard();
     }
 
     public void redrawSelectionOverlay() {
         final Set<Coord2D> selection = getState().getSelection();
 
+        final boolean moveable =
+                Tool.canMoveSelection(StippleEffect.get().getTool()) ||
+                StippleEffect.get().getTool().equals(Wand.get());
+
         selectionOverlay = getState().hasSelection()
                 ? SelectionBounds.drawOverlay(selection, (x, y) ->
-                        selection.contains(new Coord2D(x, y)), renderInfo.getZoomFactor(),
-                getState().getSelectionMode() == SelectionMode.BOUNDS) : GameImage.dummy();
+                        selection.contains(new Coord2D(x, y)),
+                renderInfo.getZoomFactor(), moveable) : GameImage.dummy();
     }
 
     private Coord2D[] getImageRenderBounds(
@@ -113,12 +117,15 @@ public class SEContext {
         final Coord2D[] bounds = getImageRenderBounds(render, w, h, zoomFactor);
 
         if (bounds.length == BOUNDS) {
-            // canvas
-            // workspace.draw(generateCheckers(), render.x, render.y);
+            // transparency checkerboard
+            workspace.draw(checkerboard.section(bounds[TL], bounds[BR]),
+                    bounds[TRP].x, bounds[TRP].y,
+                    (int)(bounds[DIM].x * zoomFactor),
+                    (int)(bounds[DIM].y * zoomFactor));
 
+            // canvas
             final GameImage canvas = getState().draw(true,
                     getState().getFrameIndex());
-
             workspace.draw(canvas.section(bounds[TL], bounds[BR]),
                     bounds[TRP].x, bounds[TRP].y,
                     (int)(bounds[DIM].x * zoomFactor),
@@ -746,12 +753,11 @@ public class SEContext {
                 middle.y - (int)(zoomFactor * anchor.y));
     }
 
-    private GameImage generateCheckers() {
+    public void redrawCheckerboard() {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
-        final float zoomFactor = renderInfo.getZoomFactor();
 
-        final GameImage image = new GameImage((int)(w * zoomFactor), (int)(h * zoomFactor));
+        final GameImage image = new GameImage(w, h);
 
         for (int x = 0; x < image.getWidth(); x += Constants.CHECKER_INCREMENT) {
             for (int y = 0; y < image.getHeight(); y += Constants.CHECKER_INCREMENT) {
@@ -764,7 +770,7 @@ public class SEContext {
             }
         }
 
-        return image.submit();
+        checkerboard = image.submit();
     }
 
     // non-state changes
@@ -821,9 +827,10 @@ public class SEContext {
 
             final ProjectState result = getState().resize(w, h, layers);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay();
 
             moveSelectionBounds(new Coord2D(-tl.x, -tl.y), false);
+
+            redrawCheckerboard();
         }
     }
 
@@ -1071,6 +1078,8 @@ public class SEContext {
         final ProjectState result = getState().resize(w, h, layers)
                 .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
         stateManager.performAction(result, ActionType.CANVAS);
+
+        redrawCheckerboard();
     }
 
     public void resize() {
@@ -1083,6 +1092,8 @@ public class SEContext {
         final ProjectState result = getState().resize(w, h, layers)
                 .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, ActionType.CANVAS);
+
+        redrawCheckerboard();
     }
 
     // IMAGE EDITING

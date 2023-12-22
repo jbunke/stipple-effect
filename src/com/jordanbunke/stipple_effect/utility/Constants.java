@@ -111,7 +111,7 @@ public class Constants {
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360,
             SPLASH_TIMEOUT_SECS = 15;
 
-    public static final int CHECKER_INCREMENT = 16, CURSOR_DIM = 40,
+    public static final int CHECKER_INCREMENT = 4, CURSOR_DIM = 40,
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,

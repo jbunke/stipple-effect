@@ -12,7 +12,7 @@ public class SelectionBounds {
     public static GameImage drawOverlay(
             final Set<Coord2D> selection,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final double z, final boolean fill
+            final double z, final boolean moveable
     ) {
         final Coord2D topLeft = topLeft(selection),
                 bottomRight = bottomRight(selection);
@@ -22,7 +22,7 @@ public class SelectionBounds {
 
         return GraphicsUtils.drawOverlay(w, h, z,
                 (x, y) -> maskValidator.apply(x + topLeft.x, y + topLeft.y),
-                Constants.BLACK, Constants.HIGHLIGHT_1, fill);
+                Constants.BLACK, Constants.HIGHLIGHT_1, moveable);
     }
 
     public static Coord2D topLeft(final Set<Coord2D> pixels) {
