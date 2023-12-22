@@ -1,0 +1,9 @@
+Shortcut: {E}
+
+A pixel-perfect eraser with no anti-aliasing
+Sets the color of an erased pixel to {RGBA [0, 0, 0, 0]}
+
+Erase: {Click & Drag}
+
+Increment/decrement eraser width:
+{Arrow Keys} or {Shift + Scroll Wheel}

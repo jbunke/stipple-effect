@@ -1,0 +1,15 @@
+Shortcut: {T}
+
+Use the pencil select tool for pixel-perfect selection.
+It can be used to select a single pixel by clicking on it,
+or clicked and dragged in additive or subtractive mode to act
+as a precise selection pencil or eraser.
+
+Simple selection: {Click}
+
+Additive selection: {Ctrl + Click & Drag}
+Adds the result of the selection to the existing selection.
+
+Subtractive selection: {Ctrl + S + Click & Drag}
+Removes the result of the selection from the existing
+selection.

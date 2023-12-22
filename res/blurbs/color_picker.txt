@@ -1,0 +1,7 @@
+Shortcut: {C}
+
+Use the color picker to set the primary or secondary color to
+the color on the current layer of the pixel that was clicked.
+
+Assign to primary: {Left Click}
+Assign to secondary: {Right Click}

@@ -1,0 +1,3 @@
+program_font:{CLASSIC}
+fullscreen_on_startup:{true}
+checkerboard_px:{4}

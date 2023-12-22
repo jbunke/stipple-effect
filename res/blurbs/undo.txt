@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Z}
+
+Return to the project state of the previous completed
+operation.

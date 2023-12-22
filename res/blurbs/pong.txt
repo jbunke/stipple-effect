@@ -1,0 +1,2 @@
+Switches playback direction when the first or last frame
+is reached

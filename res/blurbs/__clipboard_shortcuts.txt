@@ -1,0 +1,4 @@
+Copy selection: {Ctrl + C}
+Cut selection: {Ctrl + X}
+Paste clipboard: {Ctrl + V}
+Paste clipboard to new layer: {Ctrl + Shift + V}

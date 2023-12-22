@@ -1,0 +1,21 @@
+Shortcut: {B}
+
+A pixel-perfect paint brush with no anti-aliasing
+
+Primary color: {Left Click & Drag}
+Secondary color: {Right Click & Drag}
+
+Dither mode: {Ctrl + Click & Drag}
+Alternates on painted pixels between the primary and
+secondary colors in a checkerboard pattern
+
+Blend mode: {Shift + Click & Drag}
+Paints with a color that is the RGBA average of the
+primary and secondary colors
+
+Random bounded mode: {Ctrl + Shift + Click & Drag}
+Paints each pixel with a random color that lies between
+the RGBA bounds of the primary and secondary colors.
+
+Increment/decrement brush width:
+{Arrow Keys} or {Shift + Scroll Wheel}

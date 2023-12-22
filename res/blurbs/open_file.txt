@@ -1,0 +1,6 @@
+Shortcut: {Ctrl + O}
+
+Creates a project from an imported image file
+
+Importing will set automatically create a save association
+back to the imported filepath if it is a PNG.

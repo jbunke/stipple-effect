@@ -1,0 +1,22 @@
+{Upcoming}
+
+To add:
+> Rotating and stretching selections
+> Native file type
+> Larger canvas sizes and necessary performance
+    optimizations to facilitate them
+> Scripting language, system and previews
+> Adjustable panels
+> Palettes
+> More settings read from file on startup, including:
+    - Toggle for rendering at true pixel size
+    - Delta Time canvas size
+
+To change:
+> Remap subtractive mode from S to ALT key once correctly
+    implemented in Delta Time
+
+{0.0.1} - 2023-12-23
+
+Added:
+> First available version of Stipple Effect

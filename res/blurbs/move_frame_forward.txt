@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Shift + Right Arrow}
+
+Reorders the selected frame by placing it immediately
+after the next frame

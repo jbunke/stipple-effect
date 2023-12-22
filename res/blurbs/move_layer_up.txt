@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Shift + Up Arrow Key}
+
+Reorders the selected layer by swapping it with the layer
+above

@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Shift + F}
+
+Creates a new frame by duplicating the previously selected
+one.
