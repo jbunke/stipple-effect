@@ -2,7 +2,7 @@
 
 To add:
 > Rotating and stretching selections
-> Native file type (.stef)
+> Native file type
 > Larger canvas sizes and necessary performance
     optimizations to facilitate them
 > Scripting language, system and previews
@@ -16,17 +16,7 @@ To change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
 
-To fix:
-
-To remove:
-
-{TODO for 0.0.1} - 2023-12-2?
-
-To add:
-> Logo animation on splash screen
-> Program icon
-
-{0.0.1} - 2023-12-2?
+{0.0.1} - 2023-12-23
 
 Added:
 > First available version of Stipple Effect

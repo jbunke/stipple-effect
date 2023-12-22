@@ -200,9 +200,8 @@ public class StippleEffect implements ProgramContext {
 
     private GameWindow makeWindow() {
         final Coord2D size = determineWindowSize();
-        final GameWindow window = new GameWindow(PROGRAM_NAME,
-                size.x, size.y,
-                /* TODO - program icon */ GameImage.dummy(),
+        final GameWindow window = new GameWindow(PROGRAM_NAME + " v" + VERSION,
+                size.x, size.y, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
         return window;

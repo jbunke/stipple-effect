@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.utility;
 
 public class IconCodes {
     public static final String
+            PROGRAM = "program_icon",
             NEW_PROJECT = "new_project",
             OPEN_FILE = "open_file",
             CLOSE_PROJECT = "close_project",

@@ -589,7 +589,7 @@ public class DialogAssembly {
         // version
         final GameImage version = GraphicsUtils.uiText(
                 Constants.ACCENT_BACKGROUND_DARK)
-                .addText(StippleEffect.VERSION).build().draw();
+                .addText("v" + StippleEffect.VERSION).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
                 new Coord2D(version.getWidth(), version.getHeight()),
@@ -613,7 +613,12 @@ public class DialogAssembly {
                 MenuElement.Anchor.LEFT_BOTTOM, (int)(Constants.TICK_HZ / 2),
                 win, GameImage.dummy()));
 
-        // TODO - mb.add(new AnimationMenuElement());
+        // animation frames
+        mb.add(new AnimationMenuElement(
+                new Coord2D(), new Coord2D(Constants.CANVAS_W, Constants.CANVAS_H),
+                MenuElement.Anchor.LEFT_TOP, 10,
+                SplashLoader.loadAnimationFrames()
+        ));
 
         setDialog(mb.build());
     }
