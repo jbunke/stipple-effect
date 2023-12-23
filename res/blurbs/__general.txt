@@ -1,3 +1,4 @@
 Toggle fullscreen / windowed mode: {Escape}
+Recenter canvas in workspace: {Enter}
 Navigate to layer above: {Ctrl + Up Arrow Key}
 Navigate to layer below: {Ctrl + Down Arrow Key}

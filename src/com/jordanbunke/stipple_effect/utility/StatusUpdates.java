@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.utility;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 public class StatusUpdates {
@@ -53,5 +54,10 @@ public class StatusUpdates {
         StippleEffect.get().sendStatusUpdate("The font code \"" + attempt +
                 "\" is invalid; assigned to \"" + SEFonts.Code.CLASSIC.forButtonText() +
                 "\" instead");
+    }
+
+    public static void saved(final Path filepath) {
+        StippleEffect.get().sendStatusUpdate("Saved project to \"" +
+                filepath + "\"");
     }
 }

@@ -5,9 +5,11 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogAssembly;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.nio.file.Path;
 
@@ -84,9 +86,15 @@ public class ProjectInfo {
             return;
         }
 
-        final int w = StippleEffect.get().getContext().getState().getImageWidth(),
-                h = StippleEffect.get().getContext().getState().getImageHeight(),
-                frameCount = StippleEffect.get().getContext().getState().getFrameCount();
+        final SEContext c = StippleEffect.get().getContext();
+
+        if (c.getState().getSelectionMode() == SelectionMode.CONTENTS &&
+                c.getState().hasSelection())
+            c.dropContentsToLayer(true, false);
+
+        final int w = c.getState().getImageWidth(),
+                h = c.getState().getImageHeight(),
+                frameCount = c.getState().getFrameCount();
 
         switch (saveType) {
             case NATIVE -> {
@@ -96,7 +104,7 @@ public class ProjectInfo {
                 final GameImage[] images = new GameImage[frameCount];
 
                 for (int i = 0; i < frameCount; i++) {
-                    images[i] = StippleEffect.get().getContext()
+                    images[i] = c
                             .getState().draw(false, false, i);
 
                     if (scaleUp > 1)
@@ -108,7 +116,7 @@ public class ProjectInfo {
             }
             case PNG_SEPARATE -> {
                 for (int i = 0; i < frameCount; i++) {
-                    final GameImage image = StippleEffect.get().getContext()
+                    final GameImage image = c
                             .getState().draw(false, false, i);
 
                     GameImageIO.writeImage(buildFilepath("_" + i),
@@ -139,7 +147,7 @@ public class ProjectInfo {
                     final int x = i % frameDims[X],
                             y = i / frameDims[X];
 
-                    stitched.draw(StippleEffect.get().getContext().getState().draw(
+                    stitched.draw(c.getState().draw(
                             false, false, i), w * x, h * y);
                 }
 
@@ -149,6 +157,7 @@ public class ProjectInfo {
             }
         }
 
+        StatusUpdates.saved(buildFilepath());
         editedSinceLastSave = false;
         StippleEffect.get().rebuildProjectsMenu();
     }
