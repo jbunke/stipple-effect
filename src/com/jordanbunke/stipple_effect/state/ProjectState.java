@@ -189,8 +189,11 @@ public class ProjectState {
                 // edge case where pixels on editing layer behind transparent
                 // pixel that is part of selection must be unrendered when selection
                 // is being moved
-                if (inProjectRender && layer.equals(getEditingLayer()) &&
-                        hasSelection() && selectionMode == SelectionMode.CONTENTS) {
+                final boolean previewCondition = inProjectRender &&
+                        layer.equals(getEditingLayer()) && hasSelection() &&
+                        selectionMode == SelectionMode.CONTENTS;
+
+                if (previewCondition) {
                     final Set<Coord2D> pixels = selectionContents.getPixels();
 
                     pixels.stream().filter(px -> px.x >= 0 && px.y >= 0 &&
@@ -200,6 +203,12 @@ public class ProjectState {
                 }
 
                 image.draw(layerImage);
+
+                if (previewCondition) {
+                    final GameImage preview = selectionContents
+                            .getContentForCanvas(getImageWidth(), getImageHeight());
+                    image.draw(preview);
+                }
             }
         }
 

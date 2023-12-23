@@ -128,18 +128,6 @@ public class SEContext {
                     bounds[TRP].x, bounds[TRP].y,
                     (int)(bounds[DIM].x * zoomFactor),
                     (int)(bounds[DIM].y * zoomFactor));
-
-            // preview
-            if (getState().getSelectionMode() == SelectionMode.CONTENTS &&
-                    getState().hasSelection()) {
-                final SelectionContents contents = getState().getSelectionContents();
-                final GameImage preview = contents.getContentForCanvas(w, h);
-
-                workspace.draw(preview.section(bounds[TL], bounds[BR]),
-                        bounds[TRP].x, bounds[TRP].y,
-                        (int)(bounds[DIM].x * zoomFactor),
-                        (int)(bounds[DIM].y * zoomFactor));
-            }
         }
 
         // OVERLAYS
@@ -795,6 +783,16 @@ public class SEContext {
                 getState().getImageHeight() / 2));
     }
 
+    // copy - (not a state change unlike cut and paste)
+    public void copy() {
+        if (getState().hasSelection()) {
+            SEClipboard.get().sendSelectionToClipboard(getState());
+            StatusUpdates.sendToClipboard(true,
+                    SEClipboard.get().getContents().getPixels());
+        } else
+            StatusUpdates.clipboardSendFailed(true);
+    }
+
     // process all actions here and feed through state manager
 
     // SELECTION
@@ -874,26 +872,34 @@ public class SEContext {
             StatusUpdates.clipboardSendFailed(false);
     }
 
-    // copy - (not a state change)
-    public void copy() {
-        if (getState().hasSelection()) {
-            SEClipboard.get().sendSelectionToClipboard(getState());
-            StatusUpdates.sendToClipboard(true,
-                    SEClipboard.get().getContents().getPixels());
-        } else
-            StatusUpdates.clipboardSendFailed(true);
-    }
-
     // paste
     public void paste(final boolean newLayer) {
         if (SEClipboard.get().hasContents()) {
+            if (getState().hasSelectionContents())
+                dropContentsToLayer(false, true);
+
             final SelectionContents toPaste = SEClipboard.get().getContents();
 
             if (newLayer)
                 addLayer(true);
 
+            final Coord2D tl = SelectionUtils.topLeft(toPaste.getPixels()),
+                    br = SelectionUtils.bottomRight(toPaste.getPixels());
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+            final int x, y;
+
+            x = tl.x < 0 ? 0 : (br.x >= w
+                    ? Math.max(0, w - (br.x - tl.x)) : tl.x);
+            y = tl.y < 0 ? 0 : (br.y >= h
+                    ? Math.max(0, h - (br.y - tl.y)) : tl.y);
+
+            final Coord2D displacement = new Coord2D(x, y)
+                    .displace(-tl.x, -tl.y);
+
             stateManager.performAction(getState()
-                    .changeSelectionContents(toPaste), ActionType.CANVAS);
+                    .changeSelectionContents(toPaste.returnDisplaced(
+                            displacement)), ActionType.CANVAS);
 
             StippleEffect.get().autoAssignPickUpSelection();
         } else

@@ -282,6 +282,11 @@ public class DialogAssembly {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
+        DialogVals.setPadLeft(0);
+        DialogVals.setPadBottom(0);
+        DialogVals.setPadTop(0);
+        DialogVals.setPadRight(0);
+
         // text labels
         final TextLabel
                 leftLabel = makeDialogLeftLabel(1, "Left: "),
