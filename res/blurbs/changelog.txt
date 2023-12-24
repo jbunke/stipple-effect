@@ -42,7 +42,7 @@ Changed:
 Removed:
 > Mini opacity slider in the layers panel; layer buttons
     are now bigger and show more of the layer name, and the
-    opacity can still me modified from the layer settings
+    opacity can still be modified from the layer settings
     dialog
 
 {0.0.1.1} - 2023-12-23
