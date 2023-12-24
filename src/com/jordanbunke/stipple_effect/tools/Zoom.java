@@ -29,7 +29,7 @@ public final class Zoom extends Tool {
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         switch (me.button) {
             case LEFT -> context.renderInfo.zoomIn(context.getTargetPixel());
-            case RIGHT -> context.renderInfo.zoomOut(context.getTargetPixel());
+            case RIGHT -> context.renderInfo.zoomOut();
         }
 
         StippleEffect.get().rebuildToolButtonMenu();

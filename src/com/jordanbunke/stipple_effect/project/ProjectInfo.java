@@ -104,20 +104,21 @@ public class ProjectInfo {
                 final GameImage[] images = new GameImage[frameCount];
 
                 for (int i = 0; i < frameCount; i++) {
-                    images[i] = c
-                            .getState().draw(false, false, i);
+                    images[i] = c.getState().draw(false, false, i);
 
                     if (scaleUp > 1)
                         images[i] = ImageProcessing.scale(images[i], scaleUp);
                 }
 
-                GIFWriter.get().write(buildFilepath(), images,
-                        Constants.MILLIS_IN_SECOND / fps);
+                final Thread gifSaverThread = new Thread(() ->
+                        GIFWriter.get().write(buildFilepath(), images,
+                                Constants.MILLIS_IN_SECOND / fps));
+
+                gifSaverThread.start();
             }
             case PNG_SEPARATE -> {
                 for (int i = 0; i < frameCount; i++) {
-                    final GameImage image = c
-                            .getState().draw(false, false, i);
+                    final GameImage image = c.getState().draw(false, false, i);
 
                     GameImageIO.writeImage(buildFilepath("_" + i),
                             scaleUp > 1 ? ImageProcessing.scale(image, scaleUp) : image);

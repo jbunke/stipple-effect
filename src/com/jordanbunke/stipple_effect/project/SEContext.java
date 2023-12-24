@@ -276,7 +276,7 @@ public class SEContext {
                     if (mse.clicksScrolled < 0)
                         renderInfo.zoomIn(targetPixel);
                     else
-                        renderInfo.zoomOut(targetPixel);
+                        renderInfo.zoomOut();
 
                     StippleEffect.get().rebuildToolButtonMenu();
                 }
@@ -704,7 +704,7 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> {
-                            renderInfo.zoomOut(targetPixel);
+                            renderInfo.zoomOut();
                             StippleEffect.get().rebuildToolButtonMenu();
                         });
             }
