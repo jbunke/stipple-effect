@@ -22,7 +22,6 @@ Change:
 Added:
 > Added the ability to import multiple files at once
 
-
 Fixed:
 > Rendering onion skins and semi-transparent layers is now
     significantly more efficient and performant
