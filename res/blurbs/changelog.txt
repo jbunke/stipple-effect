@@ -1,6 +1,6 @@
 {Upcoming}
 
-To add:
+Add:
 > Rotating and stretching selections
 > Outline selection shortcuts
 > Native file type
@@ -13,9 +13,18 @@ To add:
     > Toggle for rendering at true pixel size
     > Delta Time canvas size
 
-To change:
+Change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
+
+{TODO for 0.0.1.2}
+
+Change:
+> Send file exports to a separate thread so that the program
+    can be used concurrently with the export process
+
+Fix:
+> Zooming out should not use the cursor position as a target
 
 {0.0.1.1} - 2023-12-23
 
