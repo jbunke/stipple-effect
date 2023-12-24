@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public final class SELayer {
-    private final List<GameImage> frames;
+    private final List<GameImage> frames, renders, onionSkins;
     private final GameImage frameLinkedContent;
     private final double opacity;
     private final boolean enabled, framesLinked;
@@ -52,6 +52,31 @@ public final class SELayer {
         this.framesLinked = framesLinked;
         this.onionSkinMode = onionSkinMode;
         this.name = name;
+
+        renders = new ArrayList<>();
+        onionSkins = new ArrayList<>();
+
+        generateRenders();
+        generateOnionSkins();
+    }
+
+    private void generateRenders() {
+        if (framesLinked)
+            renders.add(renderFrame(0));
+        else if (opacity == Constants.OPAQUE)
+            renders.addAll(frames);
+        else {
+            for (int i = 0; i < frames.size(); i++)
+                renders.add(renderFrame(i));
+        }
+    }
+
+    private void generateOnionSkins() {
+        if (framesLinked || onionSkinMode == OnionSkinMode.NONE)
+            return;
+
+        for (int i = 0; i < frames.size(); i++)
+            onionSkins.add(renderOnionSkin(i));
     }
 
     private static String giveLayerDefaultName() {
@@ -248,11 +273,29 @@ public final class SELayer {
         return framesLinked ? frameLinkedContent : frames.get(frameIndex);
     }
 
-    public GameImage renderFrame(final int frameIndex) {
+    public GameImage getRender(final int frameIndex) {
+        if (opacity == Constants.OPAQUE)
+            return getFrame(frameIndex);
+
+        return renders.get(framesLinked ? 0 : frameIndex);
+    }
+
+    public GameImage getOnionSkin(final int frameIndex) {
+        if (framesLinked || frameIndex >= onionSkins.size())
+            return GameImage.dummy();
+
+        return onionSkins.get(frameIndex);
+    }
+
+    private GameImage renderOnionSkin(final int frameIndex) {
+        return renderFrame(frameIndex, opacity * Constants.ONION_SKIN_OPACITY);
+    }
+
+    private GameImage renderFrame(final int frameIndex) {
         return renderFrame(frameIndex, opacity);
     }
 
-    public GameImage renderFrame(final int frameIndex, final double opacity) {
+    private GameImage renderFrame(final int frameIndex, final double opacity) {
         final GameImage frame = getFrame(frameIndex);
 
         final GameImage render = new GameImage(frame.getWidth(), frame.getHeight());
@@ -271,6 +314,9 @@ public final class SELayer {
 
     public void setOnionSkinMode(final OnionSkinMode onionSkinMode) {
         this.onionSkinMode = onionSkinMode;
+
+        if (onionSkins.isEmpty())
+            generateOnionSkins();
     }
 
     public OnionSkinMode getOnionSkinMode() {

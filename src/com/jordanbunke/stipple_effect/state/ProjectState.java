@@ -171,20 +171,15 @@ public class ProjectState {
                 // onion skin previous
                 if (includeOnionSkins && layer.getOnionSkinMode()
                         .doPrevious() && frameIndex > 0)
-                    image.draw(layer.renderFrame(frameIndex - 1,
-                            layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
+                    image.draw(layer.getOnionSkin(frameIndex - 1));
 
                 // onion skin next
                 if (includeOnionSkins && layer.getOnionSkinMode()
                         .doNext() && frameIndex + 1 < frameCount)
-                    image.draw(layer.renderFrame(frameIndex + 1,
-                            layer.getOpacity() * Constants.ONION_SKIN_OPACITY));
+                    image.draw(layer.getOnionSkin(frameIndex + 1));
 
                 // this layer
-                GameImage layerImage = new GameImage(
-                        layer.getOpacity() == Constants.OPAQUE
-                                ? layer.getFrame(frameIndex)
-                                : layer.renderFrame(frameIndex));
+                GameImage layerImage = new GameImage(layer.getRender(frameIndex));
 
                 // edge case where pixels on editing layer behind transparent
                 // pixel that is part of selection must be unrendered when selection

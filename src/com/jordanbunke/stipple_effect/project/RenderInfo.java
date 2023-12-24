@@ -21,7 +21,7 @@ public class RenderInfo {
     }
 
     public void zoomOut() {
-        setZoomFactor(zoomFactor / 2f);
+        setZoomFactor(zoomFactor * 0.5f);
     }
 
     private void adjustAnchorFromZoom(final Coord2D targetPixel) {

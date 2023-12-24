@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButtonStub;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
 
@@ -162,6 +163,7 @@ public class TextBox extends MenuButtonStub {
 
                     typing = false;
                     clickedOffBehaviour();
+                    DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, false);
                     return;
                 }
         }
@@ -183,6 +185,7 @@ public class TextBox extends MenuButtonStub {
 
                                 typing = false;
                                 clickedOffBehaviour();
+                                DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, false);
                             }
                             // Remove character before cursor from input string
                             case BACKSPACE -> {
@@ -193,6 +196,8 @@ public class TextBox extends MenuButtonStub {
                                             text.substring(cursorIndex);
                                     cursorIndex--;
                                 }
+
+                                DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                             }
                             // Removes character after cursor from input string
                             case DELETE -> {
@@ -202,16 +207,26 @@ public class TextBox extends MenuButtonStub {
                                     text = text.substring(0, cursorIndex) +
                                             text.substring(cursorIndex + 1);
                                 }
+
+                                DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                             }
                             // moves cursor index back if possible
                             case LEFT_ARROW ->  {
+                                keyEvent.markAsProcessed();
+
                                 if (cursorIndex > 0)
                                     cursorIndex--;
+
+                                DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                             }
                             // moves cursor index forwards if possible
                             case RIGHT_ARROW -> {
+                                keyEvent.markAsProcessed();
+
                                 if (cursorIndex < text.length())
                                     cursorIndex++;
+
+                                DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                             }
                         }
 
@@ -229,6 +244,7 @@ public class TextBox extends MenuButtonStub {
                         cursorIndex++;
 
                         clickedOffBehaviour();
+                        DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                     }
                 }
         }
@@ -240,6 +256,8 @@ public class TextBox extends MenuButtonStub {
 
         if (!typing)
             clickedOffBehaviour();
+
+        DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, typing);
     }
 
     private void clickedOffBehaviour() {

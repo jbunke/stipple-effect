@@ -15,12 +15,13 @@ public class ApproveDialogButton extends MenuButtonStub {
     private final Runnable onApproval;
 
     private final GameImage base, notMet, highlighted;
+    private final boolean clearDialog;
 
     private boolean met;
 
     public ApproveDialogButton(
-            final Coord2D position, final Coord2D dimensions,
-            final Anchor anchor, final Runnable onApproval,
+            final Coord2D position, final Coord2D dimensions, final Anchor anchor,
+            final Runnable onApproval, final boolean clearDialog,
             final Supplier<Boolean> precondition, final String text
     ) {
         super(position, dimensions, anchor, true);
@@ -30,6 +31,8 @@ public class ApproveDialogButton extends MenuButtonStub {
         highlighted = GraphicsUtils.drawHighlightedButton(base);
         notMet = GraphicsUtils.drawTextButton(dimensions.x, text,
                 false, Constants.ACCENT_BACKGROUND_DARK);
+
+        this.clearDialog = clearDialog;
 
         this.precondition = precondition;
         this.onApproval = onApproval;
@@ -60,7 +63,9 @@ public class ApproveDialogButton extends MenuButtonStub {
     public void execute() {
         if (met) {
             onApproval.run();
-            StippleEffect.get().clearDialog();
+
+            if (clearDialog)
+                StippleEffect.get().clearDialog();
         }
     }
 }

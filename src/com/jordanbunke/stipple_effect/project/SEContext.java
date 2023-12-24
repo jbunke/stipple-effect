@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
@@ -186,9 +187,13 @@ public class SEContext {
         setInWorkspaceBounds(eventLogger);
         setTargetPixel(eventLogger);
         processTools(eventLogger, tool);
-        processSingleKeyInputs(eventLogger);
-        processCompoundKeyInputs(eventLogger);
         processAdditionalMouseEvents(eventLogger);
+
+        if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
+                .orElse(Boolean.FALSE) instanceof Boolean b && !b) {
+            processSingleKeyInputs(eventLogger);
+            processCompoundKeyInputs(eventLogger);
+        }
     }
 
     private void processTools(

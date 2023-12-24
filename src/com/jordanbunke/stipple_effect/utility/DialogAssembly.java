@@ -236,7 +236,7 @@ public class DialogAssembly {
             }
 
             return c.projectInfo.hasSaveAssociation();
-            }, "Save", c.projectInfo::save));
+            }, "Save", c.projectInfo::save, true));
     }
 
     public static void setDialogToResize() {
@@ -306,7 +306,7 @@ public class DialogAssembly {
                 widthTextBox, heightTextBox);
         setDialog(assembleDialog("Resize Canvas...", contents,
                 () -> widthTextBox.isValid() && heightTextBox.isValid(),
-                Constants.GENERIC_APPROVAL_TEXT, c::resize));
+                Constants.GENERIC_APPROVAL_TEXT, c::resize, true));
     }
 
     public static void setDialogToPad() {
@@ -368,7 +368,7 @@ public class DialogAssembly {
         setDialog(assembleDialog("Pad Canvas...", contents,
                 () -> leftTextBox.isValid() && rightTextBox.isValid() &&
                         topTextBox.isValid() && bottomTextBox.isValid(),
-                Constants.GENERIC_APPROVAL_TEXT, c::pad));
+                Constants.GENERIC_APPROVAL_TEXT, c::pad, true));
     }
 
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {
@@ -432,7 +432,7 @@ public class DialogAssembly {
         setDialog(assembleDialog("Import file " +
                         filepath.getFileName().toString(), contents,
                 precondition, "Import",
-                () -> StippleEffect.get().newProjectFromFile(image, filepath)));
+                () -> StippleEffect.get().newProjectFromFile(image, filepath), false));
     }
 
     public static void setDialogToNewProject() {
@@ -457,7 +457,7 @@ public class DialogAssembly {
                 widthLabel, heightLabel, explanation, widthTextBox, heightTextBox);
         setDialog(assembleDialog("New Project...", contents,
                 () -> widthTextBox.isValid() && heightTextBox.isValid(),
-                "Create", () -> StippleEffect.get().newProject()));
+                "Create", () -> StippleEffect.get().newProject(), true));
     }
 
     public static void setDialogToCheckCloseProject(final int index) {
@@ -473,7 +473,7 @@ public class DialogAssembly {
                                 .getFormattedName(false, true)
                         + "?", contents,
                 () -> true, Constants.GENERIC_APPROVAL_TEXT,
-                () -> StippleEffect.get().removeContext(index)));
+                () -> StippleEffect.get().removeContext(index), true));
     }
 
     public static void setDialogToInfo() {
@@ -518,7 +518,7 @@ public class DialogAssembly {
                 Constants.GENERIC_APPROVAL_TEXT, () -> {
             c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
             c.changeLayerName(DialogVals.getLayerName(), index);
-        }));
+        }, true));
     }
 
     public static void setDialogToProgramSettings() {
@@ -619,8 +619,8 @@ public class DialogAssembly {
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(container);
-        setDialog(assembleDialog("Program Settings",
-                contents, () -> true, "Apply", Settings::write));
+        setDialog(assembleDialog("Program Settings", contents,
+                () -> true, "Apply", Settings::write, true));
     }
 
     public static void setDialogToSplashScreen() {
@@ -1150,8 +1150,8 @@ public class DialogAssembly {
 
     private static Menu assembleDialog(
             final String title, final MenuElementGrouping contents,
-            final Supplier<Boolean> precondition,
-            final String approveText, final Runnable onApproval
+            final Supplier<Boolean> precondition, final String approveText,
+            final Runnable onApproval, final boolean clearDialog
     ) {
         final MenuBuilder mb = new MenuBuilder();
 
@@ -1194,7 +1194,7 @@ public class DialogAssembly {
 
         mb.add(new ApproveDialogButton(approvePos,
                 new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
-                MenuElement.Anchor.RIGHT_BOTTOM, onApproval,
+                MenuElement.Anchor.RIGHT_BOTTOM, onApproval, clearDialog,
                 precondition, approveText));
 
         // contents come before border to ensure proper rendering
