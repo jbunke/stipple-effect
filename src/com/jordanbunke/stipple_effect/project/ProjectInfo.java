@@ -6,10 +6,7 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.DialogAssembly;
-import com.jordanbunke.stipple_effect.utility.DialogVals;
-import com.jordanbunke.stipple_effect.utility.StatusUpdates;
+import com.jordanbunke.stipple_effect.utility.*;
 
 import java.nio.file.Path;
 
@@ -17,13 +14,13 @@ public class ProjectInfo {
     private static final int X = 0, Y = 1;
 
     private Path folder;
-    private String name;
+    private String name, indexPrefix, indexSuffix;
     private SaveType saveType;
 
     private boolean editedSinceLastSave;
 
     private final int[] frameDims;
-    private int fps, scaleUp;
+    private int fps, scaleUp, countFrom;
 
     public enum SaveType {
         PNG_STITCHED, PNG_SEPARATE, GIF, NATIVE;
@@ -78,6 +75,10 @@ public class ProjectInfo {
         };
         fps = Constants.DEFAULT_PLAYBACK_FPS;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
+
+        countFrom = 1;
+        indexPrefix = Settings.getDefaultIndexPrefix();
+        indexSuffix = Settings.getDefaultIndexSuffix();
     }
 
     public void save() {
@@ -104,25 +105,33 @@ public class ProjectInfo {
                 final GameImage[] images = new GameImage[frameCount];
 
                 for (int i = 0; i < frameCount; i++) {
-                    images[i] = c
-                            .getState().draw(false, false, i);
+                    images[i] = c.getState().draw(false, false, i);
 
                     if (scaleUp > 1)
                         images[i] = ImageProcessing.scale(images[i], scaleUp);
                 }
 
-                GIFWriter.get().write(buildFilepath(), images,
-                        Constants.MILLIS_IN_SECOND / fps);
+                final Thread gifSaverThread = new Thread(() -> {
+                    final Path filepath = buildFilepath();
+
+                    GIFWriter.get().write(filepath, images,
+                            Constants.MILLIS_IN_SECOND / fps);
+                    StatusUpdates.saved(filepath);
+                });
+
+                gifSaverThread.start();
             }
             case PNG_SEPARATE -> {
                 for (int i = 0; i < frameCount; i++) {
-                    final GameImage image = c
-                            .getState().draw(false, false, i);
+                    final GameImage image = c.getState().draw(false, false, i);
+                    final String suffix = indexPrefix +
+                            (countFrom + i) + indexSuffix;
 
-                    GameImageIO.writeImage(buildFilepath("_" + i),
-                            scaleUp > 1 ? ImageProcessing.scale(image, scaleUp) : image);
+                    GameImageIO.writeImage(buildFilepath(suffix), scaleUp > 1
+                            ? ImageProcessing.scale(image, scaleUp) : image);
                 }
 
+                StatusUpdates.savedAllFrames(folder);
             }
             case PNG_STITCHED -> {
                 final boolean validDimensions = frameCount == frameDims[X] * frameDims[Y];
@@ -154,10 +163,10 @@ public class ProjectInfo {
                 GameImageIO.writeImage(buildFilepath(), scaleUp > 1
                         ? ImageProcessing.scale(stitched.submit(), scaleUp)
                         : stitched.submit());
+                StatusUpdates.saved(buildFilepath());
             }
         }
 
-        StatusUpdates.saved(buildFilepath());
         editedSinceLastSave = false;
         StippleEffect.get().rebuildProjectsMenu();
     }
@@ -230,6 +239,22 @@ public class ProjectInfo {
         return saveType;
     }
 
+    public String getIndexPrefix() {
+        return indexPrefix;
+    }
+
+    public String getIndexSuffix() {
+        return indexSuffix;
+    }
+
+    public int getCountFrom() {
+        return countFrom;
+    }
+
+    public void setCountFrom(final int countFrom) {
+        this.countFrom = countFrom;
+    }
+
     public void setFrameDimsX(final int v) {
         this.frameDims[X] = v;
     }
@@ -241,7 +266,7 @@ public class ProjectInfo {
         this.saveType = saveType;
     }
 
-    public void setFps(int fps) {
+    public void setFps(final int fps) {
         this.fps = fps;
     }
 
@@ -251,6 +276,14 @@ public class ProjectInfo {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public void setIndexPrefix(final String indexPrefix) {
+        this.indexPrefix = indexPrefix;
+    }
+
+    public void setIndexSuffix(final String indexSuffix) {
+        this.indexSuffix = indexSuffix;
     }
 
     public void setFolder(final Path folder) {

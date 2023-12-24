@@ -92,7 +92,7 @@ public class Constants {
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stef", OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
-            ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm";
+            ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm", TYPING_CODE = "typing";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
@@ -117,8 +117,7 @@ public class Constants {
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 74, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
-            LAYER_BUTTON_W = 88, LAYER_OPACITY_SLIDER_W = 46,
-            LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 6,
+            LAYER_BUTTON_W = 136, LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 10,
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5, PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
             PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8, PROJECTS_BEFORE_TO_DISPLAY = 1,
             VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * TOOL_NAME_X), VERT_SCROLL_WINDOW_H = (int)(LAYERS_H * 0.8),
@@ -127,7 +126,7 @@ public class Constants {
             DIALOG_W = CANVAS_W / 2, DIALOG_H = CANVAS_H / 2, DIALOG_CONTENT_INC_Y = 32,
             DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
             DIALOG_CONTENT_OFFSET_X = 115, DIALOG_CONTENT_BIG_OFFSET_X = 215,
-            DIALOG_CONTENT_W_ALLOWANCE = 300, DIALOG_CONTENT_SMALL_W_ALLOWANCE = 200,
+            DIALOG_CONTENT_W_ALLOWANCE = 280, DIALOG_CONTENT_SMALL_W_ALLOWANCE = 180,
             SMALL_TEXT_BOX_W = 80,
             STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -4,
@@ -149,7 +148,7 @@ public class Constants {
             HUE_SCALE = 360, SAT_SCALE = RGBA_SCALE, VALUE_SCALE = RGBA_SCALE,
             STATUS_UPDATE_DURATION_MILLIS = 5000,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
-            MAX_NAME_LENGTH = 25;
+            MAX_NAME_LENGTH = 25, ARBITRARY_MAX_COUNT = 10000;
 
     public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;
 
@@ -161,7 +160,7 @@ public class Constants {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
             Fill.get(), ColorPicker.get(),
-            Wand.get(), PencilSelect.get(), BoxSelect.get(),
+            Wand.get(), BrushSelect.get(), BoxSelect.get(),
             MoveSelection.get(), PickUpSelection.get()
     };
 }

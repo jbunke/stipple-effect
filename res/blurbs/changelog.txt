@@ -1,6 +1,6 @@
 {Upcoming}
 
-To add:
+Add:
 > Rotating and stretching selections
 > Outline selection shortcuts
 > Native file type
@@ -13,9 +13,37 @@ To add:
     > Toggle for rendering at true pixel size
     > Delta Time canvas size
 
-To change:
+Change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
+
+{0.0.1.2} - 2023-12-24
+
+Added:
+> Added the ability to import multiple files at once
+
+
+Fixed:
+> Rendering onion skins and semi-transparent layers is now
+    significantly more efficient and performant
+> Typing in a textbox now locks off keyboard shortcuts while
+    the textbox is enabled
+> Fixed gaps on pencil select tool, renamed to brush select,
+    made into a selection equivalent of brush tool
+
+Changed:
+> GIF file exports are now processed in a new thread, so the
+    program can be used while the process is ongoing
+> Improved zooming by adding limits to anchor area and
+    no longer adjusting the anchor on zoom outs
+> Added customizable suffixes for PNG_SEPARATE save mode and
+    associated settings to set defaults
+
+Removed:
+> Mini opacity slider in the layers panel; layer buttons
+    are now bigger and show more of the layer name, and the
+    opacity can still be modified from the layer settings
+    dialog
 
 {0.0.1.1} - 2023-12-23
 

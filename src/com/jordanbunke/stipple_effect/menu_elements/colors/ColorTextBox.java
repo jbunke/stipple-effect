@@ -20,8 +20,8 @@ public class ColorTextBox extends TextBox {
             final Coord2D position, final int index, final String initialText,
             final Supplier<Color> getter, final Consumer<String> setter
     ) {
-        super(position, Constants.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, "#",
-                initialText, "", ColorTextBox::validateAsHexCode,
+        super(position, Constants.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
+                initialText, () -> "", ColorTextBox::validateAsHexCode,
                 setter, getter, HEX_CODE_LENGTH);
 
         this.index = index;
@@ -63,7 +63,7 @@ public class ColorTextBox extends TextBox {
         int accumulator = 0, power = 0;
 
         for (int i = hexSequence.length() - 1; i >= 0; i--) {
-            final char c = hexSequence.charAt(i);
+            final char c = hexSequence.toLowerCase().charAt(i);
             final int placeValue = isNumeric(c)
                     ? c - '0' : 10 + (c - 'a');
 
@@ -92,7 +92,7 @@ public class ColorTextBox extends TextBox {
     }
 
     private static boolean isAlpha(final char c) {
-        return c >= 'a' && c <= 'f';
+        return (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
     }
 
     @Override

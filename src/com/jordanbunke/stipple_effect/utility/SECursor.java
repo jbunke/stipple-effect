@@ -26,6 +26,9 @@ public class SECursor {
             PENCIL_SELECT_ADDITIVE = "pencil_select_additive",
             PENCIL_SELECT_SUBTRACTIVE = "pencil_select_subtractive",
             PENCIL_SELECT_SINGLE = "pencil_select_single",
+            RETICLE_ADDITIVE = "reticle_additive",
+            RETICLE_SUBTRACTIVE = "reticle_subtractive",
+            RETICLE_SINGLE = "reticle_single",
             ZOOM = "zoom";
 
     private static final Set<String> CURSOR_CODES = Set.of(
@@ -38,6 +41,7 @@ public class SECursor {
             BOX_SELECT_SINGLE, BOX_SELECT_SUBTRACTIVE,
             PENCIL_SELECT_ADDITIVE, PENCIL_SELECT_GLOBAL,
             PENCIL_SELECT_SINGLE, PENCIL_SELECT_SUBTRACTIVE,
+            RETICLE_ADDITIVE, RETICLE_SUBTRACTIVE, RETICLE_SINGLE,
             ZOOM);
 
     private static final Map<String, GameImage> CURSOR_MAP = new HashMap<>();

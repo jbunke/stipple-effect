@@ -14,7 +14,7 @@ public class LayerMerger {
 
         for (int i = 0; i < frameCount; i++) {
             final GameImage frame = new GameImage(below.getFrame(i));
-            frame.draw(above.renderFrame(i));
+            frame.draw(above.getRender(i));
 
             frames.add(frame.submit());
         }

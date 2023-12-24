@@ -361,7 +361,7 @@ public class MenuAssembly {
         // layer content
 
         final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 7;
+        final int amount = layers.size(), elementsPerLayer = 6;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -393,31 +393,14 @@ public class MenuAssembly {
                     s -> StippleEffect.get().getContext().getState().setLayerEditIndex(s)
             ));
 
-            // opacity slider
-
-            final int MAX_OPACITY = 255, index = i;
-
-            final Coord2D osPos = pos.displace(
-                    Constants.LAYER_BUTTON_W + Constants.BUTTON_OFFSET,
-                    Constants.STD_TEXT_BUTTON_H / 2);
-
-            final HorizontalSlider opacitySlider = new HorizontalSlider(osPos,
-                    Constants.LAYER_OPACITY_SLIDER_W, MenuElement.Anchor.LEFT_CENTRAL,
-                    0, MAX_OPACITY,
-                    (int)(StippleEffect.get().getContext().getState().getLayers()
-                            .get(index).getOpacity() * MAX_OPACITY),
-                    o -> StippleEffect.get().getContext()
-                            .changeLayerOpacity(o / (double) MAX_OPACITY, index, false));
-
-            opacitySlider.updateAssets();
-            layerButtons[amount + i] = new ScrollableMenuElement(opacitySlider);
+            final int index = i;
 
             // visibility toggle
 
-            final Coord2D vtPos = osPos.displace(Constants.LAYER_OPACITY_SLIDER_W +
-                    Constants.BUTTON_OFFSET, 0);
+            final Coord2D vtPos = pos.displace(Constants.LAYER_BUTTON_W +
+                    Constants.BUTTON_OFFSET, Constants.STD_TEXT_BUTTON_H / 2);
 
-            layerButtons[(2 * amount) + i] =
+            layerButtons[amount + i] =
                     new ScrollableMenuElement(generateVisibilityToggle(index, vtPos));
 
             // isolate layer
@@ -425,7 +408,7 @@ public class MenuAssembly {
             final Coord2D ilPos = vtPos.displace(Constants.BUTTON_INC,
                     (int)(Constants.BUTTON_DIM * -0.5));
 
-            layerButtons[(3 * amount) + i] = new ScrollableMenuElement(
+            layerButtons[(2 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER, ilPos, true,
                     () -> StippleEffect.get().getContext().isolateLayer(index)));
 
@@ -433,21 +416,21 @@ public class MenuAssembly {
 
             final Coord2D onionPos = vtPos.displace(Constants.BUTTON_INC * 2, 0);
 
-            layerButtons[(4 * amount) + i] =
+            layerButtons[(3 * amount) + i] =
                     new ScrollableMenuElement(generateOnionSkinToggle(index, onionPos));
 
             // frames linked toggle
 
             final Coord2D flPos = onionPos.displace(Constants.BUTTON_INC, 0);
 
-            layerButtons[(5 * amount) + i] =
+            layerButtons[(4 * amount) + i] =
                     new ScrollableMenuElement(generateFramesLinkedToggle(index, flPos));
 
             // layer settings
 
             final Coord2D lsPos = ilPos.displace(Constants.BUTTON_INC * 3, 0);
 
-            layerButtons[(6 * amount) + i] = new ScrollableMenuElement(
+            layerButtons[(5 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton(IconCodes.LAYER_SETTINGS,
                             lsPos, true,
                             () -> DialogAssembly.setDialogToLayerSettings(index)));

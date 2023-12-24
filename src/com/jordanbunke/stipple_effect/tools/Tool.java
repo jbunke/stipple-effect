@@ -13,7 +13,7 @@ public abstract class Tool {
             final Tool tool
     ) {
         return tool.equals(MoveSelection.get()) ||
-                tool.equals(PencilSelect.get()) ||
+                tool.equals(BrushSelect.get()) ||
                 tool.equals(BoxSelect.get());
     }
 

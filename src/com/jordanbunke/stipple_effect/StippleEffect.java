@@ -53,6 +53,7 @@ public class StippleEffect implements ProgramContext {
     private final List<SEContext> contexts;
     private int contextIndex;
     private Menu projectsMenu;
+    private final List<Path> toImport;
 
     // tools
     private Menu toolButtonMenu;
@@ -123,6 +124,7 @@ public class StippleEffect implements ProgramContext {
         contexts = new ArrayList<>(List.of(new SEContext(
                 DialogVals.getNewProjectWidth(), DialogVals.getNewProjectHeight())));
         contextIndex = 0;
+        toImport = new ArrayList<>();
 
         // default tool is the hand
         tool = Hand.get();
@@ -216,6 +218,11 @@ public class StippleEffect implements ProgramContext {
         return windowed
                 ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h)
                 : new Coord2D(screenW, screenH);
+    }
+
+    public void rebuildAllMenusWithText() {
+        rebuildStateDependentMenus();
+        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     public void rebuildStateDependentMenus() {
@@ -502,29 +509,37 @@ public class StippleEffect implements ProgramContext {
 
     public void openProject() {
         FileIO.setDialogToFilesOnly();
-        final Optional<File> opened = FileIO.openFileFromSystem(
+        final Optional<File[]> opened = FileIO.openFilesFromSystem(
                 new String[] { "Accepted image types" },
                 new String[][] { Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES });
+        window.getEventLogger().unpressAllKeys();
 
         if (opened.isEmpty())
             return;
 
-        final Path filepath = opened.get().toPath();
-        verifyFilepath(filepath);
+        final Path[] filepaths = Arrays.stream(opened.get())
+                .map(File::toPath).toArray(Path[]::new);
+
+        if (filepaths.length > 0) {
+            verifyFilepath(filepaths[0]);
+
+            toImport.clear();
+            toImport.addAll(Arrays.asList(filepaths).subList(1, filepaths.length));
+        }
     }
 
     private static void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (endsWithOneOf(fileName)) {
+        if (isAcceptedRasterFormat(fileName)) {
             final GameImage image = GameImageIO.readImage(filepath);
 
             DialogAssembly.setDialogToOpenPNG(image, filepath);
         }
-        // TODO - extend with else-ifs for additional file types (.stef, potentially .jpg)
+        // TODO - extend with else-ifs for additional file types (.stef)
     }
 
-    private static boolean endsWithOneOf(final String toCheck) {
+    private static boolean isAcceptedRasterFormat(final String toCheck) {
         for (String suffix : Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES)
             if (toCheck.endsWith(suffix))
                 return true;
@@ -562,6 +577,11 @@ public class StippleEffect implements ProgramContext {
         project.renderInfo.setZoomFactor(Constants.DEF_ZOOM);
 
         addContext(project, true);
+
+        if (toImport.isEmpty())
+            clearDialog();
+        else
+            verifyFilepath(toImport.remove(0));
     }
 
     public void addContext(final SEContext context, final boolean setActive) {
@@ -576,6 +596,7 @@ public class StippleEffect implements ProgramContext {
         if (setActive) {
             setContextIndex(contexts.size() - 1);
             rebuildStateDependentMenus();
+            ToolWithBreadth.redrawToolOverlays();
         } else {
             rebuildProjectsMenu();
         }

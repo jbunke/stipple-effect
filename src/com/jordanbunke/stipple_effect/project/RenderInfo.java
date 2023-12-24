@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.project;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -19,9 +20,8 @@ public class RenderInfo {
         adjustAnchorFromZoom(targetPixel);
     }
 
-    public void zoomOut(final Coord2D targetPixel) {
-        setZoomFactor(zoomFactor / 2f);
-        adjustAnchorFromZoom(targetPixel);
+    public void zoomOut() {
+        setZoomFactor(zoomFactor * 0.5f);
     }
 
     private void adjustAnchorFromZoom(final Coord2D targetPixel) {
@@ -41,11 +41,15 @@ public class RenderInfo {
     }
 
     public void setAnchor(final Coord2D anchor) {
-        this.anchor = anchor;
+        final ProjectState state = StippleEffect.get().getContext().getState();
+        final int w = state.getImageWidth(), h = state.getImageHeight();
+
+        this.anchor = new Coord2D(Math.max(0, Math.min(anchor.x, w)),
+                Math.max(0, Math.min(anchor.y, h)));
     }
 
     public void incrementAnchor(final Coord2D delta) {
-        this.anchor = anchor.displace(delta);
+        setAnchor(anchor.displace(delta));
     }
 
     public String getZoomText() {

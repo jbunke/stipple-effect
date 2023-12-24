@@ -72,25 +72,8 @@ public final class Brush extends ToolWithBreadth {
             final GameImage edit = new GameImage(w, h);
             populateAround(edit, tp, selection);
 
-            final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
-                    xUnit = (int)Math.signum(xDiff),
-                    yUnit = (int)Math.signum(yDiff);
-            if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
-                    (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
-                if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                    for (int x = 1; x < Math.abs(xDiff); x++) {
-                        final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                        populateAround(edit, getLastTP().displace(
-                                xUnit * x, yUnit* y), selection);
-                    }
-                } else {
-                    for (int y = 1; y < Math.abs(yDiff); y++) {
-                        final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                        populateAround(edit, getLastTP().displace(
-                                xUnit * x, yUnit* y), selection);
-                    }
-                }
-            }
+            fillMouseSkips(tp, (x, y) -> populateAround(
+                    edit, getLastTP().displace(x, y), selection));
 
             context.paintOverImage(edit.submit());
             updateLast(context);
