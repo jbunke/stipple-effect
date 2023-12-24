@@ -1,7 +1,7 @@
 # ![Stipple Effect](https://i.imgur.com/CZhtaSP.gif)
 
 [![Download](https://i.imgur.com/X6ClI06.png)](https://flinkerflitzer.itch.io/stipple-effect)
-[![Changelog](https://i.imgur.com/IhJsonn.png)](https://github.com/jbunke/stipple-effect/blob/master/res/blurbs/changelog.txt)
+[![Changelog](https://i.imgur.com/IhJsonn.png)](https://github.com/jbunke/stipple-effect/blob/master/changelog.md)
 
 ## About
 
