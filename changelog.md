@@ -11,8 +11,8 @@
 * Adjustable panels 
 * Palettes 
 * More settings read from file on startup, including:
-* Toggle for rendering at true pixel size 
-* Delta Time canvas size
+  * Toggle for rendering at true pixel size 
+  * Delta Time canvas size
 ### Change:
 * Remap subtractive mode from S to ALT key once correctly implemented in Delta Time
 
@@ -34,7 +34,7 @@
 ## **0.0.1.1** - 2023-12-23
 ### Added:
 * Status updates for:
-* Project saved
+  * Project saved
 ### Fixed:
 * Picked up selection previews no longer shroud pixels on other layers
 * Any picked up selection is dropped onto editing layer before attempting pasting 
