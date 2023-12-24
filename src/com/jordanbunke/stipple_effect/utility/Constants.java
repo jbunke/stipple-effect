@@ -88,7 +88,7 @@ public class Constants {
             ZOOM_SLIDER_X = (int)(CANVAS_W * 0.535),
             ZOOM_SLIDER_W = (int)(CANVAS_W * 0.1);
 
-    public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Ly. ",
+    public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Layer ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stef", OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",

@@ -37,7 +37,7 @@ public class Settings {
 
     // object
     private static String defIndexPrefix = "_", defIndexSuffix = "";
-    private static SEFonts.Code programFont = SEFonts.Code.CLASSIC;
+    private static SEFonts.Code programFont = SEFonts.Code.PICCOLO;
 
     public static void read() {
         final String file = FileIO.readFile(SETTINGS_FILE);
