@@ -218,6 +218,11 @@ public class StippleEffect implements ProgramContext {
                 : new Coord2D(screenW, screenH);
     }
 
+    public void rebuildAllMenusWithText() {
+        rebuildStateDependentMenus();
+        colorsMenu = MenuAssembly.buildColorsMenu();
+    }
+
     public void rebuildStateDependentMenus() {
         rebuildLayersMenu();
         rebuildFramesMenu();

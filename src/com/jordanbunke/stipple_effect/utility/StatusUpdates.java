@@ -60,4 +60,9 @@ public class StatusUpdates {
         StippleEffect.get().sendStatusUpdate("Saved project to \"" +
                 filepath + "\"");
     }
+
+    public static void savedAllFrames(final Path folder) {
+        StippleEffect.get().sendStatusUpdate(
+                "Saved all frames in \"" + folder + "\"");
+    }
 }

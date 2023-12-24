@@ -15,12 +15,16 @@ public class Settings {
     private static final String
             FULLSCREEN_ON_STARTUP = "fullscreen_on_startup",
             FONT = "program_font",
+            DEFAULT_INDEX_PREFIX = "def_index_prefix",
+            DEFAULT_INDEX_SUFFIX = "def_index_suffix",
             CHECKERBOARD_PX = "checkerboard_px";
 
     // code-function associations
     private static final Map<String, Supplier<Object>> writerGetterMap = Map.ofEntries(
             Map.entry(FULLSCREEN_ON_STARTUP, Settings::isFullscreenOnStartup),
             Map.entry(FONT, Settings::getProgramFont),
+            Map.entry(DEFAULT_INDEX_PREFIX, Settings::getDefaultIndexPrefix),
+            Map.entry(DEFAULT_INDEX_SUFFIX, Settings::getDefaultIndexSuffix),
             Map.entry(CHECKERBOARD_PX, Settings::getCheckerboardPixels)
     );
 
@@ -32,6 +36,7 @@ public class Settings {
     private static int checkerboardPixels = Constants.DEFAULT_CHECKERBOARD_DIM;
 
     // object
+    private static String defIndexPrefix = "_", defIndexSuffix = "";
     private static SEFonts.Code programFont = SEFonts.Code.CLASSIC;
 
     public static void read() {
@@ -57,6 +62,8 @@ public class Settings {
                 case CHECKERBOARD_PX -> setIntSettingSafely(value,
                         Constants.DEFAULT_CHECKERBOARD_DIM,
                         i -> setCheckerboardPixels(i, true));
+                case DEFAULT_INDEX_PREFIX -> setDefaultIndexPrefix(value, true);
+                case DEFAULT_INDEX_SUFFIX -> setDefaultIndexSuffix(value, true);
                 case FONT -> setProgramFont(value, true);
             }
         }
@@ -106,6 +113,26 @@ public class Settings {
             StippleEffect.get().getContext().redrawCheckerboard();
     }
 
+    public static void setDefaultIndexPrefix(
+            final String defIndexPrefix, final boolean isStartup
+    ) {
+        Settings.defIndexPrefix = defIndexPrefix;
+
+        if (!isStartup)
+            StippleEffect.get().getContexts().forEach(
+                    c -> c.projectInfo.setIndexPrefix(defIndexPrefix));
+    }
+
+    public static void setDefaultIndexSuffix(
+            final String defIndexSuffix, final boolean isStartup
+    ) {
+        Settings.defIndexSuffix = defIndexSuffix;
+
+        if (!isStartup)
+            StippleEffect.get().getContexts().forEach(
+                    c -> c.projectInfo.setIndexSuffix(defIndexSuffix));
+    }
+
     public static void setProgramFont(final String fontCode, final boolean isStartup) {
         try {
             Settings.programFont = SEFonts.Code.valueOf(fontCode);
@@ -118,7 +145,7 @@ public class Settings {
 
         if (!isStartup) {
             DialogAssembly.setDialogToProgramSettings();
-            StippleEffect.get().rebuildStateDependentMenus();
+            StippleEffect.get().rebuildAllMenusWithText();
         }
     }
 
@@ -129,6 +156,14 @@ public class Settings {
 
     public static int getCheckerboardPixels() {
         return checkerboardPixels;
+    }
+
+    public static String getDefaultIndexPrefix() {
+        return defIndexPrefix;
+    }
+
+    public static String getDefaultIndexSuffix() {
+        return defIndexSuffix;
     }
 
     public static SEFonts.Code getProgramFont() {

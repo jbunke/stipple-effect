@@ -26,6 +26,16 @@ Change:
 Fix:
 > Zooming out should not use the cursor position as a target
 
+{0.0.1.2} - 2023-12-24?
+
+Changed:
+> GIF file exports are now processed in a new thread, so the
+    program can be used while the process is ongoing
+> Improved zooming by adding limits to anchor area and
+    no longer adjusting the anchor on zoom outs
+> Added customizable suffixes for PNG_SEPARATE save mode and
+    associated settings to set defaults
+
 {0.0.1.1} - 2023-12-23
 
 Added:

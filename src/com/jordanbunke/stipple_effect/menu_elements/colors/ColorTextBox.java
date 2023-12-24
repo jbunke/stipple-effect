@@ -20,8 +20,8 @@ public class ColorTextBox extends TextBox {
             final Coord2D position, final int index, final String initialText,
             final Supplier<Color> getter, final Consumer<String> setter
     ) {
-        super(position, Constants.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, "#",
-                initialText, "", ColorTextBox::validateAsHexCode,
+        super(position, Constants.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
+                initialText, () -> "", ColorTextBox::validateAsHexCode,
                 setter, getter, HEX_CODE_LENGTH);
 
         this.index = index;
