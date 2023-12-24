@@ -19,14 +19,11 @@ Change:
 
 {TODO for 0.0.1.2}
 
-Change:
-> Send file exports to a separate thread so that the program
-    can be used concurrently with the export process
-
-Fix:
-> Zooming out should not use the cursor position as a target
-
 {0.0.1.2} - 2023-12-24?
+
+Fixed:
+> Fixed gaps on pencil select tool, renamed to brush select,
+    made into a selection equivalent of brush tool
 
 Changed:
 > GIF file exports are now processed in a new thread, so the

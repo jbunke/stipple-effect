@@ -581,6 +581,7 @@ public class StippleEffect implements ProgramContext {
         if (setActive) {
             setContextIndex(contexts.size() - 1);
             rebuildStateDependentMenus();
+            ToolWithBreadth.redrawToolOverlays();
         } else {
             rebuildProjectsMenu();
         }

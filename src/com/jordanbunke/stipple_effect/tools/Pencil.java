@@ -66,23 +66,8 @@ public final class Pencil extends ToolThatDraws {
             if (selection.isEmpty() || selection.contains(tp))
                 edit.dot(c.apply(tp.x, tp.y), tp.x, tp.y);
 
-            final int xDiff = tp.x - getLastTP().x, yDiff = tp.y - getLastTP().y,
-                    xUnit = (int)Math.signum(xDiff),
-                    yUnit = (int)Math.signum(yDiff);
-            if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
-                    (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
-                if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                    for (int x = 1; x < Math.abs(xDiff); x++) {
-                        final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                        edit.dot(getLastTP().x + (xUnit * x), getLastTP().y + (yUnit * y));
-                    }
-                } else {
-                    for (int y = 1; y < Math.abs(yDiff); y++) {
-                        final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                        edit.dot(getLastTP().x + (xUnit * x), getLastTP().y + (yUnit * y));
-                    }
-                }
-            }
+            fillMouseSkips(tp, (x, y) ->
+                            edit.dot(getLastTP().x + x, getLastTP().y + y));
 
             context.paintOverImage(edit.submit());
             updateLast(context);

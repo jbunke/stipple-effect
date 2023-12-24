@@ -194,7 +194,7 @@ public class SEContext {
     private void processTools(
             final InputEventLogger eventLogger, final Tool tool
     ) {
-        if (StippleEffect.get().getTool() instanceof ToolWithMode) {
+        if (tool instanceof ToolWithMode || tool.equals(BrushSelect.get())) {
             ToolWithMode.setGlobal(eventLogger.isPressed(Key.SHIFT));
 
             if (eventLogger.isPressed(Key.S)) {
@@ -204,7 +204,7 @@ public class SEContext {
             } else {
                 ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
             }
-        } else if (StippleEffect.get().getTool() instanceof ToolThatDraws) {
+        } else if (tool instanceof ToolThatDraws) {
             if (eventLogger.isPressed(Key.CTRL) &&
                     eventLogger.isPressed(Key.SHIFT)) {
                 ToolThatDraws.setMode(ToolThatDraws.Mode.RANDOM_WITHIN_BOUNDS);
@@ -597,7 +597,7 @@ public class SEContext {
                     () -> StippleEffect.get().setTool(Wand.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(PencilSelect.get()));
+                    () -> StippleEffect.get().setTool(BrushSelect.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
                     () -> StippleEffect.get().setTool(BoxSelect.get()));

@@ -161,7 +161,7 @@ public class Constants {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(), Brush.get(), Eraser.get(),
             Fill.get(), ColorPicker.get(),
-            Wand.get(), PencilSelect.get(), BoxSelect.get(),
+            Wand.get(), BrushSelect.get(), BoxSelect.get(),
             MoveSelection.get(), PickUpSelection.get()
     };
 }
