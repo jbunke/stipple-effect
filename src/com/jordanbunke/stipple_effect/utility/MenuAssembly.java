@@ -614,6 +614,20 @@ public class MenuAssembly {
 
         mb.add(zoomSlider);
 
+        // outline button
+        final GameImage outlineIcon = GraphicsUtils.loadIcon(IconCodes.OUTLINE),
+                outlineHighlighted = new GameImage(GraphicsUtils.HIGHLIGHT_OVERLAY);
+        outlineHighlighted.draw(outlineIcon);
+
+        final SimpleMenuButton outlineButton = new SimpleMenuButton(
+                Constants.getToolsPosition().displace(Constants.BUTTON_OFFSET,
+                        Constants.WORKSPACE_H - Constants.BUTTON_OFFSET),
+                Constants.ICON_DIMS, MenuElement.Anchor.LEFT_BOTTOM,
+                true, DialogAssembly::setDialogToOutline, outlineIcon,
+                outlineHighlighted.submit());
+
+        mb.add(outlineButton);
+
         // help button
         final GameImage helpIcon = GraphicsUtils.loadIcon(IconCodes.INFO),
                 helpHighlighted = new GameImage(GraphicsUtils.HIGHLIGHT_OVERLAY);
@@ -622,7 +636,7 @@ public class MenuAssembly {
         final SimpleMenuButton helpButton = new SimpleMenuButton(
                 Constants.getBottomBarPosition().displace(
                         Constants.CANVAS_W - Constants.BUTTON_DIM,
-                        Constants.BUTTON_OFFSET), Constants.TOOL_ICON_DIMS,
+                        Constants.BUTTON_OFFSET), Constants.ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, true,
                 DialogAssembly::setDialogToInfo,
                 helpIcon, helpHighlighted.submit()
@@ -641,7 +655,7 @@ public class MenuAssembly {
                 Constants.BUTTON_OFFSET + (Constants.BUTTON_INC * index)
         );
 
-        return new SimpleMenuButton(position, Constants.TOOL_ICON_DIMS,
+        return new SimpleMenuButton(position, Constants.ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, true, () -> StippleEffect.get().setTool(tool),
                 StippleEffect.get().getTool().equals(tool) ? tool.getSelectedIcon() : tool.getIcon(),
                 tool.getHighlightedIcon());

@@ -8,10 +8,7 @@ import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.selection.SEClipboard;
-import com.jordanbunke.stipple_effect.selection.SelectionUtils;
-import com.jordanbunke.stipple_effect.selection.SelectionContents;
-import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
@@ -392,6 +389,10 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
                     () -> paste(false)
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
+                    () -> outlineSelection(DialogVals.getOutlineSideMask())
+            );
         }
 
         // SHIFT but not CTRL
@@ -407,6 +408,14 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex())
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToOutline
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
+                    () -> outlineSelection(Outliner.getSingleOutlineMask())
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
@@ -546,6 +555,10 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
                     () -> paste(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
+                    () -> outlineSelection(Outliner.getDoubleOutlineMask())
             );
         }
     }
@@ -801,6 +814,17 @@ public class SEContext {
     // process all actions here and feed through state manager
 
     // SELECTION
+
+    // outline selection
+    public void outlineSelection(final boolean[] sideMask) {
+        if (getState().hasSelection()) {
+            ToolWithMode.setGlobal(false);
+            ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
+
+            editSelection(Outliner.outline(
+                    getState().getSelection(), sideMask), true);
+        }
+    }
 
     // move selection contents
     public void moveSelectionContents(

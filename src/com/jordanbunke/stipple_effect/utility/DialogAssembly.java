@@ -27,6 +27,7 @@ import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuEle
 import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.tools.Tool;
 
 import java.io.File;
@@ -476,6 +477,74 @@ public class DialogAssembly {
                 () -> StippleEffect.get().removeContext(index), true));
     }
 
+    public static void setDialogToOutline() {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        // presets: single & double
+        final TextLabel presets = makeDialogLeftLabel(0, "Presets: ");
+        mb.add(presets);
+
+        // no selection notification
+        if (!c.getState().hasSelection())
+            mb.add(makeDialogLeftLabel(5,
+                    "Cannot outline; nothing is selected"));
+
+        // buttons for setting presets
+        final GameImage baseSingle = GraphicsUtils.drawTextButton(
+                Constants.STD_TEXT_BUTTON_W, "Single", false, Constants.GREY),
+                baseDouble = GraphicsUtils.drawTextButton(
+                        Constants.STD_TEXT_BUTTON_W,
+                        "Double", false, Constants.GREY);
+        final SimpleMenuButton singlePreset = new SimpleMenuButton(
+                getDialogContentOffsetFromLabel(presets),
+                new Coord2D(Constants.STD_TEXT_BUTTON_W, Constants.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, true,
+                () -> DialogVals.setOutlineSideMask(Outliner.getSingleOutlineMask()),
+                baseSingle, GraphicsUtils.drawHighlightedButton(baseSingle));
+        final SimpleMenuButton doublePreset = new SimpleMenuButton(
+                getDialogContentBigOffsetFromLabel(presets),
+                new Coord2D(Constants.STD_TEXT_BUTTON_W, Constants.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, true,
+                () -> DialogVals.setOutlineSideMask(Outliner.getDoubleOutlineMask()),
+                baseDouble, GraphicsUtils.drawHighlightedButton(baseDouble));
+        mb.add(singlePreset);
+        mb.add(doublePreset);
+
+        // direction buttons
+        final Coord2D buttonPos = Constants.getCanvasMiddle();
+
+        mb.add(new StaticMenuElement(buttonPos, Constants.ICON_DIMS,
+                MenuElement.Anchor.CENTRAL, GraphicsUtils.SELECT_OVERLAY));
+
+        final GameImage highlight, included, excluded;
+
+        highlight = GraphicsUtils.HIGHLIGHT_OVERLAY;
+        included = GraphicsUtils.loadIcon(IconCodes.INCLUDED);
+        excluded = GraphicsUtils.loadIcon(IconCodes.EXCLUDED);
+
+        Arrays.stream(Outliner.Side.values()).forEach(side -> {
+            final Coord2D rc = side.relativeCoordinate();
+            final int index = side.ordinal();
+
+            mb.add(new SimpleToggleMenuButton(buttonPos.displace(
+                    rc.x * Constants.BUTTON_INC, rc.y * Constants.BUTTON_INC),
+                    Constants.ICON_DIMS, MenuElement.Anchor.CENTRAL,
+                    true, new GameImage[] { included, excluded },
+                    new GameImage[] { highlight, highlight },
+                    new Runnable[] { () -> {}, () -> {} },
+                    () -> DialogVals.isThisOutlineSide(index) ? 0 : 1,
+                    () -> DialogVals.toggleThisOutlineSide(index)));
+        });
+
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Outline selection options...", contents,
+                () -> c.getState().hasSelection(), "Outline",
+                () -> c.outlineSelection(DialogVals.getOutlineSideMask()),
+                true));
+    }
+
     public static void setDialogToInfo() {
         setDialog(assembleInfoDialog());
     }
@@ -839,6 +908,7 @@ public class DialogAssembly {
             case MORE -> assembleInfoScreenContents(
                     new String[] {
                             IconCodes.SWAP_COLORS,
+                            IconCodes.OUTLINE,
                             IconCodes.GENERAL,
                             IconCodes.ON_RESOLUTION,
                             IconCodes.CLIPBOARD_SHORTCUTS,
@@ -848,6 +918,7 @@ public class DialogAssembly {
                     new String[] {
                             "Swap primary and secondary color",
                             // TODO - icon color shortcuts: toggle slider vs. palette mode
+                            "Outline",
                             "General",
                             "On resolution",
                             "Clipboard shortcuts",

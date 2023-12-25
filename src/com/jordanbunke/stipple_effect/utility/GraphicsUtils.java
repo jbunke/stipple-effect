@@ -16,8 +16,8 @@ import java.util.function.BiFunction;
 
 public class GraphicsUtils {
     public static final GameImage
-            HIGHLIGHT_OVERLAY = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("highlighted.png")),
-            SELECT_OVERLAY = ResourceLoader.loadImageResource(Constants.ICON_FOLDER.resolve("selected.png"));
+            HIGHLIGHT_OVERLAY = loadIcon("highlighted"),
+            SELECT_OVERLAY = loadIcon("selected");
 
     public static TextBuilder uiText() {
         return uiText(Constants.WHITE);

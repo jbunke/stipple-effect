@@ -137,7 +137,7 @@ public class Constants {
             HALF_COLOR_SLIDER_W = (COLOR_PICKER_W / 2) - (SLIDER_BALL_DIM + 10),
             COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 150;
 
-    public static final Coord2D TOOL_ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
+    public static final Coord2D ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
 
     public static final int DEFAULT_BRUSH_BREADTH = 3,
             MIN_BREADTH = 1, MAX_BREADTH = 200, BREADTH_INC = 5,

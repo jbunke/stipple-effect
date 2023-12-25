@@ -17,18 +17,11 @@ Change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
 
-{0.0.1.3} - 2023-12-??
-
-TODO:
-
-Change:
-> Scale up settings dialog to be same size and format as
-    info dialog; divide into tabs
-
-DONE:
+{0.0.1.3} - 2023-12-25
 
 Added:
 > Added Piccolo font and set as default
+> Added outlining system
 
 Changed:
 > Changed default additional layer name prefix to "Layer "

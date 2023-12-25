@@ -49,6 +49,9 @@ public class IconCodes {
             SWAP_COLORS = "swap_colors",
             DECREMENT = "decrement",
             INCREMENT = "increment",
+            OUTLINE = "outline",
+            INCLUDED = "included",
+            EXCLUDED = "excluded",
             SETTINGS = "settings",
             BULLET_POINT = "bullet_point",
             INFO = "info";
