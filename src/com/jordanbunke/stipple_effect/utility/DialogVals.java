@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.stipple_effect.selection.Outliner;
+
 public class DialogVals {
     private static int
             newProjectWidth = Constants.DEFAULT_IMAGE_W,
@@ -13,6 +15,7 @@ public class DialogVals {
             padTop = 0,
             padBottom = 0;
     private static double layerOpacity = Constants.OPAQUE;
+    private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String layerName = "";
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
 
@@ -27,6 +30,14 @@ public class DialogVals {
         public String toString() {
             return name().charAt(0) + name().substring(1).toLowerCase();
         }
+    }
+
+    public static void setOutlineSideMask(final boolean[] outlineSideMask) {
+        DialogVals.outlineSideMask = outlineSideMask;
+    }
+
+    public static void toggleThisOutlineSide(final int index) {
+        outlineSideMask[index] = !outlineSideMask[index];
     }
 
     public static void setInfoScreen(final InfoScreen infoScreen) {
@@ -131,5 +142,13 @@ public class DialogVals {
 
     public static int getNewProjectYDivs() {
         return newProjectYDivs;
+    }
+
+    public static boolean isThisOutlineSide(final int index) {
+        return outlineSideMask[index];
+    }
+
+    public static boolean[] getOutlineSideMask() {
+        return outlineSideMask;
     }
 }

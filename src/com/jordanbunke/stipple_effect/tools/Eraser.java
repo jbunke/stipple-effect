@@ -76,7 +76,7 @@ public final class Eraser extends ToolWithBreadth {
                     continue;
 
                 if (mask[x][y] && e.x >= 0 && e.y >= 0 &&
-                        e.x < eraseMask.length && e.y < eraseMask.length)
+                        e.x < eraseMask.length && e.y < eraseMask[e.x].length)
                     eraseMask[e.x][e.y] = true;
             }
     }
