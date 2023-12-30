@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.selection;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.Set;
 import java.util.function.BiFunction;

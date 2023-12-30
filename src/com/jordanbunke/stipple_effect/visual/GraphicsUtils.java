@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
@@ -9,6 +9,9 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.Settings;
 
 import java.awt.*;
 import java.nio.file.Path;

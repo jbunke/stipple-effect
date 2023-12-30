@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.image.GameImage;
@@ -15,15 +15,17 @@ import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.menu_elements.SelectableListItemButton;
-import com.jordanbunke.stipple_effect.menu_elements.colors.ColorTextBox;
-import com.jordanbunke.stipple_effect.menu_elements.colors.ColorSelector;
-import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.SelectableListItemButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
+import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.tools.*;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 import java.util.Arrays;
 import java.util.List;

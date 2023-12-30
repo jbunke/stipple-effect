@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.fonts.Font;
 import com.jordanbunke.delta_time.fonts.FontFamily;

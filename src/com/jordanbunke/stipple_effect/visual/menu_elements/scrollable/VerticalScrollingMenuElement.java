@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.menu_elements.scrollable;
+package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
@@ -9,40 +9,39 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.List;
 
-public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
+public class VerticalScrollingMenuElement extends ScrollingMenuElement {
 
-    private int offsetX;
+    private int offsetY;
 
-    private final HorizontalSlider slider;
+    private final VerticalSlider slider;
 
-    public HorizontalScrollingMenuElement(
+    public VerticalScrollingMenuElement(
             final Coord2D position, final Coord2D dimensions,
             final ScrollableMenuElement[] menuElements,
-            final int realRightX, final int initialOffsetX
+            final int realBottomY, final int initialOffsetY
     ) {
         super(position, dimensions, menuElements);
 
-        final int minOffsetX = 0, maxOffsetX = (realRightX - getX()) - getWidth();
+        final int minOffsetY = 0, maxOffsetY = (realBottomY - getY()) - getHeight();
 
-        offsetX = -Math.max(minOffsetX, Math.min(initialOffsetX, maxOffsetX));
+        offsetY = -Math.max(minOffsetY, Math.min(initialOffsetY, maxOffsetY));
 
-        final boolean canScroll = realRightX > position.x + dimensions.x;
-        slider = canScroll ? makeSlider(maxOffsetX) : null;
+        final boolean canScroll = realBottomY > position.y + dimensions.y;
+        slider = canScroll ? makeSlider(maxOffsetY) : null;
     }
 
-    private HorizontalSlider makeSlider(final int maxOffsetX) {
+    private VerticalSlider makeSlider(final int maxOffsetY) {
         final Coord2D position = new Coord2D(getX(), getY())
-                .displace(0, getHeight() - Constants.SLIDER_OFF_DIM);
+                .displace(getWidth() - Constants.SLIDER_OFF_DIM, 0);
 
-        final HorizontalSlider slider = new HorizontalSlider(
-                position, getWidth(), Anchor.LEFT_TOP,
-                0, maxOffsetX, -offsetX, o -> setOffsetX(-o));
+        final VerticalSlider slider = new VerticalSlider(position, getHeight(), Anchor.LEFT_TOP,
+                0, maxOffsetY, -offsetY, o -> setOffsetY(-o));
         slider.updateAssets();
         return slider;
     }
 
-    public void setOffsetX(final int offsetX) {
-        this.offsetX = offsetX;
+    public void setOffsetY(final int offsetY) {
+        this.offsetY = offsetY;
     }
 
     @Override
@@ -53,6 +52,7 @@ public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
             slider.render(canvas);
     }
 
+    // TODO - refactor this and Horizontal towards superclass
     @Override
     public void process(final InputEventLogger eventLogger) {
         super.process(eventLogger);
@@ -76,14 +76,14 @@ public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
 
     @Override
     Coord2D calculateOffset() {
-        return new Coord2D(offsetX, 0);
+        return new Coord2D(0, offsetY);
     }
 
     @Override
     boolean renderAndProcessChild(final ScrollableMenuElement child) {
         final Coord2D rp = getRenderPosition(), childRP = child.getRenderPosition();
-        final int w = getWidth(), childW = child.getWidth();
+        final int h = getHeight(), childH = child.getHeight();
 
-        return rp.x <= childRP.x && rp.x + w >= childRP.x + childW;
+        return rp.y <= childRP.y && rp.y + h >= childRP.y + childH;
     }
 }

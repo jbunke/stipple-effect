@@ -1,10 +1,13 @@
 package com.jordanbunke.stipple_effect.project;
 
+import com.jordanbunke.anim.AnimWriter;
 import com.jordanbunke.anim.GIFWriter;
+import com.jordanbunke.anim.MP4Writer;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.*;
 
@@ -23,12 +26,13 @@ public class ProjectInfo {
     private int fps, scaleUp, countFrom;
 
     public enum SaveType {
-        PNG_STITCHED, PNG_SEPARATE, GIF, NATIVE;
+        PNG_STITCHED, PNG_SEPARATE, GIF, MP4, NATIVE;
 
         public String getFileSuffix() {
             return switch (this) {
                 case PNG_SEPARATE, PNG_STITCHED -> "png";
                 case GIF -> "gif";
+                case MP4 -> "mp4";
                 case NATIVE -> Constants.NATIVE_FILE_SUFFIX;
             };
         }
@@ -38,6 +42,7 @@ public class ProjectInfo {
                 case PNG_STITCHED -> "Single PNG";
                 case PNG_SEPARATE -> "Separate PNGs per frame";
                 case GIF -> "Animated GIF";
+                case MP4 -> "MP4 Video";
                 case NATIVE -> StippleEffect.PROGRAM_NAME + " file (." + getFileSuffix() + ")";
             };
         }
@@ -45,9 +50,9 @@ public class ProjectInfo {
         public static SaveType[] validOptions() {
             // TODO - omitting NATIVE while serializing/saving and loading are not yet implemented
             if (StippleEffect.get().getContext().getState().getFrameCount() == 1)
-                return new SaveType[] { PNG_STITCHED }; // , NATIVE };
+                return new SaveType[] { PNG_STITCHED /*, NATIVE */ };
 
-            return new SaveType[] { PNG_STITCHED, PNG_SEPARATE, GIF }; // SaveType.values();
+            return new SaveType[] { PNG_STITCHED, PNG_SEPARATE, GIF, MP4 }; // SaveType.values();
         }
     }
 
@@ -101,7 +106,7 @@ public class ProjectInfo {
             case NATIVE -> {
                 // TODO
             }
-            case GIF -> {
+            case GIF, MP4 -> {
                 final GameImage[] images = new GameImage[frameCount];
 
                 for (int i = 0; i < frameCount; i++) {
@@ -111,15 +116,18 @@ public class ProjectInfo {
                         images[i] = ImageProcessing.scale(images[i], scaleUp);
                 }
 
-                final Thread gifSaverThread = new Thread(() -> {
+                final AnimWriter writer = saveType == SaveType.GIF
+                        ? GIFWriter.get() : MP4Writer.get();
+
+                final Thread animSaverThread = new Thread(() -> {
                     final Path filepath = buildFilepath();
 
-                    GIFWriter.get().write(filepath, images,
+                    writer.write(filepath, images,
                             Constants.MILLIS_IN_SECOND / fps);
                     StatusUpdates.saved(filepath);
                 });
 
-                gifSaverThread.start();
+                animSaverThread.start();
             }
             case PNG_SEPARATE -> {
                 for (int i = 0; i < frameCount; i++) {

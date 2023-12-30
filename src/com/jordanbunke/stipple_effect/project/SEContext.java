@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.menu_elements.colors;
+package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
@@ -7,10 +7,10 @@ import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
-import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 import java.awt.*;

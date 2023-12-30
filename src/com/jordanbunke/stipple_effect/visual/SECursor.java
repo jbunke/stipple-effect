@@ -1,7 +1,8 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
+import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.menu_elements.scrollable;
+package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;

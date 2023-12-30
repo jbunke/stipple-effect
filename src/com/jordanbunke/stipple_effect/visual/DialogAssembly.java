@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.image.GameImage;
@@ -17,18 +17,19 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.menu_elements.DynamicLabel;
-import com.jordanbunke.stipple_effect.menu_elements.DynamicTextButton;
-import com.jordanbunke.stipple_effect.menu_elements.TextLabel;
-import com.jordanbunke.stipple_effect.menu_elements.dialog.ApproveDialogButton;
-import com.jordanbunke.stipple_effect.menu_elements.dialog.TextBox;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.ScrollableMenuElement;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicTextButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.TextBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.utility.*;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -80,7 +81,11 @@ public class DialogAssembly {
                         return Constants.NO_FOLDER_SELECTED;
 
                     do {
-                        final String level = folder.getFileName().toString();
+                        final Path filename = folder.getFileName();
+
+                        final String level = filename != null
+                                ? filename.toString()
+                                : folder.getRoot().toString();
 
                         if (placements == 0)
                             folderPathName.insert(0, level);
@@ -214,11 +219,11 @@ public class DialogAssembly {
 
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
                 switch (c.projectInfo.getSaveType()) {
-            case PNG_STITCHED -> c.getState().getFrameCount() > 1
-                    ? pngStitchedContents : new PlaceholderMenuElement();
-            case PNG_SEPARATE -> pngSeparateContents;
-            case GIF -> gifContents;
-            default -> new PlaceholderMenuElement();
+                    case PNG_STITCHED -> c.getState().getFrameCount() > 1
+                            ? pngStitchedContents : new PlaceholderMenuElement();
+                    case PNG_SEPARATE -> pngSeparateContents;
+                    case GIF, MP4 -> gifContents;
+                    default -> new PlaceholderMenuElement();
         });
 
         // content assembly

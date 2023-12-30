@@ -1,10 +1,10 @@
-package com.jordanbunke.stipple_effect.menu_elements.colors;
+package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.menu_elements.scrollable.HorizontalSlider;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
