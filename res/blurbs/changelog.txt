@@ -22,6 +22,9 @@ Change:
 Added:
 > Added MP4 exporting
 
+Fixed:
+> Bug that would crash the program when attempting to call
+    getFileName() on the root of a Path
 
 {0.0.1.3} - 2023-12-25
 

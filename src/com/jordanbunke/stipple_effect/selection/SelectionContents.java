@@ -62,6 +62,10 @@ public class SelectionContents {
                 topLeft.displace(displacement), displacedPixels);
     }
 
+    // TODO returnRotated
+
+    // TODO returnStretched
+
     public GameImage getContentForCanvas(final int w, final int h) {
         final GameImage contentForCanvas = new GameImage(w, h);
         contentForCanvas.draw(content, topLeft.x, topLeft.y);

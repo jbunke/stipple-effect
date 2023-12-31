@@ -6,58 +6,149 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public sealed abstract class MoverTool extends Tool
         permits MoveSelection, PickUpSelection {
-    private boolean moving;
-    private Coord2D startMousePosition, lastMousePosition, startTopLeft;
+    public enum TransformType {
+        NONE, MOVE, STRETCH, ROTATE
+    }
+
+    public enum Direction {
+        T, TL, TR, L, R, B, BL, BR, NA
+    }
+
+    private TransformType transformType;
+    private Direction direction;
+    private Coord2D startMousePosition, lastMousePosition,
+            startTopLeft, startBottomRight;
 
     public MoverTool() {
-        moving = false;
+        transformType = TransformType.NONE;
+        direction = Direction.NA;
+
         startMousePosition = new Coord2D();
         lastMousePosition = new Coord2D();
         startTopLeft = Constants.NO_VALID_TARGET;
+        startBottomRight = Constants.NO_VALID_TARGET;
     }
 
     abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        moving = context.getState().hasSelection();
+        if (!context.getState().hasSelection())
+            transformType = TransformType.NONE;
+        else {
+            final Set<Coord2D> selection = context.getState().getSelection();
 
-        if (moving) {
             startMousePosition = me.mousePosition;
             lastMousePosition = me.mousePosition;
-            startTopLeft = SelectionUtils.topLeft(
-                    context.getState().getSelection());
+            startTopLeft = SelectionUtils.topLeft(selection);
+            startBottomRight = SelectionUtils.bottomRight(selection);
+
+            final float zoomFactor = context.renderInfo.getZoomFactor();
+
+            final Coord2D tp = context.getTargetPixel();
+
+            if (tp.equals(Constants.NO_VALID_TARGET)) {
+                transformType = TransformType.MOVE;
+                return;
+            }
+
+            final int left = startTopLeft.x, right = startBottomRight.x,
+                    top = startTopLeft.y, bottom = startBottomRight.y;
+
+            final boolean
+                    atLeft = Math.abs(left - tp.x) * zoomFactor <=
+                            Constants.STRETCH_PX_THRESHOLD,
+                    atRight = Math.abs(right - tp.x) * zoomFactor <=
+                            Constants.STRETCH_PX_THRESHOLD,
+                    atTop = Math.abs(top - tp.y) * zoomFactor <=
+                            Constants.STRETCH_PX_THRESHOLD,
+                    atBottom = Math.abs(bottom - tp.y) * zoomFactor <=
+                            Constants.STRETCH_PX_THRESHOLD;
+
+            if (atLeft) {
+                if (atTop) {
+                    direction = Direction.TL;
+                    transformType = TransformType.STRETCH;
+                    return;
+                } else if (atBottom) {
+                    direction = Direction.BL;
+                    transformType = TransformType.STRETCH;
+                    return;
+                } else if (tp.y > top && tp.y < bottom) {
+                    direction = Direction.L;
+                    transformType = TransformType.STRETCH;
+                    return;
+                }
+            } else if (atRight) {
+                if (atTop) {
+                    direction = Direction.TR;
+                    transformType = TransformType.STRETCH;
+                    return;
+                } else if (atBottom) {
+                    direction = Direction.BR;
+                    transformType = TransformType.STRETCH;
+                    return;
+                } else if (tp.y > top && tp.y < bottom) {
+                    direction = Direction.R;
+                    transformType = TransformType.STRETCH;
+                    return;
+                }
+            } else if (atTop && tp.x > left && tp.x < right) {
+                direction = Direction.T;
+                transformType = TransformType.STRETCH;
+                return;
+            } else if (atBottom && tp.x > left && tp.x < right) {
+                direction = Direction.B;
+                transformType = TransformType.STRETCH;
+                return;
+            }
+
+            // TODO - determinations for rotation
+
+            transformType = TransformType.MOVE;
+            direction = Direction.NA;
         }
     }
 
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
-        if (moving) {
+        if (transformType != TransformType.NONE) {
             final float zoomFactor = context.renderInfo.getZoomFactor();
 
             if (mousePosition.equals(lastMousePosition))
                 return;
 
-            final Coord2D topLeft = SelectionUtils.topLeft(
-                    context.getState().getSelection());
-            final Coord2D displacement = new Coord2D(
-                    -(int)((startMousePosition.x - mousePosition.x) / zoomFactor),
-                    -(int)((startMousePosition.y - mousePosition.y) / zoomFactor)
-            ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
+            switch (transformType) {
+                case MOVE -> {
+                    final Coord2D topLeft = SelectionUtils.topLeft(
+                            context.getState().getSelection());
+                    final Coord2D displacement = new Coord2D(
+                            -(int)((startMousePosition.x - mousePosition.x) / zoomFactor),
+                            -(int)((startMousePosition.y - mousePosition.y) / zoomFactor)
+                    ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
 
-            getMoverFunction(context).accept(displacement, false);
-            lastMousePosition = mousePosition;
+                    getMoverFunction(context).accept(displacement, false);
+                    lastMousePosition = mousePosition;
+                }
+                case STRETCH -> {
+                    // TODO
+                }
+                case ROTATE -> {
+                    // TODO
+                }
+            }
         }
     }
 
     @Override
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-        if (moving) {
-            moving = false;
+        if (transformType != TransformType.NONE) {
+            transformType = TransformType.NONE;
             context.getState().markAsCheckpoint(true, context);
             me.markAsProcessed();
         }

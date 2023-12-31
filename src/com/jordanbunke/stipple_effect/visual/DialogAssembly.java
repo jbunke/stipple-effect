@@ -528,9 +528,9 @@ public class DialogAssembly {
         included = GraphicsUtils.loadIcon(IconCodes.INCLUDED);
         excluded = GraphicsUtils.loadIcon(IconCodes.EXCLUDED);
 
-        Arrays.stream(Outliner.Side.values()).forEach(side -> {
-            final Coord2D rc = side.relativeCoordinate();
-            final int index = side.ordinal();
+        Arrays.stream(Outliner.Direction.values()).forEach(direction -> {
+            final Coord2D rc = direction.relativeCoordinate();
+            final int index = direction.ordinal();
 
             mb.add(new SimpleToggleMenuButton(buttonPos.displace(
                     rc.x * Constants.BUTTON_INC, rc.y * Constants.BUTTON_INC),
