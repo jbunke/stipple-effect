@@ -4,8 +4,10 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
+import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -21,12 +23,15 @@ public sealed abstract class MoverTool extends Tool
 
     private TransformType transformType;
     private Direction direction;
+    private Set<Coord2D> startSelection;
     private Coord2D startMousePosition, lastMousePosition,
             startTopLeft, startBottomRight;
 
     public MoverTool() {
         transformType = TransformType.NONE;
         direction = Direction.NA;
+
+        startSelection = new HashSet<>();
 
         startMousePosition = new Coord2D();
         lastMousePosition = new Coord2D();
@@ -35,6 +40,7 @@ public sealed abstract class MoverTool extends Tool
     }
 
     abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
+    abstract StretcherFunction getStretcherFunction(final SEContext context);
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
@@ -42,6 +48,8 @@ public sealed abstract class MoverTool extends Tool
             transformType = TransformType.NONE;
         else {
             final Set<Coord2D> selection = context.getState().getSelection();
+
+            startSelection = new HashSet<>(selection);
 
             startMousePosition = me.mousePosition;
             lastMousePosition = me.mousePosition;
@@ -136,7 +144,22 @@ public sealed abstract class MoverTool extends Tool
                     lastMousePosition = mousePosition;
                 }
                 case STRETCH -> {
-                    // TODO
+                    final Coord2D delta = new Coord2D(
+                            (int)((mousePosition.x - startMousePosition.x) / zoomFactor),
+                            (int)((mousePosition.y - startMousePosition.y) / zoomFactor)
+                    );
+
+                    final Coord2D change = switch (direction) {
+                        case NA -> new Coord2D();
+                        case B, T -> new Coord2D(0, delta.y);
+                        case L, R -> new Coord2D(delta.x, 0);
+                        default -> new Coord2D(delta.x, delta.y);
+                    };
+
+                    getStretcherFunction(context).accept(startSelection,
+                            change, direction, false);
+
+                    lastMousePosition = mousePosition;
                 }
                 case ROTATE -> {
                     // TODO

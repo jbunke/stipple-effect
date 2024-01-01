@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 
 import java.util.function.BiConsumer;
 
@@ -32,5 +33,10 @@ public final class PickUpSelection extends MoverTool {
     @Override
     BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context) {
         return context::moveSelectionContents;
+    }
+
+    @Override
+    StretcherFunction getStretcherFunction(final SEContext context) {
+        return context::stretchSelectionContents;
     }
 }

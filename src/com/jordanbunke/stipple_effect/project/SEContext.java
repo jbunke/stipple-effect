@@ -836,14 +836,32 @@ public class SEContext {
             final SelectionContents moved = getState()
                     .getSelectionContents().returnDisplaced(displacement);
 
-            final ProjectState result = getState().changeSelectionContents(moved)
+            final ProjectState result = getState()
+                    .changeSelectionContents(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
         }
     }
 
-    // TODO - stretch selection contents
+    // stretch selection contents
+    public void stretchSelectionContents(
+            final Set<Coord2D> initialSelection, final Coord2D change,
+            final MoverTool.Direction direction, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents stretched =
+                    getState().getSelectionContents()
+                    .returnStretched(initialSelection, change, direction);
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(stretched)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
 
     // TODO - rotate selection contents
 
@@ -856,7 +874,25 @@ public class SEContext {
             final Set<Coord2D> moved = selection.stream().map(s ->
                     s.displace(displacement)).collect(Collectors.toSet());
 
-            final ProjectState result = getState().changeSelectionBounds(moved)
+            final ProjectState result = getState()
+                    .changeSelectionBounds(moved)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    public void stretchSelectionBounds(
+            final Set<Coord2D> initialSelection, final Coord2D change,
+            final MoverTool.Direction direction, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.BOUNDS) {
+            final Set<Coord2D> stretched = SelectionUtils
+                    .stretchedPixels(initialSelection, change, direction);
+
+            final ProjectState result = getState()
+                    .changeSelectionBounds(stretched)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
