@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -13,6 +14,8 @@ import java.util.function.BiConsumer;
 
 public sealed abstract class MoverTool extends Tool
         permits MoveSelection, PickUpSelection {
+    private static final double CIRCLE = Math.PI * 2;
+
     public enum TransformType {
         NONE, MOVE, STRETCH, ROTATE
     }
@@ -25,7 +28,7 @@ public sealed abstract class MoverTool extends Tool
     private Direction direction;
     private Set<Coord2D> startSelection;
     private Coord2D startMousePosition, lastMousePosition,
-            startTopLeft, startBottomRight;
+            startTopLeft, startBottomRight, startTP, lastTP;
 
     public MoverTool() {
         transformType = TransformType.NONE;
@@ -36,12 +39,15 @@ public sealed abstract class MoverTool extends Tool
 
         startMousePosition = new Coord2D();
         lastMousePosition = new Coord2D();
+        startTP = Constants.NO_VALID_TARGET;
+        lastTP = Constants.NO_VALID_TARGET;
         startTopLeft = Constants.NO_VALID_TARGET;
         startBottomRight = Constants.NO_VALID_TARGET;
     }
 
     abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
     abstract StretcherFunction getStretcherFunction(final SEContext context);
+    abstract RotateFunction getRotateFunction(final SEContext context);
 
     public TransformType determineTransformType(
             final SEContext context
@@ -64,15 +70,16 @@ public sealed abstract class MoverTool extends Tool
             final int left = startTopLeft.x, right = startBottomRight.x,
                     top = startTopLeft.y, bottom = startBottomRight.y;
 
-            final boolean
-                    atLeft = Math.abs(left - tp.x) * zoomFactor <=
-                    Constants.STRETCH_PX_THRESHOLD,
-                    atRight = Math.abs(right - tp.x) * zoomFactor <=
-                            Constants.STRETCH_PX_THRESHOLD,
-                    atTop = Math.abs(top - tp.y) * zoomFactor <=
-                            Constants.STRETCH_PX_THRESHOLD,
-                    atBottom = Math.abs(bottom - tp.y) * zoomFactor <=
-                            Constants.STRETCH_PX_THRESHOLD;
+            final float
+                    leftProx = Math.abs(left - tp.x) * zoomFactor,
+                    rightProx = Math.abs(right - tp.x) * zoomFactor,
+                    topProx = Math.abs(top - tp.y) * zoomFactor,
+                    bottomProx = Math.abs(bottom - tp.y) * zoomFactor;
+
+            boolean atLeft = leftProx <= Constants.STRETCH_PX_THRESHOLD,
+                    atRight = rightProx <= Constants.STRETCH_PX_THRESHOLD,
+                    atTop = topProx <= Constants.STRETCH_PX_THRESHOLD,
+                    atBottom = bottomProx <= Constants.STRETCH_PX_THRESHOLD;
 
             if (atLeft) {
                 if (atTop) {
@@ -104,7 +111,15 @@ public sealed abstract class MoverTool extends Tool
                 return TransformType.STRETCH;
             }
 
-            // TODO - determinations for rotation
+            atLeft = tp.x < left && leftProx <= Constants.ROTATE_PX_THRESHOLD;
+            atRight = tp.x > right && rightProx <= Constants.ROTATE_PX_THRESHOLD;
+            atTop = tp.y < top && topProx <= Constants.ROTATE_PX_THRESHOLD;
+            atBottom = tp.y > bottom && bottomProx <= Constants.ROTATE_PX_THRESHOLD;
+
+            if (atLeft || atRight || atTop || atBottom) {
+                direction = Direction.NA;
+                return TransformType.ROTATE;
+            }
 
             direction = Direction.NA;
             return TransformType.MOVE;
@@ -141,6 +156,8 @@ public sealed abstract class MoverTool extends Tool
 
             startMousePosition = me.mousePosition;
             lastMousePosition = me.mousePosition;
+            startTP = context.getTargetPixel();
+            lastTP = startTP;
         }
     }
 
@@ -162,7 +179,6 @@ public sealed abstract class MoverTool extends Tool
                 ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
 
                 getMoverFunction(context).accept(displacement, false);
-                lastMousePosition = mousePosition;
             }
             case STRETCH -> {
                 final Coord2D delta = new Coord2D(
@@ -179,13 +195,33 @@ public sealed abstract class MoverTool extends Tool
 
                 getStretcherFunction(context).accept(startSelection,
                         change, direction, false);
-
-                lastMousePosition = mousePosition;
             }
             case ROTATE -> {
-                // TODO
+                final Coord2D tp = context.getTargetPixel();
+
+                if (!(tp.equals(Constants.NO_VALID_TARGET) ||
+                        tp.equals(startTP) || tp.equals(lastTP))) {
+                    final Coord2D pivot = new Coord2D(
+                            (startTopLeft.x + startBottomRight.x) / 2,
+                            (startTopLeft.y + startBottomRight.y) / 2);
+                    final boolean[] offset = new boolean[] {
+                            (startTopLeft.x + startBottomRight.x) % 2 == 0,
+                            (startTopLeft.y + startBottomRight.y) % 2 == 0
+                    };
+                    final double
+                            initialAngle = SelectionUtils.calculateAngleInRad(startTP, pivot),
+                            angle = SelectionUtils.calculateAngleInRad(tp, pivot),
+                            deltaR = ((initialAngle > angle
+                                    ? CIRCLE : 0d) + angle) - initialAngle;
+                    getRotateFunction(context).accept(startSelection,
+                            deltaR, pivot, offset, false);
+
+                    lastTP = tp;
+                }
             }
         }
+
+        lastMousePosition = mousePosition;
     }
 
     @Override

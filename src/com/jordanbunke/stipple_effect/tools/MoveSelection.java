@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 
 import java.util.function.BiConsumer;
@@ -31,5 +32,10 @@ public final class MoveSelection extends MoverTool {
     @Override
     StretcherFunction getStretcherFunction(final SEContext context) {
         return context::stretchSelectionBounds;
+    }
+
+    @Override
+    RotateFunction getRotateFunction(final SEContext context) {
+        return context::rotateSelectionBounds;
     }
 }

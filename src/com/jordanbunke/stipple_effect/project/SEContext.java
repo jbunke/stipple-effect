@@ -865,7 +865,25 @@ public class SEContext {
         }
     }
 
-    // TODO - rotate selection contents
+    // rotate selection contents
+    public void rotateSelectionContents(
+            final Set<Coord2D> initialSelection, final double deltaR,
+            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents rotated =
+                    getState().getSelectionContents()
+                            .returnRotated(initialSelection,
+                                    deltaR, pivot, offset);
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(rotated)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
 
     // move selection
     public void moveSelectionBounds(final Coord2D displacement, final boolean checkpoint) {
@@ -884,6 +902,7 @@ public class SEContext {
         }
     }
 
+    // stretch selection
     public void stretchSelectionBounds(
             final Set<Coord2D> initialSelection, final Coord2D change,
             final MoverTool.Direction direction, final boolean checkpoint
@@ -895,6 +914,24 @@ public class SEContext {
 
             final ProjectState result = getState()
                     .changeSelectionBounds(stretched)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // rotate selection
+    public void rotateSelectionBounds(
+            final Set<Coord2D> initialSelection, final double deltaR,
+            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.BOUNDS) {
+            final Set<Coord2D> rotated = SelectionUtils
+                    .rotatedPixels(initialSelection, deltaR, pivot, offset);
+
+            final ProjectState result = getState()
+                    .changeSelectionBounds(rotated)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();

@@ -89,4 +89,50 @@ public class SelectionUtils {
 
         return pixels;
     }
+
+    public static double calculateAngleInRad(
+            final Coord2D point, final Coord2D pivot
+    ) {
+        return Math.atan2(point.y - pivot.y, point.x - pivot.x);
+    }
+
+    public static double calculateAngleInRad(
+            final double px, final double py,
+            final double pivotX, final double pivotY
+    ) {
+        return Math.atan2(py - pivotY, px - pivotX);
+    }
+
+    public static Set<Coord2D> rotatedPixels(
+            final Set<Coord2D> initialSelection,
+            final double deltaR, final Coord2D pivot, final boolean[] offset
+    ) {
+        final int X = 0, Y = 1;
+
+        final double[] realPivot = new double[] {
+                pivot.x + (offset[X] ? -0.5 : 0d),
+                pivot.y + (offset[Y] ? -0.5 : 0d)
+        };
+        final Set<Coord2D> pixels = new HashSet<>();
+
+        initialSelection.forEach(i -> {
+            final double distance = Math.sqrt(
+                    Math.pow(realPivot[X] - i.x, 2) +
+                            Math.pow(realPivot[Y] - i.y, 2)),
+                    angle = calculateAngleInRad(i.x, i.y,
+                            realPivot[X], realPivot[Y]),
+                    newAngle = angle + deltaR;
+
+            final double deltaX = distance * Math.cos(newAngle),
+                    deltaY = distance * Math.sin(newAngle);
+
+            final Coord2D newPixel = new Coord2D(
+                    (int)Math.round(realPivot[X] + deltaX),
+                    (int)Math.round(realPivot[Y] + deltaY)
+            );
+            pixels.add(newPixel);
+        });
+
+        return pixels;
+    }
 }
