@@ -14,6 +14,7 @@ public class Constants {
     public static final Path PROGRAM_FILE = Path.of("program"),
             ICON_FOLDER = Path.of("icons"),
             CURSOR_FOLDER = Path.of("cursors"),
+            MISC_FOLDER = Path.of("misc"),
             BLURB_FOLDER = Path.of("blurbs");
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
@@ -109,7 +110,7 @@ public class Constants {
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
             OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
-    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 1,
+    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 6,
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360,
             SPLASH_TIMEOUT_SECS = 1800;
 

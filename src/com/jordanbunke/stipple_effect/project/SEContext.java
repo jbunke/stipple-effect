@@ -59,14 +59,16 @@ public class SEContext {
     public void redrawSelectionOverlay() {
         final Set<Coord2D> selection = getState().getSelection();
 
-        final boolean moveable =
-                Tool.canMoveSelectionBounds(StippleEffect.get().getTool()) ||
-                StippleEffect.get().getTool().equals(Wand.get());
+        final Tool tool = StippleEffect.get().getTool();
+
+        final boolean movable = Tool.canMoveSelectionBounds(tool) ||
+                tool.equals(Wand.get());
 
         selectionOverlay = getState().hasSelection()
                 ? SelectionUtils.drawOverlay(selection, (x, y) ->
                         selection.contains(new Coord2D(x, y)),
-                renderInfo.getZoomFactor(), moveable) : GameImage.dummy();
+                renderInfo.getZoomFactor(),
+                movable, tool instanceof MoverTool) : GameImage.dummy();
     }
 
     private Coord2D[] getImageRenderBounds(

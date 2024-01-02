@@ -87,6 +87,10 @@ public class SelectionContents {
         final Set<Coord2D> pixels = SelectionUtils.stretchedPixels(
                 initialSelection, change, direction);
 
+        if (pixels.isEmpty())
+            return new SelectionContents(GameImage.dummy(), topLeft,
+                    pixels, original == null ? this : original);
+
         final Coord2D tl = SelectionUtils.topLeft(pixels),
                 br = SelectionUtils.bottomRight(pixels);
 

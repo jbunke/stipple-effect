@@ -14,7 +14,7 @@ public class SelectionUtils {
     public static GameImage drawOverlay(
             final Set<Coord2D> selection,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final double z, final boolean moveable
+            final double z, final boolean movable, final boolean canTransform
     ) {
         final Coord2D topLeft = topLeft(selection),
                 bottomRight = bottomRight(selection);
@@ -24,7 +24,7 @@ public class SelectionUtils {
 
         return GraphicsUtils.drawOverlay(w, h, z,
                 (x, y) -> maskValidator.apply(x + topLeft.x, y + topLeft.y),
-                Constants.BLACK, Constants.HIGHLIGHT_1, moveable);
+                Constants.BLACK, Constants.HIGHLIGHT_1, movable, canTransform);
     }
 
     public static Coord2D topLeft(final Set<Coord2D> pixels) {
@@ -59,24 +59,19 @@ public class SelectionUtils {
         final int oldW = oldBR.x - oldTL.x,
                 oldH = oldBR.y - oldTL.y;
 
-        final Coord2D corner1 = switch (direction) {
+        final Coord2D tl = switch (direction) {
             case TL, T, L -> oldTL.displace(change);
             case TR -> oldTL.displace(0, change.y);
             case BL -> oldTL.displace(change.x, 0);
             default -> oldTL;
         };
 
-        final Coord2D corner2 = switch (direction) {
+        final Coord2D br = switch (direction) {
             case BR, B, R -> oldBR.displace(change);
             case TR -> oldBR.displace(change.x, 0);
             case BL -> oldBR.displace(0, change.y);
             default -> oldBR;
         };
-
-        final Coord2D tl = new Coord2D(Math.min(corner1.x, corner2.x),
-                Math.min(corner1.y, corner2.y)),
-                br = new Coord2D(Math.max(corner1.x, corner2.x),
-                        Math.max(corner1.y, corner2.y));
 
         final int w = br.x - tl.x, h = br.y - tl.y;
 

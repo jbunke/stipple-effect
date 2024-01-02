@@ -20,7 +20,9 @@ import java.util.function.BiFunction;
 public class GraphicsUtils {
     public static final GameImage
             HIGHLIGHT_OVERLAY = loadIcon("highlighted"),
-            SELECT_OVERLAY = loadIcon("selected");
+            SELECT_OVERLAY = loadIcon("selected"),
+            TRANSFORM_NUB = ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve("transform_nub.png"));
 
     public static TextBuilder uiText() {
         return uiText(Constants.WHITE);
@@ -162,7 +164,8 @@ public class GraphicsUtils {
     public static GameImage drawOverlay(
             final int w, final int h, final double z,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final Color inside, final Color outside, final boolean moveable
+            final Color inside, final Color outside,
+            final boolean filled, final boolean canTransform
     ) {
         final int scaleUpW = (int)Math.max(1, w * z),
                 scaleUpH = (int)Math.max(1, h * z),
@@ -180,7 +183,7 @@ public class GraphicsUtils {
                 final Coord2D o = new Coord2D(x + Constants.OVERLAY_BORDER_PX,
                         y + Constants.OVERLAY_BORDER_PX);
 
-                if (moveable)
+                if (filled)
                     overlay.fillRectangle(Constants.OVERLAY_FILL_C,
                             o.x, o.y, zoomInc, zoomInc);
 
@@ -205,6 +208,26 @@ public class GraphicsUtils {
                     overlay.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
                 }
             }
+
+        if (canTransform) {
+            final int BEG = 0, MID = 1, END = 2;
+            final int[] xs = new int[] {
+                    0, (overlay.getWidth() - TRANSFORM_NUB.getWidth()) / 2,
+                    overlay.getWidth() - TRANSFORM_NUB.getWidth()
+            }, ys = new int[] {
+                    0, (overlay.getHeight() - TRANSFORM_NUB.getHeight()) / 2,
+                    overlay.getHeight() - TRANSFORM_NUB.getHeight()
+            };
+
+            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[BEG]);
+            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[END]);
+            overlay.draw(TRANSFORM_NUB, xs[END], ys[BEG]);
+            overlay.draw(TRANSFORM_NUB, xs[END], ys[END]);
+            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[MID]);
+            overlay.draw(TRANSFORM_NUB, xs[END], ys[MID]);
+            overlay.draw(TRANSFORM_NUB, xs[MID], ys[BEG]);
+            overlay.draw(TRANSFORM_NUB, xs[MID], ys[END]);
+        }
 
         return overlay.submit();
     }
