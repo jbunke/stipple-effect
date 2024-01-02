@@ -133,6 +133,33 @@ public class SelectionUtils {
             pixels.add(newPixel);
         });
 
+        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
+
+        for (int x = tl.x; x < br.x; x++) {
+            for (int y = tl.y; y < br.y; y++) {
+                if (pixels.contains(new Coord2D(x, y)))
+                    continue;
+
+                final double distance = Math.sqrt(
+                        Math.pow(realPivot[X] - x, 2) +
+                                Math.pow(realPivot[Y] - y, 2)),
+                        angle = calculateAngleInRad(x, y,
+                                realPivot[X], realPivot[Y]),
+                        oldAngle = angle - deltaR;
+
+                final double deltaX = distance * Math.cos(oldAngle),
+                        deltaY = distance * Math.sin(oldAngle);
+
+                final Coord2D oldPixel = new Coord2D(
+                        (int)Math.round(realPivot[X] + deltaX),
+                        (int)Math.round(realPivot[Y] + deltaY)
+                );
+
+                if (initialSelection.contains(oldPixel))
+                    pixels.add(new Coord2D(x, y));
+            }
+        }
+
         return pixels;
     }
 }
