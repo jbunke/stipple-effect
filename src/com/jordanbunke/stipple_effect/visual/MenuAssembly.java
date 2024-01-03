@@ -15,6 +15,7 @@ import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.visual.menu_elements.SelectableListItemButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
@@ -595,6 +596,7 @@ public class MenuAssembly {
 
     public static Menu buildToolButtonMenu() {
         final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
 
         for (int i = 0; i < Constants.ALL_TOOLS.length; i++) {
             mb.add(toolButtonFromTool(Constants.ALL_TOOLS[i], i));
@@ -617,18 +619,38 @@ public class MenuAssembly {
         mb.add(zoomSlider);
 
         // outline button
-        final GameImage outlineIcon = GraphicsUtils.loadIcon(IconCodes.OUTLINE),
-                outlineHighlighted = new GameImage(GraphicsUtils.HIGHLIGHT_OVERLAY);
-        outlineHighlighted.draw(outlineIcon);
+        final Coord2D outlinePos = Constants.getToolsPosition()
+                .displace(Constants.BUTTON_OFFSET,
+                Constants.WORKSPACE_H - Constants.BUTTON_INC);
 
-        final SimpleMenuButton outlineButton = new SimpleMenuButton(
-                Constants.getToolsPosition().displace(Constants.BUTTON_OFFSET,
-                        Constants.WORKSPACE_H - Constants.BUTTON_OFFSET),
-                Constants.ICON_DIMS, MenuElement.Anchor.LEFT_BOTTOM,
-                true, DialogAssembly::setDialogToOutline, outlineIcon,
-                outlineHighlighted.submit());
-
+        final MenuElement outlineButton = GraphicsUtils.
+                generateIconButton(IconCodes.OUTLINE, outlinePos,
+                        true, DialogAssembly::setDialogToOutline);
         mb.add(outlineButton);
+
+        // reflection buttons
+        final MenuElement verticalReflectionButton = GraphicsUtils.
+                generateIconButton(IconCodes.VERTICAL_REFLECTION,
+                        outlinePos.displace(0, -Constants.BUTTON_INC),
+                        c.getState().hasSelection(), () -> {
+                    if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
+                        c.reflectSelection(false);
+                    else
+                        c.reflectSelectionContents(false);
+                        }
+                );
+        mb.add(verticalReflectionButton);
+        final MenuElement horizontalReflectionButton = GraphicsUtils.
+                generateIconButton(IconCodes.HORIZONTAL_REFLECTION,
+                        outlinePos.displace(0, -2 * Constants.BUTTON_INC),
+                        c.getState().hasSelection(), () -> {
+                            if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
+                                c.reflectSelection(true);
+                            else
+                                c.reflectSelectionContents(true);
+                        }
+                );
+        mb.add(horizontalReflectionButton);
 
         // help button
         final GameImage helpIcon = GraphicsUtils.loadIcon(IconCodes.INFO),

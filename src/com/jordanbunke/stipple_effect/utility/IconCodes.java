@@ -50,6 +50,8 @@ public class IconCodes {
             DECREMENT = "decrement",
             INCREMENT = "increment",
             OUTLINE = "outline",
+            VERTICAL_REFLECTION = "vertical_reflection",
+            HORIZONTAL_REFLECTION = "horizontal_reflection",
             INCLUDED = "included",
             EXCLUDED = "excluded",
             SETTINGS = "settings",

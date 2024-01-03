@@ -15,15 +15,10 @@ Change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
 
-{TODO for 0.0.1.4}
-
-Add:
-> Add vertical selection reflection button and shortcut
-> Add horizontal selection reflection button and shortcut
-
-{0.0.1.4} - 2024-01-0?
+{0.0.2} - 2024-01-0?
 
 Added:
+> Added vertical and horizontal selection reflection
 > Added selection stretching
 > Added selection rotation
 > Added MP4 exporting

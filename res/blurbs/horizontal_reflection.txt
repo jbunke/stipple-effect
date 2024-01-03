@@ -1,0 +1,4 @@
+Reflect selection bounds about y-axis: {Shift + 5}
+Reflect selection contents about y-axis: {Ctrl + Shift + 5}
+
+Reflect the selection about the y-axis.

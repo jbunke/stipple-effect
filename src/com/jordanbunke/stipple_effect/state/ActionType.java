@@ -16,7 +16,10 @@ public enum ActionType {
                 StippleEffect.get().rebuildFramesMenu();
                 StippleEffect.get().rebuildProjectsMenu();
             }
-            default -> StippleEffect.get().rebuildProjectsMenu();
+            case CANVAS -> {
+                StippleEffect.get().rebuildToolButtonMenu();
+                StippleEffect.get().rebuildProjectsMenu();
+            }
         }
     }
 }

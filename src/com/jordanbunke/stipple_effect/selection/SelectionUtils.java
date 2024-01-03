@@ -9,8 +9,11 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class SelectionUtils {
+    private static final int X = 0, Y = 1;
+
     public static GameImage drawOverlay(
             final Set<Coord2D> selection,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
@@ -107,8 +110,6 @@ public class SelectionUtils {
             final Set<Coord2D> initialSelection,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
-        final int X = 0, Y = 1;
-
         final double[] realPivot = new double[] {
                 pivot.x + (offset[X] ? -0.5 : 0d),
                 pivot.y + (offset[Y] ? -0.5 : 0d)
@@ -161,5 +162,25 @@ public class SelectionUtils {
         }
 
         return pixels;
+    }
+
+    public static Set<Coord2D> reflectedPixels(
+            final Set<Coord2D> initialSelection, final boolean horizontal
+    ) {
+        final Coord2D tl = topLeft(initialSelection),
+                br = bottomRight(initialSelection),
+                middle = new Coord2D((tl.x + br.x) / 2,
+                        (tl.y + br.y) / 2);
+        final boolean[] offset = new boolean[] {
+                (tl.x + br.x) % 2 == 0,
+                (tl.y + br.y) % 2 == 0
+        };
+
+        return initialSelection.stream().map(i -> new Coord2D(
+                horizontal ? middle.x + (middle.x - i.x) -
+                        (offset[X] ? 1 : 0) : i.x,
+                horizontal ? i.y : middle.y +
+                        (middle.y - i.y) - (offset[Y] ? 1 : 0)
+        )).collect(Collectors.toSet());
     }
 }

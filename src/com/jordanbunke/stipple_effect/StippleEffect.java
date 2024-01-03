@@ -673,7 +673,7 @@ public class StippleEffect implements ProgramContext {
     public void autoAssignPickUpSelection() {
         this.tool = PickUpSelection.get();
         getContext().redrawSelectionOverlay();
-        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+        rebuildToolButtonMenu();
     }
 
     public void setTool(final Tool tool) {
@@ -690,7 +690,7 @@ public class StippleEffect implements ProgramContext {
             PickUpSelection.get().engage(getContext());
 
         getContext().redrawSelectionOverlay();
-        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+        rebuildToolButtonMenu();
     }
 
     public void clearDialog() {

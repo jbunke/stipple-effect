@@ -439,6 +439,14 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
                     this::enableAllLayers
             );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelection(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelection(false)
+            );
 
             // arrow keys only in these branches
             if (eventLogger.isPressed(Key.R)) {
@@ -558,6 +566,14 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
                     () -> paste(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelectionContents(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelectionContents(false)
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
@@ -899,6 +915,31 @@ public class SEContext {
         }
     }
 
+    // reflect selection contents
+    public void reflectSelectionContents(final boolean horizontal) {
+        if (getState().hasSelection()) {
+            final boolean raiseAndDrop = getState().getSelectionMode() !=
+                    SelectionMode.CONTENTS;
+
+            if (raiseAndDrop)
+                raiseSelectionToContents(false);
+
+            final SelectionContents reflected = getState()
+                    .getSelectionContents().returnReflected(
+                            getState().getSelection(), horizontal);
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(reflected)
+                    .changeIsCheckpoint(!raiseAndDrop);
+            stateManager.performAction(result, ActionType.CANVAS);
+
+            if (raiseAndDrop)
+                dropContentsToLayer(true, false);
+            else
+                redrawSelectionOverlay();
+        }
+    }
+
     // move selection
     public void moveSelectionBounds(final Coord2D displacement, final boolean checkpoint) {
         if (getState().hasSelection() && getState().getSelectionMode() ==
@@ -948,6 +989,30 @@ public class SEContext {
                     .changeSelectionBounds(rotated)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // reflect selection
+    public void reflectSelection(final boolean horizontal) {
+        if (getState().hasSelection()) {
+            final boolean dropAndRaise = getState().getSelectionMode() !=
+                    SelectionMode.BOUNDS;
+
+            if (dropAndRaise)
+                dropContentsToLayer(false, false);
+
+            final Set<Coord2D> reflected = SelectionUtils
+                    .reflectedPixels(getState().getSelection(), horizontal);
+
+            final ProjectState result = getState()
+                    .changeSelectionBounds(reflected)
+                    .changeIsCheckpoint(!dropAndRaise);
+            stateManager.performAction(result, ActionType.CANVAS);
+
+            if (dropAndRaise)
+                raiseSelectionToContents(true);
+
             redrawSelectionOverlay();
         }
     }

@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SelectionContents {
+    private static final int X = 0, Y = 1;
+
     private final GameImage content;
     private final Coord2D topLeft;
     private final Set<Coord2D> pixels;
@@ -134,8 +136,6 @@ public class SelectionContents {
 
         final Coord2D sampleTL = original == null ? topLeft : original.topLeft;
 
-        final int X = 0, Y = 1;
-
         final double[] realPivot = new double[] {
                 pivot.x + (offset[X] ? -0.5 : 0d),
                 pivot.y + (offset[Y] ? -0.5 : 0d)
@@ -170,6 +170,52 @@ public class SelectionContents {
 
         return new SelectionContents(content.submit(), tl, pixels,
                 original == null ? this : original);
+    }
+
+    public SelectionContents returnReflected(
+            final Set<Coord2D> initialSelection, final boolean horizontal
+    ) {
+        final Set<Coord2D> pixels =
+                SelectionUtils.reflectedPixels(initialSelection, horizontal);
+
+        if (pixels.isEmpty())
+            return new SelectionContents(GameImage.dummy(), topLeft, pixels);
+
+        final Coord2D tl = SelectionUtils.topLeft(pixels),
+                br = SelectionUtils.bottomRight(pixels),
+                middle = new Coord2D((tl.x + br.x) / 2, (tl.y + br.y) / 2);
+        final boolean[] offset = new boolean[] {
+                (tl.x + br.x) % 2 == 0,
+                (tl.y + br.y) % 2 == 0
+        };
+
+        final int w = Math.max(1, br.x - tl.x),
+                h = Math.max(1, br.y - tl.y);
+
+        final GameImage content = new GameImage(w, h);
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                if (pixels.contains(tl.displace(x, y))) {
+                    final Coord2D pixel = tl.displace(x, y),
+                            was = new Coord2D(
+                                    horizontal ? middle.x + (middle.x -
+                                            pixel.x) - (offset[X] ? 1 : 0) : pixel.x,
+                                    horizontal ? pixel.y : middle.y +
+                                            (middle.y - pixel.y) - (offset[Y] ? 1 : 0)
+                            );
+
+                    final int sampleX = was.x - topLeft.x,
+                            sampleY = was.y - topLeft.y;
+
+                    if (sampleX >= 0 && sampleY >= 0 &&
+                            sampleX < this.content.getWidth() &&
+                            sampleY < this.content.getHeight())
+                        content.dot(ImageProcessing.colorAtPixel(
+                                this.content, sampleX, sampleY), x, y);
+                }
+
+        return new SelectionContents(content.submit(), tl, pixels);
     }
 
     public GameImage getContentForCanvas(final int w, final int h) {
