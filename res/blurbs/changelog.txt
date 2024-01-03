@@ -1,8 +1,6 @@
 {Upcoming}
 
 Add:
-> Rotating and stretching selections
-> Outline selection shortcuts
 > Native file type
 > Larger canvas sizes and necessary performance
     optimizations to facilitate them
@@ -17,14 +15,22 @@ Change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
 
+{TODO for 0.0.1.4}
+
+Add:
+> Add vertical selection reflection button and shortcut
+> Add horizontal selection reflection button and shortcut
+
 {0.0.1.4} - 2024-01-0?
 
 Added:
+> Added selection stretching
+> Added selection rotation
 > Added MP4 exporting
 
 Fixed:
-> Bug that would crash the program when attempting to call
-    getFileName() on the root of a Path
+> Fixed bug that would crash the program when attempting to
+    call getFileName() on the root of a Path
 
 {0.0.1.3} - 2023-12-25
 

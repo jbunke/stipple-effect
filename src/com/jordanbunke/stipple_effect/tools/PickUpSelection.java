@@ -45,4 +45,9 @@ public final class PickUpSelection extends MoverTool {
     RotateFunction getRotateFunction(final SEContext context) {
         return context::rotateSelectionContents;
     }
+
+    @Override
+    Runnable getMouseUpConsequence(final SEContext context) {
+        return context::resetContentOriginal;
+    }
 }

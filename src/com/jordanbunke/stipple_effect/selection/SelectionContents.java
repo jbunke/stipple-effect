@@ -132,14 +132,40 @@ public class SelectionContents {
         final GameImage content = new GameImage(w, h),
                 sampleFrom = original == null ? this.content : original.content;
 
+        final Coord2D sampleTL = original == null ? topLeft : original.topLeft;
+
+        final int X = 0, Y = 1;
+
+        final double[] realPivot = new double[] {
+                pivot.x + (offset[X] ? -0.5 : 0d),
+                pivot.y + (offset[Y] ? -0.5 : 0d)
+        };
+
         for (int x = 0; x < w; x++)
             for (int y = 0; y < h; y++)
                 if (pixels.contains(tl.displace(x, y))) {
-                    // TODO - sampling
-                    final int sampleX = 0, sampleY = 0;
+                    final int gx = tl.x + x, gy = tl.y + y;
 
-                    content.dot(ImageProcessing.colorAtPixel(
-                            sampleFrom, sampleX, sampleY), x, y);
+                    final double distance = Math.sqrt(
+                            Math.pow(realPivot[X] - gx, 2) +
+                                    Math.pow(realPivot[Y] - gy, 2)),
+                            angle = SelectionUtils.calculateAngleInRad(
+                                    gx, gy, realPivot[X], realPivot[Y]),
+                            oldAngle = angle - deltaR;
+
+                    final double deltaX = distance * Math.cos(oldAngle),
+                            deltaY = distance * Math.sin(oldAngle);
+
+                    final int globalX = (int)Math.round(realPivot[X] + deltaX),
+                            globalY = (int)Math.round(realPivot[Y] + deltaY),
+                            sampleX = globalX - sampleTL.x,
+                            sampleY = globalY - sampleTL.y;
+
+                    if (sampleX >= 0 && sampleY >= 0 &&
+                            sampleX < sampleFrom.getWidth() &&
+                            sampleY < sampleFrom.getHeight())
+                        content.dot(ImageProcessing.colorAtPixel(
+                                sampleFrom, sampleX, sampleY), x, y);
                 }
 
         return new SelectionContents(content.submit(), tl, pixels,

@@ -829,6 +829,20 @@ public class SEContext {
         }
     }
 
+    public void resetContentOriginal() {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents reset = getState()
+                    .getSelectionContents().returnDisplaced(new Coord2D());
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(reset)
+                    .changeIsCheckpoint(true);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
     // move selection contents
     public void moveSelectionContents(
             final Coord2D displacement, final boolean checkpoint

@@ -48,6 +48,7 @@ public sealed abstract class MoverTool extends Tool
     abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
     abstract StretcherFunction getStretcherFunction(final SEContext context);
     abstract RotateFunction getRotateFunction(final SEContext context);
+    abstract Runnable getMouseUpConsequence(final SEContext context);
 
     public TransformType determineTransformType(
             final SEContext context
@@ -228,7 +229,7 @@ public sealed abstract class MoverTool extends Tool
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
         if (transformType != TransformType.NONE) {
             transformType = TransformType.NONE;
-            context.getState().markAsCheckpoint(true, context);
+            getMouseUpConsequence(context).run();
             me.markAsProcessed();
         }
     }

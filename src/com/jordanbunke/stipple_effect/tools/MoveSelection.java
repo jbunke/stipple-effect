@@ -38,4 +38,10 @@ public final class MoveSelection extends MoverTool {
     RotateFunction getRotateFunction(final SEContext context) {
         return context::rotateSelectionBounds;
     }
+
+    @Override
+    Runnable getMouseUpConsequence(final SEContext context) {
+        return () -> context.getState()
+                .markAsCheckpoint(true, context);
+    }
 }
