@@ -393,6 +393,14 @@ public class SEContext {
                     () -> paste(false)
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelection(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelection(false)
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
                     () -> outlineSelection(DialogVals.getOutlineSideMask())
             );
@@ -438,14 +446,6 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
                     this::enableAllLayers
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(true)
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(false)
             );
 
             // arrow keys only in these branches

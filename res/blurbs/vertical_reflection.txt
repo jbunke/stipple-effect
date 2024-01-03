@@ -1,8 +1,4 @@
-Reflect selection bounds about x-axis: {Shift + 4}
-Reflect selection contents about x-axis: {Ctrl + Shift + 4}
+Reflect selection bounds about x-axis: {Ctrl + 5}
+Reflect selection contents about x-axis: {Ctrl + Shift + 5}
 
-Reflect the selection about the x-axis. Pressing the button
-will reflect the {bounds} or {contents} based on the current
-{selection mode}. To specify {bounds reflection}, ensure the
-{move selection} tool is equipped. To specify {contents},
-ensure the {pick up selection} tool is equipped.
+Reflect the selection about the x-axis.
