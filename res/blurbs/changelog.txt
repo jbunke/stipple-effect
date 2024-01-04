@@ -23,6 +23,9 @@ Added:
 > Added selection rotation
 > Added MP4 exporting
 
+Changed:
+> Updated program icon
+
 Fixed:
 > Fixed bug that would crash the program when attempting to
     call getFileName() on the root of a Path
