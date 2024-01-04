@@ -26,6 +26,10 @@ Added:
 Fixed:
 > Fixed bug that would crash the program when attempting to
     call getFileName() on the root of a Path
+> Fixed bug that would crash the program when performing an
+    undo/redo operation that resized the canvas - was caused
+    by those operations not redrawing the checkerboard
+    transparency background
 
 {0.0.1.3} - 2023-12-25
 
