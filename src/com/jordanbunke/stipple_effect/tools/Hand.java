@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.SECursor;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 
 public final class Hand extends Tool {
     private static final Hand INSTANCE;

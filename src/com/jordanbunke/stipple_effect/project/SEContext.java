@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -58,14 +59,16 @@ public class SEContext {
     public void redrawSelectionOverlay() {
         final Set<Coord2D> selection = getState().getSelection();
 
-        final boolean moveable =
-                Tool.canMoveSelectionBounds(StippleEffect.get().getTool()) ||
-                StippleEffect.get().getTool().equals(Wand.get());
+        final Tool tool = StippleEffect.get().getTool();
+
+        final boolean movable = Tool.canMoveSelectionBounds(tool) ||
+                tool.equals(Wand.get());
 
         selectionOverlay = getState().hasSelection()
                 ? SelectionUtils.drawOverlay(selection, (x, y) ->
                         selection.contains(new Coord2D(x, y)),
-                renderInfo.getZoomFactor(), moveable) : GameImage.dummy();
+                renderInfo.getZoomFactor(),
+                movable, tool instanceof MoverTool) : GameImage.dummy();
     }
 
     private Coord2D[] getImageRenderBounds(
@@ -390,6 +393,14 @@ public class SEContext {
                     () -> paste(false)
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelection(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelection(false)
+            );
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
                     () -> outlineSelection(DialogVals.getOutlineSideMask())
             );
@@ -555,6 +566,14 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
                     () -> paste(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelectionContents(true)
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> reflectSelectionContents(false)
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
@@ -826,6 +845,20 @@ public class SEContext {
         }
     }
 
+    public void resetContentOriginal() {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents reset = getState()
+                    .getSelectionContents().returnDisplaced(new Coord2D());
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(reset)
+                    .changeIsCheckpoint(true);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
     // move selection contents
     public void moveSelectionContents(
             final Coord2D displacement, final boolean checkpoint
@@ -835,16 +868,77 @@ public class SEContext {
             final SelectionContents moved = getState()
                     .getSelectionContents().returnDisplaced(displacement);
 
-            final ProjectState result = getState().changeSelectionContents(moved)
+            final ProjectState result = getState()
+                    .changeSelectionContents(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
             redrawSelectionOverlay();
         }
     }
 
-    // TODO - stretch selection contents
+    // stretch selection contents
+    public void stretchSelectionContents(
+            final Set<Coord2D> initialSelection, final Coord2D change,
+            final MoverTool.Direction direction, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents stretched =
+                    getState().getSelectionContents()
+                    .returnStretched(initialSelection, change, direction);
 
-    // TODO - rotate selection contents
+            final ProjectState result = getState()
+                    .changeSelectionContents(stretched)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // rotate selection contents
+    public void rotateSelectionContents(
+            final Set<Coord2D> initialSelection, final double deltaR,
+            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.CONTENTS) {
+            final SelectionContents rotated =
+                    getState().getSelectionContents()
+                            .returnRotated(initialSelection,
+                                    deltaR, pivot, offset);
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(rotated)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // reflect selection contents
+    public void reflectSelectionContents(final boolean horizontal) {
+        if (getState().hasSelection()) {
+            final boolean raiseAndDrop = getState().getSelectionMode() !=
+                    SelectionMode.CONTENTS;
+
+            if (raiseAndDrop)
+                raiseSelectionToContents(false);
+
+            final SelectionContents reflected = getState()
+                    .getSelectionContents().returnReflected(
+                            getState().getSelection(), horizontal);
+
+            final ProjectState result = getState()
+                    .changeSelectionContents(reflected)
+                    .changeIsCheckpoint(!raiseAndDrop);
+            stateManager.performAction(result, ActionType.CANVAS);
+
+            if (raiseAndDrop)
+                dropContentsToLayer(true, false);
+            else
+                redrawSelectionOverlay();
+        }
+    }
 
     // move selection
     public void moveSelectionBounds(final Coord2D displacement, final boolean checkpoint) {
@@ -855,9 +949,70 @@ public class SEContext {
             final Set<Coord2D> moved = selection.stream().map(s ->
                     s.displace(displacement)).collect(Collectors.toSet());
 
-            final ProjectState result = getState().changeSelectionBounds(moved)
+            final ProjectState result = getState()
+                    .changeSelectionBounds(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // stretch selection
+    public void stretchSelectionBounds(
+            final Set<Coord2D> initialSelection, final Coord2D change,
+            final MoverTool.Direction direction, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.BOUNDS) {
+            final Set<Coord2D> stretched = SelectionUtils
+                    .stretchedPixels(initialSelection, change, direction);
+
+            final ProjectState result = getState()
+                    .changeSelectionBounds(stretched)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // rotate selection
+    public void rotateSelectionBounds(
+            final Set<Coord2D> initialSelection, final double deltaR,
+            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
+    ) {
+        if (getState().hasSelection() && getState().getSelectionMode() ==
+                SelectionMode.BOUNDS) {
+            final Set<Coord2D> rotated = SelectionUtils
+                    .rotatedPixels(initialSelection, deltaR, pivot, offset);
+
+            final ProjectState result = getState()
+                    .changeSelectionBounds(rotated)
+                    .changeIsCheckpoint(checkpoint);
+            stateManager.performAction(result, ActionType.CANVAS);
+            redrawSelectionOverlay();
+        }
+    }
+
+    // reflect selection
+    public void reflectSelection(final boolean horizontal) {
+        if (getState().hasSelection()) {
+            final boolean dropAndRaise = getState().getSelectionMode() !=
+                    SelectionMode.BOUNDS;
+
+            if (dropAndRaise)
+                dropContentsToLayer(false, false);
+
+            final Set<Coord2D> reflected = SelectionUtils
+                    .reflectedPixels(getState().getSelection(), horizontal);
+
+            final ProjectState result = getState()
+                    .changeSelectionBounds(reflected)
+                    .changeIsCheckpoint(!dropAndRaise);
+            stateManager.performAction(result, ActionType.CANVAS);
+
+            if (dropAndRaise)
+                raiseSelectionToContents(true);
+
             redrawSelectionOverlay();
         }
     }

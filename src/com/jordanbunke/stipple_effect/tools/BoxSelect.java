@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.SECursor;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -88,7 +88,7 @@ public final class BoxSelect extends ToolWithMode {
 
             overlay = SelectionUtils.drawOverlay(bounds,
                     (x, y) -> x >= 0 && x < w && y >= 0 && y < h,
-                    context.renderInfo.getZoomFactor(), true);
+                    context.renderInfo.getZoomFactor(), true, false);
         }
     }
 

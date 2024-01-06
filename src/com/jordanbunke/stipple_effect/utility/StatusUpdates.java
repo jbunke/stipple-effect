@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.visual.SEFonts;
 
 import java.nio.file.Path;
 import java.util.Set;

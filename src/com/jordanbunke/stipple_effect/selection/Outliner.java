@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Outliner {
-    public static final int NUM_SIDES = Side.values().length;
+    public static final int NUM_DIRS = Direction.values().length;
 
-    public enum Side {
+    public enum Direction {
         T, L, R, B, TL, TR, BL, BR;
 
         public Coord2D relativeCoordinate() {
@@ -43,19 +43,19 @@ public class Outliner {
     public static Set<Coord2D> outline(
             final Set<Coord2D> selection, final boolean[] sideMask
     ) {
-        if (sideMask.length != NUM_SIDES)
+        if (sideMask.length != NUM_DIRS)
             return selection;
 
         final Set<Coord2D> outline = new HashSet<>();
 
-        final Side[] sides = Side.values();
+        final Direction[] directions = Direction.values();
 
         for (Coord2D pixel : selection) {
-            for (int i = 0; i < NUM_SIDES; i++) {
+            for (int i = 0; i < NUM_DIRS; i++) {
                 if (!sideMask[i])
                     continue;
 
-                final Coord2D wouldBe = pixel.displace(sides[i].relativeCoordinate());
+                final Coord2D wouldBe = pixel.displace(directions[i].relativeCoordinate());
 
                 if (!selection.contains(wouldBe))
                     outline.add(wouldBe);

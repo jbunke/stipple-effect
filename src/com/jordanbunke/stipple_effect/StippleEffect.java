@@ -17,6 +17,9 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.MenuAssembly;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
@@ -27,6 +30,7 @@ import com.jordanbunke.stipple_effect.tools.PickUpSelection;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.awt.*;
 import java.io.File;
@@ -669,7 +673,7 @@ public class StippleEffect implements ProgramContext {
     public void autoAssignPickUpSelection() {
         this.tool = PickUpSelection.get();
         getContext().redrawSelectionOverlay();
-        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+        rebuildToolButtonMenu();
     }
 
     public void setTool(final Tool tool) {
@@ -686,7 +690,7 @@ public class StippleEffect implements ProgramContext {
             PickUpSelection.get().engage(getContext());
 
         getContext().redrawSelectionOverlay();
-        toolButtonMenu = MenuAssembly.buildToolButtonMenu();
+        rebuildToolButtonMenu();
     }
 
     public void clearDialog() {

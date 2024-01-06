@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
@@ -30,7 +31,7 @@ public class StateManager {
 
             if (redraw) {
                 ActionType.MAJOR.consequence();
-                StippleEffect.get().getContext().redrawSelectionOverlay();
+                redraw();
             }
         } else
             StatusUpdates.stateChangeFailed(true);
@@ -45,7 +46,7 @@ public class StateManager {
 
         if (was != index) {
             ActionType.MAJOR.consequence();
-            StippleEffect.get().getContext().redrawSelectionOverlay();
+            redraw();
         }
     }
 
@@ -61,7 +62,7 @@ public class StateManager {
 
             if (redraw) {
                 ActionType.MAJOR.consequence();
-                StippleEffect.get().getContext().redrawSelectionOverlay();
+                redraw();
             }
         } else
             StatusUpdates.stateChangeFailed(false);
@@ -76,8 +77,15 @@ public class StateManager {
 
         if (was != index) {
             ActionType.MAJOR.consequence();
-            StippleEffect.get().getContext().redrawSelectionOverlay();
+            redraw();
         }
+    }
+
+    private void redraw() {
+        final SEContext c = StippleEffect.get().getContext();
+
+        c.redrawCheckerboard();
+        c.redrawSelectionOverlay();
     }
 
     public void performAction(final ProjectState resultantState, final ActionType actionType) {
