@@ -16,6 +16,19 @@
 ### Change:
 * Remap subtractive mode from S to ALT key once correctly implemented in Delta Time
 
+## **0.0.2** - 2024-01-06
+
+### Added:
+* Added vertical and horizontal selection reflection 
+* Added selection stretching 
+* Added selection rotation 
+* Added MP4 exporting
+### Changed:
+* Updated program icon
+### Fixed:
+* Fixed bug that would crash the program when attempting to call getFileName() on the root of a Path 
+* Fixed bug that would crash the program when performing an undo/redo operation that resized the canvas - was caused by those operations not redrawing the checkerboard transparency background
+
 ## **0.0.1.3** - 2023-12-25
 
 ### Added:
