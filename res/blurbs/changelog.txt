@@ -1,12 +1,8 @@
 {Upcoming}
 
 Add:
-> Native file type
-> Larger canvas sizes and necessary performance
-    optimizations to facilitate them
 > Scripting language, system and previews
 > Adjustable panels
-> Palettes
 > More settings read from file on startup, including:
     > Toggle for rendering at true pixel size
     > Delta Time canvas size
@@ -18,7 +14,7 @@ Change:
 {TODO for 0.0.3}
 
 Add:
-> Add tooltips for icon buttons and icon toggle buttons
+x Add tooltips for icon buttons and icon toggle buttons
 > Palettes
     > Add to palette
     > Palette files

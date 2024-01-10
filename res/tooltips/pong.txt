@@ -1,0 +1,2 @@
+Playback mode
+Toggle: {Ctrl + Enter}

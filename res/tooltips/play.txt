@@ -1,0 +1,2 @@
+Play / Stop
+Toggle: {Space}

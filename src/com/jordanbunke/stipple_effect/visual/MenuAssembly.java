@@ -16,7 +16,9 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.SelectableListItemButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
@@ -281,43 +283,32 @@ public class MenuAssembly {
                 PlaybackInfo.Mode.PONG_FORWARDS
         };
 
-        final GameImage[] baseIcons = Arrays.stream(validModes).map(
-                mode -> GraphicsUtils.loadIcon(mode.getIconCode())
-        ).toArray(GameImage[]::new);
+        final String[] codes = Arrays.stream(validModes).map(
+                PlaybackInfo.Mode::getIconCode).toArray(String[]::new);
 
-        return new SimpleToggleMenuButton(pos,
-                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_TOP, true,
-                baseIcons,
-                Arrays.stream(baseIcons).map(GraphicsUtils::highlightIconButton)
-                        .toArray(GameImage[]::new),
+        return IconToggleButton.make(pos, codes,
                 Arrays.stream(validModes).map(mode ->
                         (Runnable) () -> {}).toArray(Runnable[]::new),
                 () -> StippleEffect.get().getContext().playbackInfo
                         .getMode().buttonIndex(),
-                () -> StippleEffect.get().getContext().playbackInfo.toggleMode());
+                () -> StippleEffect.get().getContext().playbackInfo.toggleMode(),
+                i -> codes[i]);
     }
 
     private static SimpleToggleMenuButton generatePlayStopToggle(final Coord2D pos) {
         // 0: is playing, button click should STOP; 1: vice-versa
+        final String[] codes = new String[] { IconCodes.STOP, IconCodes.PLAY };
 
-        final GameImage playing = GraphicsUtils.loadIcon(IconCodes.STOP),
-                notPlaying = GraphicsUtils.loadIcon(IconCodes.PLAY);
-
-        return new SimpleToggleMenuButton(pos,
-                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_TOP, true,
-                new GameImage[] { playing, notPlaying },
-                new GameImage[] {
-                        GraphicsUtils.highlightIconButton(playing),
-                        GraphicsUtils.highlightIconButton(notPlaying)
-                },
+        return IconToggleButton.make(pos, codes,
                 new Runnable[] {
-                        () -> StippleEffect.get().getContext().playbackInfo.stop(),
-                        () -> StippleEffect.get().getContext().playbackInfo.play()
+                        () -> StippleEffect.get().getContext()
+                                .playbackInfo.stop(),
+                        () -> StippleEffect.get().getContext()
+                                .playbackInfo.play()
                 },
-                () -> StippleEffect.get().getContext().playbackInfo
-                        .isPlaying() ? 0 : 1, () -> {});
+                () -> StippleEffect.get().getContext()
+                        .playbackInfo.isPlaying() ? 0 : 1,
+                () -> {}, i -> codes[i]);
     }
 
     private static int frameButtonXDisplacement() {
@@ -455,36 +446,26 @@ public class MenuAssembly {
             final int index, final Coord2D pos
     ) {
         // 0: is enabled, button click should DISABLE; 1: vice-versa
+        final String[] codes = new String[] {
+                IconCodes.LAYER_ENABLED, IconCodes.LAYER_DISABLED
+        };
 
-        final GameImage enabled = GraphicsUtils.loadIcon(IconCodes.LAYER_ENABLED),
-                disabled = GraphicsUtils.loadIcon(IconCodes.LAYER_DISABLED);
-
-        return new SimpleToggleMenuButton(pos,
-                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_CENTRAL, true,
-                new GameImage[] { enabled, disabled },
-                new GameImage[] {
-                        GraphicsUtils.highlightIconButton(enabled),
-                        GraphicsUtils.highlightIconButton(disabled)
-                },
-                new Runnable[] {
+        return IconToggleButton.make(pos.displace(0, -Constants.BUTTON_DIM / 2),
+                codes, new Runnable[] {
                         () -> StippleEffect.get().getContext().disableLayer(index),
                         () -> StippleEffect.get().getContext().enableLayer(index)
                 },
                 () -> StippleEffect.get().getContext().getState()
                         .getLayers().get(index).isEnabled() ? 0 : 1,
-                () -> {});
+                () -> {}, i -> codes[i]);
     }
 
     private static SimpleToggleMenuButton generateOnionSkinToggle(
             final int index, final Coord2D pos
     ) {
-        final GameImage[]
-                baseSet = Arrays.stream(OnionSkinMode.values())
-                .map(osm -> GraphicsUtils.loadIcon(osm.getIconCode()))
-                .toArray(GameImage[]::new),
-                highlightedSet = Arrays.stream(baseSet).map(GraphicsUtils::highlightIconButton)
-                        .toArray(GameImage[]::new);
+        final String[] codes = Arrays.stream(OnionSkinMode.values())
+                .map(OnionSkinMode::getIconCode).toArray(String[]::new);
+
         final Runnable[] behaviours = Arrays.stream(OnionSkinMode.values()).map(
                 osm -> (Runnable) () -> {
                     final int nextIndex = (osm.ordinal() + 1) %
@@ -494,38 +475,32 @@ public class MenuAssembly {
                                     OnionSkinMode.values()[nextIndex]);
                 }).toArray(Runnable[]::new);
 
-        return new SimpleToggleMenuButton(pos,
-                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_CENTRAL, true,
-                baseSet, highlightedSet, behaviours,
+        return IconToggleButton.make(
+                pos.displace(0, -Constants.BUTTON_DIM / 2),
+                codes, behaviours,
                 () -> StippleEffect.get().getContext().getState()
                         .getLayers().get(index).getOnionSkinMode().ordinal(),
-                () -> {});
+                () -> {}, i -> codes[i]);
     }
 
     private static SimpleToggleMenuButton generateFramesLinkedToggle(
             final int index, final Coord2D pos
     ) {
         // 0: is unlinked, button click should LINK; 1: vice-versa
+        final String[] codes = new String[] {
+                IconCodes.FRAMES_LINKED,
+                IconCodes.FRAMES_UNLINKED
+        };
 
-        final GameImage linked = GraphicsUtils.loadIcon(IconCodes.FRAMES_LINKED),
-                unlinked = GraphicsUtils.loadIcon(IconCodes.FRAMES_UNLINKED);
-
-        return new SimpleToggleMenuButton(pos,
-                new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_CENTRAL, true,
-                new GameImage[] { unlinked, linked },
-                new GameImage[] {
-                        GraphicsUtils.highlightIconButton(unlinked),
-                        GraphicsUtils.highlightIconButton(linked)
-                },
-                new Runnable[] {
+        return IconToggleButton.make(
+                pos.displace(0, -Constants.BUTTON_DIM / 2),
+                codes, new Runnable[] {
                         () -> StippleEffect.get().getContext().linkFramesInLayer(index),
                         () -> StippleEffect.get().getContext().unlinkFramesInLayer(index)
                 },
                 () -> StippleEffect.get().getContext().getState()
                         .getLayers().get(index).areFramesLinked() ? 1 : 0,
-                () -> {});
+                () -> {}, i -> codes[i]);
     }
 
     private static int layerButtonYDisplacement(final int amount) {
@@ -654,20 +629,11 @@ public class MenuAssembly {
         mb.add(horizontalReflectionButton);
 
         // help button
-        final GameImage helpIcon = GraphicsUtils.loadIcon(IconCodes.INFO),
-                helpHighlighted = new GameImage(GraphicsUtils.HIGHLIGHT_OVERLAY);
-        helpHighlighted.draw(helpIcon);
-
-        final SimpleMenuButton helpButton = new SimpleMenuButton(
+        mb.add(IconButton.make(IconCodes.INFO,
                 Constants.getBottomBarPosition().displace(
                         Constants.CANVAS_W - Constants.BUTTON_DIM,
-                        Constants.BUTTON_OFFSET), Constants.ICON_DIMS,
-                MenuElement.Anchor.LEFT_TOP, true,
-                DialogAssembly::setDialogToInfo,
-                helpIcon, helpHighlighted.submit()
-        );
-
-        mb.add(helpButton);
+                        Constants.BUTTON_OFFSET),
+                DialogAssembly::setDialogToInfo));
 
         return mb.build();
     }
@@ -680,9 +646,10 @@ public class MenuAssembly {
                 Constants.BUTTON_OFFSET + (Constants.BUTTON_INC * index)
         );
 
-        return new SimpleMenuButton(position, Constants.ICON_DIMS,
-                MenuElement.Anchor.LEFT_TOP, true, () -> StippleEffect.get().setTool(tool),
-                StippleEffect.get().getTool().equals(tool) ? tool.getSelectedIcon() : tool.getIcon(),
+        return new IconButton(tool.convertNameToFilename(),
+                position, () -> StippleEffect.get().setTool(tool),
+                StippleEffect.get().getTool().equals(tool)
+                        ? tool.getSelectedIcon() : tool.getIcon(),
                 tool.getHighlightedIcon());
     }
 

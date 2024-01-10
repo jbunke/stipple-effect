@@ -1,0 +1,2 @@
+Reflect selection bounds about x-axis: {Ctrl + 5}
+Reflect selection contents about x-axis: {Ctrl + Shift + 5}

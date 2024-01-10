@@ -33,13 +33,20 @@ public class ParserUtils {
         return blocks.toArray(String[]::new);
     }
 
-
     public static String[] getBlurb(final String blurbCode) {
         final Path blurbFile = Constants.BLURB_FOLDER.resolve(blurbCode + ".txt");
 
         return FileIO.readResource(
                 ResourceLoader.loadResource(blurbFile), "\"" + blurbCode + "\" blurb"
         ).split("\n");
+    }
+
+    public static String[] getToolTip(final String toolTipCode) {
+        final Path blurbFile = Constants.TOOL_TIP_FOLDER
+                .resolve(toolTipCode + ".txt");
+
+        return FileIO.readResource(ResourceLoader.loadResource(blurbFile),
+                "\"" + toolTipCode + "\" tooltip").split("\n");
     }
 
     public static String[] splitIntoCodeAndValue(final String line) {

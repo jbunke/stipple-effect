@@ -15,6 +15,7 @@ public class Constants {
             ICON_FOLDER = Path.of("icons"),
             CURSOR_FOLDER = Path.of("cursors"),
             MISC_FOLDER = Path.of("misc"),
+            TOOL_TIP_FOLDER = Path.of("tooltips"),
             BLURB_FOLDER = Path.of("blurbs");
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
@@ -147,7 +148,7 @@ public class Constants {
             PLAYBACK_FPS_INC = 1, DEFAULT_PLAYBACK_FPS = 10,
             RGBA_SCALE = 255, COLOR_SET_RGBA_INC = 5,
             HUE_SCALE = 360, SAT_SCALE = RGBA_SCALE, VALUE_SCALE = RGBA_SCALE,
-            STATUS_UPDATE_DURATION_MILLIS = 5000,
+            STATUS_UPDATE_DURATION_MILLIS = 5000, TOOL_TIP_MILLIS_THRESHOLD = 500,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 25, ARBITRARY_MAX_COUNT = 10000,
             STRETCH_PX_THRESHOLD = 9, ROTATE_PX_THRESHOLD = 21;

@@ -15,6 +15,7 @@ import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.Menu;
+import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -83,6 +84,11 @@ public class StippleEffect implements ProgramContext {
     // status update
     private int millisSinceStatusUpdate;
     private GameImage statusUpdate;
+
+    // tool tip
+    private int toolTipMillisCounter;
+    private String toolTipCode, provisionalToolTipCode;
+    private GameImage toolTip;
 
     static {
         OnStartup.run();
@@ -158,6 +164,11 @@ public class StippleEffect implements ProgramContext {
         millisSinceStatusUpdate = 0;
         statusUpdate = GameImage.dummy();
 
+        toolTipMillisCounter = 0;
+        provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
+        toolTipCode = Constants.ICON_ID_GAP_CODE;
+        toolTip = GameImage.dummy();
+
         configureDebugger();
     }
 
@@ -202,6 +213,10 @@ public class StippleEffect implements ProgramContext {
                 Constants.TEXT_Y_OFFSET);
 
         this.statusUpdate = statusUpdate.submit();
+    }
+
+    public void sendToolTipUpdate(final String code) {
+        provisionalToolTipCode = code;
     }
 
     private GameWindow makeWindow() {
@@ -283,6 +298,8 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void update(final double deltaTime) {
+        provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
+
         if (dialog == null) {
             getContext().animate(deltaTime);
 
@@ -303,6 +320,54 @@ public class StippleEffect implements ProgramContext {
         } else {
             dialog.update(deltaTime);
         }
+
+        // tool tip update
+        updateToolTip();
+    }
+
+    private void updateToolTip() {
+        if (!provisionalToolTipCode.equals(Constants.ICON_ID_GAP_CODE) &&
+                provisionalToolTipCode.equals(toolTipCode)) {
+            toolTipMillisCounter +=
+                    (int) (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
+
+            if (toolTipMillisCounter == Constants.TOOL_TIP_MILLIS_THRESHOLD)
+                toolTip = drawToolTip();
+        } else {
+            toolTipMillisCounter = 0;
+            toolTipCode = provisionalToolTipCode;
+        }
+    }
+
+    private GameImage drawToolTip() {
+        final String[] lines = ParserUtils.getToolTip(toolTipCode);
+        final TextBuilder tb = GraphicsUtils.uiText(Constants.WHITE);
+
+        for (int l = 0; l < lines.length; l++) {
+            final String[] segments = ParserUtils.extractHighlight(lines[l]);
+
+            for (int i = 0; i < segments.length; i++) {
+                if (i % 2 == 0)
+                    tb.setColor(Constants.WHITE);
+                else
+                    tb.setColor(Constants.HIGHLIGHT_1);
+
+                tb.addText(segments[i]);
+            }
+
+            if (l + 1 < lines.length)
+                tb.addLineBreak();
+        }
+
+        final GameImage text = tb.build().draw();
+        final int w = text.getWidth() + (4 * Constants.BUTTON_BORDER_PX),
+                h = text.getHeight() - (4 * Constants.BUTTON_BORDER_PX);
+
+        final GameImage tt = new GameImage(w, h);
+        tt.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0, w, h);
+        tt.draw(text, 2 * Constants.BUTTON_BORDER_PX, Constants.TEXT_Y_OFFSET);
+
+        return tt.submit();
     }
 
     @Override
@@ -361,6 +426,17 @@ public class StippleEffect implements ProgramContext {
             canvas.fillRectangle(Constants.VEIL, 0, 0,
                     Constants.CANVAS_W, Constants.CANVAS_H);
             dialog.render(canvas);
+        }
+
+        // tool tip
+        if (toolTipMillisCounter >= Constants.TOOL_TIP_MILLIS_THRESHOLD) {
+            final boolean leftSide = mousePos.x <= Constants.getCanvasMiddle().x,
+                    atBottom = mousePos.y > Constants.CANVAS_H -
+                            (2 * toolTip.getHeight());
+            final int x = mousePos.x + (leftSide ? 0 : -toolTip.getWidth()),
+                    y = mousePos.y + (atBottom ? -toolTip.getHeight() : 0);
+
+            canvas.draw(toolTip, x, y);
         }
 
         // cursor

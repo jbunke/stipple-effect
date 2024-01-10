@@ -1,0 +1,2 @@
+Onion skin mode
+Toggle: {Ctrl + 1}

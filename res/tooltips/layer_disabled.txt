@@ -1,0 +1,2 @@
+Layer visibility
+Toggle: {Shift + 1}

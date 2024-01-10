@@ -4,7 +4,6 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
@@ -12,6 +11,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -251,18 +251,13 @@ public class GraphicsUtils {
     ) {
         final boolean stub = !precondition || behaviour == null;
 
-        final Coord2D dims = new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM);
-
-        final GameImage icon = loadIcon(iconID);
-
         if (stub)
-            return new StaticMenuElement(position, dims,
-                    MenuElement.Anchor.LEFT_TOP, greyscaleVersionOf(icon));
+            return new StaticMenuElement(position,
+                    new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
+                    MenuElement.Anchor.LEFT_TOP,
+                    greyscaleVersionOf(loadIcon(iconID)));
 
-        final GameImage highlighted = highlightIconButton(icon);
-
-        return new SimpleMenuButton(position, dims, MenuElement.Anchor.LEFT_TOP,
-                true, behaviour, icon, highlighted);
+        return IconButton.make(iconID, position, behaviour);
     }
 
     private static GameImage greyscaleVersionOf(final GameImage image) {
