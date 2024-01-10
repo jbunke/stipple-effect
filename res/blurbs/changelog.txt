@@ -15,6 +15,30 @@ Change:
 > Remap subtractive mode from S to ALT key once correctly
     implemented in Delta Time
 
+{TODO for 0.0.3}
+
+Add:
+> Add tooltips for icon buttons and icon toggle buttons
+> Palettes
+    > Add to palette
+    > Palette files
+> Dropdown menu element
+> Palettizer (layer/entire project)
+> Native file type (.stef or .stip)
+x Preview window
+> Grid
+
+Change:
+x 1000x1000 canvas size limit
+> Change settings dialog to an info-style dialog with
+    multiple tabs
+> Rework segments and render scale to be window and screen
+    size dependent
+
+Fix:
+> HSV slider slippage
+> OutOfMemoryError instances
+
 {0.0.2} - 2024-01-06
 
 Added:

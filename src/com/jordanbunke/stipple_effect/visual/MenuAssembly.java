@@ -45,13 +45,13 @@ public class MenuAssembly {
                 IconCodes.SETTINGS,
                 IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
                 IconCodes.SAVE, IconCodes.SAVE_AS,
-                IconCodes.RESIZE, IconCodes.PAD,
+                IconCodes.RESIZE, IconCodes.PAD, IconCodes.PREVIEW,
                 IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
                 IconCodes.GRANULAR_REDO, IconCodes.REDO
         };
 
         final boolean[] preconditions = new boolean[] {
-                true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true,
                 c.getStateManager().canUndo(),
                 c.getStateManager().canUndo(),
                 c.getStateManager().canRedo(),
@@ -66,6 +66,7 @@ public class MenuAssembly {
                 DialogAssembly::setDialogToSave,
                 DialogAssembly::setDialogToResize,
                 DialogAssembly::setDialogToPad,
+                () -> PreviewWindow.set(c),
                 () -> c.getStateManager().undoToCheckpoint(),
                 () -> c.getStateManager().undo(true),
                 () -> c.getStateManager().redo(true),

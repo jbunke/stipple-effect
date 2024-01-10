@@ -1033,6 +1033,7 @@ public class DialogAssembly {
                         IconCodes.SAVE_AS,
                         IconCodes.RESIZE,
                         IconCodes.PAD,
+                        IconCodes.PREVIEW,
                         IconCodes.UNDO,
                         IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO,
@@ -1041,7 +1042,7 @@ public class DialogAssembly {
                 new String[] {
                         "Info", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
-                        "Resize", "Pad",
+                        "Resize", "Pad", "Preview",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"
                 }, contentAssembler, contentStart, initialBottomY
         );

@@ -25,7 +25,7 @@ public class Constants {
 
     public static final Coord2D NO_VALID_TARGET = new Coord2D(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
-    public static final int CANVAS_W = 960, CANVAS_H = 540, SCREEN_H_BUFFER = 80;
+    public static final int CANVAS_W = 1920, CANVAS_H = 1080, SCREEN_H_BUFFER = 80;
 
     public static final double TICK_HZ = 100d, FPS = 30d;
 
@@ -111,7 +111,7 @@ public class Constants {
             OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
     public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 6,
-            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 640, MAX_IMAGE_H = 360,
+            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 1000, MAX_IMAGE_H = 1000,
             SPLASH_TIMEOUT_SECS = 1800;
 
     public static final int DEFAULT_CHECKERBOARD_DIM = 4, CURSOR_DIM = 40,

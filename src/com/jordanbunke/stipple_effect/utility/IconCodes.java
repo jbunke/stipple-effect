@@ -10,6 +10,7 @@ public class IconCodes {
             SAVE_AS = "save_as",
             RESIZE = "resize",
             PAD = "pad",
+            PREVIEW = "preview",
             UNDO = "undo",
             GRANULAR_UNDO = "granular_undo",
             GRANULAR_REDO = "granular_redo",
