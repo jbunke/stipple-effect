@@ -52,7 +52,7 @@ public class Constants {
             OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
     public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 6,
-            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 1000, MAX_IMAGE_H = 1000,
+            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 800, MAX_IMAGE_H = 800,
             SPLASH_TIMEOUT_SECS = 1800;
 
     public static final int DEFAULT_BRUSH_BREADTH = 3,

@@ -18,12 +18,26 @@ public class DialogVals {
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String layerName = "";
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
+    private static SettingScreen settingScreen = SettingScreen.STARTUP;
 
     public enum InfoScreen {
         ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, MORE, CHANGELOG;
 
         public String getTitle() {
             return this == MORE ? "More Shortcuts & Advanced Info" : toString();
+        }
+
+        @Override
+        public String toString() {
+            return name().charAt(0) + name().substring(1).toLowerCase();
+        }
+    }
+
+    public enum SettingScreen {
+        STARTUP, FORMAT, VISUAL;
+
+        public String getTitle() {
+            return this + " settings";
         }
 
         @Override
@@ -42,6 +56,10 @@ public class DialogVals {
 
     public static void setInfoScreen(final InfoScreen infoScreen) {
         DialogVals.infoScreen = infoScreen;
+    }
+
+    public static void setSettingScreen(final SettingScreen settingScreen) {
+        DialogVals.settingScreen = settingScreen;
     }
 
     public static void setLayerName(final String layerName) {
@@ -94,6 +112,10 @@ public class DialogVals {
 
     public static InfoScreen getInfoScreen() {
         return infoScreen;
+    }
+
+    public static SettingScreen getSettingScreen() {
+        return settingScreen;
     }
 
     public static int getNewProjectHeight() {

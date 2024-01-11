@@ -550,105 +550,41 @@ public class DialogAssembly {
     }
 
     public static void setDialogToProgramSettings() {
-        // TODO - redo a la info
+        final MenuBuilder mb = new MenuBuilder();
 
-        // text labels
-        final TextLabel screenModeLabel = makeDialogLeftLabel(0, "Fullscreen on startup: "),
-                checkerboardLabel = makeDialogLeftLabel(1, "Checkerboard size: "),
-                indexPrefixLabel = makeDialogLeftLabel(2, "Default frame prefix: "),
-                indexSuffixLabel = makeDialogLeftLabel(3, "Default frame suffix: "),
-                fontLabel = makeDialogLeftLabel(4, "Program font: ");
+        Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
+            final GameImage baseSS = GraphicsUtils.drawTextButton(
+                    Layout.STD_TEXT_BUTTON_W, ss.toString(),
+                    false, Constants.GREY),
+                    highlighedSS = GraphicsUtils.drawHighlightedButton(baseSS);
 
-        // toggle buttons
-        final GameImage[] smBases = makeBooleanToggleButtonSet();
-        final SimpleToggleMenuButton screenModeButton = new SimpleToggleMenuButton(
-                getDialogContentBigOffsetFromLabel(screenModeLabel),
-                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true,
-                smBases, Arrays.stream(smBases)
-                .map(GraphicsUtils::drawHighlightedButton)
-                .toArray(GameImage[]::new),
-                new Runnable[] {
-                        () -> Settings.setFullscreenOnStartup(false),
-                        () -> Settings.setFullscreenOnStartup(true)
-                }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {});
+            final Coord2D ssPos = Layout.getDialogPosition().displace(
+                    Layout.CONTENT_BUFFER_PX + (ss.ordinal() *
+                            (Layout.STD_TEXT_BUTTON_W + Layout.BUTTON_OFFSET)),
+                    Layout.CONTENT_BUFFER_PX +
+                            (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
-        final GameImage[] fontBases = makeToggleButtonSet(
-                Arrays.stream(SEFonts.Code.values())
-                        .map(SEFonts.Code::forButtonText)
-                        .toArray(String[]::new));
-        final SimpleToggleMenuButton fontButton = new SimpleToggleMenuButton(
-                getDialogContentBigOffsetFromLabel(fontLabel),
-                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true,
-                fontBases, Arrays.stream(fontBases)
-                .map(GraphicsUtils::drawHighlightedButton)
-                .toArray(GameImage[]::new),
-                Arrays.stream(SEFonts.Code.values()).map(
-                        code -> (Runnable) () -> Settings.setProgramFont(
-                                code.next().name(), false)
-                ).toArray(Runnable[]::new),
-                () -> Settings.getProgramFont().ordinal(), () -> {});
+            mb.add(new SimpleMenuButton(ssPos,
+                    new Coord2D(baseSS.getWidth(), baseSS.getHeight()),
+                    MenuElement.Anchor.LEFT_TOP, true,
+                    () -> DialogVals.setSettingScreen(ss),
+                    baseSS, highlighedSS));
+        });
 
-        // sliders
-        final HorizontalSlider checkerboardSlider = new HorizontalSlider(
-                getDialogContentBigOffsetFromLabel(checkerboardLabel),
-                Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                MenuElement.Anchor.LEFT_TOP, 0, 5,
-                (int)Math.round(Math.log(Settings.getCheckerboardPixels())
-                        / Math.log(2d)),
-                exp -> Settings.setCheckerboardPixels(
-                        (int)Math.pow(2d, exp), false));
-        checkerboardSlider.updateAssets();
-        final DynamicLabel checkerboardValue = makeDynamicFromLeftLabel(
-                checkerboardLabel,
-                () -> String.valueOf(Settings.getCheckerboardPixels()));
+        // decision logic
+        final Map<DialogVals.SettingScreen, VerticalScrollingMenuElement>
+                settingScreens = new HashMap<>();
 
-        // textboxes
-        final TextBox indexPrefixTextBox = makeDialogCustomTextBox(
-                indexPrefixLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                DialogAssembly::getDialogContentBigOffsetFromLabel,
-                () -> "", Settings.getDefaultIndexPrefix(), () -> "",
-                TextBox::validateAsOptionallyEmptyFilename,
-                s -> Settings.setDefaultIndexPrefix(s, false), 5);
-        final TextBox indexSuffixTextBox = makeDialogCustomTextBox(
-                indexSuffixLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                DialogAssembly::getDialogContentBigOffsetFromLabel,
-                () -> "", Settings.getDefaultIndexSuffix(), () -> "",
-                TextBox::validateAsOptionallyEmptyFilename,
-                s -> Settings.setDefaultIndexSuffix(s, false), 5);
+        for (DialogVals.SettingScreen settingScreen : DialogVals.SettingScreen.values()) {
+            settingScreens.put(settingScreen, assembleScroller(settingScreen));
+        }
 
-        // update as new settings are added
-        final int realBottomY = fontLabel.getRenderPosition().y +
-                fontLabel.getHeight() + Layout.STD_TEXT_BUTTON_H;
+        final ThinkingMenuElement screenDecider = new ThinkingMenuElement(
+                () -> settingScreens.get(DialogVals.getSettingScreen()));
 
-        // scrolling container
-        final double heightRatio = 0.72;
-        final VerticalScrollingMenuElement container =
-                new VerticalScrollingMenuElement(
-                        Layout.getCanvasMiddle().displace(
-                                -Layout.getDialogWidth() / 2,
-                                (int)(-Layout.getDialogHeight() * heightRatio * 0.5)),
-                        new Coord2D(Layout.getDialogWidth(),
-                                (int)(Layout.getDialogHeight() * heightRatio)),
-                        new ScrollableMenuElement[] {
-                                new ScrollableMenuElement(screenModeLabel),
-                                new ScrollableMenuElement(screenModeButton),
-                                new ScrollableMenuElement(checkerboardLabel),
-                                new ScrollableMenuElement(checkerboardSlider),
-                                new ScrollableMenuElement(checkerboardValue),
-                                new ScrollableMenuElement(indexPrefixLabel),
-                                new ScrollableMenuElement(indexSuffixLabel),
-                                new ScrollableMenuElement(indexPrefixTextBox),
-                                new ScrollableMenuElement(indexSuffixTextBox),
-                                new ScrollableMenuElement(fontLabel),
-                                new ScrollableMenuElement(fontButton)
-                        }, realBottomY, 0);
-
-        final MenuElementGrouping contents =
-                new MenuElementGrouping(container);
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                screenDecider);
         setDialog(assembleDialog("Program Settings", contents,
                 () -> true, "Apply", Settings::write, true));
     }
@@ -695,7 +631,7 @@ public class DialogAssembly {
     }
 
     public static void setDialogToSplashScreen() {
-        // TODO - set fullscreen default to false, remove overlay, redesign splash
+        // TODO - redesign splash
 
         final MenuBuilder mb = new MenuBuilder();
 
@@ -883,6 +819,147 @@ public class DialogAssembly {
     }
 
     private static VerticalScrollingMenuElement assembleScroller(
+            final DialogVals.SettingScreen settingScreen
+    ) {
+        final MenuBuilder mb = new MenuBuilder();
+
+        // title
+        final Coord2D titlePosition = Layout.getDialogPosition().displace(
+                Layout.CONTENT_BUFFER_PX + Layout.BUTTON_BORDER_PX,
+                (int)(3.5 * Layout.STD_TEXT_BUTTON_INC));
+        mb.add(TextLabel.make(titlePosition, settingScreen.getTitle(),
+                Constants.BLACK, 2d));
+        final int initialYIndex = 4;
+
+        // initialize in every execution path
+        final MenuElement bottomLabel = switch (settingScreen) {
+            case STARTUP -> {
+                // text labels
+                final TextLabel screenModeLabel = makeDialogLeftLabel(
+                        initialYIndex, "Fullscreen on startup: ");
+
+                // toggle buttons
+                final GameImage[] smBases = makeBooleanToggleButtonSet();
+                final SimpleToggleMenuButton screenModeButton = new SimpleToggleMenuButton(
+                        getDialogContentBigOffsetFromLabel(screenModeLabel),
+                        new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                                Layout.STD_TEXT_BUTTON_H),
+                        MenuElement.Anchor.LEFT_TOP, true,
+                        smBases, Arrays.stream(smBases)
+                        .map(GraphicsUtils::drawHighlightedButton)
+                        .toArray(GameImage[]::new),
+                        new Runnable[] {
+                                () -> Settings.setFullscreenOnStartup(false),
+                                () -> Settings.setFullscreenOnStartup(true)
+                        }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {});
+
+                mb.add(screenModeLabel);
+                mb.add(screenModeButton);
+
+                // update as new settings are added to category
+                yield screenModeLabel;
+            }
+            case FORMAT -> {
+                // text labels
+                final TextLabel indexPrefixLabel = makeDialogLeftLabel(
+                        initialYIndex, "Default frame prefix: "),
+                        indexSuffixLabel = makeDialogLeftLabel(
+                                initialYIndex + 1, "Default frame suffix: ");
+
+                // textboxes
+                final TextBox indexPrefixTextBox = makeDialogCustomTextBox(
+                        indexPrefixLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        () -> "", Settings.getDefaultIndexPrefix(), () -> "",
+                        TextBox::validateAsOptionallyEmptyFilename,
+                        s -> Settings.setDefaultIndexPrefix(s, false), 5);
+                final TextBox indexSuffixTextBox = makeDialogCustomTextBox(
+                        indexSuffixLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        () -> "", Settings.getDefaultIndexSuffix(), () -> "",
+                        TextBox::validateAsOptionallyEmptyFilename,
+                        s -> Settings.setDefaultIndexSuffix(s, false), 5);
+
+                mb.add(indexPrefixLabel);
+                mb.add(indexSuffixLabel);
+                mb.add(indexPrefixTextBox);
+                mb.add(indexSuffixTextBox);
+
+                // update as new settings are added to category
+                yield indexSuffixLabel;
+            }
+            case VISUAL -> {
+                // text labels
+                final TextLabel checkerboardLabel = makeDialogLeftLabel(
+                        initialYIndex, "Checkerboard size: "),
+                        fontLabel = makeDialogLeftLabel(
+                                initialYIndex + 1, "Program font: ");
+
+                // toggle buttons
+                final GameImage[] fontBases = makeToggleButtonSet(
+                        Arrays.stream(SEFonts.Code.values())
+                                .map(SEFonts.Code::forButtonText)
+                                .toArray(String[]::new));
+                final SimpleToggleMenuButton fontButton = new SimpleToggleMenuButton(
+                        getDialogContentBigOffsetFromLabel(fontLabel),
+                        new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                                Layout.STD_TEXT_BUTTON_H),
+                        MenuElement.Anchor.LEFT_TOP, true,
+                        fontBases, Arrays.stream(fontBases)
+                        .map(GraphicsUtils::drawHighlightedButton)
+                        .toArray(GameImage[]::new),
+                        Arrays.stream(SEFonts.Code.values()).map(
+                                code -> (Runnable) () -> Settings.setProgramFont(
+                                        code.next().name(), false)
+                        ).toArray(Runnable[]::new),
+                        () -> Settings.getProgramFont().ordinal(), () -> {});
+
+                // sliders
+                final HorizontalSlider checkerboardSlider = new HorizontalSlider(
+                        getDialogContentBigOffsetFromLabel(checkerboardLabel),
+                        Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        MenuElement.Anchor.LEFT_TOP, 0, 5,
+                        (int)Math.round(Math.log(Settings.getCheckerboardPixels())
+                                / Math.log(2d)),
+                        exp -> Settings.setCheckerboardPixels(
+                                (int)Math.pow(2d, exp), false));
+                checkerboardSlider.updateAssets();
+                final DynamicLabel checkerboardValue = makeDynamicFromLeftLabel(
+                        checkerboardLabel,
+                        () -> String.valueOf(Settings.getCheckerboardPixels()));
+
+                mb.add(checkerboardLabel);
+                mb.add(fontLabel);
+                mb.add(fontButton);
+                mb.add(checkerboardSlider);
+                mb.add(checkerboardValue);
+
+                // update as new settings are added to category
+                yield fontLabel;
+            }
+        };
+
+        // scrolling container
+        final int scrollerEndY = (Layout.getCanvasMiddle().y +
+                Layout.getDialogHeight() / 2) - ((2 * Layout.CONTENT_BUFFER_PX) +
+                Layout.STD_TEXT_BUTTON_H);
+
+        final Coord2D scrollerPos = Layout.getDialogPosition().displace(0,
+                (4 * Layout.STD_TEXT_BUTTON_INC) +
+                        Layout.TEXT_Y_OFFSET - Layout.BUTTON_DIM),
+                scrollerDims = new Coord2D(Layout.getDialogWidth(),
+                        scrollerEndY - scrollerPos.y);
+
+        final int realBottomY = bottomLabel.getRenderPosition().y +
+                bottomLabel.getHeight() + Layout.STD_TEXT_BUTTON_H;
+
+        return new VerticalScrollingMenuElement(scrollerPos, scrollerDims,
+                Arrays.stream(mb.build().getMenuElements()).map(
+                        ScrollableMenuElement::new).toArray(
+                                ScrollableMenuElement[]::new), realBottomY, 0);
+    }
+
+    private static VerticalScrollingMenuElement assembleScroller(
             final DialogVals.InfoScreen infoScreen, final int scrollerEndY
     ) {
         final int dialogW = (int)(Layout.width() * 0.7),
@@ -890,7 +967,7 @@ public class DialogAssembly {
 
         final Coord2D contentStart = new Coord2D(Layout.getCanvasMiddle().x -
                 (dialogW / 2) + Layout.CONTENT_BUFFER_PX + Layout.BUTTON_BORDER_PX,
-                (4 * Layout.STD_TEXT_BUTTON_INC));
+                4 * Layout.STD_TEXT_BUTTON_INC);
         final Set<MenuElement> contentAssembler = new HashSet<>();
 
         int initialbottomY = 0;

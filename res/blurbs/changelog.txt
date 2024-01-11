@@ -18,15 +18,16 @@ x Add tooltips for icon buttons and icon toggle buttons
     > Add to palette
     > Palette files
 > Dropdown menu element
-> Palettizer (layer/entire project)
+> Palettizer (layer/frame/entire project)
 > Native file type (.stip)
 x Preview window
 > Grid
 
 Change:
-x 1000x1000 canvas size limit
-> Change settings dialog to an info-style dialog with multiple tabs
+x 800x800 canvas size limit
+x Change settings dialog to an info-style dialog with multiple tabs
 x Rework segments and render scale to be window and screen size dependent
+x Change brush select behaviour to preview overlay without editing selection until unclick
 
 Fix:
 > HSV slider slippage

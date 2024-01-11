@@ -161,11 +161,15 @@ public class Layout {
         return getDialogWidth() - (DIALOG_DYNAMIC_W_ALLOWANCE + DIALOG_CONTENT_BIG_OFFSET_X);
     }
 
-    public static Coord2D getDialogContentInitial() {
+    public static Coord2D getDialogPosition() {
         return getCanvasMiddle().displace(-getDialogWidth() / 2,
-                        -getDialogHeight() / 2).displace(
-                                CONTENT_BUFFER_PX + BUTTON_BORDER_PX,
-                        TEXT_Y_OFFSET + BUTTON_BORDER_PX +
-                                (int)(1.5 * STD_TEXT_BUTTON_INC));
+                -getDialogHeight() / 2);
+    }
+
+    public static Coord2D getDialogContentInitial() {
+        return getDialogPosition().displace(
+                CONTENT_BUFFER_PX + BUTTON_BORDER_PX,
+                TEXT_Y_OFFSET + BUTTON_BORDER_PX +
+                        (int)(1.5 * STD_TEXT_BUTTON_INC));
     }
 }

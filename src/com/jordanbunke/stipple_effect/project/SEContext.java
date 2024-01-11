@@ -155,9 +155,9 @@ public class SEContext {
         }
 
         // selection overlay - drawing box
-        if (tool instanceof BoxSelect boxSelect && boxSelect.isDrawing()) {
-            final Coord2D tl = boxSelect.getTopLeft();
-            final GameImage boxOverlay = boxSelect.getOverlay();
+        if (tool instanceof OverlayTool overlayTool && overlayTool.isDrawing()) {
+            final Coord2D tl = overlayTool.getTopLeft();
+            final GameImage boxOverlay = overlayTool.getSelectionOverlay();
 
             workspace.draw(boxOverlay,
                     (render.x + (int)(tl.x * zoomFactor))
