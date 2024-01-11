@@ -75,10 +75,13 @@ public class SEContext {
     private Coord2D[] getImageRenderBounds(
             final Coord2D render, final int w, final int h, final float z
     ) {
+        final int ww = Layout.getWorkspaceWidth(),
+                wh = Layout.getWorkspaceHeight();
         final Coord2D[] bounds = new Coord2D[BOUNDS];
 
-        if (render.x > Constants.WORKSPACE_W || render.y > Constants.WORKSPACE_H ||
-                render.x + (int)(w * z) <= 0 || render.y + (int)(h * z) <= 0)
+        if (render.x > ww || render.y > wh ||
+                render.x + (int)(w * z) <= 0 ||
+                render.y + (int)(h * z) <= 0)
             return new Coord2D[] {};
 
         final int tlx, tly, brx, bry;
@@ -87,8 +90,8 @@ public class SEContext {
 
         tlx = Math.max((int)(-render.x / z), 0);
         tly = Math.max((int)(-render.y / z), 0);
-        brx = Math.min((int)((Constants.WORKSPACE_W - render.x) / z) + 1, w);
-        bry = Math.min((int)((Constants.WORKSPACE_H - render.y) / z) + 1, h);
+        brx = Math.min((int)((ww - render.x) / z) + 1, w);
+        bry = Math.min((int)((wh - render.y) / z) + 1, h);
 
         bounds[TL] = new Coord2D(tlx, tly);
         bounds[BR] = new Coord2D(brx, bry);
@@ -102,11 +105,13 @@ public class SEContext {
     }
 
     public GameImage drawWorkspace() {
-        final GameImage workspace = new GameImage(Constants.WORKSPACE_W, Constants.WORKSPACE_H);
+        final int ww = Layout.getWorkspaceWidth(),
+                wh = Layout.getWorkspaceHeight();
+
+        final GameImage workspace = new GameImage(ww, wh);
 
         // background
-        workspace.fillRectangle(Constants.BACKGROUND, 0, 0,
-                Constants.WORKSPACE_W, Constants.WORKSPACE_H);
+        workspace.fillRectangle(Constants.BACKGROUND, 0, 0, ww, wh);
 
         // math
         final float zoomFactor = renderInfo.getZoomFactor();
@@ -275,6 +280,11 @@ public class SEContext {
                         mse.markAsProcessed();
 
                         twb.setBreadth(twb.getBreadth() + mse.clicksScrolled);
+                    } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
+                        mse.markAsProcessed();
+
+                        tts.setTolerance(tts.getTolerance() + (mse.clicksScrolled *
+                                Constants.SMALL_TOLERANCE_INC));
                     }
                 } else if (inWorkspaceBounds) {
                     mse.markAsProcessed();
@@ -759,15 +769,15 @@ public class SEContext {
     private Coord2D getMouseOffsetInWorkspace(final InputEventLogger eventLogger) {
         final Coord2D
                 m = eventLogger.getAdjustedMousePosition(),
-                wp = Constants.getWorkspacePosition();
+                wp = Layout.getWorkspacePosition();
         return new Coord2D(m.x - wp.x, m.y - wp.y);
     }
 
     private void setInWorkspaceBounds(final InputEventLogger eventLogger) {
         final Coord2D workspaceM = getMouseOffsetInWorkspace(eventLogger);
         inWorkspaceBounds =  workspaceM.x > 0 &&
-                workspaceM.x < Constants.WORKSPACE_W &&
-                workspaceM.y > 0 && workspaceM.y < Constants.WORKSPACE_H;
+                workspaceM.x < Layout.getWorkspaceWidth() &&
+                workspaceM.y > 0 && workspaceM.y < Layout.getWorkspaceHeight();
     }
 
     private void setTargetPixel(final InputEventLogger eventLogger) {
@@ -795,7 +805,8 @@ public class SEContext {
     private Coord2D getImageRenderPositionInWorkspace() {
         final float zoomFactor = renderInfo.getZoomFactor();
         final Coord2D anchor = renderInfo.getAnchor(),
-                middle = new Coord2D(Constants.WORKSPACE_W / 2, Constants.WORKSPACE_H / 2);
+                middle = new Coord2D(Layout.getWorkspaceWidth() / 2,
+                        Layout.getWorkspaceHeight() / 2);
 
         return new Coord2D(middle.x - (int)(zoomFactor * anchor.x),
                 middle.y - (int)(zoomFactor * anchor.y));
@@ -1734,10 +1745,13 @@ public class SEContext {
         final Set<Coord2D> selection = getState().getSelection();
         final Coord2D tl = SelectionUtils.topLeft(selection),
                 br = SelectionUtils.bottomRight(selection);
+        final int w = br.x - tl.x, h = br.y - tl.y;
         final boolean multiple = selection.size() > 1;
 
-        return selection.isEmpty() ? "--" : selection.size() + "px " +
-                (multiple ? "from " : "at ") + tl + (multiple ? (" to " + br) : "");
+        return selection.isEmpty() ? "No selection" : "Selection: " +
+                selection.size() + "px " + (multiple ? "from " : "at ") + tl +
+                (multiple ? (" to " + br + "; " + w + "x" + h +
+                        " bounding box") : "");
     }
 
     public ProjectState getState() {

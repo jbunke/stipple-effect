@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
@@ -117,7 +118,7 @@ public abstract class Slider extends MenuElement {
 
     // graphical
     public GameImage[] drawSliderBallShells() {
-        final int sbd = Constants.SLIDER_BALL_DIM;
+        final int sbd = Layout.SLIDER_BALL_DIM;
 
         final GameImage baseSliderBall = new GameImage(sbd, sbd),
                 highlightedSliderBall = new GameImage(sbd, sbd),
@@ -157,12 +158,12 @@ public abstract class Slider extends MenuElement {
     }
 
     public boolean isValidDimForHighlight(final int mouseDim) {
-        return Math.abs(mouseDim - getSliderBallDim()) <= Constants.SLIDER_BALL_DIM / 2;
+        return Math.abs(mouseDim - getSliderBallDim()) <= Layout.SLIDER_BALL_DIM / 2;
     }
 
     private int getSliderBallDim() {
         final Coord2D rp = getRenderPosition();
-        final int sbd = Constants.SLIDER_BALL_DIM;
+        final int sbd = Layout.SLIDER_BALL_DIM;
         return coordDimFunction.apply(rp) + (sbd / 2) +
                 (int)(getSliderFraction() * (sliderDimFunction.apply(this) - sbd));
     }
@@ -171,7 +172,7 @@ public abstract class Slider extends MenuElement {
         final int valueWas = getValue();
 
         final Coord2D rp = getRenderPosition();
-        final int sbd = Constants.SLIDER_BALL_DIM,
+        final int sbd = Layout.SLIDER_BALL_DIM,
                 sd = sliderDimFunction.apply(this) - sbd,
                 startDim = coordDimFunction.apply(rp) + (sbd / 2);
         final double sliderFraction = (sliderBallDim - startDim) / (double) sd;
@@ -187,7 +188,7 @@ public abstract class Slider extends MenuElement {
     public abstract Coord2D getSliderBallRenderPos(final int sliderBallRenderDim);
 
     public void updateAssets() {
-        final int sbd = Constants.SLIDER_BALL_DIM,
+        final int sbd = Layout.SLIDER_BALL_DIM,
                 sd = sliderDimFunction.apply(this) - sbd;
         final GameImage slider = new GameImage(getWidth(), getHeight());
 
@@ -201,11 +202,11 @@ public abstract class Slider extends MenuElement {
         final GameImage[] sliderBalls = drawSliderBallShells();
 
         // slider ball core
-        final int sbcd = sbd - (2 * Constants.BUTTON_BORDER_PX);
+        final int sbcd = sbd - (2 * Layout.BUTTON_BORDER_PX);
 
         for (GameImage sliderBall : sliderBalls)
             sliderBall.fillRectangle(getSliderBallCoreColor(),
-                    Constants.BUTTON_BORDER_PX, Constants.BUTTON_BORDER_PX,
+                    Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX,
                     sbcd, sbcd);
 
         final int sliderBallRenderDim = (int)(getSliderFraction() * sd);

@@ -159,7 +159,7 @@ public class StippleEffect implements ProgramContext {
         final GameManager manager = new GameManager(0, this);
 
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
-        game.setCanvasSize(Constants.CANVAS_W, Constants.CANVAS_H);
+        game.setCanvasSize(Layout.width(), Layout.height());
 
         millisSinceStatusUpdate = 0;
         statusUpdate = GameImage.dummy();
@@ -204,13 +204,13 @@ public class StippleEffect implements ProgramContext {
 
         final GameImage text = GraphicsUtils.uiText(Constants.WHITE)
                 .addText(message).build().draw();
-        final int w = text.getWidth() + (4 * Constants.BUTTON_BORDER_PX),
-                h = text.getHeight() - (4 * Constants.BUTTON_BORDER_PX);
+        final int w = text.getWidth() + (4 * Layout.BUTTON_BORDER_PX),
+                h = text.getHeight() - (4 * Layout.BUTTON_BORDER_PX);
 
         final GameImage statusUpdate = new GameImage(w, h);
         statusUpdate.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0, w, h);
-        statusUpdate.draw(text, 2 * Constants.BUTTON_BORDER_PX,
-                Constants.TEXT_Y_OFFSET);
+        statusUpdate.draw(text, 2 * Layout.BUTTON_BORDER_PX,
+                Layout.TEXT_Y_OFFSET);
 
         this.statusUpdate = statusUpdate.submit();
     }
@@ -221,6 +221,7 @@ public class StippleEffect implements ProgramContext {
 
     private GameWindow makeWindow() {
         final Coord2D size = determineWindowSize();
+        Layout.setSize(size.x, size.y);
         final GameWindow window = new GameWindow(PROGRAM_NAME + " v" + VERSION,
                 size.x, size.y, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 true, false, !windowed);
@@ -232,10 +233,10 @@ public class StippleEffect implements ProgramContext {
         final int screenW = Toolkit.getDefaultToolkit().getScreenSize().width,
                 screenH = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-        final int h = screenH - Constants.SCREEN_H_BUFFER;
-        final double scaleUp = h / (double)Constants.CANVAS_H;
+        final int h = screenH - Layout.SCREEN_H_BUFFER;
+
         return windowed
-                ? new Coord2D((int)(scaleUp * Constants.CANVAS_W), h)
+                ? new Coord2D((int)(h * (16 / 9.)), h)
                 : new Coord2D(screenW, screenH);
     }
 
@@ -360,25 +361,25 @@ public class StippleEffect implements ProgramContext {
         }
 
         final GameImage text = tb.build().draw();
-        final int w = text.getWidth() + (4 * Constants.BUTTON_BORDER_PX),
-                h = text.getHeight() - (4 * Constants.BUTTON_BORDER_PX);
+        final int w = text.getWidth() + (4 * Layout.BUTTON_BORDER_PX),
+                h = text.getHeight() - (4 * Layout.BUTTON_BORDER_PX);
 
         final GameImage tt = new GameImage(w, h);
         tt.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0, w, h);
-        tt.draw(text, 2 * Constants.BUTTON_BORDER_PX, Constants.TEXT_Y_OFFSET);
+        tt.draw(text, 2 * Layout.BUTTON_BORDER_PX, Layout.TEXT_Y_OFFSET);
 
         return tt.submit();
     }
 
     @Override
     public void render(final GameImage canvas) {
-        final Coord2D wp = Constants.getWorkspacePosition(),
-                tp = Constants.getToolsPosition(),
-                lp = Constants.getLayersPosition(),
-                cp = Constants.getColorsPosition(),
-                pp = Constants.getProjectsPosition(),
-                fp = Constants.getFramesPosition(),
-                bbp = Constants.getBottomBarPosition();
+        final Coord2D wp = Layout.getWorkspacePosition(),
+                tp = Layout.getToolsPosition(),
+                lp = Layout.getLayersPosition(),
+                cp = Layout.getColorsPosition(),
+                pp = Layout.getProjectsPosition(),
+                fp = Layout.getFramesPosition(),
+                bbp = Layout.getBottomBarPosition();
 
         // workspace
         final GameImage workspace = getContext().drawWorkspace();
@@ -416,23 +417,22 @@ public class StippleEffect implements ProgramContext {
 
         canvas.setColor(Constants.BLACK);
         canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, wp.y); // projects and frame separation
-        canvas.drawLine(strokeWidth, pp.x, tp.y, Constants.CANVAS_W, tp.y); // top segments and middle separation
-        canvas.drawLine(strokeWidth, bbp.x, bbp.y, Constants.CANVAS_W, bbp.y); // middle segments and bottom bar separation
-        canvas.drawLine(strokeWidth, cp.x, cp.y, Constants.CANVAS_W, cp.y); // layers and colors separation
+        canvas.drawLine(strokeWidth, pp.x, tp.y, Layout.width(), tp.y); // top segments and middle separation
+        canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
+        canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
         canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace and right segments separation
 
         if (dialog != null) {
             canvas.fillRectangle(Constants.VEIL, 0, 0,
-                    Constants.CANVAS_W, Constants.CANVAS_H);
+                    Layout.width(), Layout.height());
             dialog.render(canvas);
         }
 
         // tool tip
         if (toolTipMillisCounter >= Constants.TOOL_TIP_MILLIS_THRESHOLD) {
-            final boolean leftSide = mousePos.x <= Constants.getCanvasMiddle().x,
-                    atBottom = mousePos.y > Constants.CANVAS_H -
-                            (2 * toolTip.getHeight());
+            final boolean leftSide = mousePos.x <= Layout.getCanvasMiddle().x,
+                    atBottom = mousePos.y > Layout.height() - (2 * toolTip.getHeight());
             final int x = mousePos.x + (leftSide ? 0 : -toolTip.getWidth()),
                     y = mousePos.y + (atBottom ? -toolTip.getHeight() : 0);
 
@@ -443,8 +443,8 @@ public class StippleEffect implements ProgramContext {
         final GameImage cursor = SECursor.fetchCursor(
                 getContext().isInWorkspaceBounds() && dialog == null
                         ? tool.getCursorCode() : SECursor.MAIN_CURSOR);
-        canvas.draw(cursor, mousePos.x - (Constants.CURSOR_DIM / 2),
-                mousePos.y - (Constants.CURSOR_DIM / 2));
+        canvas.draw(cursor, mousePos.x - (Layout.CURSOR_DIM / 2),
+                mousePos.y - (Layout.CURSOR_DIM / 2));
     }
 
     @Override
@@ -453,95 +453,98 @@ public class StippleEffect implements ProgramContext {
     }
 
     private GameImage drawColorsSegment() {
-        final GameImage colors = new GameImage(Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
+        final GameImage colors = new GameImage(Layout.COLOR_PICKER_W, Layout.getColorPickerHeight());
         colors.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Constants.COLOR_PICKER_W, Constants.COLOR_PICKER_H);
+                Layout.COLOR_PICKER_W, Layout.getColorPickerHeight());
 
         final GameImage sectionTitle = GraphicsUtils.uiText(Constants.WHITE)
                 .addText("Colors").build().draw();
-        colors.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+        colors.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
         return colors.submit();
     }
 
     private GameImage drawTools() {
-        final GameImage tools = new GameImage(Constants.TOOLS_W, Constants.WORKSPACE_H);
+        final GameImage tools = new GameImage(Layout.TOOLS_W, Layout.getWorkspaceHeight());
         tools.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Constants.TOOLS_W, Constants.WORKSPACE_H);
+                Layout.TOOLS_W, Layout.getWorkspaceHeight());
 
         return tools.submit();
     }
 
     private GameImage drawLayers() {
-        final GameImage layers = new GameImage(Constants.COLOR_PICKER_W, Constants.LAYERS_H);
+        final GameImage layers = new GameImage(Layout.COLOR_PICKER_W, Layout.getLayersHeight());
         layers.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Constants.COLOR_PICKER_W, Constants.LAYERS_H);
+                Layout.COLOR_PICKER_W, Layout.getLayersHeight());
 
         final GameImage sectionTitle = GraphicsUtils.uiText(Constants.WHITE)
                 .addText("Layers").build().draw();
-        layers.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+        layers.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
         return layers.submit();
     }
 
     private GameImage drawProjects() {
-        final GameImage projects = new GameImage(Constants.CONTEXTS_W, Constants.CONTEXTS_H);
+        final GameImage projects = new GameImage(Layout.getContextsWidth(), Layout.CONTEXTS_H);
         projects.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Constants.CONTEXTS_W, Constants.CONTEXTS_H);
+                Layout.getContextsWidth(), Layout.CONTEXTS_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
                 .addText("Project").build().draw();
-        projects.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+        projects.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
         return projects.submit();
     }
 
     private GameImage drawFrames() {
-        final GameImage frames = new GameImage(Constants.FRAMES_W, Constants.CONTEXTS_H);
+        final GameImage frames = new GameImage(Layout.getFramesWidth(), Layout.CONTEXTS_H);
         frames.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Constants.FRAMES_W, Constants.CONTEXTS_H);
+                Layout.getFramesWidth(), Layout.CONTEXTS_H);
 
         final GameImage sectionTitle = GraphicsUtils.uiText()
                 .addText("Frames").build().draw();
-        frames.draw(sectionTitle, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+        frames.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
         return frames.submit();
     }
 
     private GameImage drawBottomBar() {
-        final GameImage bottomBar = new GameImage(Constants.CANVAS_W, Constants.BOTTOM_BAR_H);
+        final GameImage bottomBar = new GameImage(Layout.width(), Layout.BOTTOM_BAR_H);
         bottomBar.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Constants.CANVAS_W, Constants.BOTTOM_BAR_H);
+                Layout.width(), Layout.BOTTOM_BAR_H);
 
         // target pixel
         final GameImage targetPixel = GraphicsUtils.uiText()
                 .addText(getContext().getTargetPixelText())
                 .build().draw();
-        bottomBar.draw(targetPixel, Constants.TP_X, Constants.TEXT_Y_OFFSET);
+        bottomBar.draw(targetPixel, Layout.getBottomBarTargetPixelX(),
+                Layout.TEXT_Y_OFFSET);
 
         // image size
         final GameImage size = GraphicsUtils.uiText()
                 .addText(getContext().getImageSizeText()).build().draw();
-        bottomBar.draw(size, Constants.SIZE_X, Constants.TEXT_Y_OFFSET);
+        bottomBar.draw(size, Layout.getBottomBarProjectCanvasSizeX(),
+                Layout.TEXT_Y_OFFSET);
 
         // active tool
         final GameImage activeToolName = GraphicsUtils.uiText()
                 .addText(tool.getBottomBarText()).build().draw();
-        bottomBar.draw(activeToolName, Constants.TOOL_NAME_X, Constants.TEXT_Y_OFFSET);
+        bottomBar.draw(activeToolName, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
         // zoom
         final GameImage zoom = GraphicsUtils.uiText()
                 .addText(getContext().renderInfo.getZoomText())
                 .build().draw();
-        bottomBar.draw(zoom, Constants.ZOOM_PCT_X, Constants.TEXT_Y_OFFSET);
+        bottomBar.draw(zoom, Layout.getBottomBarZoomPercentageX(),
+                Layout.TEXT_Y_OFFSET);
 
         // selection
         final GameImage selection = GraphicsUtils.uiText()
                 .addText(getContext().getSelectionText()).build().draw();
-        bottomBar.draw(selection, Constants.CANVAS_W -
-                        (Constants.TOOL_NAME_X + Constants.BUTTON_INC +
+        bottomBar.draw(selection, Layout.width() -
+                        (Layout.CONTENT_BUFFER_PX + Layout.BUTTON_INC +
                                 selection.getWidth()),
-                Constants.TEXT_Y_OFFSET);
+                Layout.TEXT_Y_OFFSET);
 
         return bottomBar.submit();
     }
@@ -743,7 +746,12 @@ public class StippleEffect implements ProgramContext {
         windowed = !windowed;
 
         window = makeWindow();
+        game.setCanvasSize(Layout.width(), Layout.height());
         game.replaceWindow(window);
+
+        // redraw everything
+        rebuildAllMenusWithText();
+        rebuildToolButtonMenu();
     }
 
     public void autoAssignPickUpSelection() {

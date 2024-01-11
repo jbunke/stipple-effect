@@ -5,7 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
@@ -23,7 +23,7 @@ public class DynamicLabel extends MenuElement {
             final Coord2D position, Anchor anchor, final Color textColor,
             final Supplier<String> getter, final int widthAllowance
     ) {
-        super(position, new Coord2D(widthAllowance, Constants.DYNAMIC_LABEL_H), anchor, true);
+        super(position, new Coord2D(widthAllowance, Layout.DYNAMIC_LABEL_H), anchor, true);
 
         this.textColor = textColor;
 

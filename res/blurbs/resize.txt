@@ -1,5 +1,4 @@
 Shortcut: {Ctrl + R}
 
-Displays a dialog allowing the user to resize the canvas.
-This will stretch or compress the existing project to the
-newly defined bounds.
+Displays a dialog allowing the user to resize the canvas. This will stretch or compress the existing
+project to the newly defined bounds.

@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButtonStub;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
@@ -62,7 +63,7 @@ public class TextBox extends MenuButtonStub {
             final Consumer<String> setter,
             final Supplier<Color> backgroundColorGetter, final int maxLength
     ) {
-        super(position, new Coord2D(width, Constants.STD_TEXT_BUTTON_H),
+        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
                 anchor, true);
 
         this.prefixGetter = prefixGetter;

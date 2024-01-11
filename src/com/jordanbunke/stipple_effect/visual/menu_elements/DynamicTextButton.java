@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.function.Supplier;
@@ -20,7 +21,7 @@ public class DynamicTextButton extends MenuButton {
             final Anchor anchor, final Runnable onClick,
             final Supplier<String> getter
     ) {
-        super(position, new Coord2D(width, Constants.STD_TEXT_BUTTON_H),
+        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
                 anchor, true, onClick);
 
         this.getter = getter;

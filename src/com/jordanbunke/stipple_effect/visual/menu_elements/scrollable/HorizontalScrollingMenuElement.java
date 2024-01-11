@@ -5,7 +5,7 @@ import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
 
     private HorizontalSlider makeSlider(final int maxOffsetX) {
         final Coord2D position = new Coord2D(getX(), getY())
-                .displace(0, getHeight() - Constants.SLIDER_OFF_DIM);
+                .displace(0, getHeight() - Layout.SLIDER_OFF_DIM);
 
         final HorizontalSlider slider = new HorizontalSlider(
                 position, getWidth(), Anchor.LEFT_TOP,
@@ -67,7 +67,7 @@ public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
                     if (e instanceof GameMouseScrollEvent mse) {
                         mse.markAsProcessed();
 
-                        slider.incrementValue(mse.clicksScrolled * Constants.PX_PER_SCROLL);
+                        slider.incrementValue(mse.clicksScrolled * Layout.PX_PER_SCROLL);
                     }
                 }
             }

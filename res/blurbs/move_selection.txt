@@ -2,5 +2,4 @@ Shortcut: {M}
 
 Move: {Click & Drag} or {Arrow Keys}
 
-You can also move the selection with the arrow keys with the
-{Box Select} tool equipped.
+You can also move the selection with the arrow keys with the {Box Select} tool equipped.

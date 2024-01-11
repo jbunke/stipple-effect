@@ -1,8 +1,4 @@
-Adjust red slider: {Shift + R + Scroll wheel} or
-{Shift + R + Left/Right Arrow Keys}
-Adjust green slider: {Shift + G + Scroll wheel} or
-{Shift + G + Left/Right Arrow Keys}
-Adjust blue slider: {Shift + B + Scroll wheel} or
-{Shift + B + Left/Right Arrow Keys}
-Adjust alpha (opacity) slider: {Shift + A + Scroll wheel} or
-{Shift + A + Left/Right Arrow Keys}
+Adjust red slider: {Shift + R + Scroll wheel} or {Shift + R + Left/Right Arrow Keys}
+Adjust green slider: {Shift + G + Scroll wheel} or {Shift + G + Left/Right Arrow Keys}
+Adjust blue slider: {Shift + B + Scroll wheel} or {Shift + B + Left/Right Arrow Keys}
+Adjust alpha (opacity) slider: {Shift + A + Scroll wheel} or {Shift + A + Left/Right Arrow Keys}

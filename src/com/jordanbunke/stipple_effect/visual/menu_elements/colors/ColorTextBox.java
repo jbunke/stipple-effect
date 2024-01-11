@@ -3,8 +3,8 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.TextBox;
-import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -20,7 +20,7 @@ public class ColorTextBox extends TextBox {
             final Coord2D position, final int index, final String initialText,
             final Supplier<Color> getter, final Consumer<String> setter
     ) {
-        super(position, Constants.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
+        super(position, Layout.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
                 initialText, () -> "", ColorTextBox::validateAsHexCode,
                 setter, getter, HEX_CODE_LENGTH);
 

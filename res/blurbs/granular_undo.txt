@@ -2,15 +2,11 @@ Shortcut: {Ctrl + Shift + Z}
 
 Return to a previous state within a single operation.
 
-For example, this can be used to navigate every stage of a
-brush stroke, rather than having to undo the entire stroke
-and attempt to replicate the initial part of the line again.
+For example, this can be used to navigate every stage of a brush stroke, rather than having to undo
+the entire stroke and attempt to replicate the initial part of the line again.
 
-{Note:} For the sake of performance, Stipple Effect does not
-calculate whether the before and after state of an operation
-alters the project's contents. That is to say, drawing over
-a pixel with the same color that was already there will
-still produce a new state on the undo/redo stack. Thus, a
-granular undo/redo operation will sometimes appear to have
-done nothing, but it will in fact have altered the project
-state.
+{Note:} For the sake of performance, Stipple Effect does not calculate whether the before and after
+state of an operation alters the project's contents. That is to say, drawing over a pixel with the
+same color that was already there will still produce a new state on the undo/redo stack. Thus, a
+granular undo/redo operation will sometimes appear to have done nothing, but it will in fact have
+altered the project state.

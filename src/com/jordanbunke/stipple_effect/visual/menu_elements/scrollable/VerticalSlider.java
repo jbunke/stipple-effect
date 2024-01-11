@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 
 import java.util.function.Consumer;
 
@@ -13,24 +14,24 @@ public class VerticalSlider extends Slider {
             final int minValue, final int maxValue, final int initialValue,
             final Consumer<Integer> setter
     ) {
-        super(position, new Coord2D(Constants.SLIDER_OFF_DIM, height), anchor,
+        super(position, new Coord2D(Layout.SLIDER_OFF_DIM, height), anchor,
                 minValue, maxValue, initialValue,
                 setter, true, c -> c.y, MenuElement::getHeight);
     }
 
     @Override
     public void drawSlider(final GameImage slider) {
-        final int sbd = Constants.SLIDER_BALL_DIM, sd = getHeight() - sbd,
-                sw = getWidth() - (2 * Constants.SLIDER_THINNING);
+        final int sbd = Layout.SLIDER_BALL_DIM, sd = getHeight() - sbd,
+                sw = getWidth() - (2 * Layout.SLIDER_THINNING);
 
         // slider core
-        slider.draw(drawSliderCore(sw, sd), Constants.SLIDER_THINNING, Constants.SLIDER_BALL_DIM / 2);
+        slider.draw(drawSliderCore(sw, sd), Layout.SLIDER_THINNING, Layout.SLIDER_BALL_DIM / 2);
 
         // slider outline
-        slider.drawRectangle(Constants.BLACK, Constants.BUTTON_BORDER_PX,
-                Constants.SLIDER_THINNING + (Constants.BUTTON_BORDER_PX / 2),
-                Constants.SLIDER_BALL_DIM / 2,
-                getWidth() - (Constants.BUTTON_BORDER_PX + (2 * Constants.SLIDER_THINNING)), sd
+        slider.drawRectangle(Constants.BLACK, Layout.BUTTON_BORDER_PX,
+                Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2),
+                Layout.SLIDER_BALL_DIM / 2,
+                getWidth() - (Layout.BUTTON_BORDER_PX + (2 * Layout.SLIDER_THINNING)), sd
         );
     }
 

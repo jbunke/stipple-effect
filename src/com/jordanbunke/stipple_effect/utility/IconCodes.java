@@ -62,7 +62,6 @@ public class IconCodes {
     public static final String NO_ICON_PREFIX = "__";
 
     public static final String
-            ON_RESOLUTION = NO_ICON_PREFIX + "on_resolution",
             GENERAL = NO_ICON_PREFIX + "general",
             CLIPBOARD_SHORTCUTS = NO_ICON_PREFIX + "clipboard_shortcuts",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",

@@ -3,7 +3,6 @@ Outline selection with current settings: {Ctrl + 9}
 Single outline selection: {Shift + 9}
 Double outline selection: {Ctrl + Shift + 9}
 
-Automatically shift the current pixel selection to the
-adjacent pixels of the {frontier} of the previous selection.
-Inclusion of adjacent pixels of each direction can be
-determined in the outline selection options menu.
+Automatically shift the current pixel selection to the adjacent pixels of the {frontier} of the
+previous selection. Inclusion of adjacent pixels of each direction can be determined in the outline
+selection options menu.

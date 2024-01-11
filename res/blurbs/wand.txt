@@ -1,9 +1,8 @@
 Shortcut: {W}
 
-Use the wand to select adjacent pixels of the same or
-similar color as the initial pixel that was clicked.
-Adjust the tolerance of the wand to increase or decrease
-the threshold of the similarity of the colors.
+Use the wand to select adjacent pixels of the same or similar color as the initial pixel that was
+clicked. Adjust the tolerance of the wand to increase or decrease the threshold of the similarity of
+the colors.
 
 Simple selection: {Click}
 
@@ -11,11 +10,10 @@ Additive selection: {Ctrl + Click}
 Adds the result of the selection to the existing selection.
 
 Subtractive selection: {Ctrl + S + Click}
-Removes the result of the selection from the existing
-selection.
+Removes the result of the selection from the existing selection.
 
 Global selection: {Shift + Click}
-Selects all pixels in the image that satisfy the color
-tolerance of the initial pixel, regardless of adjacency.
+Selects all pixels in the image that satisfy the color tolerance of the initial pixel, regardless of
+adjacency.
 
-Adjust tolerance: {Arrow Keys}
+Adjust tolerance: {Arrow Keys} or {Shift + Scroll Wheel}

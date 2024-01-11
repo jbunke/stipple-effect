@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 
@@ -57,8 +58,8 @@ public class GraphicsUtils {
                 affixTextC = textButtonColorFromBackgroundColor(
                         backgroundColor, false);
 
-        final int height = Constants.STD_TEXT_BUTTON_H,
-                px = Constants.BUTTON_BORDER_PX;
+        final int height = Layout.STD_TEXT_BUTTON_H,
+                px = Layout.BUTTON_BORDER_PX;
 
         final GameImage nhi = new GameImage(width, height);
         nhi.fillRectangle(backgroundColor, 0, 0, width, height);
@@ -72,7 +73,7 @@ public class GraphicsUtils {
                 aImage = uiText(mainTextC).addText(a).build().draw(),
                 bImage = uiText(mainTextC).addText(b).build().draw();
 
-        Coord2D textPos = new Coord2D(2 * px, Constants.BUTTON_TEXT_OFFSET_Y);
+        Coord2D textPos = new Coord2D(2 * px, Layout.BUTTON_TEXT_OFFSET_Y);
 
         nhi.draw(prefixImage, textPos.x, textPos.y);
 
@@ -116,15 +117,15 @@ public class GraphicsUtils {
                 .addText(text).build().draw();
 
         final int w = Math.max(width, textImage.getWidth() +
-                (4 * Constants.BUTTON_BORDER_PX)),
-                h = Constants.STD_TEXT_BUTTON_H;
+                (4 * Layout.BUTTON_BORDER_PX)),
+                h = Layout.STD_TEXT_BUTTON_H;
 
         final GameImage nhi = new GameImage(w, h);
         nhi.fillRectangle(backgroundColor, 0, 0, w, h);
 
-        nhi.draw(textImage, (w - textImage.getWidth()) / 2, Constants.BUTTON_TEXT_OFFSET_Y);
+        nhi.draw(textImage, (w - textImage.getWidth()) / 2, Layout.BUTTON_TEXT_OFFSET_Y);
         final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
-        nhi.drawRectangle(frame, 2f * Constants.BUTTON_BORDER_PX, 0, 0, w, h);
+        nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return nhi.submit();
     }
@@ -133,7 +134,7 @@ public class GraphicsUtils {
             final Color b, final boolean main
     ) {
         return (b.getRed() + b.getGreen() + b.getBlue()) / 3 >
-                Constants.COLOR_TEXTBOX_AVG_C_THRESHOLD
+                Layout.COLOR_TEXTBOX_AVG_C_THRESHOLD
                 ? (main ? Constants.BLACK : Constants.BACKGROUND)
                 : (main ? Constants.WHITE : Constants.GREY);
     }
@@ -144,7 +145,7 @@ public class GraphicsUtils {
         final GameImage selected = new GameImage(bounds);
         final int w = selected.getWidth();
         selected.draw(loadIcon(IconCodes.BULLET_POINT),
-                w - Constants.BUTTON_INC, Constants.BUTTON_BORDER_PX);
+                w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
     }
@@ -155,7 +156,7 @@ public class GraphicsUtils {
         final GameImage hi = new GameImage(nhi);
         final int w = hi.getWidth(), h = hi.getHeight();
         hi.fillRectangle(Constants.HIGHLIGHT_2, 0, 0, w, h);
-        hi.drawRectangle(Constants.BLACK, 2f * Constants.BUTTON_BORDER_PX,
+        hi.drawRectangle(Constants.BLACK, 2f * Layout.BUTTON_BORDER_PX,
                 0, 0, w, h);
 
         return hi.submit();
@@ -253,7 +254,7 @@ public class GraphicsUtils {
 
         if (stub)
             return new StaticMenuElement(position,
-                    new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM),
+                    new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
                     MenuElement.Anchor.LEFT_TOP,
                     greyscaleVersionOf(loadIcon(iconID)));
 
