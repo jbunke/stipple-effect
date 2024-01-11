@@ -86,7 +86,7 @@ public class ColorComponent extends MenuElementContainer {
 
         // slider
         elements.add(new ColorSlider(startingPos.displace(width / 2,
-                (int)(Layout.getColorSelectorIncY() * 0.45)),
+                (int)(Layout.getColorSelectorIncY() * 0.35)),
                 (isFull ? Layout.FULL_COLOR_SLIDER_W :
                         Layout.HALF_COLOR_SLIDER_W) + Layout.SLIDER_BALL_DIM,
                 minValue, maxValue, getter, spectralFunction,

@@ -32,7 +32,7 @@ public class Settings {
 
     // SETTINGS - set to defaults if settings cannot be read
     // booleans
-    private static boolean fullscreenOnStartup = true;
+    private static boolean fullscreenOnStartup = false;
 
     // int
     private static int checkerboardPixels = Layout.DEFAULT_CHECKERBOARD_DIM;

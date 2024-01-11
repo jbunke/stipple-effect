@@ -17,12 +17,9 @@ import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.SelectableListItemButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
-import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
@@ -218,19 +215,6 @@ public class MenuAssembly {
 
         // playback speed slider and dynamic label for playback speed
 
-        final Coord2D playbackSliderPos = firstPos.displace(
-                Layout.FRAME_PLAYBACK_SLIDER_OFFSET_X,
-                -Layout.SEGMENT_TITLE_CONTENT_OFFSET_Y + Layout.ICON_BUTTON_OFFSET_Y);
-
-        final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
-                Layout.FRAME_PLAYBACK_SLIDER_W, MenuElement.Anchor.LEFT_TOP,
-                Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                StippleEffect.get().getContext().playbackInfo.getFps(),
-                mpf -> StippleEffect.get().getContext()
-                        .playbackInfo.setFps(mpf));
-        slider.updateAssets();
-        mb.add(slider);
-
         final Coord2D labelPos = Layout.getFramesPosition().displace(
                 Layout.getFramesWidth() - Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
@@ -238,6 +222,19 @@ public class MenuAssembly {
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
                 () -> StippleEffect.get().getContext().playbackInfo.getFps() + " fps",
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
+
+        final Coord2D playbackSliderPos = Layout.getFramesPosition().displace(
+                Layout.getFramesWidth() - Layout.DYNAMIC_LABEL_W_ALLOWANCE,
+                Layout.ICON_BUTTON_OFFSET_Y);
+
+        final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
+                Layout.getUISliderWidth(), MenuElement.Anchor.RIGHT_TOP,
+                Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                StippleEffect.get().getContext().playbackInfo.getFps(),
+                mpf -> StippleEffect.get().getContext()
+                        .playbackInfo.setFps(mpf));
+        slider.updateAssets();
+        mb.add(slider);
 
         // frame content
 
@@ -546,26 +543,35 @@ public class MenuAssembly {
         final int NUM_COLORS = 2;
 
         for (int i = 0; i < NUM_COLORS; i++) {
-            final int offsetY = Layout.getSegmentContentDisplacement().y;
-            final Coord2D pos = Layout.getColorsPosition().displace(
-                    (Layout.COLOR_PICKER_W / 4) +
-                            (i * (Layout.COLOR_PICKER_W / 2)), offsetY);
+            final int offsetY = Layout.getSegmentContentDisplacement().y * 2;
+            final Coord2D labelPos = Layout.getColorsPosition().displace(
+                    Layout.getSegmentContentDisplacement()).displace(
+                            i * (Layout.COLOR_PICKER_W / 2), 0),
+                    textBoxPos = Layout.getColorsPosition().displace(
+                            (Layout.COLOR_PICKER_W / 4) + (i *
+                                    (Layout.COLOR_PICKER_W / 2)), offsetY);
 
-            final ColorTextBox colorTextBox = ColorTextBox.make(pos, i);
+            mb.add(TextLabel.make(labelPos, switch (i) {
+                case 0 -> "Primary";
+                case 1 -> "Secondary";
+                default -> "Other";
+            }, Constants.WHITE));
 
+            final ColorTextBox colorTextBox = ColorTextBox.make(textBoxPos, i);
             mb.add(colorTextBox);
 
             final int index = i;
             final Coord2D dims = new Coord2D(colorTextBox.getWidth(),
                     colorTextBox.getHeight());
             final GatewayMenuElement highlight = new GatewayMenuElement(
-                    new StaticMenuElement(pos, dims, MenuElement.Anchor.CENTRAL_TOP,
+                    new StaticMenuElement(textBoxPos, dims, MenuElement.Anchor.CENTRAL_TOP,
                             GraphicsUtils.drawSelectedTextBox(
                                     new GameImage(dims.x, dims.y))),
                     () -> StippleEffect.get().getColorIndex() == index);
             mb.add(highlight);
         }
 
+        // TODO - update for palette
         mb.add(new ColorSelector());
 
         return mb.build();
@@ -585,7 +591,7 @@ public class MenuAssembly {
                 Layout.getBottomBarPosition().displace(
                         Layout.getBottomBarZoomSliderX(),
                         Layout.BUTTON_OFFSET),
-                Layout.getBottomBarZoomSliderWidth(),
+                Layout.getUISliderWidth(),
                 MenuElement.Anchor.LEFT_TOP,
                 (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
                 (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),

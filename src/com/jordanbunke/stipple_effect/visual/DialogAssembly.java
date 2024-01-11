@@ -58,7 +58,7 @@ public class DialogAssembly {
         // folder selection button
         final DynamicTextButton folderButton = new DynamicTextButton(
                 getDialogContentOffsetFromLabel(folderLabel),
-                Layout.DIALOG_CONTENT_W_ALLOWANCE,
+                Layout.getDialogContentWidthAllowance(),
                 MenuElement.Anchor.LEFT_TOP,
                 () -> {
                     FileIO.setDialogToFoldersOnly();
@@ -113,7 +113,7 @@ public class DialogAssembly {
         // scale up slider
         final HorizontalSlider scaleUpSlider = new HorizontalSlider(
                 getDialogContentOffsetFromLabel(scaleUpLabel),
-                Layout.DIALOG_CONTENT_W_ALLOWANCE, MenuElement.Anchor.LEFT_TOP,
+                Layout.getDialogContentWidthAllowance(), MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
                 c.projectInfo.getScaleUp(),
                 c.projectInfo::setScaleUp);
@@ -125,7 +125,7 @@ public class DialogAssembly {
         // save as toggle
         final ProjectInfo.SaveType[] saveOptions = ProjectInfo.SaveType.validOptions();
 
-        final int toggleWidth = Layout.DIALOG_CONTENT_W_ALLOWANCE;
+        final int toggleWidth = Layout.getDialogContentWidthAllowance();
 
         final GameImage[] baseSet = Arrays.stream(saveOptions)
                 .map(so -> GraphicsUtils.drawTextButton(toggleWidth,
@@ -174,7 +174,7 @@ public class DialogAssembly {
         // GIF playback speed iff saveType is GIF
         final HorizontalSlider playbackSpeedSlider = new HorizontalSlider(
                 getDialogContentOffsetFromLabel(fpsLabel),
-                (int)(Layout.DIALOG_CONTENT_W_ALLOWANCE * 0.9),
+                (int)(Layout.getDialogContentWidthAllowance() * 0.9),
                 MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
                 c.projectInfo.getFps(),
@@ -259,10 +259,7 @@ public class DialogAssembly {
                 widthLabel = makeDialogLeftLabel(1, "Width: "),
                 heightLabel = makeDialogLeftLabel(2, "Height: "),
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
-                explanation = makeDialogLeftLabel(5,
-                        "Valid image sizes run from " + Constants.MIN_IMAGE_W +
-                                "x" + Constants.MIN_IMAGE_H + " to " +
-                                Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
+                explanation = makeValidDimensionsBottomLabel();
 
         // dim textboxes
         final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
@@ -332,7 +329,8 @@ public class DialogAssembly {
                 rightLabel = makeDialogLeftLabel(2, "Right: "),
                 topLabel = makeDialogLeftLabel(3, "Top: "),
                 bottomLabel = makeDialogLeftLabel(4, "Bottom: "),
-                context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h);
+                context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
+                explanation = makeValidDimensionsBottomLabel();
 
         // pad textboxes
         final TextBox leftTextBox = makeDialogPadTextBox(leftLabel, i -> {
@@ -368,9 +366,9 @@ public class DialogAssembly {
         );
 
         final MenuElementGrouping contents = new MenuElementGrouping(
-                context, leftLabel, rightLabel, topLabel, bottomLabel, preview,
-                leftTextBox, rightTextBox, topTextBox, bottomTextBox
-        );
+                context, leftLabel, rightLabel, topLabel, bottomLabel,
+                preview, explanation,
+                leftTextBox, rightTextBox, topTextBox, bottomTextBox);
         setDialog(assembleDialog("Pad Canvas...", contents,
                 () -> leftTextBox.isValid() && rightTextBox.isValid() &&
                         topTextBox.isValid() && bottomTextBox.isValid(),
@@ -396,7 +394,8 @@ public class DialogAssembly {
                 widthLabel = makeDialogLeftLabel(2, "Width: "),
                 heightLabel = makeDialogRightLabel(widthLabel, "Height: "),
                 xDivsLabel = makeDialogLeftLabel(4 - (tooBig ? 0 : 2), "X frames: "),
-                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: ");
+                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: "),
+                explanation = makeValidDimensionsBottomLabel();
 
         // downscale textboxes
         final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
@@ -417,7 +416,7 @@ public class DialogAssembly {
         // wrap downscale components in optional group in case N/A
         final MenuElementGrouping optional = tooBig
                 ? new MenuElementGrouping(instruction, widthLabel, heightLabel,
-                widthTextBox, heightTextBox)
+                widthTextBox, heightTextBox, explanation)
                 : new MenuElementGrouping();
 
         // precondition
@@ -446,10 +445,7 @@ public class DialogAssembly {
         final TextLabel
                 widthLabel = makeDialogLeftLabel(1, "Width: "),
                 heightLabel = makeDialogLeftLabel(2, "Height: "),
-                explanation = makeDialogLeftLabel(4,
-                        "Valid image sizes run from " + Constants.MIN_IMAGE_W +
-                                "x" + Constants.MIN_IMAGE_H + " to " +
-                                Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
+                explanation = makeValidDimensionsBottomLabel();
 
         // dim textboxes
         final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
@@ -492,8 +488,7 @@ public class DialogAssembly {
 
         // no selection notification
         if (!c.getState().hasSelection())
-            mb.add(makeDialogLeftLabel(5,
-                    "Cannot outline; nothing is selected"));
+            mb.add(makeDialogLeftLabelAtBottom("Cannot outline; nothing is selected"));
 
         // buttons for setting presets
         final GameImage baseSingle = GraphicsUtils.drawTextButton(
@@ -554,48 +549,9 @@ public class DialogAssembly {
         setDialog(assembleInfoDialog());
     }
 
-    public static void setDialogToLayerSettings(final int index) {
-        final SEContext c = StippleEffect.get().getContext();
-        final SELayer layer = c.getState().getLayers().get(index);
-
-        DialogVals.setLayerOpacity(layer.getOpacity());
-        DialogVals.setLayerName(layer.getName());
-
-        // text labels
-        final TextLabel layerNameLabel = makeDialogLeftLabel(1, "Name: "),
-                opacityLabel = makeDialogLeftLabel(2, "Opacity: ");
-
-        // name textbox
-        final TextBox layerNameTextBox = makeDialogNameTextBox(
-                layerNameLabel, layer.getName(), DialogVals::setLayerName);
-
-        // opacity slider
-        final int MAX_OPACITY = 255;
-
-        final HorizontalSlider opacitySlider = new HorizontalSlider(
-                getDialogContentOffsetFromLabel(opacityLabel),
-                Layout.DIALOG_CONTENT_W_ALLOWANCE,
-                MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
-                (int)(layer.getOpacity() * MAX_OPACITY),
-                o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
-        opacitySlider.updateAssets();
-
-        // opacity value
-        final DynamicLabel opacityValue = makeDynamicFromLeftLabel(opacityLabel,
-                () -> String.valueOf((int)(DialogVals.getLayerOpacity() * MAX_OPACITY)));
-
-        final MenuElementGrouping contents = new MenuElementGrouping(
-                layerNameLabel, opacityLabel, layerNameTextBox,
-                opacitySlider, opacityValue);
-        setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
-                contents, layerNameTextBox::isValid,
-                Constants.GENERIC_APPROVAL_TEXT, () -> {
-            c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
-            c.changeLayerName(DialogVals.getLayerName(), index);
-        }, true));
-    }
-
     public static void setDialogToProgramSettings() {
+        // TODO - redo a la info
+
         // text labels
         final TextLabel screenModeLabel = makeDialogLeftLabel(0, "Fullscreen on startup: "),
                 checkerboardLabel = makeDialogLeftLabel(1, "Checkerboard size: "),
@@ -697,7 +653,50 @@ public class DialogAssembly {
                 () -> true, "Apply", Settings::write, true));
     }
 
+    public static void setDialogToLayerSettings(final int index) {
+        final SEContext c = StippleEffect.get().getContext();
+        final SELayer layer = c.getState().getLayers().get(index);
+
+        DialogVals.setLayerOpacity(layer.getOpacity());
+        DialogVals.setLayerName(layer.getName());
+
+        // text labels
+        final TextLabel layerNameLabel = makeDialogLeftLabel(1, "Name: "),
+                opacityLabel = makeDialogLeftLabel(2, "Opacity: ");
+
+        // name textbox
+        final TextBox layerNameTextBox = makeDialogNameTextBox(
+                layerNameLabel, layer.getName(), DialogVals::setLayerName);
+
+        // opacity slider
+        final int MAX_OPACITY = 255;
+
+        final HorizontalSlider opacitySlider = new HorizontalSlider(
+                getDialogContentOffsetFromLabel(opacityLabel),
+                Layout.getDialogContentWidthAllowance(),
+                MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
+                (int)(layer.getOpacity() * MAX_OPACITY),
+                o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
+        opacitySlider.updateAssets();
+
+        // opacity value
+        final DynamicLabel opacityValue = makeDynamicFromLeftLabel(opacityLabel,
+                () -> String.valueOf((int)(DialogVals.getLayerOpacity() * MAX_OPACITY)));
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                layerNameLabel, opacityLabel, layerNameTextBox,
+                opacitySlider, opacityValue);
+        setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
+                contents, layerNameTextBox::isValid,
+                Constants.GENERIC_APPROVAL_TEXT, () -> {
+            c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
+            c.changeLayerName(DialogVals.getLayerName(), index);
+        }, true));
+    }
+
     public static void setDialogToSplashScreen() {
+        // TODO - set fullscreen default to false, remove overlay, redesign splash
+
         final MenuBuilder mb = new MenuBuilder();
 
         // timer
@@ -753,21 +752,12 @@ public class DialogAssembly {
                 MenuElement.Anchor.RIGHT_BOTTOM, (int)(Constants.TICK_HZ / 2),
                 ctc, GameImage.dummy()));
 
-        // windowed
-        final GameImage win = GraphicsUtils.uiText(Constants.GREY)
-                .addText("Press [Escape] to toggle fullscreen").build().draw();
-
-        mb.add(new AnimationMenuElement(new Coord2D(Layout.CONTENT_BUFFER_PX, h),
-                new Coord2D(ctc.getWidth(), ctc.getHeight()),
-                MenuElement.Anchor.LEFT_BOTTOM, (int)(Constants.TICK_HZ / 2),
-                win, GameImage.dummy()));
-
         // animation frames
-        mb.add(new AnimationMenuElement(
-                new Coord2D(), new Coord2D(Layout.width(), Layout.height()),
-                MenuElement.Anchor.LEFT_TOP, 10,
-                SplashLoader.loadAnimationFrames()
-        ));
+        final GameImage[] frames = SplashLoader.loadAnimationFrames();
+        mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
+                new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
+                MenuElement.Anchor.CENTRAL, 10,
+                SplashLoader.loadAnimationFrames()));
 
         setDialog(mb.build());
     }
@@ -848,9 +838,25 @@ public class DialogAssembly {
             final Consumer<String> setter
     ) {
         return new TextBox(getDialogContentOffsetFromLabel(label),
-                Layout.DIALOG_CONTENT_W_ALLOWANCE, MenuElement.Anchor.LEFT_TOP,
+                Layout.getDialogContentWidthAllowance(), MenuElement.Anchor.LEFT_TOP,
                 initial, TextBox::validateAsFileName, setter,
                 Constants.MAX_NAME_LENGTH);
+    }
+
+    private static TextLabel makeValidDimensionsBottomLabel() {
+        return makeDialogLeftLabelAtBottom("Valid image sizes run from " +
+                Constants.MIN_IMAGE_W + "x" + Constants.MIN_IMAGE_H + " to " +
+                Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ".");
+    }
+
+    private static TextLabel makeDialogLeftLabelAtBottom(final String text) {
+        final int y = Layout.getCanvasMiddle()
+                .displace(0, Layout.getDialogHeight() / 2)
+                .displace(0, -(Layout.DIALOG_CONTENT_INC_Y +
+                        Layout.CONTENT_BUFFER_PX)).y;
+
+        return TextLabel.make(new Coord2D(Layout.getDialogContentInitial().x,
+                y), text, Constants.WHITE);
     }
 
     private static TextLabel makeDialogLeftLabel(final int index, final String text) {
@@ -877,7 +883,7 @@ public class DialogAssembly {
     }
 
     private static VerticalScrollingMenuElement assembleScroller(
-            final DialogVals.InfoScreen infoScreen
+            final DialogVals.InfoScreen infoScreen, final int scrollerEndY
     ) {
         final int dialogW = (int)(Layout.width() * 0.7),
                 incY = Layout.DIALOG_CONTENT_INC_Y;
@@ -945,9 +951,8 @@ public class DialogAssembly {
                 contentAssembler.stream().map(ScrollableMenuElement::new)
                         .toArray(ScrollableMenuElement[]::new);
 
-        final Coord2D wrapperDims = new Coord2D(dialogW -
-                (2 * Layout.BUTTON_BORDER_PX),
-                (int)(Layout.height() * 0.75) - Layout.STD_TEXT_BUTTON_INC);
+        final Coord2D wrapperDims = new Coord2D(dialogW - (2 * Layout.BUTTON_BORDER_PX),
+                scrollerEndY - (contentStart.y + Layout.TEXT_Y_OFFSET));
 
         // assemble contents into scrolling element
         return new VerticalScrollingMenuElement(contentStart.displace(
@@ -1213,11 +1218,15 @@ public class DialogAssembly {
                             baseIS, highlighedIS));
                 });
 
+        final int scrollerEndY = (background.getRenderPosition().y +
+                background.getHeight()) - ((2 * Layout.CONTENT_BUFFER_PX) +
+                baseImage.getHeight());
+
         final Map<DialogVals.InfoScreen, VerticalScrollingMenuElement>
                 infoScreens = new HashMap<>();
 
         for (DialogVals.InfoScreen infoScreen : DialogVals.InfoScreen.values()) {
-            infoScreens.put(infoScreen, assembleScroller(infoScreen));
+            infoScreens.put(infoScreen, assembleScroller(infoScreen, scrollerEndY));
         }
 
         final ThinkingMenuElement screenDecider = new ThinkingMenuElement(

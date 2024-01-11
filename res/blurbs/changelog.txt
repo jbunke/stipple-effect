@@ -19,18 +19,21 @@ x Add tooltips for icon buttons and icon toggle buttons
     > Palette files
 > Dropdown menu element
 > Palettizer (layer/entire project)
-> Native file type (.stef or .stip)
+> Native file type (.stip)
 x Preview window
 > Grid
 
 Change:
 x 1000x1000 canvas size limit
 > Change settings dialog to an info-style dialog with multiple tabs
-X Rework segments and render scale to be window and screen size dependent
+x Rework segments and render scale to be window and screen size dependent
 
 Fix:
 > HSV slider slippage
 > OutOfMemoryError instances
+
+Remove:
+x Remove Piccolo font; set Classic to default
 
 {0.0.2} - 2024-01-06
 

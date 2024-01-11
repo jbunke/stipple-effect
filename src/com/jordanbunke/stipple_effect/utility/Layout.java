@@ -17,21 +17,19 @@ public class Layout {
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
             PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
             PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8,
-            PROJECTS_BEFORE_TO_DISPLAY = 1,
+            PROJECTS_BEFORE_TO_DISPLAY = 1, DIALOG_CONTENT_INC_Y = 32,
             VERT_SCROLL_WINDOW_W = COLOR_PICKER_W - (2 * CONTENT_BUFFER_PX),
             FRAME_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
-            FRAME_PLAYBACK_SLIDER_W = 87, FRAME_PLAYBACK_SLIDER_OFFSET_X = 309, // TODO
-            DIALOG_CONTENT_INC_Y = 32,
             DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
-            DIALOG_CONTENT_OFFSET_X = 115, DIALOG_CONTENT_BIG_OFFSET_X = 215,
-            DIALOG_CONTENT_W_ALLOWANCE = 280, DIALOG_CONTENT_SMALL_W_ALLOWANCE = 180,
+            DIALOG_CONTENT_OFFSET_X = 150, DIALOG_CONTENT_BIG_OFFSET_X = DIALOG_CONTENT_OFFSET_X + 100,
+            DIALOG_CONTENT_SMALL_W_ALLOWANCE = 180,
             SMALL_TEXT_BOX_W = 80, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -4,
-            COLOR_SELECTOR_OFFSET_Y = 68, COLOR_TEXTBOX_AVG_C_THRESHOLD = 100, COLOR_TEXTBOX_W = 116,
+            COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_AVG_C_THRESHOLD = 100, COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             FULL_COLOR_SLIDER_W = COLOR_PICKER_W - (SLIDER_BALL_DIM + 10),
             HALF_COLOR_SLIDER_W = (COLOR_PICKER_W / 2) - (SLIDER_BALL_DIM + 10),
-            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 150;
+            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100;
 
     public static final Coord2D ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM);
 
@@ -72,25 +70,25 @@ public class Layout {
         return (int)(width() * 0.35);
     }
 
-    public static int getBottomBarZoomSliderWidth() {
+    public static int getUISliderWidth() {
         return width() / 10;
     }
 
     // segments layout
     public static int getContextsWidth() {
-        return size.x / 2;
+        return width() / 2;
     }
 
     public static int getFramesWidth() {
-        return size.x - getContextsWidth();
+        return width() - getContextsWidth();
     }
 
     public static int getWorkspaceWidth() {
-        return size.x - (TOOLS_W + COLOR_PICKER_W);
+        return width() - (TOOLS_W + COLOR_PICKER_W);
     }
 
     public static int getWorkspaceHeight() {
-        return size.y - (CONTEXTS_H + BOTTOM_BAR_H);
+        return height() - (CONTEXTS_H + BOTTOM_BAR_H);
     }
 
     public static int getLayersHeight() {
@@ -134,12 +132,12 @@ public class Layout {
     }
 
     public static Coord2D getCanvasMiddle() {
-        return new Coord2D(size.x / 2, size.y / 2);
+        return new Coord2D(width() / 2, height() / 2);
     }
 
     // misc. layout
     public static int getColorSelectorIncY() {
-        return (int)(getColorPickerHeight() / 5.5);
+        return (int)(getColorPickerHeight() / 6.5);
     }
 
     public static int getVertScrollWindowHeight() {
@@ -157,6 +155,10 @@ public class Layout {
 
     public static int getDialogHeight() {
         return height() / 2;
+    }
+
+    public static int getDialogContentWidthAllowance() {
+        return getDialogWidth() - (DIALOG_DYNAMIC_W_ALLOWANCE + DIALOG_CONTENT_BIG_OFFSET_X);
     }
 
     public static Coord2D getDialogContentInitial() {
