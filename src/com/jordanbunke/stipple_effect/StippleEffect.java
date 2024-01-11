@@ -233,7 +233,7 @@ public class StippleEffect implements ProgramContext {
         final int screenW = Toolkit.getDefaultToolkit().getScreenSize().width,
                 screenH = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-        final int h = screenH - Layout.SCREEN_H_BUFFER;
+        final int h = Math.max(screenH - Layout.SCREEN_H_BUFFER, Layout.MIN_WINDOW_H);
 
         return windowed
                 ? new Coord2D((int)(h * (16 / 9.)), h)

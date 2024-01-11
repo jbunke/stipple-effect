@@ -8,7 +8,7 @@ public class Layout {
     // layout constants
     public static final int
             TOOLS_W = 25, COLOR_PICKER_W = 286, CONTEXTS_H = 84, BOTTOM_BAR_H = 24,
-            SCREEN_H_BUFFER = 120, TEXT_Y_OFFSET = -4,
+            SCREEN_H_BUFFER = 120, MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4,
             CONTENT_BUFFER_PX = 8, DEFAULT_CHECKERBOARD_DIM = 4, CURSOR_DIM = 40,
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
