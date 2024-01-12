@@ -1,4 +1,4 @@
-Outline | {Shift + O}
+Outline... | {Shift + O}
 
 Outline selection with current settings: {Ctrl + 9}
 Single outline selection: {Shift + 9}
