@@ -41,12 +41,19 @@ public class ProjectState {
                         new SELayer(imageWidth, imageHeight))), 1);
     }
 
-    public static ProjectState makeFromFile(
+    public static ProjectState makeFromRasterFile(
             final int imageWidth, final int imageHeight,
             final SELayer firstLayer, final int frameCount
     ) {
         return new ProjectState(imageWidth, imageHeight,
                 new ArrayList<>(List.of(firstLayer)), frameCount);
+    }
+
+    public static ProjectState makeFromNativeFile(
+            final int imageWidth, final int imageHeight,
+            final List<SELayer> layers, final int frameCount
+    ) {
+        return new ProjectState(imageWidth, imageHeight, layers, frameCount);
     }
 
     private ProjectState(

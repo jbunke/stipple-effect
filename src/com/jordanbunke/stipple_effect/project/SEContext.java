@@ -57,6 +57,11 @@ public class SEContext {
         redrawCheckerboard();
     }
 
+    public void initializeRender() {
+        snapToCenterOfImage();
+        renderInfo.setZoomFactor(Constants.DEF_ZOOM);
+    }
+
     public void redrawSelectionOverlay() {
         final Set<Coord2D> selection = getState().getSelection();
 

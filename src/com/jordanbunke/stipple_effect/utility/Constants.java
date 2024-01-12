@@ -20,8 +20,7 @@ public class Constants {
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
             "jpg",
-            ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix(),
-            ProjectInfo.SaveType.NATIVE.getFileSuffix()
+            ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix()
     };
 
     public static final Coord2D NO_VALID_TARGET = new Coord2D(Integer.MIN_VALUE, Integer.MIN_VALUE);
@@ -32,7 +31,8 @@ public class Constants {
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Layer ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
-            NATIVE_FILE_SUFFIX = "stef", OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
+            NATIVE_FILE_SUFFIX = "stip",
+            OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
             ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm", TYPING_CODE = "typing";
 

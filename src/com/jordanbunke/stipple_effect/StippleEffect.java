@@ -18,6 +18,7 @@ import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.MenuAssembly;
@@ -593,8 +594,15 @@ public class StippleEffect implements ProgramContext {
     public void openProject() {
         FileIO.setDialogToFilesOnly();
         final Optional<File[]> opened = FileIO.openFilesFromSystem(
-                new String[] { "Accepted image types" },
-                new String[][] { Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES });
+                new String[] {
+                        PROGRAM_NAME + " projects (." + ProjectInfo.SaveType
+                                .NATIVE.getFileSuffix() + ")",
+                        "Accepted image types"
+                },
+                new String[][] {
+                        new String[] { ProjectInfo.SaveType.NATIVE.getFileSuffix() },
+                        Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES
+                });
         window.getEventLogger().unpressAllKeys();
 
         if (opened.isEmpty())
@@ -614,12 +622,22 @@ public class StippleEffect implements ProgramContext {
     private static void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (isAcceptedRasterFormat(fileName)) {
+        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix()))
+            get().openNativeProject(filepath);
+        else if (isAcceptedRasterFormat(fileName)) {
             final GameImage image = GameImageIO.readImage(filepath);
 
             DialogAssembly.setDialogToOpenPNG(image, filepath);
         }
-        // TODO - extend with else-ifs for additional file types (.stef)
+        // extend with else-ifs for additional file types classes (scripts, palettes)
+    }
+
+    public void openNativeProject(final Path filepath) {
+        final SEContext project = ParserSerializer.load(filepath);
+        project.initializeRender();
+        addContext(project, true);
+
+        processNextImport();
     }
 
     private static boolean isAcceptedRasterFormat(final String toCheck) {
@@ -645,22 +663,25 @@ public class StippleEffect implements ProgramContext {
 
         for (int y = 0; y < yDivs; y++)
             for (int x = 0; x < xDivs; x++)
-                frames.add(new GameImage(resized.getSubimage(
-                        x * fw, y * fh, fw, fh)));
+                if (frames.size() < frameCount)
+                    frames.add(new GameImage(resized.getSubimage(
+                            x * fw, y * fh, fw, fh)));
 
         final SELayer firstLayer = new SELayer(frames,
                 new GameImage(fw, fh), Constants.OPAQUE, true, false,
                 OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
-        final ProjectState initialState = ProjectState.makeFromFile(fw, fh,
-                firstLayer, frameCount);
+        final ProjectState initialState = ProjectState.makeFromRasterFile(
+                fw, fh, firstLayer, frameCount);
 
         final SEContext project = new SEContext(
                 new ProjectInfo(filepath), initialState, fw, fh);
-        project.snapToCenterOfImage();
-        project.renderInfo.setZoomFactor(Constants.DEF_ZOOM);
-
+        project.initializeRender();
         addContext(project, true);
 
+        processNextImport();
+    }
+
+    public void processNextImport() {
         if (toImport.isEmpty())
             clearDialog();
         else
