@@ -1018,7 +1018,7 @@ public class DialogAssembly {
                     contentAssembler, contentStart, initialbottomY
             );
             case CHANGELOG -> assembleInfoScreenContents(
-                    new String[] { Constants.CHANGELOG },
+                    new String[] { IconCodes.CHANGELOG },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY
             );

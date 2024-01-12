@@ -19,7 +19,7 @@ x Add tooltips for icon buttons and icon toggle buttons
     > Palette files
 > Dropdown menu element
 > Palettizer (layer/frame/entire project)
-> Native file type (.stip)
+x Native file type (.stip)
 x Preview window
 > Grid
 

@@ -52,7 +52,7 @@ public class ColorTextBox extends TextBox {
         StippleEffect.get().setColorIndexAndColor(index, new Color(r, g, b, alpha));
     }
 
-    private static int hexToInt(final String hexSequence) {
+    public static int hexToInt(final String hexSequence) {
         if (hexSequence.isEmpty() || !validHexSequence(hexSequence)) {
             GameError.send("String \"" + hexSequence +
                     "\" is not a valid hex sequence.");

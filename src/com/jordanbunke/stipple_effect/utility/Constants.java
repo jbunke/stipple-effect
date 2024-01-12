@@ -8,7 +8,7 @@ import java.awt.*;
 import java.nio.file.Path;
 
 public class Constants {
-    public static final String ABOUT = "about", CHANGELOG = "changelog",
+    public static final String ABOUT = "about",
             NAME_CODE = "name", VERSION_CODE = "version";
 
     public static final Path PROGRAM_FILE = Path.of("program"),
