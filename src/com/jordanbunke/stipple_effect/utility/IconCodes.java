@@ -48,6 +48,7 @@ public class IconCodes {
             FRAMES_UNLINKED = "frames_unlinked",
             LAYER_SETTINGS = "layer_settings",
             SWAP_COLORS = "swap_colors",
+            COLOR_MENU_MODE = "color_menu_mode",
             DECREMENT = "decrement",
             INCREMENT = "increment",
             OUTLINE = "outline",

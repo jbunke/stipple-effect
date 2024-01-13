@@ -534,9 +534,18 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         populateButtonsIntoBuilder(
-                mb, new String[] { IconCodes.SWAP_COLORS },
-                new boolean[] { true },
-                new Runnable[] { () -> StippleEffect.get().swapColors() },
+                mb, new String[] {
+                        IconCodes.SWAP_COLORS,
+                        IconCodes.COLOR_MENU_MODE,
+                },
+                new boolean[] {
+                        true,
+                        true,
+                },
+                new Runnable[] {
+                        () -> StippleEffect.get().swapColors(),
+                        () -> StippleEffect.get().toggleColorMenuMode(),
+                },
                 Layout.getColorsPosition()
         );
 
@@ -571,8 +580,12 @@ public class MenuAssembly {
             mb.add(highlight);
         }
 
-        // TODO - update for palette
-        mb.add(new ColorSelector());
+        switch (StippleEffect.get().getColorMenuMode()) {
+            case RGBA_HSV -> mb.add(new ColorSelector());
+            case PALETTE -> {
+                // TODO - palette menu elements
+            }
+        }
 
         return mb.build();
     }

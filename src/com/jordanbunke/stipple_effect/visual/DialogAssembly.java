@@ -996,6 +996,7 @@ public class DialogAssembly {
             case MORE -> assembleInfoScreenContents(
                     new String[] {
                             IconCodes.SWAP_COLORS,
+                            IconCodes.COLOR_MENU_MODE,
                             IconCodes.HORIZONTAL_REFLECTION,
                             IconCodes.VERTICAL_REFLECTION,
                             IconCodes.OUTLINE,
@@ -1006,7 +1007,8 @@ public class DialogAssembly {
                     },
                     new String[] {
                             "Swap primary and secondary color",
-                            // TODO - icon color shortcuts: toggle slider vs. palette mode
+                            "Toggle between palettes and RGBA-HSV color selection",
+                            // TODO
                             "Horizontal reflection",
                             "Vertical reflection",
                             "Outline",

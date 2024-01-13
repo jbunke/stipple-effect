@@ -3,18 +3,12 @@
 ## Upcoming
 
 ### Add:
-* Rotating and stretching selections 
-* Outline selection shortcuts 
-* Native file type 
-* Larger canvas sizes and necessary performance optimizations to facilitate them 
-* Scripting language, system and previews 
-* Adjustable panels 
-* Palettes 
-* More settings read from file on startup, including:
-  * Toggle for rendering at true pixel size 
-  * Delta Time canvas size
-### Change:
-* Remap subtractive mode from S to ALT key once correctly implemented in Delta Time
+* Scripting language, system and previews
+* Adjustable panels
+* Grid
+* Symmetry tools
+### Fix:
+* Memory safety issues and OutOfMemoryError crashes
 
 ## **0.0.2** - 2024-01-06
 

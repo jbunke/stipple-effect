@@ -18,6 +18,9 @@ import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.color_selection.ColorMenuMode;
+import com.jordanbunke.stipple_effect.color_selection.Palette;
+import com.jordanbunke.stipple_effect.color_selection.PaletteLoader;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -68,6 +71,9 @@ public class StippleEffect implements ProgramContext {
     // colors
     private final Color[] colors;
     private int colorIndex;
+    private ColorMenuMode colorMenuMode;
+    private final List<Palette> palettes;
+    private int paletteIndex;
     private Menu colorsMenu;
 
     // layers
@@ -139,18 +145,22 @@ public class StippleEffect implements ProgramContext {
 
         // default tool is the hand
         tool = Hand.get();
-        toolButtonMenu = MenuAssembly.stub();
 
+        // colors
         colors = new Color[2];
         colors[PRIMARY] = Constants.BLACK;
         colors[SECONDARY] = Constants.WHITE;
         colorIndex = PRIMARY;
+
+        colorMenuMode = ColorMenuMode.RGBA_HSV;
+        palettes = PaletteLoader.loadOnStartup();
+        paletteIndex = palettes.isEmpty() ? Constants.NO_SELECTION : 0;
+
+        // menu stubs
+        toolButtonMenu = MenuAssembly.stub();
         colorsMenu = MenuAssembly.stub();
-
         layersMenu = MenuAssembly.stub();
-
         framesMenu = MenuAssembly.stub();
-
         projectsMenu = MenuAssembly.stub();
 
         dialog = null;
@@ -582,6 +592,10 @@ public class StippleEffect implements ProgramContext {
         return colors[index];
     }
 
+    public ColorMenuMode getColorMenuMode() {
+        return colorMenuMode;
+    }
+
     public Tool getTool() {
         return tool;
     }
@@ -761,6 +775,12 @@ public class StippleEffect implements ProgramContext {
         final Color temp = colors[PRIMARY];
         colors[PRIMARY] = colors[SECONDARY];
         colors[SECONDARY] = temp;
+    }
+
+    public void toggleColorMenuMode() {
+        colorMenuMode = ColorMenuMode.values()[1 - colorMenuMode.ordinal()];
+
+        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     private void toggleFullscreen() {
