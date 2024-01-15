@@ -316,28 +316,8 @@ public class SEContext {
                     stateManager::redoToCheckpoint
             );
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToInfo
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToProgramSettings
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToNewProject
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().openProject()
-            );
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     projectInfo::save
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToResize
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
@@ -436,16 +416,8 @@ public class SEContext {
                     }
             );
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().swapColors()
-            );
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex())
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToOutline
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
@@ -559,14 +531,6 @@ public class SEContext {
                     () -> stateManager.redo(true)
             );
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToSave
-            );
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToPad
-            );
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
                     this::cropToSelection
             );
@@ -626,47 +590,6 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
                     this::deleteSelectionContents);
-
-            // set tools
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Zoom.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Hand.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(StipplePencil.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Pencil.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Brush.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Eraser.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(ColorPicker.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Fill.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(Wand.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(BrushSelect.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(BoxSelect.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(MoveSelection.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.U, GameKeyEvent.Action.PRESS),
-                    () -> StippleEffect.get().setTool(PickUpSelection.get()));
 
             // tool modifications
             if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {

@@ -11,6 +11,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuEleme
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.color_selection.Palette;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
@@ -20,6 +21,7 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
@@ -28,6 +30,8 @@ import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +44,10 @@ public class MenuAssembly {
     public static Menu buildProjectsMenu() {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
+
+        mb.add(TextLabel.make(Layout.getProjectsPosition().displace(
+                        Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
+                "Projects", Constants.WHITE));
 
         final String[] iconIDs = new String[] {
                 IconCodes.SETTINGS,
@@ -150,6 +158,10 @@ public class MenuAssembly {
     public static Menu buildFramesMenu() {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
+
+        mb.add(TextLabel.make(Layout.getFramesPosition().displace(
+                        Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
+                "Frames", Constants.WHITE));
 
         final String[] iconIDs = new String[] {
                 IconCodes.NEW_FRAME,
@@ -317,6 +329,10 @@ public class MenuAssembly {
 
     public static Menu buildLayersMenu() {
         final MenuBuilder mb = new MenuBuilder();
+
+        mb.add(TextLabel.make(Layout.getLayersPosition().displace(
+                        Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
+                "Layers", Constants.WHITE));
 
         final String[] iconIDs = new String[] {
                 IconCodes.NEW_LAYER,
@@ -533,6 +549,10 @@ public class MenuAssembly {
     public static Menu buildColorsMenu() {
         final MenuBuilder mb = new MenuBuilder();
 
+        mb.add(TextLabel.make(Layout.getColorsPosition().displace(
+                Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
+                "Colors", Constants.WHITE));
+
         populateButtonsIntoBuilder(
                 mb, new String[] {
                         IconCodes.SWAP_COLORS,
@@ -582,12 +602,109 @@ public class MenuAssembly {
 
         switch (StippleEffect.get().getColorMenuMode()) {
             case RGBA_HSV -> mb.add(new ColorSelector());
-            case PALETTE -> {
-                // TODO - palette menu elements
-            }
+            case PALETTE -> addPaletteMenuElements(mb);
         }
 
         return mb.build();
+    }
+
+    private static void addPaletteMenuElements(final MenuBuilder mb) {
+        final Coord2D startingPos = Layout.getColorsPosition().displace(
+                Layout.CONTENT_BUFFER_PX, Layout.COLOR_SELECTOR_OFFSET_Y +
+                        Layout.COLOR_LABEL_OFFSET_Y),
+                paletteOptionsRef = startingPos.displace(
+                        -Layout.CONTENT_BUFFER_PX, -Layout.TEXT_Y_OFFSET);
+        final int contentWidth = Layout.COLOR_PICKER_W -
+                        (2 * Layout.CONTENT_BUFFER_PX),
+                dropDownHAllowance = Layout.getColorPickerHeight() -
+                        (Layout.COLOR_SELECTOR_OFFSET_Y + Layout.CONTENT_BUFFER_PX);
+
+        final List<Palette> palettes = StippleEffect.get().getPalettes();
+        final int index = StippleEffect.get().getPaletteIndex();
+        final boolean hasPaletteContents = StippleEffect.get().hasPaletteContents();
+
+        // palette label
+        mb.add(TextLabel.make(startingPos, "Palette", Constants.WHITE));
+
+        // palette options
+        populateButtonsIntoBuilder(
+                mb, new String[] {
+                        IconCodes.ADD_TO_PALETTE,
+                        IconCodes.REMOVE_FROM_PALETTE,
+                        IconCodes.IMPORT_PALETTE,
+                        IconCodes.CONTENTS_TO_PALETTE,
+                        IconCodes.SORT_PALETTE,
+                        IconCodes.PALETTIZE,
+                },
+                new boolean[] {
+                        hasPaletteContents,
+                        hasPaletteContents,
+                        true,
+                        true,
+                        hasPaletteContents,
+                        hasPaletteContents
+                },
+                new Runnable[] {
+                        () -> StippleEffect.get().addColorToPalette(),
+                        () -> StippleEffect.get().removeColorFromPalette(),
+                        // TODO
+                        () -> {},
+                        () -> {},
+                        () -> {},
+                        () -> {}
+                }, paletteOptionsRef);
+
+        //dropdown menu
+        final List<Runnable> behaviours = new ArrayList<>();
+
+        for (int i = 0; i < palettes.size(); i++) {
+            final int toSet = i;
+            behaviours.add(() -> StippleEffect.get().setPaletteIndex(toSet));
+        }
+
+        final Coord2D dropdownPos = startingPos.displace(0,
+                Layout.getSegmentContentDisplacement().y);
+
+        mb.add(hasPaletteContents
+                ? new DropDownMenu(dropdownPos, contentWidth,
+                MenuElement.Anchor.LEFT_TOP, dropDownHAllowance,
+                palettes.stream().map(Palette::getName).toArray(String[]::new),
+                behaviours.toArray(Runnable[]::new), () -> index)
+                : new StaticMenuElement(dropdownPos,
+                new Coord2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
+                contentWidth, "No palettes", false, Constants.DARK)));
+
+        // palette buttons
+        if (hasPaletteContents) {
+            final Palette palette = palettes.get(index);
+
+            final Coord2D container = startingPos.displace(0,
+                    Layout.getColorSelectorIncY());
+            final int fitsOnLine = (contentWidth - Layout.SLIDER_OFF_DIM) /
+                    Layout.PALETTE_DIMS.x;
+            final int height = Layout.getColorPickerHeight() -
+                    ((container.y - Layout.getColorsPosition().y) +
+                            Layout.CONTENT_BUFFER_PX);
+
+            final List<PaletteColorButton> buttons = new ArrayList<>();
+            final Color[] colors = palette.getColors();
+
+            for (int i = 0; i < colors.length; i++) {
+                final int x = i % fitsOnLine, y = i / fitsOnLine;
+                final Coord2D pos = container.displace(
+                        x * Layout.PALETTE_DIMS.x, y * Layout.PALETTE_DIMS.y);
+
+                buttons.add(new PaletteColorButton(pos, colors[i]));
+            }
+
+            mb.add(new VerticalScrollingMenuElement(
+                    container, new Coord2D(contentWidth, height),
+                    buttons.stream().map(ScrollableMenuElement::new)
+                            .toArray(ScrollableMenuElement[]::new),
+                    container.displace(0, (colors.length / fitsOnLine) *
+                            Layout.PALETTE_DIMS.y).y, 0));
+        }
     }
 
     public static Menu buildToolButtonMenu() {

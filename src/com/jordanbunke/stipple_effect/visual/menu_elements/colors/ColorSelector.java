@@ -107,7 +107,7 @@ public class ColorSelector extends InvisibleMenuElement {
                 }, c -> StippleEffect.get().setSelectedColor(c),
                 () -> StippleEffect.get().getSelectedColor().getAlpha()));
 
-        return menuElements.toArray(new MenuElement[0]);
+        return menuElements.toArray(MenuElement[]::new);
     }
 
     // HSV helpers

@@ -17,31 +17,31 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.color_selection.ColorMenuMode;
 import com.jordanbunke.stipple_effect.color_selection.Palette;
 import com.jordanbunke.stipple_effect.color_selection.PaletteLoader;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.tools.*;
+import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.MenuAssembly;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
-import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
-import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.state.ProjectState;
-import com.jordanbunke.stipple_effect.tools.Hand;
-import com.jordanbunke.stipple_effect.tools.PickUpSelection;
-import com.jordanbunke.stipple_effect.tools.Tool;
-import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
-import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -253,13 +253,17 @@ public class StippleEffect implements ProgramContext {
 
     public void rebuildAllMenusWithText() {
         rebuildStateDependentMenus();
-        colorsMenu = MenuAssembly.buildColorsMenu();
+        rebuildColorsMenu();
     }
 
     public void rebuildStateDependentMenus() {
         rebuildLayersMenu();
         rebuildFramesMenu();
         rebuildProjectsMenu();
+    }
+
+    public void rebuildColorsMenu() {
+        colorsMenu = MenuAssembly.buildColorsMenu();
     }
 
     public void rebuildToolButtonMenu() {
@@ -282,14 +286,11 @@ public class StippleEffect implements ProgramContext {
     public void process(final InputEventLogger eventLogger) {
         mousePos = eventLogger.getAdjustedMousePosition();
 
-        if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    this::toggleFullscreen
-            );
-        }
-
         if (dialog == null) {
+            if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
+                    .orElse(Boolean.FALSE) instanceof Boolean b && !b)
+                processNonStateKeyPresses(eventLogger);
+
             // tools
             toolButtonMenu.process(eventLogger);
             // colors
@@ -305,6 +306,102 @@ public class StippleEffect implements ProgramContext {
             getContext().process(eventLogger, tool);
         } else {
             dialog.process(eventLogger);
+        }
+    }
+
+    private void processNonStateKeyPresses(final InputEventLogger eventLogger) {
+        if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToSave
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToPad
+            );
+        } else if (eventLogger.isPressed(Key.CTRL)) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToInfo
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToProgramSettings
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToNewProject
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
+                    this::openProject
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToResize
+            );
+        } else if (eventLogger.isPressed(Key.SHIFT)) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
+                    this::swapColors
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToOutline
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
+                    this::addColorToPalette
+            );
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
+                    this::removeColorFromPalette
+            );
+        } else {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
+                    this::toggleFullscreen);
+
+            // set tools
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Zoom.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Hand.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
+                    () -> setTool(StipplePencil.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Pencil.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Brush.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Eraser.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
+                    () -> setTool(ColorPicker.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Fill.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
+                    () -> setTool(Wand.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
+                    () -> setTool(BrushSelect.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
+                    () -> setTool(BoxSelect.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    () -> setTool(MoveSelection.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.U, GameKeyEvent.Action.PRESS),
+                    () -> setTool(PickUpSelection.get()));
         }
     }
 
@@ -468,10 +565,6 @@ public class StippleEffect implements ProgramContext {
         colors.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Layout.COLOR_PICKER_W, Layout.getColorPickerHeight());
 
-        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.WHITE)
-                .addText("Colors").build().draw();
-        colors.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
-
         return colors.submit();
     }
 
@@ -488,10 +581,6 @@ public class StippleEffect implements ProgramContext {
         layers.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Layout.COLOR_PICKER_W, Layout.getLayersHeight());
 
-        final GameImage sectionTitle = GraphicsUtils.uiText(Constants.WHITE)
-                .addText("Layers").build().draw();
-        layers.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
-
         return layers.submit();
     }
 
@@ -500,10 +589,6 @@ public class StippleEffect implements ProgramContext {
         projects.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Layout.getContextsWidth(), Layout.CONTEXTS_H);
 
-        final GameImage sectionTitle = GraphicsUtils.uiText()
-                .addText("Project").build().draw();
-        projects.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
-
         return projects.submit();
     }
 
@@ -511,10 +596,6 @@ public class StippleEffect implements ProgramContext {
         final GameImage frames = new GameImage(Layout.getFramesWidth(), Layout.CONTEXTS_H);
         frames.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Layout.getFramesWidth(), Layout.CONTEXTS_H);
-
-        final GameImage sectionTitle = GraphicsUtils.uiText()
-                .addText("Frames").build().draw();
-        frames.draw(sectionTitle, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
 
         return frames.submit();
     }
@@ -596,6 +677,14 @@ public class StippleEffect implements ProgramContext {
         return colorMenuMode;
     }
 
+    public int getPaletteIndex() {
+        return paletteIndex;
+    }
+
+    public List<Palette> getPalettes() {
+        return palettes;
+    }
+
     public Tool getTool() {
         return tool;
     }
@@ -647,9 +736,14 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void openNativeProject(final Path filepath) {
-        final SEContext project = ParserSerializer.load(filepath);
-        project.initializeRender();
-        addContext(project, true);
+        final String contents = FileIO.readFile(filepath);
+
+        if (contents != null) {
+            final SEContext project = ParserSerializer.load(contents, filepath);
+            project.initializeRender();
+            addContext(project, true);
+        } else
+            StatusUpdates.openFailed(filepath);
 
         processNextImport();
     }
@@ -736,6 +830,25 @@ public class StippleEffect implements ProgramContext {
         }
     }
 
+    public boolean hasPaletteContents() {
+        return paletteIndex != Constants.NO_SELECTION &&
+                palettes != null && paletteIndex < palettes.size();
+    }
+
+    public void addColorToPalette() {
+        if (hasPaletteContents()) {
+            palettes.get(paletteIndex).addColor(getSelectedColor());
+            rebuildColorsMenu();
+        }
+    }
+
+    public void removeColorFromPalette() {
+        if (hasPaletteContents()) {
+            palettes.get(paletteIndex).removeColor(getSelectedColor());
+            rebuildColorsMenu();
+        }
+    }
+
     public void setContextIndex(final int contextIndex) {
         if (this.contextIndex != contextIndex &&
                 contextIndex >= 0 && contextIndex < contexts.size()) {
@@ -779,8 +892,12 @@ public class StippleEffect implements ProgramContext {
 
     public void toggleColorMenuMode() {
         colorMenuMode = ColorMenuMode.values()[1 - colorMenuMode.ordinal()];
+        rebuildColorsMenu();
+    }
 
-        colorsMenu = MenuAssembly.buildColorsMenu();
+    public void setPaletteIndex(final int paletteIndex) {
+        this.paletteIndex = paletteIndex;
+        rebuildColorsMenu();
     }
 
     private void toggleFullscreen() {

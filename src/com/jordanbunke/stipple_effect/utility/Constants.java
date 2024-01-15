@@ -13,6 +13,7 @@ public class Constants {
 
     public static final Path PROGRAM_FILE = Path.of("program"),
             ICON_FOLDER = Path.of("icons"),
+            PALETTE_FOLDER = Path.of("palettes"),
             CURSOR_FOLDER = Path.of("cursors"),
             MISC_FOLDER = Path.of("misc"),
             TOOL_TIP_FOLDER = Path.of("tooltips"),
@@ -31,7 +32,8 @@ public class Constants {
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Layer ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
-            NATIVE_FILE_SUFFIX = "stip",
+            NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
+            COLOR_TOOL_TIP_PREFIX = "color:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
             ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm", TYPING_CODE = "typing";
@@ -53,7 +55,8 @@ public class Constants {
 
     public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32,
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 800, MAX_IMAGE_H = 800,
-            OVERLAY_BORDER_PX = 6, SPLASH_TIMEOUT_SECS = 1800, NO_SELECTION = -1;
+            OVERLAY_BORDER_PX = 6, SPLASH_TIMEOUT_SECS = 1800, NO_SELECTION = -1,
+            MAX_PALETTE_SIZE = 300;
 
     public static final int DEFAULT_BRUSH_BREADTH = 3,
             MIN_BREADTH = 1, MAX_BREADTH = 200, BREADTH_INC = 5,

@@ -107,9 +107,25 @@ public class GraphicsUtils {
         return nhi.submit();
     }
 
-    public static GameImage drawTextButton(
+    public static GameImage drawDropDownButton(
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
+    ) {
+        final GameImage base = drawTextButton(width, text, isSelected,
+                backgroundColor, true);
+
+        final GameImage icon = GraphicsUtils.loadIcon(isSelected
+                ? IconCodes.COLLAPSE : IconCodes.EXPAND);
+
+        base.draw(icon, base.getWidth() - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
+
+        return base.submit();
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text,
+            final boolean isSelected, final Color backgroundColor,
+            final boolean leftAligned
     ) {
         final Color textColor = textButtonColorFromBackgroundColor(
                 backgroundColor, true);
@@ -123,11 +139,22 @@ public class GraphicsUtils {
         final GameImage nhi = new GameImage(w, h);
         nhi.fillRectangle(backgroundColor, 0, 0, w, h);
 
-        nhi.draw(textImage, (w - textImage.getWidth()) / 2, Layout.BUTTON_TEXT_OFFSET_Y);
+        final int x = leftAligned
+                ? (2 * Layout.BUTTON_BORDER_PX)
+                : (w - textImage.getWidth()) / 2;
+
+        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
         final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
         nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return nhi.submit();
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text,
+            final boolean isSelected, final Color backgroundColor
+    ) {
+        return drawTextButton(width, text, isSelected, backgroundColor, false);
     }
 
     private static Color textButtonColorFromBackgroundColor(

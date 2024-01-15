@@ -48,6 +48,12 @@ public class IconCodes {
             FRAMES_UNLINKED = "frames_unlinked",
             LAYER_SETTINGS = "layer_settings",
             SWAP_COLORS = "swap_colors",
+            ADD_TO_PALETTE = "add_color_to_palette",
+            REMOVE_FROM_PALETTE = "remove_color_from_palette",
+            IMPORT_PALETTE = "import_palette_file",
+            CONTENTS_TO_PALETTE = "contents_to_palette",
+            SORT_PALETTE = "sort_palette",
+            PALETTIZE = "palettize",
             COLOR_MENU_MODE = "color_menu_mode",
             DECREMENT = "decrement",
             INCREMENT = "increment",
@@ -58,6 +64,11 @@ public class IconCodes {
             EXCLUDED = "excluded",
             SETTINGS = "settings",
             BULLET_POINT = "bullet_point",
+            EXPAND = "expand",
+            COLLAPSE = "collapse",
+            PALETTE_BUTTON_BACKGROUND = "palette_button_bg",
+            PRIMARY_SELECTION = "primary_selection",
+            SECONDARY_SELECTION = "secondary_selection",
             INFO = "info";
 
     public static final String NO_ICON_PREFIX = "__";

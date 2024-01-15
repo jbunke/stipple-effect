@@ -2,24 +2,24 @@
 
 Add:
 > Scripting language, system and previews
-> Adjustable panels
 > Grid
 > Symmetry tools
 
 Fix:
 > Memory safety issues and OutOfMemoryError crashes
 
-{TODO for 0.0.3}
+{TODO for 0.1.0}
 
 Add:
 x Add tooltips for icon buttons and icon toggle buttons
-> Palettes
-    > Add to palette
+x Palettes
+    x Add to palette
     > Palette files
-> Dropdown menu element
+x Dropdown menu element
 > Palettizer (layer/frame/entire project)
 x Native file type (.stip)
 x Preview window
+> Adjustable panels
 
 Change:
 x 800x800 canvas size limit

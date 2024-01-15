@@ -41,8 +41,8 @@ public class ParserSerializer {
             COLOR_TAG = "cols",
             DIMENSION_TAG = "dims";
 
-    public static SEContext load(final Path filepath) {
-        final String contents = FileIO.readFile(filepath)
+    public static SEContext load(final String file, final Path filepath) {
+        final String contents = file
                 .replaceAll("\n", "")
                 .replaceAll("\r", "")
                 .replaceAll("\t", "");
