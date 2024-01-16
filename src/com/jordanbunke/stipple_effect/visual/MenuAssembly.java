@@ -686,8 +686,8 @@ public class MenuAssembly {
         if (hasPaletteContents) {
             final Palette palette = palettes.get(index);
 
-            final Coord2D container = startingPos.displace(0,
-                    Layout.getColorSelectorIncY());
+            final Coord2D container = dropdownPos.displace(0,
+                    Layout.STD_TEXT_BUTTON_INC);
             final int fitsOnLine = (contentWidth - Layout.SLIDER_OFF_DIM) /
                     Layout.PALETTE_DIMS.x;
             final int height = Layout.getColorPickerHeight() -
