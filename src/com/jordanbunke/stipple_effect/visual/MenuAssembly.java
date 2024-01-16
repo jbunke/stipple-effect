@@ -84,6 +84,14 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Layout.getProjectsPosition());
 
+        // exit program button
+
+        final Coord2D exitProgPos = Layout.getProjectsPosition().displace(
+                Layout.getProjectsWidth() - (Layout.CONTENT_BUFFER_PX + Layout.BUTTON_DIM),
+                Layout.ICON_BUTTON_OFFSET_Y);
+        mb.add(IconButton.make(IconCodes.EXIT_PROGRAM, exitProgPos,
+                DialogAssembly::setDialogToExitProgramAYS));
+
         // project previews
 
         final int amount = StippleEffect.get().getContexts().size(), elementsPerProject = 2,
@@ -131,15 +139,14 @@ public class MenuAssembly {
             final int index = i;
             final Runnable closeBehaviour = () -> {
                 if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges()) {
-                    DialogAssembly.setDialogToCheckCloseProject(index);
+                    DialogAssembly.setDialogToCloseProjectAYS(index);
                 } else {
                     StippleEffect.get().removeContext(index);
                 }
             };
 
             projectElements[amount + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton(IconCodes.CLOSE_PROJECT, cpPos,
-                            true, closeBehaviour));
+                    IconButton.make(IconCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
 
             cumulativeWidth += offsetX;
             realRightX = cpPos.x + Layout.BUTTON_DIM;

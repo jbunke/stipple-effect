@@ -585,9 +585,9 @@ public class StippleEffect implements ProgramContext {
     }
 
     private GameImage drawProjects() {
-        final GameImage projects = new GameImage(Layout.getContextsWidth(), Layout.CONTEXTS_H);
+        final GameImage projects = new GameImage(Layout.getProjectsWidth(), Layout.CONTEXTS_H);
         projects.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Layout.getContextsWidth(), Layout.CONTEXTS_H);
+                Layout.getProjectsWidth(), Layout.CONTEXTS_H);
 
         return projects.submit();
     }
@@ -821,13 +821,16 @@ public class StippleEffect implements ProgramContext {
             if (contextIndex >= contexts.size())
                 setContextIndex(contexts.size() - 1);
 
-            if (contexts.size() == 0) {
-                Settings.write();
-                System.exit(0);
-            }
+            if (contexts.size() == 0)
+                exitProgram();
 
             rebuildStateDependentMenus();
         }
+    }
+
+    public void exitProgram() {
+        Settings.write();
+        System.exit(0);
     }
 
     public boolean hasPaletteContents() {

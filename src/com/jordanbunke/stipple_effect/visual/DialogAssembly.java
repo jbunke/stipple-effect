@@ -462,20 +462,33 @@ public class DialogAssembly {
                 "Create", () -> StippleEffect.get().newProject(), true));
     }
 
-    public static void setDialogToCheckCloseProject(final int index) {
+    public static void setDialogToExitProgramAYS() {
+        setDialogToAYS("Exit " + StippleEffect.PROGRAM_NAME + "?",
+                "All open projects will be closed without saving...",
+                () -> StippleEffect.get().exitProgram());
+    }
+
+    public static void setDialogToCloseProjectAYS(final int index) {
+        setDialogToAYS("Close the project " + StippleEffect.get()
+                        .getContexts().get(index).projectInfo
+                        .getFormattedName(false, true) + "?",
+                "All unsaved changes will be lost...",
+                () -> StippleEffect.get().removeContext(index));
+    }
+
+    public static void setDialogToAYS(
+            final String actionLabel, final String consequence,
+            final Runnable onApprove
+    ) {
         final GameImage warningText = GraphicsUtils.uiText(Constants.WHITE)
-                .addText("All unsaved changes will be lost...").build().draw();
+                .addText(consequence).build().draw();
         final StaticMenuElement warning = new StaticMenuElement(
                 Layout.getCanvasMiddle(), new Coord2D(warningText.getWidth(),
                 warningText.getHeight()), MenuElement.Anchor.CENTRAL, warningText);
 
         final MenuElementGrouping contents = new MenuElementGrouping(warning);
-        setDialog(assembleDialog("Close the project " +
-                        StippleEffect.get().getContexts().get(index).projectInfo
-                                .getFormattedName(false, true)
-                        + "?", contents,
-                () -> true, Constants.GENERIC_APPROVAL_TEXT,
-                () -> StippleEffect.get().removeContext(index), true));
+        setDialog(assembleDialog(actionLabel, contents, () -> true,
+                Constants.GENERIC_APPROVAL_TEXT, onApprove, true));
     }
 
     public static void setDialogToOutline() {

@@ -20,6 +20,7 @@ x Dropdown menu element
 x Native file type (.stip)
 x Preview window
 > Adjustable panels
+x Close program button and corresponding are-you-sure dialog
 
 Change:
 x 800x800 canvas size limit

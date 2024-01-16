@@ -76,12 +76,12 @@ public class Layout {
     }
 
     // segments layout
-    public static int getContextsWidth() {
+    public static int getProjectsWidth() {
         return width() / 2;
     }
 
     public static int getFramesWidth() {
-        return width() - getContextsWidth();
+        return width() - getProjectsWidth();
     }
 
     public static int getWorkspaceWidth() {
@@ -105,7 +105,7 @@ public class Layout {
     }
 
     public static Coord2D getFramesPosition() {
-        return getProjectsPosition().displace(getContextsWidth(), 0);
+        return getProjectsPosition().displace(getProjectsWidth(), 0);
     }
 
     public static Coord2D getToolsPosition() {
