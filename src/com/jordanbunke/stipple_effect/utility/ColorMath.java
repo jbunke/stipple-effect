@@ -4,6 +4,17 @@ import java.awt.*;
 import java.util.Arrays;
 
 public class ColorMath {
+    public static double diff(final Color a, final Color b) {
+        final int MAX_DIFF = 255 * 4;
+
+        final int rDiff = Math.abs(a.getRed() - b.getRed()),
+                gDiff = Math.abs(a.getGreen() - b.getGreen()),
+                bDiff = Math.abs(a.getBlue() - b.getBlue()),
+                alphaDiff = Math.abs(a.getAlpha() - b.getAlpha());
+
+        return (rDiff + gDiff + bDiff + alphaDiff) / (double) MAX_DIFF;
+    }
+
     public static int scale(final double value, final int scaleMax) {
         return Math.max(0, Math.min((int)(value * scaleMax), scaleMax));
     }

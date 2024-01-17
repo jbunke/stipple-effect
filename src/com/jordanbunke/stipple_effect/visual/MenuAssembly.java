@@ -141,8 +141,7 @@ public class MenuAssembly {
             projectElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
                     i, () -> StippleEffect.get().getContextIndex(),
-                    s -> StippleEffect.get().setContextIndex(s)
-            ));
+                    s -> StippleEffect.get().setContextIndex(s)));
 
             // close project button
 

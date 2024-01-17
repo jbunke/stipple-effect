@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.stip;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
@@ -19,7 +20,7 @@ public class ParserSerializer {
     private static final char NL = '\n', INDENT = '\t',
             ENCLOSER_OPEN = '{', ENCLOSER_CLOSE = '}';
 
-    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":", FILE_STANDARD = "1.0";
+    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":";
 
     private static final int NOT_FOUND = -1;
 
@@ -240,7 +241,7 @@ public class ParserSerializer {
         final StringBuilder sb = new StringBuilder();
 
         // metadata: file standard
-        openWithTag(sb, FILE_STANDARD_TAG).append(FILE_STANDARD)
+        openWithTag(sb, FILE_STANDARD_TAG).append(StippleEffect.NATIVE_STANDARD)
                 .append(ENCLOSER_CLOSE).append(NL);
 
         final int w = state.getImageWidth(), h = state.getImageHeight(),

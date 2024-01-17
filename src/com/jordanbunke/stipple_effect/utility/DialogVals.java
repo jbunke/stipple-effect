@@ -102,7 +102,7 @@ public class DialogVals {
     }
 
     public static void cycleContentType(final SEContext c) {
-        contentType = contentType.next(c);
+        contentType = contentType.get(c).next(c);
     }
 
     public static void setLayerName(final String layerName) {

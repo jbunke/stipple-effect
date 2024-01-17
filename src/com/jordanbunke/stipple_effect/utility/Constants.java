@@ -9,7 +9,9 @@ import java.nio.file.Path;
 
 public class Constants {
     public static final String ABOUT = "about",
-            NAME_CODE = "name", VERSION_CODE = "version";
+            NAME_CODE = "name", VERSION_CODE = "version",
+            NATIVE_STANDARD_CODE = "native_standard",
+            PALETTE_STANDARD_CODE = "palette_standard";
 
     public static final Path PROGRAM_FILE = Path.of("program"),
             ICON_FOLDER = Path.of("icons"),

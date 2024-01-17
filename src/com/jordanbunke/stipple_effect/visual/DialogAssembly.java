@@ -48,7 +48,7 @@ public class DialogAssembly {
         // text labels
         final TextLabel
                 folderLabel = makeDialogLeftLabel(0, "Folder: "),
-                nameLabel = makeDialogLeftLabel(1, "Name: "),
+                nameLabel = makeDialogLeftLabel(1, "File name: "),
                 scaleUpLabel = makeDialogLeftLabel(2, "Scale factor: "),
                 saveAsTypeLabel = makeDialogLeftLabel(3, "Save as: "),
                 xDivsLabel = makeDialogLeftLabel(4, "X frames: "),
@@ -717,6 +717,10 @@ public class DialogAssembly {
         final SEContext c = StippleEffect.get().getContext();
 
         contentTypeCycleToggle(mb, c);
+
+        if (palette.size() == 0)
+            mb.add(makeDialogLeftLabelAtBottom(
+                    "This palette is empty; palettization will be trivial."));
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());

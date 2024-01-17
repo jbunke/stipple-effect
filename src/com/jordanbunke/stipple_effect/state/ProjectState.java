@@ -286,7 +286,7 @@ public class ProjectState {
     public boolean hasSelection() {
         return switch (selectionMode) {
             case BOUNDS -> !selection.isEmpty();
-            case CONTENTS -> selectionContents != null;
+            case CONTENTS -> hasSelectionContents();
         };
     }
 

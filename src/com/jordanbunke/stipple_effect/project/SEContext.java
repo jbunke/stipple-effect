@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.color_selection.Palette;
+import com.jordanbunke.stipple_effect.color_selection.PaletteLoader;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -780,10 +781,78 @@ public class SEContext {
 
     // contents to palette
     public void contentsToPalette() {
-        final DialogVals.ContentType contentType = DialogVals.getContentType(this);
-        final String paletteName = DialogVals.getPaletteName();
+        final DialogVals.ContentType contentType = DialogVals
+                .getContentType(this);
+        final String name = DialogVals.getPaletteName();
+        final List<Color> colors = new ArrayList<>();
+        final ProjectState state = getState();
 
-        // TODO
+        switch (contentType) {
+            case SELECTION -> extractColorsFromSelection(colors);
+            case LAYER_FRAME -> extractColorsFromFrame(colors, state,
+                    state.getFrameIndex(), state.getLayerEditIndex());
+            case LAYER -> {
+                final int frameCount = state.getFrameCount();
+
+                for (int i = 0; i < frameCount; i++)
+                    extractColorsFromFrame(colors, state,
+                            i, state.getLayerEditIndex());
+            }
+            case FRAME -> {
+                final int layerCount = state.getLayers().size();
+
+                for (int i = 0; i < layerCount; i++)
+                    extractColorsFromFrame(colors, state,
+                            state.getFrameIndex(), i);
+            }
+            case PROJECT -> {
+                final int frameCount = state.getFrameCount(),
+                        layerCount = state.getLayers().size();
+
+                for (int f = 0; f < frameCount; f++)
+                    for (int l = 0; l < layerCount; l++)
+                        extractColorsFromFrame(colors, state, f, l);
+            }
+        }
+
+        StippleEffect.get().addPalette(new Palette(name,
+                colors.toArray(Color[]::new)), true);
+    }
+
+    private void extractColorsFromFrame(
+            final List<Color> colors, final ProjectState state,
+            final int frameIndex, final int layerIndex
+    ) {
+        final List<SELayer> layers = new ArrayList<>(state.getLayers());
+        final SELayer layer = layers.get(layerIndex);
+
+        PaletteLoader.addPaletteColorsFromImage(
+                layer.getFrame(frameIndex), colors, null);
+    }
+
+    private void extractColorsFromSelection(
+            final List<Color> colors
+    ) {
+        if (getState().hasSelection()) {
+            final int w = getState().getImageWidth(),
+                    h = getState().getImageHeight();
+
+            final Set<Coord2D> selection = getState().getSelection();
+            final SELayer layer = getState().getEditingLayer();
+            final int frameIndex = getState().getFrameIndex();
+            final GameImage canvas = layer.getFrame(frameIndex),
+                    source = switch (getState().getSelectionMode()) {
+                        case CONTENTS -> getState().getSelectionContents()
+                                .getContentForCanvas(w, h);
+                        case BOUNDS -> {
+                            final SelectionContents contents =
+                                    new SelectionContents(canvas, selection);
+                            yield contents.getContentForCanvas(w, h);
+                    }
+            };
+
+            PaletteLoader.addPaletteColorsFromImage(source, colors, selection);
+        }
     }
 
     // state changes - process all actions here and feed through state manager
@@ -791,8 +860,86 @@ public class SEContext {
     // palettize
     public void palettize(final Palette palette) {
         final DialogVals.ContentType contentType = DialogVals.getContentType(this);
+        ProjectState state = getState();
 
-        // TODO
+        switch (contentType) {
+            case SELECTION -> palettizeSelection(palette);
+            case LAYER_FRAME -> state = palettizeFrame(palette, state,
+                    state.getFrameIndex(), state.getLayerEditIndex());
+            case LAYER -> {
+                final int frameCount = state.getFrameCount();
+
+                for (int i = 0; i < frameCount; i++)
+                    state = palettizeFrame(palette, state,
+                            i, state.getLayerEditIndex());
+            }
+            case FRAME -> {
+                final int layerCount = state.getLayers().size();
+
+                for (int i = 0; i < layerCount; i++)
+                    state = palettizeFrame(palette, state,
+                            state.getFrameIndex(), i);
+            }
+            case PROJECT -> {
+                final int frameCount = state.getFrameCount(),
+                        layerCount = state.getLayers().size();
+
+                for (int f = 0; f < frameCount; f++)
+                    for (int l = 0; l < layerCount; l++)
+                        state = palettizeFrame(palette, state, f, l);
+            }
+        }
+
+        if (contentType != DialogVals.ContentType.SELECTION) {
+            state.markAsCheckpoint(false, this);
+            stateManager.performAction(state, ActionType.CANVAS);
+        }
+    }
+
+    private ProjectState palettizeFrame(
+            final Palette palette, final ProjectState state,
+            final int frameIndex, final int layerIndex
+    ) {
+        final List<SELayer> layers = new ArrayList<>(state.getLayers());
+        final SELayer layer = layers.get(layerIndex);
+
+        final GameImage source = layer.getFrame(frameIndex),
+                edit = palette.palettize(source);
+
+        final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
+        layers.set(layerIndex, replacement);
+
+        return state.changeLayers(layers).changeIsCheckpoint(false);
+    }
+
+    private void palettizeSelection(final Palette palette) {
+        if (getState().hasSelection()) {
+            final boolean dropAndRaise = getState().getSelectionMode() ==
+                    SelectionMode.CONTENTS;
+
+            if (dropAndRaise)
+                dropContentsToLayer(false, false);
+
+            final Set<Coord2D> selection = getState().getSelection();
+            final List<SELayer> layers = new ArrayList<>(
+                    getState().getLayers());
+            final SELayer layer = getState().getEditingLayer();
+            final int frameIndex = getState().getFrameIndex();
+
+            final GameImage source = layer.getFrame(frameIndex),
+                    edit = palette.palettize(source, selection);
+
+            final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
+            layers.set(getState().getLayerEditIndex(), replacement);
+
+            final ProjectState result = getState().changeLayers(layers);
+            stateManager.performAction(result, ActionType.CANVAS);
+
+            if (dropAndRaise)
+                raiseSelectionToContents(true);
+            else
+                getState().markAsCheckpoint(true, this);
+        }
     }
 
     // SELECTION
@@ -1292,8 +1439,7 @@ public class SEContext {
         final SELayer replacement = getState().getEditingLayer()
                 .returnStamped(edit, pixels, frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
-        layers.remove(layerEditIndex);
-        layers.add(layerEditIndex, replacement);
+        layers.set(layerEditIndex, replacement);
 
         final ProjectState result = getState().changeLayers(layers)
                 .changeIsCheckpoint(false);
@@ -1307,8 +1453,7 @@ public class SEContext {
         final SELayer replacement = getState().getEditingLayer()
                 .returnPaintedOver(edit, frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
-        layers.remove(layerEditIndex);
-        layers.add(layerEditIndex, replacement);
+        layers.set(layerEditIndex, replacement);
 
         final ProjectState result = getState().changeLayers(layers)
                 .changeIsCheckpoint(false);
@@ -1322,8 +1467,7 @@ public class SEContext {
         final SELayer replacement = getState().getEditingLayer()
                 .returnErased(eraseMask, frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
-        layers.remove(layerEditIndex);
-        layers.add(layerEditIndex, replacement);
+        layers.set(layerEditIndex, replacement);
 
         final ProjectState result = getState().changeLayers(layers)
                 .changeIsCheckpoint(checkpoint);
@@ -1465,8 +1609,7 @@ public class SEContext {
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 layers.get(layerIndex).areFramesLinked()) {
             final SELayer layer = layers.get(layerIndex).returnUnlinkedFrames();
-            layers.remove(layerIndex);
-            layers.add(layerIndex, layer);
+            layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
@@ -1482,8 +1625,7 @@ public class SEContext {
                 !layers.get(layerIndex).areFramesLinked()) {
             final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
                     getState().getFrameIndex());
-            layers.remove(layerIndex);
-            layers.add(layerIndex, layer);
+            layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
@@ -1498,8 +1640,7 @@ public class SEContext {
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 layers.get(layerIndex).isEnabled()) {
             final SELayer layer = layers.get(layerIndex).returnDisabled();
-            layers.remove(layerIndex);
-            layers.add(layerIndex, layer);
+            layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
@@ -1514,8 +1655,7 @@ public class SEContext {
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 !layers.get(layerIndex).isEnabled()) {
             final SELayer layer = layers.get(layerIndex).returnEnabled();
-            layers.remove(layerIndex);
-            layers.add(layerIndex, layer);
+            layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
@@ -1529,8 +1669,7 @@ public class SEContext {
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
             final SELayer layer = layers.get(layerIndex).returnRenamed(name);
-            layers.remove(layerIndex);
-            layers.add(layerIndex, layer);
+            layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
@@ -1547,8 +1686,7 @@ public class SEContext {
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
             final SELayer layer = layers.get(layerIndex).returnChangedOpacity(opacity);
-            layers.remove(layerIndex);
-            layers.add(layerIndex, layer);
+            layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers)
                     .changeIsCheckpoint(markAsCheckpoint);

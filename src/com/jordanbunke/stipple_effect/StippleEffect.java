@@ -45,8 +45,8 @@ import java.util.Optional;
 
 public class StippleEffect implements ProgramContext {
     public static String
-            PROGRAM_NAME = "Stipple Effect",
-            VERSION = "dev_build";
+            PROGRAM_NAME = "Stipple Effect", VERSION = "dev_build",
+            NATIVE_STANDARD = "1.0", PALETTE_STANDARD = "1.0";
 
     public static final int PRIMARY = 0, SECONDARY = 1;
 
@@ -135,6 +135,10 @@ public class StippleEffect implements ProgramContext {
             switch (code) {
                 case Constants.NAME_CODE -> PROGRAM_NAME = value;
                 case Constants.VERSION_CODE -> VERSION = value;
+                case Constants.NATIVE_STANDARD_CODE ->
+                        NATIVE_STANDARD = value;
+                case Constants.PALETTE_STANDARD_CODE ->
+                        PALETTE_STANDARD = value;
             }
         }
     }
@@ -338,6 +342,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
                     Layout::togglePanels);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
+                    this::toggleColorMenuMode);
         } else if (eventLogger.isPressed(Key.CTRL)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
@@ -374,7 +381,7 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
                         if (hasPaletteContents())
-                            DialogAssembly.setDialogToSortPalette(
+                            DialogAssembly.setDialogToPalettize(
                                     palettes.get(paletteIndex));
                     });
             eventLogger.checkForMatchingKeyStroke(
@@ -844,13 +851,10 @@ public class StippleEffect implements ProgramContext {
 
         contexts.add(context);
 
-        if (setActive) {
+        if (setActive)
             setContextIndex(contexts.size() - 1);
-            rebuildStateDependentMenus();
-            ToolWithBreadth.redrawToolOverlays();
-        } else {
+        else
             rebuildProjectsMenu();
-        }
     }
 
     public void removeContext(final int index) {
@@ -862,14 +866,22 @@ public class StippleEffect implements ProgramContext {
 
             if (contexts.size() == 0)
                 exitProgram();
-
-            rebuildStateDependentMenus();
         }
     }
 
     public void exitProgram() {
         Settings.write();
         System.exit(0);
+    }
+
+    public void addPalette(final Palette palette, final boolean setActive) {
+        palettes.add(palette);
+
+        if (setActive)
+            setPaletteIndex(palettes.size() - 1);
+
+        colorMenuMode = ColorMenuMode.PALETTE;
+        rebuildColorsMenu();
     }
 
     public boolean hasPaletteContents() {
@@ -896,6 +908,7 @@ public class StippleEffect implements ProgramContext {
                 contextIndex >= 0 && contextIndex < contexts.size()) {
             this.contextIndex = contextIndex;
             rebuildStateDependentMenus();
+            ToolWithBreadth.redrawToolOverlays();
         }
     }
 
@@ -933,7 +946,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void toggleColorMenuMode() {
-        colorMenuMode = ColorMenuMode.values()[1 - colorMenuMode.ordinal()];
+        colorMenuMode = colorMenuMode.toggle();
         rebuildColorsMenu();
     }
 

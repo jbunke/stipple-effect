@@ -16,7 +16,7 @@ x Palettes
     x Add to palette
     > Palette files
 x Dropdown menu element
-> Palettizer (layer/frame/entire project)
+x Palettizer (layer/frame/entire project)
 x Native file type (.stip)
 x Preview window
 x Adjustable panels
