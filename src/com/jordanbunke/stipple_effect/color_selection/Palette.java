@@ -27,7 +27,9 @@ public class Palette {
         colorSequence.remove(c);
     }
 
-    // TODO - sort
+    public void sort(final PaletteSorter sorter) {
+        colorSequence.sort(sorter.getComparator());
+    }
 
     public int size() {
         return colorSequence.size();

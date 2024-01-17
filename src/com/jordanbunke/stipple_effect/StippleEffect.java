@@ -368,6 +368,16 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     this::removeColorFromPalette);
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToPaletteFromContents);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (hasPaletteContents())
+                            DialogAssembly.setDialogToSortPalette(
+                                    palettes.get(paletteIndex));
+                    });
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToPanelManager);
         } else {

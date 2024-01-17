@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 
 public class DialogVals {
@@ -16,9 +18,11 @@ public class DialogVals {
             padBottom = 0;
     private static double layerOpacity = Constants.OPAQUE;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
-    private static String layerName = "";
+    private static String layerName = "", paletteName = "";
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
     private static SettingScreen settingScreen = SettingScreen.STARTUP;
+    private static PaletteSorter paletteSorter = PaletteSorter.HUE;
+    private static ContentType contentType = ContentType.SELECTION;
 
     public enum InfoScreen {
         ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG;
@@ -29,7 +33,7 @@ public class DialogVals {
 
         @Override
         public String toString() {
-            return name().charAt(0) + name().substring(1).toLowerCase();
+            return enumPrintName(name());
         }
     }
 
@@ -42,8 +46,39 @@ public class DialogVals {
 
         @Override
         public String toString() {
-            return name().charAt(0) + name().substring(1).toLowerCase();
+            return enumPrintName(name());
         }
+    }
+
+    public enum ContentType {
+        SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
+
+        public ContentType next(final SEContext c) {
+            final ContentType[] vs = values();
+            final ContentType next = vs[(ordinal() + 1) % vs.length];
+
+            return next.get(c);
+        }
+
+        public ContentType get(final SEContext c) {
+            // skip SELECTION iff context has no selection
+            if (!c.getState().hasSelection() && this == SELECTION)
+                return next(c);
+
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            if (this == LAYER_FRAME)
+                return "Layer-Frame";
+
+            return enumPrintName(name());
+        }
+    }
+
+    private static String enumPrintName(final String name) {
+        return name.charAt(0) + name.substring(1).toLowerCase();
     }
 
     public static void setOutlineSideMask(final boolean[] outlineSideMask) {
@@ -62,8 +97,20 @@ public class DialogVals {
         DialogVals.settingScreen = settingScreen;
     }
 
+    public static void cyclePaletteSorter() {
+        paletteSorter = paletteSorter.next();
+    }
+
+    public static void cycleContentType(final SEContext c) {
+        contentType = contentType.next(c);
+    }
+
     public static void setLayerName(final String layerName) {
         DialogVals.layerName = layerName;
+    }
+
+    public static void setPaletteName(final String paletteName) {
+        DialogVals.paletteName = paletteName;
     }
 
     public static void setLayerOpacity(final double layerOpacity) {
@@ -118,6 +165,14 @@ public class DialogVals {
         return settingScreen;
     }
 
+    public static PaletteSorter getPaletteSorter() {
+        return paletteSorter;
+    }
+
+    public static ContentType getContentType(final SEContext c) {
+        return contentType.get(c);
+    }
+
     public static int getNewProjectHeight() {
         return newProjectHeight;
     }
@@ -156,6 +211,10 @@ public class DialogVals {
 
     public static String getLayerName() {
         return layerName;
+    }
+
+    public static String getPaletteName() {
+        return paletteName;
     }
 
     public static int getNewProjectXDivs() {

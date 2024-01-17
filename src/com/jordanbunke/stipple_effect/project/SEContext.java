@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.color_selection.Palette;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -777,7 +778,22 @@ public class SEContext {
             StatusUpdates.clipboardSendFailed(true);
     }
 
-    // process all actions here and feed through state manager
+    // contents to palette
+    public void contentsToPalette() {
+        final DialogVals.ContentType contentType = DialogVals.getContentType(this);
+        final String paletteName = DialogVals.getPaletteName();
+
+        // TODO
+    }
+
+    // state changes - process all actions here and feed through state manager
+
+    // palettize
+    public void palettize(final Palette palette) {
+        final DialogVals.ContentType contentType = DialogVals.getContentType(this);
+
+        // TODO
+    }
 
     // SELECTION
 

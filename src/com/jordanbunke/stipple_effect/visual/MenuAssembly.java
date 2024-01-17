@@ -12,23 +12,23 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.color_selection.Palette;
-import com.jordanbunke.stipple_effect.project.PlaybackInfo;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.project.PlaybackInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
-import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.tools.*;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -692,11 +692,12 @@ public class MenuAssembly {
                 new Runnable[] {
                         () -> StippleEffect.get().addColorToPalette(),
                         () -> StippleEffect.get().removeColorFromPalette(),
-                        // TODO
-                        () -> {},
-                        () -> {},
-                        () -> {},
-                        () -> {}
+                        () -> {}, // TODO
+                        DialogAssembly::setDialogToPaletteFromContents,
+                        () -> DialogAssembly
+                                .setDialogToSortPalette(palettes.get(index)),
+                        () -> DialogAssembly
+                                .setDialogToPalettize(palettes.get(index))
                 }, paletteOptionsRef);
 
         //dropdown menu

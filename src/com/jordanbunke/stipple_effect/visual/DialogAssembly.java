@@ -17,6 +17,8 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.AnimationMenuElemen
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.color_selection.Palette;
+import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicTextButton;
@@ -608,7 +610,7 @@ public class DialogAssembly {
 
             // panel label
             final TextLabel label = makeDialogLeftLabel(
-                    initialIndex + i, labelTexts[i]);
+                    initialIndex + i, labelTexts[i] + ":");
 
             // panel toggle
             final String[] toggleText = isProject
@@ -621,7 +623,7 @@ public class DialogAssembly {
                     retrievalFunctionMap.get(labelTexts[i]);
 
             final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
-                    getDialogContentBigOffsetFromLabel(label),
+                    getDialogContentOffsetFromLabel(label),
                     new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
                             Layout.STD_TEXT_BUTTON_H),
                     MenuElement.Anchor.LEFT_TOP, true,
@@ -648,6 +650,109 @@ public class DialogAssembly {
                 new MenuElementGrouping(mb.build().getMenuElements());
         setDialog(assembleDialog("Panel Manager", contents, () -> false,
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
+    }
+
+    public static void setDialogToSortPalette(final Palette palette) {
+        final MenuBuilder mb = new MenuBuilder();
+        final PaletteSorter[] vs = PaletteSorter.values();
+
+        // label
+        final TextLabel label = makeDialogLeftLabel(0, "Sort colors by:");
+
+        // toggle
+        final GameImage[] bases = makeToggleButtonSet(Arrays.stream(vs)
+                .map(PaletteSorter::toString).toArray(String[]::new));
+
+        final Runnable[] behaviours = new Runnable[vs.length];
+        Arrays.fill(behaviours, (Runnable) () -> {});
+
+        final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
+                getDialogContentOffsetFromLabel(label),
+                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        Layout.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, true,
+                bases, Arrays.stream(bases)
+                .map(GraphicsUtils::drawHighlightedButton)
+                .toArray(GameImage[]::new), behaviours,
+                () -> DialogVals.getPaletteSorter().ordinal(),
+                DialogVals::cyclePaletteSorter);
+
+        mb.add(label);
+        mb.add(toggle);
+
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog(palette.getName() + " | Sort colors",
+                contents, () -> true, "Sort", () -> {
+                    palette.sort(DialogVals.getPaletteSorter());
+                    StippleEffect.get().rebuildColorsMenu();
+                }, true));
+    }
+
+    public static void setDialogToPaletteFromContents() {
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+
+        contentTypeCycleToggle(mb, c);
+
+        // name text box
+        final TextLabel nameLabel = makeDialogLeftLabel(1, "Palette name:");
+        final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
+                "", DialogVals::setPaletteName);
+        mb.add(nameLabel);
+        mb.add(nameTextBox);
+
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Turn project contents into new palette",
+                contents, nameTextBox::isValid, "Proceed",
+                () -> {
+                    c.contentsToPalette();
+                    StippleEffect.get().rebuildColorsMenu();
+                }, true));
+    }
+
+    public static void setDialogToPalettize(final Palette palette) {
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+
+        contentTypeCycleToggle(mb, c);
+
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog(palette.getName() + " | Palettize project contents",
+                contents, () -> true, "Proceed",
+                () -> c.palettize(palette), true));
+    }
+
+    private static void contentTypeCycleToggle(
+            final MenuBuilder mb, final SEContext c
+    ) {
+        final DialogVals.ContentType[] vs = DialogVals.ContentType.values();
+
+        // label
+        final TextLabel label = makeDialogLeftLabel(0, "Scope:");
+
+        // toggle
+        final GameImage[] bases = makeToggleButtonSet(Arrays.stream(vs)
+                .map(DialogVals.ContentType::toString).toArray(String[]::new));
+
+        final Runnable[] behaviours = new Runnable[vs.length];
+        Arrays.fill(behaviours, (Runnable) () -> {});
+
+        final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
+                getDialogContentOffsetFromLabel(label),
+                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        Layout.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP, true,
+                bases, Arrays.stream(bases)
+                .map(GraphicsUtils::drawHighlightedButton)
+                .toArray(GameImage[]::new), behaviours,
+                () -> DialogVals.getContentType(c).ordinal(),
+                () -> DialogVals.cycleContentType(c));
+
+        mb.add(label);
+        mb.add(toggle);
     }
 
     public static void setDialogToInfo() {
