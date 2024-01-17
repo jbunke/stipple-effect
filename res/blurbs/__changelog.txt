@@ -19,7 +19,7 @@ x Dropdown menu element
 > Palettizer (layer/frame/entire project)
 x Native file type (.stip)
 x Preview window
-> Adjustable panels
+x Adjustable panels
 x Close program button and corresponding are-you-sure dialog
 
 Change:

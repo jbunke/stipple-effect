@@ -85,12 +85,27 @@ public class MenuAssembly {
                 behaviours, Layout.getProjectsPosition());
 
         // exit program button
-
         final Coord2D exitProgPos = Layout.getProjectsPosition().displace(
                 Layout.getProjectsWidth() - (Layout.CONTENT_BUFFER_PX + Layout.BUTTON_DIM),
                 Layout.ICON_BUTTON_OFFSET_Y);
         mb.add(IconButton.make(IconCodes.EXIT_PROGRAM, exitProgPos,
                 DialogAssembly::setDialogToExitProgramAYS));
+
+        // panel expand / collapse
+        final Coord2D panelIconPos = exitProgPos.displace(-Layout.BUTTON_INC, 0);
+
+        if (!Layout.isProjectsExpanded())
+            mb.add(IconButton.make(IconCodes.EXPAND_PANEL, panelIconPos,
+                    () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(true))));
+        else
+            mb.add(GraphicsUtils.generateIconButton(IconCodes.COLLAPSE_PANEL,
+                    panelIconPos, !Layout.isFramesPanelShowing(),
+                    () -> Layout.adjustPanels(() ->
+                            Layout.setProjectsExpanded(false))));
+
+        // early break if collapsed
+        if (!Layout.isProjectsExpanded())
+            return mb.build();
 
         // project previews
 
@@ -156,7 +171,7 @@ public class MenuAssembly {
         }
 
         mb.add(new HorizontalScrollingMenuElement(firstPos, new Coord2D(
-                Layout.getFrameScrollWindowWidth(), Layout.FRAME_SCROLL_WINDOW_H),
+                Layout.getProjectScrollWindowWidth(), Layout.TOP_PANEL_SCROLL_WINDOW_H),
                 projectElements, realRightX, initialOffsetX));
 
         return mb.build();
@@ -214,6 +229,10 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Layout.getFramesPosition());
 
+        addHidePanelToMenuBuilder(mb, Layout.getFramesPosition()
+                        .displace(Layout.getFramesWidth(), 0),
+                () -> Layout.setFramesPanelShowing(false));
+
         final Coord2D firstPos = Layout.getFramesPosition()
                 .displace(Layout.getSegmentContentDisplacement());
 
@@ -235,7 +254,8 @@ public class MenuAssembly {
         // playback speed slider and dynamic label for playback speed
 
         final Coord2D labelPos = Layout.getFramesPosition().displace(
-                Layout.getFramesWidth() - Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
+                Layout.getFramesWidth() - (Layout.CONTENT_BUFFER_PX +
+                        Layout.BUTTON_INC), Layout.TEXT_Y_OFFSET);
 
         mb.add(new DynamicLabel(labelPos,
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
@@ -286,7 +306,7 @@ public class MenuAssembly {
         }
 
         mb.add(new HorizontalScrollingMenuElement(firstPos, new Coord2D(
-                Layout.getFrameScrollWindowWidth(), Layout.FRAME_SCROLL_WINDOW_H),
+                Layout.getFrameScrollWindowWidth(), Layout.TOP_PANEL_SCROLL_WINDOW_H),
                 frameElements, realRightX, frameButtonXDisplacement()));
 
         return mb.build();
@@ -373,6 +393,10 @@ public class MenuAssembly {
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
                 behaviours, Layout.getLayersPosition());
+
+        addHidePanelToMenuBuilder(mb, Layout.getLayersPosition()
+                        .displace(Layout.getLayersWidth(), 0),
+                () -> Layout.setLayersPanelShowing(false));
 
         // layer content
 
@@ -576,16 +600,20 @@ public class MenuAssembly {
                 Layout.getColorsPosition()
         );
 
+        addHidePanelToMenuBuilder(mb, Layout.getColorsPosition()
+                .displace(Layout.getColorsWidth(), 0),
+                () -> Layout.setColorsPanelShowing(false));
+
         final int NUM_COLORS = 2;
 
         for (int i = 0; i < NUM_COLORS; i++) {
             final int offsetY = Layout.getSegmentContentDisplacement().y * 2;
             final Coord2D labelPos = Layout.getColorsPosition().displace(
                     Layout.getSegmentContentDisplacement()).displace(
-                            i * (Layout.COLOR_PICKER_W / 2), 0),
+                            i * (Layout.getColorsWidth() / 2), 0),
                     textBoxPos = Layout.getColorsPosition().displace(
-                            (Layout.COLOR_PICKER_W / 4) + (i *
-                                    (Layout.COLOR_PICKER_W / 2)), offsetY);
+                            (Layout.getColorsWidth() / 4) + (i *
+                                    (Layout.getColorsWidth() / 2)), offsetY);
 
             mb.add(TextLabel.make(labelPos, switch (i) {
                 case 0 -> "Primary";
@@ -615,15 +643,25 @@ public class MenuAssembly {
         return mb.build();
     }
 
+    private static void addHidePanelToMenuBuilder(
+            final MenuBuilder mb, final Coord2D topRight,
+            final Runnable onClick
+    ) {
+        final Coord2D pos = topRight.displace(-Layout.BUTTON_INC,
+                Layout.ICON_BUTTON_OFFSET_Y);
+        mb.add(IconButton.make(IconCodes.HIDE_PANEL, pos,
+                () -> Layout.adjustPanels(onClick)));
+    }
+
     private static void addPaletteMenuElements(final MenuBuilder mb) {
         final Coord2D startingPos = Layout.getColorsPosition().displace(
                 Layout.CONTENT_BUFFER_PX, Layout.COLOR_SELECTOR_OFFSET_Y +
                         Layout.COLOR_LABEL_OFFSET_Y),
                 paletteOptionsRef = startingPos.displace(
                         -Layout.CONTENT_BUFFER_PX, -Layout.TEXT_Y_OFFSET);
-        final int contentWidth = Layout.COLOR_PICKER_W -
+        final int contentWidth = Layout.getColorsWidth() -
                         (2 * Layout.CONTENT_BUFFER_PX),
-                dropDownHAllowance = Layout.getColorPickerHeight() -
+                dropDownHAllowance = Layout.getColorsHeight() -
                         (Layout.COLOR_SELECTOR_OFFSET_Y + Layout.CONTENT_BUFFER_PX);
 
         final List<Palette> palettes = StippleEffect.get().getPalettes();
@@ -690,7 +728,7 @@ public class MenuAssembly {
                     Layout.STD_TEXT_BUTTON_INC);
             final int fitsOnLine = (contentWidth - Layout.SLIDER_OFF_DIM) /
                     Layout.PALETTE_DIMS.x;
-            final int height = Layout.getColorPickerHeight() -
+            final int height = Layout.getColorsHeight() -
                     ((container.y - Layout.getColorsPosition().y) +
                             Layout.CONTENT_BUFFER_PX);
 
@@ -722,24 +760,6 @@ public class MenuAssembly {
             mb.add(toolButtonFromTool(Constants.ALL_TOOLS[i], i));
         }
 
-        // zoom slider
-        final float base = 2f;
-        final HorizontalSlider zoomSlider = new HorizontalSlider(
-                Layout.getBottomBarPosition().displace(
-                        Layout.getBottomBarZoomSliderX(),
-                        Layout.BUTTON_OFFSET),
-                Layout.getUISliderWidth(),
-                MenuElement.Anchor.LEFT_TOP,
-                (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
-                (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
-                (int)(Math.log(StippleEffect.get().getContext().renderInfo
-                        .getZoomFactor()) / Math.log(base)), i ->
-                StippleEffect.get().getContext().renderInfo
-                        .setZoomFactor((float)Math.pow(base, i)));
-        zoomSlider.updateAssets();
-
-        mb.add(zoomSlider);
-
         // outline button
         final Coord2D outlinePos = Layout.getToolsPosition()
                 .displace(Layout.BUTTON_OFFSET,
@@ -755,10 +775,10 @@ public class MenuAssembly {
                 generateIconButton(IconCodes.VERTICAL_REFLECTION,
                         outlinePos.displace(0, -Layout.BUTTON_INC),
                         c.getState().hasSelection(), () -> {
-                    if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
-                        c.reflectSelection(false);
-                    else
-                        c.reflectSelectionContents(false);
+                            if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
+                                c.reflectSelection(false);
+                            else
+                                c.reflectSelectionContents(false);
                         }
                 );
         mb.add(verticalReflectionButton);
@@ -773,13 +793,6 @@ public class MenuAssembly {
                         }
                 );
         mb.add(horizontalReflectionButton);
-
-        // help button
-        mb.add(IconButton.make(IconCodes.INFO,
-                Layout.getBottomBarPosition().displace(
-                        Layout.width() - Layout.BUTTON_DIM,
-                        Layout.BUTTON_OFFSET),
-                DialogAssembly::setDialogToInfo));
 
         return mb.build();
     }
@@ -799,4 +812,37 @@ public class MenuAssembly {
                 tool.getHighlightedIcon());
     }
 
+    public static Menu buildBottomBarMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+
+        // zoom slider
+        final float base = 2f;
+        final HorizontalSlider zoomSlider = new HorizontalSlider(
+                Layout.getBottomBarPosition().displace(
+                        Layout.getBottomBarZoomSliderX(),
+                        Layout.BUTTON_OFFSET),
+                Layout.getUISliderWidth(),
+                MenuElement.Anchor.LEFT_TOP,
+                (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
+                (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
+                (int)(Math.log(c.renderInfo.getZoomFactor()) / Math.log(base)),
+                i -> c.renderInfo.setZoomFactor((float)Math.pow(base, i)));
+        zoomSlider.updateAssets();
+
+        mb.add(zoomSlider);
+
+        // help button
+        final Coord2D helpButtonPos = Layout.getBottomBarPosition().displace(
+                Layout.width() - Layout.BUTTON_DIM, Layout.BUTTON_OFFSET);
+        mb.add(IconButton.make(IconCodes.INFO, helpButtonPos,
+                DialogAssembly::setDialogToInfo));
+
+        // panel manager
+        mb.add(IconButton.make(IconCodes.PANEL_MANAGER,
+                helpButtonPos.displace(-Layout.BUTTON_INC, 0),
+                DialogAssembly::setDialogToPanelManager));
+
+        return mb.build();
+    }
 }

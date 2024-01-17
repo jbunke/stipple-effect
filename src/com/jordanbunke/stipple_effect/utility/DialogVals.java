@@ -21,7 +21,7 @@ public class DialogVals {
     private static SettingScreen settingScreen = SettingScreen.STARTUP;
 
     public enum InfoScreen {
-        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, MORE, CHANGELOG;
+        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG;
 
         public String getTitle() {
             return this == MORE ? "More Shortcuts & Advanced Info" : toString();

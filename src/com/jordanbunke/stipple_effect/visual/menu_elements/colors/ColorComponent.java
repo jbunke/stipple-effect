@@ -39,11 +39,11 @@ public class ColorComponent extends MenuElementContainer {
         final boolean isFull = alignment == Alignment.FULL;
 
         final int globalOffsetX = alignment == Alignment.RIGHT
-                ? Layout.COLOR_PICKER_W / 2 : 0,
+                ? Layout.getColorsWidth() / 2 : 0,
                 globalOffsetY = Layout.COLOR_SELECTOR_OFFSET_Y +
                         (indexY * Layout.getColorSelectorIncY()),
                 width = isFull
-                        ? Layout.COLOR_PICKER_W : Layout.COLOR_PICKER_W / 2,
+                        ? Layout.getColorsWidth() : Layout.getColorsWidth() / 2,
                 indent = Layout.CONTENT_BUFFER_PX;
         final Coord2D startingPos = Layout.getColorsPosition().displace(
                 globalOffsetX, globalOffsetY),

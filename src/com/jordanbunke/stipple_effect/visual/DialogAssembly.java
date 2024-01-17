@@ -9,6 +9,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.PlaceholderMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.TimedMenuElement;
@@ -504,23 +505,15 @@ public class DialogAssembly {
             mb.add(makeDialogLeftLabelAtBottom("Cannot outline; nothing is selected"));
 
         // buttons for setting presets
-        final GameImage baseSingle = GraphicsUtils.drawTextButton(
-                Layout.STD_TEXT_BUTTON_W, "Single", false, Constants.GREY),
-                baseDouble = GraphicsUtils.drawTextButton(
-                        Layout.STD_TEXT_BUTTON_W,
-                        "Double", false, Constants.GREY);
-        final SimpleMenuButton singlePreset = new SimpleMenuButton(
+        final SimpleMenuButton singlePreset =
+                GraphicsUtils.makeStandardTextButton("Single",
                 getDialogContentOffsetFromLabel(presets),
-                new Coord2D(Layout.STD_TEXT_BUTTON_W, Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true,
-                () -> DialogVals.setOutlineSideMask(Outliner.getSingleOutlineMask()),
-                baseSingle, GraphicsUtils.drawHighlightedButton(baseSingle));
-        final SimpleMenuButton doublePreset = new SimpleMenuButton(
-                getDialogContentBigOffsetFromLabel(presets),
-                new Coord2D(Layout.STD_TEXT_BUTTON_W, Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true,
-                () -> DialogVals.setOutlineSideMask(Outliner.getDoubleOutlineMask()),
-                baseDouble, GraphicsUtils.drawHighlightedButton(baseDouble));
+                        () -> DialogVals.setOutlineSideMask(
+                                Outliner.getSingleOutlineMask())),
+                doublePreset = GraphicsUtils.makeStandardTextButton("Double",
+                        getDialogContentBigOffsetFromLabel(presets),
+                        () -> DialogVals.setOutlineSideMask(
+                                Outliner.getDoubleOutlineMask()));
         mb.add(singlePreset);
         mb.add(doublePreset);
 
@@ -556,6 +549,105 @@ public class DialogAssembly {
                 () -> c.getState().hasSelection(), "Outline",
                 () -> c.outlineSelection(DialogVals.getOutlineSideMask()),
                 true));
+    }
+
+    public static void setDialogToPanelManager() {
+        final MenuBuilder mb = new MenuBuilder();
+
+        // presets: single & double
+        final TextLabel presets = makeDialogLeftLabel(0, "Presets: ");
+        mb.add(presets);
+
+        // buttons for panel arrangement presets
+        final Coord2D showAllPos = getDialogContentOffsetFromLabel(presets),
+                minimalUIPos = getDialogContentBigOffsetFromLabel(presets),
+                noAnimationPos = minimalUIPos.displace(
+                        minimalUIPos.x - showAllPos.x, 0);
+
+        final SimpleMenuButton showAllPreset =
+                GraphicsUtils.makeStandardTextButton(
+                        "All", showAllPos, Layout::showAllPanels),
+                minimalUIPreset = GraphicsUtils.makeStandardTextButton(
+                        "Minimal", minimalUIPos, Layout::minimalUI),
+                noAnimationPreset = GraphicsUtils.makeStandardTextButton(
+                        "No Anim", noAnimationPos,
+                        () -> Layout.adjustPanels(() -> {
+                            Layout.setToolbarShowing(true);
+                            Layout.setColorsPanelShowing(true);
+                            Layout.setLayersPanelShowing(true);
+                            Layout.setFramesPanelShowing(false);
+                            Layout.setProjectsExpanded(false);
+                        }));
+        mb.add(showAllPreset);
+        mb.add(minimalUIPreset);
+        mb.add(noAnimationPreset);
+
+        // vars
+        final String TOOLBAR = "Toolbar", LAYERS = "Layers",
+                COLORS = "Colors", FRAMES = "Frames", PROJECTS = "Projects";
+        final int initialIndex = 2;
+        final String[] labelTexts = new String[] { TOOLBAR,
+                FRAMES, LAYERS, COLORS, PROJECTS };
+        final Map<String, Consumer<Boolean>> adjustmentFunctionMap =
+                Map.ofEntries(
+                        Map.entry(TOOLBAR, Layout::setToolbarShowing),
+                        Map.entry(FRAMES, Layout::setFramesPanelShowing),
+                        Map.entry(LAYERS, Layout::setLayersPanelShowing),
+                        Map.entry(COLORS, Layout::setColorsPanelShowing),
+                        Map.entry(PROJECTS, Layout::setProjectsExpanded));
+        final Map<String, Supplier<Boolean>> retrievalFunctionMap =
+                Map.ofEntries(
+                        Map.entry(TOOLBAR, Layout::isToolbarShowing),
+                        Map.entry(FRAMES, Layout::isFramesPanelShowing),
+                        Map.entry(LAYERS, Layout::isLayersPanelShowing),
+                        Map.entry(COLORS, Layout::isColorsPanelShowing),
+                        Map.entry(PROJECTS, Layout::isProjectsExpanded));
+
+        for (int i = 0; i < labelTexts.length; i++) {
+            final boolean isProject = labelTexts[i].equals(PROJECTS);
+
+            // panel label
+            final TextLabel label = makeDialogLeftLabel(
+                    initialIndex + i, labelTexts[i]);
+
+            // panel toggle
+            final String[] toggleText = isProject
+                    ? new String[] { "Expanded", "Collapsed" }
+                    : new String[] { "Visible", "Hidden" };
+            final GameImage[] bases = makeToggleButtonSet(toggleText);
+            final Consumer<Boolean> adj =
+                    adjustmentFunctionMap.get(labelTexts[i]);
+            final Supplier<Boolean> ret =
+                    retrievalFunctionMap.get(labelTexts[i]);
+
+            final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
+                    getDialogContentBigOffsetFromLabel(label),
+                    new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                            Layout.STD_TEXT_BUTTON_H),
+                    MenuElement.Anchor.LEFT_TOP, true,
+                    bases, Arrays.stream(bases)
+                    .map(GraphicsUtils::drawHighlightedButton)
+                    .toArray(GameImage[]::new),
+                    new Runnable[] {
+                            () -> Layout.adjustPanels(() -> adj.accept(false)),
+                            () -> Layout.adjustPanels(() -> adj.accept(true))
+                    },
+                    () -> ret.get() ? 0 : 1, () -> {});
+
+            if (isProject) {
+                mb.add(new GatewayMenuElement(
+                        new MenuElementGrouping(label, toggle),
+                        () -> !Layout.isFramesPanelShowing()));
+            } else {
+                mb.add(label);
+                mb.add(toggle);
+            }
+        }
+
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Panel Manager", contents, () -> false,
+                Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
     public static void setDialogToInfo() {
@@ -598,8 +690,8 @@ public class DialogAssembly {
         final MenuElementGrouping contents = new MenuElementGrouping(
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 screenDecider);
-        setDialog(assembleDialog("Program Settings", contents,
-                () -> true, "Apply", Settings::write, true));
+        setDialog(assembleDialog("Program Settings", contents, () -> false,
+                Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
     public static void setDialogToLayerSettings(final int index) {
@@ -1002,14 +1094,14 @@ public class DialogAssembly {
                     contentAssembler, contentStart, initialbottomY);
             case FRAMES -> assembleFramesInfoScreen(contentAssembler,
                     contentStart, initialbottomY);
+            case COLORS -> assembleColorsInfoScreen(contentAssembler,
+                    contentStart, initialbottomY);
             case LAYERS -> assembleLayersInfoScreen(contentAssembler,
                     contentStart, initialbottomY);
             case TOOLS -> assembleToolsInfoScreenContents(contentAssembler,
                     contentStart, initialbottomY);
             case MORE -> assembleInfoScreenContents(
                     new String[] {
-                            IconCodes.SWAP_COLORS,
-                            IconCodes.COLOR_MENU_MODE,
                             IconCodes.HORIZONTAL_REFLECTION,
                             IconCodes.VERTICAL_REFLECTION,
                             IconCodes.OUTLINE,
@@ -1019,9 +1111,6 @@ public class DialogAssembly {
                             IconCodes.COLOR_SHORTCUTS
                     },
                     new String[] {
-                            "Swap primary and secondary color",
-                            "Toggle between palettes and RGBA-HSV color selection",
-                            // TODO
                             "Horizontal reflection",
                             "Vertical reflection",
                             "Outline",
@@ -1112,6 +1201,35 @@ public class DialogAssembly {
         }
 
         return bottomY - initialBottomY;
+    }
+
+    private static int assembleColorsInfoScreen(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        return assembleInfoScreenContents(
+                new String[] {
+                        IconCodes.SWAP_COLORS,
+                        IconCodes.COLOR_MENU_MODE,
+                        IconCodes.ADD_TO_PALETTE,
+                        IconCodes.REMOVE_FROM_PALETTE,
+                        IconCodes.IMPORT_PALETTE,
+                        IconCodes.CONTENTS_TO_PALETTE,
+                        IconCodes.SORT_PALETTE,
+                        IconCodes.PALETTIZE
+                },
+                new String[] {
+                        "Swap primary and secondary color",
+                        "Toggle between palettes and RGBA-HSV color selection",
+                        "Add selected color to palette",
+                        "Remove selected color from palette",
+                        "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +
+                                Constants.PALETTE_FILE_SUFFIX + ")",
+                        "Turn project contents into new palette",
+                        "Sort colors in palette",
+                        "Palettize project contents"
+                }, contentAssembler, contentStart, initialBottomY
+        );
     }
 
     private static int assembleProjectInfoScreenContents(
@@ -1355,7 +1473,10 @@ public class DialogAssembly {
 
         // cancel button
         final GameImage baseImage = GraphicsUtils.drawTextButton(
-                Layout.STD_TEXT_BUTTON_W, "Cancel", false, Constants.GREY),
+                Layout.STD_TEXT_BUTTON_W, approveText.equals(
+                        Constants.CLOSE_DIALOG_TEXT)
+                        ? Constants.CLOSE_DIALOG_TEXT : "Cancel", false,
+                Constants.GREY),
                 highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
 
         final Coord2D cancelPos = background.getRenderPosition()
@@ -1369,13 +1490,15 @@ public class DialogAssembly {
                 baseImage, highlightedImage));
 
         // approve button
-        final Coord2D approvePos = cancelPos.displace(-(baseImage.getWidth() +
-                Layout.BUTTON_OFFSET), 0);
+        if (!approveText.equals(Constants.CLOSE_DIALOG_TEXT)) {
+            final Coord2D approvePos = cancelPos.displace(-(baseImage.getWidth() +
+                    Layout.BUTTON_OFFSET), 0);
 
-        mb.add(new ApproveDialogButton(approvePos,
-                new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
-                MenuElement.Anchor.RIGHT_BOTTOM, onApproval, clearDialog,
-                precondition, approveText));
+            mb.add(new ApproveDialogButton(approvePos,
+                    new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
+                    MenuElement.Anchor.RIGHT_BOTTOM, onApproval, clearDialog,
+                    precondition, approveText));
+        }
 
         // contents come before border to ensure proper rendering
         mb.add(contents);

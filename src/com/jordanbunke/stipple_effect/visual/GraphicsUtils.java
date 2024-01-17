@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
@@ -155,6 +156,16 @@ public class GraphicsUtils {
             final boolean isSelected, final Color backgroundColor
     ) {
         return drawTextButton(width, text, isSelected, backgroundColor, false);
+    }
+
+    public static SimpleMenuButton makeStandardTextButton(
+            final String text, final Coord2D pos, final Runnable onClick
+    ) {
+        final GameImage base = drawTextButton(Layout.STD_TEXT_BUTTON_W,
+                text, false, Constants.GREY);
+        return new SimpleMenuButton(pos, new Coord2D(Layout.STD_TEXT_BUTTON_W,
+                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
+                true, onClick, base, drawHighlightedButton(base));
     }
 
     private static Color textButtonColorFromBackgroundColor(

@@ -36,7 +36,8 @@ public class Constants {
             COLOR_TOOL_TIP_PREFIX = "color:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
-            ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm", TYPING_CODE = "typing";
+            ICON_ID_GAP_CODE = "", TYPING_CODE = "typing",
+            GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
