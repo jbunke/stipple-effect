@@ -147,7 +147,7 @@ public class Settings {
 
         if (!isStartup) {
             DialogAssembly.setDialogToProgramSettings();
-            StippleEffect.get().rebuildAllMenusWithText();
+            StippleEffect.get().rebuildAllMenus();
         }
     }
 

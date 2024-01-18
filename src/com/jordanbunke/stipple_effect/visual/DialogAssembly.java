@@ -626,7 +626,8 @@ public class DialogAssembly {
 
         // name text box
         final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
-                "", DialogVals::setPaletteName);
+                palette.getName().toLowerCase().replaceAll(" ", "_"),
+                DialogVals::setPaletteName);
         mb.add(nameTextBox);
 
         final MenuElementGrouping contents =

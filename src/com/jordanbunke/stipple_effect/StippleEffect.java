@@ -111,10 +111,7 @@ public class StippleEffect implements ProgramContext {
 
         // initially declared as empty method because
         // builders rely on calls to INSTANCE object
-        INSTANCE.toolButtonMenu = MenuAssembly.buildToolButtonMenu();
-        INSTANCE.bottomBarMenu = MenuAssembly.buildBottomBarMenu();
-        INSTANCE.colorsMenu = MenuAssembly.buildColorsMenu();
-        INSTANCE.rebuildStateDependentMenus();
+        INSTANCE.rebuildAllMenus();
 
         ToolWithBreadth.redrawToolOverlays();
     }
@@ -264,11 +261,6 @@ public class StippleEffect implements ProgramContext {
         rebuildStateDependentMenus();
         rebuildColorsMenu();
         rebuildToolButtonMenu();
-    }
-
-    public void rebuildAllMenusWithText() {
-        rebuildStateDependentMenus();
-        rebuildColorsMenu();
     }
 
     public void rebuildStateDependentMenus() {
@@ -658,39 +650,6 @@ public class StippleEffect implements ProgramContext {
         bottomBar.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
                 Layout.width(), Layout.BOTTOM_BAR_H);
 
-        // target pixel
-        final GameImage targetPixel = GraphicsUtils.uiText()
-                .addText(getContext().getTargetPixelText())
-                .build().draw();
-        bottomBar.draw(targetPixel, Layout.getBottomBarTargetPixelX(),
-                Layout.TEXT_Y_OFFSET);
-
-        // image size
-        final GameImage size = GraphicsUtils.uiText()
-                .addText(getContext().getImageSizeText()).build().draw();
-        bottomBar.draw(size, Layout.getBottomBarProjectCanvasSizeX(),
-                Layout.TEXT_Y_OFFSET);
-
-        // active tool
-        final GameImage activeToolName = GraphicsUtils.uiText()
-                .addText(tool.getBottomBarText()).build().draw();
-        bottomBar.draw(activeToolName, Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET);
-
-        // zoom
-        final GameImage zoom = GraphicsUtils.uiText()
-                .addText(getContext().renderInfo.getZoomText())
-                .build().draw();
-        bottomBar.draw(zoom, Layout.getBottomBarZoomPercentageX(),
-                Layout.TEXT_Y_OFFSET);
-
-        // selection
-        final GameImage selection = GraphicsUtils.uiText()
-                .addText(getContext().getSelectionText()).build().draw();
-        bottomBar.draw(selection, Layout.width() -
-                        (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC) +
-                                selection.getWidth()),
-                Layout.TEXT_Y_OFFSET);
-
         return bottomBar.submit();
     }
 
@@ -775,6 +734,23 @@ public class StippleEffect implements ProgramContext {
         }
     }
 
+    public void openPalette() {
+        FileIO.setDialogToFilesOnly();
+        final Optional<File> opened = FileIO.openFileFromSystem(
+                new String[] {
+                        PROGRAM_NAME + " palettes (." + Constants.PALETTE_FILE_SUFFIX + ")"
+                },
+                new String[][] {
+                        new String[] { Constants.PALETTE_FILE_SUFFIX }
+                });
+        window.getEventLogger().unpressAllKeys();
+
+        if (opened.isEmpty())
+            return;
+
+        verifyFilepath(opened.get().toPath());
+    }
+
     private static void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
@@ -784,6 +760,11 @@ public class StippleEffect implements ProgramContext {
             final GameImage image = GameImageIO.readImage(filepath);
 
             DialogAssembly.setDialogToOpenPNG(image, filepath);
+        } else if (fileName.endsWith(Constants.PALETTE_FILE_SUFFIX)) {
+            final String file = FileIO.readFile(filepath);
+            final Palette palette = ParserSerializer.loadPalette(file);
+
+            get().addPalette(palette, true);
         }
         // extend with else-ifs for additional file types classes (scripts, palettes)
     }
@@ -914,7 +895,7 @@ public class StippleEffect implements ProgramContext {
         if (this.contextIndex != contextIndex &&
                 contextIndex >= 0 && contextIndex < contexts.size()) {
             this.contextIndex = contextIndex;
-            rebuildStateDependentMenus();
+            rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
         }
     }
@@ -954,7 +935,11 @@ public class StippleEffect implements ProgramContext {
 
     public void toggleColorMenuMode() {
         colorMenuMode = colorMenuMode.toggle();
-        rebuildColorsMenu();
+
+        if (Layout.isColorsPanelShowing())
+            rebuildColorsMenu();
+        else
+            Layout.adjustPanels(() -> Layout.setColorsPanelShowing(true));
     }
 
     public void setPaletteIndex(final int paletteIndex) {
@@ -970,8 +955,7 @@ public class StippleEffect implements ProgramContext {
         game.replaceWindow(window);
 
         // redraw everything
-        rebuildAllMenusWithText();
-        rebuildToolButtonMenu();
+        rebuildAllMenus();
     }
 
     public void autoAssignPickUpSelection() {

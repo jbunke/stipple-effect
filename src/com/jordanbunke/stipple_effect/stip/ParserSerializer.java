@@ -68,9 +68,11 @@ public class ParserSerializer {
                     final String[] colorCodes = block.value()
                             .split(CONTENT_SEPARATOR);
 
-                    colors = Arrays.stream(colorCodes)
+                    colors = block.value().contains(CONTENT_SEPARATOR)
+                            ? Arrays.stream(colorCodes)
                             .map(ParserSerializer::deserializeColor)
-                            .toArray(Color[]::new);
+                            .toArray(Color[]::new)
+                            : new Color[] {};
                 }
             }
         }

@@ -20,7 +20,6 @@ public class PaletteLoader {
         final List<Palette> palettes = new ArrayList<>();
 
         loadHardCodedPalettes(palettes);
-        // TODO - *attempt* palette retrieval from reserved palette folder
 
         return palettes;
     }

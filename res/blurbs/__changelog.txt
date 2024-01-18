@@ -14,7 +14,7 @@ Add:
 x Add tooltips for icon buttons and icon toggle buttons
 x Palettes
     x Add to palette
-    > Palette files
+    x Palette files
 x Dropdown menu element
 x Palettizer (layer/frame/entire project)
 x Native file type (.stip)
@@ -28,9 +28,11 @@ x Update program icon
 x Change settings dialog to an info-style dialog with multiple tabs
 x Rework segments and render scale to be window and screen size dependent
 x Change brush select behaviour to preview overlay without editing selection until unclick
+> Redesign logo and splash screen
 
 Fix:
 > HSV slider slippage
+> Optimize selection overlays
 
 Remove:
 x Remove Piccolo font; set Classic to default

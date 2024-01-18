@@ -659,9 +659,7 @@ public class MenuAssembly {
                 paletteOptionsRef = startingPos.displace(
                         -Layout.CONTENT_BUFFER_PX, -Layout.TEXT_Y_OFFSET);
         final int contentWidth = Layout.getColorsWidth() -
-                        (2 * Layout.CONTENT_BUFFER_PX),
-                dropDownHAllowance = Layout.getColorsHeight() -
-                        (Layout.COLOR_SELECTOR_OFFSET_Y + Layout.CONTENT_BUFFER_PX);
+                        (2 * Layout.CONTENT_BUFFER_PX);
 
         final List<Palette> palettes = StippleEffect.get().getPalettes();
         final int index = StippleEffect.get().getPaletteIndex();
@@ -693,7 +691,7 @@ public class MenuAssembly {
                 new Runnable[] {
                         () -> StippleEffect.get().addColorToPalette(),
                         () -> StippleEffect.get().removeColorFromPalette(),
-                        () -> {}, // TODO
+                        () -> StippleEffect.get().openPalette(),
                         () -> DialogAssembly
                                 .setDialogToSavePalette(palettes.get(index)),
                         DialogAssembly::setDialogToPaletteFromContents,
@@ -713,6 +711,7 @@ public class MenuAssembly {
 
         final Coord2D dropdownPos = startingPos.displace(0,
                 Layout.getSegmentContentDisplacement().y);
+        final int dropDownHAllowance = Layout.getColorsHeight() / 3;
 
         mb.add(hasPaletteContents
                 ? new DropDownMenu(dropdownPos, contentWidth,
@@ -820,6 +819,43 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
+        // DYNAMIC LABELS
+        final int bottomBarTextY = Layout.getBottomBarPosition().y +
+                Layout.TEXT_Y_OFFSET;
+
+        // active tool
+        mb.add(new DynamicLabel(
+                new Coord2D(Layout.CONTENT_BUFFER_PX, bottomBarTextY),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                () -> StippleEffect.get().getTool().getBottomBarText(),
+                Layout.getBottomBarToolWidth()));
+
+        // target pixel
+        mb.add(new DynamicLabel(
+                new Coord2D(Layout.getBottomBarTargetPixelX(), bottomBarTextY),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth()));
+
+        // canvas size
+        mb.add(new DynamicLabel(new Coord2D(
+                Layout.getBottomBarCanvasSizeX(), bottomBarTextY),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth()));
+
+        // zoom percentage
+        mb.add(new DynamicLabel(new Coord2D(
+                Layout.getBottomBarZoomPercentageX(), bottomBarTextY),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                c.renderInfo::getZoomText, Layout.getBottomBarZoomPercentageWidth()));
+
+        // selection
+        mb.add(new DynamicLabel(new Coord2D(Layout.width() -
+                (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
+                MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
+                c::getSelectionText, Layout.width() -
+                (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
+
+
         // zoom slider
         final float base = 2f;
         final HorizontalSlider zoomSlider = new HorizontalSlider(
@@ -842,7 +878,7 @@ public class MenuAssembly {
         mb.add(IconButton.make(IconCodes.INFO, helpButtonPos,
                 DialogAssembly::setDialogToInfo));
 
-        // panel manager
+        // panel manager button
         mb.add(IconButton.make(IconCodes.PANEL_MANAGER,
                 helpButtonPos.displace(-Layout.BUTTON_INC, 0),
                 DialogAssembly::setDialogToPanelManager));

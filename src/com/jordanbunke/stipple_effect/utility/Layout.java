@@ -153,7 +153,7 @@ public class Layout {
         return (int)(width() * 0.15);
     }
 
-    public static int getBottomBarProjectCanvasSizeX() {
+    public static int getBottomBarCanvasSizeX() {
         return (int)(width() * 0.225);
     }
 
@@ -167,6 +167,22 @@ public class Layout {
 
     public static int getUISliderWidth() {
         return width() / 10;
+    }
+
+    public static int getBottomBarToolWidth() {
+        return getBottomBarTargetPixelX();
+    }
+
+    public static int getBottomBarTargetPixelWidth() {
+        return getBottomBarCanvasSizeX() - getBottomBarTargetPixelX();
+    }
+
+    public static int getBottomBarCanvasSizeWidth() {
+        return getBottomBarZoomPercentageX() - getBottomBarCanvasSizeX();
+    }
+
+    public static int getBottomBarZoomPercentageWidth() {
+        return getBottomBarZoomSliderX() - getBottomBarZoomPercentageX();
     }
 
     // segments layout
