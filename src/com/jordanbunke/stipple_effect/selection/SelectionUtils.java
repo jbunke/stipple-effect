@@ -17,7 +17,7 @@ public class SelectionUtils {
     public static GameImage drawOverlay(
             final Set<Coord2D> selection,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final double z, final boolean movable, final boolean canTransform
+            final double z, final boolean filled, final boolean canTransform
     ) {
         final Coord2D topLeft = topLeft(selection),
                 bottomRight = bottomRight(selection);
@@ -27,7 +27,7 @@ public class SelectionUtils {
 
         return GraphicsUtils.drawOverlay(w, h, z,
                 (x, y) -> maskValidator.apply(x + topLeft.x, y + topLeft.y),
-                Constants.BLACK, Constants.HIGHLIGHT_1, movable, canTransform);
+                Constants.BLACK, Constants.HIGHLIGHT_1, filled, canTransform);
     }
 
     public static Coord2D topLeft(final Set<Coord2D> pixels) {

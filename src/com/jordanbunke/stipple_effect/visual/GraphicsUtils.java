@@ -17,6 +17,8 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public class GraphicsUtils {
@@ -214,39 +216,55 @@ public class GraphicsUtils {
                 scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
                 scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
-        for (int x = 0; x < scaleUpW; x += zoomInc)
-            for (int y = 0; y < scaleUpH; y += zoomInc) {
-                if (!maskValidator.apply((int)(x / z), (int)(y / z)))
-                    continue;
+        final Set<Coord2D> mask = new HashSet<>();
 
-                final Coord2D o = new Coord2D(x + Constants.OVERLAY_BORDER_PX,
-                        y + Constants.OVERLAY_BORDER_PX);
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                if (maskValidator.apply(x, y))
+                    mask.add(new Coord2D(x, y));
 
-                if (filled)
-                    overlay.fillRectangle(Constants.OVERLAY_FILL_C,
-                            o.x, o.y, zoomInc, zoomInc);
+        mask.forEach(pixel -> {
+            boolean leftFrontier = false,
+                    rightFrontier = false,
+                    topFrontier = false,
+                    bottomFrontier = false;
 
-                // left is off canvas or not marked
-                if (x - z < 0 || !maskValidator.apply((int)((x / z) - 1), (int)(y / z))) {
-                    overlay.fillRectangle(inside, o.x, o.y, 1, zoomInc);
-                    overlay.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
-                }
-                // right is off canvas or not marked
-                if (x + z >= scaleUpW || !maskValidator.apply((int)((x / z) + 1), (int)(y / z))) {
-                    overlay.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
-                    overlay.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
-                }
-                // top is off canvas or not marked
-                if (y - z < 0 || !maskValidator.apply((int)(x / z), (int)((y / z) - 1))) {
-                    overlay.fillRectangle(inside, o.x, o.y, zoomInc, 1);
-                    overlay.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
-                }
-                // bottom is off canvas or not marked
-                if (y + z >= scaleUpH || !maskValidator.apply((int)(x / z), (int)((y / z) + 1))) {
-                    overlay.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
-                    overlay.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
-                }
+            // frontier defined as unmarked or off canvas
+            if (pixel.x - 1 < 0 || !mask.contains(pixel.displace(-1, 0)))
+                leftFrontier = true;
+            if (pixel.x + 1 >= w || !mask.contains(pixel.displace(1, 0)))
+                rightFrontier = true;
+            if (pixel.y - 1 < 0 || !mask.contains(pixel.displace(0, -1)))
+                topFrontier = true;
+            if (pixel.y + 1 >= h || !mask.contains(pixel.displace(0, 1)))
+                bottomFrontier = true;
+
+            final Coord2D o = new Coord2D(
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.x),
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y)
+            );
+
+            if (filled)
+                overlay.fillRectangle(Constants.OVERLAY_FILL_C,
+                        o.x, o.y, zoomInc, zoomInc);
+
+            if (leftFrontier) {
+                overlay.fillRectangle(inside, o.x, o.y, 1, zoomInc);
+                overlay.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
             }
+            if (rightFrontier) {
+                overlay.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
+                overlay.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
+            }
+            if (topFrontier) {
+                overlay.fillRectangle(inside, o.x, o.y, zoomInc, 1);
+                overlay.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
+            }
+            if (bottomFrontier) {
+                overlay.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
+                overlay.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
+            }
+        });
 
         if (canTransform) {
             final int BEG = 0, MID = 1, END = 2;

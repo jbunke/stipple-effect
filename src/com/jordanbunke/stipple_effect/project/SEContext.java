@@ -1024,7 +1024,7 @@ public class SEContext {
                     .changeSelectionContents(rotated)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay();
+            redrawSelectionOverlay(); // TODO - overload function with delta version that only updates delta selection
         }
     }
 

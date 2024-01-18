@@ -45,7 +45,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
     private void drawSelection(final SEContext context) {
         selectionOverlay = SelectionUtils.drawOverlay(selection,
                 (x, y) -> selection.contains(new Coord2D(x, y)),
-                context.renderInfo.getZoomFactor(), true, false);
+                context.renderInfo.getZoomFactor(), false, false);
     }
 
     @Override
