@@ -52,6 +52,7 @@ public class IconCodes {
             ADD_TO_PALETTE = "add_color_to_palette",
             REMOVE_FROM_PALETTE = "remove_color_from_palette",
             IMPORT_PALETTE = "import_palette_file",
+            SAVE_PALETTE = "save_palette",
             CONTENTS_TO_PALETTE = "contents_to_palette",
             SORT_PALETTE = "sort_palette",
             PALETTIZE = "palettize",

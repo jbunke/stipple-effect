@@ -676,6 +676,7 @@ public class MenuAssembly {
                         IconCodes.ADD_TO_PALETTE,
                         IconCodes.REMOVE_FROM_PALETTE,
                         IconCodes.IMPORT_PALETTE,
+                        IconCodes.SAVE_PALETTE,
                         IconCodes.CONTENTS_TO_PALETTE,
                         IconCodes.SORT_PALETTE,
                         IconCodes.PALETTIZE,
@@ -684,6 +685,7 @@ public class MenuAssembly {
                         hasPaletteContents,
                         hasPaletteContents,
                         true,
+                        hasPaletteContents,
                         true,
                         hasPaletteContents,
                         hasPaletteContents
@@ -692,6 +694,8 @@ public class MenuAssembly {
                         () -> StippleEffect.get().addColorToPalette(),
                         () -> StippleEffect.get().removeColorFromPalette(),
                         () -> {}, // TODO
+                        () -> DialogAssembly
+                                .setDialogToSavePalette(palettes.get(index)),
                         DialogAssembly::setDialogToPaletteFromContents,
                         () -> DialogAssembly
                                 .setDialogToSortPalette(palettes.get(index)),

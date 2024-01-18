@@ -4,3 +4,4 @@ Invert selection: {Ctrl + I}
 Fill selection with primary color: {Backspace}
 Fill selection with secondary color: {Shift + Backspace}
 Erase selection contents: {Delete}
+Erase selection contents and keep selection area: {Shift + Delete}

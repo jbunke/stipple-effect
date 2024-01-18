@@ -361,6 +361,13 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToResize);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (hasPaletteContents())
+                            DialogAssembly.setDialogToSavePalette(
+                                    palettes.get(paletteIndex));
+                    });
         } else if (eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),

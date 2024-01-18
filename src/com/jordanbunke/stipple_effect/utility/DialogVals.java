@@ -4,6 +4,8 @@ import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 
+import java.nio.file.Path;
+
 public class DialogVals {
     private static int
             newProjectWidth = Constants.DEFAULT_IMAGE_W,
@@ -19,6 +21,7 @@ public class DialogVals {
     private static double layerOpacity = Constants.OPAQUE;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String layerName = "", paletteName = "";
+    private static Path paletteFolder = null;
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
     private static SettingScreen settingScreen = SettingScreen.STARTUP;
     private static PaletteSorter paletteSorter = PaletteSorter.HUE;
@@ -79,6 +82,10 @@ public class DialogVals {
 
     private static String enumPrintName(final String name) {
         return name.charAt(0) + name.substring(1).toLowerCase();
+    }
+
+    public static void setPaletteFolder(final Path paletteFolder) {
+        DialogVals.paletteFolder = paletteFolder;
     }
 
     public static void setOutlineSideMask(final boolean[] outlineSideMask) {
@@ -155,6 +162,10 @@ public class DialogVals {
 
     public static void setNewProjectYDivs(final int newProjectYDivs) {
         DialogVals.newProjectYDivs = newProjectYDivs;
+    }
+
+    public static Path getPaletteFolder() {
+        return paletteFolder;
     }
 
     public static InfoScreen getInfoScreen() {

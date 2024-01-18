@@ -67,6 +67,11 @@ public class StatusUpdates {
                 "Saved all frames in \"" + folder + "\"");
     }
 
+    public static void savedPalette(final Path filepath) {
+        StippleEffect.get().sendStatusUpdate("Saved palette to \"" +
+                filepath + "\"");
+    }
+
     public static void openFailed(final Path filepath) {
         StippleEffect.get().sendStatusUpdate("Couldn't open file \"" +
                 filepath + "\"");

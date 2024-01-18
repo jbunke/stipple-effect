@@ -20,6 +20,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.color_selection.Palette;
 import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicTextButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -59,55 +60,8 @@ public class DialogAssembly {
                 fpsLabel = makeDialogLeftLabel(4, "Frame rate: ");
 
         // folder selection button
-        final DynamicTextButton folderButton = new DynamicTextButton(
-                getDialogContentOffsetFromLabel(folderLabel),
-                Layout.getDialogContentWidthAllowance(),
-                MenuElement.Anchor.LEFT_TOP,
-                () -> {
-                    FileIO.setDialogToFoldersOnly();
-                    final Optional<File> opened = FileIO.openFileFromSystem();
-
-                    if (opened.isEmpty())
-                        return;
-
-                    final Path folder = opened.get().toPath();
-                    c.projectInfo.setFolder(folder);
-                },
-                () -> {
-                    final StringBuilder folderPathName = new StringBuilder();
-                    final String ELLIPSE = "...";
-
-                    Path folder = c.projectInfo.getFolder();
-                    int placements = 0;
-
-                    if (folder == null)
-                        return Constants.NO_FOLDER_SELECTED;
-
-                    do {
-                        final Path filename = folder.getFileName();
-
-                        final String level = filename != null
-                                ? filename.toString()
-                                : folder.getRoot().toString();
-
-                        if (placements == 0)
-                            folderPathName.insert(0, level);
-                        else if (folderPathName.length() + File.separator.length() +
-                                level.length() <= Constants.MAX_NAME_LENGTH) {
-                            folderPathName.insert(0, File.separator);
-                            folderPathName.insert(0, level);
-                        } else {
-                            folderPathName.insert(0, File.separator);
-                            folderPathName.insert(0, ELLIPSE);
-                            break;
-                        }
-
-                        placements++;
-                        folder = folder.getParent();
-                    } while (folder != null);
-
-                    return folderPathName.toString();
-                });
+        final DynamicTextButton folderButton = makeFolderSelectionButton(
+                folderLabel, c.projectInfo::getFolder, c.projectInfo::setFolder);
 
         // name text box
         final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
@@ -234,7 +188,7 @@ public class DialogAssembly {
                 folderLabel, nameLabel, scaleUpLabel, saveAsTypeLabel,
                 folderButton, nameTextBox, scaleUpSlider, scaleUpValue,
                 saveAsToggle, basedOnSaveType);
-        setDialog(assembleDialog("Save Project...", contents,
+        setDialog(assembleDialog("Save project...", contents,
                 () -> {
             if (c.projectInfo.getSaveType() == ProjectInfo.SaveType.PNG_STITCHED) {
                 final boolean enoughFrames = c.projectInfo.getFrameDimsX() *
@@ -652,6 +606,42 @@ public class DialogAssembly {
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
+    public static void setDialogToSavePalette(final Palette palette) {
+        final MenuBuilder mb = new MenuBuilder();
+
+        // labels
+        final TextLabel
+                folderLabel = makeDialogLeftLabel(0, "Folder: "),
+                nameLabel = makeDialogLeftLabel(1, "File name: ");
+
+        mb.add(folderLabel);
+        mb.add(nameLabel);
+
+        // folder button
+        final DynamicTextButton folderButton =
+                makeFolderSelectionButton(folderLabel,
+                        DialogVals::getPaletteFolder,
+                        DialogVals::setPaletteFolder);
+        mb.add(folderButton);
+
+        // name text box
+        final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
+                "", DialogVals::setPaletteName);
+        mb.add(nameTextBox);
+
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Save palette...",
+                contents, () -> nameTextBox.isValid() &&
+                        DialogVals.getPaletteFolder() != null, "Save",
+                () -> {
+                    final Path filepath = DialogVals.getPaletteFolder()
+                            .resolve(DialogVals.getPaletteName() +
+                                    "." + Constants.PALETTE_FILE_SUFFIX);
+                    ParserSerializer.savePalette(palette, filepath);
+                }, true));
+    }
+
     public static void setDialogToSortPalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final PaletteSorter[] vs = PaletteSorter.values();
@@ -695,7 +685,7 @@ public class DialogAssembly {
 
         contentTypeCycleToggle(mb, c);
 
-        // name text box
+        // name
         final TextLabel nameLabel = makeDialogLeftLabel(1, "Palette name:");
         final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
                 "", DialogVals::setPaletteName);
@@ -914,6 +904,62 @@ public class DialogAssembly {
 
     private static void setDialog(final Menu dialog) {
         StippleEffect.get().setDialog(dialog);
+    }
+
+    private static DynamicTextButton makeFolderSelectionButton(
+            final TextLabel label,
+            final Supplier<Path> getter, final Consumer<Path> setter
+    ) {
+        return new DynamicTextButton(
+                getDialogContentOffsetFromLabel(label),
+                Layout.getDialogContentWidthAllowance(),
+                MenuElement.Anchor.LEFT_TOP,
+                () -> {
+                    FileIO.setDialogToFoldersOnly();
+                    final Optional<File> opened = FileIO.openFileFromSystem();
+
+                    if (opened.isEmpty())
+                        return;
+
+                    final Path folder = opened.get().toPath();
+                    setter.accept(folder);
+                    // c.projectInfo.setFolder(folder);
+                },
+                () -> {
+                    final StringBuilder folderPathName = new StringBuilder();
+                    final String ELLIPSE = "...";
+
+                    Path folder = getter.get(); // c.projectInfo.getFolder();
+                    int placements = 0;
+
+                    if (folder == null)
+                        return Constants.NO_FOLDER_SELECTED;
+
+                    do {
+                        final Path filename = folder.getFileName();
+
+                        final String level = filename != null
+                                ? filename.toString()
+                                : folder.getRoot().toString();
+
+                        if (placements == 0)
+                            folderPathName.insert(0, level);
+                        else if (folderPathName.length() + File.separator.length() +
+                                level.length() <= Constants.MAX_NAME_LENGTH) {
+                            folderPathName.insert(0, File.separator);
+                            folderPathName.insert(0, level);
+                        } else {
+                            folderPathName.insert(0, File.separator);
+                            folderPathName.insert(0, ELLIPSE);
+                            break;
+                        }
+
+                        placements++;
+                        folder = folder.getParent();
+                    } while (folder != null);
+
+                    return folderPathName.toString();
+                });
     }
 
     private static GameImage[] makeBooleanToggleButtonSet() {
@@ -1323,6 +1369,7 @@ public class DialogAssembly {
                         IconCodes.ADD_TO_PALETTE,
                         IconCodes.REMOVE_FROM_PALETTE,
                         IconCodes.IMPORT_PALETTE,
+                        IconCodes.SAVE_PALETTE,
                         IconCodes.CONTENTS_TO_PALETTE,
                         IconCodes.SORT_PALETTE,
                         IconCodes.PALETTIZE
@@ -1334,6 +1381,7 @@ public class DialogAssembly {
                         "Remove selected color from palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +
                                 Constants.PALETTE_FILE_SUFFIX + ")",
+                        "Save palette to file",
                         "Turn project contents into new palette",
                         "Sort colors in palette",
                         "Palettize project contents"
@@ -1348,6 +1396,7 @@ public class DialogAssembly {
         return assembleInfoScreenContents(
                 new String[] {
                         IconCodes.INFO,
+                        IconCodes.PANEL_MANAGER,
                         IconCodes.SETTINGS,
                         IconCodes.NEW_PROJECT,
                         IconCodes.OPEN_FILE,
@@ -1362,7 +1411,7 @@ public class DialogAssembly {
                         IconCodes.REDO
                 },
                 new String[] {
-                        "Info", "Program Settings",
+                        "Info", "Open panel manager", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad", "Preview",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"

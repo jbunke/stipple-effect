@@ -418,6 +418,9 @@ public class SEContext {
                     }
             );
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
+                    () -> deleteSelectionContents(false));
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex())
             );
@@ -591,7 +594,7 @@ public class SEContext {
             // delete selection contents
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
-                    this::deleteSelectionContents);
+                    () -> deleteSelectionContents(true));
 
             // tool modifications
             if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {
@@ -1159,7 +1162,7 @@ public class SEContext {
     public void cut() {
         if (getState().hasSelection()) {
             SEClipboard.get().sendSelectionToClipboard(getState());
-            deleteSelectionContents();
+            deleteSelectionContents(true);
             StatusUpdates.sendToClipboard(false,
                     SEClipboard.get().getContents().getPixels());
         } else
@@ -1253,7 +1256,7 @@ public class SEContext {
     }
 
     // delete selection contents
-    public void deleteSelectionContents() {
+    public void deleteSelectionContents(final boolean deselect) {
         if (getState().hasSelection()) {
             final Set<Coord2D> selection = getState().getSelection();
 
@@ -1271,7 +1274,8 @@ public class SEContext {
             }
 
             stateManager.performAction(getState().changeSelectionBounds(
-                    new HashSet<>()), ActionType.CANVAS);
+                    new HashSet<>(deselect ? Set.of() : selection)),
+                    ActionType.CANVAS);
         }
     }
 
