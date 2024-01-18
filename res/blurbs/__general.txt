@@ -1,4 +1,6 @@
 Toggle fullscreen / windowed mode: {Escape}
 Recenter canvas in workspace: {Enter}
+Toggle show all UI / minimal UI mode: {Ctrl + Shift + A}
+
 Navigate to layer above: {Ctrl + Up Arrow Key}
 Navigate to layer below: {Ctrl + Down Arrow Key}

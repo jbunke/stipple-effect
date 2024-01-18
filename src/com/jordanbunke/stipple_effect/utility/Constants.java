@@ -9,10 +9,13 @@ import java.nio.file.Path;
 
 public class Constants {
     public static final String ABOUT = "about",
-            NAME_CODE = "name", VERSION_CODE = "version";
+            NAME_CODE = "name", VERSION_CODE = "version",
+            NATIVE_STANDARD_CODE = "native_standard",
+            PALETTE_STANDARD_CODE = "palette_standard";
 
     public static final Path PROGRAM_FILE = Path.of("program"),
             ICON_FOLDER = Path.of("icons"),
+            PALETTE_FOLDER = Path.of("palettes"),
             CURSOR_FOLDER = Path.of("cursors"),
             MISC_FOLDER = Path.of("misc"),
             TOOL_TIP_FOLDER = Path.of("tooltips"),
@@ -31,10 +34,12 @@ public class Constants {
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Layer ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
-            NATIVE_FILE_SUFFIX = "stip",
+            NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
+            COLOR_TOOL_TIP_PREFIX = "color:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
-            ICON_ID_GAP_CODE = "", GENERIC_APPROVAL_TEXT = "Confirm", TYPING_CODE = "typing";
+            ICON_ID_GAP_CODE = "", TYPING_CODE = "typing",
+            GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";
 
     public static final Color BACKGROUND = new Color(80, 80, 80),
             BLACK = new Color(0, 0, 0),
@@ -51,9 +56,10 @@ public class Constants {
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
             OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
-    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32, OVERLAY_BORDER_PX = 6,
+    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32,
             MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 800, MAX_IMAGE_H = 800,
-            SPLASH_TIMEOUT_SECS = 1800;
+            OVERLAY_BORDER_PX = 6, SPLASH_TIMEOUT_SECS = 1800, NO_SELECTION = -1,
+            MAX_PALETTE_SIZE = 300;
 
     public static final int DEFAULT_BRUSH_BREADTH = 3,
             MIN_BREADTH = 1, MAX_BREADTH = 200, BREADTH_INC = 5,
@@ -64,7 +70,7 @@ public class Constants {
             HUE_SCALE = 360, SAT_SCALE = RGBA_SCALE, VALUE_SCALE = RGBA_SCALE,
             STATUS_UPDATE_DURATION_MILLIS = 5000, TOOL_TIP_MILLIS_THRESHOLD = 500,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
-            MAX_NAME_LENGTH = 25, ARBITRARY_MAX_COUNT = 10000,
+            MAX_NAME_LENGTH = 40, ARBITRARY_MAX_COUNT = 10000,
             STRETCH_PX_THRESHOLD = 9, ROTATE_PX_THRESHOLD = 21;
 
     public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;

@@ -2,24 +2,25 @@
 
 Add:
 > Scripting language, system and previews
-> Adjustable panels
 > Grid
 > Symmetry tools
 
 Fix:
 > Memory safety issues and OutOfMemoryError crashes
 
-{TODO for 0.0.3}
+{TODO for 0.1.0}
 
 Add:
 x Add tooltips for icon buttons and icon toggle buttons
-> Palettes
-    > Add to palette
-    > Palette files
-> Dropdown menu element
-> Palettizer (layer/frame/entire project)
+x Palettes
+    x Add to palette
+    x Palette files
+x Dropdown menu element
+x Palettizer (layer/frame/entire project)
 x Native file type (.stip)
 x Preview window
+x Adjustable panels
+x Close program button and corresponding are-you-sure dialog
 
 Change:
 x 800x800 canvas size limit
@@ -27,9 +28,11 @@ x Update program icon
 x Change settings dialog to an info-style dialog with multiple tabs
 x Rework segments and render scale to be window and screen size dependent
 x Change brush select behaviour to preview overlay without editing selection until unclick
+> Redesign logo and splash screen
 
 Fix:
 > HSV slider slippage
+> Optimize selection overlays
 
 Remove:
 x Remove Piccolo font; set Classic to default

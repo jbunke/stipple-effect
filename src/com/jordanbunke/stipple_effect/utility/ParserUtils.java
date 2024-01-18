@@ -42,6 +42,9 @@ public class ParserUtils {
     }
 
     public static String[] getToolTip(final String toolTipCode) {
+        if (toolTipCode.startsWith(Constants.COLOR_TOOL_TIP_PREFIX))
+            return toolTipCode.substring(Constants.COLOR_TOOL_TIP_PREFIX.length()).split("\n");
+
         final Path blurbFile = Constants.TOOL_TIP_FOLDER
                 .resolve(toolTipCode + ".txt");
 

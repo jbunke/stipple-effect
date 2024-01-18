@@ -89,6 +89,14 @@ public final class SELayer {
                 enabled, framesLinked, onionSkinMode, name + " (copy)");
     }
 
+    public SELayer returnFrameReplaced(final GameImage edit, final int frameIndex) {
+        final List<GameImage> frames = new ArrayList<>(this.frames);
+        frames.set(frameIndex, edit);
+
+        return new SELayer(frames, edit, opacity, enabled,
+                framesLinked, onionSkinMode, name);
+    }
+
     public SELayer returnStamped(
             final GameImage edit, final Set<Coord2D> pixels, final int frameIndex
     ) {

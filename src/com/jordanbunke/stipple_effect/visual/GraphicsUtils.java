@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
@@ -107,9 +108,25 @@ public class GraphicsUtils {
         return nhi.submit();
     }
 
-    public static GameImage drawTextButton(
+    public static GameImage drawDropDownButton(
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
+    ) {
+        final GameImage base = drawTextButton(width, text, isSelected,
+                backgroundColor, true);
+
+        final GameImage icon = GraphicsUtils.loadIcon(isSelected
+                ? IconCodes.COLLAPSE : IconCodes.EXPAND);
+
+        base.draw(icon, base.getWidth() - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
+
+        return base.submit();
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text,
+            final boolean isSelected, final Color backgroundColor,
+            final boolean leftAligned
     ) {
         final Color textColor = textButtonColorFromBackgroundColor(
                 backgroundColor, true);
@@ -123,11 +140,32 @@ public class GraphicsUtils {
         final GameImage nhi = new GameImage(w, h);
         nhi.fillRectangle(backgroundColor, 0, 0, w, h);
 
-        nhi.draw(textImage, (w - textImage.getWidth()) / 2, Layout.BUTTON_TEXT_OFFSET_Y);
+        final int x = leftAligned
+                ? (2 * Layout.BUTTON_BORDER_PX)
+                : (w - textImage.getWidth()) / 2;
+
+        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
         final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
         nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return nhi.submit();
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text,
+            final boolean isSelected, final Color backgroundColor
+    ) {
+        return drawTextButton(width, text, isSelected, backgroundColor, false);
+    }
+
+    public static SimpleMenuButton makeStandardTextButton(
+            final String text, final Coord2D pos, final Runnable onClick
+    ) {
+        final GameImage base = drawTextButton(Layout.STD_TEXT_BUTTON_W,
+                text, false, Constants.GREY);
+        return new SimpleMenuButton(pos, new Coord2D(Layout.STD_TEXT_BUTTON_W,
+                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
+                true, onClick, base, drawHighlightedButton(base));
     }
 
     private static Color textButtonColorFromBackgroundColor(

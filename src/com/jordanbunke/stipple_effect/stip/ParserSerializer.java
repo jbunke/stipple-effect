@@ -3,23 +3,27 @@ package com.jordanbunke.stipple_effect.stip;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
+import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.color_selection.Palette;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
 
 import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ParserSerializer {
     private static final char NL = '\n', INDENT = '\t',
             ENCLOSER_OPEN = '{', ENCLOSER_CLOSE = '}';
 
-    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":", FILE_STANDARD = "1.0";
+    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":";
 
     private static final int NOT_FOUND = -1;
 
@@ -28,6 +32,7 @@ public class ParserSerializer {
 
             INVALID_TAG = "invalid",
             FILE_STANDARD_TAG = "file_standard",
+            PALETTE_NAME_TAG = "palette_name",
             LAYERS_TAG = "layers",
             LAYER_TAG = "layer",
             LAYER_NAME_TAG = "layer_name",
@@ -41,8 +46,78 @@ public class ParserSerializer {
             COLOR_TAG = "cols",
             DIMENSION_TAG = "dims";
 
-    public static SEContext load(final Path filepath) {
-        final String contents = FileIO.readFile(filepath)
+    public static Palette loadPalette(final String file) {
+        final String contents = file
+                .replaceAll("\n", "")
+                .replaceAll("\r", "")
+                .replaceAll("\t", "");
+
+        return deserializePalette(contents);
+    }
+
+    private static Palette deserializePalette(final String contents) {
+        final SerialBlock[] paletteBlocks = deserializeBlocksAtDepthLevel(contents);
+
+        Color[] colors = new Color[] {};
+        String name = "";
+
+        for (SerialBlock block : paletteBlocks) {
+            switch (block.tag()) {
+                case PALETTE_NAME_TAG -> name = block.value();
+                case COLOR_TAG -> {
+                    final String[] colorCodes = block.value()
+                            .split(CONTENT_SEPARATOR);
+
+                    colors = block.value().contains(CONTENT_SEPARATOR)
+                            ? Arrays.stream(colorCodes)
+                            .map(ParserSerializer::deserializeColor)
+                            .toArray(Color[]::new)
+                            : new Color[] {};
+                }
+            }
+        }
+
+        return new Palette(name, colors);
+    }
+
+    public static void savePalette(final Palette palette, final Path filepath) {
+        final String serialized = serializePalette(palette);
+        FileIO.writeFile(filepath, serialized);
+        StatusUpdates.savedPalette(filepath);
+    }
+
+    private static String serializePalette(final Palette palette) {
+        final StringBuilder sb = new StringBuilder();
+
+        // metadata: file standard
+        openWithTag(sb, FILE_STANDARD_TAG).append(StippleEffect.PALETTE_STANDARD)
+                .append(ENCLOSER_CLOSE).append(NL);
+
+        // palette name definition
+        openWithTag(sb, PALETTE_NAME_TAG).append(palette.getName())
+                .append(ENCLOSER_CLOSE).append(NL);
+
+        // colors tag opener - inline so no NL
+        openWithTag(sb, COLOR_TAG);
+
+        // colors
+        final Color[] colors = palette.getColors();
+
+        for (int i = 0; i < colors.length; i++) {
+            sb.append(serializeColor(colors[i]));
+
+            if (i + 1 < colors.length)
+                sb.append(CONTENT_SEPARATOR);
+        }
+
+        // colors tag closer
+        sb.append(ENCLOSER_CLOSE).append(NL);
+
+        return sb.toString();
+    }
+
+    public static SEContext load(final String file, final Path filepath) {
+        final String contents = file
                 .replaceAll("\n", "")
                 .replaceAll("\r", "")
                 .replaceAll("\t", "");
@@ -240,7 +315,7 @@ public class ParserSerializer {
         final StringBuilder sb = new StringBuilder();
 
         // metadata: file standard
-        openWithTag(sb, FILE_STANDARD_TAG).append(FILE_STANDARD)
+        openWithTag(sb, FILE_STANDARD_TAG).append(StippleEffect.NATIVE_STANDARD)
                 .append(ENCLOSER_CLOSE).append(NL);
 
         final int w = state.getImageWidth(), h = state.getImageHeight(),
