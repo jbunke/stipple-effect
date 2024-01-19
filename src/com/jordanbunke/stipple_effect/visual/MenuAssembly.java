@@ -11,7 +11,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuEleme
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
+import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
@@ -680,10 +680,10 @@ public class MenuAssembly {
                         IconCodes.PALETTIZE,
                 },
                 new boolean[] {
-                        hasPaletteContents,
-                        hasPaletteContents,
+                        hasPaletteContents && StippleEffect.get().getSelectedPalette().isMutable(),
+                        hasPaletteContents && StippleEffect.get().getSelectedPalette().isMutable(),
                         true,
-                        hasPaletteContents,
+                        hasPaletteContents && StippleEffect.get().getSelectedPalette().isMutable(),
                         true,
                         hasPaletteContents,
                         hasPaletteContents

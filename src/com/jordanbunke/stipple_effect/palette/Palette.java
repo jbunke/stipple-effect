@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.color_selection;
+package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
@@ -12,24 +12,36 @@ import java.util.List;
 
 public class Palette {
     private final String name;
+    private final boolean mutable;
     private final List<Color> colorSequence;
 
     public Palette(final String name, final Color[] loaded) {
+        this(name, loaded, true);
+    }
+
+    public Palette(
+            final String name, final Color[] loaded, final boolean mutable
+    ) {
         this.name = name;
+        this.mutable = mutable;
         this.colorSequence = new ArrayList<>();
 
         for (Color c : loaded)
-            addColor(c);
+            if (!colorSequence.contains(c))
+                colorSequence.add(c);
     }
 
     public void addColor(final Color c) {
-        if (colorSequence.contains(c))
+        if (!mutable || colorSequence.contains(c))
             return;
 
         colorSequence.add(c);
     }
 
     public void removeColor(final Color c) {
+        if (!mutable)
+            return;
+
         colorSequence.remove(c);
     }
 
@@ -93,5 +105,9 @@ public class Palette {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isMutable() {
+        return mutable;
     }
 }

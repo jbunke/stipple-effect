@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.color_selection;
+package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
@@ -14,7 +14,9 @@ import java.util.Set;
 
 public class PaletteLoader {
     // palette codes
-    private static final String NES_PALETTE = "nes", WINDOWS_PALETTE = "win";
+    private static final String NES_PALETTE = "nes",
+            PICO_8_PALETTE = "pico_8",
+            WINDOWS_PALETTE = "win";
 
     public static List<Palette> loadOnStartup() {
         final List<Palette> palettes = new ArrayList<>();
@@ -26,10 +28,13 @@ public class PaletteLoader {
 
     private static void loadHardCodedPalettes(final List<Palette> palettes) {
         palettes.add(new Palette("Black & White (1-bit)",
-                new Color[] { Constants.BLACK, Constants.WHITE }));
-        palettes.add(new Palette("NES", paletteColorsFromCode(NES_PALETTE)));
+                new Color[] { Constants.BLACK, Constants.WHITE }, false));
+        palettes.add(new Palette("NES",
+                paletteColorsFromCode(NES_PALETTE), false));
+        palettes.add(new Palette("PICO-8",
+                paletteColorsFromCode(PICO_8_PALETTE), false));
         palettes.add(new Palette("Windows",
-                paletteColorsFromCode(WINDOWS_PALETTE)));
+                paletteColorsFromCode(WINDOWS_PALETTE), false));
     }
 
     private static Color[] paletteColorsFromCode(final String code) {

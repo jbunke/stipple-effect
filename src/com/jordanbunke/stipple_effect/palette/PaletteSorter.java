@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.color_selection;
+package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.stipple_effect.utility.ColorMath;
 

@@ -21,6 +21,7 @@ x Native file type (.stip)
 x Preview window
 x Adjustable panels
 x Close program button and corresponding are-you-sure dialog
+x New file dialog suggests project canvas size based on clipboard image size if present
 
 Change:
 x 800x800 canvas size limit

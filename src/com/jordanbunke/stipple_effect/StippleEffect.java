@@ -19,9 +19,9 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.window.GameWindow;
-import com.jordanbunke.stipple_effect.color_selection.ColorMenuMode;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
-import com.jordanbunke.stipple_effect.color_selection.PaletteLoader;
+import com.jordanbunke.stipple_effect.palette.ColorMenuMode;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
@@ -267,6 +267,7 @@ public class StippleEffect implements ProgramContext {
         rebuildLayersMenu();
         rebuildFramesMenu();
         rebuildProjectsMenu();
+        rebuildBottomBarMenu();
     }
 
     public void rebuildColorsMenu() {
@@ -277,6 +278,9 @@ public class StippleEffect implements ProgramContext {
     public void rebuildToolButtonMenu() {
         toolButtonMenu = Layout.isToolbarShowing()
                 ? MenuAssembly.buildToolButtonMenu() : MenuAssembly.stub();
+    }
+
+    public void rebuildBottomBarMenu() {
         bottomBarMenu = MenuAssembly.buildBottomBarMenu();
     }
 
@@ -357,8 +361,7 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
                         if (hasPaletteContents())
-                            DialogAssembly.setDialogToSavePalette(
-                                    palettes.get(paletteIndex));
+                            DialogAssembly.setDialogToSavePalette(getSelectedPalette());
                     });
         } else if (eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
@@ -380,8 +383,7 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
                         if (hasPaletteContents())
-                            DialogAssembly.setDialogToPalettize(
-                                    palettes.get(paletteIndex));
+                            DialogAssembly.setDialogToPalettize(getSelectedPalette());
                     });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
@@ -762,9 +764,11 @@ public class StippleEffect implements ProgramContext {
             DialogAssembly.setDialogToOpenPNG(image, filepath);
         } else if (fileName.endsWith(Constants.PALETTE_FILE_SUFFIX)) {
             final String file = FileIO.readFile(filepath);
-            final Palette palette = ParserSerializer.loadPalette(file);
 
-            get().addPalette(palette, true);
+            if (file != null)
+                get().addPalette(ParserSerializer.loadPalette(file), true);
+            else
+                StatusUpdates.openFailed(filepath);
         }
         // extend with else-ifs for additional file types classes (scripts, palettes)
     }
@@ -774,7 +778,6 @@ public class StippleEffect implements ProgramContext {
 
         if (contents != null) {
             final SEContext project = ParserSerializer.load(contents, filepath);
-            project.initializeRender();
             addContext(project, true);
         } else
             StatusUpdates.openFailed(filepath);
@@ -817,7 +820,6 @@ public class StippleEffect implements ProgramContext {
 
         final SEContext project = new SEContext(
                 new ProjectInfo(filepath), initialState, fw, fh);
-        project.initializeRender();
         addContext(project, true);
 
         processNextImport();
@@ -877,16 +879,20 @@ public class StippleEffect implements ProgramContext {
                 palettes != null && paletteIndex < palettes.size();
     }
 
+    public Palette getSelectedPalette() {
+        return hasPaletteContents() ? palettes.get(paletteIndex) : null;
+    }
+
     public void addColorToPalette() {
         if (hasPaletteContents()) {
-            palettes.get(paletteIndex).addColor(getSelectedColor());
+            getSelectedPalette().addColor(getSelectedColor());
             rebuildColorsMenu();
         }
     }
 
     public void removeColorFromPalette() {
         if (hasPaletteContents()) {
-            palettes.get(paletteIndex).removeColor(getSelectedColor());
+            getSelectedPalette().removeColor(getSelectedColor());
             rebuildColorsMenu();
         }
     }

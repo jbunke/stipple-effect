@@ -17,10 +17,17 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.AnimationMenuElemen
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
-import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.selection.SEClipboard;
+import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicTextButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -29,11 +36,6 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.TextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
-import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.selection.Outliner;
-import com.jordanbunke.stipple_effect.tools.Tool;
-import com.jordanbunke.stipple_effect.utility.*;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -398,6 +400,26 @@ public class DialogAssembly {
     }
 
     public static void setDialogToNewProject() {
+        // initial canvas size suggestion determination
+        final int initialW, initialH;
+        final boolean hasClipboard = SEClipboard.get().hasContents();
+
+        if (hasClipboard) {
+            final Set<Coord2D> clipboard = SEClipboard.get()
+                    .getContents().getPixels();
+            final Coord2D tl = SelectionUtils.topLeft(clipboard),
+                    br = SelectionUtils.bottomRight(clipboard);
+
+            initialW = br.x - tl.x;
+            initialH = br.y - tl.y;
+        } else {
+            initialW = Constants.DEFAULT_IMAGE_W;
+            initialH = Constants.DEFAULT_IMAGE_H;
+        }
+
+        DialogVals.setNewProjectWidth(initialW);
+        DialogVals.setNewProjectHeight(initialH);
+
         // text labels
         final TextLabel
                 widthLabel = makeDialogLeftLabel(1, "Width: "),
@@ -406,10 +428,10 @@ public class DialogAssembly {
 
         // dim textboxes
         final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
-                widthLabel, Constants.DEFAULT_IMAGE_W, Constants.MIN_IMAGE_W,
+                widthLabel, initialW, Constants.MIN_IMAGE_W,
                 Constants.MAX_IMAGE_W, "px", DialogVals::setNewProjectWidth, 3);
         final TextBox heightTextBox = DialogAssembly.makeDialogNumericalTextBox(
-                heightLabel, Constants.DEFAULT_IMAGE_H, Constants.MIN_IMAGE_H,
+                heightLabel, initialH, Constants.MIN_IMAGE_H,
                 Constants.MAX_IMAGE_H, "px", DialogVals::setNewProjectHeight, 3);
 
         final MenuElementGrouping contents = new MenuElementGrouping(

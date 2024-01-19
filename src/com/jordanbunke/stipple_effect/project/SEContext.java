@@ -6,8 +6,8 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
-import com.jordanbunke.stipple_effect.color_selection.PaletteLoader;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -57,11 +57,6 @@ public class SEContext {
         inWorkspaceBounds = false;
 
         redrawCheckerboard();
-    }
-
-    public void initializeRender() {
-        snapToCenterOfImage();
-        renderInfo.setZoomFactor(Constants.DEF_ZOOM);
     }
 
     public void redrawSelectionOverlay() {
@@ -300,8 +295,6 @@ public class SEContext {
                         renderInfo.zoomIn(targetPixel);
                     else
                         renderInfo.zoomOut();
-
-                    StippleEffect.get().rebuildToolButtonMenu();
                 }
             }
     }
@@ -685,16 +678,10 @@ public class SEContext {
             } else if (StippleEffect.get().getTool().equals(Zoom.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> {
-                            renderInfo.zoomIn(targetPixel);
-                            StippleEffect.get().rebuildToolButtonMenu();
-                        });
+                        () -> renderInfo.zoomIn(targetPixel));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> {
-                            renderInfo.zoomOut();
-                            StippleEffect.get().rebuildToolButtonMenu();
-                        });
+                        renderInfo::zoomOut);
             }
         }
     }
@@ -1178,7 +1165,7 @@ public class SEContext {
             final SelectionContents toPaste = SEClipboard.get().getContents();
 
             if (newLayer)
-                addLayer(true);
+                addLayer(false);
 
             final Coord2D tl = SelectionUtils.topLeft(toPaste.getPixels()),
                     br = SelectionUtils.bottomRight(toPaste.getPixels());
