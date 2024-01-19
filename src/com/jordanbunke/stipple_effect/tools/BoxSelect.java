@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.util.HashSet;
@@ -63,9 +64,11 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool {
             endTP = tp;
             topLeft = tp;
             bottomRight = tp;
-        }
 
-        selectionOverlay = GameImage.dummy();
+            selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                    context.renderInfo.getZoomFactor(),
+                    new HashSet<>(Set.of(tp)), false, false);
+        }
     }
 
     @Override
@@ -83,12 +86,12 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool {
             topLeft = SelectionUtils.topLeft(bounds);
             bottomRight = SelectionUtils.bottomRight(bounds);
 
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
+            for (int x = topLeft.x; x < bottomRight.x; x++)
+                for (int y = topLeft.y; y < bottomRight.y; y++)
+                    bounds.add(new Coord2D(x, y));
 
-            selectionOverlay = SelectionUtils.drawOverlay(bounds,
-                    (x, y) -> x >= 0 && x < w && y >= 0 && y < h,
-                    context.renderInfo.getZoomFactor(), false, false);
+            selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                    context.renderInfo.getZoomFactor(), bounds, false, false);
         }
     }
 

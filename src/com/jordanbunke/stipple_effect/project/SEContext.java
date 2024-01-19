@@ -17,6 +17,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
@@ -61,17 +62,16 @@ public class SEContext {
 
     public void redrawSelectionOverlay() {
         final Set<Coord2D> selection = getState().getSelection();
-
         final Tool tool = StippleEffect.get().getTool();
 
         final boolean movable = Tool.canMoveSelectionBounds(tool) ||
                 tool.equals(Wand.get());
 
         selectionOverlay = getState().hasSelection()
-                ? SelectionUtils.drawOverlay(selection, (x, y) ->
-                        selection.contains(new Coord2D(x, y)),
-                renderInfo.getZoomFactor(),
-                movable, tool instanceof MoverTool) : GameImage.dummy();
+                ? GraphicsUtils.drawSelectionOverlay(
+                        renderInfo.getZoomFactor(), selection,
+                movable, tool instanceof MoverTool)
+                : GameImage.dummy();
     }
 
     private Coord2D[] getImageRenderBounds(
@@ -130,7 +130,7 @@ public class SEContext {
                     (int)(bounds[DIM].y * zoomFactor));
 
             // canvas
-            GameImage canvas = getState().draw(true,
+            final GameImage canvas = getState().draw(true,
                     true, getState().getFrameIndex());
 
             workspace.draw(canvas.section(bounds[TL], bounds[BR]),
@@ -140,11 +140,11 @@ public class SEContext {
         }
 
         // OVERLAYS
-        final Tool tool = StippleEffect.get().getTool();
+        if (zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
+            final Tool tool = StippleEffect.get().getTool();
 
-        if (inWorkspaceBounds) {
             // brush / eraser overlay
-            if (tool instanceof ToolWithBreadth twb && zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
+            if (inWorkspaceBounds && tool instanceof ToolWithBreadth twb) {
                 final GameImage overlay = twb.getOverlay();
                 final int offset = twb.breadthOffset();
 
@@ -154,29 +154,30 @@ public class SEContext {
                         Math.round((targetPixel.y - offset) * zoomFactor) -
                         Constants.OVERLAY_BORDER_PX);
             }
-        }
 
-        // selection overlay - drawing box
-        if (tool instanceof OverlayTool overlayTool && overlayTool.isDrawing()) {
-            final Coord2D tl = overlayTool.getTopLeft();
-            final GameImage boxOverlay = overlayTool.getSelectionOverlay();
+            // selection overlay - drawing box
+            if (tool instanceof OverlayTool overlayTool &&
+                    overlayTool.isDrawing()) {
+                final Coord2D tl = overlayTool.getTopLeft();
+                final GameImage overlay = overlayTool.getSelectionOverlay();
 
-            workspace.draw(boxOverlay,
-                    (render.x + (int)(tl.x * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX,
-                    (render.y + (int)(tl.y * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX);
-        }
+                workspace.draw(overlay,
+                        (render.x + (int)(tl.x * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX,
+                        (render.y + (int)(tl.y * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX);
+            }
 
-        // persistent selection overlay
-        if (getState().hasSelection()) {
-            final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
+            // persistent selection overlay
+            if (getState().hasSelection()) {
+                final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
 
-            workspace.draw(selectionOverlay,
-                    (render.x + (int)(tl.x * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX,
-                    (render.y + (int)(tl.y * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX);
+                workspace.draw(selectionOverlay,
+                        (render.x + (int)(tl.x * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX,
+                        (render.y + (int)(tl.y * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX);
+            }
         }
 
         return workspace.submit();
@@ -972,7 +973,6 @@ public class SEContext {
                     .changeSelectionContents(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1011,7 +1011,7 @@ public class SEContext {
                     .changeSelectionContents(rotated)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay(); // TODO - overload function with delta version that only updates delta selection
+            redrawSelectionOverlay();
         }
     }
 
@@ -1053,7 +1053,6 @@ public class SEContext {
                     .changeSelectionBounds(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay();
         }
     }
 

@@ -917,7 +917,7 @@ public class DialogAssembly {
         final GameImage[] frames = SplashLoader.loadAnimationFrames();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
-                MenuElement.Anchor.CENTRAL, 10,
+                MenuElement.Anchor.CENTRAL, 5,
                 SplashLoader.loadAnimationFrames()));
 
         setDialog(mb.build());

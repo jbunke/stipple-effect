@@ -101,7 +101,7 @@ public class PlaybackInfo {
     public boolean checkIfNextFrameDue(final double deltaTime) {
         nanosAccumulated += deltaTime;
 
-        while (nanosAccumulated > NANOS_IN_MILLI) {
+        while (nanosAccumulated >= NANOS_IN_MILLI) {
             nanosAccumulated -= NANOS_IN_MILLI;
             millisAccumulated++;
         }
@@ -115,11 +115,15 @@ public class PlaybackInfo {
     }
 
     public void setFps(final int fps) {
+        final int was = this.fps;
         this.fps = Math.max(Constants.MIN_PLAYBACK_FPS,
                 Math.min(fps, Constants.MAX_PLAYBACK_FPS));
-        updateMillisPerFrame();
-        millisAccumulated = 0;
-        nanosAccumulated = 0d;
+
+        if (this.fps != was) {
+            updateMillisPerFrame();
+            millisAccumulated = 0;
+            nanosAccumulated = 0d;
+        }
     }
 
     public void setMode(final Mode mode) {

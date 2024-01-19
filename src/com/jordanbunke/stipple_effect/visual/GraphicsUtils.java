@@ -9,6 +9,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class GraphicsUtils {
     public static final GameImage
@@ -202,20 +204,28 @@ public class GraphicsUtils {
         return hi.submit();
     }
 
+    public static GameImage drawSelectionOverlay(
+            final double z, final Set<Coord2D> selection,
+            final boolean filled, final boolean canTransform
+    ) {
+        final Coord2D tl = SelectionUtils.topLeft(selection),
+                br = SelectionUtils.bottomRight(selection);
+
+        final Set<Coord2D> adjusted = selection.stream()
+                .map(p -> p.displace(-tl.x, -tl.y))
+                .collect(Collectors.toSet());
+        final int w = br.x - tl.x, h = br.y - tl.y;
+
+        return drawOverlay(w, h, z, adjusted, Constants.BLACK,
+                Constants.HIGHLIGHT_1, filled, canTransform);
+    }
+
     public static GameImage drawOverlay(
             final int w, final int h, final double z,
             final BiFunction<Integer, Integer, Boolean> maskValidator,
             final Color inside, final Color outside,
             final boolean filled, final boolean canTransform
     ) {
-        final int scaleUpW = (int)Math.max(1, w * z),
-                scaleUpH = (int)Math.max(1, h * z),
-                zoomInc = (int)(Math.max(1, z));
-
-        final GameImage overlay = new GameImage(
-                scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
-                scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
-
         final Set<Coord2D> mask = new HashSet<>();
 
         for (int x = 0; x < w; x++)
@@ -223,20 +233,40 @@ public class GraphicsUtils {
                 if (maskValidator.apply(x, y))
                     mask.add(new Coord2D(x, y));
 
-        mask.forEach(pixel -> {
+        return drawOverlay(w, h, z, mask, inside, outside,
+                filled, canTransform);
+    }
+
+    private static GameImage drawOverlay(
+            final int w, final int h, final double z,
+            final Set<Coord2D> selection,
+            final Color inside, final Color outside,
+            final boolean filled, final boolean canTransform
+    ) {
+        final int zoomInc = (int)Math.max(Constants.ZOOM_FOR_OVERLAY, z),
+                scaleUpW = Math.max(1, w * zoomInc),
+                scaleUpH = Math.max(1, h * zoomInc);
+
+        final GameImage overlay = new GameImage(
+                scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
+                scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
+
+        selection.stream().filter(
+                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h
+        ).forEach(pixel -> {
             boolean leftFrontier = false,
                     rightFrontier = false,
                     topFrontier = false,
                     bottomFrontier = false;
 
             // frontier defined as unmarked or off canvas
-            if (pixel.x - 1 < 0 || !mask.contains(pixel.displace(-1, 0)))
+            if (pixel.x - 1 < 0 || !selection.contains(pixel.displace(-1, 0)))
                 leftFrontier = true;
-            if (pixel.x + 1 >= w || !mask.contains(pixel.displace(1, 0)))
+            if (pixel.x + 1 >= w || !selection.contains(pixel.displace(1, 0)))
                 rightFrontier = true;
-            if (pixel.y - 1 < 0 || !mask.contains(pixel.displace(0, -1)))
+            if (pixel.y - 1 < 0 || !selection.contains(pixel.displace(0, -1)))
                 topFrontier = true;
-            if (pixel.y + 1 >= h || !mask.contains(pixel.displace(0, 1)))
+            if (pixel.y + 1 >= h || !selection.contains(pixel.displace(0, 1)))
                 bottomFrontier = true;
 
             final Coord2D o = new Coord2D(
@@ -267,23 +297,24 @@ public class GraphicsUtils {
         });
 
         if (canTransform) {
+            final Coord2D tl = SelectionUtils.topLeft(selection),
+                    br = SelectionUtils.bottomRight(selection);
+
             final int BEG = 0, MID = 1, END = 2;
             final int[] xs = new int[] {
-                    0, (overlay.getWidth() - TRANSFORM_NUB.getWidth()) / 2,
-                    overlay.getWidth() - TRANSFORM_NUB.getWidth()
+                    tl.x * zoomInc,
+                    (int)(((tl.x + br.x) / 2d) * zoomInc),
+                    br.x * zoomInc
             }, ys = new int[] {
-                    0, (overlay.getHeight() - TRANSFORM_NUB.getHeight()) / 2,
-                    overlay.getHeight() - TRANSFORM_NUB.getHeight()
+                    tl.y * zoomInc,
+                    (int)(((tl.y + br.y) / 2d) * zoomInc),
+                    br.y * zoomInc
             };
 
-            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[BEG]);
-            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[END]);
-            overlay.draw(TRANSFORM_NUB, xs[END], ys[BEG]);
-            overlay.draw(TRANSFORM_NUB, xs[END], ys[END]);
-            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[MID]);
-            overlay.draw(TRANSFORM_NUB, xs[END], ys[MID]);
-            overlay.draw(TRANSFORM_NUB, xs[MID], ys[BEG]);
-            overlay.draw(TRANSFORM_NUB, xs[MID], ys[END]);
+            for (int x = BEG; x <= END; x++)
+                for (int y = BEG; y <= END; y++)
+                    if (x != MID || y != MID)
+                        overlay.draw(TRANSFORM_NUB, xs[x], ys[y]);
         }
 
         return overlay.submit();

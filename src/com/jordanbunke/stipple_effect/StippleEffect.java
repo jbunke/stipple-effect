@@ -177,6 +177,7 @@ public class StippleEffect implements ProgramContext {
 
         game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
         game.setCanvasSize(Layout.width(), Layout.height());
+        game.setScheduleUpdates(false);
 
         millisSinceStatusUpdate = 0;
         statusUpdate = GameImage.dummy();

@@ -36,6 +36,7 @@ public class PreviewWindow implements ProgramContext {
         window = makeWindow();
         preview = new Game(window, new GameManager(0, this));
         preview.getDebugger().getChannel(GameDebugger.FRAME_RATE).mute();
+        preview.setScheduleUpdates(false);
         window.setOnCloseBehaviour(preview::terminateExecution);
     }
 

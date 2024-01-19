@@ -33,7 +33,7 @@ x Change brush select behaviour to preview overlay without editing selection unt
 
 Fix:
 > HSV slider slippage
-> Optimize selection overlays
+x Optimize selection overlays
 
 Remove:
 x Remove Piccolo font; set Classic to default

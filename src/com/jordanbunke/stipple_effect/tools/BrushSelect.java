@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,9 +44,8 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
     }
 
     private void drawSelection(final SEContext context) {
-        selectionOverlay = SelectionUtils.drawOverlay(selection,
-                (x, y) -> selection.contains(new Coord2D(x, y)),
-                context.renderInfo.getZoomFactor(), false, false);
+        selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                context.renderInfo.getZoomFactor(), selection, false, false);
     }
 
     @Override

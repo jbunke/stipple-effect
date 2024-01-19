@@ -73,7 +73,7 @@ public class Constants {
             MAX_NAME_LENGTH = 40, ARBITRARY_MAX_COUNT = 10000,
             STRETCH_PX_THRESHOLD = 9, ROTATE_PX_THRESHOLD = 21;
 
-    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;
+    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 1f;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
