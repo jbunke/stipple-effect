@@ -211,18 +211,17 @@ public class MenuAssembly {
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().getContext().addFrame(),
-                () -> StippleEffect.get().getContext().duplicateFrame(),
-                () -> StippleEffect.get().getContext().removeFrame(),
-                () -> StippleEffect.get().getContext().moveFrameBack(),
-                () -> StippleEffect.get().getContext().moveFrameForward(),
-                () -> StippleEffect.get().getContext().getState().setFrameIndex(0),
-                () -> StippleEffect.get().getContext().getState().previousFrame(),
+                c::addFrame,
+                c::duplicateFrame,
+                c::removeFrame,
+                c::moveFrameBack,
+                c::moveFrameForward,
+                () -> c.getState().setFrameIndex(0),
+                () -> c.getState().previousFrame(),
                 () -> {}, // placeholder
-                () -> StippleEffect.get().getContext().getState().nextFrame(),
-                () -> StippleEffect.get().getContext().getState().setFrameIndex(
-                        StippleEffect.get().getContext().getState().getFrameCount() - 1
-                )
+                () -> c.getState().nextFrame(),
+                () -> c.getState().setFrameIndex(
+                        c.getState().getFrameCount() - 1)
         };
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
@@ -258,7 +257,7 @@ public class MenuAssembly {
 
         mb.add(new DynamicLabel(labelPos,
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
-                () -> StippleEffect.get().getContext().playbackInfo.getFps() + " fps",
+                () -> c.playbackInfo.getFps() + " fps",
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 
         final Coord2D playbackSliderPos = Layout.getFramesPosition().displace(
@@ -268,15 +267,13 @@ public class MenuAssembly {
         final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
                 Layout.getUISliderWidth(), MenuElement.Anchor.RIGHT_TOP,
                 Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                StippleEffect.get().getContext().playbackInfo.getFps(),
-                mpf -> StippleEffect.get().getContext()
-                        .playbackInfo.setFps(mpf));
+                c.playbackInfo::getFps, c.playbackInfo::setFps);
         slider.updateAssets();
         mb.add(slider);
 
         // frame content
 
-        final int amount = StippleEffect.get().getContext().getState().getFrameCount(),
+        final int amount = c.getState().getFrameCount(),
                 elementsPerFrame = 1;
 
         final ScrollableMenuElement[] frameElements =
@@ -297,8 +294,8 @@ public class MenuAssembly {
 
             frameElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
-                    i, () -> StippleEffect.get().getContext().getState().getFrameIndex(),
-                    s -> StippleEffect.get().getContext().getState().setFrameIndex(s)
+                    i, () -> c.getState().getFrameIndex(),
+                    s -> c.getState().setFrameIndex(s)
             ));
 
             realRightX = pos.x + dims.x;
@@ -355,6 +352,7 @@ public class MenuAssembly {
 
     public static Menu buildLayersMenu() {
         final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
 
         mb.add(TextLabel.make(Layout.getLayersPosition().displace(
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
@@ -371,23 +369,23 @@ public class MenuAssembly {
         };
 
         final boolean[] preconditions = new boolean[] {
-                StippleEffect.get().getContext().getState().canAddLayer(),
-                StippleEffect.get().getContext().getState().canAddLayer(),
-                StippleEffect.get().getContext().getState().canRemoveLayer(),
-                StippleEffect.get().getContext().getState().canMoveLayerUp(),
-                StippleEffect.get().getContext().getState().canMoveLayerDown(),
-                StippleEffect.get().getContext().getState().canMoveLayerDown(),
+                c.getState().canAddLayer(),
+                c.getState().canAddLayer(),
+                c.getState().canRemoveLayer(),
+                c.getState().canMoveLayerUp(),
+                c.getState().canMoveLayerDown(),
+                c.getState().canMoveLayerDown(),
                 true
         };
 
         final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().getContext().addLayer(true),
-                () -> StippleEffect.get().getContext().duplicateLayer(),
-                () -> StippleEffect.get().getContext().removeLayer(),
-                () -> StippleEffect.get().getContext().moveLayerUp(),
-                () -> StippleEffect.get().getContext().moveLayerDown(),
-                () -> StippleEffect.get().getContext().mergeWithLayerBelow(),
-                () -> StippleEffect.get().getContext().enableAllLayers()
+                () -> c.addLayer(true),
+                c::duplicateLayer,
+                c::removeLayer,
+                c::moveLayerUp,
+                c::moveLayerDown,
+                c::mergeWithLayerBelow,
+                c::enableAllLayers
         };
 
         populateButtonsIntoBuilder(mb, iconIDs, preconditions,
@@ -399,7 +397,7 @@ public class MenuAssembly {
 
         // layer content
 
-        final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
+        final List<SELayer> layers = c.getState().getLayers();
         final int amount = layers.size(), elementsPerLayer = 6;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
@@ -428,8 +426,8 @@ public class MenuAssembly {
 
             layerButtons[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
-                    i, () -> StippleEffect.get().getContext().getState().getLayerEditIndex(),
-                    s -> StippleEffect.get().getContext().getState().setLayerEditIndex(s)
+                    i, () -> c.getState().getLayerEditIndex(),
+                    s -> c.getState().setLayerEditIndex(s)
             ));
 
             final int index = i;
@@ -449,7 +447,7 @@ public class MenuAssembly {
 
             layerButtons[(2 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER, ilPos, true,
-                    () -> StippleEffect.get().getContext().isolateLayer(index)));
+                    () -> c.isolateLayer(index)));
 
             // onion skin toggle
 
@@ -866,7 +864,7 @@ public class MenuAssembly {
                 MenuElement.Anchor.LEFT_TOP,
                 (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
                 (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
-                (int)(Math.log(c.renderInfo.getZoomFactor()) / Math.log(base)),
+                () -> (int)(Math.log(c.renderInfo.getZoomFactor()) / Math.log(base)),
                 i -> c.renderInfo.setZoomFactor((float)Math.pow(base, i)));
         zoomSlider.updateAssets();
 

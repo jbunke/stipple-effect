@@ -35,7 +35,7 @@ public class VerticalScrollingMenuElement extends ScrollingMenuElement {
                 .displace(getWidth() - Layout.SLIDER_OFF_DIM, 0);
 
         final VerticalSlider slider = new VerticalSlider(position, getHeight(), Anchor.LEFT_TOP,
-                0, maxOffsetY, -offsetY, o -> setOffsetY(-o));
+                0, maxOffsetY, () -> -offsetY, o -> setOffsetY(-o));
         slider.updateAssets();
         return slider;
     }

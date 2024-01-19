@@ -7,16 +7,17 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class VerticalSlider extends Slider {
     public VerticalSlider(
             final Coord2D position, final int height, final Anchor anchor,
-            final int minValue, final int maxValue, final int initialValue,
-            final Consumer<Integer> setter
+            final int minValue, final int maxValue,
+            final Supplier<Integer> getter, final Consumer<Integer> setter
     ) {
         super(position, new Coord2D(Layout.SLIDER_OFF_DIM, height), anchor,
-                minValue, maxValue, initialValue,
-                setter, true, c -> c.y, MenuElement::getHeight);
+                minValue, maxValue, getter, setter,
+                true, c -> c.y, MenuElement::getHeight);
     }
 
     @Override

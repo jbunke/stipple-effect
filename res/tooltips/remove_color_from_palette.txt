@@ -1,1 +1,1 @@
-Remove selected color from palette | {Shift + S}
+Remove selected color from palette | {Shift + Z}

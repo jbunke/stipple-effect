@@ -74,8 +74,7 @@ public class DialogAssembly {
                 getDialogContentOffsetFromLabel(scaleUpLabel),
                 Layout.getDialogContentWidthAllowance(), MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
-                c.projectInfo.getScaleUp(),
-                c.projectInfo::setScaleUp);
+                c.projectInfo::getScaleUp, c.projectInfo::setScaleUp);
         scaleUpSlider.updateAssets();
 
         final DynamicLabel scaleUpValue = makeDynamicFromLeftLabel(
@@ -136,8 +135,7 @@ public class DialogAssembly {
                 (int)(Layout.getDialogContentWidthAllowance() * 0.9),
                 MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                c.projectInfo.getFps(),
-                c.projectInfo::setFps);
+                c.projectInfo::getFps, c.projectInfo::setFps);
         playbackSpeedSlider.updateAssets();
 
         final DynamicLabel fpsValue = makeDynamicFromLeftLabel(
@@ -838,7 +836,7 @@ public class DialogAssembly {
                 getDialogContentOffsetFromLabel(opacityLabel),
                 Layout.getDialogContentWidthAllowance(),
                 MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
-                (int)(layer.getOpacity() * MAX_OPACITY),
+                () -> (int)(layer.getOpacity() * MAX_OPACITY),
                 o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
         opacitySlider.updateAssets();
 
@@ -1202,8 +1200,8 @@ public class DialogAssembly {
                         getDialogContentBigOffsetFromLabel(checkerboardLabel),
                         Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
                         MenuElement.Anchor.LEFT_TOP, 0, 5,
-                        (int)Math.round(Math.log(Settings.getCheckerboardPixels())
-                                / Math.log(2d)),
+                        () -> (int)Math.round(Math.log(
+                                Settings.getCheckerboardPixels()) / Math.log(2d)),
                         exp -> Settings.setCheckerboardPixels(
                                 (int)Math.pow(2d, exp), false));
                 checkerboardSlider.updateAssets();
