@@ -831,12 +831,13 @@ public class DialogAssembly {
 
         // opacity slider
         final int MAX_OPACITY = 255;
+        DialogVals.setLayerOpacity(layer.getOpacity());
 
         final HorizontalSlider opacitySlider = new HorizontalSlider(
                 getDialogContentOffsetFromLabel(opacityLabel),
                 Layout.getDialogContentWidthAllowance(),
                 MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
-                () -> (int)(layer.getOpacity() * MAX_OPACITY),
+                () -> (int)(DialogVals.getLayerOpacity() * MAX_OPACITY),
                 o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
         opacitySlider.updateAssets();
 

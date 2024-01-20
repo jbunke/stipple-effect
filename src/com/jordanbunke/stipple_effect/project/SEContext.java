@@ -6,23 +6,26 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SEContext {
@@ -1282,11 +1285,11 @@ public class SEContext {
                     h = getState().getImageHeight();
 
             final GameImage edit = new GameImage(w, h);
-            final Color c = secondary ? StippleEffect.get().getSecondary()
-                    : StippleEffect.get().getPrimary();
-            selection.forEach(s -> edit.dot(c, s.x, s.y));
+            final int c = (secondary ? StippleEffect.get().getSecondary()
+                    : StippleEffect.get().getPrimary()).getRGB();
+            selection.forEach(s -> edit.setRGB(s.x, s.y, c));
 
-            paintOverImage(edit);
+            stampImage(edit, selection);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
@@ -1426,38 +1429,29 @@ public class SEContext {
 
     // IMAGE EDITING
     public void stampImage(final GameImage edit, final Set<Coord2D> pixels) {
-        final int frameIndex = getState().getFrameIndex();
-        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer()
-                .returnStamped(edit, pixels, frameIndex);
-        final int layerEditIndex = getState().getLayerEditIndex();
-        layers.set(layerEditIndex, replacement);
-
-        final ProjectState result = getState().changeLayers(layers)
-                .changeIsCheckpoint(false);
-        stateManager.performAction(result, ActionType.CANVAS);
+        editImage(f -> getState().getEditingLayer()
+                .returnStamped(edit, pixels, f), false);
     }
 
     public void paintOverImage(final GameImage edit) {
-        final int frameIndex = getState().getFrameIndex();
-
-        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer()
-                .returnPaintedOver(edit, frameIndex);
-        final int layerEditIndex = getState().getLayerEditIndex();
-        layers.set(layerEditIndex, replacement);
-
-        final ProjectState result = getState().changeLayers(layers)
-                .changeIsCheckpoint(false);
-        stateManager.performAction(result, ActionType.CANVAS);
+        editImage(f -> getState().getEditingLayer()
+                .returnPaintedOver(edit, f), false);
     }
 
     // ERASING
     public void erase(final boolean[][] eraseMask, final boolean checkpoint) {
+        editImage(f -> getState().getEditingLayer()
+                .returnErased(eraseMask, f), checkpoint);
+    }
+
+    private void editImage(
+            final Function<Integer, SELayer> fTransform,
+            final boolean checkpoint
+    ) {
         final int frameIndex = getState().getFrameIndex();
+
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer()
-                .returnErased(eraseMask, frameIndex);
+        final SELayer replacement = fTransform.apply(frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
         layers.set(layerEditIndex, replacement);
 

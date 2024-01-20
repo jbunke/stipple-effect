@@ -152,11 +152,10 @@ public class MenuAssembly {
 
             final int index = i;
             final Runnable closeBehaviour = () -> {
-                if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges()) {
+                if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges())
                     DialogAssembly.setDialogToCloseProjectAYS(index);
-                } else {
+                else
                     StippleEffect.get().removeContext(index);
-                }
             };
 
             projectElements[amount + i] = new ScrollableMenuElement(

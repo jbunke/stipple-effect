@@ -89,14 +89,19 @@ public class SelectionUtils {
     }
 
     public static double snapAngle(final double r) {
-        // 9 instead of 8 because 2*pi will catch valid angles that 0 won't catch
-        final double[] angles = new double[9];
+        final double[] angles = new double[(int)(Math.round(
+                Constants.CIRCLE / Constants.SNAP_INC))];
 
         for (int i = 0; i < angles.length; i++)
             angles[i] = i * Constants.SNAP_INC;
 
         return MathPlus.findBestDouble(r, Double.MAX_VALUE, x -> x,
-                (x, y) -> Math.abs(x - r) < Math.abs(y - r), angles);
+                (a, b) -> angleDiff(a, r) < angleDiff(b, r), angles);
+    }
+
+    public static double angleDiff(final double ref, final double a) {
+        return Math.min(Math.abs(ref - a),
+                Math.abs((Constants.CIRCLE + ref) - a));
     }
 
     public static Set<Coord2D> rotatedPixels(

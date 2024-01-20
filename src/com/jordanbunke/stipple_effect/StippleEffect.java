@@ -854,6 +854,8 @@ public class StippleEffect implements ProgramContext {
 
             if (contextIndex >= contexts.size())
                 setContextIndex(contexts.size() - 1);
+            else
+                rebuildAllMenus();
 
             if (contexts.size() == 0)
                 exitProgram();

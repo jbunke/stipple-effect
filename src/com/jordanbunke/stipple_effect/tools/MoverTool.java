@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
@@ -19,7 +20,14 @@ public sealed abstract class MoverTool extends Tool
     }
 
     public enum Direction {
-        T, TL, TR, L, R, B, BL, BR, NA
+        R, BR, B, BL, L, TL, T, TR, NA;
+
+        double angle() {
+            if (this == NA)
+                return Double.MAX_VALUE;
+
+            return ordinal() * Constants.SNAP_INC;
+        }
     }
 
     private static boolean snap = false;
@@ -223,11 +231,18 @@ public sealed abstract class MoverTool extends Tool
                     final double
                             initialAngle = SelectionUtils.calculateAngleInRad(startTP, pivot),
                             angle = SelectionUtils.calculateAngleInRad(tp, pivot),
-                            deltaR = ((initialAngle > angle
-                                    ? Constants.CIRCLE : 0d) + angle) - initialAngle;
-                    getRotateFunction(context).accept(startSelection, snap
-                            ? SelectionUtils.snapAngle(deltaR) : deltaR,
-                            pivot, offset, false);
+                            candidate = ((initialAngle > angle
+                                    ? Constants.CIRCLE : 0d) + angle) - initialAngle,
+                            deltaR = snap ? SelectionUtils.snapAngle(candidate) : candidate;
+
+                    direction = MathPlus.findBest(Direction.NA,
+                            Double.MAX_VALUE, Direction::angle,
+                            (a, b) -> SelectionUtils.angleDiff(angle, a) <
+                                    SelectionUtils.angleDiff(angle, b),
+                            Direction.values());
+
+                    getRotateFunction(context).accept(startSelection,
+                            deltaR, pivot, offset, false);
 
                     lastTP = tp;
                 }

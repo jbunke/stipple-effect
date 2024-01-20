@@ -9,6 +9,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 
 import java.awt.*;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class Fill extends ToolThatSearches {
     private static final Fill INSTANCE;
@@ -46,17 +47,18 @@ public final class Fill extends ToolThatSearches {
                             : StippleEffect.get().getSecondary();
 
             // search
-            final Set<Coord2D> matched = search(image, initial, tp),
-                    selection = context.getState().getSelection();
+            final Set<Coord2D> selection = context.getState().getSelection(),
+                    matched = search(image, initial, tp).stream()
+                            .filter(m -> selection.isEmpty() || selection.contains(m))
+                            .collect(Collectors.toSet());
 
             // assemble edit mask
             final GameImage edit = new GameImage(w, h);
+            final int rgb = fillColor.getRGB();
 
-            for (Coord2D m : matched)
-                if (selection.isEmpty() || selection.contains(m))
-                    edit.dot(fillColor, m.x, m.y);
+            matched.forEach(m -> edit.setRGB(m.x, m.y, rgb));
 
-            context.paintOverImage(edit.submit());
+            context.stampImage(edit.submit(), matched);
             context.getState().markAsCheckpoint(true, context);
         }
     }

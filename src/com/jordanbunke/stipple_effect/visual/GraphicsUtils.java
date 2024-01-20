@@ -27,8 +27,8 @@ public class GraphicsUtils {
     public static final GameImage
             HIGHLIGHT_OVERLAY = loadIcon("highlighted"),
             SELECT_OVERLAY = loadIcon("selected"),
-            TRANSFORM_NUB = ResourceLoader.loadImageResource(
-                    Constants.MISC_FOLDER.resolve("transform_nub.png"));
+            TRANSFORM_NODE = ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve("transform_node.png"));
 
     public static TextBuilder uiText() {
         return uiText(Constants.WHITE);
@@ -314,7 +314,7 @@ public class GraphicsUtils {
             for (int x = BEG; x <= END; x++)
                 for (int y = BEG; y <= END; y++)
                     if (x != MID || y != MID)
-                        overlay.draw(TRANSFORM_NUB, xs[x], ys[y]);
+                        overlay.draw(TRANSFORM_NODE, xs[x], ys[y]);
         }
 
         return overlay.submit();
