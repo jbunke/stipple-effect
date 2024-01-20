@@ -22,6 +22,7 @@ x Preview window
 x Adjustable panels
 x Close program button and corresponding are-you-sure dialog
 x New file dialog suggests project canvas size based on clipboard image size if present
+x Multiples of 45 degrees snap angles for image rotation (Shift)
 
 Change:
 x 800x800 canvas size limit
@@ -29,6 +30,7 @@ x Update program icon
 x Change settings dialog to an info-style dialog with multiple tabs
 x Rework segments and render scale to be window and screen size dependent
 x Change brush select behaviour to preview overlay without editing selection until unclick
+x Brush select contents are now filtered by canvas bounds
 > Redesign logo and splash screen
 
 Fix:

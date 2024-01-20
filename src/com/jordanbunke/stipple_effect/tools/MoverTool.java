@@ -14,8 +14,6 @@ import java.util.function.BiConsumer;
 
 public sealed abstract class MoverTool extends Tool
         permits MoveSelection, PickUpSelection {
-    private static final double CIRCLE = Math.PI * 2;
-
     public enum TransformType {
         NONE, MOVE, STRETCH, ROTATE
     }
@@ -23,6 +21,8 @@ public sealed abstract class MoverTool extends Tool
     public enum Direction {
         T, TL, TR, L, R, B, BL, BR, NA
     }
+
+    private static boolean snap = false;
 
     private TransformType transformType, prospectiveType;
     private Direction direction;
@@ -61,8 +61,6 @@ public sealed abstract class MoverTool extends Tool
             startTopLeft = SelectionUtils.topLeft(selection);
             startBottomRight = SelectionUtils.bottomRight(selection);
 
-            final float zoomFactor = context.renderInfo.getZoomFactor();
-
             final Coord2D tp = context.getTargetPixel();
 
             if (tp.equals(Constants.NO_VALID_TARGET))
@@ -71,11 +69,10 @@ public sealed abstract class MoverTool extends Tool
             final int left = startTopLeft.x, right = startBottomRight.x,
                     top = startTopLeft.y, bottom = startBottomRight.y;
 
-            final float
-                    leftProx = Math.abs(left - tp.x) * zoomFactor,
-                    rightProx = Math.abs(right - tp.x) * zoomFactor,
-                    topProx = Math.abs(top - tp.y) * zoomFactor,
-                    bottomProx = Math.abs(bottom - tp.y) * zoomFactor;
+            final int leftProx = Math.abs(left - tp.x),
+                    rightProx = Math.abs(right - tp.x),
+                    topProx = Math.abs(top - tp.y),
+                    bottomProx = Math.abs(bottom - tp.y);
 
             boolean atLeft = leftProx <= Constants.STRETCH_PX_THRESHOLD,
                     atRight = rightProx <= Constants.STRETCH_PX_THRESHOLD,
@@ -118,7 +115,12 @@ public sealed abstract class MoverTool extends Tool
             atBottom = tp.y > bottom && bottomProx <= Constants.ROTATE_PX_THRESHOLD;
 
             if (atLeft || atRight || atTop || atBottom) {
-                direction = Direction.NA;
+                // direction = Direction.NA;
+                direction = atLeft ? (atTop ? Direction.TL
+                        : (atBottom ? Direction.BL : Direction.L)) :
+                        (atRight ? (atTop ? Direction.TR
+                                : (atBottom ? Direction.BR : Direction.R)) :
+                                (atTop ? Direction.T : Direction.B));
                 return TransformType.ROTATE;
             }
 
@@ -133,7 +135,16 @@ public sealed abstract class MoverTool extends Tool
                 ? prospectiveType : transformType;
 
         final String suffix = switch (relevantType) {
-            case ROTATE -> "_rotate";
+            case ROTATE -> switch (direction) {
+                case R, NA -> "_rotright";
+                case L -> "_rotleft";
+                case T -> "_rottop";
+                case B -> "_rotbottom";
+                case TL -> "_rottl";
+                case TR -> "_rottr";
+                case BL -> "_rotbl";
+                case BR -> "_rotbr";
+            };
             case STRETCH -> switch (direction) {
                 case NA -> "";
                 case B, T -> "_vert";
@@ -213,9 +224,10 @@ public sealed abstract class MoverTool extends Tool
                             initialAngle = SelectionUtils.calculateAngleInRad(startTP, pivot),
                             angle = SelectionUtils.calculateAngleInRad(tp, pivot),
                             deltaR = ((initialAngle > angle
-                                    ? CIRCLE : 0d) + angle) - initialAngle;
-                    getRotateFunction(context).accept(startSelection,
-                            deltaR, pivot, offset, false);
+                                    ? Constants.CIRCLE : 0d) + angle) - initialAngle;
+                    getRotateFunction(context).accept(startSelection, snap
+                            ? SelectionUtils.snapAngle(deltaR) : deltaR,
+                            pivot, offset, false);
 
                     lastTP = tp;
                 }
@@ -232,5 +244,9 @@ public sealed abstract class MoverTool extends Tool
             getMouseUpConsequence(context).run();
             me.markAsProcessed();
         }
+    }
+
+    public static void setSnap(final boolean snap) {
+        MoverTool.snap = snap;
     }
 }

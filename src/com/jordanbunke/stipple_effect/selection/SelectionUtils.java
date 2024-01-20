@@ -1,7 +1,9 @@
 package com.jordanbunke.stipple_effect.selection;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
+import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -84,6 +86,17 @@ public class SelectionUtils {
             final double pivotX, final double pivotY
     ) {
         return Math.atan2(py - pivotY, px - pivotX);
+    }
+
+    public static double snapAngle(final double r) {
+        // 9 instead of 8 because 2*pi will catch valid angles that 0 won't catch
+        final double[] angles = new double[9];
+
+        for (int i = 0; i < angles.length; i++)
+            angles[i] = i * Constants.SNAP_INC;
+
+        return MathPlus.findBestDouble(r, Double.MAX_VALUE, x -> x,
+                (x, y) -> Math.abs(x - r) < Math.abs(y - r), angles);
     }
 
     public static Set<Coord2D> rotatedPixels(
