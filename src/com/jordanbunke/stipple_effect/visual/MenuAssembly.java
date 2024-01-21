@@ -34,6 +34,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class MenuAssembly {
 
@@ -49,40 +50,42 @@ public class MenuAssembly {
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Projects", Constants.WHITE));
 
-        final String[] iconIDs = new String[] {
-                IconCodes.SETTINGS,
-                IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
-                IconCodes.SAVE, IconCodes.SAVE_AS,
-                IconCodes.RESIZE, IconCodes.PAD, IconCodes.PREVIEW,
-                IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
-                IconCodes.GRANULAR_REDO, IconCodes.REDO
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                true, true, true, true, true, true, true, true,
-                c.getStateManager().canUndo(),
-                c.getStateManager().canUndo(),
-                c.getStateManager().canRedo(),
-                c.getStateManager().canRedo()
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                DialogAssembly::setDialogToProgramSettings,
-                DialogAssembly::setDialogToNewProject,
-                () -> StippleEffect.get().openProject(),
-                c.projectInfo::save,
-                DialogAssembly::setDialogToSave,
-                DialogAssembly::setDialogToResize,
-                DialogAssembly::setDialogToPad,
-                () -> PreviewWindow.set(c),
-                () -> c.getStateManager().undoToCheckpoint(),
-                () -> c.getStateManager().undo(true),
-                () -> c.getStateManager().redo(true),
-                () -> c.getStateManager().redoToCheckpoint()
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Layout.getProjectsPosition());
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.SETTINGS,
+                        IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
+                        IconCodes.SAVE, IconCodes.SAVE_AS,
+                        IconCodes.RESIZE, IconCodes.PAD, IconCodes.PREVIEW,
+                        IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
+                        IconCodes.GRANULAR_REDO, IconCodes.REDO
+                },
+                getPreconditions(
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> c.getStateManager().canUndo(),
+                        () -> c.getStateManager().canUndo(),
+                        () -> c.getStateManager().canRedo(),
+                        () -> c.getStateManager().canRedo()),
+                new Runnable[] {
+                        DialogAssembly::setDialogToProgramSettings,
+                        DialogAssembly::setDialogToNewProject,
+                        () -> StippleEffect.get().openProject(),
+                        c.projectInfo::save,
+                        DialogAssembly::setDialogToSave,
+                        DialogAssembly::setDialogToResize,
+                        DialogAssembly::setDialogToPad,
+                        () -> PreviewWindow.set(c),
+                        () -> c.getStateManager().undoToCheckpoint(),
+                        () -> c.getStateManager().undo(true),
+                        () -> c.getStateManager().redo(true),
+                        () -> c.getStateManager().redoToCheckpoint()
+                }, Layout.getProjectsPosition());
 
         // exit program button
         final Coord2D exitProgPos = Layout.getProjectsPosition().displace(
@@ -99,7 +102,7 @@ public class MenuAssembly {
                     () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(true))));
         else
             mb.add(GraphicsUtils.generateIconButton(IconCodes.COLLAPSE_PANEL,
-                    panelIconPos, !Layout.isFramesPanelShowing(),
+                    panelIconPos, () -> !Layout.isFramesPanelShowing(),
                     () -> Layout.adjustPanels(() ->
                             Layout.setProjectsExpanded(false))));
 
@@ -183,48 +186,43 @@ public class MenuAssembly {
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Frames", Constants.WHITE));
 
-        final String[] iconIDs = new String[] {
-                IconCodes.NEW_FRAME,
-                IconCodes.DUPLICATE_FRAME,
-                IconCodes.REMOVE_FRAME,
-                IconCodes.MOVE_FRAME_BACK,
-                IconCodes.MOVE_FRAME_FORWARD,
-                IconCodes.TO_FIRST_FRAME,
-                IconCodes.PREVIOUS,
-                Constants.ICON_ID_GAP_CODE, // gap for play/stop button
-                IconCodes.NEXT,
-                IconCodes.TO_LAST_FRAME
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                c.getState().canAddFrame(),
-                c.getState().canAddFrame(),
-                c.getState().canRemoveFrame(),
-                c.getState().canMoveFrameBack(),
-                c.getState().canMoveFrameForward(),
-                true,
-                true,
-                false, // placeholder
-                true,
-                true
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                c::addFrame,
-                c::duplicateFrame,
-                c::removeFrame,
-                c::moveFrameBack,
-                c::moveFrameForward,
-                () -> c.getState().setFrameIndex(0),
-                () -> c.getState().previousFrame(),
-                () -> {}, // placeholder
-                () -> c.getState().nextFrame(),
-                () -> c.getState().setFrameIndex(
-                        c.getState().getFrameCount() - 1)
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Layout.getFramesPosition());
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.NEW_FRAME,
+                        IconCodes.DUPLICATE_FRAME,
+                        IconCodes.REMOVE_FRAME,
+                        IconCodes.MOVE_FRAME_BACK,
+                        IconCodes.MOVE_FRAME_FORWARD,
+                        IconCodes.TO_FIRST_FRAME,
+                        IconCodes.PREVIOUS,
+                        Constants.ICON_ID_GAP_CODE, // gap for play/stop button
+                        IconCodes.NEXT,
+                        IconCodes.TO_LAST_FRAME
+                },
+                getPreconditions(
+                        () -> c.getState().canAddFrame(),
+                        () -> c.getState().canAddFrame(),
+                        () -> c.getState().canRemoveFrame(),
+                        () -> c.getState().canMoveFrameBack(),
+                        () -> c.getState().canMoveFrameForward(),
+                        () -> true,
+                        () -> true,
+                        () -> false, // placeholder
+                        () -> true,
+                        () -> true),
+                new Runnable[] {
+                        c::addFrame,
+                        c::duplicateFrame,
+                        c::removeFrame,
+                        c::moveFrameBack,
+                        c::moveFrameForward,
+                        () -> c.getState().setFrameIndex(0),
+                        () -> c.getState().previousFrame(),
+                        () -> {}, // placeholder
+                        () -> c.getState().nextFrame(),
+                        () -> c.getState().setFrameIndex(
+                                c.getState().getFrameCount() - 1)
+                }, Layout.getFramesPosition());
 
         addHidePanelToMenuBuilder(mb, Layout.getFramesPosition()
                         .displace(Layout.getFramesWidth(), 0),
@@ -357,38 +355,33 @@ public class MenuAssembly {
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Layers", Constants.WHITE));
 
-        final String[] iconIDs = new String[] {
-                IconCodes.NEW_LAYER,
-                IconCodes.DUPLICATE_LAYER,
-                IconCodes.REMOVE_LAYER,
-                IconCodes.MOVE_LAYER_UP,
-                IconCodes.MOVE_LAYER_DOWN,
-                IconCodes.MERGE_WITH_LAYER_BELOW,
-                IconCodes.ENABLE_ALL_LAYERS
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                c.getState().canAddLayer(),
-                c.getState().canAddLayer(),
-                c.getState().canRemoveLayer(),
-                c.getState().canMoveLayerUp(),
-                c.getState().canMoveLayerDown(),
-                c.getState().canMoveLayerDown(),
-                true
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                () -> c.addLayer(true),
-                c::duplicateLayer,
-                c::removeLayer,
-                c::moveLayerUp,
-                c::moveLayerDown,
-                c::mergeWithLayerBelow,
-                c::enableAllLayers
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Layout.getLayersPosition());
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.NEW_LAYER,
+                        IconCodes.DUPLICATE_LAYER,
+                        IconCodes.REMOVE_LAYER,
+                        IconCodes.MOVE_LAYER_UP,
+                        IconCodes.MOVE_LAYER_DOWN,
+                        IconCodes.MERGE_WITH_LAYER_BELOW,
+                        IconCodes.ENABLE_ALL_LAYERS
+                },
+                getPreconditions(
+                        () -> c.getState().canAddLayer(),
+                        () -> c.getState().canAddLayer(),
+                        () -> c.getState().canRemoveLayer(),
+                        () -> c.getState().canMoveLayerUp(),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> true),
+                new Runnable[] {
+                        () -> c.addLayer(true),
+                        c::duplicateLayer,
+                        c::removeLayer,
+                        c::moveLayerUp,
+                        c::moveLayerDown,
+                        c::mergeWithLayerBelow,
+                        c::enableAllLayers
+                }, Layout.getLayersPosition());
 
         addHidePanelToMenuBuilder(mb, Layout.getLayersPosition()
                         .displace(Layout.getLayersWidth(), 0),
@@ -445,8 +438,8 @@ public class MenuAssembly {
                     (int)(Layout.BUTTON_DIM * -0.5));
 
             layerButtons[(2 * amount) + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER, ilPos, true,
-                    () -> c.isolateLayer(index)));
+                    GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER,
+                            ilPos, () -> true, () -> c.isolateLayer(index)));
 
             // onion skin toggle
 
@@ -468,7 +461,7 @@ public class MenuAssembly {
 
             layerButtons[(5 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton(IconCodes.LAYER_SETTINGS,
-                            lsPos, true,
+                            lsPos, () -> true,
                             () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + dims.y;
@@ -551,7 +544,7 @@ public class MenuAssembly {
 
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
-            final boolean[] preconditions, final Runnable[] behaviours,
+            final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
             final Coord2D segmentPosition
     ) {
         if (iconIDs.length != preconditions.length || iconIDs.length != behaviours.length) {
@@ -573,6 +566,11 @@ public class MenuAssembly {
         }
     }
 
+    @SafeVarargs
+    private static Supplier<Boolean>[] getPreconditions(final Supplier<Boolean>... preconditions) {
+        return preconditions;
+    }
+
     public static Menu buildColorsMenu() {
         final MenuBuilder mb = new MenuBuilder();
 
@@ -585,10 +583,10 @@ public class MenuAssembly {
                         IconCodes.SWAP_COLORS,
                         IconCodes.COLOR_MENU_MODE,
                 },
-                new boolean[] {
-                        true,
-                        true,
-                },
+                getPreconditions(
+                        () -> true,
+                        () -> true
+                ),
                 new Runnable[] {
                         () -> StippleEffect.get().swapColors(),
                         () -> StippleEffect.get().toggleColorMenuMode(),
@@ -676,15 +674,18 @@ public class MenuAssembly {
                         IconCodes.SORT_PALETTE,
                         IconCodes.PALETTIZE,
                 },
-                new boolean[] {
-                        hasPaletteContents && StippleEffect.get().getSelectedPalette().isMutable(),
-                        hasPaletteContents && StippleEffect.get().getSelectedPalette().isMutable(),
-                        true,
-                        hasPaletteContents && StippleEffect.get().getSelectedPalette().isMutable(),
-                        true,
-                        hasPaletteContents,
-                        hasPaletteContents
-                },
+                getPreconditions(
+                        () -> hasPaletteContents && StippleEffect.get()
+                                .getSelectedPalette().isMutable(),
+                        () -> hasPaletteContents && StippleEffect.get()
+                                .getSelectedPalette().isMutable(),
+                        () -> true,
+                        () -> hasPaletteContents && StippleEffect.get()
+                                .getSelectedPalette().isMutable(),
+                        () -> true,
+                        () -> hasPaletteContents,
+                        () -> hasPaletteContents
+                ),
                 new Runnable[] {
                         () -> StippleEffect.get().addColorToPalette(),
                         () -> StippleEffect.get().removeColorFromPalette(),
@@ -767,14 +768,14 @@ public class MenuAssembly {
 
         final MenuElement outlineButton = GraphicsUtils.
                 generateIconButton(IconCodes.OUTLINE, outlinePos,
-                        true, DialogAssembly::setDialogToOutline);
+                        () -> true, DialogAssembly::setDialogToOutline);
         mb.add(outlineButton);
 
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
                 generateIconButton(IconCodes.VERTICAL_REFLECTION,
                         outlinePos.displace(0, -Layout.BUTTON_INC),
-                        c.getState().hasSelection(), () -> {
+                        () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
                                 c.reflectSelection(false);
                             else
@@ -785,13 +786,12 @@ public class MenuAssembly {
         final MenuElement horizontalReflectionButton = GraphicsUtils.
                 generateIconButton(IconCodes.HORIZONTAL_REFLECTION,
                         outlinePos.displace(0, -2 * Layout.BUTTON_INC),
-                        c.getState().hasSelection(), () -> {
+                        () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
                                 c.reflectSelection(true);
                             else
                                 c.reflectSelectionContents(true);
-                        }
-                );
+                        });
         mb.add(horizontalReflectionButton);
 
         return mb.build();

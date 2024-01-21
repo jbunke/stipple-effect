@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GraphicsUtils {
@@ -335,17 +337,15 @@ public class GraphicsUtils {
 
     public static MenuElement generateIconButton(
             final String iconID, final Coord2D position,
-            final boolean precondition, final Runnable behaviour
+            final Supplier<Boolean> precondition, final Runnable behaviour
     ) {
-        final boolean stub = !precondition || behaviour == null;
+        final IconButton icon = IconButton.make(iconID, position, behaviour);
+        final StaticMenuElement stub = new StaticMenuElement(position,
+                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_TOP,
+                greyscaleVersionOf(loadIcon(iconID)));
 
-        if (stub)
-            return new StaticMenuElement(position,
-                    new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
-                    MenuElement.Anchor.LEFT_TOP,
-                    greyscaleVersionOf(loadIcon(iconID)));
-
-        return IconButton.make(iconID, position, behaviour);
+        return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
     }
 
     private static GameImage greyscaleVersionOf(final GameImage image) {

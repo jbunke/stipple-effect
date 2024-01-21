@@ -32,7 +32,7 @@ x Rework segments and render scale to be window and screen size dependent
 x Change brush select behaviour to preview overlay without editing selection until unclick
 x Brush select contents are now filtered by canvas bounds
 > Redesign logo and splash screen
-> Make list buttons dynamic; don't redraw menus when index changes unless size changes
+x Make list buttons dynamic; don't redraw menus when index changes unless size changes
 
 Fix:
 > HSV slider slippage

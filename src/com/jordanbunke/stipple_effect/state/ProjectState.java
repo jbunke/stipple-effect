@@ -2,9 +2,8 @@ package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -221,7 +220,7 @@ public class ProjectState {
         if (this.layerEditIndex != layerEditIndex &&
                 layerEditIndex >= 0 && layerEditIndex < layers.size()) {
             this.layerEditIndex = layerEditIndex;
-            StippleEffect.get().rebuildLayersMenu();
+            // StippleEffect.get().rebuildLayersMenu();
         }
     }
 
@@ -344,7 +343,7 @@ public class ProjectState {
                 frameIndex >= 0 && frameIndex < frameCount) {
             this.frameIndex = frameIndex;
 
-            StippleEffect.get().rebuildFramesMenu();
+            // StippleEffect.get().rebuildFramesMenu();
         }
     }
 
@@ -354,7 +353,7 @@ public class ProjectState {
         if (frameIndex >= frameCount)
             frameIndex = 0;
 
-        StippleEffect.get().rebuildFramesMenu();
+        // StippleEffect.get().rebuildFramesMenu();
     }
 
     public void previousFrame() {
@@ -363,6 +362,6 @@ public class ProjectState {
         if (frameIndex < 0)
             frameIndex = frameCount - 1;
 
-        StippleEffect.get().rebuildFramesMenu();
+        // StippleEffect.get().rebuildFramesMenu();
     }
 }
