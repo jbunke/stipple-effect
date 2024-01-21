@@ -913,18 +913,19 @@ public class StippleEffect implements ProgramContext {
             final int deltaR, final int deltaG,
             final int deltaB, final int deltaAlpha
     ) {
-        final Color c = colors[colorIndex];
+        final Color c = getSelectedColor();
 
         setSelectedColor(new Color(
                 Math.max(0, Math.min(c.getRed() + deltaR, 255)),
                 Math.max(0, Math.min(c.getGreen() + deltaG, 255)),
                 Math.max(0, Math.min(c.getBlue() + deltaB, 255)),
                 Math.max(0, Math.min(c.getAlpha() + deltaAlpha, 255))
-        ));
+        ), ColorMath.LastHSVEdit.NONE);
     }
 
-    public void setSelectedColor(final Color color) {
+    public void setSelectedColor(final Color color, final ColorMath.LastHSVEdit lastHSVEdit) {
         colors[colorIndex] = color;
+        ColorMath.setLastHSVEdit(lastHSVEdit, color);
     }
 
     public void setColorIndex(final int colorIndex) {
@@ -933,7 +934,7 @@ public class StippleEffect implements ProgramContext {
 
     public void setColorIndexAndColor(final int colorIndex, final Color color) {
         setColorIndex(colorIndex);
-        setSelectedColor(color);
+        setSelectedColor(color, ColorMath.LastHSVEdit.NONE);
     }
 
     public void swapColors() {

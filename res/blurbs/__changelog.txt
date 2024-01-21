@@ -35,7 +35,7 @@ x Brush select contents are now filtered by canvas bounds
 x Make list buttons dynamic; don't redraw menus when index changes unless size changes
 
 Fix:
-> HSV slider slippage
+x HSV slider slippage
 x Optimize selection overlays
 x Bug where closing project window doesn't update menu
 x Fill behaviour now replaces color rather than filling over

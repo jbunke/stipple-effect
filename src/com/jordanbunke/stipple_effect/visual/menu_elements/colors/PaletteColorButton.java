@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButton;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.utility.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -36,8 +37,9 @@ public class PaletteColorButton extends MenuButton {
     public PaletteColorButton(
             final Coord2D position, final Color color
     ) {
-        super(position, Layout.PALETTE_DIMS, Anchor.LEFT_TOP,
-                true, () -> StippleEffect.get().setSelectedColor(color));
+        super(position, Layout.PALETTE_DIMS, Anchor.LEFT_TOP, true,
+                () -> StippleEffect.get().setSelectedColor(
+                        color, ColorMath.LastHSVEdit.NONE));
 
         this.color = color;
         selection = determineSelection();
