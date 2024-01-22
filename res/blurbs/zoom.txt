@@ -3,5 +3,4 @@ Shortcut: {Z}
 Zoom in: {Left Click} or {Up Arrow Key}
 Zoom out: {Right Click} or {Down Arrow Key}
 
-You can also zoom in and out with the {scroll wheel} while the
-mouse is hovering over the workspace.
+You can also zoom in and out with the {scroll wheel} while the mouse is hovering over the workspace.

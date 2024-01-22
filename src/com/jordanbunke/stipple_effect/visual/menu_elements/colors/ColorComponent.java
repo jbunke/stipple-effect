@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -38,56 +39,54 @@ public class ColorComponent extends MenuElementContainer {
         final boolean isFull = alignment == Alignment.FULL;
 
         final int globalOffsetX = alignment == Alignment.RIGHT
-                ? Constants.COLOR_PICKER_W / 2 : 0,
-                globalOffsetY = Constants.COLOR_SELECTOR_OFFSET_Y +
-                        (indexY * Constants.COLOR_SELECTOR_INC_Y),
+                ? Layout.getColorsWidth() / 2 : 0,
+                globalOffsetY = Layout.COLOR_SELECTOR_OFFSET_Y +
+                        (indexY * Layout.getColorSelectorIncY()),
                 width = isFull
-                        ? Constants.COLOR_PICKER_W : Constants.COLOR_PICKER_W / 2,
-                indent = Constants.TOOL_NAME_X;
-        final Coord2D startingPos = Constants.getColorsPosition().displace(
+                        ? Layout.getColorsWidth() : Layout.getColorsWidth() / 2,
+                indent = Layout.CONTENT_BUFFER_PX;
+        final Coord2D startingPos = Layout.getColorsPosition().displace(
                 globalOffsetX, globalOffsetY),
-                buttonDims = new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM);
+                buttonDims = new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM);
 
         final List<MenuElement> elements = new ArrayList<>();
 
         // label
         elements.add(TextLabel.make(
-                startingPos.displace(indent, Constants.COLOR_LABEL_OFFSET_Y),
+                startingPos.displace(indent, Layout.COLOR_LABEL_OFFSET_Y),
                 label, Constants.WHITE));
 
         // value
         elements.add(new DynamicLabel(startingPos.displace(
-                width - indent, Constants.COLOR_LABEL_OFFSET_Y),
+                width - indent, Layout.COLOR_LABEL_OFFSET_Y),
                 Anchor.RIGHT_TOP, Constants.WHITE,
                 () -> String.valueOf(getter.get()),
-                Constants.DYNAMIC_LABEL_W_ALLOWANCE));
+                Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 
         // increment and decrement buttons
-        if (alignment != Alignment.RIGHT) {
-            final GameImage baseDec = GraphicsUtils.loadIcon(IconCodes.DECREMENT),
-                    highlightDec = GraphicsUtils.highlightIconButton(baseDec),
-                    baseInc = GraphicsUtils.loadIcon(IconCodes.INCREMENT),
-                    highlightInc = GraphicsUtils.highlightIconButton(baseInc);
+        final GameImage baseDec = GraphicsUtils.loadIcon(IconCodes.DECREMENT),
+                highlightDec = GraphicsUtils.highlightIconButton(baseDec),
+                baseInc = GraphicsUtils.loadIcon(IconCodes.INCREMENT),
+                highlightInc = GraphicsUtils.highlightIconButton(baseInc);
 
-            elements.add(new SimpleMenuButton(startingPos.displace((width / 2) -
-                    (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
-                    buttonDims, Anchor.CENTRAL, true,
-                    () -> setter.accept(spectralFunction
-                            .apply(Math.max(getter.get() - 1, 0))),
-                    baseDec, highlightDec));
-            elements.add(new SimpleMenuButton(startingPos.displace((width / 2) +
-                    (Constants.BUTTON_INC / 2), -Constants.BUTTON_BORDER_PX),
-                    buttonDims, Anchor.CENTRAL, true,
-                    () -> setter.accept(spectralFunction
-                            .apply(Math.min(getter.get() + 1, maxValue))),
-                    baseInc, highlightInc));
-        }
+        elements.add(new SimpleMenuButton(startingPos.displace((width / 2) -
+                (Layout.BUTTON_INC / 2), -Layout.BUTTON_BORDER_PX),
+                buttonDims, Anchor.CENTRAL, true,
+                () -> setter.accept(spectralFunction
+                        .apply(Math.max(getter.get() - 1, 0))),
+                baseDec, highlightDec));
+        elements.add(new SimpleMenuButton(startingPos.displace((width / 2) +
+                (Layout.BUTTON_INC / 2), -Layout.BUTTON_BORDER_PX),
+                buttonDims, Anchor.CENTRAL, true,
+                () -> setter.accept(spectralFunction
+                        .apply(Math.min(getter.get() + 1, maxValue))),
+                baseInc, highlightInc));
 
         // slider
         elements.add(new ColorSlider(startingPos.displace(width / 2,
-                (int)(Constants.COLOR_SELECTOR_INC_Y * 0.45)),
-                (isFull ? Constants.FULL_COLOR_SLIDER_W :
-                        Constants.HALF_COLOR_SLIDER_W) + Constants.SLIDER_BALL_DIM,
+                (int)(Layout.getColorSelectorIncY() * 0.35)),
+                (isFull ? Layout.FULL_COLOR_SLIDER_W :
+                        Layout.HALF_COLOR_SLIDER_W) + Layout.SLIDER_BALL_DIM,
                 minValue, maxValue, getter, spectralFunction,
                 i -> setter.accept(spectralFunction.apply(i))));
 

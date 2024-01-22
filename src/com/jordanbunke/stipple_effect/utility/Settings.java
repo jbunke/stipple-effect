@@ -32,14 +32,14 @@ public class Settings {
 
     // SETTINGS - set to defaults if settings cannot be read
     // booleans
-    private static boolean fullscreenOnStartup = true;
+    private static boolean fullscreenOnStartup = false;
 
     // int
-    private static int checkerboardPixels = Constants.DEFAULT_CHECKERBOARD_DIM;
+    private static int checkerboardPixels = Layout.DEFAULT_CHECKERBOARD_DIM;
 
     // object
     private static String defIndexPrefix = "_", defIndexSuffix = "";
-    private static SEFonts.Code programFont = SEFonts.Code.PICCOLO;
+    private static SEFonts.Code programFont = SEFonts.Code.CLASSIC;
 
     public static void read() {
         final String file = FileIO.readFile(SETTINGS_FILE);
@@ -62,7 +62,7 @@ public class Settings {
             switch (code) {
                 case FULLSCREEN_ON_STARTUP -> setFullscreenOnStartup(Boolean.parseBoolean(value));
                 case CHECKERBOARD_PX -> setIntSettingSafely(value,
-                        Constants.DEFAULT_CHECKERBOARD_DIM,
+                        Layout.DEFAULT_CHECKERBOARD_DIM,
                         i -> setCheckerboardPixels(i, true));
                 case DEFAULT_INDEX_PREFIX -> setDefaultIndexPrefix(value, true);
                 case DEFAULT_INDEX_SUFFIX -> setDefaultIndexSuffix(value, true);
@@ -147,7 +147,7 @@ public class Settings {
 
         if (!isStartup) {
             DialogAssembly.setDialogToProgramSettings();
-            StippleEffect.get().rebuildAllMenusWithText();
+            StippleEffect.get().rebuildAllMenus();
         }
     }
 

@@ -2,5 +2,9 @@ Shortcut: {M}
 
 Move: {Click & Drag} or {Arrow Keys}
 
-You can also move the selection with the arrow keys with the
-{Box Select} tool equipped.
+Stretch: {Click & Drag} on one of the transform nodes
+
+Rotate: {Click & Drag} around one of the transform nodes
+Modify the rotation operation to snap to the nearest 45-degree angle by holding {Shift}.
+
+You can also move the selection with the arrow keys with the {Box Select} tool equipped.

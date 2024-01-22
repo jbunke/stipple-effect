@@ -1,7 +1,7 @@
 Shortcut: {X}
 
-Use the box select tool to make rectangular selections. This is
-a convenient way to quickly enclose a desired selection area.
+Use the box select tool to make rectangular selections. This is a convenient way to quickly enclose
+a desired selection area.
 
 Simple selection: {Click & Drag}
 
@@ -9,5 +9,4 @@ Additive selection: {Ctrl + Click & Drag}
 Adds the result of the selection to the existing selection.
 
 Subtractive selection: {Ctrl + S + Click & Drag}
-Removes the result of the selection from the existing
-selection.
+Removes the result of the selection from the existing selection.

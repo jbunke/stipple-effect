@@ -1,0 +1,4 @@
+Shortcut: {Shift + A}
+
+Adds the selected color (whichever of primary and secondary is marked with the selection icon) to
+the currently selected palette.

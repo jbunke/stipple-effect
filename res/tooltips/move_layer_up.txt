@@ -1,0 +1,1 @@
+Move layer up | {Ctrl + Shift + Up Arrow Key}

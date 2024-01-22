@@ -5,24 +5,32 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class GraphicsUtils {
     public static final GameImage
             HIGHLIGHT_OVERLAY = loadIcon("highlighted"),
             SELECT_OVERLAY = loadIcon("selected"),
-            TRANSFORM_NUB = ResourceLoader.loadImageResource(
-                    Constants.MISC_FOLDER.resolve("transform_nub.png"));
+            TRANSFORM_NODE = ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve("transform_node.png"));
 
     public static TextBuilder uiText() {
         return uiText(Constants.WHITE);
@@ -57,8 +65,8 @@ public class GraphicsUtils {
                 affixTextC = textButtonColorFromBackgroundColor(
                         backgroundColor, false);
 
-        final int height = Constants.STD_TEXT_BUTTON_H,
-                px = Constants.BUTTON_BORDER_PX;
+        final int height = Layout.STD_TEXT_BUTTON_H,
+                px = Layout.BUTTON_BORDER_PX;
 
         final GameImage nhi = new GameImage(width, height);
         nhi.fillRectangle(backgroundColor, 0, 0, width, height);
@@ -72,7 +80,7 @@ public class GraphicsUtils {
                 aImage = uiText(mainTextC).addText(a).build().draw(),
                 bImage = uiText(mainTextC).addText(b).build().draw();
 
-        Coord2D textPos = new Coord2D(2 * px, Constants.BUTTON_TEXT_OFFSET_Y);
+        Coord2D textPos = new Coord2D(2 * px, Layout.BUTTON_TEXT_OFFSET_Y);
 
         nhi.draw(prefixImage, textPos.x, textPos.y);
 
@@ -106,9 +114,25 @@ public class GraphicsUtils {
         return nhi.submit();
     }
 
-    public static GameImage drawTextButton(
+    public static GameImage drawDropDownButton(
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
+    ) {
+        final GameImage base = drawTextButton(width, text, isSelected,
+                backgroundColor, true);
+
+        final GameImage icon = GraphicsUtils.loadIcon(isSelected
+                ? IconCodes.COLLAPSE : IconCodes.EXPAND);
+
+        base.draw(icon, base.getWidth() - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
+
+        return base.submit();
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text,
+            final boolean isSelected, final Color backgroundColor,
+            final boolean leftAligned
     ) {
         final Color textColor = textButtonColorFromBackgroundColor(
                 backgroundColor, true);
@@ -116,24 +140,45 @@ public class GraphicsUtils {
                 .addText(text).build().draw();
 
         final int w = Math.max(width, textImage.getWidth() +
-                (4 * Constants.BUTTON_BORDER_PX)),
-                h = Constants.STD_TEXT_BUTTON_H;
+                (4 * Layout.BUTTON_BORDER_PX)),
+                h = Layout.STD_TEXT_BUTTON_H;
 
         final GameImage nhi = new GameImage(w, h);
         nhi.fillRectangle(backgroundColor, 0, 0, w, h);
 
-        nhi.draw(textImage, (w - textImage.getWidth()) / 2, Constants.BUTTON_TEXT_OFFSET_Y);
+        final int x = leftAligned
+                ? (2 * Layout.BUTTON_BORDER_PX)
+                : (w - textImage.getWidth()) / 2;
+
+        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
         final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
-        nhi.drawRectangle(frame, 2f * Constants.BUTTON_BORDER_PX, 0, 0, w, h);
+        nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return nhi.submit();
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text,
+            final boolean isSelected, final Color backgroundColor
+    ) {
+        return drawTextButton(width, text, isSelected, backgroundColor, false);
+    }
+
+    public static SimpleMenuButton makeStandardTextButton(
+            final String text, final Coord2D pos, final Runnable onClick
+    ) {
+        final GameImage base = drawTextButton(Layout.STD_TEXT_BUTTON_W,
+                text, false, Constants.GREY);
+        return new SimpleMenuButton(pos, new Coord2D(Layout.STD_TEXT_BUTTON_W,
+                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
+                true, onClick, base, drawHighlightedButton(base));
     }
 
     private static Color textButtonColorFromBackgroundColor(
             final Color b, final boolean main
     ) {
         return (b.getRed() + b.getGreen() + b.getBlue()) / 3 >
-                Constants.COLOR_TEXTBOX_AVG_C_THRESHOLD
+                Layout.COLOR_TEXTBOX_AVG_C_THRESHOLD
                 ? (main ? Constants.BLACK : Constants.BACKGROUND)
                 : (main ? Constants.WHITE : Constants.GREY);
     }
@@ -144,7 +189,7 @@ public class GraphicsUtils {
         final GameImage selected = new GameImage(bounds);
         final int w = selected.getWidth();
         selected.draw(loadIcon(IconCodes.BULLET_POINT),
-                w - Constants.BUTTON_INC, Constants.BUTTON_BORDER_PX);
+                w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
     }
@@ -155,10 +200,26 @@ public class GraphicsUtils {
         final GameImage hi = new GameImage(nhi);
         final int w = hi.getWidth(), h = hi.getHeight();
         hi.fillRectangle(Constants.HIGHLIGHT_2, 0, 0, w, h);
-        hi.drawRectangle(Constants.BLACK, 2f * Constants.BUTTON_BORDER_PX,
+        hi.drawRectangle(Constants.BLACK, 2f * Layout.BUTTON_BORDER_PX,
                 0, 0, w, h);
 
         return hi.submit();
+    }
+
+    public static GameImage drawSelectionOverlay(
+            final double z, final Set<Coord2D> selection,
+            final boolean filled, final boolean canTransform
+    ) {
+        final Coord2D tl = SelectionUtils.topLeft(selection),
+                br = SelectionUtils.bottomRight(selection);
+
+        final Set<Coord2D> adjusted = selection.stream()
+                .map(p -> p.displace(-tl.x, -tl.y))
+                .collect(Collectors.toSet());
+        final int w = br.x - tl.x, h = br.y - tl.y;
+
+        return drawOverlay(w, h, z, adjusted, Constants.BLACK,
+                Constants.HIGHLIGHT_1, filled, canTransform);
     }
 
     public static GameImage drawOverlay(
@@ -167,66 +228,95 @@ public class GraphicsUtils {
             final Color inside, final Color outside,
             final boolean filled, final boolean canTransform
     ) {
-        final int scaleUpW = (int)Math.max(1, w * z),
-                scaleUpH = (int)Math.max(1, h * z),
-                zoomInc = (int)(Math.max(1, z));
+        final Set<Coord2D> mask = new HashSet<>();
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                if (maskValidator.apply(x, y))
+                    mask.add(new Coord2D(x, y));
+
+        return drawOverlay(w, h, z, mask, inside, outside,
+                filled, canTransform);
+    }
+
+    private static GameImage drawOverlay(
+            final int w, final int h, final double z,
+            final Set<Coord2D> selection,
+            final Color inside, final Color outside,
+            final boolean filled, final boolean canTransform
+    ) {
+        final int zoomInc = (int)Math.max(Constants.ZOOM_FOR_OVERLAY, z),
+                scaleUpW = Math.max(1, w * zoomInc),
+                scaleUpH = Math.max(1, h * zoomInc);
 
         final GameImage overlay = new GameImage(
                 scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
                 scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
-        for (int x = 0; x < scaleUpW; x += zoomInc)
-            for (int y = 0; y < scaleUpH; y += zoomInc) {
-                if (!maskValidator.apply((int)(x / z), (int)(y / z)))
-                    continue;
+        selection.stream().filter(
+                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h
+        ).forEach(pixel -> {
+            boolean leftFrontier = false,
+                    rightFrontier = false,
+                    topFrontier = false,
+                    bottomFrontier = false;
 
-                final Coord2D o = new Coord2D(x + Constants.OVERLAY_BORDER_PX,
-                        y + Constants.OVERLAY_BORDER_PX);
+            // frontier defined as unmarked or off canvas
+            if (pixel.x - 1 < 0 || !selection.contains(pixel.displace(-1, 0)))
+                leftFrontier = true;
+            if (pixel.x + 1 >= w || !selection.contains(pixel.displace(1, 0)))
+                rightFrontier = true;
+            if (pixel.y - 1 < 0 || !selection.contains(pixel.displace(0, -1)))
+                topFrontier = true;
+            if (pixel.y + 1 >= h || !selection.contains(pixel.displace(0, 1)))
+                bottomFrontier = true;
 
-                if (filled)
-                    overlay.fillRectangle(Constants.OVERLAY_FILL_C,
-                            o.x, o.y, zoomInc, zoomInc);
+            final Coord2D o = new Coord2D(
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.x),
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y)
+            );
 
-                // left is off canvas or not marked
-                if (x - z < 0 || !maskValidator.apply((int)((x / z) - 1), (int)(y / z))) {
-                    overlay.fillRectangle(inside, o.x, o.y, 1, zoomInc);
-                    overlay.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
-                }
-                // right is off canvas or not marked
-                if (x + z >= scaleUpW || !maskValidator.apply((int)((x / z) + 1), (int)(y / z))) {
-                    overlay.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
-                    overlay.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
-                }
-                // top is off canvas or not marked
-                if (y - z < 0 || !maskValidator.apply((int)(x / z), (int)((y / z) - 1))) {
-                    overlay.fillRectangle(inside, o.x, o.y, zoomInc, 1);
-                    overlay.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
-                }
-                // bottom is off canvas or not marked
-                if (y + z >= scaleUpH || !maskValidator.apply((int)(x / z), (int)((y / z) + 1))) {
-                    overlay.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
-                    overlay.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
-                }
+            if (filled)
+                overlay.fillRectangle(Constants.OVERLAY_FILL_C,
+                        o.x, o.y, zoomInc, zoomInc);
+
+            if (leftFrontier) {
+                overlay.fillRectangle(inside, o.x, o.y, 1, zoomInc);
+                overlay.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
             }
+            if (rightFrontier) {
+                overlay.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
+                overlay.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
+            }
+            if (topFrontier) {
+                overlay.fillRectangle(inside, o.x, o.y, zoomInc, 1);
+                overlay.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
+            }
+            if (bottomFrontier) {
+                overlay.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
+                overlay.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
+            }
+        });
 
         if (canTransform) {
+            final Coord2D tl = SelectionUtils.topLeft(selection),
+                    br = SelectionUtils.bottomRight(selection);
+
             final int BEG = 0, MID = 1, END = 2;
             final int[] xs = new int[] {
-                    0, (overlay.getWidth() - TRANSFORM_NUB.getWidth()) / 2,
-                    overlay.getWidth() - TRANSFORM_NUB.getWidth()
+                    tl.x * zoomInc,
+                    (int)(((tl.x + br.x) / 2d) * zoomInc),
+                    br.x * zoomInc
             }, ys = new int[] {
-                    0, (overlay.getHeight() - TRANSFORM_NUB.getHeight()) / 2,
-                    overlay.getHeight() - TRANSFORM_NUB.getHeight()
+                    tl.y * zoomInc,
+                    (int)(((tl.y + br.y) / 2d) * zoomInc),
+                    br.y * zoomInc
             };
 
-            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[BEG]);
-            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[END]);
-            overlay.draw(TRANSFORM_NUB, xs[END], ys[BEG]);
-            overlay.draw(TRANSFORM_NUB, xs[END], ys[END]);
-            overlay.draw(TRANSFORM_NUB, xs[BEG], ys[MID]);
-            overlay.draw(TRANSFORM_NUB, xs[END], ys[MID]);
-            overlay.draw(TRANSFORM_NUB, xs[MID], ys[BEG]);
-            overlay.draw(TRANSFORM_NUB, xs[MID], ys[END]);
+            for (int x = BEG; x <= END; x++)
+                for (int y = BEG; y <= END; y++)
+                    if (x != MID || y != MID)
+                        overlay.draw(TRANSFORM_NODE, xs[x], ys[y]);
         }
 
         return overlay.submit();
@@ -247,22 +337,15 @@ public class GraphicsUtils {
 
     public static MenuElement generateIconButton(
             final String iconID, final Coord2D position,
-            final boolean precondition, final Runnable behaviour
+            final Supplier<Boolean> precondition, final Runnable behaviour
     ) {
-        final boolean stub = !precondition || behaviour == null;
+        final IconButton icon = IconButton.make(iconID, position, behaviour);
+        final StaticMenuElement stub = new StaticMenuElement(position,
+                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_TOP,
+                greyscaleVersionOf(loadIcon(iconID)));
 
-        final Coord2D dims = new Coord2D(Constants.BUTTON_DIM, Constants.BUTTON_DIM);
-
-        final GameImage icon = loadIcon(iconID);
-
-        if (stub)
-            return new StaticMenuElement(position, dims,
-                    MenuElement.Anchor.LEFT_TOP, greyscaleVersionOf(icon));
-
-        final GameImage highlighted = highlightIconButton(icon);
-
-        return new SimpleMenuButton(position, dims, MenuElement.Anchor.LEFT_TOP,
-                true, behaviour, icon, highlighted);
+        return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
     }
 
     private static GameImage greyscaleVersionOf(final GameImage image) {

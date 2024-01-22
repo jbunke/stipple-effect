@@ -8,12 +8,14 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class Slider extends MenuElement {
     public final int minValue, maxValue;
@@ -22,6 +24,7 @@ public abstract class Slider extends MenuElement {
     private final Function<Coord2D, Integer> coordDimFunction;
     private final Function<Slider, Integer> sliderDimFunction;
 
+    private final Supplier<Integer> getter;
     private final Consumer<Integer> setter;
     private final boolean canSetImplicitly;
 
@@ -31,7 +34,7 @@ public abstract class Slider extends MenuElement {
 
     public Slider(
             final Coord2D position, final Coord2D dimensions, final Anchor anchor,
-            final int minValue, final int maxValue, final int initialValue,
+            final int minValue, final int maxValue, final Supplier<Integer> getter,
             final Consumer<Integer> setter, final boolean canSetImplicitly,
             final Function<Coord2D, Integer> coordDimFunction,
             final Function<Slider, Integer> sliderDimFunction
@@ -41,7 +44,8 @@ public abstract class Slider extends MenuElement {
         this.minValue = minValue;
         this.maxValue = maxValue;
 
-        value = initialValue;
+        this.getter = getter;
+        value = this.getter.get();
 
         this.setter = setter;
         this.canSetImplicitly = canSetImplicitly;
@@ -55,7 +59,8 @@ public abstract class Slider extends MenuElement {
 
     @Override
     public void update(final double deltaTime) {
-        // done
+        if (!sliding)
+            setValue(getter.get());
     }
 
     @Override
@@ -117,7 +122,7 @@ public abstract class Slider extends MenuElement {
 
     // graphical
     public GameImage[] drawSliderBallShells() {
-        final int sbd = Constants.SLIDER_BALL_DIM;
+        final int sbd = Layout.SLIDER_BALL_DIM;
 
         final GameImage baseSliderBall = new GameImage(sbd, sbd),
                 highlightedSliderBall = new GameImage(sbd, sbd),
@@ -157,12 +162,12 @@ public abstract class Slider extends MenuElement {
     }
 
     public boolean isValidDimForHighlight(final int mouseDim) {
-        return Math.abs(mouseDim - getSliderBallDim()) <= Constants.SLIDER_BALL_DIM / 2;
+        return Math.abs(mouseDim - getSliderBallDim()) <= Layout.SLIDER_BALL_DIM / 2;
     }
 
     private int getSliderBallDim() {
         final Coord2D rp = getRenderPosition();
-        final int sbd = Constants.SLIDER_BALL_DIM;
+        final int sbd = Layout.SLIDER_BALL_DIM;
         return coordDimFunction.apply(rp) + (sbd / 2) +
                 (int)(getSliderFraction() * (sliderDimFunction.apply(this) - sbd));
     }
@@ -171,7 +176,7 @@ public abstract class Slider extends MenuElement {
         final int valueWas = getValue();
 
         final Coord2D rp = getRenderPosition();
-        final int sbd = Constants.SLIDER_BALL_DIM,
+        final int sbd = Layout.SLIDER_BALL_DIM,
                 sd = sliderDimFunction.apply(this) - sbd,
                 startDim = coordDimFunction.apply(rp) + (sbd / 2);
         final double sliderFraction = (sliderBallDim - startDim) / (double) sd;
@@ -187,7 +192,7 @@ public abstract class Slider extends MenuElement {
     public abstract Coord2D getSliderBallRenderPos(final int sliderBallRenderDim);
 
     public void updateAssets() {
-        final int sbd = Constants.SLIDER_BALL_DIM,
+        final int sbd = Layout.SLIDER_BALL_DIM,
                 sd = sliderDimFunction.apply(this) - sbd;
         final GameImage slider = new GameImage(getWidth(), getHeight());
 
@@ -201,11 +206,11 @@ public abstract class Slider extends MenuElement {
         final GameImage[] sliderBalls = drawSliderBallShells();
 
         // slider ball core
-        final int sbcd = sbd - (2 * Constants.BUTTON_BORDER_PX);
+        final int sbcd = sbd - (2 * Layout.BUTTON_BORDER_PX);
 
         for (GameImage sliderBall : sliderBalls)
             sliderBall.fillRectangle(getSliderBallCoreColor(),
-                    Constants.BUTTON_BORDER_PX, Constants.BUTTON_BORDER_PX,
+                    Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX,
                     sbcd, sbcd);
 
         final int sliderBallRenderDim = (int)(getSliderFraction() * sd);
@@ -221,12 +226,14 @@ public abstract class Slider extends MenuElement {
     }
 
     public void setValue(final int value) {
+        final int valueWas = getValue();
         this.value = Math.max(minValue, Math.min(value, maxValue));
 
         if (canSetImplicitly)
             setter.accept(this.value);
 
-        updateAssets();
+        if (getValue() != valueWas)
+            updateAssets();
     }
 
     public void incrementValue(final int delta) {

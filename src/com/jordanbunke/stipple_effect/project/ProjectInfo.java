@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.*;
@@ -26,7 +27,7 @@ public class ProjectInfo {
     private int fps, scaleUp, countFrom;
 
     public enum SaveType {
-        PNG_STITCHED, PNG_SEPARATE, GIF, MP4, NATIVE;
+        NATIVE, PNG_STITCHED, PNG_SEPARATE, GIF, MP4;
 
         public String getFileSuffix() {
             return switch (this) {
@@ -48,11 +49,10 @@ public class ProjectInfo {
         }
 
         public static SaveType[] validOptions() {
-            // TODO - omitting NATIVE while serializing/saving and loading are not yet implemented
             if (StippleEffect.get().getContext().getState().getFrameCount() == 1)
-                return new SaveType[] { PNG_STITCHED /*, NATIVE */ };
+                return new SaveType[] { NATIVE, PNG_STITCHED };
 
-            return new SaveType[] { PNG_STITCHED, PNG_SEPARATE, GIF, MP4 }; // SaveType.values();
+            return SaveType.values();
         }
     }
 
@@ -73,7 +73,9 @@ public class ProjectInfo {
         }
 
         editedSinceLastSave = false;
-        saveType = SaveType.PNG_STITCHED;
+        saveType = filepath != null && filepath.getFileName()
+                .toString().endsWith(SaveType.NATIVE.getFileSuffix())
+                ? SaveType.NATIVE : SaveType.PNG_STITCHED;
         frameDims = new int[] {
                 DialogVals.getNewProjectXDivs(),
                 DialogVals.getNewProjectYDivs()
@@ -104,7 +106,14 @@ public class ProjectInfo {
 
         switch (saveType) {
             case NATIVE -> {
-                // TODO
+                final Thread stipSaverThread = new Thread(() -> {
+                    final Path filepath = buildFilepath();
+
+                    ParserSerializer.save(c, filepath);
+                    StatusUpdates.saved(filepath);
+                });
+
+                stipSaverThread.start();
             }
             case GIF, MP4 -> {
                 final GameImage[] images = new GameImage[frameCount];

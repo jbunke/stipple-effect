@@ -1,6 +1,10 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
+
+import java.nio.file.Path;
 
 public class DialogVals {
     private static int
@@ -16,11 +20,15 @@ public class DialogVals {
             padBottom = 0;
     private static double layerOpacity = Constants.OPAQUE;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
-    private static String layerName = "";
+    private static String layerName = "", paletteName = "";
+    private static Path paletteFolder = null;
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
+    private static SettingScreen settingScreen = SettingScreen.STARTUP;
+    private static PaletteSorter paletteSorter = PaletteSorter.HUE;
+    private static ContentType contentType = ContentType.SELECTION;
 
     public enum InfoScreen {
-        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, MORE, CHANGELOG;
+        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG;
 
         public String getTitle() {
             return this == MORE ? "More Shortcuts & Advanced Info" : toString();
@@ -28,8 +36,56 @@ public class DialogVals {
 
         @Override
         public String toString() {
-            return name().charAt(0) + name().substring(1).toLowerCase();
+            return enumPrintName(name());
         }
+    }
+
+    public enum SettingScreen {
+        STARTUP, FORMAT, VISUAL;
+
+        public String getTitle() {
+            return this + " settings";
+        }
+
+        @Override
+        public String toString() {
+            return enumPrintName(name());
+        }
+    }
+
+    public enum ContentType {
+        SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
+
+        public ContentType next(final SEContext c) {
+            final ContentType[] vs = values();
+            final ContentType next = vs[(ordinal() + 1) % vs.length];
+
+            return next.get(c);
+        }
+
+        public ContentType get(final SEContext c) {
+            // skip SELECTION iff context has no selection
+            if (!c.getState().hasSelection() && this == SELECTION)
+                return next(c);
+
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            if (this == LAYER_FRAME)
+                return "Layer-Frame";
+
+            return enumPrintName(name());
+        }
+    }
+
+    private static String enumPrintName(final String name) {
+        return name.charAt(0) + name.substring(1).toLowerCase();
+    }
+
+    public static void setPaletteFolder(final Path paletteFolder) {
+        DialogVals.paletteFolder = paletteFolder;
     }
 
     public static void setOutlineSideMask(final boolean[] outlineSideMask) {
@@ -44,8 +100,24 @@ public class DialogVals {
         DialogVals.infoScreen = infoScreen;
     }
 
+    public static void setSettingScreen(final SettingScreen settingScreen) {
+        DialogVals.settingScreen = settingScreen;
+    }
+
+    public static void cyclePaletteSorter() {
+        paletteSorter = paletteSorter.next();
+    }
+
+    public static void cycleContentType(final SEContext c) {
+        contentType = contentType.get(c).next(c);
+    }
+
     public static void setLayerName(final String layerName) {
         DialogVals.layerName = layerName;
+    }
+
+    public static void setPaletteName(final String paletteName) {
+        DialogVals.paletteName = paletteName;
     }
 
     public static void setLayerOpacity(final double layerOpacity) {
@@ -92,8 +164,24 @@ public class DialogVals {
         DialogVals.newProjectYDivs = newProjectYDivs;
     }
 
+    public static Path getPaletteFolder() {
+        return paletteFolder;
+    }
+
     public static InfoScreen getInfoScreen() {
         return infoScreen;
+    }
+
+    public static SettingScreen getSettingScreen() {
+        return settingScreen;
+    }
+
+    public static PaletteSorter getPaletteSorter() {
+        return paletteSorter;
+    }
+
+    public static ContentType getContentType(final SEContext c) {
+        return contentType.get(c);
     }
 
     public static int getNewProjectHeight() {
@@ -134,6 +222,10 @@ public class DialogVals {
 
     public static String getLayerName() {
         return layerName;
+    }
+
+    public static String getPaletteName() {
+        return paletteName;
     }
 
     public static int getNewProjectXDivs() {

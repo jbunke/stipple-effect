@@ -1,34 +1,16 @@
 package com.jordanbunke.stipple_effect.selection;
 
-import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class SelectionUtils {
     private static final int X = 0, Y = 1;
-
-    public static GameImage drawOverlay(
-            final Set<Coord2D> selection,
-            final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final double z, final boolean movable, final boolean canTransform
-    ) {
-        final Coord2D topLeft = topLeft(selection),
-                bottomRight = bottomRight(selection);
-
-        final int w = bottomRight.x - topLeft.x,
-                h = bottomRight.y - topLeft.y;
-
-        return GraphicsUtils.drawOverlay(w, h, z,
-                (x, y) -> maskValidator.apply(x + topLeft.x, y + topLeft.y),
-                Constants.BLACK, Constants.HIGHLIGHT_1, movable, canTransform);
-    }
 
     public static Coord2D topLeft(final Set<Coord2D> pixels) {
         int lowestX = Integer.MAX_VALUE, lowestY = Integer.MAX_VALUE;
@@ -104,6 +86,22 @@ public class SelectionUtils {
             final double pivotX, final double pivotY
     ) {
         return Math.atan2(py - pivotY, px - pivotX);
+    }
+
+    public static double snapAngle(final double r) {
+        final double[] angles = new double[(int)(Math.round(
+                Constants.CIRCLE / Constants.SNAP_INC))];
+
+        for (int i = 0; i < angles.length; i++)
+            angles[i] = i * Constants.SNAP_INC;
+
+        return MathPlus.findBestDouble(r, Double.MAX_VALUE, x -> x,
+                (a, b) -> angleDiff(a, r) < angleDiff(b, r), angles);
+    }
+
+    public static double angleDiff(final double ref, final double a) {
+        return Math.min(Math.abs(ref - a),
+                Math.abs((Constants.CIRCLE + ref) - a));
     }
 
     public static Set<Coord2D> rotatedPixels(

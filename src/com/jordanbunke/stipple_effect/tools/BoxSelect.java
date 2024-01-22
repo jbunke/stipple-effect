@@ -6,17 +6,18 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public final class BoxSelect extends ToolWithMode {
+public final class BoxSelect extends ToolWithMode implements OverlayTool {
     private static final BoxSelect INSTANCE;
 
     private boolean drawing;
     private Coord2D pivotTP, endTP, topLeft, bottomRight;
-    private GameImage overlay;
+    private GameImage selectionOverlay;
 
     static {
         INSTANCE = new BoxSelect();
@@ -30,7 +31,7 @@ public final class BoxSelect extends ToolWithMode {
         topLeft = Constants.NO_VALID_TARGET;
         bottomRight = Constants.NO_VALID_TARGET;
 
-        overlay = GameImage.dummy();
+        selectionOverlay = GameImage.dummy();
     }
 
     public static BoxSelect get() {
@@ -63,9 +64,11 @@ public final class BoxSelect extends ToolWithMode {
             endTP = tp;
             topLeft = tp;
             bottomRight = tp;
-        }
 
-        overlay = GameImage.dummy();
+            selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                    context.renderInfo.getZoomFactor(),
+                    new HashSet<>(Set.of(tp)), false, false);
+        }
     }
 
     @Override
@@ -83,12 +86,12 @@ public final class BoxSelect extends ToolWithMode {
             topLeft = SelectionUtils.topLeft(bounds);
             bottomRight = SelectionUtils.bottomRight(bounds);
 
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
+            for (int x = topLeft.x; x < bottomRight.x; x++)
+                for (int y = topLeft.y; y < bottomRight.y; y++)
+                    bounds.add(new Coord2D(x, y));
 
-            overlay = SelectionUtils.drawOverlay(bounds,
-                    (x, y) -> x >= 0 && x < w && y >= 0 && y < h,
-                    context.renderInfo.getZoomFactor(), true, false);
+            selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                    context.renderInfo.getZoomFactor(), bounds, false, false);
         }
     }
 
@@ -115,15 +118,18 @@ public final class BoxSelect extends ToolWithMode {
         }
     }
 
-    public boolean isDrawing() {
-        return drawing;
-    }
-
+    @Override
     public Coord2D getTopLeft() {
         return topLeft;
     }
 
-    public GameImage getOverlay() {
-        return overlay;
+    @Override
+    public GameImage getSelectionOverlay() {
+        return selectionOverlay;
+    }
+
+    @Override
+    public boolean isDrawing() {
+        return drawing;
     }
 }

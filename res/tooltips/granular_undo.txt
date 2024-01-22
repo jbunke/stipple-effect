@@ -1,0 +1,1 @@
+Granular undo | {Ctrl + Shift + Z}

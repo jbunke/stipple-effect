@@ -1,6 +1,5 @@
 Shortcut: {Shift + L}
 
-Opens all the layer's settings and properties in one
-place
+Opens all the layer's settings and properties in one place
 
 The layer's opacity can be adjusted from here.

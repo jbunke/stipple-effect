@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.utility.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -113,15 +114,6 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         if (initial.getAlpha() == 0 && pixel.getAlpha() == 0)
             return true;
 
-        final int MAX_DIFF = 255 * 4;
-
-        final int rDiff = Math.abs(initial.getRed() - pixel.getRed()),
-                gDiff = Math.abs(initial.getGreen() - pixel.getGreen()),
-                bDiff = Math.abs(initial.getBlue() - pixel.getBlue()),
-                alphaDiff = Math.abs(initial.getAlpha() - pixel.getAlpha());
-
-        final double difference = (rDiff + gDiff + bDiff + alphaDiff) / (double) MAX_DIFF;
-
-        return difference <= tolerance;
+        return ColorMath.diff(initial, pixel) <= tolerance;
     }
 }
