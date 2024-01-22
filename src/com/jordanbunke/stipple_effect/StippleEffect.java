@@ -585,8 +585,10 @@ public class StippleEffect implements ProgramContext {
         if (toolTipMillisCounter >= Constants.TOOL_TIP_MILLIS_THRESHOLD) {
             final boolean leftSide = mousePos.x <= Layout.getCanvasMiddle().x,
                     atBottom = mousePos.y > Layout.height() - (2 * toolTip.getHeight());
-            final int x = mousePos.x + (leftSide ? 0 : -toolTip.getWidth()),
-                    y = mousePos.y + (atBottom ? -toolTip.getHeight() : 0);
+            final int x = mousePos.x + (leftSide
+                    ? Layout.TOOL_TIP_OFFSET : -toolTip.getWidth()),
+                    y = mousePos.y + (atBottom
+                            ? -toolTip.getHeight() : Layout.TOOL_TIP_OFFSET);
 
             canvas.draw(toolTip, x, y);
         }

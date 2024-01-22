@@ -857,8 +857,6 @@ public class DialogAssembly {
     }
 
     public static void setDialogToSplashScreen() {
-        // TODO - redesign splash
-
         final MenuBuilder mb = new MenuBuilder();
 
         // timer
@@ -872,33 +870,14 @@ public class DialogAssembly {
         final GameImage background = new GameImage(w, h);
         background.free();
 
-        background.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0, w, h);
+        background.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0, w, h);
         mb.add(new SimpleMenuButton(new Coord2D(), new Coord2D(w, h),
                 MenuElement.Anchor.LEFT_TOP, true,
                 () -> StippleEffect.get().clearDialog(), background, background));
 
-        // title
-        final GameImage title = GraphicsUtils.uiText(Constants.BLACK, 3d)
-                .addText(StippleEffect.PROGRAM_NAME).build().draw();
-
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.6)),
-                new Coord2D(title.getWidth(), title.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, title));
-
-        // subtitle
-        final GameImage subtitle = GraphicsUtils.uiText(
-                Constants.ACCENT_BACKGROUND_DARK)
-                .addText("Pixel art editor and animator").addLineBreak()
-                .addText("built on Delta Time by Flinker Flitzer")
-                .build().draw();
-
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.75)),
-                new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, subtitle));
-
         // version
         final GameImage version = GraphicsUtils.uiText(
-                Constants.ACCENT_BACKGROUND_DARK)
+                Constants.ACCENT_BACKGROUND_LIGHT)
                 .addText("v" + StippleEffect.VERSION).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
@@ -918,8 +897,27 @@ public class DialogAssembly {
         final GameImage[] frames = SplashLoader.loadAnimationFrames();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
-                MenuElement.Anchor.CENTRAL, 5,
-                SplashLoader.loadAnimationFrames()));
+                MenuElement.Anchor.CENTRAL, 5, frames));
+
+        // title
+        final GameImage title = GraphicsUtils.uiText(
+                Constants.ACCENT_BACKGROUND_LIGHT, 3d)
+                .addText(StippleEffect.PROGRAM_NAME).build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.7)),
+                new Coord2D(title.getWidth(), title.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, title));
+
+        // subtitle
+        final GameImage subtitle = GraphicsUtils.uiText(
+                        Constants.ACCENT_BACKGROUND_LIGHT)
+                .addText("Pixel art editor and animator").addLineBreak()
+                .addText("built on Delta Time by Flinker Flitzer")
+                .build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.8)),
+                new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, subtitle));
 
         setDialog(mb.build());
     }

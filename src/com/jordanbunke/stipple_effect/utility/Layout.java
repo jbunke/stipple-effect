@@ -15,7 +15,7 @@ public class Layout {
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
             BOTTOM_BAR_H = 24, SCREEN_H_BUFFER = 120,
-            MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4,
+            MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
             CONTENT_BUFFER_PX = 8, DEFAULT_CHECKERBOARD_DIM = 4, CURSOR_DIM = 40,
             BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
