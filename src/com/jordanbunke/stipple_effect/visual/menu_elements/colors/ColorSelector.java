@@ -62,54 +62,48 @@ public class ColorSelector extends InvisibleMenuElement {
                 ColorComponent.Alignment.LEFT, 0, r -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(r, c.getGreen(), c.getBlue(), c.getAlpha());
-                }, c -> StippleEffect.get().setSelectedColor(c),
+                }, c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.NONE),
                 () -> StippleEffect.get().getSelectedColor().getRed()));
         // green
         menuElements.add(new ColorComponent(0, Constants.RGBA_SCALE, "G",
                 ColorComponent.Alignment.LEFT, 1, g -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(c.getRed(), g, c.getBlue(), c.getAlpha());
-                }, c -> StippleEffect.get().setSelectedColor(c),
+                }, c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.NONE),
                 () -> StippleEffect.get().getSelectedColor().getGreen()));
         // blue
         menuElements.add(new ColorComponent(0, Constants.RGBA_SCALE, "B",
                 ColorComponent.Alignment.LEFT, 2, b -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(c.getRed(), c.getGreen(), b, c.getAlpha());
-                }, c -> StippleEffect.get().setSelectedColor(c),
+                }, c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.NONE),
                 () -> StippleEffect.get().getSelectedColor().getBlue()));
         // hue
         menuElements.add(new ColorComponent(0, Constants.HUE_SCALE, "H",
                 ColorComponent.Alignment.RIGHT, 0,
                 h -> ColorMath.hueAdjustedColor(h, StippleEffect.get().getSelectedColor()),
-                c -> StippleEffect.get().setSelectedColor(c),
-                () -> ColorMath.scale(ColorMath.rgbToHue(StippleEffect.get().getSelectedColor()),
-                        Constants.HUE_SCALE)));
+                c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.HUE),
+                () -> ColorMath.hueGetter(StippleEffect.get().getSelectedColor())));
         // saturation
         menuElements.add(new ColorComponent(0, Constants.SAT_SCALE, "S",
                 ColorComponent.Alignment.RIGHT, 1,
                 s -> ColorMath.satAdjustedColor(s, StippleEffect.get().getSelectedColor()),
-                c -> StippleEffect.get().setSelectedColor(c),
-                () -> ColorMath.scale(ColorMath.rgbToSat(StippleEffect.get().getSelectedColor()),
-                        Constants.SAT_SCALE)));
+                c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.SAT),
+                () -> ColorMath.satGetter(StippleEffect.get().getSelectedColor())));
         // value
         menuElements.add(new ColorComponent(0, Constants.VALUE_SCALE, "V",
                 ColorComponent.Alignment.RIGHT, 2,
                 v -> ColorMath.valueAdjustedColor(v, StippleEffect.get().getSelectedColor()),
-                c -> StippleEffect.get().setSelectedColor(c),
-                () -> ColorMath.scale(ColorMath.rgbToValue(StippleEffect.get().getSelectedColor()),
-                        Constants.VALUE_SCALE)));
+                c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.VAL),
+                () -> ColorMath.valueGetter(StippleEffect.get().getSelectedColor())));
         // alpha
         menuElements.add(new ColorComponent(0, Constants.RGBA_SCALE, "A (Opacity)",
                 ColorComponent.Alignment.FULL, 3, a -> {
                     final Color c = StippleEffect.get().getSelectedColor();
                     return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);
-                }, c -> StippleEffect.get().setSelectedColor(c),
+                }, c -> StippleEffect.get().setSelectedColor(c, ColorMath.LastHSVEdit.NONE),
                 () -> StippleEffect.get().getSelectedColor().getAlpha()));
 
         return menuElements.toArray(MenuElement[]::new);
     }
-
-    // HSV helpers
-
 }

@@ -104,13 +104,13 @@ public final class SELayer {
         final GameImage content = getFrame(frameIndex);
 
         final GameImage composed = new GameImage(content);
+        final int w = composed.getWidth(), h = composed.getHeight();
 
-        for (int x = 0; x < composed.getWidth(); x++)
-            for (int y = 0; y < composed.getHeight(); y++)
-                if (pixels.contains(new Coord2D(x, y))) {
-                    final Color c = ImageProcessing.colorAtPixel(edit, x, y);
-                    composed.setRGB(x, y, c.getRGB());
-                }
+        pixels.stream().filter(p -> p.x >= 0 && p.x < w &&
+                p.y >= 0 && p.y < h).forEach(p -> {
+            final Color c = ImageProcessing.colorAtPixel(edit, p.x, p.y);
+            composed.setRGB(p.x, p.y, c.getRGB());
+        });
 
         composed.free();
         frames.set(frameIndex, composed);

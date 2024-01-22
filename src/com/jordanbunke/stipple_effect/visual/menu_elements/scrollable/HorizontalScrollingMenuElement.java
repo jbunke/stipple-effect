@@ -36,7 +36,7 @@ public class HorizontalScrollingMenuElement extends ScrollingMenuElement {
 
         final HorizontalSlider slider = new HorizontalSlider(
                 position, getWidth(), Anchor.LEFT_TOP,
-                0, maxOffsetX, -offsetX, o -> setOffsetX(-o));
+                0, maxOffsetX, () -> -offsetX, o -> setOffsetX(-o));
         slider.updateAssets();
         return slider;
     }

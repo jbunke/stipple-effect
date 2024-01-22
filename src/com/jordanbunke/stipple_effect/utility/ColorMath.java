@@ -1,9 +1,28 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.utility.MathPlus;
+
 import java.awt.*;
-import java.util.Arrays;
+import java.util.function.Function;
 
 public class ColorMath {
+    private static LastHSVEdit lastHSVEdit = LastHSVEdit.NONE;
+    private static double lastHue = 0d, lastSat = 0d, lastValue = 0d;
+
+    public enum LastHSVEdit {
+        HUE, SAT, VAL, NONE
+    }
+
+    public static void setLastHSVEdit(final LastHSVEdit lastHSVEdit, final Color c) {
+        ColorMath.lastHSVEdit = lastHSVEdit;
+
+        if (ColorMath.lastHSVEdit == LastHSVEdit.NONE) {
+            lastHue = rgbToHue(c);
+            lastSat = rgbToSat(c);
+            lastValue = rgbToValue(c);
+        }
+    }
+
     public static double diff(final Color a, final Color b) {
         final int MAX_DIFF = 255 * 4;
 
@@ -15,8 +34,23 @@ public class ColorMath {
         return (rDiff + gDiff + bDiff + alphaDiff) / (double) MAX_DIFF;
     }
 
+    public static int hueGetter(final Color c) {
+        return scale(lastHSVEdit == LastHSVEdit.NONE
+                ? rgbToHue(c) : lastHue, Constants.HUE_SCALE);
+    }
+
+    public static int satGetter(final Color c) {
+        return scale(lastHSVEdit == LastHSVEdit.NONE
+                ? rgbToSat(c) : lastSat, Constants.SAT_SCALE);
+    }
+
+    public static int valueGetter(final Color c) {
+        return scale(lastHSVEdit == LastHSVEdit.NONE
+                ? rgbToValue(c) : lastValue, Constants.VALUE_SCALE);
+    }
+
     public static int scale(final double value, final int scaleMax) {
-        return Math.max(0, Math.min((int)(value * scaleMax), scaleMax));
+        return MathPlus.bounded(0, (int) Math.round(value * scaleMax), scaleMax);
     }
 
     private static double normalize(final int value, final int scaleMax) {
@@ -69,21 +103,38 @@ public class ColorMath {
     }
 
     public static Color hueAdjustedColor(final int hue, final Color c) {
-        final double saturation = rgbToSat(c), value = rgbToValue(c);
-        return fromHSV(hue == Constants.HUE_SCALE ? 0d : normalize(hue,
-                Constants.HUE_SCALE), saturation, value, c.getAlpha());
+        final double saturation = getHSVAttribute(ColorMath::rgbToSat, c, lastSat),
+                value = getHSVAttribute(ColorMath::rgbToValue, c, lastValue),
+                nHue = normalize(hue, Constants.HUE_SCALE);
+
+        lastHue = nHue;
+        return fromHSV(nHue, saturation, value, c.getAlpha());
     }
 
     public static Color satAdjustedColor(final int saturation, final Color c) {
-        final double hue = rgbToHue(c), value = rgbToValue(c);
-        return fromHSV(hue == Constants.HUE_SCALE ? 0d : hue, normalize(
-                saturation, Constants.SAT_SCALE), value, c.getAlpha());
+        final double hue = getHSVAttribute(ColorMath::rgbToHue, c, lastHue),
+                value = getHSVAttribute(ColorMath::rgbToValue, c, lastValue),
+                nSat = normalize(saturation, Constants.SAT_SCALE);
+
+        lastSat = nSat;
+        return fromHSV(hue, nSat, value, c.getAlpha());
     }
 
     public static Color valueAdjustedColor(final int value, final Color c) {
-        final double saturation = rgbToSat(c), hue = rgbToHue(c);
-        return fromHSV(hue == Constants.HUE_SCALE ? 0d : hue, saturation,
-                normalize(value, Constants.VALUE_SCALE), c.getAlpha());
+        final double saturation = getHSVAttribute(ColorMath::rgbToSat, c, lastSat),
+                hue = getHSVAttribute(ColorMath::rgbToHue, c, lastHue),
+                nValue = normalize(value, Constants.VALUE_SCALE);
+
+        lastValue = nValue;
+        return fromHSV(hue, saturation, nValue, c.getAlpha());
+    }
+
+    private static double getHSVAttribute(
+            final Function<Color, Double> fRGBToAttribute,
+            final Color c, final double last
+    ) {
+        return lastHSVEdit == LastHSVEdit.NONE
+                ? fRGBToAttribute.apply(c) : last;
     }
 
     private static Color fromHSV(
@@ -134,11 +185,11 @@ public class ColorMath {
     }
 
     private static double getMaxOfRGB(final double[] rgb) {
-        return Arrays.stream(rgb).reduce(rgb[0], Math::max);
+        return MathPlus.max(rgb);
     }
 
     private static double getMinOfRGB(final double[] rgb) {
-        return Arrays.stream(rgb).reduce(rgb[0], Math::min);
+        return MathPlus.min(rgb);
     }
 
     private static double[] rgbAsArray(final Color c) {

@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 
 public class ColorSlider extends HorizontalSlider {
     private final Function<Integer, Color> spectralFunction;
-    private final Supplier<Integer> getter;
     private Color cLastUpdate;
 
     public ColorSlider(
@@ -24,10 +23,9 @@ public class ColorSlider extends HorizontalSlider {
             final Consumer<Integer> setter
     ) {
         super(position, width, Anchor.CENTRAL, minValue, maxValue,
-                getter.get(), setter, false);
+                getter, setter, false);
 
         this.spectralFunction = spectralFunction;
-        this.getter = getter;
 
         cLastUpdate = StippleEffect.get().getSelectedColor();
 
@@ -36,7 +34,7 @@ public class ColorSlider extends HorizontalSlider {
 
     @Override
     public void update(final double deltaTime) {
-        setValue(getter.get());
+        super.update(deltaTime);
 
         final Color c = StippleEffect.get().getSelectedColor();
 

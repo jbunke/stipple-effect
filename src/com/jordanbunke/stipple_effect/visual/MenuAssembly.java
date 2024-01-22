@@ -11,7 +11,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuEleme
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
+import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
@@ -34,6 +34,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class MenuAssembly {
 
@@ -49,40 +50,42 @@ public class MenuAssembly {
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Projects", Constants.WHITE));
 
-        final String[] iconIDs = new String[] {
-                IconCodes.SETTINGS,
-                IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
-                IconCodes.SAVE, IconCodes.SAVE_AS,
-                IconCodes.RESIZE, IconCodes.PAD, IconCodes.PREVIEW,
-                IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
-                IconCodes.GRANULAR_REDO, IconCodes.REDO
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                true, true, true, true, true, true, true, true,
-                c.getStateManager().canUndo(),
-                c.getStateManager().canUndo(),
-                c.getStateManager().canRedo(),
-                c.getStateManager().canRedo()
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                DialogAssembly::setDialogToProgramSettings,
-                DialogAssembly::setDialogToNewProject,
-                () -> StippleEffect.get().openProject(),
-                c.projectInfo::save,
-                DialogAssembly::setDialogToSave,
-                DialogAssembly::setDialogToResize,
-                DialogAssembly::setDialogToPad,
-                () -> PreviewWindow.set(c),
-                () -> c.getStateManager().undoToCheckpoint(),
-                () -> c.getStateManager().undo(true),
-                () -> c.getStateManager().redo(true),
-                () -> c.getStateManager().redoToCheckpoint()
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Layout.getProjectsPosition());
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.SETTINGS,
+                        IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
+                        IconCodes.SAVE, IconCodes.SAVE_AS,
+                        IconCodes.RESIZE, IconCodes.PAD, IconCodes.PREVIEW,
+                        IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
+                        IconCodes.GRANULAR_REDO, IconCodes.REDO
+                },
+                getPreconditions(
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> true,
+                        () -> c.getStateManager().canUndo(),
+                        () -> c.getStateManager().canUndo(),
+                        () -> c.getStateManager().canRedo(),
+                        () -> c.getStateManager().canRedo()),
+                new Runnable[] {
+                        DialogAssembly::setDialogToProgramSettings,
+                        DialogAssembly::setDialogToNewProject,
+                        () -> StippleEffect.get().openProject(),
+                        c.projectInfo::save,
+                        DialogAssembly::setDialogToSave,
+                        DialogAssembly::setDialogToResize,
+                        DialogAssembly::setDialogToPad,
+                        () -> PreviewWindow.set(c),
+                        () -> c.getStateManager().undoToCheckpoint(),
+                        () -> c.getStateManager().undo(true),
+                        () -> c.getStateManager().redo(true),
+                        () -> c.getStateManager().redoToCheckpoint()
+                }, Layout.getProjectsPosition());
 
         // exit program button
         final Coord2D exitProgPos = Layout.getProjectsPosition().displace(
@@ -99,7 +102,7 @@ public class MenuAssembly {
                     () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(true))));
         else
             mb.add(GraphicsUtils.generateIconButton(IconCodes.COLLAPSE_PANEL,
-                    panelIconPos, !Layout.isFramesPanelShowing(),
+                    panelIconPos, () -> !Layout.isFramesPanelShowing(),
                     () -> Layout.adjustPanels(() ->
                             Layout.setProjectsExpanded(false))));
 
@@ -152,11 +155,10 @@ public class MenuAssembly {
 
             final int index = i;
             final Runnable closeBehaviour = () -> {
-                if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges()) {
+                if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges())
                     DialogAssembly.setDialogToCloseProjectAYS(index);
-                } else {
+                else
                     StippleEffect.get().removeContext(index);
-                }
             };
 
             projectElements[amount + i] = new ScrollableMenuElement(
@@ -184,49 +186,43 @@ public class MenuAssembly {
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Frames", Constants.WHITE));
 
-        final String[] iconIDs = new String[] {
-                IconCodes.NEW_FRAME,
-                IconCodes.DUPLICATE_FRAME,
-                IconCodes.REMOVE_FRAME,
-                IconCodes.MOVE_FRAME_BACK,
-                IconCodes.MOVE_FRAME_FORWARD,
-                IconCodes.TO_FIRST_FRAME,
-                IconCodes.PREVIOUS,
-                Constants.ICON_ID_GAP_CODE, // gap for play/stop button
-                IconCodes.NEXT,
-                IconCodes.TO_LAST_FRAME
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                c.getState().canAddFrame(),
-                c.getState().canAddFrame(),
-                c.getState().canRemoveFrame(),
-                c.getState().canMoveFrameBack(),
-                c.getState().canMoveFrameForward(),
-                true,
-                true,
-                false, // placeholder
-                true,
-                true
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().getContext().addFrame(),
-                () -> StippleEffect.get().getContext().duplicateFrame(),
-                () -> StippleEffect.get().getContext().removeFrame(),
-                () -> StippleEffect.get().getContext().moveFrameBack(),
-                () -> StippleEffect.get().getContext().moveFrameForward(),
-                () -> StippleEffect.get().getContext().getState().setFrameIndex(0),
-                () -> StippleEffect.get().getContext().getState().previousFrame(),
-                () -> {}, // placeholder
-                () -> StippleEffect.get().getContext().getState().nextFrame(),
-                () -> StippleEffect.get().getContext().getState().setFrameIndex(
-                        StippleEffect.get().getContext().getState().getFrameCount() - 1
-                )
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Layout.getFramesPosition());
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.NEW_FRAME,
+                        IconCodes.DUPLICATE_FRAME,
+                        IconCodes.REMOVE_FRAME,
+                        IconCodes.MOVE_FRAME_BACK,
+                        IconCodes.MOVE_FRAME_FORWARD,
+                        IconCodes.TO_FIRST_FRAME,
+                        IconCodes.PREVIOUS,
+                        Constants.ICON_ID_GAP_CODE, // gap for play/stop button
+                        IconCodes.NEXT,
+                        IconCodes.TO_LAST_FRAME
+                },
+                getPreconditions(
+                        () -> c.getState().canAddFrame(),
+                        () -> c.getState().canAddFrame(),
+                        () -> c.getState().canRemoveFrame(),
+                        () -> c.getState().canMoveFrameBack(),
+                        () -> c.getState().canMoveFrameForward(),
+                        () -> true,
+                        () -> true,
+                        () -> false, // placeholder
+                        () -> true,
+                        () -> true),
+                new Runnable[] {
+                        c::addFrame,
+                        c::duplicateFrame,
+                        c::removeFrame,
+                        c::moveFrameBack,
+                        c::moveFrameForward,
+                        () -> c.getState().setFrameIndex(0),
+                        () -> c.getState().previousFrame(),
+                        () -> {}, // placeholder
+                        () -> c.getState().nextFrame(),
+                        () -> c.getState().setFrameIndex(
+                                c.getState().getFrameCount() - 1)
+                }, Layout.getFramesPosition());
 
         addHidePanelToMenuBuilder(mb, Layout.getFramesPosition()
                         .displace(Layout.getFramesWidth(), 0),
@@ -258,7 +254,7 @@ public class MenuAssembly {
 
         mb.add(new DynamicLabel(labelPos,
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
-                () -> StippleEffect.get().getContext().playbackInfo.getFps() + " fps",
+                () -> c.playbackInfo.getFps() + " fps",
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 
         final Coord2D playbackSliderPos = Layout.getFramesPosition().displace(
@@ -268,15 +264,13 @@ public class MenuAssembly {
         final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
                 Layout.getUISliderWidth(), MenuElement.Anchor.RIGHT_TOP,
                 Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                StippleEffect.get().getContext().playbackInfo.getFps(),
-                mpf -> StippleEffect.get().getContext()
-                        .playbackInfo.setFps(mpf));
+                c.playbackInfo::getFps, c.playbackInfo::setFps);
         slider.updateAssets();
         mb.add(slider);
 
         // frame content
 
-        final int amount = StippleEffect.get().getContext().getState().getFrameCount(),
+        final int amount = c.getState().getFrameCount(),
                 elementsPerFrame = 1;
 
         final ScrollableMenuElement[] frameElements =
@@ -297,8 +291,8 @@ public class MenuAssembly {
 
             frameElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
-                    i, () -> StippleEffect.get().getContext().getState().getFrameIndex(),
-                    s -> StippleEffect.get().getContext().getState().setFrameIndex(s)
+                    i, () -> c.getState().getFrameIndex(),
+                    s -> c.getState().setFrameIndex(s)
             ));
 
             realRightX = pos.x + dims.x;
@@ -355,43 +349,39 @@ public class MenuAssembly {
 
     public static Menu buildLayersMenu() {
         final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
 
         mb.add(TextLabel.make(Layout.getLayersPosition().displace(
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Layers", Constants.WHITE));
 
-        final String[] iconIDs = new String[] {
-                IconCodes.NEW_LAYER,
-                IconCodes.DUPLICATE_LAYER,
-                IconCodes.REMOVE_LAYER,
-                IconCodes.MOVE_LAYER_UP,
-                IconCodes.MOVE_LAYER_DOWN,
-                IconCodes.MERGE_WITH_LAYER_BELOW,
-                IconCodes.ENABLE_ALL_LAYERS
-        };
-
-        final boolean[] preconditions = new boolean[] {
-                StippleEffect.get().getContext().getState().canAddLayer(),
-                StippleEffect.get().getContext().getState().canAddLayer(),
-                StippleEffect.get().getContext().getState().canRemoveLayer(),
-                StippleEffect.get().getContext().getState().canMoveLayerUp(),
-                StippleEffect.get().getContext().getState().canMoveLayerDown(),
-                StippleEffect.get().getContext().getState().canMoveLayerDown(),
-                true
-        };
-
-        final Runnable[] behaviours = new Runnable[] {
-                () -> StippleEffect.get().getContext().addLayer(true),
-                () -> StippleEffect.get().getContext().duplicateLayer(),
-                () -> StippleEffect.get().getContext().removeLayer(),
-                () -> StippleEffect.get().getContext().moveLayerUp(),
-                () -> StippleEffect.get().getContext().moveLayerDown(),
-                () -> StippleEffect.get().getContext().mergeWithLayerBelow(),
-                () -> StippleEffect.get().getContext().enableAllLayers()
-        };
-
-        populateButtonsIntoBuilder(mb, iconIDs, preconditions,
-                behaviours, Layout.getLayersPosition());
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.NEW_LAYER,
+                        IconCodes.DUPLICATE_LAYER,
+                        IconCodes.REMOVE_LAYER,
+                        IconCodes.MOVE_LAYER_UP,
+                        IconCodes.MOVE_LAYER_DOWN,
+                        IconCodes.MERGE_WITH_LAYER_BELOW,
+                        IconCodes.ENABLE_ALL_LAYERS
+                },
+                getPreconditions(
+                        () -> c.getState().canAddLayer(),
+                        () -> c.getState().canAddLayer(),
+                        () -> c.getState().canRemoveLayer(),
+                        () -> c.getState().canMoveLayerUp(),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> true),
+                new Runnable[] {
+                        () -> c.addLayer(true),
+                        c::duplicateLayer,
+                        c::removeLayer,
+                        c::moveLayerUp,
+                        c::moveLayerDown,
+                        c::mergeWithLayerBelow,
+                        c::enableAllLayers
+                }, Layout.getLayersPosition());
 
         addHidePanelToMenuBuilder(mb, Layout.getLayersPosition()
                         .displace(Layout.getLayersWidth(), 0),
@@ -399,7 +389,7 @@ public class MenuAssembly {
 
         // layer content
 
-        final List<SELayer> layers = StippleEffect.get().getContext().getState().getLayers();
+        final List<SELayer> layers = c.getState().getLayers();
         final int amount = layers.size(), elementsPerLayer = 6;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
@@ -428,8 +418,8 @@ public class MenuAssembly {
 
             layerButtons[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
-                    i, () -> StippleEffect.get().getContext().getState().getLayerEditIndex(),
-                    s -> StippleEffect.get().getContext().getState().setLayerEditIndex(s)
+                    i, () -> c.getState().getLayerEditIndex(),
+                    s -> c.getState().setLayerEditIndex(s)
             ));
 
             final int index = i;
@@ -448,8 +438,8 @@ public class MenuAssembly {
                     (int)(Layout.BUTTON_DIM * -0.5));
 
             layerButtons[(2 * amount) + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER, ilPos, true,
-                    () -> StippleEffect.get().getContext().isolateLayer(index)));
+                    GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER,
+                            ilPos, () -> true, () -> c.isolateLayer(index)));
 
             // onion skin toggle
 
@@ -471,7 +461,7 @@ public class MenuAssembly {
 
             layerButtons[(5 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton(IconCodes.LAYER_SETTINGS,
-                            lsPos, true,
+                            lsPos, () -> true,
                             () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + dims.y;
@@ -554,7 +544,7 @@ public class MenuAssembly {
 
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
-            final boolean[] preconditions, final Runnable[] behaviours,
+            final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
             final Coord2D segmentPosition
     ) {
         if (iconIDs.length != preconditions.length || iconIDs.length != behaviours.length) {
@@ -576,6 +566,11 @@ public class MenuAssembly {
         }
     }
 
+    @SafeVarargs
+    private static Supplier<Boolean>[] getPreconditions(final Supplier<Boolean>... preconditions) {
+        return preconditions;
+    }
+
     public static Menu buildColorsMenu() {
         final MenuBuilder mb = new MenuBuilder();
 
@@ -588,10 +583,10 @@ public class MenuAssembly {
                         IconCodes.SWAP_COLORS,
                         IconCodes.COLOR_MENU_MODE,
                 },
-                new boolean[] {
-                        true,
-                        true,
-                },
+                getPreconditions(
+                        () -> true,
+                        () -> true
+                ),
                 new Runnable[] {
                         () -> StippleEffect.get().swapColors(),
                         () -> StippleEffect.get().toggleColorMenuMode(),
@@ -679,15 +674,18 @@ public class MenuAssembly {
                         IconCodes.SORT_PALETTE,
                         IconCodes.PALETTIZE,
                 },
-                new boolean[] {
-                        hasPaletteContents,
-                        hasPaletteContents,
-                        true,
-                        hasPaletteContents,
-                        true,
-                        hasPaletteContents,
-                        hasPaletteContents
-                },
+                getPreconditions(
+                        () -> hasPaletteContents && StippleEffect.get()
+                                .getSelectedPalette().isMutable(),
+                        () -> hasPaletteContents && StippleEffect.get()
+                                .getSelectedPalette().isMutable(),
+                        () -> true,
+                        () -> hasPaletteContents && StippleEffect.get()
+                                .getSelectedPalette().isMutable(),
+                        () -> true,
+                        () -> hasPaletteContents,
+                        () -> hasPaletteContents
+                ),
                 new Runnable[] {
                         () -> StippleEffect.get().addColorToPalette(),
                         () -> StippleEffect.get().removeColorFromPalette(),
@@ -770,14 +768,14 @@ public class MenuAssembly {
 
         final MenuElement outlineButton = GraphicsUtils.
                 generateIconButton(IconCodes.OUTLINE, outlinePos,
-                        true, DialogAssembly::setDialogToOutline);
+                        () -> true, DialogAssembly::setDialogToOutline);
         mb.add(outlineButton);
 
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
                 generateIconButton(IconCodes.VERTICAL_REFLECTION,
                         outlinePos.displace(0, -Layout.BUTTON_INC),
-                        c.getState().hasSelection(), () -> {
+                        () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
                                 c.reflectSelection(false);
                             else
@@ -788,13 +786,12 @@ public class MenuAssembly {
         final MenuElement horizontalReflectionButton = GraphicsUtils.
                 generateIconButton(IconCodes.HORIZONTAL_REFLECTION,
                         outlinePos.displace(0, -2 * Layout.BUTTON_INC),
-                        c.getState().hasSelection(), () -> {
+                        () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
                                 c.reflectSelection(true);
                             else
                                 c.reflectSelectionContents(true);
-                        }
-                );
+                        });
         mb.add(horizontalReflectionButton);
 
         return mb.build();
@@ -866,7 +863,7 @@ public class MenuAssembly {
                 MenuElement.Anchor.LEFT_TOP,
                 (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
                 (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
-                (int)(Math.log(c.renderInfo.getZoomFactor()) / Math.log(base)),
+                () -> (int)(Math.log(c.renderInfo.getZoomFactor()) / Math.log(base)),
                 i -> c.renderInfo.setZoomFactor((float)Math.pow(base, i)));
         zoomSlider.updateAssets();
 

@@ -6,22 +6,26 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
-import com.jordanbunke.stipple_effect.color_selection.PaletteLoader;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.ActionType;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SEContext {
@@ -59,24 +63,18 @@ public class SEContext {
         redrawCheckerboard();
     }
 
-    public void initializeRender() {
-        snapToCenterOfImage();
-        renderInfo.setZoomFactor(Constants.DEF_ZOOM);
-    }
-
     public void redrawSelectionOverlay() {
         final Set<Coord2D> selection = getState().getSelection();
-
         final Tool tool = StippleEffect.get().getTool();
 
         final boolean movable = Tool.canMoveSelectionBounds(tool) ||
                 tool.equals(Wand.get());
 
         selectionOverlay = getState().hasSelection()
-                ? SelectionUtils.drawOverlay(selection, (x, y) ->
-                        selection.contains(new Coord2D(x, y)),
-                renderInfo.getZoomFactor(),
-                movable, tool instanceof MoverTool) : GameImage.dummy();
+                ? GraphicsUtils.drawSelectionOverlay(
+                        renderInfo.getZoomFactor(), selection,
+                movable, tool instanceof MoverTool)
+                : GameImage.dummy();
     }
 
     private Coord2D[] getImageRenderBounds(
@@ -135,7 +133,7 @@ public class SEContext {
                     (int)(bounds[DIM].y * zoomFactor));
 
             // canvas
-            GameImage canvas = getState().draw(true,
+            final GameImage canvas = getState().draw(true,
                     true, getState().getFrameIndex());
 
             workspace.draw(canvas.section(bounds[TL], bounds[BR]),
@@ -145,11 +143,11 @@ public class SEContext {
         }
 
         // OVERLAYS
-        final Tool tool = StippleEffect.get().getTool();
+        if (zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
+            final Tool tool = StippleEffect.get().getTool();
 
-        if (inWorkspaceBounds) {
             // brush / eraser overlay
-            if (tool instanceof ToolWithBreadth twb && zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
+            if (inWorkspaceBounds && tool instanceof ToolWithBreadth twb) {
                 final GameImage overlay = twb.getOverlay();
                 final int offset = twb.breadthOffset();
 
@@ -159,29 +157,30 @@ public class SEContext {
                         Math.round((targetPixel.y - offset) * zoomFactor) -
                         Constants.OVERLAY_BORDER_PX);
             }
-        }
 
-        // selection overlay - drawing box
-        if (tool instanceof OverlayTool overlayTool && overlayTool.isDrawing()) {
-            final Coord2D tl = overlayTool.getTopLeft();
-            final GameImage boxOverlay = overlayTool.getSelectionOverlay();
+            // selection overlay - drawing box
+            if (tool instanceof OverlayTool overlayTool &&
+                    overlayTool.isDrawing()) {
+                final Coord2D tl = overlayTool.getTopLeft();
+                final GameImage overlay = overlayTool.getSelectionOverlay();
 
-            workspace.draw(boxOverlay,
-                    (render.x + (int)(tl.x * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX,
-                    (render.y + (int)(tl.y * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX);
-        }
+                workspace.draw(overlay,
+                        (render.x + (int)(tl.x * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX,
+                        (render.y + (int)(tl.y * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX);
+            }
 
-        // persistent selection overlay
-        if (getState().hasSelection()) {
-            final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
+            // persistent selection overlay
+            if (getState().hasSelection()) {
+                final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
 
-            workspace.draw(selectionOverlay,
-                    (render.x + (int)(tl.x * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX,
-                    (render.y + (int)(tl.y * zoomFactor))
-                            - Constants.OVERLAY_BORDER_PX);
+                workspace.draw(selectionOverlay,
+                        (render.x + (int)(tl.x * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX,
+                        (render.y + (int)(tl.y * zoomFactor))
+                                - Constants.OVERLAY_BORDER_PX);
+            }
         }
 
         return workspace.submit();
@@ -233,6 +232,8 @@ public class SEContext {
             } else {
                 ToolThatDraws.setMode(ToolThatDraws.Mode.NORMAL);
             }
+        } else if (tool instanceof MoverTool) {
+            MoverTool.setSnap(eventLogger.isPressed(Key.SHIFT));
         }
 
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
@@ -278,6 +279,21 @@ public class SEContext {
 
                         StippleEffect.get().incrementSelectedColorRGBA(
                                 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0);
+                    } else if (eventLogger.isPressed(Key.H)) {
+                        mse.markAsProcessed();
+
+                        StippleEffect.get().incrementSelectedColorHue(
+                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                    } else if (eventLogger.isPressed(Key.S)) {
+                        mse.markAsProcessed();
+
+                        StippleEffect.get().incrementSelectedColorSaturation(
+                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                    } else if (eventLogger.isPressed(Key.V)) {
+                        mse.markAsProcessed();
+
+                        StippleEffect.get().incrementSelectedColorValue(
+                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
                     } else if (eventLogger.isPressed(Key.A)) {
                         mse.markAsProcessed();
 
@@ -300,8 +316,6 @@ public class SEContext {
                         renderInfo.zoomIn(targetPixel);
                     else
                         renderInfo.zoomOut();
-
-                    StippleEffect.get().rebuildToolButtonMenu();
                 }
             }
     }
@@ -482,6 +496,33 @@ public class SEContext {
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
                                 0, 0, Constants.COLOR_SET_RGBA_INC, 0)
                 );
+            } else if (eventLogger.isPressed(Key.H)) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> StippleEffect.get().incrementSelectedColorHue(
+                                -Constants.COLOR_SET_RGBA_INC));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> StippleEffect.get().incrementSelectedColorHue(
+                                Constants.COLOR_SET_RGBA_INC));
+            } else if (eventLogger.isPressed(Key.S)) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> StippleEffect.get().incrementSelectedColorSaturation(
+                                -Constants.COLOR_SET_RGBA_INC));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> StippleEffect.get().incrementSelectedColorSaturation(
+                                Constants.COLOR_SET_RGBA_INC));
+            } else if (eventLogger.isPressed(Key.V)) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> StippleEffect.get().incrementSelectedColorValue(
+                                -Constants.COLOR_SET_RGBA_INC));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> StippleEffect.get().incrementSelectedColorValue(
+                                Constants.COLOR_SET_RGBA_INC));
             } else if (eventLogger.isPressed(Key.A)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -685,16 +726,10 @@ public class SEContext {
             } else if (StippleEffect.get().getTool().equals(Zoom.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> {
-                            renderInfo.zoomIn(targetPixel);
-                            StippleEffect.get().rebuildToolButtonMenu();
-                        });
+                        () -> renderInfo.zoomIn(targetPixel));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> {
-                            renderInfo.zoomOut();
-                            StippleEffect.get().rebuildToolButtonMenu();
-                        });
+                        renderInfo::zoomOut);
             }
         }
     }
@@ -985,7 +1020,6 @@ public class SEContext {
                     .changeSelectionContents(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1066,7 +1100,6 @@ public class SEContext {
                     .changeSelectionBounds(moved)
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, ActionType.CANVAS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1178,7 +1211,7 @@ public class SEContext {
             final SelectionContents toPaste = SEClipboard.get().getContents();
 
             if (newLayer)
-                addLayer(true);
+                addLayer(false);
 
             final Coord2D tl = SelectionUtils.topLeft(toPaste.getPixels()),
                     br = SelectionUtils.bottomRight(toPaste.getPixels());
@@ -1294,11 +1327,13 @@ public class SEContext {
                     h = getState().getImageHeight();
 
             final GameImage edit = new GameImage(w, h);
-            final Color c = secondary ? StippleEffect.get().getSecondary()
-                    : StippleEffect.get().getPrimary();
-            selection.forEach(s -> edit.dot(c, s.x, s.y));
+            final int c = (secondary ? StippleEffect.get().getSecondary()
+                    : StippleEffect.get().getPrimary()).getRGB();
+            selection.stream().filter(s -> s.x >= 0 && s.x < w &&
+                            s.y >= 0 && s.y < h)
+                    .forEach(s -> edit.setRGB(s.x, s.y, c));
 
-            paintOverImage(edit);
+            stampImage(edit, selection);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
@@ -1438,38 +1473,29 @@ public class SEContext {
 
     // IMAGE EDITING
     public void stampImage(final GameImage edit, final Set<Coord2D> pixels) {
-        final int frameIndex = getState().getFrameIndex();
-        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer()
-                .returnStamped(edit, pixels, frameIndex);
-        final int layerEditIndex = getState().getLayerEditIndex();
-        layers.set(layerEditIndex, replacement);
-
-        final ProjectState result = getState().changeLayers(layers)
-                .changeIsCheckpoint(false);
-        stateManager.performAction(result, ActionType.CANVAS);
+        editImage(f -> getState().getEditingLayer()
+                .returnStamped(edit, pixels, f), false);
     }
 
     public void paintOverImage(final GameImage edit) {
-        final int frameIndex = getState().getFrameIndex();
-
-        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer()
-                .returnPaintedOver(edit, frameIndex);
-        final int layerEditIndex = getState().getLayerEditIndex();
-        layers.set(layerEditIndex, replacement);
-
-        final ProjectState result = getState().changeLayers(layers)
-                .changeIsCheckpoint(false);
-        stateManager.performAction(result, ActionType.CANVAS);
+        editImage(f -> getState().getEditingLayer()
+                .returnPaintedOver(edit, f), false);
     }
 
     // ERASING
     public void erase(final boolean[][] eraseMask, final boolean checkpoint) {
+        editImage(f -> getState().getEditingLayer()
+                .returnErased(eraseMask, f), checkpoint);
+    }
+
+    private void editImage(
+            final Function<Integer, SELayer> fTransform,
+            final boolean checkpoint
+    ) {
         final int frameIndex = getState().getFrameIndex();
+
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-        final SELayer replacement = getState().getEditingLayer()
-                .returnErased(eraseMask, frameIndex);
+        final SELayer replacement = fTransform.apply(frameIndex);
         final int layerEditIndex = getState().getLayerEditIndex();
         layers.set(layerEditIndex, replacement);
 

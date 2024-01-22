@@ -15,6 +15,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class Slider extends MenuElement {
     public final int minValue, maxValue;
@@ -23,6 +24,7 @@ public abstract class Slider extends MenuElement {
     private final Function<Coord2D, Integer> coordDimFunction;
     private final Function<Slider, Integer> sliderDimFunction;
 
+    private final Supplier<Integer> getter;
     private final Consumer<Integer> setter;
     private final boolean canSetImplicitly;
 
@@ -32,7 +34,7 @@ public abstract class Slider extends MenuElement {
 
     public Slider(
             final Coord2D position, final Coord2D dimensions, final Anchor anchor,
-            final int minValue, final int maxValue, final int initialValue,
+            final int minValue, final int maxValue, final Supplier<Integer> getter,
             final Consumer<Integer> setter, final boolean canSetImplicitly,
             final Function<Coord2D, Integer> coordDimFunction,
             final Function<Slider, Integer> sliderDimFunction
@@ -42,7 +44,8 @@ public abstract class Slider extends MenuElement {
         this.minValue = minValue;
         this.maxValue = maxValue;
 
-        value = initialValue;
+        this.getter = getter;
+        value = this.getter.get();
 
         this.setter = setter;
         this.canSetImplicitly = canSetImplicitly;
@@ -56,7 +59,8 @@ public abstract class Slider extends MenuElement {
 
     @Override
     public void update(final double deltaTime) {
-        // done
+        if (!sliding)
+            setValue(getter.get());
     }
 
     @Override
@@ -222,12 +226,14 @@ public abstract class Slider extends MenuElement {
     }
 
     public void setValue(final int value) {
+        final int valueWas = getValue();
         this.value = Math.max(minValue, Math.min(value, maxValue));
 
         if (canSetImplicitly)
             setter.accept(this.value);
 
-        updateAssets();
+        if (getValue() != valueWas)
+            updateAssets();
     }
 
     public void incrementValue(final int delta) {

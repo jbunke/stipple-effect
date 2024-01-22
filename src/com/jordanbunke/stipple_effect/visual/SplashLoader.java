@@ -8,7 +8,7 @@ import java.nio.file.Path;
 public class SplashLoader {
     private static final Path SPLASH_FOLDER = Path.of("splash");
 
-    private static final int ANIM_FRAMES = 20;
+    private static final int ANIM_FRAMES = 25;
     private static final String BASE_NAME = "logo_anim_";
 
     public static GameImage[] loadAnimationFrames() {

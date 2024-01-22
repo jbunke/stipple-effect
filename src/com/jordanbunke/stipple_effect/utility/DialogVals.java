@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.utility;
 
-import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
+import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 

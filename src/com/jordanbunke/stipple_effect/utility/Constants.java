@@ -30,7 +30,8 @@ public class Constants {
 
     public static final double TICK_HZ = 100d, FPS = 30d;
 
-    public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5;
+    public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5,
+            CIRCLE = Math.PI * 2, SNAP_INC = CIRCLE / 8d;
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Layer ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
@@ -71,9 +72,9 @@ public class Constants {
             STATUS_UPDATE_DURATION_MILLIS = 5000, TOOL_TIP_MILLIS_THRESHOLD = 500,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 40, ARBITRARY_MAX_COUNT = 10000,
-            STRETCH_PX_THRESHOLD = 9, ROTATE_PX_THRESHOLD = 21;
+            STRETCH_PX_THRESHOLD = 2, ROTATE_PX_THRESHOLD = 5;
 
-    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 2f;
+    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f, ZOOM_FOR_OVERLAY = 1f;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

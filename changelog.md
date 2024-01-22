@@ -3,12 +3,45 @@
 ## Upcoming
 
 ### Add:
-* Scripting language, system and previews
-* Adjustable panels
+* Scripting system
+    * Language
+    * Interpreter
+    * Preview scripts and transformation scripts
 * Grid
 * Symmetry tools
 ### Fix:
-* Memory safety issues and OutOfMemoryError crashes
+* Performance optimizations
+* Memory issues and related crashes
+
+## **0.1.0** - 2024-01-22
+
+### Added:
+* Added tooltips for icon buttons and icon toggle buttons
+* Added palettes
+  * Palette files (.stippal)
+  * Palettization (scope: layer/frame/entire project)
+* Added native project file type (.stip)
+* Added preview window
+* Added customizable panel layout
+* Added exit program button and corresponding are-you-sure dialog
+* Added snap angles for image rotation (activated by holding Shift; multiples of 45 degrees)
+### Changed:
+* New file dialog now suggests project canvas size based on clipboard image size if present
+* Canvas size limit is now 800x800
+* Updated program icon and logo animation
+* Changed settings dialog to an info-style dialog with multiple tabs
+* Reworked panels and render scale to be dependent on the window and screen size
+* Changed brush select behaviour to preview overlay without editing selection until unclick
+* Brush select contents are now filtered by canvas bounds
+* Made list buttons dynamic; now only redraws menus when corresponding collection size changes
+### Fixed:
+* HSV slider slippage
+* Optimized selection overlays (still suboptimal)
+* Fixed bug where closing project window doesn't update menu
+* Fill behaviour now replaces color rather than filling over
+
+Removed:
+* Remove Piccolo font; set Classic to default
 
 ## **0.0.2** - 2024-01-06
 

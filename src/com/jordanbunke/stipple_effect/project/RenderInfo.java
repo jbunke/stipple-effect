@@ -31,13 +31,16 @@ public class RenderInfo {
     }
 
     public void setZoomFactor(final float zoomFactor) {
+        final float was = this.zoomFactor;
+
         this.zoomFactor = Math.max(Constants.MIN_ZOOM,
                 Math.min(zoomFactor, Constants.MAX_ZOOM));
 
-        if (this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY)
+        if (this.zoomFactor != was &&
+                this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
             ToolWithBreadth.redrawToolOverlays();
-
-        StippleEffect.get().getContext().redrawSelectionOverlay();
+            StippleEffect.get().getContext().redrawSelectionOverlay();
+        }
     }
 
     public void setAnchor(final Coord2D anchor) {

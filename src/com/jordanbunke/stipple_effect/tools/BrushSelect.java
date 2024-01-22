@@ -6,9 +6,11 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
     private static final BrushSelect INSTANCE;
@@ -43,9 +45,8 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
     }
 
     private void drawSelection(final SEContext context) {
-        selectionOverlay = SelectionUtils.drawOverlay(selection,
-                (x, y) -> selection.contains(new Coord2D(x, y)),
-                context.renderInfo.getZoomFactor(), true, false);
+        selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                context.renderInfo.getZoomFactor(), selection, false, false);
     }
 
     @Override
@@ -102,9 +103,15 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
             selecting = false;
             me.markAsProcessed();
 
-            // TODO - consider filtering selection by image bounds
+            // filter selection by image bounds
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
 
-            context.editSelection(new HashSet<>(selection), true);
+            final Set<Coord2D> bounded = selection.stream()
+                    .filter(p -> p.x >= 0 && p.y >= 0 && p.x < w && p.y < h)
+                    .collect(Collectors.toSet());
+
+            context.editSelection(bounded, true);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.color_selection;
+package com.jordanbunke.stipple_effect.palette;
 
 public enum ColorMenuMode {
     RGBA_HSV, PALETTE;

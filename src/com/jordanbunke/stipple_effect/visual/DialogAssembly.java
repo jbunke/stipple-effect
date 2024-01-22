@@ -17,10 +17,17 @@ import com.jordanbunke.delta_time.menus.menu_elements.visual.AnimationMenuElemen
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.color_selection.Palette;
-import com.jordanbunke.stipple_effect.color_selection.PaletteSorter;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.selection.SEClipboard;
+import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.tools.Tool;
+import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicTextButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -29,11 +36,6 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.TextBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
-import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.selection.Outliner;
-import com.jordanbunke.stipple_effect.tools.Tool;
-import com.jordanbunke.stipple_effect.utility.*;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -72,8 +74,7 @@ public class DialogAssembly {
                 getDialogContentOffsetFromLabel(scaleUpLabel),
                 Layout.getDialogContentWidthAllowance(), MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
-                c.projectInfo.getScaleUp(),
-                c.projectInfo::setScaleUp);
+                c.projectInfo::getScaleUp, c.projectInfo::setScaleUp);
         scaleUpSlider.updateAssets();
 
         final DynamicLabel scaleUpValue = makeDynamicFromLeftLabel(
@@ -134,8 +135,7 @@ public class DialogAssembly {
                 (int)(Layout.getDialogContentWidthAllowance() * 0.9),
                 MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                c.projectInfo.getFps(),
-                c.projectInfo::setFps);
+                c.projectInfo::getFps, c.projectInfo::setFps);
         playbackSpeedSlider.updateAssets();
 
         final DynamicLabel fpsValue = makeDynamicFromLeftLabel(
@@ -398,6 +398,26 @@ public class DialogAssembly {
     }
 
     public static void setDialogToNewProject() {
+        // initial canvas size suggestion determination
+        final int initialW, initialH;
+        final boolean hasClipboard = SEClipboard.get().hasContents();
+
+        if (hasClipboard) {
+            final Set<Coord2D> clipboard = SEClipboard.get()
+                    .getContents().getPixels();
+            final Coord2D tl = SelectionUtils.topLeft(clipboard),
+                    br = SelectionUtils.bottomRight(clipboard);
+
+            initialW = br.x - tl.x;
+            initialH = br.y - tl.y;
+        } else {
+            initialW = Constants.DEFAULT_IMAGE_W;
+            initialH = Constants.DEFAULT_IMAGE_H;
+        }
+
+        DialogVals.setNewProjectWidth(initialW);
+        DialogVals.setNewProjectHeight(initialH);
+
         // text labels
         final TextLabel
                 widthLabel = makeDialogLeftLabel(1, "Width: "),
@@ -406,10 +426,10 @@ public class DialogAssembly {
 
         // dim textboxes
         final TextBox widthTextBox = DialogAssembly.makeDialogNumericalTextBox(
-                widthLabel, Constants.DEFAULT_IMAGE_W, Constants.MIN_IMAGE_W,
+                widthLabel, initialW, Constants.MIN_IMAGE_W,
                 Constants.MAX_IMAGE_W, "px", DialogVals::setNewProjectWidth, 3);
         final TextBox heightTextBox = DialogAssembly.makeDialogNumericalTextBox(
-                heightLabel, Constants.DEFAULT_IMAGE_H, Constants.MIN_IMAGE_H,
+                heightLabel, initialH, Constants.MIN_IMAGE_H,
                 Constants.MAX_IMAGE_H, "px", DialogVals::setNewProjectHeight, 3);
 
         final MenuElementGrouping contents = new MenuElementGrouping(
@@ -811,12 +831,13 @@ public class DialogAssembly {
 
         // opacity slider
         final int MAX_OPACITY = 255;
+        DialogVals.setLayerOpacity(layer.getOpacity());
 
         final HorizontalSlider opacitySlider = new HorizontalSlider(
                 getDialogContentOffsetFromLabel(opacityLabel),
                 Layout.getDialogContentWidthAllowance(),
                 MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
-                (int)(layer.getOpacity() * MAX_OPACITY),
+                () -> (int)(DialogVals.getLayerOpacity() * MAX_OPACITY),
                 o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
         opacitySlider.updateAssets();
 
@@ -836,8 +857,6 @@ public class DialogAssembly {
     }
 
     public static void setDialogToSplashScreen() {
-        // TODO - redesign splash
-
         final MenuBuilder mb = new MenuBuilder();
 
         // timer
@@ -851,33 +870,14 @@ public class DialogAssembly {
         final GameImage background = new GameImage(w, h);
         background.free();
 
-        background.fillRectangle(Constants.ACCENT_BACKGROUND_LIGHT, 0, 0, w, h);
+        background.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0, w, h);
         mb.add(new SimpleMenuButton(new Coord2D(), new Coord2D(w, h),
                 MenuElement.Anchor.LEFT_TOP, true,
                 () -> StippleEffect.get().clearDialog(), background, background));
 
-        // title
-        final GameImage title = GraphicsUtils.uiText(Constants.BLACK, 3d)
-                .addText(StippleEffect.PROGRAM_NAME).build().draw();
-
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.6)),
-                new Coord2D(title.getWidth(), title.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, title));
-
-        // subtitle
-        final GameImage subtitle = GraphicsUtils.uiText(
-                Constants.ACCENT_BACKGROUND_DARK)
-                .addText("Pixel art editor and animator").addLineBreak()
-                .addText("built on Delta Time by Flinker Flitzer")
-                .build().draw();
-
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.75)),
-                new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, subtitle));
-
         // version
         final GameImage version = GraphicsUtils.uiText(
-                Constants.ACCENT_BACKGROUND_DARK)
+                Constants.ACCENT_BACKGROUND_LIGHT)
                 .addText("v" + StippleEffect.VERSION).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
@@ -897,8 +897,27 @@ public class DialogAssembly {
         final GameImage[] frames = SplashLoader.loadAnimationFrames();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
-                MenuElement.Anchor.CENTRAL, 10,
-                SplashLoader.loadAnimationFrames()));
+                MenuElement.Anchor.CENTRAL, 5, frames));
+
+        // title
+        final GameImage title = GraphicsUtils.uiText(
+                Constants.ACCENT_BACKGROUND_LIGHT, 3d)
+                .addText(StippleEffect.PROGRAM_NAME).build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.7)),
+                new Coord2D(title.getWidth(), title.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, title));
+
+        // subtitle
+        final GameImage subtitle = GraphicsUtils.uiText(
+                        Constants.ACCENT_BACKGROUND_LIGHT)
+                .addText("Pixel art editor and animator").addLineBreak()
+                .addText("built on Delta Time by Flinker Flitzer")
+                .build().draw();
+
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.8)),
+                new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
+                MenuElement.Anchor.CENTRAL_TOP, subtitle));
 
         setDialog(mb.build());
     }
@@ -1180,8 +1199,8 @@ public class DialogAssembly {
                         getDialogContentBigOffsetFromLabel(checkerboardLabel),
                         Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
                         MenuElement.Anchor.LEFT_TOP, 0, 5,
-                        (int)Math.round(Math.log(Settings.getCheckerboardPixels())
-                                / Math.log(2d)),
+                        () -> (int)Math.round(Math.log(
+                                Settings.getCheckerboardPixels()) / Math.log(2d)),
                         exp -> Settings.setCheckerboardPixels(
                                 (int)Math.pow(2d, exp), false));
                 checkerboardSlider.updateAssets();
