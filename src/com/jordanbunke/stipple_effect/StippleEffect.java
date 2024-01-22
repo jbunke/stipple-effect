@@ -18,6 +18,7 @@ import com.jordanbunke.delta_time.menus.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.palette.ColorMenuMode;
 import com.jordanbunke.stipple_effect.palette.Palette;
@@ -201,7 +202,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     private static void launchWithFile(final Path filepath) {
-        verifyFilepath(filepath);
+        get().verifyFilepath(filepath);
     }
 
     private void configureDebugger() {
@@ -754,11 +755,11 @@ public class StippleEffect implements ProgramContext {
         verifyFilepath(opened.get().toPath());
     }
 
-    private static void verifyFilepath(final Path filepath) {
+    private void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
         if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix()))
-            get().openNativeProject(filepath);
+            openNativeProject(filepath);
         else if (isAcceptedRasterFormat(fileName)) {
             final GameImage image = GameImageIO.readImage(filepath);
 
@@ -767,7 +768,7 @@ public class StippleEffect implements ProgramContext {
             final String file = FileIO.readFile(filepath);
 
             if (file != null)
-                get().addPalette(ParserSerializer.loadPalette(file), true);
+                addPalette(ParserSerializer.loadPalette(file), true);
             else
                 StatusUpdates.openFailed(filepath);
         }
@@ -909,6 +910,39 @@ public class StippleEffect implements ProgramContext {
         }
     }
 
+    public void incrementSelectedColorHue(
+            final int deltaH
+    ) {
+        final Color c = getSelectedColor();
+        final int hue = MathPlus.bounded(0,
+                ColorMath.hueGetter(c) + deltaH, Constants.HUE_SCALE);
+
+        setSelectedColor(ColorMath.hueAdjustedColor(hue, c),
+                ColorMath.LastHSVEdit.HUE);
+    }
+
+    public void incrementSelectedColorSaturation(
+            final int deltaS
+    ) {
+        final Color c = getSelectedColor();
+        final int sat = MathPlus.bounded(0,
+                ColorMath.satGetter(c) + deltaS, Constants.SAT_SCALE);
+
+        setSelectedColor(ColorMath.satAdjustedColor(sat, c),
+                ColorMath.LastHSVEdit.SAT);
+    }
+
+    public void incrementSelectedColorValue(
+            final int deltaV
+    ) {
+        final Color c = getSelectedColor();
+        final int value = MathPlus.bounded(0,
+                ColorMath.valueGetter(c) + deltaV, Constants.VALUE_SCALE);
+
+        setSelectedColor(ColorMath.valueAdjustedColor(value, c),
+                ColorMath.LastHSVEdit.VAL);
+    }
+
     public void incrementSelectedColorRGBA(
             final int deltaR, final int deltaG,
             final int deltaB, final int deltaAlpha
@@ -916,10 +950,10 @@ public class StippleEffect implements ProgramContext {
         final Color c = getSelectedColor();
 
         setSelectedColor(new Color(
-                Math.max(0, Math.min(c.getRed() + deltaR, 255)),
-                Math.max(0, Math.min(c.getGreen() + deltaG, 255)),
-                Math.max(0, Math.min(c.getBlue() + deltaB, 255)),
-                Math.max(0, Math.min(c.getAlpha() + deltaAlpha, 255))
+                MathPlus.bounded(0, c.getRed() + deltaR, Constants.RGBA_SCALE),
+                MathPlus.bounded(0, c.getGreen() + deltaG, Constants.RGBA_SCALE),
+                MathPlus.bounded(0, c.getBlue() + deltaB, Constants.RGBA_SCALE),
+                MathPlus.bounded(0, c.getAlpha() + deltaAlpha, Constants.RGBA_SCALE)
         ), ColorMath.LastHSVEdit.NONE);
     }
 
@@ -930,6 +964,8 @@ public class StippleEffect implements ProgramContext {
 
     public void setColorIndex(final int colorIndex) {
         this.colorIndex = colorIndex;
+
+        ColorMath.setLastHSVEdit(ColorMath.LastHSVEdit.NONE, getSelectedColor());
     }
 
     public void setColorIndexAndColor(final int colorIndex, final Color color) {
@@ -941,6 +977,8 @@ public class StippleEffect implements ProgramContext {
         final Color temp = colors[PRIMARY];
         colors[PRIMARY] = colors[SECONDARY];
         colors[SECONDARY] = temp;
+
+        ColorMath.setLastHSVEdit(ColorMath.LastHSVEdit.NONE, getSelectedColor());
     }
 
     public void toggleColorMenuMode() {
