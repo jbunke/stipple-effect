@@ -39,8 +39,7 @@
 * Optimized selection overlays (still suboptimal)
 * Fixed bug where closing project window doesn't update menu
 * Fill behaviour now replaces color rather than filling over
-
-Removed:
+### Removed:
 * Remove Piccolo font; set Classic to default
 
 ## **0.0.2** - 2024-01-06
