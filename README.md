@@ -16,7 +16,13 @@
   * Onion skinning
   * [Edit during playback](https://i.imgur.com/n2H93Xr.gif)
 * [Import and partition sprite sheets to animations directly](https://i.imgur.com/4OoRW4Q.gif)
-* Outlining
+* Palettes
+  * Import and export palettes
+  * Sort palette colors by hue, saturation, or value
+  * Palettize project (entire project, layer, frame, or layer-frame) i.e. snap pixels in scope to nearest color in palette, measured by RGBA difference
+  * Extract project contents to new palette
+  * Easily modify palettes with color addition and removal options
+* Intuitive and powerful outlining utilities
 * Family of selection tools designed for pixel-perfect selection
 * And much more!
 
