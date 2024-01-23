@@ -22,4 +22,4 @@
 
 ## External Dependencies
 * [Delta Time](https://github.com/jbunke/delta-time) - my lightweight graphics library that handles GUI and execution loop boilerplate
-* Animation Encoder - wrapper for Square's [gifencoder](https://github.com/square/gifencoder) and [jcodec](https://github.com/jcodec/jcodec)
+* Animation Encoder - wrapper for Square's [gifencoder](https://github.com/square/gifencoder) and for [jcodec](https://github.com/jcodec/jcodec)
