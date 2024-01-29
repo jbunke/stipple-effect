@@ -8,22 +8,22 @@
 
 ## Features
 * Projects consist of layers and frames
-  * Layers can be _static_ or _dynamic_ i.e. their contents can vary per frame or persist across the animation
-* [Advanced brush modes that combine the primary and secondary color in interesting ways](https://i.imgur.com/USum331.gif)
+  * [Layers can be _static_ or _dynamic_ i.e. their contents can vary per frame or persist across the animation](https://i.imgur.com/kGmxS0q.gif)
+* [Advanced brush modes that combine the primary and secondary color in interesting ways](https://i.imgur.com/rioexla.gif)
 * Rigorous state management
-  * [Granular undo/redo](https://i.imgur.com/kL84ffp.gif)
+  * [Granular undo/redo](https://i.imgur.com/0v1a0na.gif)
 * Animation playback
-  * Onion skinning
-  * [Edit during playback](https://i.imgur.com/n2H93Xr.gif)
-* [Import and partition sprite sheets to animations directly](https://i.imgur.com/4OoRW4Q.gif)
+  * [Onion skinning](https://i.imgur.com/FuhTIir.gif)
+  * [Edit during playback](https://i.imgur.com/pNjlHng.gif)
+* [Import and partition sprite sheets to animations directly](https://i.imgur.com/nzGI6z7.gif)
 * Palettes
   * Import and export palettes
   * Sort palette colors by hue, saturation, or value
-  * Palettize project (entire project, layer, frame, or layer-frame) i.e. snap pixels in scope to nearest color in palette, measured by RGBA difference
+  * [Palettize project (entire project, layer, frame, or layer-frame) i.e. snap pixels in scope to nearest color in palette, measured by RGBA difference](https://i.imgur.com/j3W1fd9.gif)
   * Extract project contents to new palette
   * Easily modify palettes with color addition and removal options
-* Intuitive and powerful outlining utilities
-* Family of selection tools designed for pixel-perfect selection
+* [Intuitive and powerful outlining utilities](https://i.imgur.com/Fp48y2v.gif)
+* [Family of selection tools designed for pixel-perfect selection](https://i.imgur.com/U0qONz3.gif)
 * And much more!
 
 ## External Dependencies
