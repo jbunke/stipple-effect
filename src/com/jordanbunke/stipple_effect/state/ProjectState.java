@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
@@ -203,12 +204,21 @@ public class ProjectState {
                             new Color(0, 0, 0, 0).getRGB()));
                 }
 
-                image.draw(layerImage);
+                image.draw(layerImage.submit());
 
                 if (previewCondition) {
                     final GameImage preview = selectionContents
                             .getContentForCanvas(getImageWidth(), getImageHeight());
                     image.draw(preview);
+                }
+
+                final boolean toolPreviewCondition = inProjectRender &&
+                        StippleEffect.get().getTool().hasToolContentPreview();
+
+                if (toolPreviewCondition) {
+                    final GameImage toolContentPreview = StippleEffect.get()
+                            .getTool().getToolContentPreview(this);
+                    image.draw(toolContentPreview);
                 }
             }
         }
