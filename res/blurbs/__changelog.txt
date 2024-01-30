@@ -32,6 +32,7 @@ Change:
 > Redesign order and layout of layer-specific buttons
 > Refactor ToolWithBreadth to interface HasBreadth
 > Optimize STIP files to save static layers as single frame
+x Cropping to selection bounds now snaps the image to the center of the screen
 
 Fix:
 x Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu

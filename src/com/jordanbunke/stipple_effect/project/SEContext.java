@@ -1188,6 +1188,7 @@ public class SEContext {
             moveSelectionBounds(new Coord2D(-tl.x, -tl.y), false);
 
             redrawCheckerboard();
+            snapToCenterOfImage();
         }
     }
 

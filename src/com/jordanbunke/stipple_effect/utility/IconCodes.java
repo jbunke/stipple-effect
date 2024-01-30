@@ -76,6 +76,7 @@ public class IconCodes {
             PALETTE_BUTTON_BACKGROUND = "palette_button_bg",
             PRIMARY_SELECTION = "primary_selection",
             SECONDARY_SELECTION = "secondary_selection",
+            EXCLUDED_FROM_PALETTE = "excluded_from_palette",
             HIDE_PANEL = "hide_panel",
             COLLAPSE_PANEL = "collapse_panel",
             EXPAND_PANEL = "expand_panel",

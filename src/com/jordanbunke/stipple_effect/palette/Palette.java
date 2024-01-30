@@ -73,6 +73,13 @@ public class Palette {
         }
     }
 
+    public void toggleInclusion(final Color c) {
+        if (!colorSequence.contains(c))
+            return;
+
+        inclusionMap.put(c, !inclusionMap.get(c));
+    }
+
     public void sort(final PaletteSorter sorter) {
         colorSequence.sort(sorter.getComparator());
     }

@@ -746,8 +746,6 @@ public class MenuAssembly {
 
         // palette buttons
         if (hasPaletteContents) {
-            final Palette palette = palettes.get(index);
-
             final Coord2D container = dropdownPos.displace(0,
                     Layout.STD_TEXT_BUTTON_INC);
             final int fitsOnLine = (contentWidth - Layout.SLIDER_OFF_DIM) /
@@ -757,14 +755,14 @@ public class MenuAssembly {
                             Layout.CONTENT_BUFFER_PX);
 
             final List<PaletteColorButton> buttons = new ArrayList<>();
-            final Color[] colors = palette.getColors();
+            final Color[] colors = s.getSelectedPalette().getColors();
 
             for (int i = 0; i < colors.length; i++) {
                 final int x = i % fitsOnLine, y = i / fitsOnLine;
                 final Coord2D pos = container.displace(
                         x * Layout.PALETTE_DIMS.x, y * Layout.PALETTE_DIMS.y);
 
-                buttons.add(new PaletteColorButton(pos, colors[i]));
+                buttons.add(new PaletteColorButton(pos, colors[i], s.getSelectedPalette()));
             }
 
             mb.add(new VerticalScrollingMenuElement(
