@@ -12,6 +12,30 @@ Fix:
 > Performance optimizations
 > Memory issues and related crashes
 
+{TODO for 0.2.0} - Scheduled for 2024-02-09
+
+Add:
+> Add tools:
+    > Line tool
+    > Gradient tool
+    > Shade brush
+> Add layer properties besides name and opacity to the layer settings dialog
+> Add pixel grid
+> Extend TextBox to support text selection
+> Status updates for actions without visual feedback
+    > Saving...
+    > Color slider adjustments and color actions if color panel is hidden
+    > Layer actions if layer panel is hidden
+    > Frame actions if frame panel is hidden
+
+Change:
+> Redesign order and layout of layer-specific buttons
+> Refactor ToolWithBreadth to interface HasBreadth
+> Optimize STIP files to save static layers as single frame
+
+Fix:
+> Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
+
 {0.1.0} - 2024-01-22
 
 Added:
