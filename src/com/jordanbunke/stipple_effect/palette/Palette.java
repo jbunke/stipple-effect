@@ -5,16 +5,18 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.utility.ColorMath;
+import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public class Palette {
     private String name;
     private final boolean mutable;
     private final List<Color> colorSequence;
+    private final Map<Color, Boolean> inclusionMap;
 
     public Palette(final String name, final Color[] loaded) {
         this(name, loaded, true);
@@ -26,10 +28,13 @@ public class Palette {
         this.name = name;
         this.mutable = mutable;
         this.colorSequence = new ArrayList<>();
+        this.inclusionMap = new HashMap<>();
 
         for (Color c : loaded)
-            if (!colorSequence.contains(c))
+            if (!colorSequence.contains(c)) {
                 colorSequence.add(c);
+                inclusionMap.put(c, true);
+            }
     }
 
     public void addColor(final Color c) {
@@ -37,6 +42,7 @@ public class Palette {
             return;
 
         colorSequence.add(c);
+        inclusionMap.put(c, true);
     }
 
     public void removeColor(final Color c) {
@@ -44,6 +50,7 @@ public class Palette {
             return;
 
         colorSequence.remove(c);
+        inclusionMap.remove(c);
     }
 
     public void moveLeft(final Color c) {
@@ -105,11 +112,17 @@ public class Palette {
         if (colorSequence.isEmpty())
             return source;
 
-        final Color arbitrary = colorSequence.get(0),
-                nearest = MathPlus.findBest(source, arbitrary, c -> c,
-                        (c1, c2) -> ColorMath.diff(c1, source) <
-                                ColorMath.diff(c2, source),
-                        colorSequence.toArray(Color[]::new));
+        final int max = Constants.RGBA_SCALE;
+        final Color worst = new Color(
+                (source.getRed() + (max / 2)) % max,
+                (source.getGreen() + (max / 2)) % max,
+                (source.getBlue() + (max / 2)) % max,
+                (source.getAlpha() + (max / 2)) % max
+        ), nearest = MathPlus.findBest(source, worst, c -> c,
+                (c1, c2) -> ColorMath.diff(c1, source) <
+                        ColorMath.diff(c2, source),
+                colorSequence.stream().filter(this::isIncluded)
+                        .toArray(Color[]::new));
 
         palettizationMap.put(source, nearest);
 
@@ -146,5 +159,9 @@ public class Palette {
 
     public boolean isMutable() {
         return mutable;
+    }
+
+    public boolean isIncluded(final Color c) {
+        return inclusionMap.getOrDefault(c, false);
     }
 }
