@@ -9,9 +9,10 @@ import com.jordanbunke.stipple_effect.utility.ColorMath;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 
 public class Palette {
-    private final String name;
+    private String name;
     private final boolean mutable;
     private final List<Color> colorSequence;
 
@@ -43,6 +44,26 @@ public class Palette {
             return;
 
         colorSequence.remove(c);
+    }
+
+    public void moveLeft(final Color c) {
+        shift(c, i -> i - 1, this::canMoveLeft);
+    }
+
+    public void moveRight(final Color c) {
+        shift(c, i -> i + 1, this::canMoveRight);
+    }
+
+    private void shift(
+            final Color c,
+            final Function<Integer, Integer> indexUpdate,
+            final Function<Color, Boolean> precondition
+    ) {
+        if (precondition.apply(c)) {
+            final int i = colorSequence.indexOf(c);
+            colorSequence.remove(c);
+            colorSequence.add(indexUpdate.apply(i), c);
+        }
     }
 
     public void sort(final PaletteSorter sorter) {
@@ -93,6 +114,22 @@ public class Palette {
         palettizationMap.put(source, nearest);
 
         return nearest;
+    }
+
+    public boolean canMoveLeft(final Color candidate) {
+        return mutable && colorSequence.indexOf(candidate) > 0;
+    }
+
+    public boolean canMoveRight(final Color candidate) {
+        return mutable && colorSequence.contains(candidate) &&
+                colorSequence.indexOf(candidate) < colorSequence.size() - 1;
+    }
+
+    public void setName(final String name) {
+        if (!mutable)
+            return;
+
+        this.name = name;
     }
 
     public int size() {

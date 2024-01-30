@@ -34,7 +34,7 @@ Change:
 > Optimize STIP files to save static layers as single frame
 
 Fix:
-> Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
+x Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
 
 {0.1.0} - 2024-01-22
 

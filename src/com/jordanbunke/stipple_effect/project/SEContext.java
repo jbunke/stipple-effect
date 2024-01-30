@@ -377,7 +377,7 @@ public class SEContext {
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> addLayer(true)
+                    this::addLayer
             );
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
@@ -1211,7 +1211,7 @@ public class SEContext {
             final SelectionContents toPaste = SEClipboard.get().getContents();
 
             if (newLayer)
-                addLayer(false);
+                addLayer();
 
             final Coord2D tl = SelectionUtils.topLeft(toPaste.getPixels()),
                     br = SelectionUtils.bottomRight(toPaste.getPixels());
@@ -1725,7 +1725,7 @@ public class SEContext {
     }
 
     // add layer
-    public void addLayer(final boolean checkpoint) {
+    public void addLayer() {
         // pre-check
         if (getState().canAddLayer()) {
             final int w = getState().getImageWidth(),
@@ -1734,8 +1734,8 @@ public class SEContext {
             final int addIndex = getState().getLayerEditIndex() + 1;
             layers.add(addIndex, SELayer.newLayer(w, h, getState().getFrameCount()));
 
-            final ProjectState result = getState().changeLayers(
-                    layers, addIndex).changeIsCheckpoint(checkpoint);
+            final ProjectState result = getState()
+                    .changeLayers(layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
         }
     }

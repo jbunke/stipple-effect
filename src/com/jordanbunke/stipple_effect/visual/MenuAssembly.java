@@ -374,7 +374,7 @@ public class MenuAssembly {
                         () -> c.getState().canMoveLayerDown(),
                         () -> true),
                 new Runnable[] {
-                        () -> c.addLayer(true),
+                        c::addLayer,
                         c::duplicateLayer,
                         c::removeLayer,
                         c::moveLayerUp,
@@ -652,13 +652,16 @@ public class MenuAssembly {
                 Layout.CONTENT_BUFFER_PX, Layout.COLOR_SELECTOR_OFFSET_Y +
                         Layout.COLOR_LABEL_OFFSET_Y),
                 paletteOptionsRef = startingPos.displace(
-                        -Layout.CONTENT_BUFFER_PX, -Layout.TEXT_Y_OFFSET);
+                        -Layout.CONTENT_BUFFER_PX, -Layout.TEXT_Y_OFFSET),
+                selColOptionsRef = paletteOptionsRef.displace(
+                        0, Layout.BUTTON_INC);
         final int contentWidth = Layout.getColorsWidth() -
                         (2 * Layout.CONTENT_BUFFER_PX);
 
-        final List<Palette> palettes = StippleEffect.get().getPalettes();
-        final int index = StippleEffect.get().getPaletteIndex();
-        final boolean hasPaletteContents = StippleEffect.get().hasPaletteContents();
+        final StippleEffect s = StippleEffect.get();
+        final List<Palette> palettes = s.getPalettes();
+        final int index = s.getPaletteIndex();
+        final boolean hasPaletteContents = s.hasPaletteContents();
 
         // palette label
         mb.add(TextLabel.make(startingPos, "Palette", Constants.WHITE));
@@ -666,49 +669,72 @@ public class MenuAssembly {
         // palette options
         populateButtonsIntoBuilder(
                 mb, new String[] {
-                        IconCodes.ADD_TO_PALETTE,
-                        IconCodes.REMOVE_FROM_PALETTE,
+                        IconCodes.NEW_PALETTE,
                         IconCodes.IMPORT_PALETTE,
-                        IconCodes.SAVE_PALETTE,
                         IconCodes.CONTENTS_TO_PALETTE,
+                        IconCodes.DELETE_PALETTE,
+                        IconCodes.SAVE_PALETTE,
                         IconCodes.SORT_PALETTE,
                         IconCodes.PALETTIZE,
+                        IconCodes.PALETTE_SETTINGS
                 },
                 getPreconditions(
-                        () -> hasPaletteContents && StippleEffect.get()
-                                .getSelectedPalette().isMutable(),
-                        () -> hasPaletteContents && StippleEffect.get()
-                                .getSelectedPalette().isMutable(),
                         () -> true,
-                        () -> hasPaletteContents && StippleEffect.get()
-                                .getSelectedPalette().isMutable(),
+                        () -> true,
                         () -> true,
                         () -> hasPaletteContents,
-                        () -> hasPaletteContents
+                        () -> hasPaletteContents && s
+                                .getSelectedPalette().isMutable(),
+                        () -> hasPaletteContents,
+                        () -> hasPaletteContents,
+                        () -> hasPaletteContents && s
+                                .getSelectedPalette().isMutable()
                 ),
                 new Runnable[] {
-                        () -> StippleEffect.get().addColorToPalette(),
-                        () -> StippleEffect.get().removeColorFromPalette(),
-                        () -> StippleEffect.get().openPalette(),
+                        () -> {}, // TODO
+                        s::openPalette,
+                        DialogAssembly::setDialogToPaletteFromContents,
+                        () -> {}, // TODO
                         () -> DialogAssembly
                                 .setDialogToSavePalette(palettes.get(index)),
-                        DialogAssembly::setDialogToPaletteFromContents,
                         () -> DialogAssembly
                                 .setDialogToSortPalette(palettes.get(index)),
                         () -> DialogAssembly
-                                .setDialogToPalettize(palettes.get(index))
+                                .setDialogToPalettize(palettes.get(index)),
+                        () -> {} // TODO
                 }, paletteOptionsRef);
+        populateButtonsIntoBuilder(
+                mb, new String[] {
+                        IconCodes.ADD_TO_PALETTE,
+                        IconCodes.REMOVE_FROM_PALETTE,
+                        IconCodes.MOVE_LEFT_IN_PALETTE,
+                        IconCodes.MOVE_RIGHT_IN_PALETTE
+                },
+                getPreconditions(
+                        () -> hasPaletteContents && s.getSelectedPalette().isMutable(),
+                        () -> hasPaletteContents && s.getSelectedPalette().isMutable(),
+                        () -> hasPaletteContents && s.getSelectedPalette()
+                                .canMoveLeft(s.getSelectedColor()),
+                        () -> hasPaletteContents && s.getSelectedPalette()
+                                .canMoveRight(s.getSelectedColor())
+                ),
+                new Runnable[] {
+                        s::addColorToPalette,
+                        s::removeColorFromPalette,
+                        s::moveColorLeftInPalette,
+                        s::moveColorRightInPalette
+                }, selColOptionsRef);
 
         //dropdown menu
         final List<Runnable> behaviours = new ArrayList<>();
 
         for (int i = 0; i < palettes.size(); i++) {
             final int toSet = i;
-            behaviours.add(() -> StippleEffect.get().setPaletteIndex(toSet));
+            behaviours.add(() -> s.setPaletteIndex(toSet));
         }
 
         final Coord2D dropdownPos = startingPos.displace(0,
-                Layout.getSegmentContentDisplacement().y);
+                Layout.getSegmentContentDisplacement().y + Layout.BUTTON_INC);
         final int dropDownHAllowance = Layout.getColorsHeight() / 3;
 
         mb.add(hasPaletteContents

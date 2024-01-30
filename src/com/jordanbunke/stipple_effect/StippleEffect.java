@@ -20,11 +20,11 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.ColorMenuMode;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
-import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -890,15 +891,24 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void addColorToPalette() {
-        if (hasPaletteContents()) {
-            getSelectedPalette().addColor(getSelectedColor());
-            rebuildColorsMenu();
-        }
+        paletteSelectedColorAction(Palette::addColor);
     }
 
     public void removeColorFromPalette() {
+        paletteSelectedColorAction(Palette::removeColor);
+    }
+
+    public void moveColorLeftInPalette() {
+        paletteSelectedColorAction(Palette::moveLeft);
+    }
+
+    public void moveColorRightInPalette() {
+        paletteSelectedColorAction(Palette::moveRight);
+    }
+
+    private void paletteSelectedColorAction(final BiConsumer<Palette, Color> f) {
         if (hasPaletteContents()) {
-            getSelectedPalette().removeColor(getSelectedColor());
+            f.accept(getSelectedPalette(), getSelectedColor());
             rebuildColorsMenu();
         }
     }

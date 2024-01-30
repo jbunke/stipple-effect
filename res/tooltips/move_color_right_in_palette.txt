@@ -1,0 +1,1 @@
+Shift selected color right in palette | {TODO}
