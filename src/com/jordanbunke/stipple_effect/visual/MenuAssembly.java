@@ -691,17 +691,14 @@ public class MenuAssembly {
                                 .getSelectedPalette().isMutable()
                 ),
                 new Runnable[] {
-                        () -> {}, // TODO
+                        s::newPalette,
                         s::openPalette,
                         DialogAssembly::setDialogToPaletteFromContents,
-                        () -> {}, // TODO
-                        () -> DialogAssembly
-                                .setDialogToSavePalette(palettes.get(index)),
-                        () -> DialogAssembly
-                                .setDialogToSortPalette(palettes.get(index)),
-                        () -> DialogAssembly
-                                .setDialogToPalettize(palettes.get(index)),
-                        () -> {} // TODO
+                        s::deletePalette,
+                        () -> DialogAssembly.setDialogToSavePalette(s.getSelectedPalette()),
+                        () -> DialogAssembly.setDialogToSortPalette(s.getSelectedPalette()),
+                        () -> DialogAssembly.setDialogToPalettize(s.getSelectedPalette()),
+                        () -> DialogAssembly.setDialogToPaletteSettings(s.getSelectedPalette())
                 }, paletteOptionsRef);
         populateButtonsIntoBuilder(
                 mb, new String[] {

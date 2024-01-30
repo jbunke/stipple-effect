@@ -713,6 +713,11 @@ public class StippleEffect implements ProgramContext {
                 DialogVals.getNewProjectHeight()), true);
     }
 
+    public void newPalette() {
+        addPalette(new Palette("Palette " +
+                (palettes.size() + 1), new Color[] {}), true);
+    }
+
     public void openProject() {
         FileIO.setDialogToFilesOnly();
         final Optional<File[]> opened = FileIO.openFilesFromSystem(
@@ -879,6 +884,18 @@ public class StippleEffect implements ProgramContext {
 
         colorMenuMode = ColorMenuMode.PALETTE;
         rebuildColorsMenu();
+    }
+
+    public void deletePalette() {
+        if (hasPaletteContents()) {
+            palettes.remove(paletteIndex);
+
+            if (paletteIndex >= palettes.size())
+                setPaletteIndex(palettes.size() - 1);
+
+            colorMenuMode = ColorMenuMode.PALETTE;
+            rebuildColorsMenu();
+        }
     }
 
     public boolean hasPaletteContents() {

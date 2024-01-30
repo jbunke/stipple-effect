@@ -770,6 +770,28 @@ public class DialogAssembly {
         mb.add(toggle);
     }
 
+    public static void setDialogToPaletteSettings(final Palette palette) {
+        DialogVals.setPaletteName(palette.getName());
+
+        // text labels
+        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name: ");
+
+        // name textbox
+        final TextBox paletteNameTextBox = makeDialogNameTextBox(
+                paletteNameLabel, palette.getName(), DialogVals::setPaletteName);
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                paletteNameLabel, paletteNameTextBox);
+        setDialog(assembleDialog(palette.getName() + "  |  Palette Settings",
+                contents, paletteNameTextBox::isValid,
+                Constants.GENERIC_APPROVAL_TEXT,
+                () -> {
+                    palette.setName(DialogVals.getPaletteName());
+
+                    StippleEffect.get().rebuildColorsMenu();
+                }, true));
+    }
+
     public static void setDialogToInfo() {
         setDialog(assembleInfoDialog());
     }
