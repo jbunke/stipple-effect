@@ -1,1 +1,1 @@
-Shift selected color left in palette | {TODO}
+Shift selected color left in palette | {Shift + ,}

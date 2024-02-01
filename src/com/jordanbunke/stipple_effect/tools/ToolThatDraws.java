@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
 
 public abstract class ToolThatDraws extends Tool {
     public enum Mode {
-        NORMAL, DITHERING, BLEND, RANDOM_WITHIN_BOUNDS
+        NORMAL, DITHERING, BLEND, NOISE
     }
 
     private static Mode mode = Mode.NORMAL;
@@ -95,7 +95,7 @@ public abstract class ToolThatDraws extends Tool {
                         (primary.getAlpha() + secondary.getAlpha()) / 2
                 );
             }
-            case RANDOM_WITHIN_BOUNDS -> {
+            case NOISE -> {
                 final Color primary = StippleEffect.get().getPrimary(),
                         secondary = StippleEffect.get().getSecondary();
                 final int pr = primary.getRed(), pg = primary.getGreen(),

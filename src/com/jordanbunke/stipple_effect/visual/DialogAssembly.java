@@ -1408,25 +1408,35 @@ public class DialogAssembly {
                 new String[] {
                         IconCodes.SWAP_COLORS,
                         IconCodes.COLOR_MENU_MODE,
+                        IconCodes.NEW_PALETTE,
+                        IconCodes.IMPORT_PALETTE,
+                        IconCodes.CONTENTS_TO_PALETTE,
+                        IconCodes.DELETE_PALETTE,
+                        IconCodes.SAVE_PALETTE,
+                        IconCodes.SORT_PALETTE,
+                        IconCodes.PALETTIZE,
+                        IconCodes.PALETTE_SETTINGS,
                         IconCodes.ADD_TO_PALETTE,
                         IconCodes.REMOVE_FROM_PALETTE,
-                        IconCodes.IMPORT_PALETTE,
-                        IconCodes.SAVE_PALETTE,
-                        IconCodes.CONTENTS_TO_PALETTE,
-                        IconCodes.SORT_PALETTE,
-                        IconCodes.PALETTIZE
+                        IconCodes.MOVE_LEFT_IN_PALETTE,
+                        IconCodes.MOVE_RIGHT_IN_PALETTE
                 },
                 new String[] {
                         "Swap primary and secondary color",
                         "Toggle between palettes and RGBA-HSV color selection",
-                        "Add selected color to palette",
-                        "Remove selected color from palette",
+                        "Create a new palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +
                                 Constants.PALETTE_FILE_SUFFIX + ")",
-                        "Save palette to file",
                         "Turn project contents into new palette",
+                        "Delete the selected palette",
+                        "Save palette to file",
                         "Sort colors in palette",
-                        "Palettize project contents"
+                        "Palettize project contents",
+                        "Open the settings dialog for the selected palette",
+                        "Add selected color to palette",
+                        "Remove selected color from palette",
+                        "Shift the selected color one slot to the left in the selected palette",
+                        "Shift the selected color one slot to the right in the selected palette"
                 }, contentAssembler, contentStart, initialBottomY
         );
     }

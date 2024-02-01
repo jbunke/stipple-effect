@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -386,11 +387,35 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
                         if (hasPaletteContents())
-                            DialogAssembly.setDialogToPalettize(getSelectedPalette());
+                            DialogAssembly.setDialogToPalettize(
+                                    getSelectedPalette());
                     });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToPanelManager);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
+                    this::newPalette);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (hasPaletteContents())
+                            DialogAssembly.setDialogToSortPalette(
+                                    getSelectedPalette());
+                    });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (hasPaletteContents())
+                            DialogAssembly.setDialogToPaletteSettings(
+                                    getSelectedPalette());
+                    });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
+                    this::moveColorLeftInPalette);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
+                    this::moveColorRightInPalette);
         } else {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
@@ -908,23 +933,27 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void addColorToPalette() {
-        paletteSelectedColorAction(Palette::addColor);
+        paletteSelectedColorAction(Palette::addColor, (p, c) -> true);
     }
 
     public void removeColorFromPalette() {
-        paletteSelectedColorAction(Palette::removeColor);
+        paletteSelectedColorAction(Palette::removeColor, (p, c) -> true);
     }
 
     public void moveColorLeftInPalette() {
-        paletteSelectedColorAction(Palette::moveLeft);
+        paletteSelectedColorAction(Palette::moveLeft, Palette::canMoveLeft);
     }
 
     public void moveColorRightInPalette() {
-        paletteSelectedColorAction(Palette::moveRight);
+        paletteSelectedColorAction(Palette::moveRight, Palette::canMoveRight);
     }
 
-    private void paletteSelectedColorAction(final BiConsumer<Palette, Color> f) {
-        if (hasPaletteContents()) {
+    private void paletteSelectedColorAction(
+            final BiConsumer<Palette, Color> f,
+            final BiFunction<Palette, Color, Boolean> precondition
+            ) {
+        if (hasPaletteContents() && precondition
+                .apply(getSelectedPalette(), getSelectedColor())) {
             f.accept(getSelectedPalette(), getSelectedColor());
             rebuildColorsMenu();
         }

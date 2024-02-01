@@ -224,7 +224,7 @@ public class SEContext {
         } else if (tool instanceof ToolThatDraws) {
             if (eventLogger.isPressed(Key.CTRL) &&
                     eventLogger.isPressed(Key.SHIFT)) {
-                ToolThatDraws.setMode(ToolThatDraws.Mode.RANDOM_WITHIN_BOUNDS);
+                ToolThatDraws.setMode(ToolThatDraws.Mode.NOISE);
             } else if (eventLogger.isPressed(Key.CTRL)) {
                 ToolThatDraws.setMode(ToolThatDraws.Mode.DITHERING);
             } else if (eventLogger.isPressed(Key.SHIFT)) {

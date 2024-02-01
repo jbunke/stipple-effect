@@ -1,1 +1,1 @@
-Palette settings... | {TODO}
+Palette settings... | {Shift + E}

@@ -1,1 +1,1 @@
-Create new palette... | {TODO}
+Create new palette... | {Shift + N}
