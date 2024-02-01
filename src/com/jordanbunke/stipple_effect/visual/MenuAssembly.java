@@ -321,8 +321,7 @@ public class MenuAssembly {
                         (Runnable) () -> {}).toArray(Runnable[]::new),
                 () -> StippleEffect.get().getContext().playbackInfo
                         .getMode().buttonIndex(),
-                () -> StippleEffect.get().getContext().playbackInfo.toggleMode(),
-                i -> codes[i]);
+                () -> StippleEffect.get().getContext().playbackInfo.toggleMode());
     }
 
     private static SimpleToggleMenuButton generatePlayStopToggle(final Coord2D pos) {
@@ -337,8 +336,7 @@ public class MenuAssembly {
                                 .playbackInfo.play()
                 },
                 () -> StippleEffect.get().getContext()
-                        .playbackInfo.isPlaying() ? 0 : 1,
-                () -> {}, i -> codes[i]);
+                        .playbackInfo.isPlaying() ? 0 : 1, () -> {});
     }
 
     private static int frameButtonXDisplacement() {
@@ -362,8 +360,7 @@ public class MenuAssembly {
                         IconCodes.REMOVE_LAYER,
                         IconCodes.MOVE_LAYER_UP,
                         IconCodes.MOVE_LAYER_DOWN,
-                        IconCodes.MERGE_WITH_LAYER_BELOW,
-                        IconCodes.ENABLE_ALL_LAYERS
+                        IconCodes.MERGE_WITH_LAYER_BELOW
                 },
                 getPreconditions(
                         () -> c.getState().canAddLayer(),
@@ -371,16 +368,14 @@ public class MenuAssembly {
                         () -> c.getState().canRemoveLayer(),
                         () -> c.getState().canMoveLayerUp(),
                         () -> c.getState().canMoveLayerDown(),
-                        () -> c.getState().canMoveLayerDown(),
-                        () -> true),
+                        () -> c.getState().canMoveLayerDown()),
                 new Runnable[] {
                         c::addLayer,
                         c::duplicateLayer,
                         c::removeLayer,
                         c::moveLayerUp,
                         c::moveLayerDown,
-                        c::mergeWithLayerBelow,
-                        c::enableAllLayers
+                        c::mergeWithLayerBelow
                 }, Layout.getLayersPosition());
 
         addHidePanelToMenuBuilder(mb, Layout.getLayersPosition()
@@ -390,7 +385,7 @@ public class MenuAssembly {
         // layer content
 
         final List<SELayer> layers = c.getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 6;
+        final int amount = layers.size(), elementsPerLayer = 5;
 
         final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
 
@@ -425,41 +420,25 @@ public class MenuAssembly {
             final int index = i;
 
             // visibility toggle
+            final Coord2D vtPos = pos.displace(
+                    Layout.LAYER_BUTTON_W + Layout.BUTTON_OFFSET,
+                    (Layout.STD_TEXT_BUTTON_H / 2)  - (Layout.BUTTON_DIM / 2));
+            layerButtons[amount + i] = new ScrollableMenuElement(
+                    new LayerVisibilityButton(vtPos, index));
 
-            final Coord2D vtPos = pos.displace(Layout.LAYER_BUTTON_W +
-                    Layout.BUTTON_OFFSET, Layout.STD_TEXT_BUTTON_H / 2);
-
-            layerButtons[amount + i] =
-                    new ScrollableMenuElement(generateVisibilityToggle(index, vtPos));
-
-            // isolate layer
-
-            final Coord2D ilPos = vtPos.displace(Layout.BUTTON_INC,
-                    (int)(Layout.BUTTON_DIM * -0.5));
-
-            layerButtons[(2 * amount) + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton(IconCodes.ISOLATE_LAYER,
-                            ilPos, () -> true, () -> c.isolateLayer(index)));
+            // frames linked toggle
+            final Coord2D flPos = vtPos.displace(Layout.BUTTON_INC, 0);
+            layerButtons[(2 * amount) + i] =
+                    new ScrollableMenuElement(generateFramesLinkedToggle(index, flPos));
 
             // onion skin toggle
-
             final Coord2D onionPos = vtPos.displace(Layout.BUTTON_INC * 2, 0);
-
             layerButtons[(3 * amount) + i] =
                     new ScrollableMenuElement(generateOnionSkinToggle(index, onionPos));
 
-            // frames linked toggle
-
-            final Coord2D flPos = onionPos.displace(Layout.BUTTON_INC, 0);
-
-            layerButtons[(4 * amount) + i] =
-                    new ScrollableMenuElement(generateFramesLinkedToggle(index, flPos));
-
             // layer settings
-
-            final Coord2D lsPos = ilPos.displace(Layout.BUTTON_INC * 3, 0);
-
-            layerButtons[(5 * amount) + i] = new ScrollableMenuElement(
+            final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
+            layerButtons[(4 * amount) + i] = new ScrollableMenuElement(
                     GraphicsUtils.generateIconButton(IconCodes.LAYER_SETTINGS,
                             lsPos, () -> true,
                             () -> DialogAssembly.setDialogToLayerSettings(index)));
@@ -476,27 +455,10 @@ public class MenuAssembly {
         return mb.build();
     }
 
-    private static SimpleToggleMenuButton generateVisibilityToggle(
+    private static MenuElement generateOnionSkinToggle(
             final int index, final Coord2D pos
     ) {
-        // 0: is enabled, button click should DISABLE; 1: vice-versa
-        final String[] codes = new String[] {
-                IconCodes.LAYER_ENABLED, IconCodes.LAYER_DISABLED
-        };
-
-        return IconToggleButton.make(pos.displace(0, -Layout.BUTTON_DIM / 2),
-                codes, new Runnable[] {
-                        () -> StippleEffect.get().getContext().disableLayer(index),
-                        () -> StippleEffect.get().getContext().enableLayer(index)
-                },
-                () -> StippleEffect.get().getContext().getState()
-                        .getLayers().get(index).isEnabled() ? 0 : 1,
-                () -> {}, i -> codes[i]);
-    }
-
-    private static SimpleToggleMenuButton generateOnionSkinToggle(
-            final int index, final Coord2D pos
-    ) {
+        final SEContext c = StippleEffect.get().getContext();
         final String[] codes = Arrays.stream(OnionSkinMode.values())
                 .map(OnionSkinMode::getIconCode).toArray(String[]::new);
 
@@ -504,20 +466,18 @@ public class MenuAssembly {
                 osm -> (Runnable) () -> {
                     final int nextIndex = (osm.ordinal() + 1) %
                             OnionSkinMode.values().length;
-                    StippleEffect.get().getContext().getState()
-                            .getLayers().get(index).setOnionSkinMode(
+                    c.getState().getLayers().get(index).setOnionSkinMode(
                                     OnionSkinMode.values()[nextIndex]);
                 }).toArray(Runnable[]::new);
 
-        return IconToggleButton.make(
-                pos.displace(0, -Layout.BUTTON_DIM / 2),
-                codes, behaviours,
-                () -> StippleEffect.get().getContext().getState()
-                        .getLayers().get(index).getOnionSkinMode().ordinal(),
-                () -> {}, i -> codes[i]);
+        return GraphicsUtils.generateIconToggleButton(pos, codes, behaviours,
+                () -> c.getState().getLayers().get(index).getOnionSkinMode().ordinal(),
+                () -> {},
+                () -> !c.getState().getLayers().get(index).areFramesLinked(),
+                OnionSkinMode.NONE.getIconCode());
     }
 
-    private static SimpleToggleMenuButton generateFramesLinkedToggle(
+    private static MenuElement generateFramesLinkedToggle(
             final int index, final Coord2D pos
     ) {
         // 0: is unlinked, button click should LINK; 1: vice-versa
@@ -526,15 +486,14 @@ public class MenuAssembly {
                 IconCodes.FRAMES_LINKED
         };
 
-        return IconToggleButton.make(
-                pos.displace(0, -Layout.BUTTON_DIM / 2),
-                codes, new Runnable[] {
+        return IconToggleButton.make(pos, codes,
+                new Runnable[] {
                         () -> StippleEffect.get().getContext().linkFramesInLayer(index),
                         () -> StippleEffect.get().getContext().unlinkFramesInLayer(index)
                 },
                 () -> StippleEffect.get().getContext().getState()
                         .getLayers().get(index).areFramesLinked() ? 1 : 0,
-                () -> {}, i -> codes[i]);
+                () -> {});
     }
 
     private static int layerButtonYDisplacement(final int amount) {

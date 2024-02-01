@@ -16,6 +16,7 @@ import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -344,6 +345,22 @@ public class GraphicsUtils {
                 new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
                 MenuElement.Anchor.LEFT_TOP,
                 greyscaleVersionOf(loadIcon(iconID)));
+
+        return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
+    }
+
+    public static MenuElement generateIconToggleButton(
+            final Coord2D position, final String[] codes,
+            final Runnable[] behaviours,
+            final Supplier<Integer> updateIndexLogic, final Runnable global,
+            final Supplier<Boolean> precondition, final String stubIconCode
+    ) {
+        final IconToggleButton icon = IconToggleButton.make(position,
+                codes, behaviours, updateIndexLogic, global);
+        final StaticMenuElement stub = new StaticMenuElement(position,
+                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
+                MenuElement.Anchor.LEFT_TOP,
+                greyscaleVersionOf(loadIcon(stubIconCode)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
     }

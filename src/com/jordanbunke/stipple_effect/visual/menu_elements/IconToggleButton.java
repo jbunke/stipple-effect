@@ -44,6 +44,16 @@ public class IconToggleButton extends SimpleToggleMenuButton {
                 globalBehaviour, iconCodeFunction);
     }
 
+    public static IconToggleButton make(
+            final Coord2D position, final String[] codes,
+            final Runnable[] chosenBehaviours,
+            final Supplier<Integer> updateIndexLogic,
+            final Runnable globalBehaviour
+    ) {
+        return make(position, codes, chosenBehaviours, updateIndexLogic,
+                globalBehaviour, i -> codes[i]);
+    }
+
     @Override
     public void update(final double deltaTime) {
         super.update(deltaTime);

@@ -1,2 +1,4 @@
-Layer visibility
-Toggle: {Shift + 1}
+Disable layer | {Shift + 1}
+
+{Shift + Click}: Isolate layer | {Shift + 2}
+{Ctrl + Click}: Enable all layers | {Shift + 3}

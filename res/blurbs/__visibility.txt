@@ -1,1 +1,3 @@
-Shortcut to toggle: {Shift + 1}
+Toggle the visibility of the current editing layer: {Shift + 1}
+Isolate the current editing layer: {Shift + 2}
+Enable all layers: {Shift + 3}

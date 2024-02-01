@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
@@ -1656,6 +1657,7 @@ public class SEContext {
                 !layers.get(layerIndex).areFramesLinked()) {
             final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
                     getState().getFrameIndex());
+            layer.setOnionSkinMode(OnionSkinMode.NONE);
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
