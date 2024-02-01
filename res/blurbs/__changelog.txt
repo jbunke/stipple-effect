@@ -29,7 +29,7 @@ Add:
 
 Change:
 x Redesigned order and layout of layer-specific buttons
-> Refactor ToolWithBreadth to interface HasBreadth
+x Refactored much of ToolWithBreadth to interface HasBreadth
 > Optimize STIP files to save static layers as single frame
 x Cropping to selection bounds now snaps the image to the center of the screen
 

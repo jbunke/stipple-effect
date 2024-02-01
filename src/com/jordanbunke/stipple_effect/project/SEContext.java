@@ -300,10 +300,10 @@ public class SEContext {
 
                         StippleEffect.get().incrementSelectedColorRGBA(
                                 0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (StippleEffect.get().getTool() instanceof ToolWithBreadth twb) {
+                    } else if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
                         mse.markAsProcessed();
 
-                        twb.setBreadth(twb.getBreadth() + mse.clicksScrolled);
+                        bt.setBreadth(bt.getBreadth() + mse.clicksScrolled);
                     } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
                         mse.markAsProcessed();
 
@@ -639,23 +639,19 @@ public class SEContext {
                     () -> deleteSelectionContents(true));
 
             // tool modifications
-            if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {
+            if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        twr::decreaseBreadth
-                );
+                        bt::decreaseBreadth);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        twr::increaseBreadth
-                );
+                        bt::increaseBreadth);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> twr.setBreadth(twr.getBreadth() + Constants.BREADTH_INC)
-                );
+                        () -> bt.setBreadth(bt.getBreadth() + Constants.BREADTH_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> twr.setBreadth(twr.getBreadth() - Constants.BREADTH_INC)
-                );
+                        () -> bt.setBreadth(bt.getBreadth() - Constants.BREADTH_INC));
             } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
