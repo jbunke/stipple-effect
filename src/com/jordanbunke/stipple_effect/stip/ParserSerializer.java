@@ -229,7 +229,7 @@ public class ParserSerializer {
         return frame.submit();
     }
 
-    private static Color deserializeColor(final String contents) {
+    public static Color deserializeColor(final String contents) {
         final int LENGTH_OF_SECTION = 2, R = 0, G = 2, B = 4, A = 6;
 
         final int r = ColorTextBox.hexToInt(contents.substring(
@@ -449,7 +449,7 @@ public class ParserSerializer {
         return sb.toString();
     }
 
-    private static String serializeColor(final Color c) {
+    public static String serializeColor(final Color c) {
         final String r = Integer.toHexString(c.getRed()),
                 g = Integer.toHexString(c.getGreen()),
                 b = Integer.toHexString(c.getBlue()),

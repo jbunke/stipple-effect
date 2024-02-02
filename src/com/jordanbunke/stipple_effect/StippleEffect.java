@@ -223,8 +223,7 @@ public class StippleEffect implements ProgramContext {
     private void updateStatus(final String message) {
         millisSinceStatusUpdate = 0;
 
-        final GameImage text = GraphicsUtils.uiText(Constants.WHITE)
-                .addText(message).build().draw();
+        final GameImage text = ParserUtils.generateStatusEffectText(message);
         final int w = text.getWidth() + (4 * Layout.BUTTON_BORDER_PX),
                 h = text.getHeight() - (4 * Layout.BUTTON_BORDER_PX);
 
@@ -933,29 +932,50 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void addColorToPalette() {
-        paletteSelectedColorAction(Palette::addColor, (p, c) -> true);
+        paletteSelectedColorAction(Palette::addColor,
+                Palette::canAdd, StatusUpdates::addColorToPalette,
+                (p, c) -> StatusUpdates.cannotColorPalette(true, p, c));
     }
 
     public void removeColorFromPalette() {
-        paletteSelectedColorAction(Palette::removeColor, (p, c) -> true);
+        paletteSelectedColorAction(Palette::removeColor,
+                Palette::canRemove, StatusUpdates::removeColorFromPalette,
+                (p, c) -> StatusUpdates.cannotColorPalette(false, p, c));
     }
 
     public void moveColorLeftInPalette() {
-        paletteSelectedColorAction(Palette::moveLeft, Palette::canMoveLeft);
+        paletteSelectedColorAction(Palette::moveLeft,
+                Palette::canMoveLeft, StatusUpdates::moveLeftInPalette,
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(true, p, c));
     }
 
     public void moveColorRightInPalette() {
-        paletteSelectedColorAction(Palette::moveRight, Palette::canMoveRight);
+        paletteSelectedColorAction(Palette::moveRight,
+                Palette::canMoveRight, StatusUpdates::moveRightInPalette,
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(false, p, c));
     }
 
     private void paletteSelectedColorAction(
             final BiConsumer<Palette, Color> f,
-            final BiFunction<Palette, Color, Boolean> precondition
-            ) {
-        if (hasPaletteContents() && precondition
-                .apply(getSelectedPalette(), getSelectedColor())) {
-            f.accept(getSelectedPalette(), getSelectedColor());
-            rebuildColorsMenu();
+            final BiFunction<Palette, Color, Boolean> precondition,
+            final BiConsumer<Palette, Color> statusUpdate,
+            final BiConsumer<Palette, Color> notPermitted
+    ) {
+        final Palette p = getSelectedPalette();
+        final Color c = getSelectedColor();
+
+        if (hasPaletteContents() && precondition.apply(p, c)) {
+            f.accept(p, c);
+
+            if (Layout.isColorsPanelShowing())
+                rebuildColorsMenu();
+            else
+                statusUpdate.accept(p, c);
+        } else if (hasPaletteContents()) {
+            // precondition failed
+            notPermitted.accept(p, c);
+        } else {
+            StatusUpdates.noPalette();
         }
     }
 
@@ -972,11 +992,19 @@ public class StippleEffect implements ProgramContext {
             final int deltaH
     ) {
         final Color c = getSelectedColor();
-        final int hue = MathPlus.bounded(0,
-                ColorMath.hueGetter(c) + deltaH, Constants.HUE_SCALE);
+        int hue = ColorMath.hueGetter(c) + deltaH;
 
-        setSelectedColor(ColorMath.hueAdjustedColor(hue, c),
-                ColorMath.LastHSVEdit.HUE);
+        while (hue > Constants.HUE_SCALE)
+            hue -= Constants.HUE_SCALE;
+
+        while (hue < 0)
+            hue += Constants.HUE_SCALE;
+
+        final Color newC = ColorMath.hueAdjustedColor(hue, c);
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.HUE);
+
+        StatusUpdates.colorSliderAdjustment("Hue", hue, newC);
     }
 
     public void incrementSelectedColorSaturation(
@@ -986,8 +1014,11 @@ public class StippleEffect implements ProgramContext {
         final int sat = MathPlus.bounded(0,
                 ColorMath.satGetter(c) + deltaS, Constants.SAT_SCALE);
 
-        setSelectedColor(ColorMath.satAdjustedColor(sat, c),
-                ColorMath.LastHSVEdit.SAT);
+        final Color newC = ColorMath.satAdjustedColor(sat, c);
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.SAT);
+
+        StatusUpdates.colorSliderAdjustment("Saturation", sat, newC);
     }
 
     public void incrementSelectedColorValue(
@@ -997,22 +1028,47 @@ public class StippleEffect implements ProgramContext {
         final int value = MathPlus.bounded(0,
                 ColorMath.valueGetter(c) + deltaV, Constants.VALUE_SCALE);
 
-        setSelectedColor(ColorMath.valueAdjustedColor(value, c),
-                ColorMath.LastHSVEdit.VAL);
+        final Color newC = ColorMath.valueAdjustedColor(value, c);
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.VAL);
+
+        StatusUpdates.colorSliderAdjustment("Value", value, newC);
     }
 
     public void incrementSelectedColorRGBA(
             final int deltaR, final int deltaG,
             final int deltaB, final int deltaAlpha
     ) {
-        final Color c = getSelectedColor();
-
-        setSelectedColor(new Color(
+        final Color c = getSelectedColor(), newC = new Color(
                 MathPlus.bounded(0, c.getRed() + deltaR, Constants.RGBA_SCALE),
                 MathPlus.bounded(0, c.getGreen() + deltaG, Constants.RGBA_SCALE),
                 MathPlus.bounded(0, c.getBlue() + deltaB, Constants.RGBA_SCALE),
                 MathPlus.bounded(0, c.getAlpha() + deltaAlpha, Constants.RGBA_SCALE)
-        ), ColorMath.LastHSVEdit.NONE);
+        );
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.NONE);
+
+        final String slider;
+        final int sliderVal;
+
+        if (deltaR != 0) {
+            slider = "Red";
+            sliderVal = newC.getRed();
+        } else if (deltaG != 0) {
+            slider = "Green";
+            sliderVal = newC.getGreen();
+        } else if (deltaB != 0) {
+            slider = "Blue";
+            sliderVal = newC.getBlue();
+        } else if (deltaAlpha != 0) {
+            slider = "Alpha";
+            sliderVal = newC.getAlpha();
+        } else {
+            slider = "???";
+            sliderVal = 0;
+        }
+
+        StatusUpdates.colorSliderAdjustment(slider, sliderVal, newC);
     }
 
     public void setSelectedColor(final Color color, final ColorMath.LastHSVEdit lastHSVEdit) {
@@ -1037,6 +1093,9 @@ public class StippleEffect implements ProgramContext {
         colors[SECONDARY] = temp;
 
         ColorMath.setLastHSVEdit(ColorMath.LastHSVEdit.NONE, getSelectedColor());
+
+        if (!Layout.isColorsPanelShowing())
+            StatusUpdates.swapColors();
     }
 
     public void toggleColorMenuMode() {

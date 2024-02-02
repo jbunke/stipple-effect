@@ -352,8 +352,6 @@ public class ProjectState {
         if (this.frameIndex != frameIndex &&
                 frameIndex >= 0 && frameIndex < frameCount) {
             this.frameIndex = frameIndex;
-
-            // StippleEffect.get().rebuildFramesMenu();
         }
     }
 
@@ -362,8 +360,6 @@ public class ProjectState {
 
         if (frameIndex >= frameCount)
             frameIndex = 0;
-
-        // StippleEffect.get().rebuildFramesMenu();
     }
 
     public void previousFrame() {
@@ -371,7 +367,5 @@ public class ProjectState {
 
         if (frameIndex < 0)
             frameIndex = frameCount - 1;
-
-        // StippleEffect.get().rebuildFramesMenu();
     }
 }

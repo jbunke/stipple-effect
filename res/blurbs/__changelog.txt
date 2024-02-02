@@ -22,8 +22,8 @@ Add:
 > Add pixel grid
 > Extend TextBox to support text selection
 > Status updates for actions without visual feedback
-    > Saving...
-    > Color slider adjustments and color actions if color panel is hidden
+    x Saving...
+    x Color slider adjustments and color actions if color panel is hidden
     > Layer actions if layer panel is hidden
     > Frame actions if frame panel is hidden
 

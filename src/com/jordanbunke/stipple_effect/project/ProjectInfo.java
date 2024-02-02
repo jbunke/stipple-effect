@@ -94,6 +94,8 @@ public class ProjectInfo {
             return;
         }
 
+        StatusUpdates.saving();
+
         final SEContext c = StippleEffect.get().getContext();
 
         if (c.getState().getSelectionMode() == SelectionMode.CONTENTS &&

@@ -38,6 +38,7 @@ public class Constants {
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
             COLOR_TOOL_TIP_PREFIX = "color:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
+            OPEN_COLOR = "<#", CLOSE_COLOR = ">",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
             ICON_ID_GAP_CODE = "", TYPING_CODE = "typing",
             GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";

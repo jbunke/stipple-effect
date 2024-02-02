@@ -2,24 +2,138 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
+import java.awt.*;
 import java.nio.file.Path;
 import java.util.Set;
 
 public class StatusUpdates {
-    public static void movedFrame(final int fromIndex, final int toIndex) {
+    // not permitted
+    public static void noPalette() {
         StippleEffect.get().sendStatusUpdate(
-                "Moved selected frame from position " +
-                        (fromIndex + 1) + " to " + (toIndex + 1));
+                "There is no palette selected for this action to be performed");
     }
 
+    public static void cannotShiftColorPalette(
+            final boolean left, final Palette p, final Color c
+    ) {
+        final boolean colorInPalette = p.canRemove(c);
+
+        actionNotPermitted("shift the selected color " + processColor(c) +
+                        " to the " + (left ? "left" : "right") + " in \"" +
+                        p.getName() + "\"",
+                p.isMutable() ? (colorInPalette
+                        ? ("it is already the " + (left ? "left" : "right") + "most color")
+                        : "it is not in the palette")
+                        : "\"" + p.getName() + "\" is immutable");
+    }
+
+    public static void cannotColorPalette(
+            final boolean add, final Palette p, final Color c
+    ) {
+        actionNotPermitted((add ? "add" : "remove") + " the selected color " +
+                        processColor(c) + (add ? "to" : "from") +
+                        " \"" + p.getName() + "\"",
+                processColor(c) + (add ? " is already" : " is not") +
+                        " in the palette");
+    }
+
+    private static void actionNotPermitted(
+            final String attempt, final String reason
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Cannot " + attempt + " because " + reason);
+    }
+
+    // color actions
+    public static void colorSliderAdjustment(
+            final String slider, final int sliderVal, final Color result
+    ) {
+        StippleEffect.get().sendStatusUpdate(slider + " slider set to " +
+                sliderVal + "; selected color is " + processColor(result));
+    }
+
+    public static void swapColors() {
+        final Color primary = StippleEffect.get().getPrimary(),
+                secondary = StippleEffect.get().getSecondary();
+
+        StippleEffect.get().sendStatusUpdate(
+                "Primary: " + processColor(primary) +
+                        " | Secondary: " + processColor(secondary));
+    }
+
+    public static void addColorToPalette(final Palette p, final Color c) {
+        StippleEffect.get().sendStatusUpdate("Added " + processColor(c) +
+                " to \"" + p.getName() + "\"");
+    }
+
+    public static void removeColorFromPalette(final Palette p, final Color c) {
+        StippleEffect.get().sendStatusUpdate("Removed " + processColor(c) +
+                " from \"" + p.getName() + "\"");
+    }
+
+    public static void moveLeftInPalette(final Palette p, final Color c) {
+        StippleEffect.get().sendStatusUpdate("Shifted " + processColor(c) +
+                " to the left in \"" + p.getName() + "\"");
+    }
+
+    public static void moveRightInPalette(final Palette p, final Color c) {
+        StippleEffect.get().sendStatusUpdate("Shifted " + processColor(c) +
+                " to the right in \"" + p.getName() + "\"");
+    }
+
+    private static String processColor(final Color c) {
+        return Constants.OPEN_COLOR + ParserSerializer.serializeColor(c) +
+                Constants.CLOSE_COLOR;
+    }
+
+    // frame actions
+    public static void movedFrame(
+            final int fromIndex, final int toIndex, final int frameCount
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Moved selected frame from position (" + (fromIndex + 1) +
+                        "/" + frameCount + ") to (" + (toIndex + 1) +
+                        "/" + frameCount + ")");
+    }
+
+    public static void addedFrame(
+            final boolean duplicated, final int wasIndex,
+            final int index, final int frameCount
+    ) {
+        StippleEffect.get().sendStatusUpdate((duplicated
+                ? "Duplicated frame from (" + (wasIndex + 1) + " to "
+                : "Added frame (") + (index + 1) + "/" +
+                frameCount + ")");
+    }
+
+    public static void removedFrame(
+            final int wasIndex, final int index, final int frameCount
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Removed frame " + (wasIndex + 1) + "; active frame: (" +
+                        (index + 1) + "/" + frameCount + ")");
+    }
+
+    public static void frameNavigation(
+            final int index, final int frameCount
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Active frame: (" + (index + 1) + "/" + frameCount + ")");
+    }
+
+    // layer actions
     public static void movedLayer(
-            final String name, final int fromIndex, final int toIndex
+            final String name, final int fromIndex, final int toIndex,
+            final int layerCount
     ) {
         StippleEffect.get().sendStatusUpdate("Moved layer \"" +
                 name + "\" " + (fromIndex > toIndex ? "down" : "up") +
-                " from position " + (fromIndex + 1) + " to " + (toIndex + 1));
+                " from (" + (fromIndex + 1) + "/" + layerCount +
+                ") to (" + (toIndex + 1) + "/" + layerCount + ")");
     }
 
     public static void stateChangeFailed(final boolean triedUndo) {
@@ -55,6 +169,12 @@ public class StatusUpdates {
         StippleEffect.get().sendStatusUpdate("The font code \"" + attempt +
                 "\" is invalid; assigned to \"" + SEFonts.Code.CLASSIC.forButtonText() +
                 "\" instead");
+    }
+
+    public static void saving() {
+        StippleEffect.get().sendStatusUpdate(
+                "Saving... do not close " + StippleEffect.PROGRAM_NAME +
+                        " until the project has been saved");
     }
 
     public static void saved(final Path filepath) {

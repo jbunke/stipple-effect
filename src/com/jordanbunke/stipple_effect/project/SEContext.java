@@ -326,123 +326,103 @@ public class SEContext {
         if (eventLogger.isPressed(Key.CTRL) && !eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    stateManager::undoToCheckpoint
-            );
+                    stateManager::undoToCheckpoint);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    stateManager::redoToCheckpoint
-            );
+                    stateManager::redoToCheckpoint);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    projectInfo::save
-            );
+                    projectInfo::save);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    this::selectAll
-            );
+                    this::selectAll);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    () -> deselect(true)
-            );
+                    () -> deselect(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.I, GameKeyEvent.Action.PRESS),
-                    this::invertSelection
-            );
+                    this::invertSelection);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    () -> getState().nextFrame()
-            );
+                    () -> {
+                        getState().nextFrame();
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                    playbackInfo::toggleMode
-            );
+                    playbackInfo::toggleMode);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(0)
-            );
+                    () -> getState().setFrameIndex(0));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(getState().getFrameCount() - 1)
-            );
+                    () -> getState().setFrameIndex(getState().getFrameCount() - 1));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().editLayerAbove()
-            );
+                    () -> getState().editLayerAbove());
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().editLayerBelow()
-            );
+                    () -> getState().editLayerBelow());
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    this::addFrame
-            );
+                    this::addFrame);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    this::addLayer
-            );
+                    this::addLayer);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
-                    this::toggleLayerLinking
-            );
+                    this::toggleLayerLinking);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
                     () -> getState().getEditingLayer().setOnionSkinMode(
-                            getState().getEditingLayer().getOnionSkinMode().next())
-            );
+                            getState().getEditingLayer().getOnionSkinMode().next()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    this::removeFrame
-            );
+                    this::removeFrame);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    this::cut
-            );
+                    this::cut);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    this::copy
-            );
+                    this::copy);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
-                    () -> paste(false)
-            );
+                    () -> paste(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(true)
-            );
+                    () -> reflectSelection(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(false)
-            );
+                    () -> reflectSelection(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(DialogVals.getOutlineSideMask())
-            );
+                    () -> outlineSelection(DialogVals.getOutlineSideMask()));
         }
 
         // SHIFT but not CTRL
         if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    () -> fillSelection(true)
-            );
+                    () -> fillSelection(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
                     () -> {
                         PreviewWindow.set(this);
                         eventLogger.unpressAllKeys();
-                    }
-            );
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
                     () -> deleteSelectionContents(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex())
-            );
+                    () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(Outliner.getSingleOutlineMask())
-            );
+                    () -> outlineSelection(Outliner.getSingleOutlineMask()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
                     () -> {
@@ -452,51 +432,42 @@ public class SEContext {
                             disableLayer(index);
                         else
                             enableLayer(index);
-                    }
-            );
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
-                    () -> isolateLayer(getState().getLayerEditIndex())
-            );
+                    () -> isolateLayer(getState().getLayerEditIndex()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
-                    this::enableAllLayers
-            );
+                    this::enableAllLayers);
 
             // arrow keys only in these branches
             if (eventLogger.isPressed(Key.R)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                -Constants.COLOR_SET_RGBA_INC, 0, 0, 0)
-                );
+                                -Constants.COLOR_SET_RGBA_INC, 0, 0, 0));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                Constants.COLOR_SET_RGBA_INC, 0, 0, 0)
-                );
+                                Constants.COLOR_SET_RGBA_INC, 0, 0, 0));
             } else if (eventLogger.isPressed(Key.G)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, -Constants.COLOR_SET_RGBA_INC, 0, 0)
-                );
+                                0, -Constants.COLOR_SET_RGBA_INC, 0, 0));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, Constants.COLOR_SET_RGBA_INC, 0, 0)
-                );
+                                0, Constants.COLOR_SET_RGBA_INC, 0, 0));
             } else if (eventLogger.isPressed(Key.B)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, -Constants.COLOR_SET_RGBA_INC, 0)
-                );
+                                0, 0, -Constants.COLOR_SET_RGBA_INC, 0));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, Constants.COLOR_SET_RGBA_INC, 0)
-                );
+                                0, 0, Constants.COLOR_SET_RGBA_INC, 0));
             } else if (eventLogger.isPressed(Key.H)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -528,22 +499,18 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, -Constants.COLOR_SET_RGBA_INC)
-                );
+                                0, 0, 0, -Constants.COLOR_SET_RGBA_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, Constants.COLOR_SET_RGBA_INC)
-                );
+                                0, 0, 0, Constants.COLOR_SET_RGBA_INC));
             } else {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> playbackInfo.incrementFps(-Constants.PLAYBACK_FPS_INC)
-                );
+                        () -> playbackInfo.incrementFps(-Constants.PLAYBACK_FPS_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC)
-                );
+                        () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC));
             }
         }
 
@@ -551,68 +518,59 @@ public class SEContext {
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    () -> getState().previousFrame()
-            );
+                    () -> {
+                        getState().previousFrame();
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveLayerUp
-            );
+                    this::moveLayerUp);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveLayerDown
-            );
+                    this::moveLayerDown);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveFrameBack
-            );
+                    this::moveFrameBack);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveFrameForward
-            );
+                    this::moveFrameForward);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    () -> stateManager.undo(true)
-            );
+                    () -> stateManager.undo(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    () -> stateManager.redo(true)
-            );
+                    () -> stateManager.redo(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    this::cropToSelection
-            );
+                    this::cropToSelection);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    this::duplicateFrame
-            );
+                    this::duplicateFrame);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    this::duplicateLayer
-            );
+                    this::duplicateLayer);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    this::mergeWithLayerBelow
-            );
+                    this::mergeWithLayerBelow);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    this::removeLayer
-            );
+                    this::removeLayer);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
-                    () -> paste(true)
-            );
+                    () -> paste(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelectionContents(true)
-            );
+                    () -> reflectSelectionContents(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelectionContents(false)
-            );
+                    () -> reflectSelectionContents(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(Outliner.getDoubleOutlineMask())
-            );
+                    () -> outlineSelection(Outliner.getDoubleOutlineMask()));
         }
     }
 
@@ -655,71 +613,55 @@ public class SEContext {
             } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::decreaseTolerance
-                );
+                        tts::decreaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::increaseTolerance
-                );
+                        tts::increaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC)
-                );
+                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC)
-                );
+                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
             } else if (StippleEffect.get().getTool().equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(0, 1))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(0, 1)));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(0, -1))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(0, -1)));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(1, 0))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(1, 0)));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(-1, 0))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(-1, 0)));
             } else if (StippleEffect.get().getTool().equals(PickUpSelection.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(0, -1), true)
-                );
+                        () -> moveSelectionContents(new Coord2D(0, -1), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(0, 1), true)
-                );
+                        () -> moveSelectionContents(new Coord2D(0, 1), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(-1, 0), true)
-                );
+                        () -> moveSelectionContents(new Coord2D(-1, 0), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(1, 0), true)
-                );
+                        () -> moveSelectionContents(new Coord2D(1, 0), true));
             } else if (Tool.canMoveSelectionBounds(StippleEffect.get().getTool())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(0, -1), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(0, -1), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(0, 1), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(0, 1), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(-1, 0), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(-1, 0), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(1, 0), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(1, 0), true));
             } else if (StippleEffect.get().getTool().equals(Zoom.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
@@ -1508,15 +1450,16 @@ public class SEContext {
         // pre-check
         if (getState().canMoveFrameForward()) {
             final int frameIndex = getState().getFrameIndex(),
-                    toIndex = frameIndex + 1;
+                    toIndex = frameIndex + 1,
+                    frameCount = getState().getFrameCount();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedForward(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    toIndex, getState().getFrameCount());
+                    toIndex, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
-            StatusUpdates.movedFrame(frameIndex, toIndex);
+            StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         }
     }
 
@@ -1525,15 +1468,16 @@ public class SEContext {
         // pre-check
         if (getState().canMoveFrameBack()) {
             final int frameIndex = getState().getFrameIndex(),
-                    toIndex = frameIndex - 1;
+                    toIndex = frameIndex - 1,
+                    frameCount = getState().getFrameCount();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedBack(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    toIndex, getState().getFrameCount());
+                    toIndex, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
-            StatusUpdates.movedFrame(frameIndex, toIndex);
+            StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         }
     }
 
@@ -1545,12 +1489,17 @@ public class SEContext {
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
-            final int addIndex = getState().getFrameIndex() + 1;
+            final int addIndex = getState().getFrameIndex() + 1,
+                    frameCount = getState().getFrameCount() + 1;
             layers.replaceAll(l -> l.returnAddedFrame(addIndex, w, h));
 
             final ProjectState result = getState().changeFrames(layers,
-                    addIndex, getState().getFrameCount() + 1);
+                    addIndex, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
+
+            if (!Layout.isFramesPanelShowing())
+                StatusUpdates.addedFrame(false, addIndex - 1,
+                        addIndex, frameCount);
         }
     }
 
@@ -1558,15 +1507,19 @@ public class SEContext {
     public void duplicateFrame() {
         // pre-check
         if (getState().canAddFrame()) {
-            final int frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex(),
+                    frameCount = getState().getFrameCount() + 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnDuplicatedFrame(frameIndex));
 
             final ProjectState result = getState().changeFrames(
-                    layers, frameIndex + 1,
-                    getState().getFrameCount() + 1);
+                    layers, frameIndex + 1, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
+
+            if (!Layout.isFramesPanelShowing())
+                StatusUpdates.addedFrame(true, frameIndex,
+                        frameIndex + 1, frameCount);
         }
     }
 
@@ -1574,14 +1527,19 @@ public class SEContext {
     public void removeFrame() {
         // pre-check
         if (getState().canRemoveFrame()) {
-            final int frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex(),
+                    frameCount = getState().getFrameCount() - 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnRemovedFrame(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    frameIndex - 1, getState().getFrameCount() - 1);
+                    frameIndex - 1, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
+
+            if (!Layout.isFramesPanelShowing())
+                StatusUpdates.removedFrame(frameIndex,
+                        Math.max(0, frameIndex - 1), frameCount);
         }
     }
 
@@ -1783,7 +1741,7 @@ public class SEContext {
                     layers, reinsertionIndex);
             stateManager.performAction(result, ActionType.LAYER);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
-                    reinsertionIndex);
+                    reinsertionIndex, layers.size());
         }
     }
 
@@ -1803,7 +1761,7 @@ public class SEContext {
                     layers, reinsertionIndex);
             stateManager.performAction(result, ActionType.LAYER);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
-                    reinsertionIndex);
+                    reinsertionIndex, layers.size());
         }
     }
 

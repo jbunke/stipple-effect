@@ -38,7 +38,7 @@ public class Palette {
     }
 
     public void addColor(final Color c) {
-        if (!mutable || colorSequence.contains(c))
+        if (!canAdd(c))
             return;
 
         colorSequence.add(c);
@@ -46,7 +46,7 @@ public class Palette {
     }
 
     public void removeColor(final Color c) {
-        if (!mutable)
+        if (!canRemove(c))
             return;
 
         colorSequence.remove(c);
@@ -134,6 +134,14 @@ public class Palette {
         palettizationMap.put(source, nearest);
 
         return nearest;
+    }
+
+    public boolean canAdd(final Color candidate) {
+        return mutable && !colorSequence.contains(candidate);
+    }
+
+    public boolean canRemove(final Color candidate) {
+        return mutable && colorSequence.contains(candidate);
     }
 
     public boolean canMoveLeft(final Color candidate) {
