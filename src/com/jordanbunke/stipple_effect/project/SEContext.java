@@ -1447,11 +1447,12 @@ public class SEContext {
     // FRAME MANIPULATION
     // move frame forward
     public void moveFrameForward() {
+        final int frameIndex = getState().getFrameIndex(),
+                toIndex = frameIndex + 1,
+                frameCount = getState().getFrameCount();
+
         // pre-check
         if (getState().canMoveFrameForward()) {
-            final int frameIndex = getState().getFrameIndex(),
-                    toIndex = frameIndex + 1,
-                    frameCount = getState().getFrameCount();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedForward(frameIndex));
@@ -1460,16 +1461,19 @@ public class SEContext {
                     toIndex, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotMoveFrame(frameIndex, true);
         }
     }
 
     // move frame back
     public void moveFrameBack() {
+        final int frameIndex = getState().getFrameIndex(),
+                toIndex = frameIndex - 1,
+                frameCount = getState().getFrameCount();
+
         // pre-check
         if (getState().canMoveFrameBack()) {
-            final int frameIndex = getState().getFrameIndex(),
-                    toIndex = frameIndex - 1,
-                    frameCount = getState().getFrameCount();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedBack(frameIndex));
@@ -1478,6 +1482,8 @@ public class SEContext {
                     toIndex, frameCount);
             stateManager.performAction(result, ActionType.FRAME);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotMoveFrame(frameIndex, false);
         }
     }
 
@@ -1500,6 +1506,8 @@ public class SEContext {
             if (!Layout.isFramesPanelShowing())
                 StatusUpdates.addedFrame(false, addIndex - 1,
                         addIndex, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotAddFrame();
         }
     }
 
@@ -1520,6 +1528,8 @@ public class SEContext {
             if (!Layout.isFramesPanelShowing())
                 StatusUpdates.addedFrame(true, frameIndex,
                         frameIndex + 1, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotAddFrame();
         }
     }
 
@@ -1540,6 +1550,8 @@ public class SEContext {
             if (!Layout.isFramesPanelShowing())
                 StatusUpdates.removedFrame(frameIndex,
                         Math.max(0, frameIndex - 1), frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotRemoveFrame();
         }
     }
 
@@ -1599,6 +1611,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
+            // TODO
         }
     }
 
@@ -1616,6 +1629,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
+            // TODO
         }
     }
 
@@ -1631,6 +1645,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
+            // TODO
         }
     }
 
@@ -1646,6 +1661,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
+            // TODO
         }
     }
 
@@ -1694,6 +1710,9 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
+            // TODO
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotAddLayer();
         }
     }
 
@@ -1708,6 +1727,9 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
+            // TODO
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotAddLayer();
         }
     }
 
@@ -1722,6 +1744,10 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(
                     layers, index > 0 ? index - 1 : index);
             stateManager.performAction(result, ActionType.LAYER);
+            // TODO
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotRemoveLayer(
+                    getState().getEditingLayer().getName());
         }
     }
 
@@ -1742,6 +1768,9 @@ public class SEContext {
             stateManager.performAction(result, ActionType.LAYER);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotMoveLayer(
+                    getState().getEditingLayer().getName(), false);
         }
     }
 
@@ -1762,6 +1791,9 @@ public class SEContext {
             stateManager.performAction(result, ActionType.LAYER);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotMoveLayer(
+                    getState().getEditingLayer().getName(), true);
         }
     }
 
@@ -1784,6 +1816,10 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(
                     layers, belowIndex);
             stateManager.performAction(result, ActionType.LAYER);
+            // TODO
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotMergeWithLayerBelow(
+                    getState().getEditingLayer().getName());
         }
     }
 

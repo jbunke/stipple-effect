@@ -12,6 +12,62 @@ import java.util.Set;
 
 public class StatusUpdates {
     // not permitted
+    public static void cannotMergeWithLayerBelow(final String layerName) {
+        actionNotPermitted("merge \"" + layerName + "\" with the layer below",
+                "it is the bottommost layer");
+    }
+
+    public static void cannotMoveLayer(
+            final String layerName, final boolean triedForward
+    ) {
+        cannotMove(true, "\"" + layerName + "\"", triedForward);
+    }
+
+    public static void cannotMoveFrame(
+            final int index, final boolean triedForward
+    ) {
+        cannotMove(false, String.valueOf(index + 1), triedForward);
+    }
+
+    private static void cannotMove(
+            final boolean isLayer, final String name, final boolean triedForward
+    ) {
+        final String thing = isLayer ? "layer" : "frame",
+                direction = isLayer
+                        ? (triedForward ? "up" : "down")
+                        : (triedForward ? "forward" : "back"),
+                extreme = triedForward ? "last" : "first";
+
+        actionNotPermitted("move " + thing + " " + name + " " + direction,
+                "it is already the " + extreme + " " + thing + " in the project");
+    }
+
+    public static void cannotAddLayer() {
+        cannotAdd("layer", Constants.MAX_NUM_LAYERS);
+    }
+
+    public static void cannotAddFrame() {
+        cannotAdd("frame", Constants.MAX_NUM_FRAMES);
+    }
+
+    private static void cannotAdd(final String thing, final int maximum) {
+        actionNotPermitted("add a " + thing + " to the project",
+                "the maximum (" + maximum + ") has already been reached");
+    }
+
+    public static void cannotRemoveFrame() {
+        cannotRemove("This", "frame");
+    }
+
+    public static void cannotRemoveLayer(final String layerName) {
+        cannotRemove("\"" + layerName + "\"", "layer");
+    }
+
+    private static void cannotRemove(final String name, final String thing) {
+        StippleEffect.get().sendStatusUpdate(name + " is the only " +
+                thing + " in the project; it cannot be removed");
+    }
+
     public static void noPalette() {
         StippleEffect.get().sendStatusUpdate(
                 "There is no palette selected for this action to be performed");

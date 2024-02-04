@@ -25,7 +25,7 @@ Add:
     x Saving...
     x Color slider adjustments and color actions if color panel is hidden
     > Layer actions if layer panel is hidden
-    > Frame actions if frame panel is hidden
+    x Frame actions if frame panel is hidden
 
 Change:
 x Redesigned order and layout of layer-specific buttons
