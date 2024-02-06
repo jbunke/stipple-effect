@@ -363,10 +363,26 @@ public class SEContext {
                     () -> getState().setFrameIndex(getState().getFrameCount() - 1));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().editLayerAbove());
+                    () -> {
+                        getState().editLayerAbove();
+
+                        if (!Layout.isLayersPanelShowing())
+                            StatusUpdates.layerNavigation(
+                                    getState().getEditingLayer().getName(),
+                                    getState().getLayerEditIndex(),
+                                    getState().getLayers().size());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().editLayerBelow());
+                    () -> {
+                        getState().editLayerBelow();
+
+                        if (!Layout.isLayersPanelShowing())
+                            StatusUpdates.layerNavigation(
+                                    getState().getEditingLayer().getName(),
+                                    getState().getLayerEditIndex(),
+                                    getState().getLayers().size());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     this::addFrame);
@@ -1611,7 +1627,10 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerLinkedStatus(false,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1629,7 +1648,10 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerLinkedStatus(true,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1645,7 +1667,10 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerVisibilityStatus(false,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1661,7 +1686,10 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, ActionType.CANVAS);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerVisibilityStatus(true,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1705,12 +1733,15 @@ public class SEContext {
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
-            layers.add(addIndex, SELayer.newLayer(w, h, getState().getFrameCount()));
+            final SELayer added = SELayer.newLayer(w, h, getState().getFrameCount());
+            layers.add(addIndex, added);
 
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.addedLayer(added.getName(), addIndex, layers.size());
         } else if (!Layout.isLayersPanelShowing()) {
             StatusUpdates.cannotAddLayer();
         }
@@ -1722,12 +1753,17 @@ public class SEContext {
         if (getState().canAddLayer()) {
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
-            layers.add(addIndex, getState().getEditingLayer().duplicate());
+            final SELayer old = getState().getEditingLayer(),
+                    duplicated = old.duplicate();
+            layers.add(addIndex, duplicated);
 
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
             stateManager.performAction(result, ActionType.LAYER);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.duplicatedLayer(old.getName(),
+                        duplicated.getName(), addIndex, layers.size());
         } else if (!Layout.isLayersPanelShowing()) {
             StatusUpdates.cannotAddLayer();
         }
@@ -1738,13 +1774,18 @@ public class SEContext {
         // pre-check
         if (getState().canRemoveLayer()) {
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-            final int index = getState().getLayerEditIndex();
+            final int index = getState().getLayerEditIndex(),
+                    setIndex = index > 0 ? index - 1 : index;
+            final SELayer toRemove = layers.get(index);
             layers.remove(index);
 
             final ProjectState result = getState().changeLayers(
-                    layers, index > 0 ? index - 1 : index);
+                    layers, setIndex);
             stateManager.performAction(result, ActionType.LAYER);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.removedLayer(toRemove.getName(),
+                        setIndex, layers.size());
         } else if (!Layout.isLayersPanelShowing()) {
             StatusUpdates.cannotRemoveLayer(
                     getState().getEditingLayer().getName());
@@ -1816,7 +1857,10 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(
                     layers, belowIndex);
             stateManager.performAction(result, ActionType.LAYER);
-            // TODO
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.mergedWithLayerBelow(above.getName(),
+                        below.getName(), belowIndex, layers.size());
         } else if (!Layout.isLayersPanelShowing()) {
             StatusUpdates.cannotMergeWithLayerBelow(
                     getState().getEditingLayer().getName());

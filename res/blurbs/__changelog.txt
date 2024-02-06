@@ -21,10 +21,10 @@ Add:
     > Shade brush
 > Add pixel grid
 > Extend TextBox to support text selection
-> Status updates for actions without visual feedback
+x Status updates for actions without visual feedback
     x Saving...
     x Color slider adjustments and color actions if color panel is hidden
-    > Layer actions if layer panel is hidden
+    x Layer actions if layer panel is hidden
     x Frame actions if frame panel is hidden
 
 Change:

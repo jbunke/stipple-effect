@@ -36,7 +36,9 @@ public class StatusUpdates {
                 direction = isLayer
                         ? (triedForward ? "up" : "down")
                         : (triedForward ? "forward" : "back"),
-                extreme = triedForward ? "last" : "first";
+                extreme = isLayer
+                        ? (triedForward ? "highest" : "lowest")
+                        : (triedForward ? "last" : "first");
 
         actionNotPermitted("move " + thing + " " + name + " " + direction,
                 "it is already the " + extreme + " " + thing + " in the project");
@@ -182,6 +184,66 @@ public class StatusUpdates {
     }
 
     // layer actions
+    public static void changedLayerLinkedStatus(
+            final boolean linked, final String layerName,
+            final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate((linked ? "L" : "Unl") +
+                "inked frames in layer \"" + layerName + "\" (" +
+                (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void changedLayerVisibilityStatus(
+            final boolean visible, final String layerName,
+            final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate((visible ? "En" : "Dis") +
+                "abled layer \"" + layerName + "\" (" +
+                (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void addedLayer(
+            final String layerName, final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Added layer \"" + layerName + "\" (" +
+                        (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void duplicatedLayer(
+            final String oldLayerName, final String newLayerName,
+            final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate("Duplicated layer \"" +
+                oldLayerName + "\" as \"" + newLayerName + "\" (" +
+                (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void removedLayer(
+            final String layerName, final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Removed layer \"" + layerName + "\"; active layer: (" +
+                        (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void layerNavigation(
+            final String layerName, final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Active layer: \"" + layerName + "\" (" +
+                        (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void mergedWithLayerBelow(
+            final String aboveName, final String belowName,
+            final int index, final int layerCount
+    ) {
+        StippleEffect.get().sendStatusUpdate("Merged layer \"" +
+                aboveName + "\" onto \"" + belowName + "\" (" +
+                (index + 1) + "/" + layerCount + ")");
+    }
+
     public static void movedLayer(
             final String name, final int fromIndex, final int toIndex,
             final int layerCount
