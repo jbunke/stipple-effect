@@ -20,12 +20,12 @@ Add:
     > Gradient tool
     > Shade brush
 > Add pixel grid
-> Extend TextBox to support text selection
-x Status updates for actions without visual feedback
+x Extended TextBox to support text selection
+x Added status updates for actions without visual feedback
     x Saving...
-    x Color slider adjustments and color actions if color panel is hidden
-    x Layer actions if layer panel is hidden
-    x Frame actions if frame panel is hidden
+    x Color slider adjustments and color actions when color panel is hidden
+    x Layer actions when layer panel is hidden
+    x Frame actions when frame panel is hidden
 
 Change:
 x Redesigned order and layout of layer-specific buttons

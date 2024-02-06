@@ -57,7 +57,7 @@ public class GraphicsUtils {
     public static GameImage drawTextBox(
             final int width,
             final String prefix, final String text, final String suffix,
-            final int cursorIndex,
+            final int cursorIndex, final int selectionIndex,
             final boolean isHighlighted, final Color accentColor,
             final Color backgroundColor
     ) {
@@ -65,6 +65,12 @@ public class GraphicsUtils {
                         backgroundColor, true),
                 affixTextC = textButtonColorFromBackgroundColor(
                         backgroundColor, false);
+
+        final int left = Math.min(cursorIndex, selectionIndex),
+                right = Math.max(cursorIndex, selectionIndex);
+
+        final boolean hasSelection = left != right,
+                cursorAtRight = cursorIndex == right;
 
         final int height = Layout.STD_TEXT_BUTTON_H,
                 px = Layout.BUTTON_BORDER_PX;
@@ -74,45 +80,62 @@ public class GraphicsUtils {
 
         // text and cursor
 
-        final String a = text.substring(0, cursorIndex), b = text.substring(cursorIndex);
+        final String preSel = text.substring(0, left),
+                sel = text.substring(left, right),
+                postSel = text.substring(right);
         final GameImage
                 prefixImage = uiText(affixTextC).addText(prefix).build().draw(),
                 suffixImage = uiText(affixTextC).addText(suffix).build().draw(),
-                aImage = uiText(mainTextC).addText(a).build().draw(),
-                bImage = uiText(mainTextC).addText(b).build().draw();
+                preSelImage = uiText(mainTextC).addText(preSel).build().draw(),
+                selImage = uiText(mainTextC).addText(sel).build().draw(),
+                postSelImage = uiText(mainTextC).addText(postSel).build().draw();
 
         Coord2D textPos = new Coord2D(2 * px, Layout.BUTTON_TEXT_OFFSET_Y);
 
+        // possible prefix
         nhi.draw(prefixImage, textPos.x, textPos.y);
-
         if (!prefix.isEmpty())
             textPos = textPos.displace(prefixImage.getWidth() + px, 0);
 
-        nhi.draw(aImage, textPos.x, textPos.y);
+        // main text prior to possible selection
+        nhi.draw(preSelImage, textPos.x, textPos.y);
+        if (!preSel.isEmpty())
+            textPos = textPos.displace(preSelImage.getWidth() + px, 0);
 
-        if (!a.isEmpty())
-            textPos = textPos.displace(aImage.getWidth() + px, 0);
+        // possible selection text
+        if (hasSelection) {
+            if (!cursorAtRight)
+                textPos = textPos.displace(2 * px, 0);
 
-        nhi.fillRectangle(mainTextC, textPos.x, 0, px, height);
-        textPos = textPos.displace(2 * px, 0);
+            nhi.draw(selImage, textPos.x, textPos.y);
+            nhi.fillRectangle(Constants.HIGHLIGHT_2, textPos.x - px, 0,
+                    selImage.getWidth() + (2 * px), height);
+            textPos = textPos.displace(selImage.getWidth() + px, 0);
+        }
 
-        nhi.draw(bImage, textPos.x, textPos.y);
+        // cursor
+        nhi.fillRectangle(mainTextC, textPos.x - (cursorAtRight
+                ? 0 : selImage.getWidth() + (3 * px)), 0, px, height);
+        if (cursorAtRight)
+            textPos = textPos.displace(2 * px, 0);
 
-        if (!b.isEmpty())
-            textPos = textPos.displace(bImage.getWidth() + px, 0);
+        // main text following possible selection
+        nhi.draw(postSelImage, textPos.x, textPos.y);
+        if (!postSel.isEmpty())
+            textPos = textPos.displace(postSelImage.getWidth() + px, 0);
 
+        // possible suffix
         nhi.draw(suffixImage, textPos.x, textPos.y);
 
         // border
-
         nhi.drawRectangle(accentColor, 2f * px,
                 0, 0, width, height);
 
-        if (isHighlighted) {
+        // highlighting
+        if (isHighlighted)
             return drawHighlightedButton(nhi.submit());
-        }
-
-        return nhi.submit();
+        else
+            return nhi.submit();
     }
 
     public static GameImage drawDropDownButton(
