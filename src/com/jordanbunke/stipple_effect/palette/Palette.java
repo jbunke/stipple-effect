@@ -73,6 +73,33 @@ public class Palette {
         }
     }
 
+    public Color nextLeft(final Color c) {
+        return adjacentIncludedColor(c, -1, i -> i > 0);
+    }
+
+    public Color nextRight(final Color c) {
+        return adjacentIncludedColor(c, 1, i -> i < colorSequence.size() - 1);
+    }
+
+    private Color adjacentIncludedColor(
+            final Color c, final int increment,
+            final Function<Integer, Boolean> boundCondition
+    ) {
+        if (!isIncluded(c))
+            return c;
+
+        int i = colorSequence.indexOf(c);
+
+        while (boundCondition.apply(i)) {
+            i += increment;
+            final Color next = colorSequence.get(i);
+            if (isIncluded(next))
+                return next;
+        }
+
+        return c;
+    }
+
     public void toggleInclusion(final Color c) {
         if (!colorSequence.contains(c))
             return;

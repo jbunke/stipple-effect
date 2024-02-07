@@ -437,6 +437,9 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
                     () -> setTool(Brush.get()));
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
+                    () -> setTool(ShadeBrush.get()));
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
                     () -> setTool(Eraser.get()));
             eventLogger.checkForMatchingKeyStroke(
@@ -592,7 +595,7 @@ public class StippleEffect implements ProgramContext {
         // borders
         final float strokeWidth = 2f;
 
-        canvas.setColor(Constants.BLACK);
+        canvas.setColor(Constants.DARK);
         canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, wp.y); // projects and frame separation
         canvas.drawLine(strokeWidth, pp.x, tp.y, Layout.width(), tp.y); // top segments and middle separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation

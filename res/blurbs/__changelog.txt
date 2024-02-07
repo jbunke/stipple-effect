@@ -18,7 +18,7 @@ Add:
 > Add tools:
     > Line tool
     > Gradient tool
-    > Shade brush
+    x Shade brush
 > Add pixel grid
 x Extended TextBox to support text selection
 x Added status updates for actions without visual feedback
