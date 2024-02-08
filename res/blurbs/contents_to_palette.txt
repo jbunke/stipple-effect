@@ -1,4 +1,4 @@
 Shortcut: {Shift + D}
 
-Extracts every non-transparent color from the chosen content (selection, layer-frame, layer, frame,
-or the entire project) and turns them into a new palette.
+Extracts every non-transparent color from the chosen project scope (selection, layer-frame, layer,
+frame, or the entire project) and adds them to the selected palette.

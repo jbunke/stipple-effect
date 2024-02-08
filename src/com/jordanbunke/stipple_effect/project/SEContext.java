@@ -774,10 +774,9 @@ public class SEContext {
     }
 
     // contents to palette
-    public void contentsToPalette() {
+    public void contentsToPalette(final Palette palette) {
         final DialogVals.ContentType contentType = DialogVals
                 .getContentType(this);
-        final String name = DialogVals.getPaletteName();
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
@@ -809,8 +808,8 @@ public class SEContext {
             }
         }
 
-        StippleEffect.get().addPalette(new Palette(name,
-                colors.toArray(Color[]::new)), true);
+        for (Color c : colors)
+            palette.addColor(c);
     }
 
     private void extractColorsFromFrame(

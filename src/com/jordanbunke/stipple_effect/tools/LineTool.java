@@ -149,11 +149,6 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
     }
 
     @Override
-    public String getCursorCode() {
-        return convertNameToFilename();
-    }
-
-    @Override
     public String getName() {
         return "Line Tool";
     }

@@ -700,25 +700,17 @@ public class DialogAssembly {
                 }, true));
     }
 
-    public static void setDialogToPaletteFromContents() {
+    public static void setDialogToAddContentsToPalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
         contentTypeCycleToggle(mb, c);
 
-        // name
-        final TextLabel nameLabel = makeDialogLeftLabel(1, "Palette name:");
-        final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
-                "", DialogVals::setPaletteName);
-        mb.add(nameLabel);
-        mb.add(nameTextBox);
-
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
-        setDialog(assembleDialog("Turn project contents into new palette",
-                contents, nameTextBox::isValid, "Proceed",
-                () -> {
-                    c.contentsToPalette();
+        setDialog(assembleDialog(palette.getName() + " | Add colors in project to palette",
+                contents, () -> true, "Proceed", () -> {
+                    c.contentsToPalette(palette);
                     StippleEffect.get().rebuildColorsMenu();
                 }, true));
     }
@@ -1427,7 +1419,7 @@ public class DialogAssembly {
                         "Create a new palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +
                                 Constants.PALETTE_FILE_SUFFIX + ")",
-                        "Turn project contents into new palette",
+                        "Add colors from project contents to palette",
                         "Delete the selected palette",
                         "Save palette to file",
                         "Sort colors in palette",

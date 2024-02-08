@@ -640,7 +640,8 @@ public class MenuAssembly {
                 getPreconditions(
                         () -> true,
                         () -> true,
-                        () -> true,
+                        () -> hasPaletteContents && s
+                                .getSelectedPalette().isMutable(),
                         () -> hasPaletteContents,
                         () -> hasPaletteContents && s
                                 .getSelectedPalette().isMutable(),
@@ -652,12 +653,17 @@ public class MenuAssembly {
                 new Runnable[] {
                         s::newPalette,
                         s::openPalette,
-                        DialogAssembly::setDialogToPaletteFromContents,
+                        () -> DialogAssembly.setDialogToAddContentsToPalette(
+                                s.getSelectedPalette()),
                         s::deletePalette,
-                        () -> DialogAssembly.setDialogToSavePalette(s.getSelectedPalette()),
-                        () -> DialogAssembly.setDialogToSortPalette(s.getSelectedPalette()),
-                        () -> DialogAssembly.setDialogToPalettize(s.getSelectedPalette()),
-                        () -> DialogAssembly.setDialogToPaletteSettings(s.getSelectedPalette())
+                        () -> DialogAssembly.setDialogToSavePalette(
+                                s.getSelectedPalette()),
+                        () -> DialogAssembly.setDialogToSortPalette(
+                                s.getSelectedPalette()),
+                        () -> DialogAssembly.setDialogToPalettize(
+                                s.getSelectedPalette()),
+                        () -> DialogAssembly.setDialogToPaletteSettings(
+                                s.getSelectedPalette())
                 }, paletteOptionsRef);
         populateButtonsIntoBuilder(
                 mb, new String[] {
