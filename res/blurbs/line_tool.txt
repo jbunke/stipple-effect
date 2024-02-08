@@ -5,6 +5,6 @@ The line tool plots a continuous line of a determined pixel width.
 Primary color: {Left Click & Drag}
 Secondary color: {Right Click & Drag}
 
-Snap the line to the nearest 45-degree angle by holding {Shift}.
+Snap the line to the nearest 15-degree angle by holding {Shift}.
 
 Increment/decrement brush width: {Arrow Keys} or {Shift + Scroll Wheel}

@@ -31,7 +31,8 @@ public class Constants {
     public static final double TICK_HZ = 100d, FPS = 30d;
 
     public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5,
-            CIRCLE = Math.PI * 2, SNAP_INC = CIRCLE / 8d;
+            CIRCLE = Math.PI * 2, _45_SNAP_INC = CIRCLE / 8d,
+            _15_SNAP_INC = _45_SNAP_INC / 3d;
 
     public static final String BASE_LAYER_NAME = "Background", SUBSEQUENT_LAYER_PREFIX = "Layer ",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",

@@ -8,12 +8,13 @@ import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public sealed abstract class MoverTool extends Tool
+public sealed abstract class MoverTool extends Tool implements SnappableTool
         permits MoveSelection, PickUpSelection {
     public enum TransformType {
         NONE, MOVE, STRETCH, ROTATE
@@ -26,11 +27,11 @@ public sealed abstract class MoverTool extends Tool
             if (this == NA)
                 return Double.MAX_VALUE;
 
-            return ordinal() * Constants.SNAP_INC;
+            return ordinal() * Constants._45_SNAP_INC;
         }
     }
 
-    private static boolean snap = false;
+    private boolean snap = false;
 
     private TransformType transformType, prospectiveType;
     private Direction direction;
@@ -229,16 +230,18 @@ public sealed abstract class MoverTool extends Tool
                             (startTopLeft.y + startBottomRight.y) % 2 == 0
                     };
                     final double
-                            initialAngle = SelectionUtils.calculateAngleInRad(startTP, pivot),
-                            angle = SelectionUtils.calculateAngleInRad(tp, pivot),
+                            initialAngle = Geometry.calculateAngleInRad(startTP, pivot),
+                            angle = Geometry.calculateAngleInRad(tp, pivot),
                             candidate = ((initialAngle > angle
                                     ? Constants.CIRCLE : 0d) + angle) - initialAngle,
-                            deltaR = snap ? SelectionUtils.snapAngle(candidate) : candidate;
+                            deltaR = isSnap() ? Geometry.snapAngle(
+                                    candidate, Constants._45_SNAP_INC) :
+                                    candidate;
 
                     direction = MathPlus.findBest(Direction.NA,
                             Double.MAX_VALUE, Direction::angle,
-                            (a, b) -> SelectionUtils.angleDiff(angle, a) <
-                                    SelectionUtils.angleDiff(angle, b),
+                            (a, b) -> Geometry.angleDiff(angle, a) <
+                                    Geometry.angleDiff(angle, b),
                             Direction.values());
 
                     getRotateFunction(context).accept(startSelection,
@@ -261,7 +264,13 @@ public sealed abstract class MoverTool extends Tool
         }
     }
 
-    public static void setSnap(final boolean snap) {
-        MoverTool.snap = snap;
+    @Override
+    public void setSnap(final boolean snap) {
+        this.snap = snap;
+    }
+
+    @Override
+    public boolean isSnap() {
+        return snap;
     }
 }

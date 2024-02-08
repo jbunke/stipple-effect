@@ -233,9 +233,10 @@ public class SEContext {
             } else {
                 ToolThatDraws.setMode(ToolThatDraws.Mode.NORMAL);
             }
-        } else if (tool instanceof MoverTool) {
-            MoverTool.setSnap(eventLogger.isPressed(Key.SHIFT));
         }
+
+        if (tool instanceof SnappableTool st)
+            st.setSnap(eventLogger.isPressed(Key.SHIFT));
 
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
             if (e instanceof GameMouseEvent me) {

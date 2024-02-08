@@ -7,15 +7,15 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.visual.SECursor;
+import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.awt.*;
 import java.util.Set;
 
-public final class LineTool extends ToolWithBreadth {
+public final class LineTool extends ToolWithBreadth implements SnappableTool {
     private static final LineTool INSTANCE;
 
-    private boolean drawing;
+    private boolean drawing, snap;
     private Color c;
     private GameImage toolContentPreview;
     private Coord2D anchor;
@@ -26,6 +26,7 @@ public final class LineTool extends ToolWithBreadth {
 
     private LineTool() {
         drawing = false;
+        snap = false;
         c = Constants.BLACK;
         toolContentPreview = GameImage.dummy();
 
@@ -67,10 +68,21 @@ public final class LineTool extends ToolWithBreadth {
 
             toolContentPreview = new GameImage(w, h);
 
-            populateAround(toolContentPreview, anchor, selection);
-            populateAround(toolContentPreview, tp, selection);
+            final Coord2D endpoint;
 
-            fillLineSpace(anchor, tp, (x, y) -> populateAround(
+            if (isSnap()) {
+                final double angle = Geometry.normalizeAngle(
+                        Geometry.calculateAngleInRad(tp, anchor)),
+                        distance = Coord2D.unitDistanceBetween(anchor, tp),
+                        snapped = Geometry.snapAngle(angle, Constants._15_SNAP_INC);
+                endpoint = Geometry.projectPoint(anchor, snapped, distance);
+            } else
+                endpoint = tp;
+
+            populateAround(toolContentPreview, anchor, selection);
+            populateAround(toolContentPreview, endpoint, selection);
+
+            fillLineSpace(anchor, endpoint, (x, y) -> populateAround(
                     toolContentPreview, anchor.displace(x, y), selection));
 
             updateLast(context);
@@ -110,6 +122,11 @@ public final class LineTool extends ToolWithBreadth {
     }
 
     @Override
+    public void setSnap(final boolean snap) {
+        this.snap = snap;
+    }
+
+    @Override
     public boolean hasToolContentPreview() {
         return drawing;
     }
@@ -120,8 +137,13 @@ public final class LineTool extends ToolWithBreadth {
     }
 
     @Override
+    public boolean isSnap() {
+        return snap;
+    }
+
+    @Override
     public String getCursorCode() {
-        return SECursor.RETICLE; // TODO - override ToolWithBreadth accessor with same behaviour as Tool accessor if you add static line_tool.png cursor
+        return convertNameToFilename();
     }
 
     @Override
