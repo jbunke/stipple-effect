@@ -213,6 +213,7 @@ public class ProjectState {
                 }
 
                 final boolean toolPreviewCondition = inProjectRender &&
+                        layer.equals(getEditingLayer()) &&
                         StippleEffect.get().getTool().hasToolContentPreview();
 
                 if (toolPreviewCondition) {

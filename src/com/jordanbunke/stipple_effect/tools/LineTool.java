@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
 
 public final class LineTool extends ToolWithBreadth implements SnappableTool {
@@ -19,6 +20,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
     private Color c;
     private GameImage toolContentPreview;
     private Coord2D anchor;
+    private Set<Coord2D> included;
 
     static {
         INSTANCE = new LineTool();
@@ -31,6 +33,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
         toolContentPreview = GameImage.dummy();
 
         anchor = Constants.NO_VALID_TARGET;
+        included = new HashSet<>();
     }
 
     public static LineTool get() {
@@ -51,6 +54,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
 
             reset();
             anchor = tp;
+            included = new HashSet<>();
         }
     }
 
@@ -67,6 +71,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
                 return;
 
             toolContentPreview = new GameImage(w, h);
+            included = new HashSet<>();
 
             final Coord2D endpoint;
 
@@ -116,8 +121,10 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
                 if (!(selection.isEmpty() || selection.contains(b)))
                     continue;
 
-                if (mask[x][y])
+                if (mask[x][y] && !included.contains(b)) {
                     edit.dot(c, b.x, b.y);
+                    included.add(b);
+                }
             }
     }
 
