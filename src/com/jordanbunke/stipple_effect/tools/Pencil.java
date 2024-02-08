@@ -66,7 +66,7 @@ public final class Pencil extends ToolThatDraws {
             if (selection.isEmpty() || selection.contains(tp))
                 edit.dot(c.apply(tp.x, tp.y), tp.x, tp.y);
 
-            fillMouseSkips(tp, (x, y) ->
+            fillLineSpace(getLastTP(), tp, (x, y) ->
                             edit.dot(getLastTP().x + x, getLastTP().y + y));
 
             context.paintOverImage(edit.submit());

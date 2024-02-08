@@ -75,7 +75,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
 
             populateAround(tp);
 
-            fillMouseSkips(tp, (x, y) ->
+            fillLineSpace(getLastTP(), tp, (x, y) ->
                     populateAround(getLastTP().displace(x, y)));
 
             drawSelection(context);

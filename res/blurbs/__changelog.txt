@@ -16,7 +16,7 @@ Fix:
 
 Add:
 > Add tools:
-    > Line tool
+    x Line tool
     > Gradient tool
     x Shade brush
 > Add pixel grid

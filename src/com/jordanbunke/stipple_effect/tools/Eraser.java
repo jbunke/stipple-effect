@@ -53,7 +53,7 @@ public final class Eraser extends ToolWithBreadth {
             final boolean[][] eraseMask = new boolean[w][h];
             populateAround(eraseMask, tp, selection);
 
-            fillMouseSkips(tp, (x, y) -> populateAround(
+            fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
                     eraseMask, getLastTP().displace(x, y), selection));
 
             context.erase(eraseMask, false);

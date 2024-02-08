@@ -78,8 +78,8 @@ public final class ShadeBrush extends ToolWithBreadth {
                             context.getState().getFrameIndex());
             populateAround(edit, current, tp, selection, w, h);
 
-            fillMouseSkips(tp, (x, y) -> populateAround(edit, current,
-                    getLastTP().displace(x, y), selection, w, h));
+            fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(edit,
+                    current, getLastTP().displace(x, y), selection, w, h));
 
             context.paintOverImage(edit.submit());
             updateLast(context);

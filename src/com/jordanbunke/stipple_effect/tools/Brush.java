@@ -72,7 +72,7 @@ public final class Brush extends ToolWithBreadth {
             final GameImage edit = new GameImage(w, h);
             populateAround(edit, tp, selection);
 
-            fillMouseSkips(tp, (x, y) -> populateAround(
+            fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
                     edit, getLastTP().displace(x, y), selection));
 
             context.paintOverImage(edit.submit());
