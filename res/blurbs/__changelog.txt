@@ -15,7 +15,7 @@ Fix:
 {TODO for 0.2.0} - Scheduled for 2024-02-09
 
 Add:
-x Add tools:
+x Added tools:
     x Line tool
     x Gradient tool
     x Shade brush
@@ -34,7 +34,7 @@ x Added status updates for actions without visual feedback
 Change:
 x Redesigned order and layout of layer-specific buttons
 x Refactored much of ToolWithBreadth to interface HasBreadth
-> Optimize STIP files to save static layers as single frame
+x Optimized STIP files to save static layers as single frame
 x Cropping to selection bounds now snaps the image to the center of the screen
 > Independent checkerboard settings for x and y that can be set to values between 1-256
 
