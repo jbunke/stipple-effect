@@ -235,6 +235,9 @@ public class SEContext {
             }
         }
 
+        if (tool instanceof ToggleModeTool tmt)
+            tmt.setMode(eventLogger.isPressed(Key.CTRL));
+
         if (tool instanceof SnappableTool st)
             st.setSnap(eventLogger.isPressed(Key.SHIFT));
 

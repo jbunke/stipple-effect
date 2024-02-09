@@ -218,7 +218,7 @@ public class ProjectState {
 
                 if (toolPreviewCondition) {
                     final GameImage toolContentPreview = StippleEffect.get()
-                            .getTool().getToolContentPreview(this);
+                            .getTool().getToolContentPreview();
                     image.draw(toolContentPreview);
                 }
             }

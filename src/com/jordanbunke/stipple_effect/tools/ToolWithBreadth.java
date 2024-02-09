@@ -7,9 +7,10 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public sealed abstract class ToolWithBreadth extends ToolThatDraws implements BreadthTool
-        permits Brush, Eraser, BrushSelect, ShadeBrush, LineTool {
+        permits Brush, Eraser, BrushSelect, ShadeBrush, LineTool, GradientTool {
     private int breadth;
     private GameImage overlay;
 
@@ -18,11 +19,10 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     }
 
     public static void redrawToolOverlays() {
-        Brush.get().drawOverlay();
-        ShadeBrush.get().drawOverlay();
-        Eraser.get().drawOverlay();
-        LineTool.get().drawOverlay();
-        BrushSelect.get().drawOverlay();
+        Arrays.stream(Constants.ALL_TOOLS).forEach(t -> {
+            if (t instanceof ToolWithBreadth twb)
+                twb.drawOverlay();
+        });
     }
 
     public void drawOverlay() {

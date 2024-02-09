@@ -5,7 +5,6 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Geometry;
 
@@ -139,7 +138,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
     }
 
     @Override
-    public GameImage getToolContentPreview(final ProjectState state) {
+    public GameImage getToolContentPreview() {
         return toolContentPreview;
     }
 

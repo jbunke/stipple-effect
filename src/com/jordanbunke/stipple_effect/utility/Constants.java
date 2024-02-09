@@ -85,8 +85,9 @@ public class Constants {
     public static final Tool[] ALL_TOOLS = new Tool[] {
             Hand.get(), Zoom.get(),
             StipplePencil.get(), Pencil.get(),
-            Brush.get(), ShadeBrush.get(), /* TODO - GradientBrush.get(), */ Eraser.get(),
-            LineTool.get(), Fill.get(), ColorPicker.get(),
+            Brush.get(), ShadeBrush.get(), Eraser.get(),
+            GradientTool.get(), LineTool.get(),
+            Fill.get(), ColorPicker.get(),
             Wand.get(), BrushSelect.get(), BoxSelect.get(),
             MoveSelection.get(), PickUpSelection.get()
     };

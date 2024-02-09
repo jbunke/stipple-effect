@@ -444,7 +444,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
                     () -> setTool(ShadeBrush.get()));
-            // TODO - gradient brush tool
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
+                    () -> setTool(GradientTool.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
                     () -> setTool(Eraser.get()));

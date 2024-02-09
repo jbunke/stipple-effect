@@ -4,7 +4,6 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 public abstract class Tool {
@@ -67,7 +66,7 @@ public abstract class Tool {
         return false;
     }
 
-    public GameImage getToolContentPreview(final ProjectState state) {
+    public GameImage getToolContentPreview() {
         return GameImage.dummy();
     }
 }
