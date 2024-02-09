@@ -15,23 +15,28 @@ Fix:
 {TODO for 0.2.0} - Scheduled for 2024-02-09
 
 Add:
-> Add tools:
+x Add tools:
     x Line tool
-    > Gradient tool
+    x Gradient tool
     x Shade brush
-> Add pixel grid
 x Extended TextBox to support text selection
 x Added status updates for actions without visual feedback
     x Saving...
     x Color slider adjustments and color actions when color panel is hidden
     x Layer actions when layer panel is hidden
     x Frame actions when frame panel is hidden
+> Pixel grid
+> New default font MonoSE
+> New stylized font Bruch
+> Snap option for mover tools where arrow key selection area is incremented by its own size in the
+    relevant dimension
 
 Change:
 x Redesigned order and layout of layer-specific buttons
 x Refactored much of ToolWithBreadth to interface HasBreadth
 > Optimize STIP files to save static layers as single frame
 x Cropping to selection bounds now snaps the image to the center of the screen
+> Independent checkerboard settings for x and y that can be set to values between 1-256
 
 Fix:
 x Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu

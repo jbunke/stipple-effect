@@ -10,10 +10,8 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public final class GradientTool extends ToolWithBreadth
         implements SnappableTool, ToggleModeTool {
@@ -78,7 +76,7 @@ public final class GradientTool extends ToolWithBreadth
             toolContentPreview = new GameImage(w, h);
 
             if (linear)
-                updateLinearMode(selection, tp);
+                updateLinearMode(selection, tp, w, h);
             else
                 updateBrushMode(selection, tp, w, h);
 
@@ -102,7 +100,8 @@ public final class GradientTool extends ToolWithBreadth
     }
 
     private void updateLinearMode(
-            final Set<Coord2D> selection, final Coord2D tp
+            final Set<Coord2D> selection, final Coord2D tp,
+            final int w, final int h
     ) {
         final Coord2D endpoint;
 
@@ -115,7 +114,7 @@ public final class GradientTool extends ToolWithBreadth
         } else
             endpoint = tp;
 
-        // TODO - draw tool content preview based on where pixels lie along spectrum with selection as mask
+        drawLinearGradient(endpoint, selection, w, h);
     }
 
     private void populateAround(
@@ -136,6 +135,50 @@ public final class GradientTool extends ToolWithBreadth
                 if (mask[x][y])
                     gradientStage.add(b);
             }
+    }
+
+    private void drawLinearGradient(
+            final Coord2D endpoint, final Set<Coord2D> selection,
+            final int w, final int h
+    ) {
+        final boolean hasSelection = !selection.isEmpty();
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                final Coord2D pos = new Coord2D(x, y);
+                if (hasSelection && !selection.contains(pos))
+                    continue;
+
+                final double c = getC(pos, endpoint);
+                toolContentPreview.setRGB(x, y, getColor(c).getRGB());
+            }
+        }
+    }
+
+    private double getC(final Coord2D pos, final Coord2D endpoint) {
+        final int diffY = endpoint.y - anchor.y,
+                diffX = endpoint.x - anchor.x,
+                deltaY = pos.y - anchor.y,
+                deltaX = pos.x - anchor.x;
+
+        if (diffX == 0)
+            return diffY == 0 ? 0d : deltaY / (double) diffY;
+        else {
+            // y = mx + b where m is slope and b is the y-intercept
+            final double m1 = diffY / (double) diffX,
+                    b1 = anchor.y - (m1 * anchor.x);
+
+            if (m1 == 0d)
+                return deltaX / (double) diffX;
+            else {
+                // y = m2x + b2 represents the perpendicular line measured from the target point
+                final double m2 = -1d / m1,
+                        b2 = pos.y - (m2 * pos.x);
+
+                final double x = (b2 - b1) / (m1 - m2);
+                return (x - anchor.x) / (double) diffX;
+            }
+        }
     }
 
     private void drawGradientStages(final int w, final int h) {
@@ -183,7 +226,8 @@ public final class GradientTool extends ToolWithBreadth
 
     @Override
     public void setMode(final boolean linear) {
-        this.linear = linear;
+        if (!drawing)
+            this.linear = linear;
     }
 
     @Override
