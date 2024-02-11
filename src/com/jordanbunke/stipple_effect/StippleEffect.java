@@ -469,6 +469,9 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
                     () -> setTool(BoxSelect.get()));
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
+                    () -> setTool(PolygonSelect.get()));
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
                     () -> setTool(MoveSelection.get()));
             eventLogger.checkForMatchingKeyStroke(

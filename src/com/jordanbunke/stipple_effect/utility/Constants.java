@@ -2,7 +2,6 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
-import com.jordanbunke.stipple_effect.tools.*;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -81,14 +80,4 @@ public class Constants {
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
             SMALL_TOLERANCE_INC = 0.01, BIG_TOLERANCE_INC = SMALL_TOLERANCE_INC * 10d;
-
-    public static final Tool[] ALL_TOOLS = new Tool[] {
-            Hand.get(), Zoom.get(),
-            StipplePencil.get(), Pencil.get(),
-            Brush.get(), ShadeBrush.get(), Eraser.get(),
-            GradientTool.get(), LineTool.get(),
-            Fill.get(), ColorPicker.get(),
-            Wand.get(), BrushSelect.get(), BoxSelect.get(),
-            MoveSelection.get(), PickUpSelection.get()
-    };
 }

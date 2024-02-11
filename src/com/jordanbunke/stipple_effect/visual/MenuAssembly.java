@@ -743,8 +743,9 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        for (int i = 0; i < Constants.ALL_TOOLS.length; i++) {
-            mb.add(toolButtonFromTool(Constants.ALL_TOOLS[i], i));
+        final Tool[] all = Tool.getAll();
+        for (int i = 0; i < all.length; i++) {
+            mb.add(toolButtonFromTool(all[i], i));
         }
 
         // outline button

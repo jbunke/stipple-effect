@@ -1583,11 +1583,11 @@ public class DialogAssembly {
             final Set<MenuElement> contentAssembler, final Coord2D contentStart,
             final int initialBottomY
     ) {
+        final Tool[] all = Tool.getAll();
         return assembleInfoScreenContents(
-                Arrays.stream(Constants.ALL_TOOLS)
-                        .map(Tool::convertNameToFilename).toArray(String[]::new),
-                Arrays.stream(Constants.ALL_TOOLS)
-                        .map(Tool::getName).toArray(String[]::new),
+                Arrays.stream(all).map(Tool::convertNameToFilename)
+                        .toArray(String[]::new),
+                Arrays.stream(all).map(Tool::getName).toArray(String[]::new),
                 contentAssembler, contentStart, initialBottomY);
     }
 

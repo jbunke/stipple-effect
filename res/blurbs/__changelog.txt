@@ -19,6 +19,7 @@ x Added tools:
     x Line tool
     x Gradient tool
     x Shade brush
+    > Polygon select
 x Extended TextBox to support text selection
 x Added status updates for actions without visual feedback
     x Saving...

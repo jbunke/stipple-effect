@@ -19,7 +19,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     }
 
     public static void redrawToolOverlays() {
-        Arrays.stream(Constants.ALL_TOOLS).forEach(t -> {
+        Arrays.stream(Tool.getAll()).forEach(t -> {
             if (t instanceof ToolWithBreadth twb)
                 twb.drawOverlay();
         });
