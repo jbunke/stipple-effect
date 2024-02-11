@@ -93,8 +93,8 @@ public class StatusUpdates {
             final boolean add, final Palette p, final Color c
     ) {
         actionNotPermitted((add ? "add" : "remove") + " the selected color " +
-                        processColor(c) + (add ? "to" : "from") +
-                        " \"" + p.getName() + "\"",
+                        processColor(c) + (add ? " to " : " from ") +
+                        "\"" + p.getName() + "\"",
                 processColor(c) + (add ? " is already" : " is not") +
                         " in the palette");
     }

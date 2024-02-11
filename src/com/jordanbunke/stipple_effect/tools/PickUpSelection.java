@@ -32,7 +32,7 @@ public final class PickUpSelection extends MoverTool {
     }
 
     @Override
-    BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context) {
+    public BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context) {
         return context::moveSelectionContents;
     }
 

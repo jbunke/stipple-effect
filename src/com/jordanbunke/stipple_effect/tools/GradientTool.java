@@ -253,7 +253,7 @@ public final class GradientTool extends ToolWithBreadth
     @Override
     public String getBottomBarText() {
         return linear
-                ? getName() + " (linear function)"
-                : super.getBottomBarText();
+                ? "Linear Gradient"
+                : super.getBottomBarText().replace("Tool", "Brush");
     }
 }

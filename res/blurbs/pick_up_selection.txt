@@ -1,6 +1,7 @@
 Shortcut: {U}
 
 Move: {Click & Drag} or {Arrow Keys}
+Snap to the nearest multiple of the selection dimensions by holding {Shift}.
 
 Stretch: {Click & Drag} on one of the transform nodes
 

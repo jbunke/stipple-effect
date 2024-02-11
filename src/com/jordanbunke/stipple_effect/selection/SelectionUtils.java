@@ -33,6 +33,20 @@ public class SelectionUtils {
         return new Coord2D(lowestX, lowestY);
     }
 
+    public static int height(final Set<Coord2D> pixels) {
+        return bounds(pixels).y;
+    }
+
+    public static int width(final Set<Coord2D> pixels) {
+        return bounds(pixels).x;
+    }
+
+    public static Coord2D bounds(final Set<Coord2D> pixels) {
+        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
+
+        return new Coord2D(br.x - tl.x, br.y - tl.y);
+    }
+
     public static Set<Coord2D> stretchedPixels(
             final Set<Coord2D> oldPixels, final Coord2D change,
             final MoverTool.Direction direction

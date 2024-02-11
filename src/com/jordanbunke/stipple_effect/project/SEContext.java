@@ -595,6 +595,8 @@ public class SEContext {
     }
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
+        final Tool tool = StippleEffect.get().getTool();
+
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
             // toggle playback
             eventLogger.checkForMatchingKeyStroke(
@@ -617,7 +619,7 @@ public class SEContext {
                     () -> deleteSelectionContents(true));
 
             // tool modifications
-            if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
+            if (tool instanceof BreadthTool bt) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         bt::decreaseBreadth);
@@ -630,7 +632,7 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> bt.setBreadth(bt.getBreadth() - Constants.BREADTH_INC));
-            } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
+            } else if (tool instanceof ToolThatSearches tts) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         tts::decreaseTolerance);
@@ -643,7 +645,7 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
-            } else if (StippleEffect.get().getTool().equals(Hand.get())) {
+            } else if (tool.equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> renderInfo.incrementAnchor(new Coord2D(0, 1)));
@@ -656,20 +658,7 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> renderInfo.incrementAnchor(new Coord2D(-1, 0)));
-            } else if (StippleEffect.get().getTool().equals(PickUpSelection.get())) {
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(0, -1), true));
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(0, 1), true));
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(-1, 0), true));
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(1, 0), true));
-            } else if (Tool.canMoveSelectionBounds(StippleEffect.get().getTool())) {
+            } else if (Tool.canMoveSelectionBounds(tool)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> moveSelectionBounds(new Coord2D(0, -1), true));
@@ -682,7 +671,7 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> moveSelectionBounds(new Coord2D(1, 0), true));
-            } else if (StippleEffect.get().getTool().equals(Zoom.get())) {
+            } else if (tool.equals(Zoom.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> renderInfo.zoomIn(targetPixel));
@@ -690,6 +679,31 @@ public class SEContext {
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         renderInfo::zoomOut);
             }
+        }
+
+        // special case where shifting would constitute snap and is permitted
+        if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool mt &&
+                getState().hasSelection()) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            0, -1 * (mt.isSnap() ? SelectionUtils.height(
+                            getState().getSelection()) : 1)), true));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            0, mt.isSnap() ? SelectionUtils.height(
+                            getState().getSelection()) : 1), true));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            -1 * (mt.isSnap() ? SelectionUtils.width(
+                                    getState().getSelection()) : 1), 0), true));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            mt.isSnap() ? SelectionUtils.width(
+                                    getState().getSelection()) : 1, 0), true));
         }
     }
 

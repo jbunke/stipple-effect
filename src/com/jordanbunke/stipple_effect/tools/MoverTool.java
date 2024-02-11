@@ -54,7 +54,7 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
         startBottomRight = Constants.NO_VALID_TARGET;
     }
 
-    abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
+    public abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
     abstract StretcherFunction getStretcherFunction(final SEContext context);
     abstract RotateFunction getRotateFunction(final SEContext context);
     abstract Runnable getMouseUpConsequence(final SEContext context);
@@ -192,12 +192,23 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
         switch (transformType) {
             case NONE -> prospectiveType = determineTransformType(context);
             case MOVE -> {
-                final Coord2D topLeft = SelectionUtils.topLeft(
-                        context.getState().getSelection());
-                final Coord2D displacement = new Coord2D(
+                final Set<Coord2D> selection = context.getState().getSelection();
+                final Coord2D topLeft = SelectionUtils.topLeft(selection);
+
+                Coord2D displacement = new Coord2D(
                         -(int)((startMousePosition.x - mousePosition.x) / zoomFactor),
                         -(int)((startMousePosition.y - mousePosition.y) / zoomFactor)
                 ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
+
+                if (isSnap()) {
+                    final Coord2D bounds = SelectionUtils.bounds(selection);
+
+                    final int snappedX = bounds.x * (int)Math.round(
+                            displacement.x / (double) bounds.x),
+                            snappedY = bounds.y * (int)Math.round(
+                                    displacement.y / (double) bounds.y);
+                    displacement = new Coord2D(snappedX, snappedY);
+                }
 
                 getMoverFunction(context).accept(displacement, false);
             }
