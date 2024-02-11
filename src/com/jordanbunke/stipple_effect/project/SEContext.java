@@ -759,14 +759,15 @@ public class SEContext {
 
         final GameImage image = new GameImage(w, h);
 
-        final int cb = Settings.getCheckerboardPixels();
+        final int cbx = Settings.getCheckerboardXPixels(),
+                cby = Settings.getCheckerboardYPixels();
 
-        for (int x = 0; x < image.getWidth(); x += cb) {
-            for (int y = 0; y < image.getHeight(); y += cb) {
-                final Color c = ((x / cb) + (y / cb)) % 2 == 0
+        for (int x = 0; x < image.getWidth(); x += cbx) {
+            for (int y = 0; y < image.getHeight(); y += cby) {
+                final Color c = ((x / cbx) + (y / cby)) % 2 == 0
                         ? Constants.WHITE : Constants.ACCENT_BACKGROUND_LIGHT;
 
-                image.fillRectangle(c, x, y, cb, cb);
+                image.fillRectangle(c, x, y, cbx, cby);
             }
         }
 

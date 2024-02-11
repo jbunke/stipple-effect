@@ -1026,7 +1026,9 @@ public class DialogAssembly {
             final Consumer<Integer> setter
     ) {
         return makeDialogNumericalTextBox(label,
-                String.valueOf(0), "px", TextBox.getIntTextValidator(validatorLogic),
+                DialogAssembly::getDialogContentOffsetFromLabel,
+                String.valueOf(0), "px",
+                TextBox.getIntTextValidator(validatorLogic),
                 s -> setter.accept(Integer.parseInt(s)), 4);
     }
 
@@ -1035,17 +1037,32 @@ public class DialogAssembly {
             final int min, final int max, final String suffix,
             final Consumer<Integer> setter, final int maxLength
     ) {
-        return makeDialogNumericalTextBox(label, String.valueOf(initial),
-                suffix, TextBox.getIntTextValidator(min, max),
+        return makeDialogNumericalTextBox(label,
+                DialogAssembly::getDialogContentOffsetFromLabel,
+                initial, min, max, suffix, setter, maxLength);
+    }
+
+    private static TextBox makeDialogNumericalTextBox(
+            final TextLabel label,
+            final Function<TextLabel, Coord2D> offsetFunction,
+            final int initial, final int min, final int max,
+            final String suffix, final Consumer<Integer> setter,
+            final int maxLength
+    ) {
+        return makeDialogNumericalTextBox(label, offsetFunction,
+                String.valueOf(initial), suffix,
+                TextBox.getIntTextValidator(min, max),
                 s -> setter.accept(Integer.parseInt(s)), maxLength);
     }
 
     private static TextBox makeDialogNumericalTextBox(
-            final TextLabel label, final String initial, final String suffix,
+            final TextLabel label,
+            final Function<TextLabel, Coord2D> offsetFunction,
+            final String initial, final String suffix,
             final Function<String, Boolean> textValidator,
             final Consumer<String> setter, final int maxLength
     ) {
-        return new TextBox(getDialogContentOffsetFromLabel(label),
+        return new TextBox(offsetFunction.apply(label),
                 Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
                 "", initial, suffix, textValidator, setter, maxLength);
     }
@@ -1184,10 +1201,17 @@ public class DialogAssembly {
             }
             case VISUAL -> {
                 // text labels
-                final TextLabel checkerboardLabel = makeDialogLeftLabel(
-                        initialYIndex, "Checkerboard size: "),
+                final TextLabel checkerboardXLabel = makeDialogLeftLabel(
+                        initialYIndex, "Checkerboard size (X): "),
+                        checkerboardYLabel = makeDialogLeftLabel(
+                                initialYIndex + 1, "Checkerboard size (Y): "),
+                        checkerboardContext = makeDialogLeftLabel(
+                                initialYIndex + 2,
+                                "Valid checkerboard size values range from " +
+                                        Layout.CHECKERBOARD_MIN + " to " +
+                                        Layout.CHECKERBOARD_MAX + " pixels."),
                         fontLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Program font: ");
+                                initialYIndex + 4, "Program font: ");
 
                 // toggle buttons
                 final GameImage[] fontBases = makeToggleButtonSet(
@@ -1208,25 +1232,27 @@ public class DialogAssembly {
                         ).toArray(Runnable[]::new),
                         () -> Settings.getProgramFont().ordinal(), () -> {});
 
-                // sliders
-                final HorizontalSlider checkerboardSlider = new HorizontalSlider(
-                        getDialogContentBigOffsetFromLabel(checkerboardLabel),
-                        Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        MenuElement.Anchor.LEFT_TOP, 0, 5,
-                        () -> (int)Math.round(Math.log(
-                                Settings.getCheckerboardPixels()) / Math.log(2d)),
-                        exp -> Settings.setCheckerboardPixels(
-                                (int)Math.pow(2d, exp), false));
-                checkerboardSlider.updateAssets();
-                final DynamicLabel checkerboardValue = makeDynamicFromLeftLabel(
-                        checkerboardLabel,
-                        () -> String.valueOf(Settings.getCheckerboardPixels()));
+                // textboxes
+                final TextBox checkerboardXTextBox = makeDialogNumericalTextBox(
+                        checkerboardXLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getCheckerboardXPixels(),
+                        Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
+                        "px", i -> Settings.setCheckerboardXPixels(i, false), 3);
+                final TextBox checkerboardYTextBox = makeDialogNumericalTextBox(
+                        checkerboardYLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getCheckerboardYPixels(),
+                        Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
+                        "px", i -> Settings.setCheckerboardYPixels(i, false), 3);
 
-                mb.add(checkerboardLabel);
+                mb.add(checkerboardXLabel);
+                mb.add(checkerboardYLabel);
+                mb.add(checkerboardContext);
+                mb.add(checkerboardXTextBox);
+                mb.add(checkerboardYTextBox);
                 mb.add(fontLabel);
                 mb.add(fontButton);
-                mb.add(checkerboardSlider);
-                mb.add(checkerboardValue);
 
                 // update as new settings are added to category
                 yield fontLabel;

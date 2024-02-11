@@ -35,7 +35,7 @@ x Redesigned order and layout of layer-specific buttons
 x Refactored much of ToolWithBreadth to interface HasBreadth
 x Optimized STIP files to save static layers as single frame
 x Cropping to selection bounds now snaps the image to the center of the screen
-> Independent checkerboard settings for x and y that can be set to values between 1-256
+x Independent checkerboard settings for x and y that can be set to values between 1-256
 
 Fix:
 x Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu

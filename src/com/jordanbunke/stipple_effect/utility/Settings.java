@@ -6,6 +6,9 @@ import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -19,7 +22,8 @@ public class Settings {
             FONT = "program_font",
             DEFAULT_INDEX_PREFIX = "def_index_prefix",
             DEFAULT_INDEX_SUFFIX = "def_index_suffix",
-            CHECKERBOARD_PX = "checkerboard_px";
+            CHECKERBOARD_X_PX = "checkerboard_x_px",
+            CHECKERBOARD_Y_PX = "checkerboard_y_px";
 
     // code-function associations
     private static final Map<String, Supplier<Object>> writerGetterMap = Map.ofEntries(
@@ -27,7 +31,8 @@ public class Settings {
             Map.entry(FONT, Settings::getProgramFont),
             Map.entry(DEFAULT_INDEX_PREFIX, Settings::getDefaultIndexPrefix),
             Map.entry(DEFAULT_INDEX_SUFFIX, Settings::getDefaultIndexSuffix),
-            Map.entry(CHECKERBOARD_PX, Settings::getCheckerboardPixels)
+            Map.entry(CHECKERBOARD_X_PX, Settings::getCheckerboardXPixels),
+            Map.entry(CHECKERBOARD_Y_PX, Settings::getCheckerboardYPixels)
     );
 
     // SETTINGS - set to defaults if settings cannot be read
@@ -35,7 +40,8 @@ public class Settings {
     private static boolean fullscreenOnStartup = false;
 
     // int
-    private static int checkerboardPixels = Layout.DEFAULT_CHECKERBOARD_DIM;
+    private static int checkerboardXPixels = Layout.DEFAULT_CHECKERBOARD_DIM,
+            checkerboardYPixels = Layout.DEFAULT_CHECKERBOARD_DIM;
 
     // object
     private static String defIndexPrefix = "_", defIndexSuffix = "";
@@ -61,9 +67,12 @@ public class Settings {
 
             switch (code) {
                 case FULLSCREEN_ON_STARTUP -> setFullscreenOnStartup(Boolean.parseBoolean(value));
-                case CHECKERBOARD_PX -> setIntSettingSafely(value,
+                case CHECKERBOARD_X_PX -> setIntSettingSafely(value,
                         Layout.DEFAULT_CHECKERBOARD_DIM,
-                        i -> setCheckerboardPixels(i, true));
+                        i -> setCheckerboardXPixels(i, true));
+                case CHECKERBOARD_Y_PX -> setIntSettingSafely(value,
+                        Layout.DEFAULT_CHECKERBOARD_DIM,
+                        i -> setCheckerboardYPixels(i, true));
                 case DEFAULT_INDEX_PREFIX -> setDefaultIndexPrefix(value, true);
                 case DEFAULT_INDEX_SUFFIX -> setDefaultIndexSuffix(value, true);
                 case FONT -> setProgramFont(value, true);
@@ -76,7 +85,10 @@ public class Settings {
 
         final StringBuilder sb = new StringBuilder();
 
-        for (String code : writerGetterMap.keySet())
+        final List<String> codes = new ArrayList<>(writerGetterMap.keySet());
+        codes.sort(Comparator.naturalOrder());
+
+        for (String code : codes)
             sb.append(code).append(Constants.SETTING_SEPARATOR)
                     .append(Constants.OPEN_SETTING_VAL)
                     .append(writerGetterMap.get(code).get())
@@ -106,10 +118,19 @@ public class Settings {
         Settings.fullscreenOnStartup = fullscreenOnStartup;
     }
 
-    public static void setCheckerboardPixels(
-            final int checkerboardPixels, final boolean isStartup
+    public static void setCheckerboardXPixels(
+            final int checkerboardXPixels, final boolean isStartup
     ) {
-        Settings.checkerboardPixels = checkerboardPixels;
+        Settings.checkerboardXPixels = checkerboardXPixels;
+
+        if (!isStartup)
+            StippleEffect.get().getContext().redrawCheckerboard();
+    }
+
+    public static void setCheckerboardYPixels(
+            final int checkerboardYPixels, final boolean isStartup
+    ) {
+        Settings.checkerboardYPixels = checkerboardYPixels;
 
         if (!isStartup)
             StippleEffect.get().getContext().redrawCheckerboard();
@@ -156,8 +177,12 @@ public class Settings {
         return fullscreenOnStartup;
     }
 
-    public static int getCheckerboardPixels() {
-        return checkerboardPixels;
+    public static int getCheckerboardXPixels() {
+        return checkerboardXPixels;
+    }
+
+    public static int getCheckerboardYPixels() {
+        return checkerboardYPixels;
     }
 
     public static String getDefaultIndexPrefix() {
