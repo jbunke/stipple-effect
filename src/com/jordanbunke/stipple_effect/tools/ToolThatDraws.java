@@ -61,14 +61,14 @@ public abstract class ToolThatDraws extends Tool {
         if (!from.equals(Constants.NO_VALID_TARGET) &&
                 (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
             if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                for (int x = 1; x < Math.abs(xDiff); x++) {
-                    final int y = (int)Math.round(x * Math.abs(yDiff / (double)xDiff));
-                    action.accept(xUnit * x, yUnit * y);
+                for (int x = xUnit; Math.abs(x) < Math.abs(xDiff); x += xUnit) {
+                    final int y = (int)Math.round(x * (yDiff / (double)xDiff));
+                    action.accept(x, y);
                 }
             } else {
-                for (int y = 1; y < Math.abs(yDiff); y++) {
-                    final int x = (int)Math.round(y * Math.abs(xDiff / (double)yDiff));
-                    action.accept(xUnit * x, yUnit * y);
+                for (int y = yUnit; Math.abs(y) < Math.abs(yDiff); y += yUnit) {
+                    final int x = (int)Math.round(y * (xDiff / (double)yDiff));
+                    action.accept(x, y);
                 }
             }
         }

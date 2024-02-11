@@ -1911,13 +1911,13 @@ public class SEContext {
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
         final Coord2D tl = SelectionUtils.topLeft(selection),
-                br = SelectionUtils.bottomRight(selection);
-        final int w = br.x - tl.x, h = br.y - tl.y;
+                br = SelectionUtils.bottomRight(selection),
+                bounds = SelectionUtils.bounds(selection);
         final boolean multiple = selection.size() > 1;
 
         return selection.isEmpty() ? "No selection" : "Selection: " +
                 selection.size() + "px " + (multiple ? "from " : "at ") + tl +
-                (multiple ? (" to " + br + "; " + w + "x" + h +
+                (multiple ? (" to " + br + "; " + bounds.x + "x" + bounds.y +
                         " bounding box") : "");
     }
 
