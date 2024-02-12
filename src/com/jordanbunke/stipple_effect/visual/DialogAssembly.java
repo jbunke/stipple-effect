@@ -446,9 +446,9 @@ public class DialogAssembly {
     }
 
     public static void setDialogToCloseProjectAYS(final int index) {
-        setDialogToAYS("Close the project " + StippleEffect.get()
+        setDialogToAYS("Close the project \"" + StippleEffect.get()
                         .getContexts().get(index).projectInfo
-                        .getFormattedName(false, true) + "?",
+                        .getFormattedName(false, true) + "\"?",
                 "All unsaved changes will be lost...",
                 () -> StippleEffect.get().removeContext(index));
     }

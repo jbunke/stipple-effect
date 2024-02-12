@@ -40,6 +40,15 @@ public class LineMath {
             y = (m1 * x) + b1;
         }
 
-        return new double[] { x, y };
+        return new double[] {
+                pixelErrorCorrection(x), pixelErrorCorrection(y)
+        };
+    }
+
+    public static double pixelErrorCorrection(final double pDim) {
+        final double margin = 0.0001;
+
+        return Math.abs(pDim - (int)Math.round(pDim)) < margin
+                ? (int)Math.round(pDim) : pDim;
     }
 }

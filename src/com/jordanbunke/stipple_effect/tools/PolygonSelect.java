@@ -143,11 +143,15 @@ public final class PolygonSelect extends ToolWithMode {
                         new HashSet<>(vertices)).displace(1, 1);
 
         // define selection and populate
-        final Set<Coord2D> selection = new HashSet<>(edges);
+        final Set<Coord2D> selection = new HashSet<>(edges),
+                removalCandidates = new HashSet<>();
 
         for (int x = tl.x; x < br.x; x++) {
             for (int y = tl.y; y < br.y; y++) {
                 final Coord2D pixel = new Coord2D(x, y);
+                if (selection.contains(pixel))
+                    continue;
+
                 final Direction bestDir = MathPlus.findBest(
                         Direction.TL, Double.MAX_VALUE,
                         d -> d.getBoundDistance(tl, br, pixel),
@@ -165,17 +169,21 @@ public final class PolygonSelect extends ToolWithMode {
                         final int X = 0, Y = 1;
                         final double[] p = LineMath.intersection(raycast, edge);
 
-                        final boolean isPixel =
-                                p[X] - (int)p[X] == 0d &&
+                        final boolean isPixel = p[X] - (int)p[X] == 0d &&
                                 p[Y] - (int)p[Y] == 0d;
 
                         if (isPixel) {
                             final Coord2D point = new Coord2D((int)p[X], (int)p[Y]);
 
                             if (vertices.contains(point)) {
+                                // ensures that multiple-time intersections
+                                // of the same vertex are not counted as
+                                // multiple edge encounters
                                 if (!intersectedVertices.contains(point)) {
                                     intersectedVertices.add(point);
                                     edgeEncounters++;
+
+                                    removalCandidates.add(pixel);
                                 }
                             } else
                                 edgeEncounters++;
@@ -188,6 +196,20 @@ public final class PolygonSelect extends ToolWithMode {
                     selection.add(pixel);
             }
         }
+
+        // remove stragglers that were added by intersecting a single
+        // vertex from outside the selection polygon
+        final Set<Coord2D> toRemove = new HashSet<>();
+
+        for (Coord2D pixel : removalCandidates)
+            if (selection.contains(pixel) && !(
+                    selection.contains(pixel.displace(-1, 0)) &&
+                    selection.contains(pixel.displace(1, 0)) &&
+                    selection.contains(pixel.displace(0, -1)) &&
+                    selection.contains(pixel.displace(0, 1))))
+                toRemove.add(pixel);
+
+        selection.removeAll(toRemove);
 
         // edit selection
         context.editSelection(selection, true);
