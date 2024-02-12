@@ -2,7 +2,8 @@ package com.jordanbunke.stipple_effect.utility;
 
 public class LineMath {
     public static boolean linesIntersect(
-            final LineSegment l1, final LineSegment l2
+            final LineSegment l1, final LineSegment l2,
+            final boolean startVertexOnly
     ) {
         final double m1 = l1.slope(), m2 = l2.slope(),
                 b1 = l1.yIntercept(), b2 = l2.yIntercept();
@@ -30,7 +31,8 @@ public class LineMath {
                 y = (m1 * x) + b1;
             }
 
-            return l1.pointOnLine(x, y, false) && l2.pointOnLine(x, y, false);
+            return l1.pointOnLine(x, y, startVertexOnly) &&
+                    l2.pointOnLine(x, y, startVertexOnly);
         }
     }
 }

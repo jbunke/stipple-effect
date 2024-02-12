@@ -7,6 +7,8 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.LineMath;
+import com.jordanbunke.stipple_effect.utility.LineSegment;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.awt.*;
@@ -50,6 +52,17 @@ public final class PolygonSelect extends ToolWithMode {
                 case RIGHT -> new Coord2D(1, 0);
                 case UP -> new Coord2D(0, -1);
                 case DOWN -> new Coord2D(0, 1);
+            };
+        }
+
+        LineSegment getRaycast(
+                final Coord2D tl, final Coord2D br, final Coord2D pixel
+        ) {
+            return switch (this) {
+                case LEFT -> new LineSegment(pixel, new Coord2D(tl.x, pixel.y));
+                case RIGHT -> new LineSegment(pixel, new Coord2D(br.x, pixel.y));
+                case UP -> new LineSegment(pixel, new Coord2D(pixel.x, tl.y));
+                case DOWN -> new LineSegment(pixel, new Coord2D(pixel.x, br.y));
             };
         }
 
@@ -101,13 +114,16 @@ public final class PolygonSelect extends ToolWithMode {
             if (selecting) {
                 // add to selection
                 addEdge(getLastVertex(), tp);
+                vertices.add(tp);
 
                 if (tp.equals(vertices.get(0))) {
                     // finish selection
 
                     // define bounding box
-                    final Coord2D tl = SelectionUtils.topLeft(new HashSet<>(vertices)),
-                            br = SelectionUtils.bottomRight(new HashSet<>(vertices));
+                    final Coord2D tl = SelectionUtils.topLeft(
+                            new HashSet<>(vertices)).displace(-1, -1),
+                            br = SelectionUtils.bottomRight(
+                                    new HashSet<>(vertices)).displace(1, 1);
 
                     // define selection and populate
                     final Set<Coord2D> selection = new HashSet<>(edges);
@@ -120,19 +136,18 @@ public final class PolygonSelect extends ToolWithMode {
                                     d -> d.getBoundDistance(tl, br, pixel),
                                     (a, b) -> a < b, Direction.values());
 
-                            final int distance = bestDir.getBoundDistance(tl, br, pixel);
+                            final LineSegment raycast = bestDir.getRaycast(tl, br, pixel);
+                            // final int distance = bestDir.getBoundDistance(tl, br, pixel);
                             int edgeEncounters = 0;
-                            boolean lastWasEdge = false;
-                            Coord2D scanPixel = pixel;
+                            // boolean lastWasEdge = false;
+                            // Coord2D scanPixel = pixel;
 
-                            for (int i = 0; i <= distance + 1; i++) {
-                                final boolean isEdge = edges.contains(scanPixel);
+                            for (int i = 1; i < vertices.size(); i++) {
+                                final LineSegment edge = new LineSegment(
+                                        vertices.get(i - 1), vertices.get(i));
 
-                                if (lastWasEdge && !isEdge)
+                                if (LineMath.linesIntersect(raycast, edge, true))
                                     edgeEncounters++;
-
-                                lastWasEdge = isEdge;
-                                scanPixel = scanPixel.displace(bestDir.getIncrement());
                             }
 
                             if (edgeEncounters % 2 == 1)
@@ -143,8 +158,7 @@ public final class PolygonSelect extends ToolWithMode {
                     // edit selection
                     context.editSelection(selection, true);
                     reset();
-                } else
-                    vertices.add(tp);
+                }
             } else {
                 // Start selection
                 selecting = true;

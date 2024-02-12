@@ -38,26 +38,41 @@ public record LineSegment(Coord2D pa, Coord2D pb) {
     }
 
     public boolean pointOnLine(
-            final double px, final double py, final boolean includeVertices
+            final double px, final double py, final boolean startVertexOnly
     ) {
         final double margin = 0.1, m = slope(), b = yIntercept();
         final boolean satisfiesEquation = isSlopeUndefined()
                 ? (int)Math.round(px) == pa.x
                 : Math.abs(((px * m) + b) - py) <= margin;
 
-        final int lesserBoundX = Math.min(pa.x, pb.x),
-                greaterBoundX = Math.max(pa.x, pb.x),
-                lesserBoundY = Math.min(pa.y, pb.y),
-                greaterBoundY = Math.max(pa.y, pb.y);
-        final BiFunction<Double, Integer, Boolean> gt = includeVertices
-                ? (pDim, ref) -> pDim >= ref
-                : (pDim, ref) -> pDim > ref, lt = includeVertices
-                ? (pDim, ref) -> pDim <= ref
-                : (pDim, ref) -> pDim < ref;
-        final boolean isInBounds =
-                gt.apply(px, lesserBoundX) && lt.apply(px, greaterBoundX) &&
-                gt.apply(py, lesserBoundY) && lt.apply(py, greaterBoundY);
+        if (!satisfiesEquation)
+            return false;
 
-        return satisfiesEquation && isInBounds;
+        // greater and lesser bounds
+        final int lbx = Math.min(pa.x, pb.x),
+                gbx = Math.max(pa.x, pb.x),
+                lby = Math.min(pa.y, pb.y),
+                gby = Math.max(pa.y, pb.y);
+        // greater- and less than functions
+        final BiFunction<Double, Integer, Boolean>
+                gtx = startVertexOnly && lbx == pb.x
+                        ? (pDim, ref) -> pDim > ref
+                        : (pDim, ref) -> pDim >= ref,
+                ltx = startVertexOnly && gbx == pb.x
+                        ? (pDim, ref) -> pDim < ref
+                        : (pDim, ref) -> pDim <= ref,
+                gty = startVertexOnly && lby == pb.y
+                        ? (pDim, ref) -> pDim > ref
+                        : (pDim, ref) -> pDim >= ref,
+                lty = startVertexOnly && gby == pb.y
+                        ? (pDim, ref) -> pDim < ref
+                        : (pDim, ref) -> pDim <= ref;
+        final boolean
+                isInBoundsX = pa.x == pb.x ? px == pa.x
+                        : gtx.apply(px, lbx) && ltx.apply(px, gbx),
+                isInBoundsY = pa.y == pb.y ? py == pa.y
+                        : gty.apply(py, lby) && lty.apply(py, gby);
+
+        return isInBoundsX && isInBoundsY;
     }
 }
