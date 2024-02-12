@@ -38,7 +38,7 @@ public record LineSegment(Coord2D pa, Coord2D pb) {
     }
 
     public boolean pointOnLine(
-            final double px, final double py, final boolean startVertexOnly
+            final double px, final double py
     ) {
         final double margin = 0.1, m = slope(), b = yIntercept();
         final boolean satisfiesEquation = isSlopeUndefined()
@@ -55,23 +55,13 @@ public record LineSegment(Coord2D pa, Coord2D pb) {
                 gby = Math.max(pa.y, pb.y);
         // greater- and less than functions
         final BiFunction<Double, Integer, Boolean>
-                gtx = startVertexOnly && lbx == pb.x
-                        ? (pDim, ref) -> pDim > ref
-                        : (pDim, ref) -> pDim >= ref,
-                ltx = startVertexOnly && gbx == pb.x
-                        ? (pDim, ref) -> pDim < ref
-                        : (pDim, ref) -> pDim <= ref,
-                gty = startVertexOnly && lby == pb.y
-                        ? (pDim, ref) -> pDim > ref
-                        : (pDim, ref) -> pDim >= ref,
-                lty = startVertexOnly && gby == pb.y
-                        ? (pDim, ref) -> pDim < ref
-                        : (pDim, ref) -> pDim <= ref;
+                gt = (pDim, ref) -> pDim >= ref,
+                lt = (pDim, ref) -> pDim <= ref;
         final boolean
                 isInBoundsX = pa.x == pb.x ? px == pa.x
-                        : gtx.apply(px, lbx) && ltx.apply(px, gbx),
+                        : gt.apply(px, lbx) && lt.apply(px, gbx),
                 isInBoundsY = pa.y == pb.y ? py == pa.y
-                        : gty.apply(py, lby) && lty.apply(py, gby);
+                        : gt.apply(py, lby) && lt.apply(py, gby);
 
         return isInBoundsX && isInBoundsY;
     }

@@ -44,37 +44,27 @@ public final class PolygonSelect extends ToolWithMode {
     }
 
     private enum Direction {
-        LEFT, RIGHT, UP, DOWN;
+        TL, TR, BL, BR;
 
-        Coord2D getIncrement() {
+        private Coord2D getBound(final Coord2D tl, final Coord2D br) {
             return switch (this) {
-                case LEFT -> new Coord2D(-1, 0);
-                case RIGHT -> new Coord2D(1, 0);
-                case UP -> new Coord2D(0, -1);
-                case DOWN -> new Coord2D(0, 1);
+                case TL -> tl;
+                case TR -> new Coord2D(br.x, tl.y);
+                case BL -> new Coord2D(tl.x, br.y);
+                case BR -> br;
             };
         }
 
         LineSegment getRaycast(
                 final Coord2D tl, final Coord2D br, final Coord2D pixel
         ) {
-            return switch (this) {
-                case LEFT -> new LineSegment(pixel, new Coord2D(tl.x, pixel.y));
-                case RIGHT -> new LineSegment(pixel, new Coord2D(br.x, pixel.y));
-                case UP -> new LineSegment(pixel, new Coord2D(pixel.x, tl.y));
-                case DOWN -> new LineSegment(pixel, new Coord2D(pixel.x, br.y));
-            };
+            return new LineSegment(pixel, getBound(tl, br));
         }
 
-        int getBoundDistance(
+        double getBoundDistance(
                 final Coord2D tl, final Coord2D br, final Coord2D pixel
         ) {
-            return switch (this) {
-                case LEFT -> pixel.x - tl.x;
-                case RIGHT -> br.x - pixel.x;
-                case UP -> pixel.y - tl.y;
-                case DOWN -> br.y - pixel.y;
-            };
+            return Coord2D.unitDistanceBetween(pixel, getBound(tl, br));
         }
     }
 
@@ -116,49 +106,8 @@ public final class PolygonSelect extends ToolWithMode {
                 addEdge(getLastVertex(), tp);
                 vertices.add(tp);
 
-                if (tp.equals(vertices.get(0))) {
-                    // finish selection
-
-                    // define bounding box
-                    final Coord2D tl = SelectionUtils.topLeft(
-                            new HashSet<>(vertices)).displace(-1, -1),
-                            br = SelectionUtils.bottomRight(
-                                    new HashSet<>(vertices)).displace(1, 1);
-
-                    // define selection and populate
-                    final Set<Coord2D> selection = new HashSet<>(edges);
-
-                    for (int x = tl.x; x < br.x; x++) {
-                        for (int y = tl.y; y < br.y; y++) {
-                            final Coord2D pixel = new Coord2D(x, y);
-                            final Direction bestDir = MathPlus.findBest(
-                                    Direction.LEFT, Integer.MAX_VALUE,
-                                    d -> d.getBoundDistance(tl, br, pixel),
-                                    (a, b) -> a < b, Direction.values());
-
-                            final LineSegment raycast = bestDir.getRaycast(tl, br, pixel);
-                            // final int distance = bestDir.getBoundDistance(tl, br, pixel);
-                            int edgeEncounters = 0;
-                            // boolean lastWasEdge = false;
-                            // Coord2D scanPixel = pixel;
-
-                            for (int i = 1; i < vertices.size(); i++) {
-                                final LineSegment edge = new LineSegment(
-                                        vertices.get(i - 1), vertices.get(i));
-
-                                if (LineMath.linesIntersect(raycast, edge, true))
-                                    edgeEncounters++;
-                            }
-
-                            if (edgeEncounters % 2 == 1)
-                                selection.add(pixel);
-                        }
-                    }
-
-                    // edit selection
-                    context.editSelection(selection, true);
-                    reset();
-                }
+                if (tp.equals(vertices.get(0)))
+                    finish(context);
             } else {
                 // Start selection
                 selecting = true;
@@ -185,6 +134,65 @@ public final class PolygonSelect extends ToolWithMode {
 
     @Override
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {}
+
+    private void finish(final SEContext context) {
+        // define bounding box
+        final Coord2D tl = SelectionUtils.topLeft(
+                new HashSet<>(vertices)).displace(-1, -1),
+                br = SelectionUtils.bottomRight(
+                        new HashSet<>(vertices)).displace(1, 1);
+
+        // define selection and populate
+        final Set<Coord2D> selection = new HashSet<>(edges);
+
+        for (int x = tl.x; x < br.x; x++) {
+            for (int y = tl.y; y < br.y; y++) {
+                final Coord2D pixel = new Coord2D(x, y);
+                final Direction bestDir = MathPlus.findBest(
+                        Direction.TL, Double.MAX_VALUE,
+                        d -> d.getBoundDistance(tl, br, pixel),
+                        (a, b) -> a < b, Direction.values());
+
+                final LineSegment raycast = bestDir.getRaycast(tl, br, pixel);
+                final Set<Coord2D> intersectedVertices = new HashSet<>();
+                int edgeEncounters = 0;
+
+                for (int i = 1; i < vertices.size(); i++) {
+                    final LineSegment edge = new LineSegment(
+                            vertices.get(i - 1), vertices.get(i));
+
+                    if (LineMath.linesIntersect(raycast, edge)) {
+                        final int X = 0, Y = 1;
+                        final double[] p = LineMath.intersection(raycast, edge);
+
+                        final boolean isPixel =
+                                p[X] - (int)p[X] == 0d &&
+                                p[Y] - (int)p[Y] == 0d;
+
+                        if (isPixel) {
+                            final Coord2D point = new Coord2D((int)p[X], (int)p[Y]);
+
+                            if (vertices.contains(point)) {
+                                if (!intersectedVertices.contains(point)) {
+                                    intersectedVertices.add(point);
+                                    edgeEncounters++;
+                                }
+                            } else
+                                edgeEncounters++;
+                        } else
+                            edgeEncounters++;
+                    }
+                }
+
+                if (edgeEncounters % 2 == 1)
+                    selection.add(pixel);
+            }
+        }
+
+        // edit selection
+        context.editSelection(selection, true);
+        reset();
+    }
 
     private void updateToolContentPreview(final SEContext context) {
         final int w = context.getState().getImageWidth(),
