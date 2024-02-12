@@ -43,31 +43,6 @@ public final class PolygonSelect extends ToolWithMode {
         return INSTANCE;
     }
 
-    private enum Direction {
-        TL, TR, BL, BR;
-
-        private Coord2D getBound(final Coord2D tl, final Coord2D br) {
-            return switch (this) {
-                case TL -> tl;
-                case TR -> new Coord2D(br.x, tl.y);
-                case BL -> new Coord2D(tl.x, br.y);
-                case BR -> br;
-            };
-        }
-
-        LineSegment getRaycast(
-                final Coord2D tl, final Coord2D br, final Coord2D pixel
-        ) {
-            return new LineSegment(pixel, getBound(tl, br));
-        }
-
-        double getBoundDistance(
-                final Coord2D tl, final Coord2D br, final Coord2D pixel
-        ) {
-            return Coord2D.unitDistanceBetween(pixel, getBound(tl, br));
-        }
-    }
-
     @Override
     public String getName() {
         return "Polygon Select";
@@ -152,13 +127,9 @@ public final class PolygonSelect extends ToolWithMode {
                 if (selection.contains(pixel))
                     continue;
 
-                final Direction bestDir = MathPlus.findBest(
-                        Direction.TL, Double.MAX_VALUE,
-                        d -> d.getBoundDistance(tl, br, pixel),
-                        (a, b) -> a < b, Direction.values());
-
-                final LineSegment raycast = bestDir.getRaycast(tl, br, pixel);
-                final Set<Coord2D> intersectedVertices = new HashSet<>();
+                final LineSegment raycast = new LineSegment(pixel, tl);
+                final Set<Coord2D> crossedVertices = new HashSet<>(),
+                        doubleBackVertices = new HashSet<>();
                 int edgeEncounters = 0;
 
                 for (int i = 1; i < vertices.size(); i++) {
@@ -175,22 +146,49 @@ public final class PolygonSelect extends ToolWithMode {
                         if (isPixel) {
                             final Coord2D point = new Coord2D((int)p[X], (int)p[Y]);
 
+                            // ensures that multiple-time intersections
+                            // of the same vertex are not counted as
+                            // multiple edge encounters
                             if (vertices.contains(point)) {
-                                // ensures that multiple-time intersections
-                                // of the same vertex are not counted as
-                                // multiple edge encounters
-                                if (!intersectedVertices.contains(point)) {
-                                    intersectedVertices.add(point);
-                                    edgeEncounters++;
+                                removalCandidates.add(pixel);
 
-                                    removalCandidates.add(pixel);
+                                /* raycast crosses edges adjoining vertex or
+                                 * edges double back
+                                 * ========================
+                                 * Recall for next and previous definitions that
+                                 * first and last vertex in vertices are the same
+                                 */
+                                final int vIndex = vertices.indexOf(point);
+                                final Coord2D next = vIndex == vertices.size() - 1
+                                        ? vertices.get(1)
+                                        : vertices.get(vIndex + 1),
+                                        previous = vIndex == 0
+                                                ? vertices.get(vertices.size() - 2)
+                                                : vertices.get(vIndex - 1);
+                                final LineSegment adjacents =
+                                        new LineSegment(previous, next);
+                                final boolean sameSlope = adjacents.slope() == raycast.slope(),
+                                        bothUndefined = adjacents.isSlopeUndefined() &&
+                                                raycast.isSlopeUndefined();
+
+                                if (sameSlope || bothUndefined)
+                                    doubleBackVertices.add(point);
+                                else {
+                                    final double[] adjP = LineMath.intersection(raycast, adjacents);
+                                    if (adjacents.pointOnLine(adjP[X], adjP[Y]))
+                                        crossedVertices.add(point);
+                                    else
+                                        doubleBackVertices.add(point);
                                 }
-                            } else
-                                edgeEncounters++;
-                        } else
-                            edgeEncounters++;
+                            }
+                        }
+
+                        edgeEncounters++;
                     }
                 }
+
+                edgeEncounters -= crossedVertices.size();
+                edgeEncounters -= (2 * doubleBackVertices.size());
 
                 if (edgeEncounters % 2 == 1)
                     selection.add(pixel);
