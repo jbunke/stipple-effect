@@ -79,6 +79,10 @@ public abstract class Tool {
         return false;
     }
 
+    public boolean previewScopeIsGlobal() {
+        return false;
+    }
+
     public GameImage getToolContentPreview() {
         return GameImage.dummy();
     }

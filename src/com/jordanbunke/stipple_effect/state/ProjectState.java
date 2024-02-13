@@ -7,6 +7,7 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -172,6 +173,7 @@ public class ProjectState {
             final int frameIndex
     ) {
         final GameImage image = new GameImage(imageWidth, imageHeight);
+        final Tool tool = StippleEffect.get().getTool();
 
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
@@ -214,14 +216,24 @@ public class ProjectState {
 
                 final boolean toolPreviewCondition = inProjectRender &&
                         layer.equals(getEditingLayer()) &&
-                        StippleEffect.get().getTool().hasToolContentPreview();
+                        tool.hasToolContentPreview() &&
+                        !tool.previewScopeIsGlobal();
 
                 if (toolPreviewCondition) {
-                    final GameImage toolContentPreview = StippleEffect.get()
-                            .getTool().getToolContentPreview();
+                    final GameImage toolContentPreview =
+                            tool.getToolContentPreview();
                     image.draw(toolContentPreview);
                 }
             }
+        }
+
+        final boolean toolPreviewCondition = inProjectRender &&
+                tool.hasToolContentPreview() &&
+                tool.previewScopeIsGlobal();
+
+        if (toolPreviewCondition) {
+            final GameImage toolContentPreview = tool.getToolContentPreview();
+            image.draw(toolContentPreview);
         }
 
         return image.submit();

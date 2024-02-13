@@ -9,7 +9,6 @@ import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.LineMath;
 import com.jordanbunke.stipple_effect.utility.LineSegment;
-import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -290,12 +289,12 @@ public final class PolygonSelect extends ToolWithMode {
     }
 
     @Override
-    public GameImage getToolContentPreview() {
-        return toolContentPreview;
+    public boolean previewScopeIsGlobal() {
+        return true;
     }
 
     @Override
-    public String getCursorCode() {
-        return SECursor.RETICLE; // TODO - remove method once ToolWithMode-compliant cursors have been drawn
+    public GameImage getToolContentPreview() {
+        return toolContentPreview;
     }
 }

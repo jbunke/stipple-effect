@@ -7,10 +7,10 @@ the colors.
 Simple selection: {Click}
 
 Additive selection: {Ctrl + Click}
-Adds the result of the selection to the existing selection.
+Adds the result of the wand wave to the existing selection.
 
-Subtractive selection: {Ctrl + S + Click}
-Removes the result of the selection from the existing selection.
+Subtractive selection: {S + Click}
+Removes the result of the wand wave from the existing selection.
 
 Global selection: {Shift + Click}
 Selects all pixels in the image that satisfy the color tolerance of the initial pixel, regardless of
