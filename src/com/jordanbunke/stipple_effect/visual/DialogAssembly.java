@@ -913,15 +913,6 @@ public class DialogAssembly {
                 new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
                 MenuElement.Anchor.CENTRAL, 5, frames));
 
-        // title
-        final GameImage title = GraphicsUtils.uiText(
-                Constants.ACCENT_BACKGROUND_LIGHT, 3d)
-                .addText(StippleEffect.PROGRAM_NAME).build().draw();
-
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.7)),
-                new Coord2D(title.getWidth(), title.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, title));
-
         // subtitle
         final GameImage subtitle = GraphicsUtils.uiText(
                         Constants.ACCENT_BACKGROUND_LIGHT)
@@ -929,9 +920,9 @@ public class DialogAssembly {
                 .addText("built on Delta Time by Flinker Flitzer")
                 .build().draw();
 
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.8)),
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, h - (version.getHeight() * 2)),
                 new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, subtitle));
+                MenuElement.Anchor.CENTRAL_BOTTOM, subtitle));
 
         setDialog(mb.build());
     }

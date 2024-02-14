@@ -45,7 +45,7 @@ public class Settings {
 
     // object
     private static String defIndexPrefix = "_", defIndexSuffix = "";
-    private static SEFonts.Code programFont = SEFonts.Code.CLASSIC;
+    private static SEFonts.Code programFont = SEFonts.DEFAULT_FONT;
 
     public static void read() {
         final String file = FileIO.readFile(SETTINGS_FILE);
@@ -163,7 +163,7 @@ public class Settings {
             if (!isStartup)
                 StatusUpdates.invalidFontCode(fontCode);
 
-            Settings.programFont = SEFonts.Code.CLASSIC;
+            Settings.programFont = SEFonts.DEFAULT_FONT;
         }
 
         if (!isStartup) {

@@ -19,7 +19,7 @@ x Added tools:
     x Line tool
     x Gradient tool
     x Shade brush
-    > Polygon select
+    x Polygon select
 x Extended TextBox to support text selection
 x Added status updates for actions without visual feedback
     x Saving...
@@ -27,16 +27,17 @@ x Added status updates for actions without visual feedback
     x Layer actions when layer panel is hidden
     x Frame actions when frame panel is hidden
 > Pixel grid
-> New default font MonoSE
-> New stylized font Bruch
+x New fonts SE and SE Bold (default)
 x Snap option for moving (translating) selection bounds and contents
 
 Change:
 x Redesigned order and layout of layer-specific buttons
 x Refactored much of ToolWithBreadth to interface HasBreadth
 x Optimized STIP files to save static layers as single frame
+    x Incremented STIP file standard from 1.0 to 1.1
 x Cropping to selection bounds now snaps the image to the center of the screen
 x Independent checkerboard settings for x and y that can be set to values between 1-256
+x Updated splash screen
 
 Fix:
 x Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
