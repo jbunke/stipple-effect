@@ -23,7 +23,8 @@ public class ParserSerializer {
     private static final char NL = '\n', INDENT = '\t',
             ENCLOSER_OPEN = '{', ENCLOSER_CLOSE = '}';
 
-    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":";
+    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":",
+            TRANSPARENT = "t";
 
     private static final int NOT_FOUND = -1;
 
@@ -108,7 +109,7 @@ public class ParserSerializer {
         final Color[] colors = palette.getColors();
 
         for (int i = 0; i < colors.length; i++) {
-            sb.append(serializeColor(colors[i]));
+            sb.append(serializeColor(colors[i], true));
 
             if (i + 1 < colors.length)
                 sb.append(CONTENT_SEPARATOR);
@@ -254,6 +255,9 @@ public class ParserSerializer {
     }
 
     public static Color deserializeColor(final String contents) {
+        if (contents.equals(TRANSPARENT))
+            return new Color(0, 0, 0, 0);
+
         final int LENGTH_OF_SECTION = 2, R = 0, G = 2, B = 4, A = 6;
 
         final int r = ColorTextBox.hexToInt(contents.substring(
@@ -457,7 +461,7 @@ public class ParserSerializer {
 
             for (int x = 0; x < w; x++) {
                 sb.append(serializeColor(ImageProcessing
-                        .colorAtPixel(image, x, y)));
+                        .colorAtPixel(image, x, y), false));
 
                 if (x + 1 < w || y + 1 < h)
                     sb.append(CONTENT_SEPARATOR);
@@ -478,7 +482,12 @@ public class ParserSerializer {
         return sb.toString();
     }
 
-    public static String serializeColor(final Color c) {
+    public static String serializeColor(
+            final Color c, final boolean preserveRGBForTransparent
+    ) {
+        if (c.getAlpha() == 0 && !preserveRGBForTransparent)
+            return TRANSPARENT;
+
         final String r = Integer.toHexString(c.getRed()),
                 g = Integer.toHexString(c.getGreen()),
                 b = Integer.toHexString(c.getBlue()),

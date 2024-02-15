@@ -917,7 +917,7 @@ public class DialogAssembly {
         final GameImage subtitle = GraphicsUtils.uiText(
                         Constants.ACCENT_BACKGROUND_LIGHT)
                 .addText("Pixel art editor and animator").addLineBreak()
-                .addText("built on Delta Time by Flinker Flitzer")
+                .addText("Jordan Bunke, 2023-2024")
                 .build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h - (version.getHeight() * 2)),
@@ -1353,6 +1353,7 @@ public class DialogAssembly {
                             IconCodes.HORIZONTAL_REFLECTION,
                             IconCodes.VERTICAL_REFLECTION,
                             IconCodes.OUTLINE,
+                            IconCodes.PIXEL_GRID_ON,
                             IconCodes.GENERAL,
                             IconCodes.CLIPBOARD_SHORTCUTS,
                             IconCodes.SELECTION_SHORTCUTS,
@@ -1362,6 +1363,7 @@ public class DialogAssembly {
                             "Horizontal reflection",
                             "Vertical reflection",
                             "Outline",
+                            "Pixel grid",
                             "General",
                             "Clipboard shortcuts",
                             "Selection shortcuts",

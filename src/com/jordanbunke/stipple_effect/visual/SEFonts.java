@@ -6,17 +6,17 @@ import com.jordanbunke.delta_time.fonts.FontFamily;
 import java.nio.file.Path;
 
 public class SEFonts {
-    public static final Code DEFAULT_FONT = Code.SE_BOLD;
+    public static final Code DEFAULT_FONT = Code.SE;
 
     public enum Code {
-        SE_BOLD, SE, CLASSIC, SCHIEF, ZIFFER;
+        SE, PENCIL_SE, CLASSIC, SCHIEF, ZIFFER;
 
         public String forButtonText() {
             final String name = name();
 
             return switch (this) {
+                case PENCIL_SE -> "Pencil SE";
                 case SE -> "SE";
-                case SE_BOLD -> "SE Bold";
                 default -> name.charAt(0) + name.substring(1).toLowerCase();
             };
         }
@@ -33,8 +33,8 @@ public class SEFonts {
                 case CLASSIC -> SEFonts.CLASSIC.getStandard();
                 case SCHIEF -> SEFonts.CLASSIC.getItalics();
                 case ZIFFER -> SEFonts.ZIFFER;
-                case SE -> SEFonts.SE.getStandard();
-                case SE_BOLD -> SEFonts.SE.getBold();
+                case PENCIL_SE -> SEFonts.SE.getStandard();
+                case SE -> SEFonts.SE.getBold();
             };
         }
     }

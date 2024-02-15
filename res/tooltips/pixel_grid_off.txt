@@ -1,0 +1,2 @@
+Pixel grid is OFF
+Turn on: {Ctrl + G}

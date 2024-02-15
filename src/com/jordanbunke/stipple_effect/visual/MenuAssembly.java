@@ -781,6 +781,22 @@ public class MenuAssembly {
                         });
         mb.add(horizontalReflectionButton);
 
+        // pixel grid
+        final MenuElement pixelGridToggleButton = GraphicsUtils
+                .generateIconToggleButton(
+                        outlinePos.displace(0, -3 * Layout.BUTTON_INC),
+                        new String[] {
+                                IconCodes.PIXEL_GRID_OFF,
+                                IconCodes.PIXEL_GRID_ON
+                        },
+                        new Runnable[] {
+                                () -> c.renderInfo.setPixelGrid(true),
+                                () -> c.renderInfo.setPixelGrid(false)
+                        },
+                        () -> c.renderInfo.isPixelGridOn() ? 1 : 0, () -> {},
+                        c::couldRenderPixelGrid, IconCodes.PIXEL_GRID_OFF);
+        mb.add(pixelGridToggleButton);
+
         return mb.build();
     }
 

@@ -12,6 +12,13 @@ import java.util.Set;
 
 public class StatusUpdates {
     // not permitted
+    public static void cannotSetPixelGrid() {
+        actionNotPermitted(
+                "turn pixel grid on or off",
+                "the pixel grid cannot be rendered for this project's current dimensions and/or zoom level"
+        );
+    }
+
     public static void cannotMergeWithLayerBelow(final String layerName) {
         actionNotPermitted("merge \"" + layerName + "\" with the layer below",
                 "it is the bottommost layer");
@@ -106,6 +113,12 @@ public class StatusUpdates {
                 "Cannot " + attempt + " because " + reason);
     }
 
+    // toolbar actions
+    public static void setPixelGrid(final boolean on) {
+        final String value = on ? "ON" : "OFF";
+        StippleEffect.get().sendStatusUpdate("Turned pixel grid " + value);
+    }
+
     // color actions
     public static void colorSliderAdjustment(
             final String slider, final int sliderVal, final Color result
@@ -144,7 +157,7 @@ public class StatusUpdates {
     }
 
     private static String processColor(final Color c) {
-        return Constants.OPEN_COLOR + ParserSerializer.serializeColor(c) +
+        return Constants.OPEN_COLOR + ParserSerializer.serializeColor(c, true) +
                 Constants.CLOSE_COLOR;
     }
 

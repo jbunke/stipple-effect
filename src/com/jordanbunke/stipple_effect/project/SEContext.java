@@ -143,7 +143,7 @@ public class SEContext {
                     (int)(bounds[DIM].y * zoomFactor));
 
             // pixel grid
-            if (canRenderPixelGrid()) {
+            if (renderInfo.isPixelGridOn() && couldRenderPixelGrid()) {
                 final int z = (int) zoomFactor;
                 workspace.draw(pixelGrid.section(
                                 bounds[TL].x * z, bounds[TL].y * z,
@@ -398,7 +398,15 @@ public class SEContext {
                     });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
-                    renderInfo::togglePixelGrid);
+                    () -> {
+                        if (couldRenderPixelGrid()) {
+                            renderInfo.togglePixelGrid();
+
+                            if (!Layout.isToolbarShowing())
+                                StatusUpdates.setPixelGrid(renderInfo.isPixelGridOn());
+                        } else
+                            StatusUpdates.cannotSetPixelGrid();
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     this::addFrame);
@@ -791,18 +799,17 @@ public class SEContext {
         checkerboard = image.submit();
     }
 
-    public boolean canRenderPixelGrid() {
+    public boolean couldRenderPixelGrid() {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        return renderInfo.isPixelGridOn() &&
-                renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
+        return renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
                 w <= Layout.PIXEL_GRID_IMAGE_DIM_MAX &&
                 h <= Layout.PIXEL_GRID_IMAGE_DIM_MAX;
     }
 
     public void redrawPixelGrid() {
-        if (!canRenderPixelGrid()) {
+        if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid())) {
             pixelGrid = GameImage.dummy();
             return;
         }

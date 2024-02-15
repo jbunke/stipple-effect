@@ -65,6 +65,8 @@ public class IconCodes {
             OUTLINE = "outline",
             VERTICAL_REFLECTION = "vertical_reflection",
             HORIZONTAL_REFLECTION = "horizontal_reflection",
+            PIXEL_GRID_OFF = "pixel_grid_off",
+            PIXEL_GRID_ON = "pixel_grid_on",
             INCLUDED = "included",
             EXCLUDED = "excluded",
             SETTINGS = "settings",
