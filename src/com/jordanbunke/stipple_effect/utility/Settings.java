@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
@@ -23,25 +24,35 @@ public class Settings {
             DEFAULT_INDEX_PREFIX = "def_index_prefix",
             DEFAULT_INDEX_SUFFIX = "def_index_suffix",
             CHECKERBOARD_X_PX = "checkerboard_x_px",
-            CHECKERBOARD_Y_PX = "checkerboard_y_px";
+            CHECKERBOARD_Y_PX = "checkerboard_y_px",
+            PIXEL_GRID_ON_BY_DEF = "pixel_grid_on_by_default",
+            PIXEL_GRID_X_PX = "pixel_grid_x_px",
+            PIXEL_GRID_Y_PX = "pixel_grid_y_px";
 
     // code-function associations
     private static final Map<String, Supplier<Object>> writerGetterMap = Map.ofEntries(
             Map.entry(FULLSCREEN_ON_STARTUP, Settings::isFullscreenOnStartup),
+            Map.entry(PIXEL_GRID_ON_BY_DEF, Settings::isPixelGridOnByDefault),
             Map.entry(FONT, Settings::getProgramFont),
             Map.entry(DEFAULT_INDEX_PREFIX, Settings::getDefaultIndexPrefix),
             Map.entry(DEFAULT_INDEX_SUFFIX, Settings::getDefaultIndexSuffix),
             Map.entry(CHECKERBOARD_X_PX, Settings::getCheckerboardXPixels),
-            Map.entry(CHECKERBOARD_Y_PX, Settings::getCheckerboardYPixels)
+            Map.entry(CHECKERBOARD_Y_PX, Settings::getCheckerboardYPixels),
+            Map.entry(PIXEL_GRID_X_PX, Settings::getPixelGridXPixels),
+            Map.entry(PIXEL_GRID_Y_PX, Settings::getPixelGridYPixels)
     );
 
     // SETTINGS - set to defaults if settings cannot be read
     // booleans
-    private static boolean fullscreenOnStartup = false;
+    private static boolean fullscreenOnStartup = false,
+            pixelGridOnByDefault = false;
 
     // int
-    private static int checkerboardXPixels = Layout.DEFAULT_CHECKERBOARD_DIM,
-            checkerboardYPixels = Layout.DEFAULT_CHECKERBOARD_DIM;
+    private static int
+            checkerboardXPixels = Layout.DEFAULT_CHECKERBOARD_DIM,
+            checkerboardYPixels = Layout.DEFAULT_CHECKERBOARD_DIM,
+            pixelGridXPixels = Layout.DEFAULT_PIXEL_GRID_DIM,
+            pixelGridYPixels = Layout.DEFAULT_PIXEL_GRID_DIM;
 
     // object
     private static String defIndexPrefix = "_", defIndexSuffix = "";
@@ -67,12 +78,19 @@ public class Settings {
 
             switch (code) {
                 case FULLSCREEN_ON_STARTUP -> setFullscreenOnStartup(Boolean.parseBoolean(value));
+                case PIXEL_GRID_ON_BY_DEF -> setPixelGridOnByDefault(Boolean.parseBoolean(value));
                 case CHECKERBOARD_X_PX -> setIntSettingSafely(value,
                         Layout.DEFAULT_CHECKERBOARD_DIM,
                         i -> setCheckerboardXPixels(i, true));
                 case CHECKERBOARD_Y_PX -> setIntSettingSafely(value,
                         Layout.DEFAULT_CHECKERBOARD_DIM,
                         i -> setCheckerboardYPixels(i, true));
+                case PIXEL_GRID_X_PX -> setIntSettingSafely(value,
+                        Layout.DEFAULT_PIXEL_GRID_DIM,
+                        i -> setPixelGridXPixels(i, true));
+                case PIXEL_GRID_Y_PX -> setIntSettingSafely(value,
+                        Layout.DEFAULT_PIXEL_GRID_DIM,
+                        i -> setPixelGridYPixels(i, true));
                 case DEFAULT_INDEX_PREFIX -> setDefaultIndexPrefix(value, true);
                 case DEFAULT_INDEX_SUFFIX -> setDefaultIndexSuffix(value, true);
                 case FONT -> setProgramFont(value, true);
@@ -118,6 +136,10 @@ public class Settings {
         Settings.fullscreenOnStartup = fullscreenOnStartup;
     }
 
+    public static void setPixelGridOnByDefault(final boolean pixelGridOnByDefault) {
+        Settings.pixelGridOnByDefault = pixelGridOnByDefault;
+    }
+
     public static void setCheckerboardXPixels(
             final int checkerboardXPixels, final boolean isStartup
     ) {
@@ -134,6 +156,30 @@ public class Settings {
 
         if (!isStartup)
             StippleEffect.get().getContext().redrawCheckerboard();
+    }
+
+    public static void setPixelGridXPixels(
+            final int pixelGridXPixels, final boolean isStartup
+    ) {
+        Settings.pixelGridXPixels = pixelGridXPixels;
+
+        if (!isStartup) {
+            final SEContext c = StippleEffect.get().getContext();
+            c.renderInfo.setPixelGrid(true);
+            c.redrawPixelGrid();
+        }
+    }
+
+    public static void setPixelGridYPixels(
+            final int pixelGridYPixels, final boolean isStartup
+    ) {
+        Settings.pixelGridYPixels = pixelGridYPixels;
+
+        if (!isStartup) {
+            final SEContext c = StippleEffect.get().getContext();
+            c.renderInfo.setPixelGrid(true);
+            c.redrawPixelGrid();
+        }
     }
 
     public static void setDefaultIndexPrefix(
@@ -177,12 +223,24 @@ public class Settings {
         return fullscreenOnStartup;
     }
 
+    public static boolean isPixelGridOnByDefault() {
+        return pixelGridOnByDefault;
+    }
+
     public static int getCheckerboardXPixels() {
         return checkerboardXPixels;
     }
 
     public static int getCheckerboardYPixels() {
         return checkerboardYPixels;
+    }
+
+    public static int getPixelGridXPixels() {
+        return pixelGridXPixels;
+    }
+
+    public static int getPixelGridYPixels() {
+        return pixelGridYPixels;
     }
 
     public static String getDefaultIndexPrefix() {

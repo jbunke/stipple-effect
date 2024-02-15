@@ -5,7 +5,6 @@ Add:
     > Language
     > Interpreter
     > Preview scripts and transformation scripts
-> Grid
 > Symmetry tools
 
 Fix:

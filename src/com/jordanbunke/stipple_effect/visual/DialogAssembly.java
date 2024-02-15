@@ -1138,7 +1138,9 @@ public class DialogAssembly {
             case STARTUP -> {
                 // text labels
                 final TextLabel screenModeLabel = makeDialogLeftLabel(
-                        initialYIndex, "Fullscreen on startup: ");
+                        initialYIndex, "Fullscreen on startup: "),
+                        pixelGridDefaultLabel = makeDialogLeftLabel(
+                                initialYIndex + 1, "Pixel grid on by default: ");
 
                 // toggle buttons
                 final GameImage[] smBases = makeBooleanToggleButtonSet();
@@ -1153,13 +1155,27 @@ public class DialogAssembly {
                         new Runnable[] {
                                 () -> Settings.setFullscreenOnStartup(false),
                                 () -> Settings.setFullscreenOnStartup(true)
-                        }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {});
+                        }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {}),
+                        pixelGridDefaultButton = new SimpleToggleMenuButton(
+                                getDialogContentBigOffsetFromLabel(pixelGridDefaultLabel),
+                                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                                        Layout.STD_TEXT_BUTTON_H),
+                                MenuElement.Anchor.LEFT_TOP, true,
+                                smBases, Arrays.stream(smBases)
+                                .map(GraphicsUtils::drawHighlightedButton)
+                                .toArray(GameImage[]::new),
+                                new Runnable[] {
+                                        () -> Settings.setPixelGridOnByDefault(false),
+                                        () -> Settings.setPixelGridOnByDefault(true)
+                                }, () -> Settings.isPixelGridOnByDefault() ? 0 : 1, () -> {});
 
                 mb.add(screenModeLabel);
                 mb.add(screenModeButton);
+                mb.add(pixelGridDefaultLabel);
+                mb.add(pixelGridDefaultButton);
 
                 // update as new settings are added to category
-                yield screenModeLabel;
+                yield pixelGridDefaultLabel;
             }
             case FORMAT -> {
                 // text labels
@@ -1201,8 +1217,17 @@ public class DialogAssembly {
                                 "Valid checkerboard size values range from " +
                                         Layout.CHECKERBOARD_MIN + " to " +
                                         Layout.CHECKERBOARD_MAX + " pixels."),
+                        pixelGridXLabel = makeDialogLeftLabel(
+                                initialYIndex + 4, "Pixel grid size (X): "),
+                        pixelGridYLabel = makeDialogLeftLabel(
+                                initialYIndex + 5, "Pixel grid size (Y): "),
+                        pixelGridContext = makeDialogLeftLabel(
+                                initialYIndex + 6,
+                                "Valid pixel grid size values range from " +
+                                        Layout.PIXEL_GRID_MIN + " to " +
+                                        Layout.PIXEL_GRID_MAX + " pixels."),
                         fontLabel = makeDialogLeftLabel(
-                                initialYIndex + 4, "Program font: ");
+                                initialYIndex + 8, "Program font: ");
 
                 // toggle buttons
                 final GameImage[] fontBases = makeToggleButtonSet(
@@ -1236,12 +1261,29 @@ public class DialogAssembly {
                         Settings.getCheckerboardYPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
                         "px", i -> Settings.setCheckerboardYPixels(i, false), 3);
+                final TextBox pixelGridXTextBox = makeDialogNumericalTextBox(
+                        pixelGridXLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getPixelGridXPixels(),
+                        Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
+                        "px", i -> Settings.setPixelGridXPixels(i, false), 3);
+                final TextBox pixelGridYTextBox = makeDialogNumericalTextBox(
+                        pixelGridYLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getPixelGridYPixels(),
+                        Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
+                        "px", i -> Settings.setPixelGridYPixels(i, false), 3);
 
                 mb.add(checkerboardXLabel);
                 mb.add(checkerboardYLabel);
                 mb.add(checkerboardContext);
                 mb.add(checkerboardXTextBox);
                 mb.add(checkerboardYTextBox);
+                mb.add(pixelGridXLabel);
+                mb.add(pixelGridYLabel);
+                mb.add(pixelGridContext);
+                mb.add(pixelGridXTextBox);
+                mb.add(pixelGridYTextBox);
                 mb.add(fontLabel);
                 mb.add(fontButton);
 

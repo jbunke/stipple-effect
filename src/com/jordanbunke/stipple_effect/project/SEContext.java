@@ -40,7 +40,7 @@ public class SEContext {
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
 
-    private GameImage selectionOverlay, checkerboard;
+    private GameImage selectionOverlay, checkerboard, pixelGrid;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -61,7 +61,7 @@ public class SEContext {
         targetPixel = Constants.NO_VALID_TARGET;
         inWorkspaceBounds = false;
 
-        redrawCheckerboard();
+        redrawCanvasAuxiliaries();
     }
 
     public void redrawSelectionOverlay() {
@@ -141,6 +141,15 @@ public class SEContext {
                     bounds[TRP].x, bounds[TRP].y,
                     (int)(bounds[DIM].x * zoomFactor),
                     (int)(bounds[DIM].y * zoomFactor));
+
+            // pixel grid
+            if (canRenderPixelGrid()) {
+                final int z = (int) zoomFactor;
+                workspace.draw(pixelGrid.section(
+                                bounds[TL].x * z, bounds[TL].y * z,
+                                bounds[BR].x * z, bounds[BR].y * z),
+                        bounds[TRP].x, bounds[TRP].y);
+            }
         }
 
         // OVERLAYS
@@ -387,6 +396,9 @@ public class SEContext {
                                     getState().getLayerEditIndex(),
                                     getState().getLayers().size());
                     });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
+                    renderInfo::togglePixelGrid);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     this::addFrame);
@@ -753,6 +765,11 @@ public class SEContext {
                 middle.y - (int)(zoomFactor * anchor.y));
     }
 
+    public void redrawCanvasAuxiliaries() {
+        redrawCheckerboard();
+        redrawPixelGrid();
+    }
+
     public void redrawCheckerboard() {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
@@ -762,8 +779,8 @@ public class SEContext {
         final int cbx = Settings.getCheckerboardXPixels(),
                 cby = Settings.getCheckerboardYPixels();
 
-        for (int x = 0; x < image.getWidth(); x += cbx) {
-            for (int y = 0; y < image.getHeight(); y += cby) {
+        for (int x = 0; x < w; x += cbx) {
+            for (int y = 0; y < h; y += cby) {
                 final Color c = ((x / cbx) + (y / cby)) % 2 == 0
                         ? Constants.WHITE : Constants.ACCENT_BACKGROUND_LIGHT;
 
@@ -772,6 +789,56 @@ public class SEContext {
         }
 
         checkerboard = image.submit();
+    }
+
+    public boolean canRenderPixelGrid() {
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        return renderInfo.isPixelGridOn() &&
+                renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
+                w <= Layout.PIXEL_GRID_IMAGE_DIM_MAX &&
+                h <= Layout.PIXEL_GRID_IMAGE_DIM_MAX;
+    }
+
+    public void redrawPixelGrid() {
+        if (!canRenderPixelGrid()) {
+            pixelGrid = GameImage.dummy();
+            return;
+        }
+
+        final Color a = new Color(0, 0, 0, 150),
+                b = new Color(100, 100, 100, 150);
+
+        final int z = (int) renderInfo.getZoomFactor(),
+                w = getState().getImageWidth(),
+                h = getState().getImageHeight(),
+                altPx = Math.max(2, z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
+
+        final GameImage image = new GameImage(w * z, h * z);
+
+        final int pgx = Settings.getPixelGridXPixels(),
+                pgy = Settings.getPixelGridYPixels();
+
+        // vertical grid
+        for (int x = 0; x < w; x += pgx)
+            for (int y = 0; y < h; y++)
+                for (int zInc = 0; zInc < z; zInc += altPx) {
+                    final Color c = (zInc / altPx) % 2 == 0
+                            ? a : b;
+                    image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
+                }
+
+        // horizontal grid
+        for (int y = 0; y < h; y += pgy)
+            for (int x = 0; x < w; x++)
+                for (int zInc = 0; zInc < z; zInc += altPx) {
+                    final Color c = (zInc / altPx) % 2 == 0
+                            ? a : b;
+                    image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
+                }
+
+        pixelGrid = image.submit();
     }
 
     // non-state changes
@@ -1160,7 +1227,7 @@ public class SEContext {
 
             moveSelectionBounds(new Coord2D(-tl.x, -tl.y), false);
 
-            redrawCheckerboard();
+            redrawCanvasAuxiliaries();
             snapToCenterOfImage();
         }
     }
@@ -1428,7 +1495,7 @@ public class SEContext {
                 .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
         stateManager.performAction(result, ActionType.CANVAS);
 
-        redrawCheckerboard();
+        redrawCanvasAuxiliaries();
     }
 
     public void resize() {
@@ -1442,7 +1509,7 @@ public class SEContext {
                 .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, ActionType.CANVAS);
 
-        redrawCheckerboard();
+        redrawCanvasAuxiliaries();
     }
 
     // IMAGE EDITING

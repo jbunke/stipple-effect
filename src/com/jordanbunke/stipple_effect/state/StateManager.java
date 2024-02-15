@@ -84,7 +84,7 @@ public class StateManager {
     private void redraw() {
         final SEContext c = StippleEffect.get().getContext();
 
-        c.redrawCheckerboard();
+        c.redrawCanvasAuxiliaries();
         c.redrawSelectionOverlay();
     }
 
