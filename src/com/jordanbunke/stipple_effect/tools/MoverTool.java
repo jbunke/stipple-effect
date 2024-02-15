@@ -123,13 +123,27 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
             atTop = tp.y < top && topProx <= Constants.ROTATE_PX_THRESHOLD;
             atBottom = tp.y > bottom && bottomProx <= Constants.ROTATE_PX_THRESHOLD;
 
-            if (atLeft || atRight || atTop || atBottom) {
-                // direction = Direction.NA;
-                direction = atLeft ? (atTop ? Direction.TL
-                        : (atBottom ? Direction.BL : Direction.L)) :
-                        (atRight ? (atTop ? Direction.TR
-                                : (atBottom ? Direction.BR : Direction.R)) :
-                                (atTop ? Direction.T : Direction.B));
+            final int middleX = left + ((right - left) / 2),
+                    middleY = top + ((bottom - top) / 2);
+            final boolean atMiddleX = Math.abs(tp.x - middleX) < Constants.ROTATE_PX_THRESHOLD,
+                    atMiddleY = Math.abs(tp.y - middleY) < Constants.ROTATE_PX_THRESHOLD;
+
+            if (atLeft || atRight) {
+                if (atTop) {
+                    direction = atLeft ? Direction.TL : Direction.TR;
+                    return TransformType.ROTATE;
+                } else if (atBottom) {
+                    direction = atLeft ? Direction.BL : Direction.BR;
+                    return TransformType.ROTATE;
+                } else if (atMiddleY) {
+                    direction = atLeft ? Direction.L : Direction.R;
+                    return TransformType.ROTATE;
+                }
+            } else if (atTop && atMiddleX) {
+                direction = Direction.T;
+                return TransformType.ROTATE;
+            } else if (atBottom && atMiddleX) {
+                direction = Direction.B;
                 return TransformType.ROTATE;
             }
 
