@@ -22,10 +22,8 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,7 +38,8 @@ public class SEContext {
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
 
-    private GameImage selectionOverlay, checkerboard, pixelGrid;
+    private GameImage selectionOverlay, checkerboard;
+    private Map<Float, GameImage> pixelGridMap;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -144,6 +143,8 @@ public class SEContext {
 
             // pixel grid
             if (renderInfo.isPixelGridOn() && couldRenderPixelGrid()) {
+                final GameImage pixelGrid = pixelGridMap
+                        .getOrDefault(zoomFactor, GameImage.dummy());
                 final int z = (int) zoomFactor;
                 workspace.draw(pixelGrid.section(
                                 bounds[TL].x * z, bounds[TL].y * z,
@@ -809,43 +810,48 @@ public class SEContext {
     }
 
     public void redrawPixelGrid() {
-        if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid())) {
-            pixelGrid = GameImage.dummy();
+        pixelGridMap = new HashMap<>();
+
+        if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid()))
             return;
-        }
 
         final Color a = new Color(0, 0, 0, 150),
                 b = new Color(100, 100, 100, 150);
 
-        final int z = (int) renderInfo.getZoomFactor(),
-                w = getState().getImageWidth(),
-                h = getState().getImageHeight(),
-                altPx = Math.max(2, z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
 
-        final GameImage image = new GameImage(w * z, h * z);
+        final float minZ = Constants.ZOOM_FOR_GRID, maxZ = Constants.MAX_ZOOM;
 
-        final int pgx = Settings.getPixelGridXPixels(),
-                pgy = Settings.getPixelGridYPixels();
+        for (float fZ = minZ; fZ <= maxZ; fZ *= 2f) {
+            final int z = (int) fZ, altPx = Math.max(2,
+                    z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
-        // vertical grid
-        for (int x = 0; x < w; x += pgx)
-            for (int y = 0; y < h; y++)
-                for (int zInc = 0; zInc < z; zInc += altPx) {
-                    final Color c = (zInc / altPx) % 2 == 0
-                            ? a : b;
-                    image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
-                }
+            final GameImage image = new GameImage(w * z, h * z);
 
-        // horizontal grid
-        for (int y = 0; y < h; y += pgy)
-            for (int x = 0; x < w; x++)
-                for (int zInc = 0; zInc < z; zInc += altPx) {
-                    final Color c = (zInc / altPx) % 2 == 0
-                            ? a : b;
-                    image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
-                }
+            final int pgx = Settings.getPixelGridXPixels(),
+                    pgy = Settings.getPixelGridYPixels();
 
-        pixelGrid = image.submit();
+            // vertical grid
+            for (int x = 0; x < w; x += pgx)
+                for (int y = 0; y < h; y++)
+                    for (int zInc = 0; zInc < z; zInc += altPx) {
+                        final Color c = (zInc / altPx) % 2 == 0
+                                ? a : b;
+                        image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
+                    }
+
+            // horizontal grid
+            for (int y = 0; y < h; y += pgy)
+                for (int x = 0; x < w; x++)
+                    for (int zInc = 0; zInc < z; zInc += altPx) {
+                        final Color c = (zInc / altPx) % 2 == 0
+                                ? a : b;
+                        image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
+                    }
+
+            pixelGridMap.put(fZ, image.submit());
+        }
     }
 
     // non-state changes

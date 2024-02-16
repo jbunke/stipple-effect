@@ -88,7 +88,9 @@ public class StateManager {
         c.redrawSelectionOverlay();
     }
 
-    public void performAction(final ProjectState resultantState, final ActionType actionType) {
+    public void performAction(
+            final ProjectState resultantState, final ActionType actionType
+    ) {
         lastActionType = actionType;
 
         // clear REDO stack
