@@ -1,26 +1,27 @@
-{Stipple Effect} is a pixel art editor and animator designed and programmed by me, Jordan Bunke, also
-known as {Flinker Flitzer}. It is built on top of and rendered with {Delta Time}, my personal Java
-game library.
+{Stipple Effect} is a pixel art editor and animator.
 
-The program is purpose-built and tailor-made to seamlessly integrate with my own workflow for the
-pixel art that I produce as an indie game developer and freelancer.
+It runs on the Java Virtual Machine (JVM) and is built on top of {Delta Time}, the developer's
+proprietary Java game library, which handles most of the rendering boilerplate, menu element logic,
+and other low-level systems and behaviours.
 
-For the past ten years or so, I have used {Paint.NET} for any raster image editing task. While I'm
-used to it and generally like it, it is almost entirely unsuitable for animation, and its lack of
-quality of life features and optimizations make it very inefficient and slow to get work done in.
-I am not a fan of paid software - more of a financial issue than a philosophical one - and suffer from
-a pretty exaggerated case of "not invented here" syndrome, so I never seriously considered buying
-{Photoshop} or {Aseprite}, which is the undisputed state-of-the-art software for this niche.
+Message from Jordan, the developer:
 
-What I have done instead is created something that makes my life and work significantly {easier},
-{faster}, {BETTER}, and more fun. With {Stipple Effect}, I can produce better pixel art stills and
-animations than ever before - and do so significantly faster - due to a host of features not available
-in most freeware.
+I initially built Stipple Effect as a private tool. I had been using {Paint.NET} for pixel art for
+years, but as I became a more experienced programmer and artist, I realized that Paint.NET was not
+conducive with the kind of workflow that I wanted to cultivate to improve my work and to be more
+efficient. Furthermore, Paint.NET has no utilities or features for animation, and it is painstaking
+to draw animation frames without being able to quickly cycle through them as one works. These two
+reasons came to be overwhelming enough that I abandoned the program and started working on my own
+replacement.
 
-I wanted to share that with the countless developers, artists and creators that I KNOW are in the
-same position. Please reach out with any feedback or questions and enjoy!
+Over the course of weeks of development, I started to feel good enough about Stipple Effect to flesh
+it out and make it publicly available. I hope you get as much use out of the program as I do!
+Please reach out with any feedback or questions!
 
-If you get a lot of use and value out of the program, please consider supporting my work by leaving
-a donation on the Stipple Effect {Itch.io} page.
+If you get a lot of value out of the program, please consider supporting my work by leaving a donation
+on the Stipple Effect {Itch.io} page. The more I make from Stipple Effect, the more time I can
+dedicate to its improvement and extension.
+
+Thank you!
 
 {Jordan Bunke, 2023-2024}
