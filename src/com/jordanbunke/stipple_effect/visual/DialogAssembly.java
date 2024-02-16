@@ -1226,14 +1226,15 @@ public class DialogAssembly {
                                 "Valid pixel grid size values range from " +
                                         Layout.PIXEL_GRID_MIN + " to " +
                                         Layout.PIXEL_GRID_MAX + " pixels."),
-                        pixelGridLimits = makeDialogLeftLabel(
+                        pixelGridLimits1 = makeDialogLeftLabel(
                                 initialYIndex + 7,
-                                "The pixel grid is displayed for projects" +
-                                        " with a maximum canvas size of " +
+                                "The pixel grid is displayed for projects with a "),
+                        pixelGridLimits2 = makeDialogLeftLabel(
+                                initialYIndex + 8, "maximum canvas size of " +
                                         Layout.PIXEL_GRID_IMAGE_DIM_MAX + "x" +
                                         Layout.PIXEL_GRID_IMAGE_DIM_MAX + " pixels."),
                         fontLabel = makeDialogLeftLabel(
-                                initialYIndex + 9, "Program font: ");
+                                initialYIndex + 10, "Program font: ");
 
                 // toggle buttons
                 final GameImage[] fontBases = makeToggleButtonSet(
@@ -1288,7 +1289,8 @@ public class DialogAssembly {
                 mb.add(pixelGridXLabel);
                 mb.add(pixelGridYLabel);
                 mb.add(pixelGridContext);
-                mb.add(pixelGridLimits);
+                mb.add(pixelGridLimits1);
+                mb.add(pixelGridLimits2);
                 mb.add(pixelGridXTextBox);
                 mb.add(pixelGridYTextBox);
                 mb.add(fontLabel);

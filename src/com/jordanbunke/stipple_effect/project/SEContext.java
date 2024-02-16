@@ -1503,6 +1503,7 @@ public class SEContext {
         stateManager.performAction(result, ActionType.CANVAS);
 
         redrawCanvasAuxiliaries();
+        snapToCenterOfImage();
     }
 
     public void resize() {
@@ -1517,6 +1518,7 @@ public class SEContext {
         stateManager.performAction(result, ActionType.CANVAS);
 
         redrawCanvasAuxiliaries();
+        snapToCenterOfImage();
     }
 
     // IMAGE EDITING
