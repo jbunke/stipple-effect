@@ -1208,33 +1208,33 @@ public class DialogAssembly {
             }
             case VISUAL -> {
                 // text labels
-                final TextLabel checkerboardXLabel = makeDialogLeftLabel(
-                        initialYIndex, "Checkerboard size (X): "),
+                final TextLabel fontLabel = makeDialogLeftLabel(
+                        initialYIndex, "Program font: "),
+                        checkerboardXLabel = makeDialogLeftLabel(
+                                initialYIndex + 2, "Checkerboard size (X): "),
                         checkerboardYLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Checkerboard size (Y): "),
+                                initialYIndex + 3, "Checkerboard size (Y): "),
                         checkerboardContext = makeDialogLeftLabel(
-                                initialYIndex + 2,
+                                initialYIndex + 4,
                                 "Valid checkerboard size values range from " +
                                         Layout.CHECKERBOARD_MIN + " to " +
                                         Layout.CHECKERBOARD_MAX + " pixels."),
                         pixelGridXLabel = makeDialogLeftLabel(
-                                initialYIndex + 4, "Pixel grid size (X): "),
+                                initialYIndex + 6, "Pixel grid size (X): "),
                         pixelGridYLabel = makeDialogLeftLabel(
-                                initialYIndex + 5, "Pixel grid size (Y): "),
+                                initialYIndex + 7, "Pixel grid size (Y): "),
                         pixelGridContext = makeDialogLeftLabel(
-                                initialYIndex + 6,
+                                initialYIndex + 8,
                                 "Valid pixel grid size values range from " +
                                         Layout.PIXEL_GRID_MIN + " to " +
                                         Layout.PIXEL_GRID_MAX + " pixels."),
                         pixelGridLimits1 = makeDialogLeftLabel(
-                                initialYIndex + 7,
+                                initialYIndex + 9,
                                 "The pixel grid is displayed for projects with a "),
                         pixelGridLimits2 = makeDialogLeftLabel(
-                                initialYIndex + 8, "maximum canvas size of " +
+                                initialYIndex + 10, "maximum canvas size of " +
                                         Layout.PIXEL_GRID_IMAGE_DIM_MAX + "x" +
-                                        Layout.PIXEL_GRID_IMAGE_DIM_MAX + " pixels."),
-                        fontLabel = makeDialogLeftLabel(
-                                initialYIndex + 10, "Program font: ");
+                                        Layout.PIXEL_GRID_IMAGE_DIM_MAX + " pixels.");
 
                 // toggle buttons
                 final GameImage[] fontBases = makeToggleButtonSet(
@@ -1297,7 +1297,7 @@ public class DialogAssembly {
                 mb.add(fontButton);
 
                 // update as new settings are added to category
-                yield fontLabel;
+                yield pixelGridLimits2;
             }
         };
 

@@ -952,11 +952,17 @@ public class SEContext {
             case LAYER_FRAME -> state = palettizeFrame(palette, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
             case LAYER -> {
-                final int frameCount = state.getFrameCount();
-
-                for (int i = 0; i < frameCount; i++)
+                if (state.getEditingLayer().areFramesLinked()) {
                     state = palettizeFrame(palette, state,
-                            i, state.getLayerEditIndex());
+                            state.getFrameIndex(),
+                            state.getLayerEditIndex());
+                } else {
+                    final int frameCount = state.getFrameCount();
+
+                    for (int i = 0; i < frameCount; i++)
+                        state = palettizeFrame(palette, state,
+                                i, state.getLayerEditIndex());
+                }
             }
             case FRAME -> {
                 final int layerCount = state.getLayers().size();
@@ -969,9 +975,15 @@ public class SEContext {
                 final int frameCount = state.getFrameCount(),
                         layerCount = state.getLayers().size();
 
-                for (int f = 0; f < frameCount; f++)
-                    for (int l = 0; l < layerCount; l++)
-                        state = palettizeFrame(palette, state, f, l);
+                for (int l = 0; l < layerCount; l++) {
+                    if (state.getLayers().get(l).areFramesLinked()) {
+                        state = palettizeFrame(palette, state,
+                                state.getFrameIndex(), l);
+                    } else {
+                        for (int f = 0; f < frameCount; f++)
+                            state = palettizeFrame(palette, state, f, l);
+                    }
+                }
             }
         }
 

@@ -23,8 +23,13 @@ public class LayerMerger {
         // content from above layer on selected frame
         final GameImage frameLinkedContent = frames.get(frameIndex);
 
+        // override frame linking on below layer if above layer is unlinked
+        // and frameCount > 1
+        final boolean framesLinked = below.areFramesLinked() &&
+                (above.areFramesLinked() || frameCount == 1);
+
         return new SELayer(frames, frameLinkedContent, below.getOpacity(),
-                below.isEnabled(), below.areFramesLinked(),
-                below.getOnionSkinMode(), below.getName());
+                below.isEnabled(), framesLinked, below.getOnionSkinMode(),
+                below.getName());
     }
 }

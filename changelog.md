@@ -38,6 +38,8 @@
 * Cropping to selection bounds now snaps the image to the center of the screen
 * Independent checkerboard settings for x and y that can be set to values between 1-256
 * Updated splash screen
+* Optimized palettization of frame-linked layers 
+* Merging an unlinked layer onto a frame-linked layer in a project with multiple frames will now result in an unlinked layer that preserves each frame's contents
 ### Fixed:
 * Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
 * Bug: Nonsensical cursor positions suggest rotate selection operation instead of move selection
