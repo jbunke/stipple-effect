@@ -1,4 +1,4 @@
-# ![Stipple Effect](https://i.imgur.com/1ellrZx.gif)
+# ![Stipple Effect](https://i.imgur.com/sDn5Bz5.gif)
 
 [![Download](https://i.imgur.com/X6ClI06.png)](https://flinkerflitzer.itch.io/stipple-effect)
 [![Changelog](https://i.imgur.com/IhJsonn.png)](https://github.com/jbunke/stipple-effect/blob/master/changelog.md)
