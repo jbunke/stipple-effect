@@ -34,7 +34,7 @@ public final class Eraser extends ToolWithBreadth {
         if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET)) {
             erasing = true;
             reset();
-            context.getState().markAsCheckpoint(false, context);
+            context.getState().markAsCheckpoint(false);
         }
     }
 
@@ -85,7 +85,7 @@ public final class Eraser extends ToolWithBreadth {
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
         if (erasing) {
             erasing = false;
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }
