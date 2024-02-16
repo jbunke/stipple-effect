@@ -40,6 +40,7 @@
 * Updated splash screen
 * Optimized palettization of frame-linked layers 
 * Merging an unlinked layer onto a frame-linked layer in a project with multiple frames will now result in an unlinked layer that preserves each frame's contents
+* Optimized and refactored state management system
 ### Fixed:
 * Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
 * Bug: Nonsensical cursor positions suggest rotate selection operation instead of move selection

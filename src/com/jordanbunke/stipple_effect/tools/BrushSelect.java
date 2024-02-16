@@ -59,7 +59,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
                 context.deselect(false);
 
             reset();
-            context.getState().markAsCheckpoint(false, context);
+            context.getState().markAsCheckpoint(false);
         }
 
         selectionOverlay = GameImage.dummy();

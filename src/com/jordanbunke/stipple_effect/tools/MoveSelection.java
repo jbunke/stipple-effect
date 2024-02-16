@@ -41,7 +41,6 @@ public final class MoveSelection extends MoverTool {
 
     @Override
     Runnable getMouseUpConsequence(final SEContext context) {
-        return () -> context.getState()
-                .markAsCheckpoint(true, context);
+        return () -> context.getState().markAsCheckpoint(true);
     }
 }

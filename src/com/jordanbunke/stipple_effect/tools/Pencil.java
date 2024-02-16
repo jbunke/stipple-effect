@@ -43,7 +43,7 @@ public final class Pencil extends ToolThatDraws {
             drawing = true;
             c = ToolThatDraws.getColorMode(me);
             reset();
-            context.getState().markAsCheckpoint(false, context);
+            context.getState().markAsCheckpoint(false);
         }
     }
 
@@ -80,7 +80,7 @@ public final class Pencil extends ToolThatDraws {
     ) {
         if (drawing) {
             drawing = false;
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

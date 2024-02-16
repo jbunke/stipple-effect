@@ -209,7 +209,7 @@ public final class GradientTool extends ToolWithBreadth
 
             context.paintOverImage(toolContentPreview);
 
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

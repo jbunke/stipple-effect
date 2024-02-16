@@ -51,7 +51,7 @@ public final class StipplePencil extends Tool {
                 edit.dot(c, tp.x, tp.y);
 
             context.paintOverImage(edit.submit());
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
         }
     }
 

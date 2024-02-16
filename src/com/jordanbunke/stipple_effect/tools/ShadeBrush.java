@@ -54,7 +54,7 @@ public final class ShadeBrush extends ToolWithBreadth {
             painted = new HashSet<>();
 
             reset();
-            context.getState().markAsCheckpoint(false, context);
+            context.getState().markAsCheckpoint(false);
         }
     }
 
@@ -119,7 +119,7 @@ public final class ShadeBrush extends ToolWithBreadth {
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
         if (painting) {
             painting = false;
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

@@ -48,7 +48,7 @@ public final class Brush extends ToolWithBreadth {
             painted = new HashSet<>();
 
             reset();
-            context.getState().markAsCheckpoint(false, context);
+            context.getState().markAsCheckpoint(false);
         }
     }
 
@@ -108,7 +108,7 @@ public final class Brush extends ToolWithBreadth {
     ) {
         if (painting) {
             painting = false;
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

@@ -100,7 +100,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
 
             context.paintOverImage(toolContentPreview);
 
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

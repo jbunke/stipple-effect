@@ -39,13 +39,10 @@ public class RenderInfo {
         this.zoomFactor = Math.max(Constants.MIN_ZOOM,
                 Math.min(zoomFactor, Constants.MAX_ZOOM));
 
-        if (this.zoomFactor != was) {
-            if (this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
-                ToolWithBreadth.redrawToolOverlays();
-                StippleEffect.get().getContext().redrawSelectionOverlay();
-            }
-
-            StippleEffect.get().getContext().redrawPixelGrid();
+        if (this.zoomFactor != was &&
+                this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
+            ToolWithBreadth.redrawToolOverlays();
+            StippleEffect.get().getContext().redrawSelectionOverlay();
         }
     }
 

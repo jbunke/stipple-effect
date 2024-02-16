@@ -12,7 +12,7 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.selection.*;
-import com.jordanbunke.stipple_effect.state.ActionType;
+import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
@@ -22,10 +22,8 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,7 +38,8 @@ public class SEContext {
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
 
-    private GameImage selectionOverlay, checkerboard, pixelGrid;
+    private GameImage selectionOverlay, checkerboard;
+    private Map<Float, GameImage> pixelGridMap;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -144,6 +143,8 @@ public class SEContext {
 
             // pixel grid
             if (renderInfo.isPixelGridOn() && couldRenderPixelGrid()) {
+                final GameImage pixelGrid = pixelGridMap
+                        .getOrDefault(zoomFactor, GameImage.dummy());
                 final int z = (int) zoomFactor;
                 workspace.draw(pixelGrid.section(
                                 bounds[TL].x * z, bounds[TL].y * z,
@@ -370,10 +371,24 @@ public class SEContext {
                     playbackInfo::toggleMode);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(0));
+                    () -> {
+                        getState().setFrameIndex(0);
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(getState().getFrameCount() - 1));
+                    () -> {
+                        getState().setFrameIndex(getState().getFrameCount() - 1);
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                     () -> {
@@ -809,43 +824,48 @@ public class SEContext {
     }
 
     public void redrawPixelGrid() {
-        if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid())) {
-            pixelGrid = GameImage.dummy();
+        pixelGridMap = new HashMap<>();
+
+        if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid()))
             return;
-        }
 
         final Color a = new Color(0, 0, 0, 150),
                 b = new Color(100, 100, 100, 150);
 
-        final int z = (int) renderInfo.getZoomFactor(),
-                w = getState().getImageWidth(),
-                h = getState().getImageHeight(),
-                altPx = Math.max(2, z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
 
-        final GameImage image = new GameImage(w * z, h * z);
+        final float minZ = Constants.ZOOM_FOR_GRID, maxZ = Constants.MAX_ZOOM;
 
-        final int pgx = Settings.getPixelGridXPixels(),
-                pgy = Settings.getPixelGridYPixels();
+        for (float fZ = minZ; fZ <= maxZ; fZ *= 2f) {
+            final int z = (int) fZ, altPx = Math.max(2,
+                    z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
-        // vertical grid
-        for (int x = 0; x < w; x += pgx)
-            for (int y = 0; y < h; y++)
-                for (int zInc = 0; zInc < z; zInc += altPx) {
-                    final Color c = (zInc / altPx) % 2 == 0
-                            ? a : b;
-                    image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
-                }
+            final GameImage image = new GameImage(w * z, h * z);
 
-        // horizontal grid
-        for (int y = 0; y < h; y += pgy)
-            for (int x = 0; x < w; x++)
-                for (int zInc = 0; zInc < z; zInc += altPx) {
-                    final Color c = (zInc / altPx) % 2 == 0
-                            ? a : b;
-                    image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
-                }
+            final int pgx = Settings.getPixelGridXPixels(),
+                    pgy = Settings.getPixelGridYPixels();
 
-        pixelGrid = image.submit();
+            // vertical grid
+            for (int x = 0; x < w; x += pgx)
+                for (int y = 0; y < h; y++)
+                    for (int zInc = 0; zInc < z; zInc += altPx) {
+                        final Color c = (zInc / altPx) % 2 == 0
+                                ? a : b;
+                        image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
+                    }
+
+            // horizontal grid
+            for (int y = 0; y < h; y += pgy)
+                for (int x = 0; x < w; x++)
+                    for (int zInc = 0; zInc < z; zInc += altPx) {
+                        final Color c = (zInc / altPx) % 2 == 0
+                                ? a : b;
+                        image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
+                    }
+
+            pixelGridMap.put(fZ, image.submit());
+        }
     }
 
     // non-state changes
@@ -988,8 +1008,8 @@ public class SEContext {
         }
 
         if (contentType != DialogVals.ContentType.SELECTION) {
-            state.markAsCheckpoint(false, this);
-            stateManager.performAction(state, ActionType.CANVAS);
+            state.markAsCheckpoint(false);
+            stateManager.performAction(state, Operation.PALETTIZE);
         }
     }
 
@@ -1030,12 +1050,12 @@ public class SEContext {
             layers.set(getState().getLayerEditIndex(), replacement);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.PALETTIZE);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
             else
-                getState().markAsCheckpoint(true, this);
+                getState().markAsCheckpoint(true);
         }
     }
 
@@ -1061,7 +1081,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(reset)
                     .changeIsCheckpoint(true);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.RESET_SELECTION_CONTENTS);
             redrawSelectionOverlay();
         }
     }
@@ -1078,7 +1099,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(moved)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.MOVE_SELECTION_CONTENTS);
         }
     }
 
@@ -1096,7 +1118,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(stretched)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.STRETCH_SELECTION_CONTENTS);
             redrawSelectionOverlay();
         }
     }
@@ -1116,7 +1139,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(rotated)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.ROTATE_SELECTION_CONTENTS);
             redrawSelectionOverlay();
         }
     }
@@ -1137,7 +1161,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(reflected)
                     .changeIsCheckpoint(!raiseAndDrop);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.REFLECT_SELECTION_CONTENTS);
 
             if (raiseAndDrop)
                 dropContentsToLayer(true, false);
@@ -1158,7 +1183,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(moved)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.MOVE_SELECTION_BOUNDS);
         }
     }
 
@@ -1175,7 +1201,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(stretched)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.STRETCH_SELECTION_BOUNDS);
             redrawSelectionOverlay();
         }
     }
@@ -1193,7 +1220,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(rotated)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.ROTATE_SELECTION_BOUNDS);
             redrawSelectionOverlay();
         }
     }
@@ -1213,7 +1241,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(reflected)
                     .changeIsCheckpoint(!dropAndRaise);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.REFLECT_SELECTION_BOUNDS);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
@@ -1242,7 +1271,8 @@ public class SEContext {
                             -tl.x, -tl.y, w, h)).toList();
 
             final ProjectState result = getState().resize(w, h, layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.CROP_TO_SELECTION);
 
             moveSelectionBounds(new Coord2D(-tl.x, -tl.y), false);
 
@@ -1289,7 +1319,7 @@ public class SEContext {
 
             stateManager.performAction(getState()
                     .changeSelectionContents(toPaste.returnDisplaced(
-                            displacement)), ActionType.CANVAS);
+                            displacement)), Operation.PASTE);
 
             StippleEffect.get().autoAssignPickUpSelection();
         } else
@@ -1326,7 +1356,7 @@ public class SEContext {
         final ProjectState result = getState()
                 .changeSelectionContents(selectionContents)
                 .changeIsCheckpoint(checkpoint);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.RAISE);
     }
 
     // drop contents to layer
@@ -1343,7 +1373,7 @@ public class SEContext {
                     .changeSelectionBounds(deselect ? new HashSet<>()
                             : new HashSet<>(contents.getPixels()))
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.DROP);
             redrawSelectionOverlay();
         }
     }
@@ -1368,7 +1398,7 @@ public class SEContext {
 
             stateManager.performAction(getState().changeSelectionBounds(
                     new HashSet<>(deselect ? Set.of() : selection)),
-                    ActionType.CANVAS);
+                    Operation.DELETE_SELECTION_CONTENTS);
         }
     }
 
@@ -1398,7 +1428,7 @@ public class SEContext {
             if (dropAndRaise)
                 raiseSelectionToContents(true);
             else
-                getState().markAsCheckpoint(true, this);
+                getState().markAsCheckpoint(true);
         }
     }
 
@@ -1410,8 +1440,7 @@ public class SEContext {
             else {
                 final ProjectState result = getState().changeSelectionBounds(
                         new HashSet<>()).changeIsCheckpoint(checkpoint);
-                stateManager.performAction(result, ActionType.CANVAS);
-                redrawSelectionOverlay();
+                stateManager.performAction(result, Operation.DESELECT);
             }
         }
     }
@@ -1436,7 +1465,7 @@ public class SEContext {
         final ProjectState result = getState()
                 .changeSelectionBounds(selection)
                 .changeIsCheckpoint(!dropAndRaise);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.SELECT);
 
         if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
@@ -1466,7 +1495,7 @@ public class SEContext {
         final ProjectState result = getState()
                 .changeSelectionBounds(willBe)
                 .changeIsCheckpoint(!dropAndRaise);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.SELECT);
 
         if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
@@ -1495,7 +1524,7 @@ public class SEContext {
 
         final ProjectState result = getState().changeSelectionBounds(
                 selection).changeIsCheckpoint(checkpoint);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.SELECT);
         redrawSelectionOverlay();
     }
 
@@ -1512,7 +1541,7 @@ public class SEContext {
 
         final ProjectState result = getState().resize(w, h, layers)
                 .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.PAD);
 
         redrawCanvasAuxiliaries();
         snapToCenterOfImage();
@@ -1527,7 +1556,7 @@ public class SEContext {
 
         final ProjectState result = getState().resize(w, h, layers)
                 .changeSelectionBounds(new HashSet<>());
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.RESIZE);
 
         redrawCanvasAuxiliaries();
         snapToCenterOfImage();
@@ -1563,7 +1592,7 @@ public class SEContext {
 
         final ProjectState result = getState().changeLayers(layers)
                 .changeIsCheckpoint(checkpoint);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.EDIT_IMAGE);
     }
 
     // FRAME MANIPULATION
@@ -1581,7 +1610,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(layers,
                     toIndex, frameCount);
-            stateManager.performAction(result, ActionType.FRAME);
+            stateManager.performAction(result, Operation.MOVE_FRAME_FORWARD);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         } else if (!Layout.isFramesPanelShowing()) {
             StatusUpdates.cannotMoveFrame(frameIndex, true);
@@ -1602,7 +1631,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(layers,
                     toIndex, frameCount);
-            stateManager.performAction(result, ActionType.FRAME);
+            stateManager.performAction(result, Operation.MOVE_FRAME_BACK);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         } else if (!Layout.isFramesPanelShowing()) {
             StatusUpdates.cannotMoveFrame(frameIndex, false);
@@ -1623,7 +1652,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(layers,
                     addIndex, frameCount);
-            stateManager.performAction(result, ActionType.FRAME);
+            stateManager.performAction(result, Operation.ADD_FRAME);
 
             if (!Layout.isFramesPanelShowing())
                 StatusUpdates.addedFrame(false, addIndex - 1,
@@ -1645,7 +1674,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(
                     layers, frameIndex + 1, frameCount);
-            stateManager.performAction(result, ActionType.FRAME);
+            stateManager.performAction(result, Operation.DUPLICATE_FRAME);
 
             if (!Layout.isFramesPanelShowing())
                 StatusUpdates.addedFrame(true, frameIndex,
@@ -1667,7 +1696,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(layers,
                     frameIndex - 1, frameCount);
-            stateManager.performAction(result, ActionType.FRAME);
+            stateManager.performAction(result, Operation.REMOVE_FRAME);
 
             if (!Layout.isFramesPanelShowing())
                 StatusUpdates.removedFrame(frameIndex,
@@ -1683,7 +1712,8 @@ public class SEContext {
         final ProjectState result = getState().changeLayers(
                 getState().getLayers().stream().map(SELayer::returnEnabled)
                         .collect(Collectors.toList()));
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result,
+                Operation.LAYER_VISIBILITY_CHANGE);
     }
 
     // isolate layer
@@ -1702,7 +1732,8 @@ public class SEContext {
             }
 
             final ProjectState result = getState().changeLayers(newLayers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.LAYER_VISIBILITY_CHANGE);
         }
     }
 
@@ -1732,7 +1763,7 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.LAYER_LINKING_CHANGE);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.changedLayerLinkedStatus(false,
@@ -1753,7 +1784,7 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.LAYER_LINKING_CHANGE);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.changedLayerLinkedStatus(true,
@@ -1772,7 +1803,8 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.LAYER_VISIBILITY_CHANGE);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.changedLayerVisibilityStatus(false,
@@ -1791,7 +1823,8 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.LAYER_VISIBILITY_CHANGE);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.changedLayerVisibilityStatus(true,
@@ -1809,7 +1842,7 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.CHANGE_LAYER_NAME);
         }
     }
 
@@ -1827,7 +1860,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers)
                     .changeIsCheckpoint(markAsCheckpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.LAYER_OPACITY_CHANGE);
         }
     }
 
@@ -1844,7 +1877,7 @@ public class SEContext {
 
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.ADD_LAYER);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.addedLayer(added.getName(), addIndex, layers.size());
@@ -1865,7 +1898,7 @@ public class SEContext {
 
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.DUPLICATE_LAYER);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.duplicatedLayer(old.getName(),
@@ -1887,7 +1920,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, setIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.REMOVE_LAYER);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.removedLayer(toRemove.getName(),
@@ -1912,7 +1945,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.MOVE_LAYER_DOWN);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
         } else if (!Layout.isLayersPanelShowing()) {
@@ -1935,7 +1968,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.MOVE_LAYER_UP);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
         } else if (!Layout.isLayersPanelShowing()) {
@@ -1962,7 +1995,8 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, belowIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result,
+                    Operation.MERGE_WITH_LAYER_BELOW);
 
             if (!Layout.isLayersPanelShowing())
                 StatusUpdates.mergedWithLayerBelow(above.getName(),
