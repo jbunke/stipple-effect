@@ -2,10 +2,11 @@ package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -16,6 +17,7 @@ import java.util.Set;
 
 public class ProjectState {
     private boolean checkpoint;
+    private Operation operation;
 
     private final int imageWidth, imageHeight;
 
@@ -98,6 +100,7 @@ public class ProjectState {
         this.selectionContents = selectionContents;
 
         this.checkpoint = checkpoint;
+        this.operation = Operation.NONE;
     }
 
     public ProjectState changeIsCheckpoint(
@@ -171,6 +174,7 @@ public class ProjectState {
             final int frameIndex
     ) {
         final GameImage image = new GameImage(imageWidth, imageHeight);
+        final Tool tool = StippleEffect.get().getTool();
 
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
@@ -203,14 +207,34 @@ public class ProjectState {
                             new Color(0, 0, 0, 0).getRGB()));
                 }
 
-                image.draw(layerImage);
+                image.draw(layerImage.submit());
 
                 if (previewCondition) {
                     final GameImage preview = selectionContents
                             .getContentForCanvas(getImageWidth(), getImageHeight());
                     image.draw(preview);
                 }
+
+                final boolean toolPreviewCondition = inProjectRender &&
+                        layer.equals(getEditingLayer()) &&
+                        tool.hasToolContentPreview() &&
+                        !tool.previewScopeIsGlobal();
+
+                if (toolPreviewCondition) {
+                    final GameImage toolContentPreview =
+                            tool.getToolContentPreview();
+                    image.draw(toolContentPreview);
+                }
             }
+        }
+
+        final boolean toolPreviewCondition = inProjectRender &&
+                tool.hasToolContentPreview() &&
+                tool.previewScopeIsGlobal();
+
+        if (toolPreviewCondition) {
+            final GameImage toolContentPreview = tool.getToolContentPreview();
+            image.draw(toolContentPreview);
         }
 
         return image.submit();
@@ -233,12 +257,16 @@ public class ProjectState {
     }
 
     public void markAsCheckpoint(
-            final boolean processLastConsequence, final SEContext context
+            final boolean processConsequence
     ) {
         this.checkpoint = true;
 
-        if (processLastConsequence)
-            context.getStateManager().processLastConsequence();
+        if (processConsequence)
+            operation.getActionType().consequence();
+    }
+
+    public void tag(final Operation operation) {
+        this.operation = operation;
     }
 
     // PRECONDITIONS
@@ -280,6 +308,10 @@ public class ProjectState {
     // getters
     public boolean isCheckpoint() {
         return checkpoint;
+    }
+
+    public Operation getOperation() {
+        return operation;
     }
 
     public boolean hasSelection() {
@@ -342,8 +374,6 @@ public class ProjectState {
         if (this.frameIndex != frameIndex &&
                 frameIndex >= 0 && frameIndex < frameCount) {
             this.frameIndex = frameIndex;
-
-            // StippleEffect.get().rebuildFramesMenu();
         }
     }
 
@@ -352,8 +382,6 @@ public class ProjectState {
 
         if (frameIndex >= frameCount)
             frameIndex = 0;
-
-        // StippleEffect.get().rebuildFramesMenu();
     }
 
     public void previousFrame() {
@@ -361,7 +389,5 @@ public class ProjectState {
 
         if (frameIndex < 0)
             frameIndex = frameCount - 1;
-
-        // StippleEffect.get().rebuildFramesMenu();
     }
 }

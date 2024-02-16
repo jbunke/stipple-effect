@@ -5,12 +5,47 @@ Add:
     > Language
     > Interpreter
     > Preview scripts and transformation scripts
-> Grid
 > Symmetry tools
 
 Fix:
 > Performance optimizations
 > Memory issues and related crashes
+
+{0.2.0} - 2024-02-16
+
+Added:
+> Added tools:
+    > Line tool
+    > Gradient tool
+    > Shade brush
+    > Polygon select
+> Extended TextBox to support text selection
+> Added status updates for actions without visual feedback
+    > Saving...
+    > Color slider adjustments and color actions when color panel is hidden
+    > Layer actions when layer panel is hidden
+    > Frame actions when frame panel is hidden
+> Pixel grid
+    > Holding Shift while using box select snaps selection to pixel grid
+> New fonts SE (default) and Pencil SE
+> Snap option for moving (translating) selection bounds and contents
+
+Changed:
+> Redesigned order and layout of layer-specific buttons
+> Refactored much of ToolWithBreadth to interface HasBreadth
+> Optimized STIP files to save static layers as single frame
+    > Incremented STIP file standard from 1.0 to 1.1
+> Cropping to selection bounds now snaps the image to the center of the screen
+> Independent checkerboard settings for x and y that can be set to values between 1-256
+> Updated splash screen
+> Optimized palettization of frame-linked layers
+> Merging an unlinked layer onto a frame-linked layer in a project with multiple frames will
+    now result in an unlinked layer that preserves each frame's contents
+> Optimized and refactored state management system
+
+Fixed:
+> Bug: Pasting onto new layer does not trigger a re-draw of the layer panel menu
+> Bug: Nonsensical cursor positions suggest rotate selection operation instead of move selection
 
 {0.1.0} - 2024-01-22
 

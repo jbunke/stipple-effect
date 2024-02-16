@@ -1,0 +1,15 @@
+Shortcut: {Y}
+
+Define a polygonal selection area by placing vertices. Adjacent vertices form edges that define
+the bounds of the selection. To close the polygon, place a vertex down on the same pixel where
+the shape began.
+
+Place vertex: {Left Click}
+Remove previous vertex: {Right Click}
+Reset: {Middle Click}
+
+Additive selection: Hold {Ctrl} while placing vertices
+Adds the polygon to the existing selection.
+
+Subtractive selection: Hold {S} while placing vertices
+Removes the polygon from the existing selection.

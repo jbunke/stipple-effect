@@ -5,14 +5,17 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Settings;
 
 public class RenderInfo {
     private Coord2D anchor;
     private float zoomFactor;
+    private boolean pixelGridOn;
 
     public RenderInfo(final int imageWidth, final int imageHeight) {
         this.anchor = new Coord2D(imageWidth / 2, imageHeight / 2);
         this.zoomFactor = Constants.DEF_ZOOM;
+        this.pixelGridOn = Settings.isPixelGridOnByDefault();
     }
 
     public void zoomIn(final Coord2D targetPixel) {
@@ -55,6 +58,16 @@ public class RenderInfo {
         setAnchor(anchor.displace(delta));
     }
 
+    public void togglePixelGrid() {
+        setPixelGrid(!pixelGridOn);
+    }
+
+    public void setPixelGrid(final boolean pixelGridOn) {
+        this.pixelGridOn = pixelGridOn;
+
+        StippleEffect.get().getContext().redrawPixelGrid();
+    }
+
     public String getZoomText() {
         return zoomFactor >= 1 / 4f
                 ? (int)(zoomFactor * 100) + "%"
@@ -67,5 +80,9 @@ public class RenderInfo {
 
     public Coord2D getAnchor() {
         return anchor;
+    }
+
+    public boolean isPixelGridOn() {
+        return pixelGridOn;
     }
 }

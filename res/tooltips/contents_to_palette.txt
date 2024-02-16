@@ -1,1 +1,1 @@
-Contents to palette... | {Shift + D}
+Add contents to palette... | {Shift + D}

@@ -25,7 +25,7 @@ public final class MoveSelection extends MoverTool {
 
 
     @Override
-    BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context) {
+    public BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context) {
         return context::moveSelectionBounds;
     }
 
@@ -41,7 +41,6 @@ public final class MoveSelection extends MoverTool {
 
     @Override
     Runnable getMouseUpConsequence(final SEContext context) {
-        return () -> context.getState()
-                .markAsCheckpoint(true, context);
+        return () -> context.getState().markAsCheckpoint(true);
     }
 }

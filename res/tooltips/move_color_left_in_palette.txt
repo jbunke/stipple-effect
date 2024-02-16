@@ -1,0 +1,1 @@
+Shift selected color left in palette | {Shift + ,}

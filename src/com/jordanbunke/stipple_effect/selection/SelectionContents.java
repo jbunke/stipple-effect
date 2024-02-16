@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
+import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.awt.*;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class SelectionContents {
                     final double distance = Math.sqrt(
                             Math.pow(realPivot[X] - gx, 2) +
                                     Math.pow(realPivot[Y] - gy, 2)),
-                            angle = SelectionUtils.calculateAngleInRad(
+                            angle = Geometry.calculateAngleInRad(
                                     gx, gy, realPivot[X], realPivot[Y]),
                             oldAngle = angle - deltaR;
 

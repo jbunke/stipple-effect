@@ -23,6 +23,29 @@ public class ColorMath {
         }
     }
 
+    public static Color betweenColor(
+            final double pos, final Color start, final Color end
+    ) {
+        if (pos <= 0d)
+            return start;
+        else if (pos >= 1d)
+            return end;
+
+        final int baseR = start.getRed(), baseG = start.getGreen(),
+                baseB = start.getBlue(), baseA = start.getAlpha(),
+                deltaR = end.getRed() - start.getRed(),
+                deltaG = end.getGreen() - start.getGreen(),
+                deltaB = end.getBlue() - start.getBlue(),
+                deltaA = end.getAlpha() - start.getAlpha();
+
+        return new Color(
+                baseR + (int)Math.round(deltaR * pos),
+                baseG + (int)Math.round(deltaG * pos),
+                baseB + (int)Math.round(deltaB * pos),
+                baseA + (int)Math.round(deltaA * pos)
+        );
+    }
+
     public static double diff(final Color a, final Color b) {
         final int MAX_DIFF = 255 * 4;
 

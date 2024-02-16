@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
+import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButtonStub;
@@ -22,7 +23,8 @@ import java.util.function.Supplier;
 
 public class TextBox extends MenuButtonStub {
     private String text, lastText, prefix, suffix;
-    private int cursorIndex, lastCursorIndex;
+    private int cursorIndex, lastCursorIndex,
+            selectionIndex, lastSelectionIndex;
     private boolean typing;
 
     private final Supplier<String> prefixGetter, suffixGetter;
@@ -71,6 +73,7 @@ public class TextBox extends MenuButtonStub {
 
         text = initialText;
         cursorIndex = text.length();
+        selectionIndex = cursorIndex;
         typing = false;
 
         this.backgroundColorGetter = backgroundColorGetter;
@@ -131,20 +134,21 @@ public class TextBox extends MenuButtonStub {
         suffix = suffixGetter.get();
 
         validImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
-                text, suffix, cursorIndex, false, Constants.BLACK,
-                backgroundColorGetter.get());
+                text, suffix, cursorIndex, selectionIndex, false,
+                Constants.BLACK, backgroundColorGetter.get());
         invalidImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
-                text, suffix, cursorIndex, false, Constants.INVALID,
-                backgroundColorGetter.get());
+                text, suffix, cursorIndex, selectionIndex, false,
+                Constants.INVALID, backgroundColorGetter.get());
         highlightedImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
-                text, suffix, cursorIndex, true, Constants.BLACK,
-                backgroundColorGetter.get());
+                text, suffix, cursorIndex, selectionIndex, true,
+                Constants.BLACK, backgroundColorGetter.get());
         typingImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
-                text, suffix, cursorIndex, false, Constants.HIGHLIGHT_1,
-                backgroundColorGetter.get());
+                text, suffix, cursorIndex, selectionIndex, false,
+                Constants.HIGHLIGHT_1, backgroundColorGetter.get());
 
         lastText = text;
         lastCursorIndex = cursorIndex;
+        lastSelectionIndex = selectionIndex;
     }
 
     @Override
@@ -192,10 +196,13 @@ public class TextBox extends MenuButtonStub {
                             case BACKSPACE -> {
                                 keyEvent.markAsProcessed();
 
-                                if (cursorIndex > 0) {
+                                if (hasSelection())
+                                    collapseSelection();
+                                else if (cursorIndex > 0) {
                                     text = text.substring(0, cursorIndex - 1) +
                                             text.substring(cursorIndex);
                                     cursorIndex--;
+                                    selectionIndex = cursorIndex;
                                 }
 
                                 DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
@@ -204,7 +211,9 @@ public class TextBox extends MenuButtonStub {
                             case DELETE -> {
                                 keyEvent.markAsProcessed();
 
-                                if (cursorIndex < text.length()) {
+                                if (hasSelection())
+                                    collapseSelection();
+                                else if (cursorIndex < text.length()) {
                                     text = text.substring(0, cursorIndex) +
                                             text.substring(cursorIndex + 1);
                                 }
@@ -215,8 +224,17 @@ public class TextBox extends MenuButtonStub {
                             case LEFT_ARROW ->  {
                                 keyEvent.markAsProcessed();
 
-                                if (cursorIndex > 0)
-                                    cursorIndex--;
+                                if (eventLogger.isPressed(Key.SHIFT)) {
+                                    if (cursorIndex > 0)
+                                        cursorIndex--;
+                                } else {
+                                    if (hasSelection())
+                                        cursorIndex = leftIndex();
+                                    else if (cursorIndex > 0)
+                                        cursorIndex--;
+
+                                    selectionIndex = cursorIndex;
+                                }
 
                                 DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                             }
@@ -224,27 +242,41 @@ public class TextBox extends MenuButtonStub {
                             case RIGHT_ARROW -> {
                                 keyEvent.markAsProcessed();
 
-                                if (cursorIndex < text.length())
-                                    cursorIndex++;
+                                if (eventLogger.isPressed(Key.SHIFT)) {
+                                    if (cursorIndex < text.length())
+                                        cursorIndex++;
+                                } else {
+                                    if (hasSelection())
+                                        cursorIndex = rightIndex();
+                                    else if (cursorIndex < text.length())
+                                        cursorIndex++;
+
+                                    selectionIndex = cursorIndex;
+                                }
 
                                 DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                             }
                         }
 
-                        clickedOffBehaviour();
+                        attemptAccept();
                     } else if (keyEvent.matchesAction(GameKeyEvent.Action.TYPE)) {
                         keyEvent.markAsProcessed();
 
                         final char c = keyEvent.character;
 
-                        if (c == DELETE || c < LOWEST_PRINTABLE || text.length() >= maxLength)
+                        if (c == DELETE || c < LOWEST_PRINTABLE ||
+                                text.length() + 1 - (rightIndex() - leftIndex()) > maxLength)
                             continue;
+
+                        if (hasSelection())
+                            collapseSelection();
 
                         text = text.substring(0, cursorIndex) + c +
                                 text.substring(cursorIndex);
                         cursorIndex++;
+                        selectionIndex = cursorIndex;
 
-                        clickedOffBehaviour();
+                        attemptAccept();
                         DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, true);
                     }
                 }
@@ -255,13 +287,27 @@ public class TextBox extends MenuButtonStub {
     public void execute() {
         typing = !typing;
 
-        if (!typing)
+        if (typing)
+            clickedOnBehaviour();
+        else
             clickedOffBehaviour();
 
         DeltaTimeGlobal.setStatus(Constants.TYPING_CODE, typing);
     }
 
+    private void clickedOnBehaviour() {
+        cursorIndex = text.length();
+        selectionIndex = 0;
+    }
+
     private void clickedOffBehaviour() {
+        attemptAccept();
+
+        cursorIndex = text.length();
+        selectionIndex = cursorIndex;
+    }
+
+    private void attemptAccept() {
         if (isValid())
             setter.accept(text);
     }
@@ -269,6 +315,7 @@ public class TextBox extends MenuButtonStub {
     @Override
     public void update(final double deltaTime) {
         if (!text.equals(lastText) || cursorIndex != lastCursorIndex ||
+                selectionIndex != lastSelectionIndex ||
                 !prefix.equals(prefixGetter.get()) ||
                 !suffix.equals(suffixGetter.get()))
             updateAssets();
@@ -293,6 +340,25 @@ public class TextBox extends MenuButtonStub {
 
     public boolean isTyping() {
         return typing;
+    }
+
+    private int leftIndex() {
+        return Math.min(selectionIndex, cursorIndex);
+    }
+
+    private int rightIndex() {
+        return Math.max(selectionIndex, cursorIndex);
+    }
+
+    private boolean hasSelection() {
+        return selectionIndex != cursorIndex;
+    }
+
+    private void collapseSelection() {
+        text = text.substring(0, leftIndex()) +
+                text.substring(rightIndex());
+        cursorIndex = leftIndex();
+        selectionIndex = cursorIndex;
     }
 
     public void setText(final String text) {

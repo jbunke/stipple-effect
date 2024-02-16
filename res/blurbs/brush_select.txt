@@ -5,9 +5,9 @@ Behaves like the brush, but for selection.
 Simple selection: {Click}
 
 Additive selection: {Ctrl + Click & Drag}
-Adds the result of the selection to the existing selection.
+Adds the result of the operation to the existing selection.
 
-Subtractive selection: {Ctrl + S + Click & Drag}
-Removes the result of the selection from the existing selection.
+Subtractive selection: {S + Click & Drag}
+Removes the result of the operation from the existing selection.
 
 Increment/decrement brush width: {Arrow Keys} or {Shift + Scroll Wheel}

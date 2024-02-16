@@ -1,9 +1,8 @@
 package com.jordanbunke.stipple_effect.selection;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +31,20 @@ public class SelectionUtils {
         }
 
         return new Coord2D(lowestX, lowestY);
+    }
+
+    public static int height(final Set<Coord2D> pixels) {
+        return bounds(pixels).y;
+    }
+
+    public static int width(final Set<Coord2D> pixels) {
+        return bounds(pixels).x;
+    }
+
+    public static Coord2D bounds(final Set<Coord2D> pixels) {
+        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
+
+        return new Coord2D(br.x - tl.x, br.y - tl.y);
     }
 
     public static Set<Coord2D> stretchedPixels(
@@ -75,35 +88,6 @@ public class SelectionUtils {
         return pixels;
     }
 
-    public static double calculateAngleInRad(
-            final Coord2D point, final Coord2D pivot
-    ) {
-        return Math.atan2(point.y - pivot.y, point.x - pivot.x);
-    }
-
-    public static double calculateAngleInRad(
-            final double px, final double py,
-            final double pivotX, final double pivotY
-    ) {
-        return Math.atan2(py - pivotY, px - pivotX);
-    }
-
-    public static double snapAngle(final double r) {
-        final double[] angles = new double[(int)(Math.round(
-                Constants.CIRCLE / Constants.SNAP_INC))];
-
-        for (int i = 0; i < angles.length; i++)
-            angles[i] = i * Constants.SNAP_INC;
-
-        return MathPlus.findBestDouble(r, Double.MAX_VALUE, x -> x,
-                (a, b) -> angleDiff(a, r) < angleDiff(b, r), angles);
-    }
-
-    public static double angleDiff(final double ref, final double a) {
-        return Math.min(Math.abs(ref - a),
-                Math.abs((Constants.CIRCLE + ref) - a));
-    }
-
     public static Set<Coord2D> rotatedPixels(
             final Set<Coord2D> initialSelection,
             final double deltaR, final Coord2D pivot, final boolean[] offset
@@ -118,7 +102,7 @@ public class SelectionUtils {
             final double distance = Math.sqrt(
                     Math.pow(realPivot[X] - i.x, 2) +
                             Math.pow(realPivot[Y] - i.y, 2)),
-                    angle = calculateAngleInRad(i.x, i.y,
+                    angle = Geometry.calculateAngleInRad(i.x, i.y,
                             realPivot[X], realPivot[Y]),
                     newAngle = angle + deltaR;
 
@@ -142,7 +126,7 @@ public class SelectionUtils {
                 final double distance = Math.sqrt(
                         Math.pow(realPivot[X] - x, 2) +
                                 Math.pow(realPivot[Y] - y, 2)),
-                        angle = calculateAngleInRad(x, y,
+                        angle = Geometry.calculateAngleInRad(x, y,
                                 realPivot[X], realPivot[Y]),
                         oldAngle = angle - deltaR;
 

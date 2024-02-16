@@ -446,9 +446,9 @@ public class DialogAssembly {
     }
 
     public static void setDialogToCloseProjectAYS(final int index) {
-        setDialogToAYS("Close the project " + StippleEffect.get()
+        setDialogToAYS("Close the project \"" + StippleEffect.get()
                         .getContexts().get(index).projectInfo
-                        .getFormattedName(false, true) + "?",
+                        .getFormattedName(false, true) + "\"?",
                 "All unsaved changes will be lost...",
                 () -> StippleEffect.get().removeContext(index));
     }
@@ -700,25 +700,17 @@ public class DialogAssembly {
                 }, true));
     }
 
-    public static void setDialogToPaletteFromContents() {
+    public static void setDialogToAddContentsToPalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
         contentTypeCycleToggle(mb, c);
 
-        // name
-        final TextLabel nameLabel = makeDialogLeftLabel(1, "Palette name:");
-        final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
-                "", DialogVals::setPaletteName);
-        mb.add(nameLabel);
-        mb.add(nameTextBox);
-
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
-        setDialog(assembleDialog("Turn project contents into new palette",
-                contents, nameTextBox::isValid, "Proceed",
-                () -> {
-                    c.contentsToPalette();
+        setDialog(assembleDialog(palette.getName() + " | Add colors in project to palette",
+                contents, () -> true, "Proceed", () -> {
+                    c.contentsToPalette(palette);
                     StippleEffect.get().rebuildColorsMenu();
                 }, true));
     }
@@ -768,6 +760,28 @@ public class DialogAssembly {
 
         mb.add(label);
         mb.add(toggle);
+    }
+
+    public static void setDialogToPaletteSettings(final Palette palette) {
+        DialogVals.setPaletteName(palette.getName());
+
+        // text labels
+        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name: ");
+
+        // name textbox
+        final TextBox paletteNameTextBox = makeDialogNameTextBox(
+                paletteNameLabel, palette.getName(), DialogVals::setPaletteName);
+
+        final MenuElementGrouping contents = new MenuElementGrouping(
+                paletteNameLabel, paletteNameTextBox);
+        setDialog(assembleDialog(palette.getName() + "  |  Palette Settings",
+                contents, paletteNameTextBox::isValid,
+                Constants.GENERIC_APPROVAL_TEXT,
+                () -> {
+                    palette.setName(DialogVals.getPaletteName());
+
+                    StippleEffect.get().rebuildColorsMenu();
+                }, true));
     }
 
     public static void setDialogToInfo() {
@@ -899,25 +913,16 @@ public class DialogAssembly {
                 new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
                 MenuElement.Anchor.CENTRAL, 5, frames));
 
-        // title
-        final GameImage title = GraphicsUtils.uiText(
-                Constants.ACCENT_BACKGROUND_LIGHT, 3d)
-                .addText(StippleEffect.PROGRAM_NAME).build().draw();
-
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.7)),
-                new Coord2D(title.getWidth(), title.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, title));
-
         // subtitle
         final GameImage subtitle = GraphicsUtils.uiText(
                         Constants.ACCENT_BACKGROUND_LIGHT)
                 .addText("Pixel art editor and animator").addLineBreak()
-                .addText("built on Delta Time by Flinker Flitzer")
+                .addText("Jordan Bunke, 2023-2024")
                 .build().draw();
 
-        mb.add(new StaticMenuElement(new Coord2D(w / 2, (int)(h * 0.8)),
+        mb.add(new StaticMenuElement(new Coord2D(w / 2, h - (version.getHeight() * 2)),
                 new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
-                MenuElement.Anchor.CENTRAL_TOP, subtitle));
+                MenuElement.Anchor.CENTRAL_BOTTOM, subtitle));
 
         setDialog(mb.build());
     }
@@ -1012,7 +1017,9 @@ public class DialogAssembly {
             final Consumer<Integer> setter
     ) {
         return makeDialogNumericalTextBox(label,
-                String.valueOf(0), "px", TextBox.getIntTextValidator(validatorLogic),
+                DialogAssembly::getDialogContentOffsetFromLabel,
+                String.valueOf(0), "px",
+                TextBox.getIntTextValidator(validatorLogic),
                 s -> setter.accept(Integer.parseInt(s)), 4);
     }
 
@@ -1021,17 +1028,32 @@ public class DialogAssembly {
             final int min, final int max, final String suffix,
             final Consumer<Integer> setter, final int maxLength
     ) {
-        return makeDialogNumericalTextBox(label, String.valueOf(initial),
-                suffix, TextBox.getIntTextValidator(min, max),
+        return makeDialogNumericalTextBox(label,
+                DialogAssembly::getDialogContentOffsetFromLabel,
+                initial, min, max, suffix, setter, maxLength);
+    }
+
+    private static TextBox makeDialogNumericalTextBox(
+            final TextLabel label,
+            final Function<TextLabel, Coord2D> offsetFunction,
+            final int initial, final int min, final int max,
+            final String suffix, final Consumer<Integer> setter,
+            final int maxLength
+    ) {
+        return makeDialogNumericalTextBox(label, offsetFunction,
+                String.valueOf(initial), suffix,
+                TextBox.getIntTextValidator(min, max),
                 s -> setter.accept(Integer.parseInt(s)), maxLength);
     }
 
     private static TextBox makeDialogNumericalTextBox(
-            final TextLabel label, final String initial, final String suffix,
+            final TextLabel label,
+            final Function<TextLabel, Coord2D> offsetFunction,
+            final String initial, final String suffix,
             final Function<String, Boolean> textValidator,
             final Consumer<String> setter, final int maxLength
     ) {
-        return new TextBox(getDialogContentOffsetFromLabel(label),
+        return new TextBox(offsetFunction.apply(label),
                 Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
                 "", initial, suffix, textValidator, setter, maxLength);
     }
@@ -1116,7 +1138,9 @@ public class DialogAssembly {
             case STARTUP -> {
                 // text labels
                 final TextLabel screenModeLabel = makeDialogLeftLabel(
-                        initialYIndex, "Fullscreen on startup: ");
+                        initialYIndex, "Fullscreen on startup: "),
+                        pixelGridDefaultLabel = makeDialogLeftLabel(
+                                initialYIndex + 1, "Pixel grid on by default: ");
 
                 // toggle buttons
                 final GameImage[] smBases = makeBooleanToggleButtonSet();
@@ -1131,13 +1155,27 @@ public class DialogAssembly {
                         new Runnable[] {
                                 () -> Settings.setFullscreenOnStartup(false),
                                 () -> Settings.setFullscreenOnStartup(true)
-                        }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {});
+                        }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {}),
+                        pixelGridDefaultButton = new SimpleToggleMenuButton(
+                                getDialogContentBigOffsetFromLabel(pixelGridDefaultLabel),
+                                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                                        Layout.STD_TEXT_BUTTON_H),
+                                MenuElement.Anchor.LEFT_TOP, true,
+                                smBases, Arrays.stream(smBases)
+                                .map(GraphicsUtils::drawHighlightedButton)
+                                .toArray(GameImage[]::new),
+                                new Runnable[] {
+                                        () -> Settings.setPixelGridOnByDefault(false),
+                                        () -> Settings.setPixelGridOnByDefault(true)
+                                }, () -> Settings.isPixelGridOnByDefault() ? 0 : 1, () -> {});
 
                 mb.add(screenModeLabel);
                 mb.add(screenModeButton);
+                mb.add(pixelGridDefaultLabel);
+                mb.add(pixelGridDefaultButton);
 
                 // update as new settings are added to category
-                yield screenModeLabel;
+                yield pixelGridDefaultLabel;
             }
             case FORMAT -> {
                 // text labels
@@ -1170,10 +1208,33 @@ public class DialogAssembly {
             }
             case VISUAL -> {
                 // text labels
-                final TextLabel checkerboardLabel = makeDialogLeftLabel(
-                        initialYIndex, "Checkerboard size: "),
-                        fontLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Program font: ");
+                final TextLabel fontLabel = makeDialogLeftLabel(
+                        initialYIndex, "Program font: "),
+                        checkerboardXLabel = makeDialogLeftLabel(
+                                initialYIndex + 2, "Checkerboard size (X): "),
+                        checkerboardYLabel = makeDialogLeftLabel(
+                                initialYIndex + 3, "Checkerboard size (Y): "),
+                        checkerboardContext = makeDialogLeftLabel(
+                                initialYIndex + 4,
+                                "Valid checkerboard size values range from " +
+                                        Layout.CHECKERBOARD_MIN + " to " +
+                                        Layout.CHECKERBOARD_MAX + " pixels."),
+                        pixelGridXLabel = makeDialogLeftLabel(
+                                initialYIndex + 6, "Pixel grid size (X): "),
+                        pixelGridYLabel = makeDialogLeftLabel(
+                                initialYIndex + 7, "Pixel grid size (Y): "),
+                        pixelGridContext = makeDialogLeftLabel(
+                                initialYIndex + 8,
+                                "Valid pixel grid size values range from " +
+                                        Layout.PIXEL_GRID_MIN + " to " +
+                                        Layout.PIXEL_GRID_MAX + " pixels."),
+                        pixelGridLimits1 = makeDialogLeftLabel(
+                                initialYIndex + 9,
+                                "The pixel grid is displayed for projects with a "),
+                        pixelGridLimits2 = makeDialogLeftLabel(
+                                initialYIndex + 10, "maximum canvas size of " +
+                                        Layout.PIXEL_GRID_IMAGE_DIM_MAX + "x" +
+                                        Layout.PIXEL_GRID_IMAGE_DIM_MAX + " pixels.");
 
                 // toggle buttons
                 final GameImage[] fontBases = makeToggleButtonSet(
@@ -1194,28 +1255,49 @@ public class DialogAssembly {
                         ).toArray(Runnable[]::new),
                         () -> Settings.getProgramFont().ordinal(), () -> {});
 
-                // sliders
-                final HorizontalSlider checkerboardSlider = new HorizontalSlider(
-                        getDialogContentBigOffsetFromLabel(checkerboardLabel),
-                        Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        MenuElement.Anchor.LEFT_TOP, 0, 5,
-                        () -> (int)Math.round(Math.log(
-                                Settings.getCheckerboardPixels()) / Math.log(2d)),
-                        exp -> Settings.setCheckerboardPixels(
-                                (int)Math.pow(2d, exp), false));
-                checkerboardSlider.updateAssets();
-                final DynamicLabel checkerboardValue = makeDynamicFromLeftLabel(
-                        checkerboardLabel,
-                        () -> String.valueOf(Settings.getCheckerboardPixels()));
+                // textboxes
+                final TextBox checkerboardXTextBox = makeDialogNumericalTextBox(
+                        checkerboardXLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getCheckerboardXPixels(),
+                        Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
+                        "px", i -> Settings.setCheckerboardXPixels(i, false), 3);
+                final TextBox checkerboardYTextBox = makeDialogNumericalTextBox(
+                        checkerboardYLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getCheckerboardYPixels(),
+                        Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
+                        "px", i -> Settings.setCheckerboardYPixels(i, false), 3);
+                final TextBox pixelGridXTextBox = makeDialogNumericalTextBox(
+                        pixelGridXLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getPixelGridXPixels(),
+                        Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
+                        "px", i -> Settings.setPixelGridXPixels(i, false), 3);
+                final TextBox pixelGridYTextBox = makeDialogNumericalTextBox(
+                        pixelGridYLabel,
+                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        Settings.getPixelGridYPixels(),
+                        Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
+                        "px", i -> Settings.setPixelGridYPixels(i, false), 3);
 
-                mb.add(checkerboardLabel);
+                mb.add(checkerboardXLabel);
+                mb.add(checkerboardYLabel);
+                mb.add(checkerboardContext);
+                mb.add(checkerboardXTextBox);
+                mb.add(checkerboardYTextBox);
+                mb.add(pixelGridXLabel);
+                mb.add(pixelGridYLabel);
+                mb.add(pixelGridContext);
+                mb.add(pixelGridLimits1);
+                mb.add(pixelGridLimits2);
+                mb.add(pixelGridXTextBox);
+                mb.add(pixelGridYTextBox);
                 mb.add(fontLabel);
                 mb.add(fontButton);
-                mb.add(checkerboardSlider);
-                mb.add(checkerboardValue);
 
                 // update as new settings are added to category
-                yield fontLabel;
+                yield pixelGridLimits2;
             }
         };
 
@@ -1280,6 +1362,7 @@ public class DialogAssembly {
                             IconCodes.HORIZONTAL_REFLECTION,
                             IconCodes.VERTICAL_REFLECTION,
                             IconCodes.OUTLINE,
+                            IconCodes.PIXEL_GRID_ON,
                             IconCodes.GENERAL,
                             IconCodes.CLIPBOARD_SHORTCUTS,
                             IconCodes.SELECTION_SHORTCUTS,
@@ -1289,6 +1372,7 @@ public class DialogAssembly {
                             "Horizontal reflection",
                             "Vertical reflection",
                             "Outline",
+                            "Pixel grid",
                             "General",
                             "Clipboard shortcuts",
                             "Selection shortcuts",
@@ -1386,25 +1470,35 @@ public class DialogAssembly {
                 new String[] {
                         IconCodes.SWAP_COLORS,
                         IconCodes.COLOR_MENU_MODE,
+                        IconCodes.NEW_PALETTE,
+                        IconCodes.IMPORT_PALETTE,
+                        IconCodes.CONTENTS_TO_PALETTE,
+                        IconCodes.DELETE_PALETTE,
+                        IconCodes.SAVE_PALETTE,
+                        IconCodes.SORT_PALETTE,
+                        IconCodes.PALETTIZE,
+                        IconCodes.PALETTE_SETTINGS,
                         IconCodes.ADD_TO_PALETTE,
                         IconCodes.REMOVE_FROM_PALETTE,
-                        IconCodes.IMPORT_PALETTE,
-                        IconCodes.SAVE_PALETTE,
-                        IconCodes.CONTENTS_TO_PALETTE,
-                        IconCodes.SORT_PALETTE,
-                        IconCodes.PALETTIZE
+                        IconCodes.MOVE_LEFT_IN_PALETTE,
+                        IconCodes.MOVE_RIGHT_IN_PALETTE
                 },
                 new String[] {
                         "Swap primary and secondary color",
                         "Toggle between palettes and RGBA-HSV color selection",
-                        "Add selected color to palette",
-                        "Remove selected color from palette",
+                        "Create a new palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +
                                 Constants.PALETTE_FILE_SUFFIX + ")",
+                        "Add colors from project contents to palette",
+                        "Delete the selected palette",
                         "Save palette to file",
-                        "Turn project contents into new palette",
                         "Sort colors in palette",
-                        "Palettize project contents"
+                        "Palettize project contents",
+                        "Open the settings dialog for the selected palette",
+                        "Add selected color to palette",
+                        "Remove selected color from palette",
+                        "Shift the selected color one slot to the left in the selected palette",
+                        "Shift the selected color one slot to the right in the selected palette"
                 }, contentAssembler, contentStart, initialBottomY
         );
     }
@@ -1454,8 +1548,6 @@ public class DialogAssembly {
                         IconCodes.LAYER_VISIBILITY,
                         IconCodes.LAYER_ENABLED,
                         IconCodes.LAYER_DISABLED,
-                        IconCodes.ISOLATE_LAYER,
-                        IconCodes.ENABLE_ALL_LAYERS,
                         IconCodes.ONION_SKIN,
                         IconCodes.ONION_SKIN_NONE,
                         IconCodes.ONION_SKIN_PREVIOUS,
@@ -1476,8 +1568,6 @@ public class DialogAssembly {
                         "Layer visibility controls",
                         "Layer is visible/enabled",
                         "Layer is invisible/disabled",
-                        "Isolate layer",
-                        "Enable all layers",
                         "Onion skin modes",
                         "Disabled",
                         "Previous frame",
@@ -1537,11 +1627,11 @@ public class DialogAssembly {
             final Set<MenuElement> contentAssembler, final Coord2D contentStart,
             final int initialBottomY
     ) {
+        final Tool[] all = Tool.getAll();
         return assembleInfoScreenContents(
-                Arrays.stream(Constants.ALL_TOOLS)
-                        .map(Tool::convertNameToFilename).toArray(String[]::new),
-                Arrays.stream(Constants.ALL_TOOLS)
-                        .map(Tool::getName).toArray(String[]::new),
+                Arrays.stream(all).map(Tool::convertNameToFilename)
+                        .toArray(String[]::new),
+                Arrays.stream(all).map(Tool::getName).toArray(String[]::new),
                 contentAssembler, contentStart, initialBottomY);
     }
 

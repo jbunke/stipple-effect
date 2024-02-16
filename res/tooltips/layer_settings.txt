@@ -1,1 +1,1 @@
-Layer settings | {Shift + L}
+Layer settings... | {Shift + L}

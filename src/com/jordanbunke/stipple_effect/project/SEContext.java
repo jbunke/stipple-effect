@@ -7,11 +7,12 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerMerger;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.selection.*;
-import com.jordanbunke.stipple_effect.state.ActionType;
+import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
@@ -21,10 +22,8 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,6 +39,7 @@ public class SEContext {
     private Coord2D targetPixel;
 
     private GameImage selectionOverlay, checkerboard;
+    private Map<Float, GameImage> pixelGridMap;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -60,7 +60,7 @@ public class SEContext {
         targetPixel = Constants.NO_VALID_TARGET;
         inWorkspaceBounds = false;
 
-        redrawCheckerboard();
+        redrawCanvasAuxiliaries();
     }
 
     public void redrawSelectionOverlay() {
@@ -140,6 +140,17 @@ public class SEContext {
                     bounds[TRP].x, bounds[TRP].y,
                     (int)(bounds[DIM].x * zoomFactor),
                     (int)(bounds[DIM].y * zoomFactor));
+
+            // pixel grid
+            if (renderInfo.isPixelGridOn() && couldRenderPixelGrid()) {
+                final GameImage pixelGrid = pixelGridMap
+                        .getOrDefault(zoomFactor, GameImage.dummy());
+                final int z = (int) zoomFactor;
+                workspace.draw(pixelGrid.section(
+                                bounds[TL].x * z, bounds[TL].y * z,
+                                bounds[BR].x * z, bounds[BR].y * z),
+                        bounds[TRP].x, bounds[TRP].y);
+            }
         }
 
         // OVERLAYS
@@ -224,7 +235,7 @@ public class SEContext {
         } else if (tool instanceof ToolThatDraws) {
             if (eventLogger.isPressed(Key.CTRL) &&
                     eventLogger.isPressed(Key.SHIFT)) {
-                ToolThatDraws.setMode(ToolThatDraws.Mode.RANDOM_WITHIN_BOUNDS);
+                ToolThatDraws.setMode(ToolThatDraws.Mode.NOISE);
             } else if (eventLogger.isPressed(Key.CTRL)) {
                 ToolThatDraws.setMode(ToolThatDraws.Mode.DITHERING);
             } else if (eventLogger.isPressed(Key.SHIFT)) {
@@ -232,9 +243,13 @@ public class SEContext {
             } else {
                 ToolThatDraws.setMode(ToolThatDraws.Mode.NORMAL);
             }
-        } else if (tool instanceof MoverTool) {
-            MoverTool.setSnap(eventLogger.isPressed(Key.SHIFT));
         }
+
+        if (tool instanceof ToggleModeTool tmt)
+            tmt.setMode(eventLogger.isPressed(Key.CTRL));
+
+        if (tool instanceof SnappableTool st)
+            st.setSnap(eventLogger.isPressed(Key.SHIFT));
 
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
             if (e instanceof GameMouseEvent me) {
@@ -299,10 +314,10 @@ public class SEContext {
 
                         StippleEffect.get().incrementSelectedColorRGBA(
                                 0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (StippleEffect.get().getTool() instanceof ToolWithBreadth twb) {
+                    } else if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
                         mse.markAsProcessed();
 
-                        twb.setBreadth(twb.getBreadth() + mse.clicksScrolled);
+                        bt.setBreadth(bt.getBreadth() + mse.clicksScrolled);
                     } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
                         mse.markAsProcessed();
 
@@ -325,123 +340,144 @@ public class SEContext {
         if (eventLogger.isPressed(Key.CTRL) && !eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    stateManager::undoToCheckpoint
-            );
+                    stateManager::undoToCheckpoint);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    stateManager::redoToCheckpoint
-            );
+                    stateManager::redoToCheckpoint);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    projectInfo::save
-            );
+                    projectInfo::save);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    this::selectAll
-            );
+                    this::selectAll);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    () -> deselect(true)
-            );
+                    () -> deselect(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.I, GameKeyEvent.Action.PRESS),
-                    this::invertSelection
-            );
+                    this::invertSelection);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    () -> getState().nextFrame()
-            );
+                    () -> {
+                        getState().nextFrame();
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                    playbackInfo::toggleMode
-            );
+                    playbackInfo::toggleMode);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(0)
-            );
+                    () -> {
+                        getState().setFrameIndex(0);
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().setFrameIndex(getState().getFrameCount() - 1)
-            );
+                    () -> {
+                        getState().setFrameIndex(getState().getFrameCount() - 1);
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().editLayerAbove()
-            );
+                    () -> {
+                        getState().editLayerAbove();
+
+                        if (!Layout.isLayersPanelShowing())
+                            StatusUpdates.layerNavigation(
+                                    getState().getEditingLayer().getName(),
+                                    getState().getLayerEditIndex(),
+                                    getState().getLayers().size());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> getState().editLayerBelow()
-            );
+                    () -> {
+                        getState().editLayerBelow();
+
+                        if (!Layout.isLayersPanelShowing())
+                            StatusUpdates.layerNavigation(
+                                    getState().getEditingLayer().getName(),
+                                    getState().getLayerEditIndex(),
+                                    getState().getLayers().size());
+                    });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (couldRenderPixelGrid()) {
+                            renderInfo.togglePixelGrid();
+
+                            if (!Layout.isToolbarShowing())
+                                StatusUpdates.setPixelGrid(renderInfo.isPixelGridOn());
+                        } else
+                            StatusUpdates.cannotSetPixelGrid();
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    this::addFrame
-            );
+                    this::addFrame);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> addLayer(true)
-            );
+                    this::addLayer);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
-                    this::toggleLayerLinking
-            );
+                    this::toggleLayerLinking);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
                     () -> getState().getEditingLayer().setOnionSkinMode(
-                            getState().getEditingLayer().getOnionSkinMode().next())
-            );
+                            getState().getEditingLayer().getOnionSkinMode().next()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    this::removeFrame
-            );
+                    this::removeFrame);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    this::cut
-            );
+                    this::cut);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    this::copy
-            );
+                    this::copy);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
-                    () -> paste(false)
-            );
+                    () -> paste(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(true)
-            );
+                    () -> reflectSelection(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(false)
-            );
+                    () -> reflectSelection(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(DialogVals.getOutlineSideMask())
-            );
+                    () -> outlineSelection(DialogVals.getOutlineSideMask()));
         }
 
         // SHIFT but not CTRL
         if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    () -> fillSelection(true)
-            );
+                    () -> fillSelection(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
                     () -> {
                         PreviewWindow.set(this);
                         eventLogger.unpressAllKeys();
-                    }
-            );
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
                     () -> deleteSelectionContents(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex())
-            );
+                    () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(Outliner.getSingleOutlineMask())
-            );
+                    () -> outlineSelection(Outliner.getSingleOutlineMask()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
                     () -> {
@@ -451,51 +487,42 @@ public class SEContext {
                             disableLayer(index);
                         else
                             enableLayer(index);
-                    }
-            );
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
-                    () -> isolateLayer(getState().getLayerEditIndex())
-            );
+                    () -> isolateLayer(getState().getLayerEditIndex()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
-                    this::enableAllLayers
-            );
+                    this::enableAllLayers);
 
             // arrow keys only in these branches
             if (eventLogger.isPressed(Key.R)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                -Constants.COLOR_SET_RGBA_INC, 0, 0, 0)
-                );
+                                -Constants.COLOR_SET_RGBA_INC, 0, 0, 0));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                Constants.COLOR_SET_RGBA_INC, 0, 0, 0)
-                );
+                                Constants.COLOR_SET_RGBA_INC, 0, 0, 0));
             } else if (eventLogger.isPressed(Key.G)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, -Constants.COLOR_SET_RGBA_INC, 0, 0)
-                );
+                                0, -Constants.COLOR_SET_RGBA_INC, 0, 0));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, Constants.COLOR_SET_RGBA_INC, 0, 0)
-                );
+                                0, Constants.COLOR_SET_RGBA_INC, 0, 0));
             } else if (eventLogger.isPressed(Key.B)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, -Constants.COLOR_SET_RGBA_INC, 0)
-                );
+                                0, 0, -Constants.COLOR_SET_RGBA_INC, 0));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, Constants.COLOR_SET_RGBA_INC, 0)
-                );
+                                0, 0, Constants.COLOR_SET_RGBA_INC, 0));
             } else if (eventLogger.isPressed(Key.H)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -527,22 +554,18 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, -Constants.COLOR_SET_RGBA_INC)
-                );
+                                0, 0, 0, -Constants.COLOR_SET_RGBA_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, Constants.COLOR_SET_RGBA_INC)
-                );
+                                0, 0, 0, Constants.COLOR_SET_RGBA_INC));
             } else {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> playbackInfo.incrementFps(-Constants.PLAYBACK_FPS_INC)
-                );
+                        () -> playbackInfo.incrementFps(-Constants.PLAYBACK_FPS_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC)
-                );
+                        () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC));
             }
         }
 
@@ -550,72 +573,65 @@ public class SEContext {
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    () -> getState().previousFrame()
-            );
+                    () -> {
+                        getState().previousFrame();
+
+                        if (!Layout.isFramesPanelShowing())
+                            StatusUpdates.frameNavigation(
+                                    getState().getFrameIndex(),
+                                    getState().getFrameCount());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveLayerUp
-            );
+                    this::moveLayerUp);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveLayerDown
-            );
+                    this::moveLayerDown);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveFrameBack
-            );
+                    this::moveFrameBack);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    this::moveFrameForward
-            );
+                    this::moveFrameForward);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    () -> stateManager.undo(true)
-            );
+                    () -> stateManager.undo(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    () -> stateManager.redo(true)
-            );
+                    () -> stateManager.redo(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    this::cropToSelection
-            );
+                    this::cropToSelection);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    this::duplicateFrame
-            );
+                    this::duplicateFrame);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    this::duplicateLayer
-            );
+                    this::duplicateLayer);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    this::mergeWithLayerBelow
-            );
+                    this::mergeWithLayerBelow);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    this::removeLayer
-            );
+                    this::removeLayer);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
-                    () -> paste(true)
-            );
+                    () -> paste(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelectionContents(true)
-            );
+                    () -> reflectSelectionContents(true));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelectionContents(false)
-            );
+                    () -> reflectSelectionContents(false));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(Outliner.getDoubleOutlineMask())
-            );
+                    () -> outlineSelection(Outliner.getDoubleOutlineMask()));
         }
     }
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
+        final Tool tool = StippleEffect.get().getTool();
+
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
             // toggle playback
             eventLogger.checkForMatchingKeyStroke(
@@ -638,92 +654,59 @@ public class SEContext {
                     () -> deleteSelectionContents(true));
 
             // tool modifications
-            if (StippleEffect.get().getTool() instanceof ToolWithBreadth twr) {
+            if (tool instanceof BreadthTool bt) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        twr::decreaseBreadth
-                );
+                        bt::decreaseBreadth);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        twr::increaseBreadth
-                );
+                        bt::increaseBreadth);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> twr.setBreadth(twr.getBreadth() + Constants.BREADTH_INC)
-                );
+                        () -> bt.setBreadth(bt.getBreadth() + Constants.BREADTH_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> twr.setBreadth(twr.getBreadth() - Constants.BREADTH_INC)
-                );
-            } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
+                        () -> bt.setBreadth(bt.getBreadth() - Constants.BREADTH_INC));
+            } else if (tool instanceof ToolThatSearches tts) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::decreaseTolerance
-                );
+                        tts::decreaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::increaseTolerance
-                );
+                        tts::increaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC)
-                );
+                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC)
-                );
-            } else if (StippleEffect.get().getTool().equals(Hand.get())) {
+                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
+            } else if (tool.equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(0, 1))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(0, 1)));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(0, -1))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(0, -1)));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(1, 0))
-                );
+                        () -> renderInfo.incrementAnchor(new Coord2D(1, 0)));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> renderInfo.incrementAnchor(new Coord2D(-1, 0))
-                );
-            } else if (StippleEffect.get().getTool().equals(PickUpSelection.get())) {
+                        () -> renderInfo.incrementAnchor(new Coord2D(-1, 0)));
+            } else if (Tool.canMoveSelectionBounds(tool)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(0, -1), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(0, -1), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(0, 1), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(0, 1), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(-1, 0), true)
-                );
+                        () -> moveSelectionBounds(new Coord2D(-1, 0), true));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionContents(new Coord2D(1, 0), true)
-                );
-            } else if (Tool.canMoveSelectionBounds(StippleEffect.get().getTool())) {
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(0, -1), true)
-                );
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(0, 1), true)
-                );
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(-1, 0), true)
-                );
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> moveSelectionBounds(new Coord2D(1, 0), true)
-                );
-            } else if (StippleEffect.get().getTool().equals(Zoom.get())) {
+                        () -> moveSelectionBounds(new Coord2D(1, 0), true));
+            } else if (tool.equals(Zoom.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> renderInfo.zoomIn(targetPixel));
@@ -731,6 +714,31 @@ public class SEContext {
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         renderInfo::zoomOut);
             }
+        }
+
+        // special case where shifting would constitute snap and is permitted
+        if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool mt &&
+                getState().hasSelection()) {
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            0, -1 * (mt.isSnap() ? SelectionUtils.height(
+                            getState().getSelection()) : 1)), true));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            0, mt.isSnap() ? SelectionUtils.height(
+                            getState().getSelection()) : 1), true));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            -1 * (mt.isSnap() ? SelectionUtils.width(
+                                    getState().getSelection()) : 1), 0), true));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                    () -> mt.getMoverFunction(this).accept(new Coord2D(
+                            mt.isSnap() ? SelectionUtils.width(
+                                    getState().getSelection()) : 1, 0), true));
         }
     }
 
@@ -780,24 +788,84 @@ public class SEContext {
                 middle.y - (int)(zoomFactor * anchor.y));
     }
 
+    public void redrawCanvasAuxiliaries() {
+        redrawCheckerboard();
+        redrawPixelGrid();
+    }
+
     public void redrawCheckerboard() {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
         final GameImage image = new GameImage(w, h);
 
-        final int cb = Settings.getCheckerboardPixels();
+        final int cbx = Settings.getCheckerboardXPixels(),
+                cby = Settings.getCheckerboardYPixels();
 
-        for (int x = 0; x < image.getWidth(); x += cb) {
-            for (int y = 0; y < image.getHeight(); y += cb) {
-                final Color c = ((x / cb) + (y / cb)) % 2 == 0
+        for (int x = 0; x < w; x += cbx) {
+            for (int y = 0; y < h; y += cby) {
+                final Color c = ((x / cbx) + (y / cby)) % 2 == 0
                         ? Constants.WHITE : Constants.ACCENT_BACKGROUND_LIGHT;
 
-                image.fillRectangle(c, x, y, cb, cb);
+                image.fillRectangle(c, x, y, cbx, cby);
             }
         }
 
         checkerboard = image.submit();
+    }
+
+    public boolean couldRenderPixelGrid() {
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        return renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
+                w <= Layout.PIXEL_GRID_IMAGE_DIM_MAX &&
+                h <= Layout.PIXEL_GRID_IMAGE_DIM_MAX;
+    }
+
+    public void redrawPixelGrid() {
+        pixelGridMap = new HashMap<>();
+
+        if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid()))
+            return;
+
+        final Color a = new Color(0, 0, 0, 150),
+                b = new Color(100, 100, 100, 150);
+
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        final float minZ = Constants.ZOOM_FOR_GRID, maxZ = Constants.MAX_ZOOM;
+
+        for (float fZ = minZ; fZ <= maxZ; fZ *= 2f) {
+            final int z = (int) fZ, altPx = Math.max(2,
+                    z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
+
+            final GameImage image = new GameImage(w * z, h * z);
+
+            final int pgx = Settings.getPixelGridXPixels(),
+                    pgy = Settings.getPixelGridYPixels();
+
+            // vertical grid
+            for (int x = 0; x < w; x += pgx)
+                for (int y = 0; y < h; y++)
+                    for (int zInc = 0; zInc < z; zInc += altPx) {
+                        final Color c = (zInc / altPx) % 2 == 0
+                                ? a : b;
+                        image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
+                    }
+
+            // horizontal grid
+            for (int y = 0; y < h; y += pgy)
+                for (int x = 0; x < w; x++)
+                    for (int zInc = 0; zInc < z; zInc += altPx) {
+                        final Color c = (zInc / altPx) % 2 == 0
+                                ? a : b;
+                        image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
+                    }
+
+            pixelGridMap.put(fZ, image.submit());
+        }
     }
 
     // non-state changes
@@ -818,10 +886,9 @@ public class SEContext {
     }
 
     // contents to palette
-    public void contentsToPalette() {
+    public void contentsToPalette(final Palette palette) {
         final DialogVals.ContentType contentType = DialogVals
                 .getContentType(this);
-        final String name = DialogVals.getPaletteName();
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
@@ -853,8 +920,8 @@ public class SEContext {
             }
         }
 
-        StippleEffect.get().addPalette(new Palette(name,
-                colors.toArray(Color[]::new)), true);
+        for (Color c : colors)
+            palette.addColor(c);
     }
 
     private void extractColorsFromFrame(
@@ -905,11 +972,17 @@ public class SEContext {
             case LAYER_FRAME -> state = palettizeFrame(palette, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
             case LAYER -> {
-                final int frameCount = state.getFrameCount();
-
-                for (int i = 0; i < frameCount; i++)
+                if (state.getEditingLayer().areFramesLinked()) {
                     state = palettizeFrame(palette, state,
-                            i, state.getLayerEditIndex());
+                            state.getFrameIndex(),
+                            state.getLayerEditIndex());
+                } else {
+                    final int frameCount = state.getFrameCount();
+
+                    for (int i = 0; i < frameCount; i++)
+                        state = palettizeFrame(palette, state,
+                                i, state.getLayerEditIndex());
+                }
             }
             case FRAME -> {
                 final int layerCount = state.getLayers().size();
@@ -922,15 +995,21 @@ public class SEContext {
                 final int frameCount = state.getFrameCount(),
                         layerCount = state.getLayers().size();
 
-                for (int f = 0; f < frameCount; f++)
-                    for (int l = 0; l < layerCount; l++)
-                        state = palettizeFrame(palette, state, f, l);
+                for (int l = 0; l < layerCount; l++) {
+                    if (state.getLayers().get(l).areFramesLinked()) {
+                        state = palettizeFrame(palette, state,
+                                state.getFrameIndex(), l);
+                    } else {
+                        for (int f = 0; f < frameCount; f++)
+                            state = palettizeFrame(palette, state, f, l);
+                    }
+                }
             }
         }
 
         if (contentType != DialogVals.ContentType.SELECTION) {
-            state.markAsCheckpoint(false, this);
-            stateManager.performAction(state, ActionType.CANVAS);
+            state.markAsCheckpoint(false);
+            stateManager.performAction(state, Operation.PALETTIZE);
         }
     }
 
@@ -971,12 +1050,12 @@ public class SEContext {
             layers.set(getState().getLayerEditIndex(), replacement);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.PALETTIZE);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
             else
-                getState().markAsCheckpoint(true, this);
+                getState().markAsCheckpoint(true);
         }
     }
 
@@ -1002,7 +1081,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(reset)
                     .changeIsCheckpoint(true);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.RESET_SELECTION_CONTENTS);
             redrawSelectionOverlay();
         }
     }
@@ -1019,7 +1099,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(moved)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.MOVE_SELECTION_CONTENTS);
         }
     }
 
@@ -1037,7 +1118,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(stretched)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.STRETCH_SELECTION_CONTENTS);
             redrawSelectionOverlay();
         }
     }
@@ -1057,7 +1139,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(rotated)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.ROTATE_SELECTION_CONTENTS);
             redrawSelectionOverlay();
         }
     }
@@ -1078,7 +1161,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionContents(reflected)
                     .changeIsCheckpoint(!raiseAndDrop);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.REFLECT_SELECTION_CONTENTS);
 
             if (raiseAndDrop)
                 dropContentsToLayer(true, false);
@@ -1099,7 +1183,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(moved)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.MOVE_SELECTION_BOUNDS);
         }
     }
 
@@ -1116,7 +1201,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(stretched)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.STRETCH_SELECTION_BOUNDS);
             redrawSelectionOverlay();
         }
     }
@@ -1134,7 +1220,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(rotated)
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.ROTATE_SELECTION_BOUNDS);
             redrawSelectionOverlay();
         }
     }
@@ -1154,7 +1241,8 @@ public class SEContext {
             final ProjectState result = getState()
                     .changeSelectionBounds(reflected)
                     .changeIsCheckpoint(!dropAndRaise);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.REFLECT_SELECTION_BOUNDS);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
@@ -1183,11 +1271,13 @@ public class SEContext {
                             -tl.x, -tl.y, w, h)).toList();
 
             final ProjectState result = getState().resize(w, h, layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.CROP_TO_SELECTION);
 
             moveSelectionBounds(new Coord2D(-tl.x, -tl.y), false);
 
-            redrawCheckerboard();
+            redrawCanvasAuxiliaries();
+            snapToCenterOfImage();
         }
     }
 
@@ -1211,7 +1301,7 @@ public class SEContext {
             final SelectionContents toPaste = SEClipboard.get().getContents();
 
             if (newLayer)
-                addLayer(false);
+                addLayer();
 
             final Coord2D tl = SelectionUtils.topLeft(toPaste.getPixels()),
                     br = SelectionUtils.bottomRight(toPaste.getPixels());
@@ -1229,7 +1319,7 @@ public class SEContext {
 
             stateManager.performAction(getState()
                     .changeSelectionContents(toPaste.returnDisplaced(
-                            displacement)), ActionType.CANVAS);
+                            displacement)), Operation.PASTE);
 
             StippleEffect.get().autoAssignPickUpSelection();
         } else
@@ -1266,7 +1356,7 @@ public class SEContext {
         final ProjectState result = getState()
                 .changeSelectionContents(selectionContents)
                 .changeIsCheckpoint(checkpoint);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.RAISE);
     }
 
     // drop contents to layer
@@ -1283,7 +1373,7 @@ public class SEContext {
                     .changeSelectionBounds(deselect ? new HashSet<>()
                             : new HashSet<>(contents.getPixels()))
                     .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.DROP);
             redrawSelectionOverlay();
         }
     }
@@ -1308,7 +1398,7 @@ public class SEContext {
 
             stateManager.performAction(getState().changeSelectionBounds(
                     new HashSet<>(deselect ? Set.of() : selection)),
-                    ActionType.CANVAS);
+                    Operation.DELETE_SELECTION_CONTENTS);
         }
     }
 
@@ -1338,7 +1428,7 @@ public class SEContext {
             if (dropAndRaise)
                 raiseSelectionToContents(true);
             else
-                getState().markAsCheckpoint(true, this);
+                getState().markAsCheckpoint(true);
         }
     }
 
@@ -1350,8 +1440,7 @@ public class SEContext {
             else {
                 final ProjectState result = getState().changeSelectionBounds(
                         new HashSet<>()).changeIsCheckpoint(checkpoint);
-                stateManager.performAction(result, ActionType.CANVAS);
-                redrawSelectionOverlay();
+                stateManager.performAction(result, Operation.DESELECT);
             }
         }
     }
@@ -1376,7 +1465,7 @@ public class SEContext {
         final ProjectState result = getState()
                 .changeSelectionBounds(selection)
                 .changeIsCheckpoint(!dropAndRaise);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.SELECT);
 
         if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
@@ -1406,7 +1495,7 @@ public class SEContext {
         final ProjectState result = getState()
                 .changeSelectionBounds(willBe)
                 .changeIsCheckpoint(!dropAndRaise);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.SELECT);
 
         if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
@@ -1435,7 +1524,7 @@ public class SEContext {
 
         final ProjectState result = getState().changeSelectionBounds(
                 selection).changeIsCheckpoint(checkpoint);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.SELECT);
         redrawSelectionOverlay();
     }
 
@@ -1452,9 +1541,10 @@ public class SEContext {
 
         final ProjectState result = getState().resize(w, h, layers)
                 .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.PAD);
 
-        redrawCheckerboard();
+        redrawCanvasAuxiliaries();
+        snapToCenterOfImage();
     }
 
     public void resize() {
@@ -1466,9 +1556,10 @@ public class SEContext {
 
         final ProjectState result = getState().resize(w, h, layers)
                 .changeSelectionBounds(new HashSet<>());
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.RESIZE);
 
-        redrawCheckerboard();
+        redrawCanvasAuxiliaries();
+        snapToCenterOfImage();
     }
 
     // IMAGE EDITING
@@ -1501,41 +1592,49 @@ public class SEContext {
 
         final ProjectState result = getState().changeLayers(layers)
                 .changeIsCheckpoint(checkpoint);
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result, Operation.EDIT_IMAGE);
     }
 
     // FRAME MANIPULATION
     // move frame forward
     public void moveFrameForward() {
+        final int frameIndex = getState().getFrameIndex(),
+                toIndex = frameIndex + 1,
+                frameCount = getState().getFrameCount();
+
         // pre-check
         if (getState().canMoveFrameForward()) {
-            final int frameIndex = getState().getFrameIndex(),
-                    toIndex = frameIndex + 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedForward(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    toIndex, getState().getFrameCount());
-            stateManager.performAction(result, ActionType.FRAME);
-            StatusUpdates.movedFrame(frameIndex, toIndex);
+                    toIndex, frameCount);
+            stateManager.performAction(result, Operation.MOVE_FRAME_FORWARD);
+            StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotMoveFrame(frameIndex, true);
         }
     }
 
     // move frame back
     public void moveFrameBack() {
+        final int frameIndex = getState().getFrameIndex(),
+                toIndex = frameIndex - 1,
+                frameCount = getState().getFrameCount();
+
         // pre-check
         if (getState().canMoveFrameBack()) {
-            final int frameIndex = getState().getFrameIndex(),
-                    toIndex = frameIndex - 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnFrameMovedBack(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    toIndex, getState().getFrameCount());
-            stateManager.performAction(result, ActionType.FRAME);
-            StatusUpdates.movedFrame(frameIndex, toIndex);
+                    toIndex, frameCount);
+            stateManager.performAction(result, Operation.MOVE_FRAME_BACK);
+            StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotMoveFrame(frameIndex, false);
         }
     }
 
@@ -1547,12 +1646,19 @@ public class SEContext {
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
-            final int addIndex = getState().getFrameIndex() + 1;
+            final int addIndex = getState().getFrameIndex() + 1,
+                    frameCount = getState().getFrameCount() + 1;
             layers.replaceAll(l -> l.returnAddedFrame(addIndex, w, h));
 
             final ProjectState result = getState().changeFrames(layers,
-                    addIndex, getState().getFrameCount() + 1);
-            stateManager.performAction(result, ActionType.FRAME);
+                    addIndex, frameCount);
+            stateManager.performAction(result, Operation.ADD_FRAME);
+
+            if (!Layout.isFramesPanelShowing())
+                StatusUpdates.addedFrame(false, addIndex - 1,
+                        addIndex, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotAddFrame();
         }
     }
 
@@ -1560,15 +1666,21 @@ public class SEContext {
     public void duplicateFrame() {
         // pre-check
         if (getState().canAddFrame()) {
-            final int frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex(),
+                    frameCount = getState().getFrameCount() + 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnDuplicatedFrame(frameIndex));
 
             final ProjectState result = getState().changeFrames(
-                    layers, frameIndex + 1,
-                    getState().getFrameCount() + 1);
-            stateManager.performAction(result, ActionType.FRAME);
+                    layers, frameIndex + 1, frameCount);
+            stateManager.performAction(result, Operation.DUPLICATE_FRAME);
+
+            if (!Layout.isFramesPanelShowing())
+                StatusUpdates.addedFrame(true, frameIndex,
+                        frameIndex + 1, frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotAddFrame();
         }
     }
 
@@ -1576,14 +1688,21 @@ public class SEContext {
     public void removeFrame() {
         // pre-check
         if (getState().canRemoveFrame()) {
-            final int frameIndex = getState().getFrameIndex();
+            final int frameIndex = getState().getFrameIndex(),
+                    frameCount = getState().getFrameCount() - 1;
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
             layers.replaceAll(l -> l.returnRemovedFrame(frameIndex));
 
             final ProjectState result = getState().changeFrames(layers,
-                    frameIndex - 1, getState().getFrameCount() - 1);
-            stateManager.performAction(result, ActionType.FRAME);
+                    frameIndex - 1, frameCount);
+            stateManager.performAction(result, Operation.REMOVE_FRAME);
+
+            if (!Layout.isFramesPanelShowing())
+                StatusUpdates.removedFrame(frameIndex,
+                        Math.max(0, frameIndex - 1), frameCount);
+        } else if (!Layout.isFramesPanelShowing()) {
+            StatusUpdates.cannotRemoveFrame();
         }
     }
 
@@ -1593,7 +1712,8 @@ public class SEContext {
         final ProjectState result = getState().changeLayers(
                 getState().getLayers().stream().map(SELayer::returnEnabled)
                         .collect(Collectors.toList()));
-        stateManager.performAction(result, ActionType.CANVAS);
+        stateManager.performAction(result,
+                Operation.LAYER_VISIBILITY_CHANGE);
     }
 
     // isolate layer
@@ -1612,7 +1732,8 @@ public class SEContext {
             }
 
             final ProjectState result = getState().changeLayers(newLayers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.LAYER_VISIBILITY_CHANGE);
         }
     }
 
@@ -1642,7 +1763,11 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.LAYER_LINKING_CHANGE);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerLinkedStatus(false,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1655,10 +1780,15 @@ public class SEContext {
                 !layers.get(layerIndex).areFramesLinked()) {
             final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
                     getState().getFrameIndex());
+            layer.setOnionSkinMode(OnionSkinMode.NONE);
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.LAYER_LINKING_CHANGE);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerLinkedStatus(true,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1673,7 +1803,12 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.LAYER_VISIBILITY_CHANGE);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerVisibilityStatus(false,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1688,7 +1823,12 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result,
+                    Operation.LAYER_VISIBILITY_CHANGE);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.changedLayerVisibilityStatus(true,
+                        layer.getName(), layerIndex, layers.size());
         }
     }
 
@@ -1702,7 +1842,7 @@ public class SEContext {
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.CHANGE_LAYER_NAME);
         }
     }
 
@@ -1720,23 +1860,29 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers)
                     .changeIsCheckpoint(markAsCheckpoint);
-            stateManager.performAction(result, ActionType.CANVAS);
+            stateManager.performAction(result, Operation.LAYER_OPACITY_CHANGE);
         }
     }
 
     // add layer
-    public void addLayer(final boolean checkpoint) {
+    public void addLayer() {
         // pre-check
         if (getState().canAddLayer()) {
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
-            layers.add(addIndex, SELayer.newLayer(w, h, getState().getFrameCount()));
+            final SELayer added = SELayer.newLayer(w, h, getState().getFrameCount());
+            layers.add(addIndex, added);
 
-            final ProjectState result = getState().changeLayers(
-                    layers, addIndex).changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result, ActionType.LAYER);
+            final ProjectState result = getState()
+                    .changeLayers(layers, addIndex);
+            stateManager.performAction(result, Operation.ADD_LAYER);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.addedLayer(added.getName(), addIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotAddLayer();
         }
     }
 
@@ -1746,11 +1892,19 @@ public class SEContext {
         if (getState().canAddLayer()) {
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
             final int addIndex = getState().getLayerEditIndex() + 1;
-            layers.add(addIndex, getState().getEditingLayer().duplicate());
+            final SELayer old = getState().getEditingLayer(),
+                    duplicated = old.duplicate();
+            layers.add(addIndex, duplicated);
 
             final ProjectState result = getState()
                     .changeLayers(layers, addIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.DUPLICATE_LAYER);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.duplicatedLayer(old.getName(),
+                        duplicated.getName(), addIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotAddLayer();
         }
     }
 
@@ -1759,12 +1913,21 @@ public class SEContext {
         // pre-check
         if (getState().canRemoveLayer()) {
             final List<SELayer> layers = new ArrayList<>(getState().getLayers());
-            final int index = getState().getLayerEditIndex();
+            final int index = getState().getLayerEditIndex(),
+                    setIndex = index > 0 ? index - 1 : index;
+            final SELayer toRemove = layers.get(index);
             layers.remove(index);
 
             final ProjectState result = getState().changeLayers(
-                    layers, index > 0 ? index - 1 : index);
-            stateManager.performAction(result, ActionType.LAYER);
+                    layers, setIndex);
+            stateManager.performAction(result, Operation.REMOVE_LAYER);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.removedLayer(toRemove.getName(),
+                        setIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotRemoveLayer(
+                    getState().getEditingLayer().getName());
         }
     }
 
@@ -1782,9 +1945,12 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.MOVE_LAYER_DOWN);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
-                    reinsertionIndex);
+                    reinsertionIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotMoveLayer(
+                    getState().getEditingLayer().getName(), false);
         }
     }
 
@@ -1802,9 +1968,12 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result, Operation.MOVE_LAYER_UP);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
-                    reinsertionIndex);
+                    reinsertionIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotMoveLayer(
+                    getState().getEditingLayer().getName(), true);
         }
     }
 
@@ -1826,7 +1995,15 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, belowIndex);
-            stateManager.performAction(result, ActionType.LAYER);
+            stateManager.performAction(result,
+                    Operation.MERGE_WITH_LAYER_BELOW);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.mergedWithLayerBelow(above.getName(),
+                        below.getName(), belowIndex, layers.size());
+        } else if (!Layout.isLayersPanelShowing()) {
+            StatusUpdates.cannotMergeWithLayerBelow(
+                    getState().getEditingLayer().getName());
         }
     }
 
@@ -1856,13 +2033,13 @@ public class SEContext {
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
         final Coord2D tl = SelectionUtils.topLeft(selection),
-                br = SelectionUtils.bottomRight(selection);
-        final int w = br.x - tl.x, h = br.y - tl.y;
+                br = SelectionUtils.bottomRight(selection),
+                bounds = SelectionUtils.bounds(selection);
         final boolean multiple = selection.size() > 1;
 
         return selection.isEmpty() ? "No selection" : "Selection: " +
                 selection.size() + "px " + (multiple ? "from " : "at ") + tl +
-                (multiple ? (" to " + br + "; " + w + "x" + h +
+                (multiple ? (" to " + br + "; " + bounds.x + "x" + bounds.y +
                         " bounding box") : "");
     }
 

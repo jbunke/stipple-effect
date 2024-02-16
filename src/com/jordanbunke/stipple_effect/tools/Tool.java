@@ -9,12 +9,25 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 public abstract class Tool {
     private final GameImage icon, highlightedIcon, selectedIcon;
 
+    public static Tool[] getAll() {
+        return new Tool[] {
+                Hand.get(), Zoom.get(),
+                StipplePencil.get(), Pencil.get(),
+                Brush.get(), ShadeBrush.get(), Eraser.get(),
+                GradientTool.get(), LineTool.get(),
+                Fill.get(), ColorPicker.get(),
+                Wand.get(), BrushSelect.get(), BoxSelect.get(), PolygonSelect.get(),
+                MoveSelection.get(), PickUpSelection.get()
+        };
+    }
+
     public static boolean canMoveSelectionBounds(
             final Tool tool
     ) {
         return tool.equals(MoveSelection.get()) ||
                 tool.equals(BrushSelect.get()) ||
-                tool.equals(BoxSelect.get());
+                tool.equals(BoxSelect.get()) ||
+                tool.equals(PolygonSelect.get());
     }
 
     Tool() {
@@ -60,5 +73,17 @@ public abstract class Tool {
 
     public GameImage getSelectedIcon() {
         return selectedIcon;
+    }
+
+    public boolean hasToolContentPreview() {
+        return false;
+    }
+
+    public boolean previewScopeIsGlobal() {
+        return false;
+    }
+
+    public GameImage getToolContentPreview() {
+        return GameImage.dummy();
     }
 }

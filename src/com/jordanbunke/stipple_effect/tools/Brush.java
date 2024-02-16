@@ -48,7 +48,7 @@ public final class Brush extends ToolWithBreadth {
             painted = new HashSet<>();
 
             reset();
-            context.getState().markAsCheckpoint(false, context);
+            context.getState().markAsCheckpoint(false);
         }
     }
 
@@ -72,7 +72,7 @@ public final class Brush extends ToolWithBreadth {
             final GameImage edit = new GameImage(w, h);
             populateAround(edit, tp, selection);
 
-            fillMouseSkips(tp, (x, y) -> populateAround(
+            fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
                     edit, getLastTP().displace(x, y), selection));
 
             context.paintOverImage(edit.submit());
@@ -108,7 +108,7 @@ public final class Brush extends ToolWithBreadth {
     ) {
         if (painting) {
             painting = false;
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
     }

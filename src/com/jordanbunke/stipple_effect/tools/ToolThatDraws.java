@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
 
 public abstract class ToolThatDraws extends Tool {
     public enum Mode {
-        NORMAL, DITHERING, BLEND, RANDOM_WITHIN_BOUNDS
+        NORMAL, DITHERING, BLEND, NOISE
     }
 
     private static Mode mode = Mode.NORMAL;
@@ -50,25 +50,25 @@ public abstract class ToolThatDraws extends Tool {
         return lastFrameIndex == context.getState().getFrameIndex();
     }
 
-    public void fillMouseSkips(
-            final Coord2D targetPixel,
+    public void fillLineSpace(
+            final Coord2D from, final Coord2D to,
             final BiConsumer<Integer, Integer> action
     ) {
-        final int xDiff = targetPixel.x - getLastTP().x,
-                yDiff = targetPixel.y - getLastTP().y,
+        final int xDiff = to.x - from.x,
+                yDiff = to.y - from.y,
                 xUnit = (int)Math.signum(xDiff),
                 yUnit = (int)Math.signum(yDiff);
-        if (!getLastTP().equals(Constants.NO_VALID_TARGET) &&
+        if (!from.equals(Constants.NO_VALID_TARGET) &&
                 (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
             if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                for (int x = 1; x < Math.abs(xDiff); x++) {
-                    final int y = (int)(x * Math.abs(yDiff / (double)xDiff));
-                    action.accept(xUnit * x, yUnit * y);
+                for (int x = xUnit; Math.abs(x) < Math.abs(xDiff); x += xUnit) {
+                    final int y = (int)Math.round(x * (yDiff / (double)xDiff));
+                    action.accept(x, y);
                 }
             } else {
-                for (int y = 1; y < Math.abs(yDiff); y++) {
-                    final int x = (int)(y * Math.abs(xDiff / (double)yDiff));
-                    action.accept(xUnit * x, yUnit * y);
+                for (int y = yUnit; Math.abs(y) < Math.abs(yDiff); y += yUnit) {
+                    final int x = (int)Math.round(y * (xDiff / (double)yDiff));
+                    action.accept(x, y);
                 }
             }
         }
@@ -95,7 +95,7 @@ public abstract class ToolThatDraws extends Tool {
                         (primary.getAlpha() + secondary.getAlpha()) / 2
                 );
             }
-            case RANDOM_WITHIN_BOUNDS -> {
+            case NOISE -> {
                 final Color primary = StippleEffect.get().getPrimary(),
                         secondary = StippleEffect.get().getSecondary();
                 final int pr = primary.getRed(), pg = primary.getGreen(),

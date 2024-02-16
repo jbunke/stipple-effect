@@ -5,5 +5,6 @@ Enabling one of the onion skin modes will render translucent previews of {one or
 if there are no changes between frames, or there is no transparency on the active layer at the active
 frame for the onion skins to show up through.
 
-This feature is an animation aid only. Onion skins are not exported when the image is saved. Thus,
-toggling the onion skin mode does not constitute a state change.
+This feature is an animation aid only. Onion skins are {not preserved when the project is exported}
+as one of the non-native export types (PNG, GIF, MP4, etc.). Thus, toggling the onion skin mode does
+not constitute a state change.

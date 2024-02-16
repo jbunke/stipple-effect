@@ -1,12 +1,14 @@
 Shortcut: {X}
 
-Use the box select tool to make rectangular selections. This is a convenient way to quickly enclose
-a desired selection area.
+Use the box select tool to make rectangular selections.
+This is a convenient way to quickly enclose a desired selection area.
 
 Simple selection: {Click & Drag}
 
 Additive selection: {Ctrl + Click & Drag}
-Adds the result of the selection to the existing selection.
+Adds the bounds of the box to the existing selection.
 
-Subtractive selection: {Ctrl + S + Click & Drag}
-Removes the result of the selection from the existing selection.
+Subtractive selection: {S + Click & Drag}
+Removes the bounds of the box from the existing selection.
+
+If the pixel grid is on, hold {Shift} while selecting to snap the selection to the pixel grid.

@@ -23,9 +23,13 @@ public class ParserSerializer {
     private static final char NL = '\n', INDENT = '\t',
             ENCLOSER_OPEN = '{', ENCLOSER_CLOSE = '}';
 
-    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":";
+    private static final String CONTENT_SEPARATOR = ",", TAG_SEPARATOR = ":",
+            TRANSPARENT = "t";
 
     private static final int NOT_FOUND = -1;
+
+    private static final double FS_INITIAL = 1.0,
+            FS_LINKED_OPTIMIZATION_THRESHOLD = 1.1;
 
     // tags
     private static final String
@@ -42,6 +46,7 @@ public class ParserSerializer {
             LAYER_OPACITY_TAG = "opacity",
             FRAME_COUNT_TAG = "frame_count",
             FRAMES_TAG = "frames",
+            LINKED_LAYER_TAG = "linked_layer",
             FRAME_TAG = "frame",
             COLOR_TAG = "cols",
             DIMENSION_TAG = "dims";
@@ -104,7 +109,7 @@ public class ParserSerializer {
         final Color[] colors = palette.getColors();
 
         for (int i = 0; i < colors.length; i++) {
-            sb.append(serializeColor(colors[i]));
+            sb.append(serializeColor(colors[i], true));
 
             if (i + 1 < colors.length)
                 sb.append(CONTENT_SEPARATOR);
@@ -132,6 +137,7 @@ public class ParserSerializer {
 
         final List<SELayer> layers = new ArrayList<>();
         int frameCount = 1, w = 1, h = 1;
+        double fileStandard = FS_INITIAL;
 
         for (SerialBlock block : stateBlocks) {
             switch (block.tag()) {
@@ -143,13 +149,17 @@ public class ParserSerializer {
                         h = Integer.parseInt(vals[1]);
                     }
                 }
-                case FRAME_COUNT_TAG -> frameCount = Integer.parseInt(block.value());
+                case FILE_STANDARD_TAG ->
+                        fileStandard = Double.parseDouble(block.value());
+                case FRAME_COUNT_TAG ->
+                        frameCount = Integer.parseInt(block.value());
                 case LAYERS_TAG -> {
                     final SerialBlock[] layerBlocks = deserializeBlocksAtDepthLevel(block.value());
 
                     for (SerialBlock layerBlock : layerBlocks)
                         if (layerBlock.tag().equals(LAYER_TAG))
-                            layers.add(deserializeLayer(layerBlock.value()));
+                            layers.add(deserializeLayer(layerBlock.value(),
+                                    fileStandard, frameCount));
                 }
             }
         }
@@ -157,10 +167,14 @@ public class ParserSerializer {
         return ProjectState.makeFromNativeFile(w, h, layers, frameCount);
     }
 
-    private static SELayer deserializeLayer(final String contents) {
+    private static SELayer deserializeLayer(
+            final String contents, final double fileStandard,
+            final int frameCount
+    ) {
         final SerialBlock[] blocks = deserializeBlocksAtDepthLevel(contents);
 
         final List<GameImage> frames = new ArrayList<>();
+        GameImage linked = GameImage.dummy();
         double opacity = 1.0;
         boolean enabled = true, framesLinked = false;
         OnionSkinMode osm = OnionSkinMode.NONE;
@@ -177,22 +191,33 @@ public class ParserSerializer {
                         osm = OnionSkinMode.valueOf(block.value());
                 case LAYER_OPACITY_TAG ->
                         opacity = Double.parseDouble(block.value());
+                case LINKED_LAYER_TAG ->
+                        linked = deserializeImage(block.value());
                 case FRAMES_TAG -> {
                     final SerialBlock[] frameBlocks = deserializeBlocksAtDepthLevel(block.value());
 
                     for (SerialBlock frameBlock : frameBlocks)
                         if (frameBlock.tag().equals(FRAME_TAG))
-                            frames.add(deserializeFrame(frameBlock.value()));
+                            frames.add(deserializeImage(frameBlock.value()));
                 }
             }
         }
 
-        return new SELayer(frames, frames.isEmpty()
-                ? GameImage.dummy() : frames.get(0),
-                opacity, enabled, framesLinked, osm, name);
+        final boolean loadFromLinked = framesLinked &&
+                fileStandard >= FS_LINKED_OPTIMIZATION_THRESHOLD && frameCount > 0;
+
+        if (loadFromLinked) {
+            frames.clear();
+
+            for (int i = 0; i < frameCount; i++)
+                frames.add(linked);
+        } else
+            linked = frames.isEmpty() ? GameImage.dummy() : frames.get(0);
+
+        return new SELayer(frames, linked, opacity, enabled, framesLinked, osm, name);
     }
 
-    private static GameImage deserializeFrame(final String contents) {
+    private static GameImage deserializeImage(final String contents) {
         final int DIM_INDEX = 0, COL_INDEX = 1;
 
         final SerialBlock[] blocks = deserializeBlocksAtDepthLevel(contents);
@@ -229,7 +254,10 @@ public class ParserSerializer {
         return frame.submit();
     }
 
-    private static Color deserializeColor(final String contents) {
+    public static Color deserializeColor(final String contents) {
+        if (contents.equals(TRANSPARENT))
+            return new Color(0, 0, 0, 0);
+
         final int LENGTH_OF_SECTION = 2, R = 0, G = 2, B = 4, A = 6;
 
         final int r = ColorTextBox.hexToInt(contents.substring(
@@ -381,17 +409,22 @@ public class ParserSerializer {
         openWithTag(sb, LAYER_OPACITY_TAG).append(layer.getOpacity())
                 .append(ENCLOSER_CLOSE).append(NL);
 
-        // frames tag opener
-        indent(sb, indentLevel + 1);
-        openWithTag(sb, FRAMES_TAG).append(NL);
+        if (layer.areFramesLinked())
+            sb.append(serializeImage(layer.getFrame(0), false, true));
+        else {
+            // frames tag opener
+            indent(sb, indentLevel + 1);
+            openWithTag(sb, FRAMES_TAG).append(NL);
 
-        // frames
-        for (int i = 0; i < frameCount; i++)
-            sb.append(serializeFrame(layer.getFrame(i), i + 1 < frameCount));
+            // frames
+            for (int i = 0; i < frameCount; i++)
+                sb.append(serializeImage(layer.getFrame(i),
+                        i + 1 < frameCount, false));
 
-        // frames tag closer
-        indent(sb, indentLevel + 1);
-        sb.append(ENCLOSER_CLOSE).append(NL);
+            // frames tag closer
+            indent(sb, indentLevel + 1);
+            sb.append(ENCLOSER_CLOSE).append(NL);
+        }
 
         // layer tag closer
         indent(sb, indentLevel);
@@ -401,18 +434,18 @@ public class ParserSerializer {
         return sb.toString();
     }
 
-    private static String serializeFrame(
-            final GameImage frame, final boolean notLast
+    private static String serializeImage(
+            final GameImage image, final boolean notLast, final boolean linked
     ) {
         final StringBuilder sb = new StringBuilder();
-        final int indentLevel = 3;
+        final int indentLevel = 2 + (linked ? 0 : 1);
 
-        // frame tag opener
+        // image type tag opener
         indent(sb, indentLevel);
-        openWithTag(sb, FRAME_TAG).append(NL);
+        openWithTag(sb, linked ? LINKED_LAYER_TAG : FRAME_TAG).append(NL);
 
         // dims
-        final int w = frame.getWidth(), h = frame.getHeight();
+        final int w = image.getWidth(), h = image.getHeight();
 
         // dims definition
         indent(sb, indentLevel + 1);
@@ -428,7 +461,7 @@ public class ParserSerializer {
 
             for (int x = 0; x < w; x++) {
                 sb.append(serializeColor(ImageProcessing
-                        .colorAtPixel(frame, x, y)));
+                        .colorAtPixel(image, x, y), false));
 
                 if (x + 1 < w || y + 1 < h)
                     sb.append(CONTENT_SEPARATOR);
@@ -441,7 +474,7 @@ public class ParserSerializer {
         indent(sb, indentLevel + 1);
         sb.append(ENCLOSER_CLOSE).append(NL);
 
-        // frame tag closer
+        // image type tag closer
         indent(sb, indentLevel);
         sb.append(ENCLOSER_CLOSE).append(notLast
                 ? CONTENT_SEPARATOR : "").append(NL);
@@ -449,7 +482,12 @@ public class ParserSerializer {
         return sb.toString();
     }
 
-    private static String serializeColor(final Color c) {
+    public static String serializeColor(
+            final Color c, final boolean preserveRGBForTransparent
+    ) {
+        if (c.getAlpha() == 0 && !preserveRGBForTransparent)
+            return TRANSPARENT;
+
         final String r = Integer.toHexString(c.getRed()),
                 g = Integer.toHexString(c.getGreen()),
                 b = Integer.toHexString(c.getBlue()),

@@ -1,0 +1,12 @@
+Shortcut: {G}
+
+The gradient tool draws a gradient from the primary to the secondary color, or vice versa, either
+as a brush or as a linear spectrum that covers the entire selection or layer-frame.
+
+Primary to secondary color: {Left Click & Drag}
+Secondary to primary color: {Right Click & Drag}
+
+Hold {Ctrl} to toggle linear spectrum mode.
+Snap the slope of the line to the nearest 15-degree angle by holding {Shift}.
+
+Increment/decrement brush width: {Arrow Keys} or {Shift + Scroll Wheel}

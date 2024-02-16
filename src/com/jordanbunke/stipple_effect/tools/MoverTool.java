@@ -8,12 +8,13 @@ import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Geometry;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public sealed abstract class MoverTool extends Tool
+public sealed abstract class MoverTool extends Tool implements SnappableTool
         permits MoveSelection, PickUpSelection {
     public enum TransformType {
         NONE, MOVE, STRETCH, ROTATE
@@ -26,11 +27,11 @@ public sealed abstract class MoverTool extends Tool
             if (this == NA)
                 return Double.MAX_VALUE;
 
-            return ordinal() * Constants.SNAP_INC;
+            return ordinal() * Constants._45_SNAP_INC;
         }
     }
 
-    private static boolean snap = false;
+    private boolean snap = false;
 
     private TransformType transformType, prospectiveType;
     private Direction direction;
@@ -53,7 +54,7 @@ public sealed abstract class MoverTool extends Tool
         startBottomRight = Constants.NO_VALID_TARGET;
     }
 
-    abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
+    public abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
     abstract StretcherFunction getStretcherFunction(final SEContext context);
     abstract RotateFunction getRotateFunction(final SEContext context);
     abstract Runnable getMouseUpConsequence(final SEContext context);
@@ -122,13 +123,27 @@ public sealed abstract class MoverTool extends Tool
             atTop = tp.y < top && topProx <= Constants.ROTATE_PX_THRESHOLD;
             atBottom = tp.y > bottom && bottomProx <= Constants.ROTATE_PX_THRESHOLD;
 
-            if (atLeft || atRight || atTop || atBottom) {
-                // direction = Direction.NA;
-                direction = atLeft ? (atTop ? Direction.TL
-                        : (atBottom ? Direction.BL : Direction.L)) :
-                        (atRight ? (atTop ? Direction.TR
-                                : (atBottom ? Direction.BR : Direction.R)) :
-                                (atTop ? Direction.T : Direction.B));
+            final int middleX = left + ((right - left) / 2),
+                    middleY = top + ((bottom - top) / 2);
+            final boolean atMiddleX = Math.abs(tp.x - middleX) < Constants.ROTATE_PX_THRESHOLD,
+                    atMiddleY = Math.abs(tp.y - middleY) < Constants.ROTATE_PX_THRESHOLD;
+
+            if (atLeft || atRight) {
+                if (atTop) {
+                    direction = atLeft ? Direction.TL : Direction.TR;
+                    return TransformType.ROTATE;
+                } else if (atBottom) {
+                    direction = atLeft ? Direction.BL : Direction.BR;
+                    return TransformType.ROTATE;
+                } else if (atMiddleY) {
+                    direction = atLeft ? Direction.L : Direction.R;
+                    return TransformType.ROTATE;
+                }
+            } else if (atTop && atMiddleX) {
+                direction = Direction.T;
+                return TransformType.ROTATE;
+            } else if (atBottom && atMiddleX) {
+                direction = Direction.B;
                 return TransformType.ROTATE;
             }
 
@@ -191,12 +206,23 @@ public sealed abstract class MoverTool extends Tool
         switch (transformType) {
             case NONE -> prospectiveType = determineTransformType(context);
             case MOVE -> {
-                final Coord2D topLeft = SelectionUtils.topLeft(
-                        context.getState().getSelection());
-                final Coord2D displacement = new Coord2D(
+                final Set<Coord2D> selection = context.getState().getSelection();
+                final Coord2D topLeft = SelectionUtils.topLeft(selection);
+
+                Coord2D displacement = new Coord2D(
                         -(int)((startMousePosition.x - mousePosition.x) / zoomFactor),
                         -(int)((startMousePosition.y - mousePosition.y) / zoomFactor)
                 ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
+
+                if (isSnap()) {
+                    final Coord2D bounds = SelectionUtils.bounds(selection);
+
+                    final int snappedX = bounds.x * (int)Math.round(
+                            displacement.x / (double) bounds.x),
+                            snappedY = bounds.y * (int)Math.round(
+                                    displacement.y / (double) bounds.y);
+                    displacement = new Coord2D(snappedX, snappedY);
+                }
 
                 getMoverFunction(context).accept(displacement, false);
             }
@@ -229,16 +255,18 @@ public sealed abstract class MoverTool extends Tool
                             (startTopLeft.y + startBottomRight.y) % 2 == 0
                     };
                     final double
-                            initialAngle = SelectionUtils.calculateAngleInRad(startTP, pivot),
-                            angle = SelectionUtils.calculateAngleInRad(tp, pivot),
+                            initialAngle = Geometry.calculateAngleInRad(startTP, pivot),
+                            angle = Geometry.calculateAngleInRad(tp, pivot),
                             candidate = ((initialAngle > angle
                                     ? Constants.CIRCLE : 0d) + angle) - initialAngle,
-                            deltaR = snap ? SelectionUtils.snapAngle(candidate) : candidate;
+                            deltaR = isSnap() ? Geometry.snapAngle(
+                                    candidate, Constants._45_SNAP_INC) :
+                                    candidate;
 
                     direction = MathPlus.findBest(Direction.NA,
                             Double.MAX_VALUE, Direction::angle,
-                            (a, b) -> SelectionUtils.angleDiff(angle, a) <
-                                    SelectionUtils.angleDiff(angle, b),
+                            (a, b) -> Geometry.angleDiff(angle, a) <
+                                    Geometry.angleDiff(angle, b),
                             Direction.values());
 
                     getRotateFunction(context).accept(startSelection,
@@ -261,7 +289,13 @@ public sealed abstract class MoverTool extends Tool
         }
     }
 
-    public static void setSnap(final boolean snap) {
-        MoverTool.snap = snap;
+    @Override
+    public void setSnap(final boolean snap) {
+        this.snap = snap;
+    }
+
+    @Override
+    public boolean isSnap() {
+        return snap;
     }
 }

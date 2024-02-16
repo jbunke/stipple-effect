@@ -59,7 +59,7 @@ public final class Fill extends ToolThatSearches {
             matched.forEach(m -> edit.setRGB(m.x, m.y, rgb));
 
             context.stampImage(edit.submit(), matched);
-            context.getState().markAsCheckpoint(true, context);
+            context.getState().markAsCheckpoint(true);
         }
     }
 

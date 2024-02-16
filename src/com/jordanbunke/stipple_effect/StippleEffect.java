@@ -20,11 +20,11 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
+import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.ColorMenuMode;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
-import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -221,8 +223,7 @@ public class StippleEffect implements ProgramContext {
     private void updateStatus(final String message) {
         millisSinceStatusUpdate = 0;
 
-        final GameImage text = GraphicsUtils.uiText(Constants.WHITE)
-                .addText(message).build().draw();
+        final GameImage text = ParserUtils.generateStatusEffectText(message);
         final int w = text.getWidth() + (4 * Layout.BUTTON_BORDER_PX),
                 h = text.getHeight() - (4 * Layout.BUTTON_BORDER_PX);
 
@@ -362,7 +363,8 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
-                        if (hasPaletteContents())
+                        if (hasPaletteContents() &&
+                                getSelectedPalette().isMutable())
                             DialogAssembly.setDialogToSavePalette(getSelectedPalette());
                     });
         } else if (eventLogger.isPressed(Key.SHIFT)) {
@@ -380,16 +382,46 @@ public class StippleEffect implements ProgramContext {
                     this::removeColorFromPalette);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToPaletteFromContents);
+                    () -> {
+                        if (hasPaletteContents() &&
+                                getSelectedPalette().isMutable())
+                            DialogAssembly.setDialogToAddContentsToPalette(
+                                    getSelectedPalette());
+                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
                         if (hasPaletteContents())
-                            DialogAssembly.setDialogToPalettize(getSelectedPalette());
+                            DialogAssembly.setDialogToPalettize(
+                                    getSelectedPalette());
                     });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToPanelManager);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
+                    this::newPalette);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (hasPaletteContents())
+                            DialogAssembly.setDialogToSortPalette(
+                                    getSelectedPalette());
+                    });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (hasPaletteContents() &&
+                                getSelectedPalette().isMutable())
+                            DialogAssembly.setDialogToPaletteSettings(
+                                    getSelectedPalette());
+                    });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
+                    this::moveColorLeftInPalette);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
+                    this::moveColorRightInPalette);
         } else {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
@@ -412,6 +444,12 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
                     () -> setTool(Brush.get()));
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
+                    () -> setTool(ShadeBrush.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
+                    () -> setTool(GradientTool.get()));
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
                     () -> setTool(Eraser.get()));
             eventLogger.checkForMatchingKeyStroke(
@@ -421,6 +459,9 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     () -> setTool(Fill.get()));
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
+                    () -> setTool(LineTool.get()));
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
                     () -> setTool(Wand.get()));
             eventLogger.checkForMatchingKeyStroke(
@@ -429,6 +470,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
                     () -> setTool(BoxSelect.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
+                    () -> setTool(PolygonSelect.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
                     () -> setTool(MoveSelection.get()));
@@ -567,7 +611,7 @@ public class StippleEffect implements ProgramContext {
         // borders
         final float strokeWidth = 2f;
 
-        canvas.setColor(Constants.BLACK);
+        canvas.setColor(Constants.DARK);
         canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, wp.y); // projects and frame separation
         canvas.drawLine(strokeWidth, pp.x, tp.y, Layout.width(), tp.y); // top segments and middle separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
@@ -710,6 +754,11 @@ public class StippleEffect implements ProgramContext {
     public void newProject() {
         addContext(new SEContext(DialogVals.getNewProjectWidth(),
                 DialogVals.getNewProjectHeight()), true);
+    }
+
+    public void newPalette() {
+        addPalette(new Palette("Palette " +
+                (palettes.size() + 1), new Color[] {}), true);
     }
 
     public void openProject() {
@@ -880,6 +929,18 @@ public class StippleEffect implements ProgramContext {
         rebuildColorsMenu();
     }
 
+    public void deletePalette() {
+        if (hasPaletteContents()) {
+            palettes.remove(paletteIndex);
+
+            if (paletteIndex >= palettes.size())
+                setPaletteIndex(palettes.size() - 1);
+
+            colorMenuMode = ColorMenuMode.PALETTE;
+            rebuildColorsMenu();
+        }
+    }
+
     public boolean hasPaletteContents() {
         return paletteIndex != Constants.NO_SELECTION &&
                 palettes != null && paletteIndex < palettes.size();
@@ -890,16 +951,50 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void addColorToPalette() {
-        if (hasPaletteContents()) {
-            getSelectedPalette().addColor(getSelectedColor());
-            rebuildColorsMenu();
-        }
+        paletteSelectedColorAction(Palette::addColor,
+                Palette::canAdd, StatusUpdates::addColorToPalette,
+                (p, c) -> StatusUpdates.cannotColorPalette(true, p, c));
     }
 
     public void removeColorFromPalette() {
-        if (hasPaletteContents()) {
-            getSelectedPalette().removeColor(getSelectedColor());
-            rebuildColorsMenu();
+        paletteSelectedColorAction(Palette::removeColor,
+                Palette::canRemove, StatusUpdates::removeColorFromPalette,
+                (p, c) -> StatusUpdates.cannotColorPalette(false, p, c));
+    }
+
+    public void moveColorLeftInPalette() {
+        paletteSelectedColorAction(Palette::moveLeft,
+                Palette::canMoveLeft, StatusUpdates::moveLeftInPalette,
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(true, p, c));
+    }
+
+    public void moveColorRightInPalette() {
+        paletteSelectedColorAction(Palette::moveRight,
+                Palette::canMoveRight, StatusUpdates::moveRightInPalette,
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(false, p, c));
+    }
+
+    private void paletteSelectedColorAction(
+            final BiConsumer<Palette, Color> f,
+            final BiFunction<Palette, Color, Boolean> precondition,
+            final BiConsumer<Palette, Color> statusUpdate,
+            final BiConsumer<Palette, Color> notPermitted
+    ) {
+        final Palette p = getSelectedPalette();
+        final Color c = getSelectedColor();
+
+        if (hasPaletteContents() && precondition.apply(p, c)) {
+            f.accept(p, c);
+
+            if (Layout.isColorsPanelShowing() && colorMenuMode == ColorMenuMode.PALETTE)
+                rebuildColorsMenu();
+            else
+                statusUpdate.accept(p, c);
+        } else if (hasPaletteContents()) {
+            // precondition failed
+            notPermitted.accept(p, c);
+        } else {
+            StatusUpdates.noPalette();
         }
     }
 
@@ -916,11 +1011,19 @@ public class StippleEffect implements ProgramContext {
             final int deltaH
     ) {
         final Color c = getSelectedColor();
-        final int hue = MathPlus.bounded(0,
-                ColorMath.hueGetter(c) + deltaH, Constants.HUE_SCALE);
+        int hue = ColorMath.hueGetter(c) + deltaH;
 
-        setSelectedColor(ColorMath.hueAdjustedColor(hue, c),
-                ColorMath.LastHSVEdit.HUE);
+        while (hue > Constants.HUE_SCALE)
+            hue -= Constants.HUE_SCALE;
+
+        while (hue < 0)
+            hue += Constants.HUE_SCALE;
+
+        final Color newC = ColorMath.hueAdjustedColor(hue, c);
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.HUE);
+
+        StatusUpdates.colorSliderAdjustment("Hue", hue, newC);
     }
 
     public void incrementSelectedColorSaturation(
@@ -930,8 +1033,11 @@ public class StippleEffect implements ProgramContext {
         final int sat = MathPlus.bounded(0,
                 ColorMath.satGetter(c) + deltaS, Constants.SAT_SCALE);
 
-        setSelectedColor(ColorMath.satAdjustedColor(sat, c),
-                ColorMath.LastHSVEdit.SAT);
+        final Color newC = ColorMath.satAdjustedColor(sat, c);
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.SAT);
+
+        StatusUpdates.colorSliderAdjustment("Saturation", sat, newC);
     }
 
     public void incrementSelectedColorValue(
@@ -941,22 +1047,47 @@ public class StippleEffect implements ProgramContext {
         final int value = MathPlus.bounded(0,
                 ColorMath.valueGetter(c) + deltaV, Constants.VALUE_SCALE);
 
-        setSelectedColor(ColorMath.valueAdjustedColor(value, c),
-                ColorMath.LastHSVEdit.VAL);
+        final Color newC = ColorMath.valueAdjustedColor(value, c);
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.VAL);
+
+        StatusUpdates.colorSliderAdjustment("Value", value, newC);
     }
 
     public void incrementSelectedColorRGBA(
             final int deltaR, final int deltaG,
             final int deltaB, final int deltaAlpha
     ) {
-        final Color c = getSelectedColor();
-
-        setSelectedColor(new Color(
+        final Color c = getSelectedColor(), newC = new Color(
                 MathPlus.bounded(0, c.getRed() + deltaR, Constants.RGBA_SCALE),
                 MathPlus.bounded(0, c.getGreen() + deltaG, Constants.RGBA_SCALE),
                 MathPlus.bounded(0, c.getBlue() + deltaB, Constants.RGBA_SCALE),
                 MathPlus.bounded(0, c.getAlpha() + deltaAlpha, Constants.RGBA_SCALE)
-        ), ColorMath.LastHSVEdit.NONE);
+        );
+
+        setSelectedColor(newC, ColorMath.LastHSVEdit.NONE);
+
+        final String slider;
+        final int sliderVal;
+
+        if (deltaR != 0) {
+            slider = "Red";
+            sliderVal = newC.getRed();
+        } else if (deltaG != 0) {
+            slider = "Green";
+            sliderVal = newC.getGreen();
+        } else if (deltaB != 0) {
+            slider = "Blue";
+            sliderVal = newC.getBlue();
+        } else if (deltaAlpha != 0) {
+            slider = "Alpha";
+            sliderVal = newC.getAlpha();
+        } else {
+            slider = "???";
+            sliderVal = 0;
+        }
+
+        StatusUpdates.colorSliderAdjustment(slider, sliderVal, newC);
     }
 
     public void setSelectedColor(final Color color, final ColorMath.LastHSVEdit lastHSVEdit) {
@@ -981,6 +1112,9 @@ public class StippleEffect implements ProgramContext {
         colors[SECONDARY] = temp;
 
         ColorMath.setLastHSVEdit(ColorMath.LastHSVEdit.NONE, getSelectedColor());
+
+        if (!Layout.isColorsPanelShowing())
+            StatusUpdates.swapColors();
     }
 
     public void toggleColorMenuMode() {

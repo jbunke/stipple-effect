@@ -44,7 +44,7 @@ public class DialogVals {
         STARTUP, FORMAT, VISUAL;
 
         public String getTitle() {
-            return this + " settings";
+            return (this == STARTUP ? this + " / default" : this) + " settings";
         }
 
         @Override
