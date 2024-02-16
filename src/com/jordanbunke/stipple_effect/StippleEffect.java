@@ -363,7 +363,8 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
                     () -> {
-                        if (hasPaletteContents())
+                        if (hasPaletteContents() &&
+                                getSelectedPalette().isMutable())
                             DialogAssembly.setDialogToSavePalette(getSelectedPalette());
                     });
         } else if (eventLogger.isPressed(Key.SHIFT)) {
@@ -410,7 +411,8 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
                     () -> {
-                        if (hasPaletteContents())
+                        if (hasPaletteContents() &&
+                                getSelectedPalette().isMutable())
                             DialogAssembly.setDialogToPaletteSettings(
                                     getSelectedPalette());
                     });
@@ -984,7 +986,7 @@ public class StippleEffect implements ProgramContext {
         if (hasPaletteContents() && precondition.apply(p, c)) {
             f.accept(p, c);
 
-            if (Layout.isColorsPanelShowing())
+            if (Layout.isColorsPanelShowing() && colorMenuMode == ColorMenuMode.PALETTE)
                 rebuildColorsMenu();
             else
                 statusUpdate.accept(p, c);
