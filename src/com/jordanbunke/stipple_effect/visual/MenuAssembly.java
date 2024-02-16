@@ -193,9 +193,12 @@ public class MenuAssembly {
                         IconCodes.REMOVE_FRAME,
                         IconCodes.MOVE_FRAME_BACK,
                         IconCodes.MOVE_FRAME_FORWARD,
+                        // gap between frame operations and navigation/playback
+                        Constants.ICON_ID_GAP_CODE,
                         IconCodes.TO_FIRST_FRAME,
                         IconCodes.PREVIOUS,
-                        Constants.ICON_ID_GAP_CODE, // gap for play/stop button
+                        // gap for play/stop button
+                        Constants.ICON_ID_GAP_CODE,
                         IconCodes.NEXT,
                         IconCodes.TO_LAST_FRAME
                 },
@@ -205,6 +208,7 @@ public class MenuAssembly {
                         () -> c.getState().canRemoveFrame(),
                         () -> c.getState().canMoveFrameBack(),
                         () -> c.getState().canMoveFrameForward(),
+                        () -> false, // placeholder
                         () -> true,
                         () -> true,
                         () -> false, // placeholder
@@ -216,6 +220,7 @@ public class MenuAssembly {
                         c::removeFrame,
                         c::moveFrameBack,
                         c::moveFrameForward,
+                        () -> {}, // placeholder
                         () -> c.getState().setFrameIndex(0),
                         () -> c.getState().previousFrame(),
                         () -> {}, // placeholder
@@ -234,7 +239,7 @@ public class MenuAssembly {
         // play/stop as toggle
 
         final Coord2D playStopTogglePos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X + (7 * Layout.BUTTON_INC),
+                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X + (8 * Layout.BUTTON_INC),
                 Layout.ICON_BUTTON_OFFSET_Y);
 
         mb.add(generatePlayStopToggle(playStopTogglePos));
@@ -242,7 +247,7 @@ public class MenuAssembly {
         // playback mode toggle button
 
         final Coord2D playbackModeTogglePos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X + (10 * Layout.BUTTON_INC),
+                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X + (11 * Layout.BUTTON_INC),
                 Layout.ICON_BUTTON_OFFSET_Y);
         mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
 

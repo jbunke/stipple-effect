@@ -27,6 +27,7 @@
   * Layer actions when layer panel is hidden
   * Frame actions when frame panel is hidden
 * Pixel grid
+  * Holding Shift while using box select snaps selection to pixel grid
 * New fonts SE (default) and Pencil SE
 * Snap option for moving (translating) selection bounds and contents
 ### Changed:
