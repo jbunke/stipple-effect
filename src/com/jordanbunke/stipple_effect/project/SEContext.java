@@ -1083,7 +1083,6 @@ public class SEContext {
                     .changeIsCheckpoint(true);
             stateManager.performAction(result,
                     Operation.RESET_SELECTION_CONTENTS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1120,7 +1119,6 @@ public class SEContext {
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result,
                     Operation.STRETCH_SELECTION_CONTENTS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1141,7 +1139,6 @@ public class SEContext {
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result,
                     Operation.ROTATE_SELECTION_CONTENTS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1166,8 +1163,6 @@ public class SEContext {
 
             if (raiseAndDrop)
                 dropContentsToLayer(true, false);
-            else
-                redrawSelectionOverlay();
         }
     }
 
@@ -1203,7 +1198,6 @@ public class SEContext {
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result,
                     Operation.STRETCH_SELECTION_BOUNDS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1222,7 +1216,6 @@ public class SEContext {
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result,
                     Operation.ROTATE_SELECTION_BOUNDS);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1246,8 +1239,6 @@ public class SEContext {
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
-
-            redrawSelectionOverlay();
         }
     }
 
@@ -1276,7 +1267,6 @@ public class SEContext {
 
             moveSelectionBounds(new Coord2D(-tl.x, -tl.y), false);
 
-            redrawCanvasAuxiliaries();
             snapToCenterOfImage();
         }
     }
@@ -1374,7 +1364,6 @@ public class SEContext {
                             : new HashSet<>(contents.getPixels()))
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, Operation.DROP);
-            redrawSelectionOverlay();
         }
     }
 
@@ -1469,8 +1458,6 @@ public class SEContext {
 
         if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
-
-        redrawSelectionOverlay();
     }
 
     // invert selection
@@ -1499,8 +1486,6 @@ public class SEContext {
 
         if (dropAndRaise || StippleEffect.get().getTool().equals(PickUpSelection.get()))
             raiseSelectionToContents(true);
-
-        redrawSelectionOverlay();
     }
 
     // edit selection
@@ -1525,7 +1510,6 @@ public class SEContext {
         final ProjectState result = getState().changeSelectionBounds(
                 selection).changeIsCheckpoint(checkpoint);
         stateManager.performAction(result, Operation.SELECT);
-        redrawSelectionOverlay();
     }
 
     public void pad() {
@@ -1543,7 +1527,6 @@ public class SEContext {
                 .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
         stateManager.performAction(result, Operation.PAD);
 
-        redrawCanvasAuxiliaries();
         snapToCenterOfImage();
     }
 
@@ -1558,7 +1541,6 @@ public class SEContext {
                 .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, Operation.RESIZE);
 
-        redrawCanvasAuxiliaries();
         snapToCenterOfImage();
     }
 
