@@ -61,7 +61,9 @@ public final class SELayer {
     }
 
     private void generateRenders() {
-        if (framesLinked)
+        if (framesLinked && opacity == Constants.OPAQUE)
+            renders.add(frames.get(0));
+        else if (framesLinked)
             renders.add(renderFrame(0));
         else if (opacity == Constants.OPAQUE)
             renders.addAll(frames);
@@ -310,10 +312,14 @@ public final class SELayer {
 
         for (int x = 0; x < render.getWidth(); x++) {
             for (int y = 0; y < render.getHeight(); y++) {
-                final Color c = ImageProcessing.colorAtPixel(frame, x, y),
-                        cp = new Color(c.getRed(), c.getGreen(), c.getBlue(),
-                                (int)(c.getAlpha() * opacity));
-                render.dot(cp, x, y);
+                final Color c = ImageProcessing.colorAtPixel(frame, x, y);
+
+                if (c.getAlpha() == 0)
+                    continue;
+
+                final Color cp = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                        (int)(c.getAlpha() * opacity));
+                render.setRGB(x, y, cp.getRGB());
             }
         }
 
