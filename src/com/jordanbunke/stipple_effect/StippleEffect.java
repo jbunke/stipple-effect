@@ -999,8 +999,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void setContextIndex(final int contextIndex) {
-        if (this.contextIndex != contextIndex &&
-                contextIndex >= 0 && contextIndex < contexts.size()) {
+        if (contextIndex >= 0 && contextIndex < contexts.size()) {
             this.contextIndex = contextIndex;
             rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
