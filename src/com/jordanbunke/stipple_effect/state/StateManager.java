@@ -5,8 +5,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class StateManager {
     private int index;
@@ -94,6 +93,8 @@ public class StateManager {
                 redrawSelectionOverlay = false,
                 redrawCanvasAuxiliaries = false;
 
+        final Set<ActionType> triggeredActions = new HashSet<>();
+
         for (int i = was; inc > 0 ? i <= index : i >= index;
              i += inc) {
             final ProjectState s = states.get(i);
@@ -103,6 +104,8 @@ public class StateManager {
                     .triggersSelectionOverlayRedraw();
             redrawCanvasAuxiliaries |= s.getOperation()
                     .triggersCanvasAuxiliaryRedraw();
+
+            triggeredActions.add(s.getOperation().getActionType());
         }
 
         final SEContext c = StippleEffect.get().getContext();
@@ -116,7 +119,8 @@ public class StateManager {
         if (redrawCanvasAuxiliaries)
             c.redrawCanvasAuxiliaries();
 
-        getState().getOperation().getActionType().consequence();
+        for (ActionType actionType : triggeredActions)
+            actionType.consequence();
     }
 
     private void updateStateMetadataAndAssets(final ProjectState state) {
