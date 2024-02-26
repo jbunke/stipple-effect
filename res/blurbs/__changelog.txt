@@ -11,6 +11,12 @@ Fix:
 > Performance optimizations
 > Memory issues and related crashes
 
+{0.2.0.1} - 2024-02-26
+
+Fixed:
+> Crash bug that was caused by undo/redo operations not executing their consequence
+    (e.g. undoing "add layer" operation did not redraw the layer buttons)
+
 {0.2.0} - 2024-02-16
 
 Added:
