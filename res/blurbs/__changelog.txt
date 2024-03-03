@@ -11,6 +11,24 @@ Fix:
 > Performance optimizations
 > Memory issues and related crashes
 
+{TODO for 0.3.0}
+
+Add:
+> Add "Frame Conversion" dialog
+> Add text tool
+> Add tool options bar
+
+Change:
+> Overhaul preview window
+> Redesign and expand project dialogs
+> Optimize selection overlays
+> Redraw frame icons to feature purple film reels instead of orange motion blobs
+
+Fix:
+> Bug: Palettes are saved with the palette name instead of the filename
+
+{0.3.0} - 2024-??-??
+
 {0.2.0.1} - 2024-02-26
 
 Fixed:
