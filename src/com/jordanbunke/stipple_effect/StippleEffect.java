@@ -103,6 +103,10 @@ public class StippleEffect implements ProgramContext {
     private String toolTipCode, provisionalToolTipCode;
     private GameImage toolTip;
 
+    // timer
+    private int timerCounter, timerMillis;
+    private boolean timerToggle;
+
     static {
         OnStartup.run();
         Settings.read();
@@ -189,6 +193,10 @@ public class StippleEffect implements ProgramContext {
         provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
         toolTipCode = Constants.ICON_ID_GAP_CODE;
         toolTip = GameImage.dummy();
+
+        timerCounter = 0;
+        timerToggle = false;
+        timerMillis = 0;
 
         configureDebugger();
     }
@@ -489,9 +497,25 @@ public class StippleEffect implements ProgramContext {
         if (dialog == null) {
             getContext().animate(deltaTime);
 
+            final int millisThisTick = (int)
+                    (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
+
+            // system timer
+            timerMillis += millisThisTick;
+
+            if (timerMillis >= Constants.MILLIS_PER_TIMER_INC) {
+                timerMillis -= Constants.MILLIS_PER_TIMER_INC;
+
+                timerCounter++;
+
+                if (timerCounter >= Constants.TIMER_MAX_OUT) {
+                    timerCounter = 0;
+                    timerToggle = !timerToggle;
+                }
+            }
+
             // status update
-            millisSinceStatusUpdate +=
-                    (int) (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
+            millisSinceStatusUpdate += millisThisTick;
 
             // bottom bar
             bottomBarMenu.update(deltaTime);
@@ -749,6 +773,14 @@ public class StippleEffect implements ProgramContext {
 
     public Tool getTool() {
         return tool;
+    }
+
+    public int getTimerCounter() {
+        return timerCounter;
+    }
+
+    public boolean isTimerToggle() {
+        return timerToggle;
     }
 
     public void newProject() {

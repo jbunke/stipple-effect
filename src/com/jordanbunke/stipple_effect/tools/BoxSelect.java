@@ -3,22 +3,25 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Settings;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class BoxSelect extends ToolWithMode implements OverlayTool, SnappableTool {
+public final class BoxSelect extends ToolWithMode implements SnappableTool {
     private static final BoxSelect INSTANCE;
 
     private boolean drawing, snap;
     private Coord2D pivotTP, endTP, topLeft, bottomRight;
-    private GameImage selectionOverlay;
+    private GameImage toolContentPreview;
+
+    private int lastOffset;
 
     static {
         INSTANCE = new BoxSelect();
@@ -28,12 +31,14 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
         drawing = false;
         snap = false;
 
+        lastOffset = 0;
+
         pivotTP = Constants.NO_VALID_TARGET;
         endTP = Constants.NO_VALID_TARGET;
         topLeft = Constants.NO_VALID_TARGET;
         bottomRight = Constants.NO_VALID_TARGET;
 
-        selectionOverlay = GameImage.dummy();
+        toolContentPreview = GameImage.dummy();
     }
 
     public static BoxSelect get() {
@@ -54,12 +59,14 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         final Coord2D tp = snapToClosestGridPosition(
-                context, context.getTargetPixel());
+                context, context.getTargetPixel(), true);
 
         // this condition instead of constants.isTargetingPixelOnCanvas()
         // so that dragging can start off canvas
         if (!tp.equals(Constants.NO_VALID_TARGET)) {
             drawing = true;
+
+            lastOffset = StippleEffect.get().getTimerCounter();
 
             if (ToolWithMode.getMode() == Mode.SINGLE)
                 context.deselect(false);
@@ -71,8 +78,7 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
             topLeft = tp;
             bottomRight = SelectionUtils.bottomRight(bounds);
 
-            selectionOverlay = GraphicsUtils.drawSelectionOverlay(
-                    context.renderInfo.getZoomFactor(), bounds, false, false);
+            updateToolContentPreview(context);
         }
     }
 
@@ -81,25 +87,31 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
         if (drawing) {
             final Coord2D tp = context.getTargetPixel();
 
-            if (tp.equals(endTP) || tp.equals(Constants.NO_VALID_TARGET))
+            if (tp.equals(endTP) || tp.equals(Constants.NO_VALID_TARGET)) {
+                final int offset = StippleEffect.get().getTimerCounter();
+
+                if (offset != lastOffset)
+                    updateToolContentPreview(context);
+
+                lastOffset = offset;
                 return;
+            }
 
             endTP = tp;
 
             final Set<Coord2D> bounds = new HashSet<>(pivotTP.equals(endTP)
                     ? Set.of(pivotTP) : Set.of(pivotTP, endTP));
             topLeft = snapToClosestGridPosition(context,
-                    SelectionUtils.topLeft(bounds));
+                    SelectionUtils.topLeft(bounds), true);
             bottomRight = snapToClosestGridPosition(context,
-                    SelectionUtils.bottomRight(bounds));
+                    SelectionUtils.bottomRight(bounds), false);
 
             bounds.clear();
             for (int x = topLeft.x; x < bottomRight.x; x++)
                 for (int y = topLeft.y; y < bottomRight.y; y++)
                     bounds.add(new Coord2D(x, y));
 
-            selectionOverlay = GraphicsUtils.drawSelectionOverlay(
-                    context.renderInfo.getZoomFactor(), bounds, false, false);
+            updateToolContentPreview(context);
         }
     }
 
@@ -124,15 +136,17 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
     }
 
     private Coord2D snapToClosestGridPosition(
-            final SEContext context, final Coord2D pos
+            final SEContext context, final Coord2D pos, final boolean in
     ) {
         if (!(isSnap() && canSnap(context)))
             return pos;
 
         final int pgX = Settings.getPixelGridXPixels(),
                 pgY = Settings.getPixelGridYPixels(),
-                x = (int) Math.round(pos.x / (double) pgX),
-                y = (int) Math.round(pos.y / (double) pgY);
+                x = ((int) (pos.x / (double) pgX)) +
+                        (in ? 0 : (pos.x % pgX == 0 ? 0 : 1)),
+                y = ((int) (pos.y / (double) pgY)) +
+                        (in ? 0 : (pos.y % pgY == 0 ? 0 : 1));
 
         return new Coord2D(x * pgX, y * pgY);
     }
@@ -142,19 +156,54 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
                 context.couldRenderPixelGrid();
     }
 
-    @Override
-    public Coord2D getTopLeft() {
-        return topLeft;
-    }
+    private void updateToolContentPreview(final SEContext context) {
+        final int w = context.getState().getImageWidth(),
+                h = context.getState().getImageHeight();
 
-    @Override
-    public GameImage getSelectionOverlay() {
-        return selectionOverlay;
-    }
+        toolContentPreview = new GameImage(w, h);
 
-    @Override
-    public boolean isDrawing() {
-        return drawing;
+        final boolean reverse = StippleEffect.get().isTimerToggle();
+        final Color a = reverse ? Constants.WHITE : Constants.BLACK,
+                b = reverse ? Constants.BLACK : Constants.WHITE;
+        final int offset = StippleEffect.get().getTimerCounter(), altPx = 4,
+                distanceX = bottomRight.x - topLeft.x,
+                distanceY = bottomRight.y - topLeft.y,
+                realOffsetX = Math.min(offset, distanceX),
+                realOffsetY = Math.min(offset, distanceY);
+
+        if (realOffsetX > 0) {
+            toolContentPreview.fillRectangle(b,
+                    topLeft.x, topLeft.y, realOffsetX, 1);
+            toolContentPreview.fillRectangle(a,
+                    topLeft.x, bottomRight.y - 1, realOffsetX, 1);
+
+            toolContentPreview.fillRectangle(b,
+                    topLeft.x, topLeft.y, 1, realOffsetY);
+            toolContentPreview.fillRectangle(a,
+                    bottomRight.x - 1, topLeft.y, 1, realOffsetY);
+        }
+
+        for (int x = offset; x < distanceX; x += altPx) {
+            final boolean isA = (x / altPx) % 2 == 0;
+
+            final int tickLength = Math.min(altPx, distanceX - x);
+
+            toolContentPreview.fillRectangle(isA ? a : b,
+                    topLeft.x + x, topLeft.y, tickLength, 1);
+            toolContentPreview.fillRectangle(isA ? b : a,
+                    topLeft.x + x, bottomRight.y - 1, tickLength, 1);
+        }
+
+        for (int y = offset; y < distanceY; y += altPx) {
+            final boolean isA = (y / altPx) % 2 == 0;
+
+            final int tickLength = Math.min(altPx, distanceY - y);
+
+            toolContentPreview.fillRectangle(isA ? a : b,
+                    topLeft.x, topLeft.y + y, 1, tickLength);
+            toolContentPreview.fillRectangle(isA ? b : a,
+                    bottomRight.x - 1, topLeft.y + y, 1, tickLength);
+        }
     }
 
     @Override
@@ -165,5 +214,20 @@ public final class BoxSelect extends ToolWithMode implements OverlayTool, Snappa
     @Override
     public boolean isSnap() {
         return snap;
+    }
+
+    @Override
+    public boolean hasToolContentPreview() {
+        return drawing;
+    }
+
+    @Override
+    public boolean previewScopeIsGlobal() {
+        return true;
+    }
+
+    @Override
+    public GameImage getToolContentPreview() {
+        return toolContentPreview;
     }
 }

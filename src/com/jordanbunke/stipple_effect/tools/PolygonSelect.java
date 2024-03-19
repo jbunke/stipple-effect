@@ -72,9 +72,6 @@ public final class PolygonSelect extends ToolWithMode {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
 
-            if (tp.x < 0 || tp.x >= w || tp.y < 0 || tp.y >= h)
-                return;
-
             if (selecting) {
                 // add to selection
                 addEdge(getLastVertex(), tp);
@@ -82,8 +79,9 @@ public final class PolygonSelect extends ToolWithMode {
 
                 if (tp.equals(vertices.get(0)))
                     finish(context);
-            } else {
+            } else if (tp.x >= 0 && tp.x < w && tp.y >= 0 && tp.y < h) {
                 // Start selection
+                // bounds check only necessary for first vertex
                 selecting = true;
                 vertices = new ArrayList<>();
                 vertices.add(tp);

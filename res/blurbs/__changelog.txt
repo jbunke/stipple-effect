@@ -25,8 +25,14 @@ Change:
 
 {0.3.0} - 2024-??-??
 
+Added:
+> Added system timer
+
 Changed:
 > Redrew frame icons to feature purple film reels instead of orange motion blobs
+> Changed box select tool's overlay to a tool content preview
+> Modified box select tool snapping behaviour
+> Modified polygon select behaviour: middle vertices can be placed off the canvas
 
 Fixed:
 > Bug: Palettes were saved with the palette name instead of the filename
