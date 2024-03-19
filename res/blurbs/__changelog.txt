@@ -22,12 +22,14 @@ Change:
 > Overhaul preview window
 > Redesign and expand project dialogs
 > Optimize selection overlays
-> Redraw frame icons to feature purple film reels instead of orange motion blobs
 
 Fix:
 > Bug: Palettes are saved with the palette name instead of the filename
 
 {0.3.0} - 2024-??-??
+
+Changed:
+> Redrew frame icons to feature purple film reels instead of orange motion blobs
 
 {0.2.0.1} - 2024-02-26
 
