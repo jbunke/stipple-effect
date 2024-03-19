@@ -645,9 +645,11 @@ public class DialogAssembly {
         mb.add(folderButton);
 
         // name text box
+        final String suggestedFilename = palette.getName().toLowerCase()
+                .replaceAll(" ", "_");
+        DialogVals.setPaletteName(suggestedFilename);
         final TextBox nameTextBox = makeDialogNameTextBox(nameLabel,
-                palette.getName().toLowerCase().replaceAll(" ", "_"),
-                DialogVals::setPaletteName);
+                suggestedFilename, DialogVals::setPaletteName);
         mb.add(nameTextBox);
 
         final MenuElementGrouping contents =
@@ -769,6 +771,7 @@ public class DialogAssembly {
         final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name: ");
 
         // name textbox
+        DialogVals.setPaletteName(palette.getName());
         final TextBox paletteNameTextBox = makeDialogNameTextBox(
                 paletteNameLabel, palette.getName(), DialogVals::setPaletteName);
 
