@@ -86,4 +86,8 @@ public abstract class Tool {
     public GameImage getToolContentPreview() {
         return GameImage.dummy();
     }
+
+    public boolean hasToolOptionsBar() {
+        return false;
+    }
 }

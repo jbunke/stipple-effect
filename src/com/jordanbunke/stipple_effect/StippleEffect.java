@@ -586,6 +586,7 @@ public class StippleEffect implements ProgramContext {
     public void render(final GameImage canvas) {
         final Coord2D wp = Layout.getWorkspacePosition(),
                 tp = Layout.getToolsPosition(),
+                tobp = Layout.getToolOptionsBarPosition(),
                 lp = Layout.getLayersPosition(),
                 cp = Layout.getColorsPosition(),
                 pp = Layout.getProjectsPosition(),
@@ -607,6 +608,11 @@ public class StippleEffect implements ProgramContext {
         if (Layout.isToolbarShowing()) {
             final GameImage tools = drawTools();
             canvas.draw(tools, tp.x, tp.y);
+
+            if (tool.hasToolOptionsBar()) {
+                final GameImage toolOptionsBar = drawToolOptionsBar();
+                canvas.draw(toolOptionsBar, tobp.x, tobp.y);
+            }
         }
         toolButtonMenu.render(canvas);
         // layers
@@ -636,11 +642,12 @@ public class StippleEffect implements ProgramContext {
         final float strokeWidth = 2f;
 
         canvas.setColor(Constants.DARK);
-        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, wp.y); // projects and frame separation
+        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation
         canvas.drawLine(strokeWidth, pp.x, tp.y, Layout.width(), tp.y); // top segments and middle separation
+        canvas.drawLine(strokeWidth, wp.x, wp.y, lp.x, wp.y); // tool options bar and workspace separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
         canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
-        canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
+        canvas.drawLine(strokeWidth, tobp.x, tobp.y, tobp.x, bbp.y); // tools and options bar/workspace separation
         canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace and right segments separation
 
         if (dialog != null) {
@@ -685,11 +692,21 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawTools() {
         final GameImage tools = new GameImage(Layout.getToolsWidth(),
-                Layout.getWorkspaceHeight());
+                Layout.getToolsHeight());
         tools.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Layout.getToolsWidth(), Layout.getWorkspaceHeight());
+                Layout.getToolsWidth(), Layout.getToolsHeight());
 
         return tools.submit();
+    }
+
+    private GameImage drawToolOptionsBar() {
+        final GameImage toolOptionsBar = new GameImage(
+                Layout.getWorkspaceWidth(),
+                Layout.TOOL_OPTIONS_BAR_H);
+        toolOptionsBar.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
+                Layout.getWorkspaceWidth(), Layout.TOOL_OPTIONS_BAR_H);
+
+        return toolOptionsBar.submit();
     }
 
     private GameImage drawLayers() {

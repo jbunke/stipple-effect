@@ -14,7 +14,7 @@ public class Layout {
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
-            BOTTOM_BAR_H = 24, SCREEN_H_BUFFER = 120,
+            BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = BOTTOM_BAR_H, SCREEN_H_BUFFER = 120,
             MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
             CONTENT_BUFFER_PX = 8,
             DEFAULT_CHECKERBOARD_DIM = 4, CHECKERBOARD_MIN = 1, CHECKERBOARD_MAX = 256,
@@ -219,24 +219,32 @@ public class Layout {
         return isProjectsExpanded() ? CONTEXTS_H : COLLAPSED_CONTEXTS_H;
     }
 
-    public static int getWorkspaceHeight() {
+    public static int getToolOptionsBarHeight() {
+        return isToolbarShowing() && StippleEffect.get().getTool().hasToolOptionsBar() ? TOOL_OPTIONS_BAR_H : 0;
+    }
+
+    public static int getToolsHeight() {
         return height() - (getTopPanelHeight() + BOTTOM_BAR_H);
+    }
+
+    public static int getWorkspaceHeight() {
+        return getToolsHeight() - getToolOptionsBarHeight();
     }
 
     public static int getLayersHeight() {
         if (!isLayersPanelShowing())
             return 0;
 
-        final int workspaceH = getWorkspaceHeight();
+        final int toolsH = getToolsHeight();
 
-        return isColorsPanelShowing() ? workspaceH / 2 : workspaceH;
+        return isColorsPanelShowing() ? toolsH / 2 : toolsH;
     }
 
     public static int getColorsHeight() {
         if (!isColorsPanelShowing())
             return 0;
 
-        return getWorkspaceHeight() - getLayersHeight();
+        return getToolsHeight() - getLayersHeight();
     }
 
     public static Coord2D getProjectsPosition() {
@@ -251,12 +259,16 @@ public class Layout {
         return getProjectsPosition().displace(0, getTopPanelHeight());
     }
 
-    public static Coord2D getWorkspacePosition() {
+    public static Coord2D getToolOptionsBarPosition() {
         return getToolsPosition().displace(getToolsWidth(), 0);
     }
 
+    public static Coord2D getWorkspacePosition() {
+        return getToolOptionsBarPosition().displace(0, getToolOptionsBarHeight());
+    }
+
     public static Coord2D getLayersPosition() {
-        return getWorkspacePosition().displace(getWorkspaceWidth(), 0);
+        return getToolOptionsBarPosition().displace(getWorkspaceWidth(), 0);
     }
 
     public static Coord2D getColorsPosition() {
@@ -264,7 +276,7 @@ public class Layout {
     }
 
     public static Coord2D getBottomBarPosition() {
-        return getToolsPosition().displace(0, getWorkspaceHeight());
+        return getToolsPosition().displace(0, getToolsHeight());
     }
 
     public static Coord2D getSegmentContentDisplacement() {

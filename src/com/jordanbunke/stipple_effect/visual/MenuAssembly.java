@@ -756,7 +756,7 @@ public class MenuAssembly {
         // outline button
         final Coord2D outlinePos = Layout.getToolsPosition()
                 .displace(Layout.BUTTON_OFFSET,
-                        Layout.getWorkspaceHeight() - Layout.BUTTON_INC);
+                        Layout.getToolsHeight() - Layout.BUTTON_INC);
 
         final MenuElement outlineButton = GraphicsUtils.
                 generateIconButton(IconCodes.OUTLINE, outlinePos,

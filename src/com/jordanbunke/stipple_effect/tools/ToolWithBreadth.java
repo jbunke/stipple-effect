@@ -61,4 +61,9 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
 
         drawOverlay();
     }
+
+    @Override
+    public boolean hasToolOptionsBar() {
+        return true;
+    }
 }
