@@ -33,6 +33,7 @@ Changed:
 > Changed box select tool's overlay to a tool content preview
 > Modified box select tool snapping behaviour
 > Modified polygon select behaviour: middle vertices can be placed off the canvas
+> Changed brush select hotkey from {T} to {V}
 
 Fixed:
 > Bug: Palettes were saved with the palette name instead of the filename

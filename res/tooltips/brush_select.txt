@@ -1,1 +1,1 @@
-Brush Select | {T}
+Brush Select | {V}

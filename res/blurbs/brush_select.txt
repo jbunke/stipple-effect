@@ -1,4 +1,4 @@
-Shortcut: {T}
+Shortcut: {V}
 
 Behaves like the brush, but for selection.
 
