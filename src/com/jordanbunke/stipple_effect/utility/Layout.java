@@ -193,6 +193,10 @@ public class Layout {
         return Layout.getWorkspaceWidth() / 10;
     }
 
+    public static int optionsBarSectionBuffer() {
+        return (int) (getToolOptionsBarWidth() * 0.07);
+    }
+
     // segments layout
     public static int getProjectsWidth() {
         final int w = width();

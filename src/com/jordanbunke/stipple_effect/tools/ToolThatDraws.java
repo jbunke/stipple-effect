@@ -199,9 +199,9 @@ public abstract class ToolThatDraws extends Tool {
         final DynamicLabel ditherLabel = new DynamicLabel(
                 new Coord2D(getDitherTextX(), optionsBarTextY),
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                () -> "4x4 dithering: " +
-                        ditherStage.getPercentage() + "% primary color",
-                getDitherSliderX() - getDitherTextX());
+                () -> "Dither: " +
+                        ditherStage.getPercentage() + "% primary",
+                getDitherDecrementButtonX() - getDitherTextX());
 
         // dither decrement and increment buttons
         final IconButton decButton = IconButton.makeNoTooltip(
@@ -229,7 +229,7 @@ public abstract class ToolThatDraws extends Tool {
     abstract int getDitherTextX();
 
     private int getDitherDecrementButtonX() {
-        return getDitherTextX() + (int)(Layout.getToolOptionsBarWidth() * 0.2);
+        return getDitherTextX() + (int)(Layout.getToolOptionsBarWidth() * 0.12);
     }
 
     private int getDitherIncrementButtonX() {

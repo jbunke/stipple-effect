@@ -231,6 +231,6 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
 
     private static int getDiagonalTextX() {
         return getToleranceSliderX() + Layout.optionsBarSliderWidth() +
-                (int)(Layout.getToolOptionsBarWidth() * 0.1);
+                Layout.optionsBarSectionBuffer();
     }
 }

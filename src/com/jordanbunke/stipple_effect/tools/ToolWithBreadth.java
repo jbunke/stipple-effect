@@ -137,6 +137,6 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     @Override
     int getDitherTextX() {
         return getBreadthSliderX() + Layout.optionsBarSliderWidth() +
-                (int)(Layout.getToolOptionsBarWidth() * 0.1);
+                Layout.optionsBarSectionBuffer();
     }
 }
