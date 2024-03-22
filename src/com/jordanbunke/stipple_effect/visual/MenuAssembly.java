@@ -11,9 +11,9 @@ import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuEleme
 import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
@@ -692,7 +692,7 @@ public class MenuAssembly {
                         s::moveColorRightInPalette
                 }, selColOptionsRef);
 
-        //dropdown menu
+        // dropdown menu
         final List<Runnable> behaviours = new ArrayList<>();
 
         for (int i = 0; i < palettes.size(); i++) {
@@ -801,6 +801,15 @@ public class MenuAssembly {
                         () -> c.renderInfo.isPixelGridOn() ? 1 : 0, () -> {},
                         c::couldRenderPixelGrid, IconCodes.PIXEL_GRID_OFF);
         mb.add(pixelGridToggleButton);
+
+        final Tool tool = StippleEffect.get().getTool();
+
+        if (tool.hasToolOptionsBar()) {
+            mb.add(tool.buildToolOptionsBar());
+            addHidePanelToMenuBuilder(mb, Layout.getToolOptionsBarPosition()
+                            .displace(Layout.getWorkspaceWidth(), 0),
+                    () -> Layout.setToolbarShowing(false));
+        }
 
         return mb.build();
     }

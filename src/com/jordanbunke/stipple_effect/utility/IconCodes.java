@@ -95,4 +95,6 @@ public class IconCodes {
             LAYER_VISIBILITY = NO_ICON_PREFIX + "visibility",
             ONION_SKIN = NO_ICON_PREFIX + "onion_skin",
             FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking";
+
+    public static final String NO_TOOLTIP = "no_tooltip";
 }

@@ -2,9 +2,13 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 public abstract class Tool {
     private final GameImage icon, highlightedIcon, selectedIcon;
@@ -89,5 +93,19 @@ public abstract class Tool {
 
     public boolean hasToolOptionsBar() {
         return false;
+    }
+
+    public MenuElementGrouping buildToolOptionsBar() {
+        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
+                Layout.TEXT_Y_OFFSET,
+                optionsBarTextX = Layout.getToolOptionsBarPosition().x +
+                        Layout.CONTENT_BUFFER_PX;
+
+        // options label
+        final TextLabel optionsLabel = TextLabel.make(
+                new Coord2D(optionsBarTextX, optionsBarTextY),
+                "Tool Options", Constants.WHITE);
+
+        return new MenuElementGrouping(optionsLabel);
     }
 }
