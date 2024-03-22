@@ -104,7 +104,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
         final int SLIDER_MULT = 320;
         final HorizontalSlider breadthSlider = new HorizontalSlider(
                 new Coord2D(getBreadthSliderX(), optionsBarButtonY),
-                optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
+                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_BREADTH,
                 (int) Math.cbrt(Constants.MAX_BREADTH * SLIDER_MULT),
                 () -> (int) Math.cbrt(getBreadth() * SLIDER_MULT),
@@ -116,24 +116,14 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
                 breadthLabel, decButton, incButton, breadthSlider);
     }
 
-    private static int optionsBarWidth() {
-        return Layout.getWorkspaceWidth();
-    }
-
-    private static int optionsBarX() {
-        return Layout.getToolOptionsBarPosition().x;
-    }
-
-    private static int optionsBarSliderWidth() {
-        return optionsBarWidth() / 10;
-    }
-
     private static int getBreadthTextX() {
-        return optionsBarX() + (int)(optionsBarWidth() * 0.11);
+        return Layout.getToolOptionsBarPosition().x +
+                (int)(Layout.getToolOptionsBarWidth() * 0.11);
     }
 
     private static int getBreadthDecrementButtonX() {
-        return optionsBarX() + (int)(optionsBarWidth() * 0.21);
+        return Layout.getToolOptionsBarPosition().x +
+                (int)(Layout.getToolOptionsBarWidth() * 0.21);
     }
 
     private static int getBreadthIncrementButtonX() {
@@ -142,5 +132,11 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
 
     private static int getBreadthSliderX() {
         return getBreadthIncrementButtonX() + Layout.BUTTON_INC;
+    }
+
+    @Override
+    int getDitherTextX() {
+        return getBreadthSliderX() + Layout.optionsBarSliderWidth() +
+                (int)(Layout.getToolOptionsBarWidth() * 0.1);
     }
 }

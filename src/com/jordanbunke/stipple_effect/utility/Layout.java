@@ -188,6 +188,11 @@ public class Layout {
         return getBottomBarZoomSliderX() - getBottomBarZoomPercentageX();
     }
 
+    // tool options bar layout
+    public static int optionsBarSliderWidth() {
+        return Layout.getWorkspaceWidth() / 10;
+    }
+
     // segments layout
     public static int getProjectsWidth() {
         final int w = width();
@@ -201,6 +206,10 @@ public class Layout {
     public static int getWorkspaceWidth() {
         return width() - (getToolsWidth() + Math.max(getLayersWidth(),
                 getColorsWidth()));
+    }
+
+    public static int getToolOptionsBarWidth() {
+        return getWorkspaceWidth();
     }
 
     public static int getToolsWidth() {

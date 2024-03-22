@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 
 import java.awt.*;
 import java.util.Set;
@@ -83,5 +84,16 @@ public final class Pencil extends ToolThatDraws {
             context.getState().markAsCheckpoint(true);
             me.markAsProcessed();
         }
+    }
+
+    @Override
+    public boolean hasToolOptionsBar() {
+        return true;
+    }
+
+    @Override
+    int getDitherTextX() {
+        return Layout.getToolOptionsBarPosition().x +
+                (int)(Layout.getToolOptionsBarWidth() * 0.11);
     }
 }
