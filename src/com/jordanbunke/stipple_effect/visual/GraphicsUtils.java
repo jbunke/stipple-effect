@@ -31,7 +31,9 @@ public class GraphicsUtils {
             HIGHLIGHT_OVERLAY = loadIcon("highlighted"),
             SELECT_OVERLAY = loadIcon("selected"),
             TRANSFORM_NODE = ResourceLoader.loadImageResource(
-                    Constants.MISC_FOLDER.resolve("transform_node.png"));
+                    Constants.MISC_FOLDER.resolve("transform_node.png")),
+            CHECKMARK = ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve("checkmark.png"));
 
     public static TextBuilder uiText() {
         return uiText(Constants.WHITE);
@@ -52,6 +54,26 @@ public class GraphicsUtils {
 
     public static Color buttonBorderColorAlt(final boolean selected) {
         return selected ? Constants.HIGHLIGHT_1 : Constants.WHITE;
+    }
+
+    public static GameImage drawCheckbox(
+            final boolean isHighlighted, final boolean isChecked
+    ) {
+        final Coord2D dims = Layout.ICON_DIMS;
+        final int w = dims.x, h = dims.y;
+
+        final GameImage checkbox = new GameImage(w, h);
+        checkbox.fillRectangle(Constants.WHITE, 0, 0, w, h);
+
+        if (isChecked)
+            checkbox.draw(CHECKMARK);
+
+        final Color frame = GraphicsUtils.buttonBorderColor(false);
+        checkbox.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX,
+                0, 0, w, h);
+
+        return isHighlighted ? drawHighlightedButton(checkbox.submit())
+                : checkbox.submit();
     }
 
     public static GameImage drawTextBox(
