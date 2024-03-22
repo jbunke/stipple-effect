@@ -16,7 +16,6 @@ Fix:
 Add:
 > Add "Frame Conversion" dialog
 > Add text tool
-> Add tool options bar
 
 Change:
 > Overhaul preview window
@@ -27,6 +26,8 @@ Change:
 
 Added:
 > Added system timer
+> Added tool options bar
+> Added dither option to gradient tool
 
 Changed:
 > Redrew frame icons to feature purple film reels instead of orange motion blobs

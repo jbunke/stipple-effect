@@ -25,30 +25,55 @@ public abstract class ToolThatDraws extends Tool {
     }
 
     public enum DitherStage {
-        ONE, TWO, THREE, FOUR, FIVE, SIX,
+        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX,
         SEVEN,
-        EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN;
+        EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FULL;
+
+        double getFraction() {
+            final double pixels = 16d;
+
+            return switch (this) {
+                case ZERO -> 0d;
+                case ONE -> 1 / pixels;
+                case TWO -> 2 / pixels;
+                case THREE -> 3 / pixels;
+                case FOUR -> 4 / pixels;
+                case FIVE -> 5 / pixels;
+                case SIX -> 6 / pixels;
+                case SEVEN -> 8 / pixels;
+                case EIGHT -> 10 / pixels;
+                case NINE -> 11 / pixels;
+                case TEN -> 12 / pixels;
+                case ELEVEN -> 13 / pixels;
+                case TWELVE -> 14 / pixels;
+                case THIRTEEN -> 15 / pixels;
+                case FULL -> 1d;
+            };
+        }
 
         String getPercentage() {
             return switch (this) {
-                case ONE -> "6.25"; // 1/16
-                case TWO -> "12.5"; // 2/16
-                case THREE -> "18.75"; // 3/16
-                case FOUR -> "25"; // 4/16
-                case FIVE -> "31.25"; // 5/16
-                case SIX -> "37.5"; // 6/16
-                case SEVEN -> "50"; // 8/16
-                case EIGHT -> "62.5"; // 10/16
-                case NINE -> "68.75"; // 11/16
-                case TEN -> "75"; // 12/16
-                case ELEVEN -> "81.25"; // 13/16
-                case TWELVE -> "87.5"; // 14/16
-                case THIRTEEN -> "93.75"; // 15/16
+                case ZERO -> "0";
+                case ONE -> "6.25";
+                case TWO -> "12.5";
+                case THREE -> "18.75";
+                case FOUR -> "25";
+                case FIVE -> "31.25";
+                case SIX -> "37.5";
+                case SEVEN -> "50";
+                case EIGHT -> "62.5";
+                case NINE -> "68.75";
+                case TEN -> "75";
+                case ELEVEN -> "81.25";
+                case TWELVE -> "87.5";
+                case THIRTEEN -> "93.75";
+                case FULL -> "100";
             };
         }
 
         boolean condition(final int x, final int y) {
             return switch (this) {
+                case ZERO -> false;
                 case ONE -> x % 4 == 2 && y % 4 == 1;
                 case TWO -> ONE.condition(x, y) ||
                         (x % 4 == 0 && y % 4 == 3);
@@ -73,6 +98,7 @@ public abstract class ToolThatDraws extends Tool {
                         (x % 4 == 3 && y % 4 == 1);
                 case THIRTEEN -> TWELVE.condition(x, y) ||
                         ((x % 4) + (y % 4) == 6);
+                case FULL -> true;
             };
         }
     }

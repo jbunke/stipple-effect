@@ -2,12 +2,18 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Geometry;
+import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 import java.util.*;
@@ -17,7 +23,7 @@ public final class GradientTool extends ToolWithBreadth
         implements SnappableTool, ToggleModeTool {
     private static final GradientTool INSTANCE;
 
-    private boolean drawing, linear, snap, backwards;
+    private boolean drawing, linear, snap, backwards, dithered;
     private GameImage toolContentPreview;
     private Coord2D anchor;
     private List<Set<Coord2D>> gradientStages;
@@ -31,6 +37,7 @@ public final class GradientTool extends ToolWithBreadth
         linear = false;
         snap = false;
         backwards = false;
+        dithered = false;
 
         toolContentPreview = GameImage.dummy();
 
@@ -150,7 +157,9 @@ public final class GradientTool extends ToolWithBreadth
                     continue;
 
                 final double c = getC(pos, endpoint);
-                toolContentPreview.setRGB(x, y, getColor(c).getRGB());
+                toolContentPreview.setRGB(x, y, (dithered
+                        ? getDitherColor(x, y, getDitherStage(c))
+                        : getColor(c)).getRGB());
             }
         }
     }
@@ -186,12 +195,22 @@ public final class GradientTool extends ToolWithBreadth
 
         for (int g = 0; g < size; g++) {
             final double c = size == 1 ? 0d : g / (double) (size - 1);
-            final Color stageColor = getColor(c);
 
-            gradientStages.get(g).stream().filter(
-                    p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
-                    .forEach(p -> toolContentPreview.setRGB(
-                            p.x, p.y, stageColor.getRGB()));
+            if (dithered) {
+                final DitherStage ds = getDitherStage(c);
+
+                gradientStages.get(g).stream().filter(
+                                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
+                        .forEach(p -> toolContentPreview.setRGB(
+                                p.x, p.y, getDitherColor(p.x, p.y, ds).getRGB()));
+            } else {
+                final Color stageColor = getColor(c);
+
+                gradientStages.get(g).stream().filter(
+                                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
+                        .forEach(p -> toolContentPreview.setRGB(
+                                p.x, p.y, stageColor.getRGB()));
+            }
         }
     }
 
@@ -200,6 +219,26 @@ public final class GradientTool extends ToolWithBreadth
                 s = StippleEffect.get().getSecondary();
 
         return ColorMath.betweenColor(backwards ? 1 - c : c, p, s);
+    }
+
+    private DitherStage getDitherStage(final double c) {
+        final DitherStage[] ds = DitherStage.values();
+
+        return MathPlus.findBest(
+                DitherStage.SEVEN, DitherStage.SEVEN, d -> d,
+                (d1, d2) -> Math.abs(d1.getFraction() - c) <=
+                        Math.abs(d2.getFraction() - c), ds);
+    }
+
+    private Color getDitherColor(
+            final int x, final int y, final DitherStage ds
+    ) {
+        final Color p = StippleEffect.get().getPrimary(),
+                s = StippleEffect.get().getSecondary();
+
+        return ds.condition(x, y)
+                ? (backwards ? p : s)
+                : (backwards ? s : p);
     }
 
     @Override
@@ -230,6 +269,14 @@ public final class GradientTool extends ToolWithBreadth
             this.linear = linear;
     }
 
+    public void setDithered(final boolean dithered) {
+        this.dithered = dithered;
+    }
+
+    public boolean isDithered() {
+        return dithered;
+    }
+
     @Override
     public void setSnap(final boolean snap) {
         this.snap = linear && snap;
@@ -255,5 +302,28 @@ public final class GradientTool extends ToolWithBreadth
         return linear
                 ? "Linear Gradient"
                 : super.getBottomBarText().replace("Tool", "Brush");
+    }
+
+    @Override
+    public MenuElementGrouping buildToolOptionsBar() {
+        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
+                Layout.TEXT_Y_OFFSET,
+                optionsBarButtonY = Layout.getToolOptionsBarPosition().y +
+                        Layout.BUTTON_OFFSET;
+
+        // dithered label
+        final TextLabel ditheredLabel = TextLabel.make(
+                new Coord2D(getDitherTextX(), optionsBarTextY),
+                "Dithered?", Constants.WHITE);
+
+        // dithered checkbox
+        final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
+                ditheredLabel.getX() + ditheredLabel.getWidth() +
+                        Layout.CONTENT_BUFFER_PX, optionsBarButtonY),
+                MenuElement.Anchor.LEFT_TOP,
+                this::isDithered, this::setDithered);
+
+        return new MenuElementGrouping(super.buildToolOptionsBar(),
+                ditheredLabel, ditheredCheckbox);
     }
 }
