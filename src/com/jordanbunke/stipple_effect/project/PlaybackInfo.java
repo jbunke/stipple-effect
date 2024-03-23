@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.project;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 public class PlaybackInfo {
@@ -16,6 +17,10 @@ public class PlaybackInfo {
     public enum Mode {
         FORWARDS, BACKWARDS, LOOP, PONG_FORWARDS, PONG_BACKWARDS;
 
+        /**
+         * Two enum values map to the same result, so this cannot be replaced with
+         * {@link EnumUtils#next(Enum)}.
+         * */
         public Mode next() {
             return switch (this) {
                 case PONG_FORWARDS, PONG_BACKWARDS -> FORWARDS;

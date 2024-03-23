@@ -21,13 +21,6 @@ public class SEFonts {
             };
         }
 
-        public Code next() {
-            final Code[] vals = Code.values();
-
-            return this == vals[vals.length - 1]
-                    ? vals[0] : vals[ordinal() + 1];
-        }
-
         public Font associated() {
             return switch (this) {
                 case CLASSIC -> SEFonts.CLASSIC.getStandard();

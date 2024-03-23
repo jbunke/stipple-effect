@@ -14,11 +14,6 @@ public enum PaletteSorter {
         return name().charAt(0) + name().substring(1).toLowerCase();
     }
 
-    public PaletteSorter next() {
-        final PaletteSorter[] vs = values();
-        return vs[(ordinal() + 1) % vs.length];
-    }
-
     private static final Function<Color, Double>
             hf = ColorMath::rgbToHue,
             sf = ColorMath::rgbToSat,

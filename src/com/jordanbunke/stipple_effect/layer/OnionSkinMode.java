@@ -5,13 +5,6 @@ import com.jordanbunke.stipple_effect.utility.IconCodes;
 public enum OnionSkinMode {
     NONE, PREVIOUS, NEXT, BOTH;
 
-    public OnionSkinMode next() {
-        if (this == BOTH)
-            return NONE;
-
-        return OnionSkinMode.values()[ordinal() + 1];
-    }
-
     public boolean doPrevious() {
         return this == PREVIOUS || this == BOTH;
     }

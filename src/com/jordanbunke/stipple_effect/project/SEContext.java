@@ -457,7 +457,7 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
                     () -> getState().getEditingLayer().setOnionSkinMode(
-                            getState().getEditingLayer().getOnionSkinMode().next()));
+                            EnumUtils.next(getState().getEditingLayer().getOnionSkinMode())));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
                     this::removeFrame);

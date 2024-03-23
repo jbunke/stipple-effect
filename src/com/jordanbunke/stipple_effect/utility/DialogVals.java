@@ -105,7 +105,7 @@ public class DialogVals {
     }
 
     public static void cyclePaletteSorter() {
-        paletteSorter = paletteSorter.next();
+        paletteSorter = EnumUtils.next(paletteSorter);
     }
 
     public static void cycleContentType(final SEContext c) {

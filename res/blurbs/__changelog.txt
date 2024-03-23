@@ -21,6 +21,7 @@ Change:
 > Overhaul preview window
 > Redesign and expand project dialogs
 > Optimize selection overlays
+> Change pixel grid validation so that # of grid lines is checked instead of image bounds
 
 {0.3.0} - 2024-??-??
 

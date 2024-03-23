@@ -1254,7 +1254,7 @@ public class DialogAssembly {
                         .toArray(GameImage[]::new),
                         Arrays.stream(SEFonts.Code.values()).map(
                                 code -> (Runnable) () -> Settings.setProgramFont(
-                                        code.next().name(), false)
+                                        EnumUtils.next(code).name(), false)
                         ).toArray(Runnable[]::new),
                         () -> Settings.getProgramFont().ordinal(), () -> {});
 
