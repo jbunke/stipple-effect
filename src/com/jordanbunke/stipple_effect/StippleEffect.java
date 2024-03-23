@@ -1061,10 +1061,20 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void setContextIndex(final int contextIndex) {
+        if (contextIndex == this.contextIndex)
+            return;
+
         if (contextIndex >= 0 && contextIndex < contexts.size()) {
+            // release resources
+            getContext().releasePixelGrid();
+
+            // assign
             this.contextIndex = contextIndex;
+
+            // auxiliaries
             rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
+            getContext().redrawCanvasAuxiliaries();
         }
     }
 

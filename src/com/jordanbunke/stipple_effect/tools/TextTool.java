@@ -149,9 +149,9 @@ public final class TextTool extends Tool {
                                 keyEvent.markAsProcessed();
                                 nextLine(context);
                             }
-                            case TAB, ESCAPE -> {
+                            case ESCAPE -> {
                                 keyEvent.markAsProcessed();
-                                finish(context);
+                                setTyping(false);
                             }
                             case BACKSPACE -> {
                                 keyEvent.markAsProcessed();

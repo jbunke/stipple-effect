@@ -14,14 +14,13 @@ Fix:
 {TODO for 0.3.0}
 
 Add:
-> Add "Frame Conversion" dialog
+> Add "Pack/Split Frames" dialog
 > Add text tool
 
 Change:
 > Overhaul preview window
 > Redesign and expand project dialogs
 > Optimize selection overlays
-> Change pixel grid validation so that # of grid lines is checked instead of image bounds
 
 {0.3.0} - 2024-??-??
 
@@ -36,6 +35,7 @@ Changed:
 > Modified box select tool snapping behaviour
 > Modified polygon select behaviour: middle vertices can be placed off the canvas
 > Changed brush select hotkey from {T} to {V}
+> Changed pixel grid validation so that # of grid lines is checked instead of image bounds
 
 Fixed:
 > Bug: Palettes were saved with the palette name instead of the filename

@@ -146,10 +146,12 @@ public class SEContext {
                 final GameImage pixelGrid = pixelGridMap
                         .getOrDefault(zoomFactor, GameImage.dummy());
                 final int z = (int) zoomFactor;
-                workspace.draw(pixelGrid.section(
-                                bounds[TL].x * z, bounds[TL].y * z,
-                                bounds[BR].x * z, bounds[BR].y * z),
-                        bounds[TRP].x, bounds[TRP].y);
+
+                if (pixelGrid.getWidth() > GameImage.dummy().getWidth())
+                    workspace.draw(pixelGrid.section(
+                                    bounds[TL].x * z, bounds[TL].y * z,
+                                    bounds[BR].x * z, bounds[BR].y * z),
+                            bounds[TRP].x, bounds[TRP].y);
             }
         }
 
@@ -854,13 +856,22 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
+        final int xLines = w / Settings.getPixelGridXPixels(),
+                yLines = h / Settings.getPixelGridYPixels();
+
         return renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
-                w <= Layout.PIXEL_GRID_IMAGE_DIM_MAX &&
-                h <= Layout.PIXEL_GRID_IMAGE_DIM_MAX;
+                xLines + yLines <= Layout.MAX_PIXEL_GRID_LINES;
+    }
+
+    public void releasePixelGrid() {
+        if (pixelGridMap != null)
+            pixelGridMap.clear();
+
+        pixelGridMap = new HashMap<>();
     }
 
     public void redrawPixelGrid() {
-        pixelGridMap = new HashMap<>();
+        releasePixelGrid();
 
         if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid()))
             return;
@@ -877,28 +888,53 @@ public class SEContext {
             final int z = (int) fZ, altPx = Math.max(2,
                     z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
+            // too large condition; GameImage.dummy() will be drawn instead
+            // but pixel grid will be treated as though it is present for snapping
+            if (w * z >= Layout.PIXEL_GRID_ZOOM_DIM_MAX ||
+                    h * z >= Layout.PIXEL_GRID_ZOOM_DIM_MAX)
+                continue;
+
             final GameImage image = new GameImage(w * z, h * z);
 
             final int pgx = Settings.getPixelGridXPixels(),
                     pgy = Settings.getPixelGridYPixels();
 
+            final GameImage vertGridLine = new GameImage(1, h * z),
+                    horzGridLine = new GameImage(w * z, 1),
+                    vertPixel = new GameImage(1, z),
+                    horzPixel = new GameImage(z, 1);
+
+            // populate lines
+            // pixel stretches
+            for (int zInc = 0; zInc < z; zInc += altPx) {
+                final Color c = (zInc / altPx) % 2 == 0 ? a : b;
+
+                vertPixel.fillRectangle(c, 0, zInc, 1, altPx);
+                horzPixel.fillRectangle(c, zInc, 0, altPx, 1);
+            }
+
+            vertPixel.free();
+            horzPixel.free();
+
+            // vertical
+            for (int y = 0; y < h; y++)
+                vertGridLine.draw(vertPixel, 0, y * z);
+
+            vertGridLine.free();
+
+            // horizontal
+            for (int x = 0; x < w; x++)
+                horzGridLine.draw(horzPixel, x * z, 0);
+
+            horzGridLine.free();
+
             // vertical grid
             for (int x = 0; x < w; x += pgx)
-                for (int y = 0; y < h; y++)
-                    for (int zInc = 0; zInc < z; zInc += altPx) {
-                        final Color c = (zInc / altPx) % 2 == 0
-                                ? a : b;
-                        image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
-                    }
+                image.draw(vertGridLine, x * z, 0);
 
             // horizontal grid
             for (int y = 0; y < h; y += pgy)
-                for (int x = 0; x < w; x++)
-                    for (int zInc = 0; zInc < z; zInc += altPx) {
-                        final Color c = (zInc / altPx) % 2 == 0
-                                ? a : b;
-                        image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
-                    }
+                image.draw(horzGridLine, 0, y * z);
 
             pixelGridMap.put(fZ, image.submit());
         }

@@ -3,4 +3,5 @@
 /.idea/
 /test_out/
 *.iml
+*.log
 /data/
