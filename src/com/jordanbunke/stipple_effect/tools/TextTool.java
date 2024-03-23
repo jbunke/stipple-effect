@@ -179,6 +179,13 @@ public final class TextTool extends Tool {
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         if (typing) {
+            // emergency cancellation
+            if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
+                    .orElse(Boolean.FALSE) instanceof Boolean b && !b) {
+                setTyping(false);
+                return;
+            }
+
             if (textChanged() || toggleChanged())
                 updateToolContentPreview(context);
 

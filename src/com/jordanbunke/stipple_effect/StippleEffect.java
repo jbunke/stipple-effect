@@ -646,12 +646,12 @@ public class StippleEffect implements ProgramContext {
 
         canvas.setColor(Constants.DARK);
         canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation
-        canvas.drawLine(strokeWidth, pp.x, tp.y, Layout.width(), tp.y); // top segments and middle separation
-        canvas.drawLine(strokeWidth, wp.x, wp.y, lp.x, wp.y); // tool options bar and workspace separation
+        canvas.drawLine(strokeWidth, pp.x, tobp.y, Layout.width(), tobp.y); // top segments and middle separation
+        canvas.drawLine(strokeWidth, tp.x, wp.y, lp.x, wp.y); // tool options bar and tools/workspace separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
         canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
-        canvas.drawLine(strokeWidth, tobp.x, tobp.y, tobp.x, bbp.y); // tools and options bar/workspace separation
-        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace and right segments separation
+        canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
+        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace/option bar and right segments separation
 
         if (dialog != null) {
             canvas.fillRectangle(Constants.VEIL, 0, 0,
@@ -704,10 +704,10 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawToolOptionsBar() {
         final GameImage toolOptionsBar = new GameImage(
-                Layout.getWorkspaceWidth(),
+                Layout.getToolOptionsBarWidth(),
                 Layout.TOOL_OPTIONS_BAR_H);
         toolOptionsBar.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Layout.getWorkspaceWidth(), Layout.TOOL_OPTIONS_BAR_H);
+                Layout.getToolOptionsBarWidth(), Layout.TOOL_OPTIONS_BAR_H);
 
         return toolOptionsBar.submit();
     }

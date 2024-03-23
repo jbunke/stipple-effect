@@ -191,7 +191,7 @@ public class Layout {
 
     // tool options bar layout
     public static int optionsBarSliderWidth() {
-        return Layout.getWorkspaceWidth() / 10;
+        return getToolOptionsBarWidth() / 10;
     }
 
     public static int optionsBarSectionBuffer() {
@@ -214,7 +214,7 @@ public class Layout {
     }
 
     public static int getToolOptionsBarWidth() {
-        return getWorkspaceWidth();
+        return getToolsWidth() + getWorkspaceWidth();
     }
 
     public static int getToolsWidth() {
@@ -234,31 +234,35 @@ public class Layout {
     }
 
     public static int getToolOptionsBarHeight() {
-        return isToolbarShowing() && StippleEffect.get().getTool().hasToolOptionsBar() ? TOOL_OPTIONS_BAR_H : 0;
+        return isToolbarShowing() && StippleEffect.get().getTool()
+                .hasToolOptionsBar() ? TOOL_OPTIONS_BAR_H : 0;
     }
 
     public static int getToolsHeight() {
-        return height() - (getTopPanelHeight() + BOTTOM_BAR_H);
+        return height() - (getTopPanelHeight() +
+                getToolOptionsBarHeight() + BOTTOM_BAR_H);
     }
 
     public static int getWorkspaceHeight() {
-        return getToolsHeight() - getToolOptionsBarHeight();
+        return getToolsHeight();
     }
 
     public static int getLayersHeight() {
         if (!isLayersPanelShowing())
             return 0;
 
-        final int toolsH = getToolsHeight();
+        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
 
-        return isColorsPanelShowing() ? toolsH / 2 : toolsH;
+        return isColorsPanelShowing() ? middleH / 2 : middleH;
     }
 
     public static int getColorsHeight() {
         if (!isColorsPanelShowing())
             return 0;
 
-        return getToolsHeight() - getLayersHeight();
+        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
+
+        return middleH - getLayersHeight();
     }
 
     public static Coord2D getProjectsPosition() {
@@ -270,19 +274,19 @@ public class Layout {
     }
 
     public static Coord2D getToolsPosition() {
-        return getProjectsPosition().displace(0, getTopPanelHeight());
-    }
-
-    public static Coord2D getToolOptionsBarPosition() {
-        return getToolsPosition().displace(getToolsWidth(), 0);
-    }
-
-    public static Coord2D getWorkspacePosition() {
         return getToolOptionsBarPosition().displace(0, getToolOptionsBarHeight());
     }
 
+    public static Coord2D getToolOptionsBarPosition() {
+        return getProjectsPosition().displace(0, getTopPanelHeight());
+    }
+
+    public static Coord2D getWorkspacePosition() {
+        return getToolsPosition().displace(getToolsWidth(), 0);
+    }
+
     public static Coord2D getLayersPosition() {
-        return getToolOptionsBarPosition().displace(getWorkspaceWidth(), 0);
+        return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
     }
 
     public static Coord2D getColorsPosition() {

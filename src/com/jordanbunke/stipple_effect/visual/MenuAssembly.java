@@ -807,7 +807,7 @@ public class MenuAssembly {
         if (tool.hasToolOptionsBar()) {
             mb.add(tool.buildToolOptionsBar());
             addHidePanelToMenuBuilder(mb, Layout.getToolOptionsBarPosition()
-                            .displace(Layout.getWorkspaceWidth(), 0),
+                            .displace(Layout.getToolOptionsBarWidth(), 0),
                     () -> Layout.setToolbarShowing(false));
         }
 
