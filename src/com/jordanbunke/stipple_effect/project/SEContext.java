@@ -206,10 +206,10 @@ public class SEContext {
         }
     }
 
-    public void process(final InputEventLogger eventLogger, final Tool tool) {
+    public void process(final InputEventLogger eventLogger) {
         setInWorkspaceBounds(eventLogger);
         setTargetPixel(eventLogger);
-        processTools(eventLogger, tool);
+        processTools(eventLogger);
         processAdditionalMouseEvents(eventLogger);
 
         if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
@@ -219,9 +219,9 @@ public class SEContext {
         }
     }
 
-    private void processTools(
-            final InputEventLogger eventLogger, final Tool tool
-    ) {
+    private void processTools(final InputEventLogger eventLogger) {
+        final Tool tool = StippleEffect.get().getTool();
+
         if (tool instanceof ToolWithMode || tool.equals(BrushSelect.get())) {
             ToolWithMode.setGlobal(eventLogger.isPressed(Key.SHIFT));
 
@@ -263,10 +263,17 @@ public class SEContext {
             }
         }
 
+        if (tool.equals(TextTool.get()))
+            TextTool.get().process(this, eventLogger);
+
         tool.update(this, eventLogger.getAdjustedMousePosition());
     }
 
     public void processAdditionalMouseEvents(final InputEventLogger eventLogger) {
+        final boolean typingNotBlocked = DeltaTimeGlobal
+                .getStatusOf(Constants.TYPING_CODE)
+                .orElse(Boolean.FALSE) instanceof Boolean b && !b;
+
         final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
 
         for (GameEvent e : unprocessed)
@@ -279,42 +286,50 @@ public class SEContext {
                     else
                         getState().nextFrame();
                 } else if (eventLogger.isPressed(Key.SHIFT)) {
-                    if (eventLogger.isPressed(Key.R)) {
-                        mse.markAsProcessed();
+                    if (typingNotBlocked) {
+                        if (eventLogger.isPressed(Key.R)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0, 0);
-                    } else if (eventLogger.isPressed(Key.G)) {
-                        mse.markAsProcessed();
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0, 0);
+                        } else if (eventLogger.isPressed(Key.G)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0);
-                    } else if (eventLogger.isPressed(Key.B)) {
-                        mse.markAsProcessed();
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0);
+                        } else if (eventLogger.isPressed(Key.B)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0);
-                    } else if (eventLogger.isPressed(Key.H)) {
-                        mse.markAsProcessed();
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0);
+                        } else if (eventLogger.isPressed(Key.H)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorHue(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (eventLogger.isPressed(Key.S)) {
-                        mse.markAsProcessed();
+                            StippleEffect.get().incrementSelectedColorHue(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        } else if (eventLogger.isPressed(Key.S)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorSaturation(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (eventLogger.isPressed(Key.V)) {
-                        mse.markAsProcessed();
+                            StippleEffect.get().incrementSelectedColorSaturation(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        } else if (eventLogger.isPressed(Key.V)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorValue(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (eventLogger.isPressed(Key.A)) {
-                        mse.markAsProcessed();
+                            StippleEffect.get().incrementSelectedColorValue(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        } else if (eventLogger.isPressed(Key.A)) {
+                            mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        }
+                    }
+
+                    // preceding block does not guarantee whether mse has been processed
+                    if (mse.isProcessed())
+                        continue;
+
+                    if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
                         mse.markAsProcessed();
 
                         bt.setBreadth(bt.getBreadth() + mse.clicksScrolled);
@@ -323,6 +338,10 @@ public class SEContext {
 
                         tts.setTolerance(tts.getTolerance() + (mse.clicksScrolled *
                                 Constants.SMALL_TOLERANCE_INC));
+                    } else if (StippleEffect.get().getTool() instanceof TextTool tt) {
+                        mse.markAsProcessed();
+
+                        tt.setFontScale(tt.getFontScale() + mse.clicksScrolled);
                     }
                 } else if (inWorkspaceBounds) {
                     mse.markAsProcessed();
@@ -680,6 +699,19 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
+            } else if (tool instanceof TextTool tt) {
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontScale(tt.getFontScale() - 1));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontScale(tt.getFontScale() + 1));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontIndex(tt.getFontIndex() - 1));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontIndex(tt.getFontIndex() + 1));
             } else if (tool.equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),

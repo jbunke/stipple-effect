@@ -65,6 +65,7 @@ public class Constants {
 
     public static final int DEFAULT_BRUSH_BREADTH = 3,
             MIN_BREADTH = 1, MAX_BREADTH = 200, BREADTH_INC = 5,
+            MIN_FONT_SCALE = 1, MAX_FONT_SCALE = 10,
             MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, MAX_NUM_STATES = 5000,
             MILLIS_IN_SECOND = 1000, MIN_PLAYBACK_FPS = 1, MAX_PLAYBACK_FPS = 24,
             PLAYBACK_FPS_INC = 1, DEFAULT_PLAYBACK_FPS = 10,

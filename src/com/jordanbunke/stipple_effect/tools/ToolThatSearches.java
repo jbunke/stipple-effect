@@ -211,25 +211,25 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
                 diagonalLabel, diagonalCheckbox);
     }
 
-    private static int getToleranceTextX() {
+    private int getToleranceTextX() {
         return Layout.getToolOptionsBarPosition().x +
                 (int)(Layout.getToolOptionsBarWidth() * 0.11);
     }
 
-    private static int getToleranceDecrementButtonX() {
+    private int getToleranceDecrementButtonX() {
         return Layout.getToolOptionsBarPosition().x +
                 (int)(Layout.getToolOptionsBarWidth() * 0.26);
     }
 
-    private static int getToleranceIncrementButtonX() {
+    private int getToleranceIncrementButtonX() {
         return getToleranceDecrementButtonX() + Layout.BUTTON_INC;
     }
 
-    private static int getToleranceSliderX() {
+    private int getToleranceSliderX() {
         return getToleranceIncrementButtonX() + Layout.BUTTON_INC;
     }
 
-    private static int getDiagonalTextX() {
+    private int getDiagonalTextX() {
         return getToleranceSliderX() + Layout.optionsBarSliderWidth() +
                 Layout.optionsBarSectionBuffer();
     }

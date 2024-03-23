@@ -19,7 +19,7 @@ public abstract class Tool {
                 StipplePencil.get(), Pencil.get(),
                 Brush.get(), ShadeBrush.get(), Eraser.get(),
                 GradientTool.get(), LineTool.get(),
-                Fill.get(), ColorPicker.get(),
+                TextTool.get(), Fill.get(), ColorPicker.get(),
                 Wand.get(), BrushSelect.get(), BoxSelect.get(), PolygonSelect.get(),
                 MoveSelection.get(), PickUpSelection.get()
         };

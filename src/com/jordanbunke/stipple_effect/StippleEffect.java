@@ -332,7 +332,7 @@ public class StippleEffect implements ProgramContext {
             projectsMenu.process(eventLogger);
 
             // workspace
-            getContext().process(eventLogger, tool);
+            getContext().process(eventLogger);
         } else {
             dialog.process(eventLogger);
         }
@@ -469,6 +469,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     () -> setTool(LineTool.get()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
+                    () -> setTool(TextTool.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
                     () -> setTool(Wand.get()));
@@ -1202,6 +1205,9 @@ public class StippleEffect implements ProgramContext {
         if (was.equals(PickUpSelection.get()) &&
                 !tool.equals(PickUpSelection.get()))
             PickUpSelection.get().disengage(getContext());
+        else if (was.equals(TextTool.get()) &&
+                !tool.equals(TextTool.get()) && TextTool.get().isTyping())
+            TextTool.get().setTyping(false);
 
         this.tool = tool;
 

@@ -116,21 +116,21 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
                 breadthLabel, decButton, incButton, breadthSlider);
     }
 
-    private static int getBreadthTextX() {
+    private int getBreadthTextX() {
         return Layout.getToolOptionsBarPosition().x +
                 (int)(Layout.getToolOptionsBarWidth() * 0.11);
     }
 
-    private static int getBreadthDecrementButtonX() {
+    private int getBreadthDecrementButtonX() {
         return Layout.getToolOptionsBarPosition().x +
                 (int)(Layout.getToolOptionsBarWidth() * 0.21);
     }
 
-    private static int getBreadthIncrementButtonX() {
+    private int getBreadthIncrementButtonX() {
         return getBreadthDecrementButtonX() + Layout.BUTTON_INC;
     }
 
-    private static int getBreadthSliderX() {
+    private int getBreadthSliderX() {
         return getBreadthIncrementButtonX() + Layout.BUTTON_INC;
     }
 
