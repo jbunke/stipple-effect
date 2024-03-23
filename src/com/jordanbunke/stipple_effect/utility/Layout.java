@@ -14,9 +14,10 @@ public class Layout {
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
-            BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = BOTTOM_BAR_H, SCREEN_H_BUFFER = 120,
+            BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
-            TEXT_CARET_W = 1, TEXT_CARET_H = 23, TEXT_CARET_Y_OFFSET = -11,
+            TEXT_CARET_W = 1, TEXT_CARET_H = 23,
+            TEXT_CARET_Y_OFFSET = -11, TEXT_LINE_PX_H = TEXT_CARET_H + 2,
             CONTENT_BUFFER_PX = 8,
             DEFAULT_CHECKERBOARD_DIM = 4, CHECKERBOARD_MIN = 1, CHECKERBOARD_MAX = 256,
             DEFAULT_PIXEL_GRID_DIM = 1, PIXEL_GRID_MIN = 1, PIXEL_GRID_MAX = 64,
@@ -196,6 +197,20 @@ public class Layout {
 
     public static int optionsBarSectionBuffer() {
         return (int) (getToolOptionsBarWidth() * 0.07);
+    }
+
+    public static int optionsBarTextY() {
+        return getToolOptionsBarPosition().y + TEXT_Y_OFFSET +
+                optionsBarRelativeYOffsetToBottomBar();
+    }
+
+    public static int optionsBarButtonY() {
+        return getToolOptionsBarPosition().y + BUTTON_OFFSET +
+                optionsBarRelativeYOffsetToBottomBar();
+    }
+
+    private static int optionsBarRelativeYOffsetToBottomBar() {
+        return ((TOOL_OPTIONS_BAR_H - BOTTOM_BAR_H) / 2);
     }
 
     // segments layout

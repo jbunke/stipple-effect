@@ -67,6 +67,8 @@ public class IconCodes {
             HORIZONTAL_REFLECTION = "horizontal_reflection",
             PIXEL_GRID_OFF = "pixel_grid_off",
             PIXEL_GRID_ON = "pixel_grid_on",
+            NEW_FONT = "new_font",
+            DELETE_FONT = "delete_font",
             INCLUDED = "included",
             EXCLUDED = "excluded",
             SETTINGS = "settings",

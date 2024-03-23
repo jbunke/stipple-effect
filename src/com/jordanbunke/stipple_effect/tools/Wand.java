@@ -44,14 +44,4 @@ public final class Wand extends ToolThatSearches {
             context.editSelection(matched, true);
         }
     }
-
-    @Override
-    public void update(final SEContext context, final Coord2D mousePosition) {
-
-    }
-
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-
-    }
 }

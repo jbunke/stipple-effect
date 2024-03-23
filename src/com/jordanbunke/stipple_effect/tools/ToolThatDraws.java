@@ -216,14 +216,9 @@ public abstract class ToolThatDraws extends Tool {
         if (!this.equals(Brush.get()) && !this.equals(Pencil.get()))
             return super.buildToolOptionsBar();
 
-        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                optionsBarButtonY = Layout.getToolOptionsBarPosition().y +
-                        Layout.BUTTON_OFFSET;
-
         // dither label
         final DynamicLabel ditherLabel = new DynamicLabel(
-                new Coord2D(getDitherTextX(), optionsBarTextY),
+                new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> "Dither: " +
                         ditherStage.getPercentage() + "% primary",
@@ -232,16 +227,16 @@ public abstract class ToolThatDraws extends Tool {
         // dither decrement and increment buttons
         final IconButton decButton = IconButton.makeNoTooltip(
                 IconCodes.DECREMENT, new Coord2D(
-                        getDitherDecrementButtonX(), optionsBarButtonY),
+                        getDitherDecrementButtonX(), Layout.optionsBarButtonY()),
                 () -> setDitherStage(ditherStage.ordinal() - 1)),
                 incButton = IconButton.makeNoTooltip(IconCodes.INCREMENT,
                         new Coord2D(getDitherIncrementButtonX(),
-                                optionsBarButtonY),
+                                Layout.optionsBarButtonY()),
                         () -> setDitherStage(ditherStage.ordinal() + 1));
 
         // dither slider
         final HorizontalSlider ditherSlider = new HorizontalSlider(
-                new Coord2D(getDitherSliderX(), optionsBarButtonY),
+                new Coord2D(getDitherSliderX(), Layout.optionsBarButtonY()),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 0, DitherStage.values().length - 1,
                 () -> ditherStage.ordinal(),

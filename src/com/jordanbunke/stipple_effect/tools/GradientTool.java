@@ -306,20 +306,15 @@ public final class GradientTool extends ToolWithBreadth
 
     @Override
     public MenuElementGrouping buildToolOptionsBar() {
-        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                optionsBarButtonY = Layout.getToolOptionsBarPosition().y +
-                        Layout.BUTTON_OFFSET;
-
         // dithered label
         final TextLabel ditheredLabel = TextLabel.make(
-                new Coord2D(getDitherTextX(), optionsBarTextY),
+                new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
                 "Dithered?", Constants.WHITE);
 
         // dithered checkbox
         final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
                 ditheredLabel.getX() + ditheredLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX, optionsBarButtonY),
+                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
                 MenuElement.Anchor.LEFT_TOP,
                 this::isDithered, this::setDithered);
 

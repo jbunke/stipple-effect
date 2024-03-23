@@ -257,6 +257,10 @@ public class SEContext {
                         inWorkspaceBounds) {
                     tool.onMouseDown(this, me);
                     me.markAsProcessed();
+                } else if (me.matchesAction(GameMouseEvent.Action.CLICK) &&
+                        inWorkspaceBounds) {
+                    tool.onClick(this, me);
+                    me.markAsProcessed();
                 } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
                     tool.onMouseUp(this, me);
                 }

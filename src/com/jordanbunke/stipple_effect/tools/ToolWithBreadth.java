@@ -78,14 +78,9 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
 
     @Override
     public MenuElementGrouping buildToolOptionsBar() {
-        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                optionsBarButtonY = Layout.getToolOptionsBarPosition().y +
-                        Layout.BUTTON_OFFSET;
-
         // breadth label
         final DynamicLabel breadthLabel = new DynamicLabel(
-                new Coord2D(getBreadthTextX(), optionsBarTextY),
+                new Coord2D(getBreadthTextX(), Layout.optionsBarTextY()),
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> "Breadth: " + getBreadth() + " px",
                 getBreadthDecrementButtonX() - getBreadthTextX());
@@ -93,17 +88,17 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
         // breadth decrement and increment buttons
         final IconButton decButton = IconButton.makeNoTooltip(
                 IconCodes.DECREMENT, new Coord2D(
-                        getBreadthDecrementButtonX(), optionsBarButtonY),
+                        getBreadthDecrementButtonX(), Layout.optionsBarButtonY()),
                 () -> setBreadth(getBreadth() - 1)),
                 incButton = IconButton.makeNoTooltip(IconCodes.INCREMENT,
                         new Coord2D(getBreadthIncrementButtonX(),
-                                optionsBarButtonY),
+                                Layout.optionsBarButtonY()),
                         () -> setBreadth(getBreadth() + 1));
 
         // breadth slider
         final int SLIDER_MULT = 320;
         final HorizontalSlider breadthSlider = new HorizontalSlider(
-                new Coord2D(getBreadthSliderX(), optionsBarButtonY),
+                new Coord2D(getBreadthSliderX(), Layout.optionsBarButtonY()),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_BREADTH,
                 (int) Math.cbrt(Constants.MAX_BREADTH * SLIDER_MULT),

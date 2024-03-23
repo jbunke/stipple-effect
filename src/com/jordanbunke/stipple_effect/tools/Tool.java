@@ -47,9 +47,23 @@ public abstract class Tool {
     }
 
     public abstract String getName();
-    public abstract void onMouseDown(final SEContext context, final GameMouseEvent me);
-    public abstract void update(final SEContext context, final Coord2D mousePosition);
-    public abstract void onMouseUp(final SEContext context, final GameMouseEvent me);
+
+    // stubs that can be extended for custom behaviours
+    public void onMouseDown(final SEContext context, final GameMouseEvent me) {
+
+    }
+
+    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
+
+    }
+
+    public void onClick(final SEContext context, final GameMouseEvent me) {
+
+    }
+
+    public void update(final SEContext context, final Coord2D mousePosition) {
+
+    }
 
     public String convertNameToFilename() {
         return getName().replace(" ", "_").toLowerCase();
@@ -96,14 +110,12 @@ public abstract class Tool {
     }
 
     public MenuElementGrouping buildToolOptionsBar() {
-        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                optionsBarTextX = Layout.getToolOptionsBarPosition().x +
+        final int optionsBarTextX = Layout.getToolOptionsBarPosition().x +
                         Layout.CONTENT_BUFFER_PX;
 
         // options label
         final TextLabel optionsLabel = TextLabel.make(
-                new Coord2D(optionsBarTextX, optionsBarTextY),
+                new Coord2D(optionsBarTextX, Layout.optionsBarTextY()),
                 "Tool Options", Constants.WHITE);
 
         return new MenuElementGrouping(optionsLabel);

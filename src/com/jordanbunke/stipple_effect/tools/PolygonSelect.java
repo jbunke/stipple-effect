@@ -104,9 +104,6 @@ public final class PolygonSelect extends ToolWithMode {
         lastTP = tp;
     }
 
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {}
-
     private void finish(final SEContext context) {
         // define bounding box
         final Coord2D tl = SelectionUtils.topLeft(

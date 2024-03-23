@@ -162,14 +162,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
 
     @Override
     public MenuElementGrouping buildToolOptionsBar() {
-        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                optionsBarButtonY = Layout.getToolOptionsBarPosition().y +
-                        Layout.BUTTON_OFFSET;
-
         // tolerance label
         final DynamicLabel toleranceLabel = new DynamicLabel(
-                new Coord2D(getToleranceTextX(), optionsBarTextY),
+                new Coord2D(getToleranceTextX(), Layout.optionsBarTextY()),
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> "Tolerance: " + getToleranceText().replace(" tolerance", ""),
                 getToleranceDecrementButtonX() - getToleranceTextX());
@@ -177,17 +172,17 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         // tolerance decrement and increment buttons
         final IconButton decButton = IconButton.makeNoTooltip(
                 IconCodes.DECREMENT, new Coord2D(
-                        getToleranceDecrementButtonX(), optionsBarButtonY),
+                        getToleranceDecrementButtonX(), Layout.optionsBarButtonY()),
                 this::decreaseTolerance),
                 incButton = IconButton.makeNoTooltip(IconCodes.INCREMENT,
                         new Coord2D(getToleranceIncrementButtonX(),
-                                optionsBarButtonY),
+                                Layout.optionsBarButtonY()),
                         this::increaseTolerance);
 
         // tolerance slider
         final int SLIDER_MULT = 100;
         final HorizontalSlider toleranceSlider = new HorizontalSlider(
-                new Coord2D(getToleranceSliderX(), optionsBarButtonY),
+                new Coord2D(getToleranceSliderX(), Layout.optionsBarButtonY()),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 0, (int) (SLIDER_MULT * Constants.MAX_TOLERANCE),
                 () -> (int) (SLIDER_MULT * getTolerance()),
@@ -196,13 +191,13 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
 
         // diagonal label
         final TextLabel diagonalLabel = TextLabel.make(
-                new Coord2D(getDiagonalTextX(), optionsBarTextY),
+                new Coord2D(getDiagonalTextX(), Layout.optionsBarTextY()),
                 "Search diagonally adjacent pixels?", Constants.WHITE);
 
         // diagonal checkbox
         final Checkbox diagonalCheckbox = new Checkbox(new Coord2D(
                 diagonalLabel.getX() + diagonalLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX, optionsBarButtonY),
+                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
                 MenuElement.Anchor.LEFT_TOP,
                 this::isSearchDiag, this::setSearchDiag);
 

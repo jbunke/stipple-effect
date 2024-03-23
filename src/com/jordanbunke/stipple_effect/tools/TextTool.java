@@ -15,13 +15,10 @@ import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
-import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
-import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
-import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.awt.*;
@@ -35,11 +32,11 @@ public final class TextTool extends Tool {
 
     // fields
     private boolean typing, wasTimerToggle;
-    private final List<Font> fonts;
-    private Font lastFont;
-    private int fontIndex, fontScale, lastScale;
+    private final List<TextToolFont> fonts;
+    private int fontIndex, fontScale;
     private String text, lastText;
     private Coord2D textPos;
+    private Text.Orientation alignment;
     private GameImage textImage, toolContentPreview;
 
     static {
@@ -49,13 +46,14 @@ public final class TextTool extends Tool {
     private TextTool() {
         typing = false;
         fonts = Arrays.stream(SEFonts.Code.values())
-                .map(SEFonts.Code::associated)
+                .map(c -> new TextToolFont(c.forButtonText(), c.associated()))
                 .collect(Collectors.toList());
         fontIndex = 0;
 
         fontScale = Constants.MIN_FONT_SCALE;
         text = "";
         textPos = new Coord2D();
+        alignment = Text.Orientation.LEFT;
 
         textImage = GameImage.dummy();
         toolContentPreview = GameImage.dummy();
@@ -63,8 +61,6 @@ public final class TextTool extends Tool {
         // update conditions
         wasTimerToggle = false;
         lastText = "";
-        lastFont = getFont();
-        lastScale = fontScale;
     }
 
     public static TextTool get() {
@@ -72,7 +68,7 @@ public final class TextTool extends Tool {
     }
 
     @Override
-    public void onMouseDown(final SEContext context, final GameMouseEvent me) {
+    public void onClick(final SEContext context, final GameMouseEvent me) {
         final Coord2D tp = context.getTargetPixel();
 
         if (!tp.equals(Constants.NO_VALID_TARGET)) {
@@ -100,10 +96,19 @@ public final class TextTool extends Tool {
         resetLast();
     }
 
+    private void nextLine(final SEContext context) {
+        finish(context);
+
+        setTyping(true);
+        text = "";
+        textPos = textPos.displace(0, fontScale * Layout.TEXT_LINE_PX_H);
+
+        updateToolContentPreview(context);
+        resetLast();
+    }
+
     private void resetLast() {
         lastText = text;
-        lastScale = fontScale;
-        lastFont = getFont();
         wasTimerToggle = StippleEffect.get().isTimerToggle();
     }
 
@@ -112,12 +117,20 @@ public final class TextTool extends Tool {
                 h = context.getState().getImageHeight();
 
         final GameImage edit = new GameImage(w, h);
-        edit.draw(textImage, textPos.x, textPos.y);
+        edit.draw(textImage, getFormattedTextX(), textPos.y);
         context.paintOverImage(edit.submit());
 
         context.getState().markAsCheckpoint(true);
 
         setTyping(false);
+    }
+
+    private int getFormattedTextX() {
+        return switch (alignment) {
+            case LEFT -> textPos.x;
+            case CENTER -> textPos.x - (textImage.getWidth() / 2);
+            case RIGHT -> textPos.x - textImage.getWidth();
+        };
     }
 
     public void process(
@@ -132,8 +145,11 @@ public final class TextTool extends Tool {
                 if (e instanceof GameKeyEvent keyEvent) {
                     if (keyEvent.matchesAction(GameKeyEvent.Action.PRESS)) {
                         switch (keyEvent.key) {
-                            // Finish keys
-                            case ENTER, TAB, ESCAPE -> {
+                            case ENTER -> {
+                                keyEvent.markAsProcessed();
+                                nextLine(context);
+                            }
+                            case TAB, ESCAPE -> {
                                 keyEvent.markAsProcessed();
                                 finish(context);
                             }
@@ -173,7 +189,7 @@ public final class TextTool extends Tool {
     }
 
     private Font getFont() {
-        return fonts.get(fontIndex);
+        return fonts.get(fontIndex).font();
     }
 
     @Override
@@ -194,9 +210,7 @@ public final class TextTool extends Tool {
     }
 
     private boolean textChanged() {
-        return !lastText.equals(text) ||
-                !lastFont.equals(getFont()) ||
-                lastScale != fontScale;
+        return !lastText.equals(text);
     }
 
     private boolean toggleChanged() {
@@ -211,19 +225,14 @@ public final class TextTool extends Tool {
 
         toolContentPreview = new GameImage(w, h);
 
-        toolContentPreview.draw(textImage, textPos.x, textPos.y);
+        toolContentPreview.draw(textImage, getFormattedTextX(), textPos.y);
 
         final Color caretColor = StippleEffect.get().isTimerToggle()
                 ? Constants.WHITE : Constants.BLACK;
-        final int caretX = textPos.x + textImage.getWidth() + 1;
+        final int caretX = getFormattedTextX() + textImage.getWidth() + 1;
         toolContentPreview.fillRectangle(caretColor, caretX, textPos.y,
                 Layout.TEXT_CARET_W * fontScale,
                 Layout.TEXT_CARET_H * fontScale);
-    }
-
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-
     }
 
     @Override
@@ -253,6 +262,14 @@ public final class TextTool extends Tool {
     public void setFontScale(final int fontScale) {
         this.fontScale = MathPlus.bounded(Constants.MIN_FONT_SCALE,
                 fontScale, Constants.MAX_FONT_SCALE);
+
+        updateTCPIfTyping();
+    }
+
+    public void setAlignment(final Text.Orientation alignment) {
+        this.alignment = alignment;
+
+        updateTCPIfTyping();
     }
 
     public int getFontIndex() {
@@ -261,6 +278,24 @@ public final class TextTool extends Tool {
 
     public void setFontIndex(final int fontIndex) {
         this.fontIndex = MathPlus.bounded(0, fontIndex, fonts.size() - 1);
+
+        StippleEffect.get().rebuildToolButtonMenu();
+        updateTCPIfTyping();
+    }
+
+    public void addFont(final TextToolFont font) {
+        fonts.add(font);
+        setFontIndex(fonts.size() - 1);
+    }
+
+    public void deleteFont() {
+        fonts.remove(fontIndex);
+        setFontIndex(fontIndex - 1);
+    }
+
+    private void updateTCPIfTyping() {
+        if (typing)
+            updateToolContentPreview(StippleEffect.get().getContext());
     }
 
     @Override
@@ -285,14 +320,9 @@ public final class TextTool extends Tool {
 
     @Override
     public MenuElementGrouping buildToolOptionsBar() {
-        final int optionsBarTextY = Layout.getToolOptionsBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                optionsBarButtonY = Layout.getToolOptionsBarPosition().y +
-                        Layout.BUTTON_OFFSET;
-
         // scale label
         final DynamicLabel scaleLabel = new DynamicLabel(
-                new Coord2D(getScaleTextX(), optionsBarTextY),
+                new Coord2D(getScaleTextX(), Layout.optionsBarTextY()),
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> "Scale: " + fontScale + "x",
                 getScaleDecrementButtonX() - getScaleTextX());
@@ -300,34 +330,75 @@ public final class TextTool extends Tool {
         // scale decrement and increment buttons
         final IconButton decButton = IconButton.makeNoTooltip(
                 IconCodes.DECREMENT, new Coord2D(
-                        getScaleDecrementButtonX(), optionsBarButtonY),
+                        getScaleDecrementButtonX(), Layout.optionsBarButtonY()),
                 () -> setFontScale(getFontScale() - 1)),
                 incButton = IconButton.makeNoTooltip(IconCodes.INCREMENT,
                         new Coord2D(getScaleIncrementButtonX(),
-                                optionsBarButtonY),
+                                Layout.optionsBarButtonY()),
                         () -> setFontScale(getFontScale() + 1));
 
         // scale slider
         final HorizontalSlider scaleSlider = new HorizontalSlider(
-                new Coord2D(getScaleSliderX(), optionsBarButtonY),
+                new Coord2D(getScaleSliderX(), Layout.optionsBarButtonY()),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 Constants.MIN_FONT_SCALE, Constants.MAX_FONT_SCALE,
                 this::getFontScale, this::setFontScale);
         scaleSlider.updateAssets();
 
+        // alignment label
+        final TextLabel alignmentLabel = TextLabel.make(new Coord2D(
+                getAlignmentTextX(), Layout.optionsBarTextY()), "Alignment", Constants.WHITE);
+
+        // alignment toggle
+        final IconToggleButton alignmentToggle = IconToggleButton.make(new Coord2D(
+                alignmentLabel.getX() + alignmentLabel.getWidth() +
+                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
+                Arrays.stream(Text.Orientation.values())
+                        .map(a -> a.name().toLowerCase() + "_aligned")
+                        .toArray(String[]::new),
+                Arrays.stream(Text.Orientation.values())
+                        .map(a -> (Runnable) () -> setAlignment(EnumUtils.next(a)))
+                        .toArray(Runnable[]::new), () -> alignment.ordinal(), () -> {});
+
         // font label
         final TextLabel fontLabel = TextLabel.make(new Coord2D(
-                getFontTextX(), optionsBarTextY), "Font: ", Constants.WHITE);
+                alignmentToggle.getX() + Layout.BUTTON_DIM +
+                        Layout.optionsBarSectionBuffer(),
+                        Layout.optionsBarTextY()),
+                "Font", Constants.WHITE);
 
-        // TODO - font dropdown
+        // font dropdown
+        final DropDownMenu fontDropDown = new DropDownMenu(new Coord2D(
+                fontLabel.getX() + fontLabel.getWidth() +
+                        Layout.CONTENT_BUFFER_PX,
+                Layout.getToolOptionsBarPosition().y +
+                        ((Layout.TOOL_OPTIONS_BAR_H -
+                                Layout.STD_TEXT_BUTTON_H) / 2)),
+                Layout.optionsBarSliderWidth(),
+                MenuElement.Anchor.LEFT_TOP, (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+                fonts.stream().map(TextToolFont::name).toArray(String[]::new),
+                fonts.stream().map(ttf -> (Runnable) () ->
+                        setFontIndex(fonts.indexOf(ttf)))
+                        .toArray(Runnable[]::new), () -> fontIndex);
 
+        // upload font button
+        final IconButton newFontButton = IconButton.make(IconCodes.NEW_FONT,
+                new Coord2D(fontDropDown.getX() + fontDropDown.getWidth() +
+                        Layout.BUTTON_OFFSET, Layout.optionsBarButtonY()),
+                () -> {} /* TODO - set dialog to new font */);
 
-        // TODO - upload font button
-
+        // delete font button
+        final MenuElement deleteFontButton = GraphicsUtils
+                .generateIconButton(IconCodes.DELETE_FONT, new Coord2D(
+                        newFontButton.getX() + Layout.BUTTON_INC,
+                                Layout.optionsBarButtonY()),
+                        () -> fontIndex >= SEFonts.Code.values().length,
+                        this::deleteFont);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 scaleLabel, decButton, incButton, scaleSlider,
-                fontLabel);
+                alignmentLabel, alignmentToggle,
+                fontLabel, fontDropDown, newFontButton, deleteFontButton);
     }
 
     private int getScaleTextX() {
@@ -348,7 +419,7 @@ public final class TextTool extends Tool {
         return getScaleIncrementButtonX() + Layout.BUTTON_INC;
     }
 
-    private int getFontTextX() {
+    private int getAlignmentTextX() {
         return getScaleSliderX() + Layout.optionsBarSliderWidth() +
                 Layout.optionsBarSectionBuffer();
     }
