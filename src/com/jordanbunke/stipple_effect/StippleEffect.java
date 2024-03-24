@@ -964,6 +964,7 @@ public class StippleEffect implements ProgramContext {
 
     public void removeContext(final int index) {
         if (index >= 0 && index < contexts.size()) {
+            contexts.get(index).releasePixelGrid();
             contexts.remove(index);
 
             if (contextIndex >= contexts.size())
@@ -1066,7 +1067,8 @@ public class StippleEffect implements ProgramContext {
 
         if (contextIndex >= 0 && contextIndex < contexts.size()) {
             // release resources
-            getContext().releasePixelGrid();
+            if (this.contextIndex < contexts.size())
+                getContext().releasePixelGrid();
 
             // assign
             this.contextIndex = contextIndex;
