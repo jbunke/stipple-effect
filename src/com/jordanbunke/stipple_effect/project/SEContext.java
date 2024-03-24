@@ -853,14 +853,23 @@ public class SEContext {
     }
 
     public boolean couldRenderPixelGrid() {
+        final float z = renderInfo.getZoomFactor();
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final int xLines = w / Settings.getPixelGridXPixels(),
-                yLines = h / Settings.getPixelGridYPixels();
+        final int px = Settings.getPixelGridXPixels(),
+                py = Settings.getPixelGridYPixels(),
+                xLines = w / px, yLines = h / py,
+                narrowerLineGapPx = Math.min(px, py),
+                widerGridDim = (int) Math.max(w * z, h * z);
 
-        return renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
-                xLines + yLines <= Layout.MAX_PIXEL_GRID_LINES;
+        final boolean exceedsLineLimit =
+                xLines + yLines > Layout.MAX_PIXEL_GRID_LINES,
+                linesTooNarrowForZoomLevel =
+                        z * narrowerLineGapPx < Constants.ZOOM_FOR_GRID,
+                pixelGridImageTooLarge = widerGridDim > Layout.PIXEL_GRID_ZOOM_DIM_MAX;
+
+        return !(exceedsLineLimit || linesTooNarrowForZoomLevel || pixelGridImageTooLarge);
     }
 
     public void releasePixelGrid() {
@@ -882,16 +891,15 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final float minZ = Constants.ZOOM_FOR_GRID, maxZ = Constants.MAX_ZOOM;
-
-        for (float fZ = minZ; fZ <= maxZ; fZ *= 2f) {
+        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM; fZ *= 2f) {
             final int z = (int) fZ, altPx = Math.max(2,
                     z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
-            // too large condition; GameImage.dummy() will be drawn instead
-            // but pixel grid will be treated as though it is present for snapping
-            if (w * z >= Layout.PIXEL_GRID_ZOOM_DIM_MAX ||
-                    h * z >= Layout.PIXEL_GRID_ZOOM_DIM_MAX)
+            final boolean tooSmall = z == 0,
+                    tooLarge = Math.max(w, h) * z >
+                            Layout.PIXEL_GRID_ZOOM_DIM_MAX;
+
+            if (tooSmall || tooLarge)
                 continue;
 
             final GameImage image = new GameImage(w * z, h * z);

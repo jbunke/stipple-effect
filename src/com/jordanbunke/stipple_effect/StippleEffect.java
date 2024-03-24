@@ -951,8 +951,10 @@ public class StippleEffect implements ProgramContext {
         // close unmodified untitled project
         if (contexts.size() == 1 && !contexts.get(0).projectInfo
                 .hasUnsavedChanges() &&
-                !contexts.get(0).projectInfo.hasSaveAssociation())
+                !contexts.get(0).projectInfo.hasSaveAssociation()) {
+            contexts.get(0).releasePixelGrid();
             contexts.remove(0);
+        }
 
         contexts.add(context);
 
@@ -1062,9 +1064,6 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void setContextIndex(final int contextIndex) {
-        if (contextIndex == this.contextIndex)
-            return;
-
         if (contextIndex >= 0 && contextIndex < contexts.size()) {
             // release resources
             if (this.contextIndex < contexts.size())
