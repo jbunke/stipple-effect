@@ -25,9 +25,9 @@ public abstract class ToolThatDraws extends Tool {
     }
 
     public enum DitherStage {
-        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX,
-        SEVEN,
-        EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FULL;
+        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN,
+        FIFTY_FIFTY,
+        NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FOURTEEN, FIFTEEN, FULL;
 
         double getFraction() {
             final double pixels = 16d;
@@ -40,13 +40,15 @@ public abstract class ToolThatDraws extends Tool {
                 case FOUR -> 4 / pixels;
                 case FIVE -> 5 / pixels;
                 case SIX -> 6 / pixels;
-                case SEVEN -> 8 / pixels;
-                case EIGHT -> 10 / pixels;
-                case NINE -> 11 / pixels;
-                case TEN -> 12 / pixels;
-                case ELEVEN -> 13 / pixels;
-                case TWELVE -> 14 / pixels;
-                case THIRTEEN -> 15 / pixels;
+                case SEVEN -> 7 / pixels;
+                case FIFTY_FIFTY -> 8 / pixels;
+                case NINE -> 9 / pixels;
+                case TEN -> 10 / pixels;
+                case ELEVEN -> 11 / pixels;
+                case TWELVE -> 12 / pixels;
+                case THIRTEEN -> 13 / pixels;
+                case FOURTEEN -> 14 / pixels;
+                case FIFTEEN -> 15 / pixels;
                 case FULL -> 1d;
             };
         }
@@ -60,13 +62,15 @@ public abstract class ToolThatDraws extends Tool {
                 case FOUR -> "25";
                 case FIVE -> "31.25";
                 case SIX -> "37.5";
-                case SEVEN -> "50";
-                case EIGHT -> "62.5";
-                case NINE -> "68.75";
-                case TEN -> "75";
-                case ELEVEN -> "81.25";
-                case TWELVE -> "87.5";
-                case THIRTEEN -> "93.75";
+                case SEVEN -> "43.75";
+                case FIFTY_FIFTY -> "50";
+                case NINE -> "56.25";
+                case TEN -> "62.5";
+                case ELEVEN -> "68.75";
+                case TWELVE -> "75";
+                case THIRTEEN -> "81.25";
+                case FOURTEEN -> "87.5";
+                case FIFTEEN -> "93.75";
                 case FULL -> "100";
             };
         }
@@ -85,18 +89,21 @@ public abstract class ToolThatDraws extends Tool {
                 case SIX -> (x % 4) + (y % 4) == 3 ||
                         (x % 4 == 0 && y % 4 == 1) ||
                         (x % 4 == 2 && y % 4 == 3);
-                case SEVEN -> x % 2 != y % 2;
-                case EIGHT -> SEVEN.condition(x, y) ||
-                        (x % 4 == 2 && y % 4 == 0) ||
+                case SEVEN -> SIX.condition(x, y) ||
+                        (x % 4 == 3 && y % 4 == 2);
+                case FIFTY_FIFTY -> x % 2 != y % 2;
+                case NINE -> FIFTY_FIFTY.condition(x, y) ||
+                        (x % 4 == 2 && y % 4 == 0);
+                case TEN -> NINE.condition(x, y) ||
                         (x % 4 == 0 && y % 4 == 2);
-                case NINE -> EIGHT.condition(x, y) ||
-                        ((x % 4) + (y % 4) == 0);
-                case TEN -> !(x % 2 == 1 && y % 2 == 1);
                 case ELEVEN -> TEN.condition(x, y) ||
-                        (x % 4 == 1 && y % 4 == 3);
-                case TWELVE -> ELEVEN.condition(x, y) ||
-                        (x % 4 == 3 && y % 4 == 1);
+                        ((x % 4) + (y % 4) == 0);
+                case TWELVE -> !(x % 2 == 1 && y % 2 == 1);
                 case THIRTEEN -> TWELVE.condition(x, y) ||
+                        (x % 4 == 1 && y % 4 == 3);
+                case FOURTEEN -> THIRTEEN.condition(x, y) ||
+                        (x % 4 == 3 && y % 4 == 1);
+                case FIFTEEN -> FOURTEEN.condition(x, y) ||
                         ((x % 4) + (y % 4) == 6);
                 case FULL -> true;
             };
@@ -104,7 +111,7 @@ public abstract class ToolThatDraws extends Tool {
     }
 
     private static Mode mode = Mode.NORMAL;
-    private static DitherStage ditherStage = DitherStage.SEVEN;
+    private static DitherStage ditherStage = DitherStage.FIFTY_FIFTY;
 
     private Coord2D lastTP;
     private int lastFrameIndex;

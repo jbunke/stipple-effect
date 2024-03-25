@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
+import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.fonts.Font;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
@@ -126,6 +127,10 @@ public final class TextTool extends Tool {
         setTyping(false);
     }
 
+    private void adjustTextPosition(final int deltaX, final int deltaY) {
+        textPos = textPos.displace(deltaX, deltaY);
+    }
+
     private int getFormattedTextX() {
         return switch (alignment) {
             case LEFT -> textPos.x;
@@ -152,19 +157,41 @@ public final class TextTool extends Tool {
                             }
                             case LEFT_ARROW -> {
                                 keyEvent.markAsProcessed();
-                                setFontScale(fontScale - 1);
+
+                                if (eventLogger.isPressed(Key.SHIFT))
+                                    adjustTextPosition(-1, 0);
+                                else
+                                    setFontIndex(fontIndex - 1);
                             }
                             case RIGHT_ARROW -> {
                                 keyEvent.markAsProcessed();
-                                setFontScale(fontScale + 1);
+
+                                if (eventLogger.isPressed(Key.SHIFT))
+                                    adjustTextPosition(1, 0);
+                                else
+                                    setFontIndex(fontIndex + 1);
                             }
                             case UP_ARROW -> {
                                 keyEvent.markAsProcessed();
-                                setFontIndex(fontIndex - 1);
+
+                                if (eventLogger.isPressed(Key.SHIFT))
+                                    adjustTextPosition(0, -1);
+                                else
+                                    setFontScale(fontScale - 1);
                             }
                             case DOWN_ARROW -> {
                                 keyEvent.markAsProcessed();
-                                setFontIndex(fontIndex + 1);
+
+                                if (eventLogger.isPressed(Key.SHIFT))
+                                    adjustTextPosition(0, 1);
+                                else
+                                    setFontScale(fontScale + 1);
+                            }
+                            case K -> {
+                                if (eventLogger.isPressed(Key.CTRL)) {
+                                    keyEvent.markAsProcessed();
+                                    toggleAlignment();
+                                }
                             }
                             case ESCAPE -> {
                                 keyEvent.markAsProcessed();
@@ -287,6 +314,10 @@ public final class TextTool extends Tool {
         this.alignment = alignment;
 
         updateTCPIfTyping();
+    }
+
+    public void toggleAlignment() {
+        setAlignment(EnumUtils.next(alignment));
     }
 
     public int getFontIndex() {

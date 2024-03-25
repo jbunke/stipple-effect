@@ -337,6 +337,7 @@ public class StippleEffect implements ProgramContext {
 
     private void processNonStateKeyPresses(final InputEventLogger eventLogger) {
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+            // Ctrl + Shift + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToSave);
@@ -350,6 +351,7 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::toggleColorMenuMode);
         } else if (eventLogger.isPressed(Key.CTRL)) {
+            // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToInfo);
@@ -372,7 +374,14 @@ public class StippleEffect implements ProgramContext {
                                 getSelectedPalette().isMutable())
                             DialogAssembly.setDialogToSavePalette(getSelectedPalette());
                     });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.K, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (tool.equals(TextTool.get()))
+                            TextTool.get().toggleAlignment();
+                    });
         } else if (eventLogger.isPressed(Key.SHIFT)) {
+            // Shift + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::swapColors);
@@ -422,12 +431,19 @@ public class StippleEffect implements ProgramContext {
                                     getSelectedPalette());
                     });
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (tool.equals(TextTool.get()))
+                            DialogAssembly.setDialogToNewFont();
+                    });
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
                     this::moveColorLeftInPalette);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
                     this::moveColorRightInPalette);
         } else {
+            // single key presses
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     this::toggleFullscreen);

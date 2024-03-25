@@ -709,16 +709,16 @@ public class SEContext {
                 final TextTool tt = TextTool.get();
 
                 eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tt.setFontScale(tt.getFontScale() - 1));
                 eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tt.setFontScale(tt.getFontScale() + 1));
                 eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tt.setFontIndex(tt.getFontIndex() - 1));
                 eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tt.setFontIndex(tt.getFontIndex() + 1));
             } else if (tool.equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(

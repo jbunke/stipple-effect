@@ -1,1 +1,2 @@
 Center-aligned
+Toggle: {Ctrl + K}

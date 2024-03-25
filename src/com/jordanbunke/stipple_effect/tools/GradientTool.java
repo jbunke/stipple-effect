@@ -225,7 +225,7 @@ public final class GradientTool extends ToolWithBreadth
         final DitherStage[] ds = DitherStage.values();
 
         return MathPlus.findBest(
-                DitherStage.SEVEN, DitherStage.SEVEN, d -> d,
+                DitherStage.FIFTY_FIFTY, DitherStage.FIFTY_FIFTY, d -> d,
                 (d1, d2) -> Math.abs(d1.getFraction() - c) <=
                         Math.abs(d2.getFraction() - c), ds);
     }

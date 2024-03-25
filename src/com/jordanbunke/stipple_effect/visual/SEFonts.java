@@ -19,17 +19,16 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class SEFonts {
-    public static final Code DEFAULT_FONT = Code.SE;
+    public static final Code DEFAULT_FONT = Code.DELTAN;
 
     public enum Code {
-        SE, PENCIL_SE, CLASSIC, SCHIEF, ZIFFER;
+        DELTAN, SKINNY_DELTAN, CLASSIC, SCHIEF, ZIFFER;
 
         public String forButtonText() {
-            return switch (this) {
-                case PENCIL_SE -> "Pencil SE";
-                case SE -> "SE";
-                default -> EnumUtils.formattedName(this);
-            };
+            if (this == SKINNY_DELTAN)
+                return "Skinny Deltan";
+
+            return EnumUtils.formattedName(this);
         }
 
         public Font associated() {
@@ -37,8 +36,8 @@ public class SEFonts {
                 case CLASSIC -> SEFonts.CLASSIC.getStandard();
                 case SCHIEF -> SEFonts.CLASSIC.getItalics();
                 case ZIFFER -> SEFonts.ZIFFER;
-                case PENCIL_SE -> SEFonts.SE.getStandard();
-                case SE -> SEFonts.SE.getBold();
+                case SKINNY_DELTAN -> SEFonts.DELTAN.getBold();
+                case DELTAN -> SEFonts.DELTAN.getStandard();
             };
         }
     }
@@ -47,14 +46,14 @@ public class SEFonts {
 
     public static final FontFamily CLASSIC = new FontFamily("Classic",
             Font.loadFromSource(FONT_FOLDER, true, "font-classic",
-                    false, 0.6, 2, false, true),
+                    true, 0.6, 2, false, true),
             null,
             Font.loadFromSource(FONT_FOLDER, true, "font-classic-italics",
-                    false, 0.5, 2, false, true)),
-            SE = new FontFamily("SE",
-                    Font.loadFromSource(FONT_FOLDER, true, "font-se",
+                    true, 0.5, 2, false, true)),
+            DELTAN = new FontFamily("Deltan",
+                    Font.loadFromSource(FONT_FOLDER, true, "font-deltan",
                             true, 0.6, 2, false, true),
-                    Font.loadFromSource(FONT_FOLDER, true, "font-se-bold",
+                    Font.loadFromSource(FONT_FOLDER, true, "font-skinny-deltan",
                             true, 0.6, 2, false, true),
                     null);
 
