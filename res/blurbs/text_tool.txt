@@ -7,15 +7,12 @@ the text to be written.
 
 Start typing: {Click}
 
-(While not typing)
 Increment/decrement font scale factor: {Left/Right Arrow Keys} or {Shift + Scroll Wheel}*
 Navigate to previous/next font: {Up/Down Arrow Keys}
 
-* - This shortcut can also be performed while typing
-
 (While typing)
-Modify text: <type as normal>
-Finish line: {Left Click} or {Escape}
-Finish line and start new: {Right Click}
-Finish line and start line below: {Enter}
-Cancel line: {Middle Click} or {Escape}
+    Modify text: < type as normal >
+    Finish line: {Left Click} or {Escape}
+    Finish line and start new: {Right Click}
+    Finish line and start line below: {Enter}
+    Cancel line: {Middle Click} or {Escape}

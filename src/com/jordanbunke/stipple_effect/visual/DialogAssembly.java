@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.error.GameError;
+import com.jordanbunke.delta_time.fonts.FontConstants;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.menus.Menu;
@@ -26,8 +27,10 @@ import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.tools.TextTool;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicTextButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -326,10 +329,37 @@ public class DialogAssembly {
                 context, leftLabel, rightLabel, topLabel, bottomLabel,
                 preview, explanation,
                 leftTextBox, rightTextBox, topTextBox, bottomTextBox);
-        setDialog(assembleDialog("Pad Canvas...", contents,
+        setDialog(assembleDialog("Pad canvas...", contents,
                 () -> leftTextBox.isValid() && rightTextBox.isValid() &&
                         topTextBox.isValid() && bottomTextBox.isValid(),
                 Constants.GENERIC_APPROVAL_TEXT, c::pad, true));
+    }
+
+
+    public static void setDialogToPackFrames() {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        // TODO
+
+        final Supplier<Boolean> canPack = () -> false;
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Pack frames...", contents,
+                canPack, Constants.GENERIC_APPROVAL_TEXT, c::pack, true));
+    }
+
+    public static void setDialogToSplitCanvasIntoFrames() {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        // TODO
+
+        final Supplier<Boolean> canSplit = () -> false;
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Split canvas into frames...", contents,
+                canSplit, Constants.GENERIC_APPROVAL_TEXT, c::split, true));
     }
 
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {
@@ -439,6 +469,146 @@ public class DialogAssembly {
                 "Create", () -> StippleEffect.get().newProject(), true));
     }
 
+    public static void setDialogToNewFont() {
+        DialogVals.setNewFontPixelSpacing(Constants.DEFAULT_FONT_PX_SPACING, false);
+        DialogVals.setHasLatinEx(false, false);
+        DialogVals.setCharSpecificSpacing(true, false);
+        DialogVals.setFontName("");
+
+        DialogVals.resetAscii();
+        DialogVals.resetLatinEx();
+
+        DialogVals.setFontPreviewImage(GameImage.dummy());
+
+        final MenuBuilder mb = new MenuBuilder();
+
+        final int LINE_BREAK = 1;
+        int lines = 0;
+
+        // specification
+        mb.add(makeDialogLeftLabel(lines, "Font source files must be PNGs and " +
+                FontConstants.FONT_SOURCE_BASE_WIDTH + "x" +
+                FontConstants.FONT_SOURCE_BASE_HEIGHT + " pixels (or a multple thereof)."));
+        lines++;
+
+        // import font templates
+        final TextLabel importTemplatesLabel = makeDialogLeftLabel(
+                lines, "You can use these font templates as references:");
+        final SimpleMenuButton importTemplatesButton =
+                GraphicsUtils.makeStandardTextButton("Import",
+                        getDialogContentOffsetFollowingLabel(importTemplatesLabel),
+                        () -> StippleEffect.get().openFontTemplateProjects());
+        mb.add(importTemplatesLabel);
+        mb.add(importTemplatesButton);
+        lines += 1 + LINE_BREAK;
+
+        // name
+        final TextLabel nameLabel = makeDialogLeftLabel(lines, "Font name:");
+        final TextBox nameTextBox = makeDialogCustomTextBox(nameLabel,
+                Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                () -> "", DialogVals.getFontName(), () -> "",
+                TextBox::validateAsFileName, DialogVals::setFontName,
+                Constants.MAX_NAME_LENGTH);
+        mb.add(nameLabel);
+        mb.add(nameTextBox);
+        lines++;
+
+        // pixel spacing
+        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing: ");
+        final TextBox spacingTextBox = makeDialogNumericalTextBox(spacingLabel,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                DialogVals.getNewFontPixelSpacing(),
+                Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
+                "px", DialogVals::setNewFontPixelSpacing, 2);
+        mb.add(spacingLabel);
+        mb.add(spacingTextBox);
+        // character-specific
+        final TextLabel charSpecificLabel =
+                makeDialogRightLabel(spacingLabel, "Character-specific?");
+        final Checkbox charSpecificCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(charSpecificLabel),
+                MenuElement.Anchor.LEFT_TOP,
+                DialogVals::isCharSpecificSpacing,
+                DialogVals::setCharSpecificSpacing);
+        mb.add(charSpecificLabel);
+        mb.add(charSpecificCheckbox);
+        lines += 1 + LINE_BREAK;
+
+        // ASCII
+        final TextLabel asciiLabel = makeDialogLeftLabel(
+                lines, "Upload ASCII source: ");
+        final SimpleMenuButton asciiButton =
+                GraphicsUtils.makeStandardTextButton("Upload",
+                        getDialogContentOffsetFollowingLabel(asciiLabel),
+                        SEFonts::uploadASCIISourceFile);
+        final DynamicLabel asciiConfirmation = new DynamicLabel(
+                getDialogRightContentPositionForRow(lines),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                () -> DialogVals.getAsciiStatus().getMessage(),
+                Layout.getDialogWidth());
+        mb.add(asciiLabel);
+        mb.add(asciiButton);
+        mb.add(asciiConfirmation);
+        lines++;
+
+        // latin extended
+        final TextLabel latinExQuestion = makeDialogLeftLabel(lines,
+                "Does this font support Latin Extended characters?");
+        final Checkbox latinExCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(latinExQuestion),
+                MenuElement.Anchor.LEFT_TOP,
+                DialogVals::hasLatinEx, DialogVals::setHasLatinEx);
+        final TextLabel latinExLabel = makeDialogLeftLabel(
+                lines + 1, "Upload Latin Extended source: ");
+        final SimpleMenuButton latinExButton =
+                GraphicsUtils.makeStandardTextButton("Upload",
+                        getDialogContentOffsetFollowingLabel(latinExLabel),
+                        SEFonts::uploadLatinExtendedSourceFile);
+        final DynamicLabel latinExConfirmation = new DynamicLabel(
+                getDialogRightContentPositionForRow(lines + 1),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                () -> DialogVals.getLatinExStatus().getMessage(),
+                Layout.getDialogWidth());
+        final MenuElementGrouping latinExContent = new MenuElementGrouping(
+                latinExLabel, latinExButton, latinExConfirmation);
+        final GatewayMenuElement latinExGateway = new GatewayMenuElement(
+                latinExContent, DialogVals::hasLatinEx);
+        mb.add(latinExQuestion);
+        mb.add(latinExCheckbox);
+        mb.add(latinExGateway);
+        lines += 2 + LINE_BREAK;
+
+        // partial precondition
+        final Supplier<Boolean> rawFontCondition =
+                () -> spacingTextBox.isValid() &&
+                        DialogVals.getAsciiStatus().isValid() &&
+                        (!DialogVals.hasLatinEx() ||
+                                DialogVals.getLatinExStatus().isValid());
+
+        // preview text
+        final int previewRow = lines;
+        final ThinkingMenuElement previewText = new ThinkingMenuElement(() -> {
+            if (rawFontCondition.get())
+                return new StaticMenuElement(
+                        getDialogLeftContentPositionForRow(previewRow),
+                        MenuElement.Anchor.LEFT_TOP,
+                        DialogVals.getFontPreviewImage()
+                );
+            else
+                return new PlaceholderMenuElement();
+        });
+        mb.add(previewText);
+
+        final Supplier<Boolean> precondition =
+                () -> nameTextBox.isValid() && rawFontCondition.get();
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Define a new font...", contents,
+                precondition, "Add",
+                () -> TextTool.get().addFont(), true));
+    }
+
     public static void setDialogToExitProgramAYS() {
         setDialogToAYS("Exit " + StippleEffect.PROGRAM_NAME + "?",
                 "All open projects will be closed without saving...",
@@ -453,7 +623,7 @@ public class DialogAssembly {
                 () -> StippleEffect.get().removeContext(index));
     }
 
-    public static void setDialogToAYS(
+    private static void setDialogToAYS(
             final String actionLabel, final String consequence,
             final Runnable onApprove
     ) {
@@ -1007,8 +1177,8 @@ public class DialogAssembly {
     private static DynamicLabel makeDynamicFromLeftLabel(
             final TextLabel label, final Supplier<String> getter
     ) {
-        final Coord2D pos = new Coord2D(Layout.width() -
-                (label.getX() + Layout.BUTTON_INC), label.getY());
+        final Coord2D pos = new Coord2D(
+                Layout.getDialogContentRightBound(), label.getY());
 
         return new DynamicLabel(pos, MenuElement.Anchor.RIGHT_TOP,
                 Constants.WHITE, getter, Layout.DIALOG_DYNAMIC_W_ALLOWANCE);
@@ -1101,14 +1271,27 @@ public class DialogAssembly {
     }
 
     private static TextLabel makeDialogLeftLabel(final int index, final String text) {
-        return TextLabel.make(Layout.getDialogContentInitial()
-                .displace(0, index * Layout.DIALOG_CONTENT_INC_Y),
+        return TextLabel.make(getDialogLeftContentPositionForRow(index),
                 text, Constants.WHITE);
     }
 
     private static TextLabel makeDialogRightLabel(final TextLabel leftLabel, final String text) {
-        return TextLabel.make(leftLabel.getRenderPosition().displace(
-                Layout.getDialogWidth() / 2, 0), text, Constants.WHITE);
+        return TextLabel.make(getRightColumnFromLeftDisplacement(
+                leftLabel.getRenderPosition()), text, Constants.WHITE);
+    }
+
+    private static Coord2D getDialogLeftContentPositionForRow(final int index) {
+        return Layout.getDialogContentInitial()
+                .displace(0, index * Layout.DIALOG_CONTENT_INC_Y);
+    }
+
+    private static Coord2D getDialogRightContentPositionForRow(final int index) {
+        return getRightColumnFromLeftDisplacement(
+                getDialogLeftContentPositionForRow(index));
+    }
+
+    private static Coord2D getRightColumnFromLeftDisplacement(final Coord2D left) {
+        return left.displace(Layout.getDialogWidth() / 2, 0);
     }
 
     private static Coord2D getDialogContentOffsetFromLabel(final TextLabel label) {
@@ -1120,6 +1303,12 @@ public class DialogAssembly {
     private static Coord2D getDialogContentBigOffsetFromLabel(final TextLabel label) {
         return label.getRenderPosition().displace(
                 Layout.DIALOG_CONTENT_BIG_OFFSET_X,
+                Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
+    }
+
+    private static Coord2D getDialogContentOffsetFollowingLabel(final TextLabel label) {
+        return label.getRenderPosition().displace(
+                label.getWidth() + Layout.CONTENT_BUFFER_PX,
                 Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 

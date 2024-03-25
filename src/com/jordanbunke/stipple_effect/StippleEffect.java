@@ -31,10 +31,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
-import com.jordanbunke.stipple_effect.visual.DialogAssembly;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.MenuAssembly;
-import com.jordanbunke.stipple_effect.visual.SECursor;
+import com.jordanbunke.stipple_effect.visual.*;
 
 import java.awt.*;
 import java.io.File;
@@ -851,6 +848,24 @@ public class StippleEffect implements ProgramContext {
         }
     }
 
+    public void openFontTemplateProjects() {
+        final String suffix = "." + Constants.NATIVE_FILE_SUFFIX;
+        final Path folder = SEFonts.FONT_FOLDER.resolve("templates"),
+                asciiPath = folder.resolve(Constants.ASCII_TEMPLATE + suffix),
+                latinExtendedPath = folder.resolve(Constants.LATIN_EXTENDED_TEMPLATE + suffix);
+
+        final String ascii = FileIO.readResource(
+                ResourceLoader.loadResource(asciiPath), "ASCII Template"),
+                latinExtended = FileIO.readResource(
+                        ResourceLoader.loadResource(latinExtendedPath),
+                        "Latin Extended Template");
+
+        openNativeProject(ascii, asciiPath);
+        openNativeProject(latinExtended, latinExtendedPath);
+
+        clearDialog();
+    }
+
     public void openPalette() {
         FileIO.setDialogToFilesOnly();
         final Optional<File> opened = FileIO.openFileFromSystem(
@@ -871,9 +886,12 @@ public class StippleEffect implements ProgramContext {
     private void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix()))
-            openNativeProject(filepath);
-        else if (isAcceptedRasterFormat(fileName)) {
+        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix())) {
+            final String contents = FileIO.readFile(filepath);
+            openNativeProject(contents, filepath);
+
+            processNextImport();
+        } else if (isAcceptedRasterFormat(fileName)) {
             final GameImage image = GameImageIO.readImage(filepath);
 
             DialogAssembly.setDialogToOpenPNG(image, filepath);
@@ -888,16 +906,12 @@ public class StippleEffect implements ProgramContext {
         // extend with else-ifs for additional file types classes (scripts, palettes)
     }
 
-    public void openNativeProject(final Path filepath) {
-        final String contents = FileIO.readFile(filepath);
-
+    public void openNativeProject(final String contents, final Path filepath) {
         if (contents != null) {
             final SEContext project = ParserSerializer.load(contents, filepath);
             addContext(project, true);
         } else
             StatusUpdates.openFailed(filepath);
-
-        processNextImport();
     }
 
     private static boolean isAcceptedRasterFormat(final String toCheck) {

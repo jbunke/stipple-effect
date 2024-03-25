@@ -16,6 +16,7 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
@@ -148,6 +149,22 @@ public final class TextTool extends Tool {
                             case ENTER -> {
                                 keyEvent.markAsProcessed();
                                 nextLine(context);
+                            }
+                            case LEFT_ARROW -> {
+                                keyEvent.markAsProcessed();
+                                setFontScale(fontScale - 1);
+                            }
+                            case RIGHT_ARROW -> {
+                                keyEvent.markAsProcessed();
+                                setFontScale(fontScale + 1);
+                            }
+                            case UP_ARROW -> {
+                                keyEvent.markAsProcessed();
+                                setFontIndex(fontIndex - 1);
+                            }
+                            case DOWN_ARROW -> {
+                                keyEvent.markAsProcessed();
+                                setFontIndex(fontIndex + 1);
                             }
                             case ESCAPE -> {
                                 keyEvent.markAsProcessed();
@@ -283,7 +300,11 @@ public final class TextTool extends Tool {
         updateTCPIfTyping();
     }
 
-    public void addFont(final TextToolFont font) {
+    public void addFont() {
+        final String name = DialogVals.getFontName();
+        final Font raw = SEFonts.buildNewFont();
+        final TextToolFont font = new TextToolFont(name, raw);
+
         fonts.add(font);
         setFontIndex(fonts.size() - 1);
     }
@@ -385,7 +406,7 @@ public final class TextTool extends Tool {
         final IconButton newFontButton = IconButton.make(IconCodes.NEW_FONT,
                 new Coord2D(fontDropDown.getX() + fontDropDown.getWidth() +
                         Layout.BUTTON_OFFSET, Layout.optionsBarButtonY()),
-                () -> {} /* TODO - set dialog to new font */);
+                DialogAssembly::setDialogToNewFont);
 
         // delete font button
         final MenuElement deleteFontButton = GraphicsUtils

@@ -96,7 +96,8 @@ public class IconCodes {
             PLAYBACK_MODES = NO_ICON_PREFIX + "playback",
             LAYER_VISIBILITY = NO_ICON_PREFIX + "visibility",
             ONION_SKIN = NO_ICON_PREFIX + "onion_skin",
-            FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking";
+            FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking",
+            FONT_EXAMPLE_TEXT = NO_ICON_PREFIX + "font_example_text";
 
     public static final String NO_TOOLTIP = "no_tooltip";
 }

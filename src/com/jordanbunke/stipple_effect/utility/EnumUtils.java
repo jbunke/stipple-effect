@@ -23,4 +23,9 @@ public class EnumUtils {
 
         return values[nextIndex];
     }
+
+    public static <T extends Enum<T>> String formattedName(final T enumConst) {
+        final String name = enumConst.name();
+        return name.charAt(0) + name.substring(1).toLowerCase();
+    }
 }

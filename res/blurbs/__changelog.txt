@@ -15,7 +15,6 @@ Fix:
 
 Add:
 > Add "Pack/Split Frames" dialog
-> Add text tool
 
 Change:
 > Overhaul preview window
@@ -25,6 +24,7 @@ Change:
 {0.3.0} - 2024-??-??
 
 Added:
+> Added text tool
 > Added system timer
 > Added tool options bar
 > Added dither option to gradient tool

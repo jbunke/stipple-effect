@@ -705,7 +705,9 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
-            } else if (tool instanceof TextTool tt) {
+            } else if (tool.equals(TextTool.get())) {
+                final TextTool tt = TextTool.get();
+
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         () -> tt.setFontScale(tt.getFontScale() - 1));
@@ -1622,6 +1624,14 @@ public class SEContext {
         stateManager.performAction(result, Operation.RESIZE);
 
         snapToCenterOfImage();
+    }
+
+    public void pack() {
+        // TODO
+    }
+
+    public void split() {
+        // TODO
     }
 
     // IMAGE EDITING

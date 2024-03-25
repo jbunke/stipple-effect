@@ -33,7 +33,7 @@ public class Layout {
             PROJECTS_BEFORE_TO_DISPLAY = 1, DIALOG_CONTENT_INC_Y = 32,
             VERT_SCROLL_WINDOW_W = RIGHT_PANEL_W - (2 * CONTENT_BUFFER_PX),
             TOP_PANEL_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
-            DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
+            DIALOG_CONTENT_COMP_OFFSET_Y = 5, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
             DIALOG_CONTENT_OFFSET_X = 150, DIALOG_CONTENT_BIG_OFFSET_X = DIALOG_CONTENT_OFFSET_X + 100,
             DIALOG_CONTENT_SMALL_W_ALLOWANCE = 180,
             SMALL_TEXT_BOX_W = 80, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
@@ -361,5 +361,9 @@ public class Layout {
                 CONTENT_BUFFER_PX + BUTTON_BORDER_PX,
                 TEXT_Y_OFFSET + BUTTON_BORDER_PX +
                         (int)(1.5 * STD_TEXT_BUTTON_INC));
+    }
+
+    public static int getDialogContentRightBound() {
+        return width() - (getDialogContentInitial().x + BUTTON_INC);
     }
 }

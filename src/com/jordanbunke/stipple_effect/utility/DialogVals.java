@@ -1,8 +1,10 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.visual.SEFonts;
 
 import java.nio.file.Path;
 
@@ -10,22 +12,48 @@ public class DialogVals {
     private static int
             newProjectWidth = Constants.DEFAULT_IMAGE_W,
             newProjectHeight = Constants.DEFAULT_IMAGE_H,
-            newProjectXDivs = 1,
-            newProjectYDivs = 1,
+            newProjectXDivs = 1, newProjectYDivs = 1,
             resizeWidth = Constants.DEFAULT_IMAGE_W,
             resizeHeight = Constants.DEFAULT_IMAGE_H,
-            padLeft = 0,
-            padRight = 0,
-            padTop = 0,
-            padBottom = 0;
+            padLeft = 0, padRight = 0, padTop = 0, padBottom = 0,
+            newFontPixelSpacing = Constants.DEFAULT_FONT_PX_SPACING;
     private static double layerOpacity = Constants.OPAQUE;
+    private static boolean
+            hasLatinEx = false,
+            charSpecificSpacing = true;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
-    private static String layerName = "", paletteName = "";
+    private static String
+            layerName = "",
+            paletteName = "",
+            fontName = "";
     private static Path paletteFolder = null;
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
     private static SettingScreen settingScreen = SettingScreen.STARTUP;
     private static PaletteSorter paletteSorter = PaletteSorter.HUE;
     private static ContentType contentType = ContentType.SELECTION;
+    private static UploadStatus
+            asciiStatus = UploadStatus.UNATTEMPTED,
+            latinExStatus = UploadStatus.UNATTEMPTED;
+    private static GameImage
+            asciiImage = null,
+            latinExImage = null,
+            fontPreviewImage = GameImage.dummy();
+
+    public enum UploadStatus {
+        UNATTEMPTED, VALIDATED, INVALID;
+
+        public String getMessage() {
+            return "[ " + switch (this) {
+                case INVALID -> "Invalid / upload failed";
+                case VALIDATED -> "Validated image!";
+                case UNATTEMPTED -> "Nothing uploaded";
+            } + " ]";
+        }
+
+        public boolean isValid() {
+            return this == VALIDATED;
+        }
+    }
 
     public enum InfoScreen {
         ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG;
@@ -36,7 +64,7 @@ public class DialogVals {
 
         @Override
         public String toString() {
-            return enumPrintName(name());
+            return EnumUtils.formattedName(this);
         }
     }
 
@@ -49,7 +77,7 @@ public class DialogVals {
 
         @Override
         public String toString() {
-            return enumPrintName(name());
+            return EnumUtils.formattedName(this);
         }
     }
 
@@ -76,12 +104,8 @@ public class DialogVals {
             if (this == LAYER_FRAME)
                 return "Layer-Frame";
 
-            return enumPrintName(name());
+            return EnumUtils.formattedName(this);
         }
-    }
-
-    private static String enumPrintName(final String name) {
-        return name.charAt(0) + name.substring(1).toLowerCase();
     }
 
     public static void setPaletteFolder(final Path paletteFolder) {
@@ -164,6 +188,93 @@ public class DialogVals {
         DialogVals.newProjectYDivs = newProjectYDivs;
     }
 
+    public static void setNewFontPixelSpacing(final int newFontPixelSpacing) {
+        setNewFontPixelSpacing(newFontPixelSpacing, true);
+    }
+
+    public static void setNewFontPixelSpacing(
+            final int newFontPixelSpacing, final boolean attemptPreviewUpdate
+    ) {
+        DialogVals.newFontPixelSpacing = newFontPixelSpacing;
+
+        if (attemptPreviewUpdate)
+            SEFonts.attemptPreviewUpdate();
+    }
+
+    public static void setHasLatinEx(final boolean hasLatinEx) {
+        setHasLatinEx(hasLatinEx, true);
+    }
+
+    public static void setHasLatinEx(
+            final boolean hasLatinEx, final boolean attemptPreviewUpdate
+    ) {
+        DialogVals.hasLatinEx = hasLatinEx;
+
+        if (attemptPreviewUpdate)
+            SEFonts.attemptPreviewUpdate();
+    }
+
+    public static void setCharSpecificSpacing(final boolean charSpecificSpacing) {
+        setCharSpecificSpacing(charSpecificSpacing, true);
+    }
+
+    public static void setCharSpecificSpacing(
+            final boolean charSpecificSpacing, final boolean attemptPreviewUpdate
+    ) {
+        DialogVals.charSpecificSpacing = charSpecificSpacing;
+
+        if (attemptPreviewUpdate)
+            SEFonts.attemptPreviewUpdate();
+    }
+
+    public static void setFontName(final String fontName) {
+        DialogVals.fontName = fontName;
+    }
+
+    public static void resetAscii() {
+        asciiStatus = UploadStatus.UNATTEMPTED;
+        asciiImage = null;
+    }
+
+    public static void asciiFailedValidation() {
+        asciiStatus = UploadStatus.INVALID;
+        asciiImage = null;
+    }
+
+    public static void asciiPassedValidation(
+            final GameImage asciiImage
+    ) {
+        asciiStatus = UploadStatus.VALIDATED;
+        DialogVals.asciiImage = asciiImage;
+
+        SEFonts.attemptPreviewUpdate();
+    }
+
+    public static void resetLatinEx() {
+        latinExStatus = UploadStatus.UNATTEMPTED;
+        latinExImage = null;
+    }
+
+    public static void latinExFailedValidation() {
+        latinExStatus = UploadStatus.INVALID;
+        latinExImage = null;
+    }
+
+    public static void latinExPassedValidation(
+            final GameImage latinExImage
+    ) {
+        latinExStatus = UploadStatus.VALIDATED;
+        DialogVals.latinExImage = latinExImage;
+
+        SEFonts.attemptPreviewUpdate();
+    }
+
+    public static void setFontPreviewImage(
+            final GameImage fontPreviewImage
+    ) {
+        DialogVals.fontPreviewImage = fontPreviewImage;
+    }
+
     public static Path getPaletteFolder() {
         return paletteFolder;
     }
@@ -234,6 +345,42 @@ public class DialogVals {
 
     public static int getNewProjectYDivs() {
         return newProjectYDivs;
+    }
+
+    public static int getNewFontPixelSpacing() {
+        return newFontPixelSpacing;
+    }
+
+    public static boolean hasLatinEx() {
+        return hasLatinEx;
+    }
+
+    public static boolean isCharSpecificSpacing() {
+        return charSpecificSpacing;
+    }
+
+    public static String getFontName() {
+        return fontName;
+    }
+
+    public static UploadStatus getAsciiStatus() {
+        return asciiStatus;
+    }
+
+    public static UploadStatus getLatinExStatus() {
+        return latinExStatus;
+    }
+
+    public static GameImage getAsciiImage() {
+        return asciiImage;
+    }
+
+    public static GameImage getLatinExImage() {
+        return latinExImage;
+    }
+
+    public static GameImage getFontPreviewImage() {
+        return fontPreviewImage;
     }
 
     public static boolean isThisOutlineSide(final int index) {
