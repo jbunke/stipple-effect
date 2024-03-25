@@ -8,25 +8,36 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.ColorMath;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.Geometry;
-import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.DropdownMenu;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public final class GradientTool extends ToolWithBreadth
         implements SnappableTool, ToggleModeTool {
     private static final GradientTool INSTANCE;
 
-    private boolean drawing, linear, snap, backwards, dithered;
+    private boolean drawing, global, snap, backwards, dithered, wholeCanvas;
     private GameImage toolContentPreview;
     private Coord2D anchor;
     private List<Set<Coord2D>> gradientStages;
+    private Shape shape;
+
+    public enum Shape {
+        LINEAR, RADIAL;
+
+        public BiFunction<Coord2D, Coord2D, Double> cGetter() {
+            return switch (this) {
+                case LINEAR -> INSTANCE::getLinearC;
+                case RADIAL -> INSTANCE::getRadialC;
+            };
+        }
+    }
 
     static {
         INSTANCE = new GradientTool();
@@ -34,10 +45,13 @@ public final class GradientTool extends ToolWithBreadth
 
     private GradientTool() {
         drawing = false;
-        linear = false;
+        global = false;
         snap = false;
         backwards = false;
         dithered = false;
+        wholeCanvas = true;
+
+        shape = Shape.LINEAR;
 
         toolContentPreview = GameImage.dummy();
 
@@ -82,8 +96,8 @@ public final class GradientTool extends ToolWithBreadth
 
             toolContentPreview = new GameImage(w, h);
 
-            if (linear)
-                updateLinearMode(selection, tp, w, h);
+            if (global)
+                updateGlobalMode(selection, tp, w, h);
             else
                 updateBrushMode(selection, tp, w, h);
 
@@ -106,7 +120,7 @@ public final class GradientTool extends ToolWithBreadth
         drawGradientStages(w, h);
     }
 
-    private void updateLinearMode(
+    private void updateGlobalMode(
             final Set<Coord2D> selection, final Coord2D tp,
             final int w, final int h
     ) {
@@ -121,7 +135,7 @@ public final class GradientTool extends ToolWithBreadth
         } else
             endpoint = tp;
 
-        drawLinearGradient(endpoint, selection, w, h);
+        drawGlobalGradient(endpoint, selection, w, h);
     }
 
     private void populateAround(
@@ -144,7 +158,7 @@ public final class GradientTool extends ToolWithBreadth
             }
     }
 
-    private void drawLinearGradient(
+    private void drawGlobalGradient(
             final Coord2D endpoint, final Set<Coord2D> selection,
             final int w, final int h
     ) {
@@ -156,15 +170,26 @@ public final class GradientTool extends ToolWithBreadth
                 if (hasSelection && !selection.contains(pos))
                     continue;
 
-                final double c = getC(pos, endpoint);
-                toolContentPreview.setRGB(x, y, (dithered
-                        ? getDitherColor(x, y, getDitherStage(c))
-                        : getColor(c)).getRGB());
+                final double c = shape.cGetter().apply(pos, endpoint);
+
+                if (wholeCanvas || (c >= 0d && c <= 1d))
+                    toolContentPreview.setRGB(x, y, (dithered
+                            ? getDitherColor(x, y, getDitherStage(c))
+                            : getColor(c)).getRGB());
             }
         }
     }
 
-    private double getC(final Coord2D pos, final Coord2D endpoint) {
+    private double getRadialC(final Coord2D pos, final Coord2D endpoint) {
+        final double
+                totalDistance = Coord2D.unitDistanceBetween(anchor, endpoint),
+                distance = Coord2D.unitDistanceBetween(pos, anchor);
+
+        return totalDistance == 0d ? 0d
+                : distance / totalDistance;
+    }
+
+    private double getLinearC(final Coord2D pos, final Coord2D endpoint) {
         final int diffY = endpoint.y - anchor.y,
                 diffX = endpoint.x - anchor.x,
                 deltaY = pos.y - anchor.y,
@@ -264,22 +289,26 @@ public final class GradientTool extends ToolWithBreadth
     }
 
     @Override
-    public void setMode(final boolean linear) {
+    public void setMode(final boolean global) {
         if (!drawing)
-            this.linear = linear;
+            this.global = global;
     }
 
     public void setDithered(final boolean dithered) {
         this.dithered = dithered;
     }
 
-    public boolean isDithered() {
-        return dithered;
+    public void setWholeCanvas(final boolean wholeCanvas) {
+        this.wholeCanvas = wholeCanvas;
+    }
+
+    public void setShape(final Shape shape) {
+        this.shape = shape;
     }
 
     @Override
     public void setSnap(final boolean snap) {
-        this.snap = linear && snap;
+        this.snap = global && snap;
     }
 
     @Override
@@ -294,13 +323,13 @@ public final class GradientTool extends ToolWithBreadth
 
     @Override
     public GameImage getOverlay() {
-        return linear ? GameImage.dummy() : super.getOverlay();
+        return global ? GameImage.dummy() : super.getOverlay();
     }
 
     @Override
     public String getBottomBarText() {
-        return linear
-                ? "Linear Gradient"
+        return global
+                ? EnumUtils.formattedName(shape) + " Gradient"
                 : super.getBottomBarText().replace("Tool", "Brush");
     }
 
@@ -316,9 +345,44 @@ public final class GradientTool extends ToolWithBreadth
                 ditheredLabel.getX() + ditheredLabel.getWidth() +
                         Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
                 MenuElement.Anchor.LEFT_TOP,
-                this::isDithered, this::setDithered);
+                () -> dithered, this::setDithered);
+
+        // shape label
+        final TextLabel shapeLabel = TextLabel.make(new Coord2D(
+                        ditheredCheckbox.getX() + Layout.BUTTON_DIM +
+                                Layout.optionsBarSectionBuffer(),
+                        Layout.optionsBarTextY()), "Shape", Constants.WHITE);
+
+        // shape dropdown
+        final DropdownMenu shapeDropdown = new DropdownMenu(new Coord2D(
+                shapeLabel.getX() + shapeLabel.getWidth() +
+                        Layout.CONTENT_BUFFER_PX,
+                Layout.getToolOptionsBarPosition().y +
+                        ((Layout.TOOL_OPTIONS_BAR_H -
+                                Layout.STD_TEXT_BUTTON_H) / 2)),
+                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
+                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+                Arrays.stream(Shape.values()).map(EnumUtils::formattedName)
+                        .toArray(String[]::new),
+                Arrays.stream(Shape.values()).map(s -> (Runnable) () ->
+                        setShape(s)).toArray(Runnable[]::new), shape::ordinal);
+
+        // whole canvas label
+        final TextLabel wholeCanvasLabel = TextLabel.make(new Coord2D(
+                shapeDropdown.getX() + shapeDropdown.getWidth() +
+                        Layout.optionsBarSectionBuffer(),
+                        Layout.optionsBarTextY()),
+                "Whole canvas?", Constants.WHITE);
+
+        // whole canvas checkbox
+        final Checkbox wholeCanvasCheckbox = new Checkbox(new Coord2D(
+                wholeCanvasLabel.getX() + wholeCanvasLabel.getWidth() +
+                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
+                MenuElement.Anchor.LEFT_TOP,
+                () -> wholeCanvas, this::setWholeCanvas);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
-                ditheredLabel, ditheredCheckbox);
+                ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
+                wholeCanvasLabel, wholeCanvasCheckbox);
     }
 }

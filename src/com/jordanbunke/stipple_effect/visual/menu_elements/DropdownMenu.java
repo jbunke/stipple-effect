@@ -17,7 +17,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalSc
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-public class DropDownMenu extends DeferredRenderMenuElement {
+public class DropdownMenu extends DeferredRenderMenuElement {
     private boolean droppedDown;
 
     private final int length;
@@ -28,7 +28,7 @@ public class DropDownMenu extends DeferredRenderMenuElement {
     private SimpleToggleMenuButton ddButton;
     private final VerticalScrollingMenuElement ddContainer;
 
-    public DropDownMenu(
+    public DropdownMenu(
             final Coord2D position, final int width, final Anchor anchor,
             final int dropDownHAllowance,
             final String[] labels, final Runnable[] behaviours,

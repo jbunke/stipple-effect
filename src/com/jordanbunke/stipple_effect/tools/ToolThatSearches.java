@@ -17,17 +17,18 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill, Wand {
     private double tolerance;
     private boolean searchDiag;
+    private final Map<Color, Boolean> hasCheckedMap;
 
     ToolThatSearches() {
         tolerance = Constants.DEFAULT_TOLERANCE;
         searchDiag = false;
+
+        hasCheckedMap = new HashMap<>();
     }
 
     @Override
@@ -76,6 +77,8 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
     private Set<Coord2D> adjacentSearch(
             final GameImage image, final Color initial, final Coord2D target
     ) {
+        hasCheckedMap.clear();
+
         final Set<Coord2D> matched = new HashSet<>(), searched = new HashSet<>();
         final int w = image.getWidth(), h = image.getHeight();
 
@@ -89,7 +92,11 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
             final Color pixel = ImageProcessing.colorAtPixel(
                     image, active.x, active.y);
 
-            if (pixelMatchesToleranceCondition(initial, pixel)) {
+            final boolean result =
+                    pixelMatchesToleranceCondition(initial, pixel);
+            hasCheckedMap.put(pixel, result);
+
+            if (result) {
                 matched.add(active);
 
                 // neighbours
@@ -126,6 +133,8 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
     private Set<Coord2D> globalSearch(
             final GameImage image, final Color initial
     ) {
+        hasCheckedMap.clear();
+
         final Set<Coord2D> matched = new HashSet<>();
         final int w = image.getWidth(), h = image.getHeight();
 
@@ -133,7 +142,11 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
             for (int y = 0; y < h; y++) {
                 final Color pixel = ImageProcessing.colorAtPixel(image, x, y);
 
-                if (pixelMatchesToleranceCondition(initial, pixel))
+                final boolean result =
+                        pixelMatchesToleranceCondition(initial, pixel);
+                hasCheckedMap.put(pixel, result);
+
+                if (result)
                     matched.add(new Coord2D(x, y));
             }
         }
@@ -144,6 +157,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
     public boolean pixelMatchesToleranceCondition(
             final Color initial, final Color pixel
     ) {
+        if (hasCheckedMap.containsKey(pixel))
+            return hasCheckedMap.get(pixel);
+
         if (initial.equals(pixel))
             return true;
 

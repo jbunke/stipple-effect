@@ -705,7 +705,7 @@ public class MenuAssembly {
         final int dropDownHAllowance = Layout.getColorsHeight() / 3;
 
         mb.add(hasPaletteContents
-                ? new DropDownMenu(dropdownPos, contentWidth,
+                ? new DropdownMenu(dropdownPos, contentWidth,
                 MenuElement.Anchor.LEFT_TOP, dropDownHAllowance,
                 palettes.stream().map(Palette::getName).toArray(String[]::new),
                 behaviours.toArray(Runnable[]::new), () -> index)

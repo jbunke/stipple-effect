@@ -420,14 +420,14 @@ public final class TextTool extends Tool {
                 "Font", Constants.WHITE);
 
         // font dropdown
-        final DropDownMenu fontDropDown = new DropDownMenu(new Coord2D(
+        final DropdownMenu fontDropdown = new DropdownMenu(new Coord2D(
                 fontLabel.getX() + fontLabel.getWidth() +
                         Layout.CONTENT_BUFFER_PX,
                 Layout.getToolOptionsBarPosition().y +
                         ((Layout.TOOL_OPTIONS_BAR_H -
                                 Layout.STD_TEXT_BUTTON_H) / 2)),
-                Layout.optionsBarSliderWidth(),
-                MenuElement.Anchor.LEFT_TOP, (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
+                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
                 fonts.stream().map(TextToolFont::name).toArray(String[]::new),
                 fonts.stream().map(ttf -> (Runnable) () ->
                         setFontIndex(fonts.indexOf(ttf)))
@@ -435,7 +435,7 @@ public final class TextTool extends Tool {
 
         // upload font button
         final IconButton newFontButton = IconButton.make(IconCodes.NEW_FONT,
-                new Coord2D(fontDropDown.getX() + fontDropDown.getWidth() +
+                new Coord2D(fontDropdown.getX() + fontDropdown.getWidth() +
                         Layout.BUTTON_OFFSET, Layout.optionsBarButtonY()),
                 DialogAssembly::setDialogToNewFont);
 
@@ -450,7 +450,7 @@ public final class TextTool extends Tool {
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 scaleLabel, decButton, incButton, scaleSlider,
                 alignmentLabel, alignmentToggle,
-                fontLabel, fontDropDown, newFontButton, deleteFontButton);
+                fontLabel, fontDropdown, newFontButton, deleteFontButton);
     }
 
     private int getScaleTextX() {
