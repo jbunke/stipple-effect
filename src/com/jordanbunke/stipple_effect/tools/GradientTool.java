@@ -206,7 +206,7 @@ public final class GradientTool extends ToolWithBreadth
 
                 if (replacePixel)
                     toolContentPreview.setRGB(x, y, (dithered
-                            ? getDitherColor(x, y, getDitherStage(c))
+                            ? getDitherColor(x, y, DitherStage.get(c))
                             : getColor(c)).getRGB());
             }
         }
@@ -282,7 +282,7 @@ public final class GradientTool extends ToolWithBreadth
             final double c = size == 1 ? 0d : g / (double) (size - 1);
 
             if (dithered) {
-                final DitherStage ds = getDitherStage(c);
+                final DitherStage ds = DitherStage.get(c);
 
                 gradientStages.get(g).stream().filter(
                                 p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
@@ -304,15 +304,6 @@ public final class GradientTool extends ToolWithBreadth
                 s = StippleEffect.get().getSecondary();
 
         return ColorMath.betweenColor(backwards ? 1 - c : c, p, s);
-    }
-
-    private DitherStage getDitherStage(final double c) {
-        final DitherStage[] ds = DitherStage.values();
-
-        return MathPlus.findBest(
-                DitherStage.FIFTY_FIFTY, DitherStage.FIFTY_FIFTY, d -> d,
-                (d1, d2) -> Math.abs(d1.getFraction() - c) <=
-                        Math.abs(d2.getFraction() - c), ds);
     }
 
     private Color getDitherColor(

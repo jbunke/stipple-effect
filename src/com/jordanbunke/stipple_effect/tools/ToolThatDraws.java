@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.delta_time.utility.RNG;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -25,6 +26,15 @@ public abstract class ToolThatDraws extends Tool {
         ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN,
         FIFTY_FIFTY,
         NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FOURTEEN, FIFTEEN, FULL;
+
+        static DitherStage get(final double c) {
+            final DitherStage[] ds = DitherStage.values();
+
+            return MathPlus.findBest(
+                    DitherStage.FIFTY_FIFTY, DitherStage.FIFTY_FIFTY, d -> d,
+                    (d1, d2) -> Math.abs(d1.getFraction() - c) <=
+                            Math.abs(d2.getFraction() - c), ds);
+        }
 
         double getFraction() {
             final double pixels = 16d;
@@ -47,28 +57,6 @@ public abstract class ToolThatDraws extends Tool {
                 case FOURTEEN -> 14 / pixels;
                 case FIFTEEN -> 15 / pixels;
                 case FULL -> 1d;
-            };
-        }
-
-        String getPercentage() {
-            return switch (this) {
-                case ZERO -> "0";
-                case ONE -> "6.25";
-                case TWO -> "12.5";
-                case THREE -> "18.75";
-                case FOUR -> "25";
-                case FIVE -> "31.25";
-                case SIX -> "37.5";
-                case SEVEN -> "43.75";
-                case FIFTY_FIFTY -> "50";
-                case NINE -> "56.25";
-                case TEN -> "62.5";
-                case ELEVEN -> "68.75";
-                case TWELVE -> "75";
-                case THIRTEEN -> "81.25";
-                case FOURTEEN -> "87.5";
-                case FIFTEEN -> "93.75";
-                case FULL -> "100";
             };
         }
 
@@ -108,7 +96,7 @@ public abstract class ToolThatDraws extends Tool {
     }
 
     private static Mode mode = Mode.NORMAL;
-    private static DitherStage ditherStage = DitherStage.FIFTY_FIFTY;
+    private static double bias = Constants.UNBIASED;
 
     private Coord2D lastTP;
     private int lastFrameIndex;
@@ -170,9 +158,9 @@ public abstract class ToolThatDraws extends Tool {
         ToolThatDraws.mode = mode;
     }
 
-    private static void setDitherStage(final int index) {
-        ditherStage = DitherStage.values()[MathPlus.bounded(0,
-                index, DitherStage.values().length - 1)];
+    private static void setBias(final double bias) {
+        ToolThatDraws.bias = MathPlus.bounded(
+                Constants.MIN_BIAS, bias, Constants.MAX_BIAS);
     }
 
     public static Mode getMode() {
@@ -185,12 +173,8 @@ public abstract class ToolThatDraws extends Tool {
             case BLEND -> {
                 final Color primary = StippleEffect.get().getPrimary(),
                         secondary = StippleEffect.get().getSecondary();
-                yield (x, y) -> new Color(
-                        (primary.getRed() + secondary.getRed()) / 2,
-                        (primary.getGreen() + secondary.getGreen()) / 2,
-                        (primary.getBlue() + secondary.getBlue()) / 2,
-                        (primary.getAlpha() + secondary.getAlpha()) / 2
-                );
+                yield (x, y) -> ColorMath.betweenColor(
+                        bias, secondary, primary);
             }
             case NOISE -> {
                 final Color primary = StippleEffect.get().getPrimary(),
@@ -206,9 +190,10 @@ public abstract class ToolThatDraws extends Tool {
                         RNG.randomInRange(Math.min(pa, sa), Math.max(pa, sa))
                 );
             }
-            case DITHERING -> (x, y) -> ditherStage.condition(x, y)
-                    ? StippleEffect.get().getPrimary()
-                    : StippleEffect.get().getSecondary();
+            case DITHERING -> (x, y) ->
+                    DitherStage.get(bias).condition(x, y)
+                            ? StippleEffect.get().getPrimary()
+                            : StippleEffect.get().getSecondary();
             case NORMAL -> me.button == GameMouseEvent.Button.LEFT
                     ? (x, y) -> StippleEffect.get().getPrimary()
                     : (x, y) -> StippleEffect.get().getSecondary();
@@ -220,25 +205,35 @@ public abstract class ToolThatDraws extends Tool {
         if (!this.equals(Brush.get()) && !this.equals(Pencil.get()))
             return super.buildToolOptionsBar();
 
-        // dither label
-        final TextLabel ditherLabel = TextLabel.make(
+        // bias label
+        final TextLabel biasLabel = TextLabel.make(
                 new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
-                "Dither", Constants.WHITE);
+                "Combination mode bias", Constants.WHITE);
 
-        // dither content
-        final String VALUE_SUFFIX = "% primary color";
-        final ToolOptionIncrementalRange<Integer> dither =
-                ToolOptionIncrementalRange.makeForInt(
-                        ditherLabel, 1, 0, DitherStage.values().length - 1,
-                        ToolThatDraws::setDitherStage,
-                        () -> ditherStage.ordinal(), i -> i, i -> i,
-                        ds -> DitherStage.values()[ds]
-                                .getPercentage() + VALUE_SUFFIX,
-                        "XX.XX" + VALUE_SUFFIX);
+        // bias content
+        final int PERCENT = 100;
+        final String INFIX = "% towards ", SUFFIX = " color";
+        final ToolOptionIncrementalRange<Double> biasElems =
+                ToolOptionIncrementalRange.makeForDouble(biasLabel,
+                        () -> setBias(bias - Constants.BIAS_INC),
+                        () -> setBias(bias + Constants.BIAS_INC),
+                        Constants.MIN_BIAS, Constants.MAX_BIAS,
+                        ToolThatDraws::setBias, () -> bias,
+                        b -> (int) (b * PERCENT), sv -> sv / (double) PERCENT,
+                        b -> {
+                    final int biasPercentage = (int)
+                            (Math.abs(Constants.UNBIASED - b) * PERCENT * 2);
+                    final String color = b < Constants.UNBIASED
+                            ? "secondary" : "primary";
 
-        return new MenuElementGrouping(super.buildToolOptionsBar(),
-                ditherLabel, dither.decButton, dither.incButton,
-                dither.slider, dither.value);
+                    return biasPercentage + INFIX + color + SUFFIX;
+                    }, "XXX" + INFIX + "secondary" + SUFFIX);
+
+        return new MenuElementGrouping(
+                super.buildToolOptionsBar(), biasLabel,
+                biasElems.decButton, biasElems.incButton,
+                biasElems.slider, biasElems.value
+        );
     }
 
     abstract int getDitherTextX();

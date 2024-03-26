@@ -84,5 +84,6 @@ public class Constants {
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
-            SMALL_TOLERANCE_INC = 0.01, BIG_TOLERANCE_INC = SMALL_TOLERANCE_INC * 10d;
+            SMALL_TOLERANCE_INC = 0.01, BIG_TOLERANCE_INC = SMALL_TOLERANCE_INC * 10,
+            UNBIASED = 0.5d, MIN_BIAS = 0d, MAX_BIAS = 1d, BIAS_INC = 0.01;
 }
