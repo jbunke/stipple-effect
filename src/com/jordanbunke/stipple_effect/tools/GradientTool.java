@@ -29,12 +29,13 @@ public final class GradientTool extends ToolWithBreadth
     private Shape shape;
 
     public enum Shape {
-        LINEAR, RADIAL;
+        LINEAR, RADIAL, SPIRAL;
 
         public BiFunction<Coord2D, Coord2D, Double> cGetter() {
             return switch (this) {
                 case LINEAR -> INSTANCE::getLinearC;
                 case RADIAL -> INSTANCE::getRadialC;
+                case SPIRAL -> INSTANCE::getSpiralC;
             };
         }
     }
@@ -183,10 +184,19 @@ public final class GradientTool extends ToolWithBreadth
     private double getRadialC(final Coord2D pos, final Coord2D endpoint) {
         final double
                 totalDistance = Coord2D.unitDistanceBetween(anchor, endpoint),
-                distance = Coord2D.unitDistanceBetween(pos, anchor);
+                distance = Coord2D.unitDistanceBetween(anchor, pos);
 
         return totalDistance == 0d ? 0d
                 : distance / totalDistance;
+    }
+
+    private double getSpiralC(final Coord2D pos, final Coord2D endpoint) {
+        final double
+                initialAngle = Geometry.calculateAngleInRad(endpoint, anchor),
+                angle = Geometry.calculateAngleInRad(pos, anchor),
+                normalized = Geometry.normalizeAngle(angle - initialAngle);
+
+        return normalized / Constants.CIRCLE;
     }
 
     private double getLinearC(final Coord2D pos, final Coord2D endpoint) {
