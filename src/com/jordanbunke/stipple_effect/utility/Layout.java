@@ -197,7 +197,7 @@ public class Layout {
     }
 
     public static int optionsBarSectionBuffer() {
-        return (int) (getToolOptionsBarWidth() * 0.07);
+        return (int) (getToolOptionsBarWidth() * 0.04);
     }
 
     public static int optionsBarTextY() {

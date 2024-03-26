@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.Coord2D;
@@ -97,7 +98,6 @@ public final class GradientTool extends ToolWithBreadth
         if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
-            final Set<Coord2D> selection = context.getState().getSelection();
 
             if (tp.equals(getLastTP()))
                 return;
@@ -105,19 +105,21 @@ public final class GradientTool extends ToolWithBreadth
             toolContentPreview = new GameImage(w, h);
 
             if (global)
-                updateGlobalMode(selection, tp, w, h);
+                updateGlobalMode(context, tp, w, h);
             else
-                updateBrushMode(selection, tp, w, h);
+                updateBrushMode(context, tp, w, h);
 
             updateLast(context);
         }
     }
 
     private void updateBrushMode(
-            final Set<Coord2D> selection, final Coord2D tp,
+            final SEContext context, final Coord2D tp,
             final int w, final int h
     ) {
-        final Set<Coord2D> gradientStage = new HashSet<>();
+        final Set<Coord2D>
+                selection = context.getState().getSelection(),
+                gradientStage = new HashSet<>();
 
         populateAround(gradientStage, tp, selection);
         fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
@@ -129,7 +131,7 @@ public final class GradientTool extends ToolWithBreadth
     }
 
     private void updateGlobalMode(
-            final Set<Coord2D> selection, final Coord2D tp,
+            final SEContext context, final Coord2D tp,
             final int w, final int h
     ) {
         final Coord2D endpoint;
@@ -143,7 +145,7 @@ public final class GradientTool extends ToolWithBreadth
         } else
             endpoint = tp;
 
-        drawGlobalGradient(endpoint, selection, w, h);
+        drawGlobalGradient(endpoint, context, w, h);
     }
 
     private void populateAround(
@@ -167,10 +169,22 @@ public final class GradientTool extends ToolWithBreadth
     }
 
     private void drawGlobalGradient(
-            final Coord2D endpoint, final Set<Coord2D> selection,
+            final Coord2D endpoint, final SEContext context,
             final int w, final int h
     ) {
+        final Set<Coord2D> selection = context.getState().getSelection();
         final boolean hasSelection = !selection.isEmpty();
+
+        final int frameIndex = context.getState().getFrameIndex();
+        final GameImage frame = context.getState()
+                .getEditingLayer().getFrame(frameIndex);
+        final boolean anchorInBounds =
+                anchor.x >= 0 && anchor.x < w &&
+                anchor.y >= 0 && anchor.y < h;
+        final Optional<Color> maskColor = anchorInBounds
+                ? Optional.of(ImageProcessing
+                .colorAtPixel(frame, anchor.x, anchor.y))
+                : Optional.empty();
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
@@ -180,7 +194,15 @@ public final class GradientTool extends ToolWithBreadth
 
                 final double c = shape.cGetter().apply(pos, endpoint);
 
-                if (scope == Scope.CANVAS || (c >= 0d && c <= 1d))
+                final boolean satisfiesMask = !masked ||
+                        (maskColor.isPresent() &&
+                                ImageProcessing.colorAtPixel(frame, x, y)
+                                .equals(maskColor.get())),
+                        satisfiesScope = scope == Scope.CANVAS ||
+                                (c >= 0d && c <= 1d),
+                        replacePixel = satisfiesMask && satisfiesScope;
+
+                if (replacePixel)
                     toolContentPreview.setRGB(x, y, (dithered
                             ? getDitherColor(x, y, getDitherStage(c))
                             : getColor(c)).getRGB());
