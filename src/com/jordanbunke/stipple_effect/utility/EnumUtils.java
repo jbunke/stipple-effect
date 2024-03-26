@@ -26,6 +26,13 @@ public class EnumUtils {
 
     public static <T extends Enum<T>> String formattedName(final T enumConst) {
         final String name = enumConst.name();
-        return name.charAt(0) + name.substring(1).toLowerCase();
+
+        return Arrays.stream(name.split("_"))
+                .map(EnumUtils::capitalizeFirstLetter)
+                .reduce((a, b) -> a + " " + b).orElse(name);
+    }
+
+    private static String capitalizeFirstLetter(final String word) {
+        return word.charAt(0) + word.substring(1).toLowerCase();
     }
 }

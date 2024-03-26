@@ -17,16 +17,22 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 public final class GradientTool extends ToolWithBreadth
         implements SnappableTool, ToggleModeTool {
     private static final GradientTool INSTANCE;
 
-    private boolean drawing, global, snap, backwards, dithered, wholeCanvas;
+    private boolean drawing, global, snap, backwards, dithered, masked;
     private GameImage toolContentPreview;
     private Coord2D anchor;
     private List<Set<Coord2D>> gradientStages;
     private Shape shape;
+    private Scope scope;
+
+    public enum Scope {
+        CANVAS, RANGE
+    }
 
     public enum Shape {
         LINEAR, RADIAL, SPIRAL;
@@ -50,7 +56,8 @@ public final class GradientTool extends ToolWithBreadth
         snap = false;
         backwards = false;
         dithered = false;
-        wholeCanvas = true;
+        masked = false;
+        scope = Scope.CANVAS;
 
         shape = Shape.LINEAR;
 
@@ -173,7 +180,7 @@ public final class GradientTool extends ToolWithBreadth
 
                 final double c = shape.cGetter().apply(pos, endpoint);
 
-                if (wholeCanvas || (c >= 0d && c <= 1d))
+                if (scope == Scope.CANVAS || (c >= 0d && c <= 1d))
                     toolContentPreview.setRGB(x, y, (dithered
                             ? getDitherColor(x, y, getDitherStage(c))
                             : getColor(c)).getRGB());
@@ -308,8 +315,12 @@ public final class GradientTool extends ToolWithBreadth
         this.dithered = dithered;
     }
 
-    public void setWholeCanvas(final boolean wholeCanvas) {
-        this.wholeCanvas = wholeCanvas;
+    public void setMasked(final boolean masked) {
+        this.masked = masked;
+    }
+
+    public void setScope(final Scope scope) {
+        this.scope = scope;
     }
 
     public void setShape(final Shape shape) {
@@ -377,22 +388,42 @@ public final class GradientTool extends ToolWithBreadth
                 Arrays.stream(Shape.values()).map(s -> (Runnable) () ->
                         setShape(s)).toArray(Runnable[]::new), shape::ordinal);
 
-        // whole canvas label
-        final TextLabel wholeCanvasLabel = TextLabel.make(new Coord2D(
+        // scope label
+        final TextLabel scopeLabel = TextLabel.make(new Coord2D(
                 shapeDropdown.getX() + shapeDropdown.getWidth() +
                         Layout.optionsBarSectionBuffer(),
                         Layout.optionsBarTextY()),
-                "Whole canvas?", Constants.WHITE);
+                "Scope", Constants.WHITE);
 
-        // whole canvas checkbox
-        final Checkbox wholeCanvasCheckbox = new Checkbox(new Coord2D(
-                wholeCanvasLabel.getX() + wholeCanvasLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
+        // scope dropdown
+        final DropdownMenu scopeDropdown = new DropdownMenu(new Coord2D(
+                scopeLabel.getX() + scopeLabel.getWidth() +
+                        Layout.CONTENT_BUFFER_PX,
+                Layout.getToolOptionsBarPosition().y +
+                        ((Layout.TOOL_OPTIONS_BAR_H -
+                                Layout.STD_TEXT_BUTTON_H) / 2)),
+                Layout.optionsBarSliderWidth(),
                 MenuElement.Anchor.LEFT_TOP,
-                () -> wholeCanvas, this::setWholeCanvas);
+                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+                Arrays.stream(Scope.values())
+                        .flatMap(scope -> Stream.of(
+                                new Pair<>(scope, false),
+                                new Pair<>(scope, true)))
+                        .map(p -> EnumUtils.formattedName(p.first()) +
+                                (p.second() ? " (masked)" : ""))
+                        .toArray(String[]::new),
+                Arrays.stream(Scope.values())
+                        .flatMap(scope -> Stream.of(
+                                new Pair<>(scope, false),
+                                new Pair<>(scope, true)))
+                        .map(p -> (Runnable) () -> {
+                            setScope(p.first());
+                            setMasked(p.second());
+                        }).toArray(Runnable[]::new),
+                () -> (scope.ordinal() * 2) + (masked ? 1 : 0));
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
-                wholeCanvasLabel, wholeCanvasCheckbox);
+                scopeLabel, scopeDropdown);
     }
 }
