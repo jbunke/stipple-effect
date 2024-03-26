@@ -30,9 +30,24 @@ public final class GradientTool extends ToolWithBreadth
     private List<Set<Coord2D>> gradientStages;
     private Shape shape;
     private Scope scope;
+    private Color maskColor;
+    private Set<Coord2D> accessible;
 
     public enum Scope {
-        CANVAS, RANGE
+        GLOBAL, RANGE, LOCAL;
+
+        public BiFunction<GameImage, Color, Set<Coord2D>> fSearch() {
+            return (frame, maskColor) -> switch (this) {
+                case GLOBAL, RANGE -> ToolThatSearches
+                        .globalSearch(frame, maskColor);
+                case LOCAL -> ToolThatSearches
+                        .adjacentSearch(frame, maskColor, INSTANCE.anchor);
+            };
+        }
+
+        public boolean validC(final double c) {
+            return this == GLOBAL || (c >= 0d && c <= 1d);
+        }
     }
 
     public enum Shape {
@@ -58,9 +73,12 @@ public final class GradientTool extends ToolWithBreadth
         backwards = false;
         dithered = false;
         masked = false;
-        scope = Scope.CANVAS;
 
+        scope = Scope.GLOBAL;
         shape = Shape.LINEAR;
+
+        maskColor = null;
+        accessible = new HashSet<>();
 
         toolContentPreview = GameImage.dummy();
 
@@ -88,7 +106,26 @@ public final class GradientTool extends ToolWithBreadth
             reset();
             anchor = tp;
             gradientStages = new ArrayList<>();
+
+            initializeMask(context);
         }
+    }
+
+    private void initializeMask(final SEContext context) {
+        final int w = context.getState().getImageWidth(),
+                h = context.getState().getImageHeight();
+
+        final GameImage frame = context.getState().getActiveLayerFrame();
+        final boolean anchorInBounds =
+                anchor.x >= 0 && anchor.x < w &&
+                        anchor.y >= 0 && anchor.y < h;
+
+        maskColor = masked && anchorInBounds
+                ? ImageProcessing.colorAtPixel(frame, anchor.x, anchor.y)
+                : null;
+        accessible = maskColor != null
+                ? scope.fSearch().apply(frame, maskColor)
+                : new HashSet<>();
     }
 
     @Override
@@ -175,15 +212,6 @@ public final class GradientTool extends ToolWithBreadth
         final Set<Coord2D> selection = context.getState().getSelection();
         final boolean hasSelection = !selection.isEmpty();
 
-        final GameImage frame = context.getState().getActiveLayerFrame();
-        final boolean anchorInBounds =
-                anchor.x >= 0 && anchor.x < w &&
-                anchor.y >= 0 && anchor.y < h;
-        final Optional<Color> maskColor = anchorInBounds
-                ? Optional.of(ImageProcessing
-                .colorAtPixel(frame, anchor.x, anchor.y))
-                : Optional.empty();
-
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 final Coord2D pos = new Coord2D(x, y);
@@ -193,11 +221,9 @@ public final class GradientTool extends ToolWithBreadth
                 final double c = shape.cGetter().apply(pos, endpoint);
 
                 final boolean satisfiesMask = !masked ||
-                        (maskColor.isPresent() &&
-                                ImageProcessing.colorAtPixel(frame, x, y)
-                                .equals(maskColor.get())),
-                        satisfiesScope = scope == Scope.CANVAS ||
-                                (c >= 0d && c <= 1d),
+                        (maskColor != null &&
+                                accessible.contains(new Coord2D(x, y))),
+                        satisfiesScope = scope.validC(c),
                         replacePixel = satisfiesMask && satisfiesScope;
 
                 if (replacePixel)
