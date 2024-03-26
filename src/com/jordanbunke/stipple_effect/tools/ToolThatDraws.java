@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.MathPlus;
@@ -9,11 +8,9 @@ import com.jordanbunke.delta_time.utility.RNG;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
-import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.ToolOptionIncrementalRange;
 
 import java.awt.*;
 import java.util.function.BiConsumer;
@@ -224,47 +221,25 @@ public abstract class ToolThatDraws extends Tool {
             return super.buildToolOptionsBar();
 
         // dither label
-        final DynamicLabel ditherLabel = new DynamicLabel(
+        final TextLabel ditherLabel = TextLabel.make(
                 new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                () -> "Dither: " +
-                        ditherStage.getPercentage() + "% primary",
-                getDitherDecrementButtonX() - getDitherTextX());
+                "Dither", Constants.WHITE);
 
-        // dither decrement and increment buttons
-        final IconButton decButton = IconButton.makeNoTooltip(
-                IconCodes.DECREMENT, new Coord2D(
-                        getDitherDecrementButtonX(), Layout.optionsBarButtonY()),
-                () -> setDitherStage(ditherStage.ordinal() - 1)),
-                incButton = IconButton.makeNoTooltip(IconCodes.INCREMENT,
-                        new Coord2D(getDitherIncrementButtonX(),
-                                Layout.optionsBarButtonY()),
-                        () -> setDitherStage(ditherStage.ordinal() + 1));
-
-        // dither slider
-        final HorizontalSlider ditherSlider = new HorizontalSlider(
-                new Coord2D(getDitherSliderX(), Layout.optionsBarButtonY()),
-                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
-                0, DitherStage.values().length - 1,
-                () -> ditherStage.ordinal(),
-                x -> ditherStage = DitherStage.values()[x]);
-        ditherSlider.updateAssets();
+        // dither content
+        final String VALUE_SUFFIX = "% primary color";
+        final ToolOptionIncrementalRange<Integer> dither =
+                ToolOptionIncrementalRange.makeForInt(
+                        ditherLabel, 1, 0, DitherStage.values().length - 1,
+                        ToolThatDraws::setDitherStage,
+                        () -> ditherStage.ordinal(), i -> i, i -> i,
+                        ds -> DitherStage.values()[ds]
+                                .getPercentage() + VALUE_SUFFIX,
+                        "XX.XX" + VALUE_SUFFIX);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
-                ditherLabel, decButton, incButton, ditherSlider);
+                ditherLabel, dither.decButton, dither.incButton,
+                dither.slider, dither.value);
     }
 
     abstract int getDitherTextX();
-
-    private int getDitherDecrementButtonX() {
-        return getDitherTextX() + (int)(Layout.getToolOptionsBarWidth() * 0.12);
-    }
-
-    private int getDitherIncrementButtonX() {
-        return getDitherDecrementButtonX() + Layout.BUTTON_INC;
-    }
-
-    private int getDitherSliderX() {
-        return getDitherIncrementButtonX() + Layout.BUTTON_INC;
-    }
 }

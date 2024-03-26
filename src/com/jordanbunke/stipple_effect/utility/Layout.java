@@ -1,7 +1,9 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 
@@ -11,6 +13,8 @@ public class Layout {
             colorsPanelShowing, toolbarShowing, projectsExpanded;
 
     // layout constants
+    private static final double
+            TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.03;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
@@ -197,7 +201,8 @@ public class Layout {
     }
 
     public static int optionsBarSectionBuffer() {
-        return (int) (getToolOptionsBarWidth() * 0.04);
+        return (int) (getToolOptionsBarWidth() *
+                TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION);
     }
 
     public static int optionsBarTextY() {
@@ -212,6 +217,27 @@ public class Layout {
 
     private static int optionsBarRelativeYOffsetToBottomBar() {
         return ((TOOL_OPTIONS_BAR_H - BOTTOM_BAR_H) / 2);
+    }
+
+    public static int optionsBarNextElementX(
+            final MenuElement preceding, final boolean sectionGap
+    ) {
+        return preceding.getX() + preceding.getWidth() + (sectionGap
+                ? optionsBarSectionBuffer() : CONTENT_BUFFER_PX);
+    }
+
+    public static int optionsBarNextButtonX(
+            final MenuElement preceding
+    ) {
+        return preceding.getX() + preceding.getWidth() + BUTTON_OFFSET;
+    }
+
+    public static int estimateDynamicLabelMaxWidth(
+            final String widestTextCase
+    ) {
+        return TextLabel
+                .make(new Coord2D(), widestTextCase, Constants.WHITE)
+                .getWidth();
     }
 
     // segments layout

@@ -21,7 +21,6 @@ import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -127,8 +126,13 @@ public final class TextTool extends Tool {
         setTyping(false);
     }
 
-    private void adjustTextPosition(final int deltaX, final int deltaY) {
+    private void adjustTextPosition(
+            final int deltaX, final int deltaY,
+            final SEContext context
+    ) {
         textPos = textPos.displace(deltaX, deltaY);
+
+        updateToolContentPreview(context);
     }
 
     private int getFormattedTextX() {
@@ -159,7 +163,7 @@ public final class TextTool extends Tool {
                                 keyEvent.markAsProcessed();
 
                                 if (eventLogger.isPressed(Key.SHIFT))
-                                    adjustTextPosition(-1, 0);
+                                    adjustTextPosition(-1, 0, context);
                                 else
                                     setFontIndex(fontIndex - 1);
                             }
@@ -167,7 +171,7 @@ public final class TextTool extends Tool {
                                 keyEvent.markAsProcessed();
 
                                 if (eventLogger.isPressed(Key.SHIFT))
-                                    adjustTextPosition(1, 0);
+                                    adjustTextPosition(1, 0, context);
                                 else
                                     setFontIndex(fontIndex + 1);
                             }
@@ -175,7 +179,7 @@ public final class TextTool extends Tool {
                                 keyEvent.markAsProcessed();
 
                                 if (eventLogger.isPressed(Key.SHIFT))
-                                    adjustTextPosition(0, -1);
+                                    adjustTextPosition(0, -1, context);
                                 else
                                     setFontScale(fontScale - 1);
                             }
@@ -183,7 +187,7 @@ public final class TextTool extends Tool {
                                 keyEvent.markAsProcessed();
 
                                 if (eventLogger.isPressed(Key.SHIFT))
-                                    adjustTextPosition(0, 1);
+                                    adjustTextPosition(0, 1, context);
                                 else
                                     setFontScale(fontScale + 1);
                             }
@@ -373,38 +377,26 @@ public final class TextTool extends Tool {
     @Override
     public MenuElementGrouping buildToolOptionsBar() {
         // scale label
-        final DynamicLabel scaleLabel = new DynamicLabel(
-                new Coord2D(getScaleTextX(), Layout.optionsBarTextY()),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                () -> "Scale: " + fontScale + "x",
-                getScaleDecrementButtonX() - getScaleTextX());
+        final TextLabel scaleLabel = TextLabel.make(
+                getFirstOptionLabelPosition(), "Scale", Constants.WHITE);
 
-        // scale decrement and increment buttons
-        final IconButton decButton = IconButton.makeNoTooltip(
-                IconCodes.DECREMENT, new Coord2D(
-                        getScaleDecrementButtonX(), Layout.optionsBarButtonY()),
-                () -> setFontScale(getFontScale() - 1)),
-                incButton = IconButton.makeNoTooltip(IconCodes.INCREMENT,
-                        new Coord2D(getScaleIncrementButtonX(),
-                                Layout.optionsBarButtonY()),
-                        () -> setFontScale(getFontScale() + 1));
-
-        // scale slider
-        final HorizontalSlider scaleSlider = new HorizontalSlider(
-                new Coord2D(getScaleSliderX(), Layout.optionsBarButtonY()),
-                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
-                Constants.MIN_FONT_SCALE, Constants.MAX_FONT_SCALE,
-                this::getFontScale, this::setFontScale);
-        scaleSlider.updateAssets();
+        final ToolOptionIncrementalRange<Integer> scale =
+                ToolOptionIncrementalRange.makeForInt(
+                        scaleLabel, 1,
+                        Constants.MIN_FONT_SCALE, Constants.MAX_FONT_SCALE,
+                        this::setFontScale, this::getFontScale,
+                        i -> i, i -> i, fs -> fs + "x",
+                        Constants.MAX_FONT_SCALE + "x");
 
         // alignment label
         final TextLabel alignmentLabel = TextLabel.make(new Coord2D(
-                getAlignmentTextX(), Layout.optionsBarTextY()), "Alignment", Constants.WHITE);
+                Layout.optionsBarNextElementX(scale.value, true),
+                Layout.optionsBarTextY()), "Alignment", Constants.WHITE);
 
         // alignment toggle
         final IconToggleButton alignmentToggle = IconToggleButton.make(new Coord2D(
-                alignmentLabel.getX() + alignmentLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
+                Layout.optionsBarNextElementX(alignmentLabel, false),
+                        Layout.optionsBarButtonY()),
                 Arrays.stream(Text.Orientation.values())
                         .map(a -> a.name().toLowerCase() + "_aligned")
                         .toArray(String[]::new),
@@ -414,65 +406,36 @@ public final class TextTool extends Tool {
 
         // font label
         final TextLabel fontLabel = TextLabel.make(new Coord2D(
-                alignmentToggle.getX() + Layout.BUTTON_DIM +
-                        Layout.optionsBarSectionBuffer(),
+                Layout.optionsBarNextElementX(alignmentToggle, true),
                         Layout.optionsBarTextY()),
                 "Font", Constants.WHITE);
 
         // font dropdown
-        final DropdownMenu fontDropdown = new DropdownMenu(new Coord2D(
-                fontLabel.getX() + fontLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX,
-                Layout.getToolOptionsBarPosition().y +
-                        ((Layout.TOOL_OPTIONS_BAR_H -
-                                Layout.STD_TEXT_BUTTON_H) / 2)),
-                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
-                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+        final DropdownMenu fontDropdown = DropdownMenu.forToolOptionsBar(
+                Layout.optionsBarNextElementX(fontLabel, false),
                 fonts.stream().map(TextToolFont::name).toArray(String[]::new),
                 fonts.stream().map(ttf -> (Runnable) () ->
-                        setFontIndex(fonts.indexOf(ttf)))
+                                setFontIndex(fonts.indexOf(ttf)))
                         .toArray(Runnable[]::new), () -> fontIndex);
 
         // upload font button
         final IconButton newFontButton = IconButton.make(IconCodes.NEW_FONT,
-                new Coord2D(fontDropdown.getX() + fontDropdown.getWidth() +
-                        Layout.BUTTON_OFFSET, Layout.optionsBarButtonY()),
+                new Coord2D(Layout.optionsBarNextButtonX(fontDropdown),
+                        Layout.optionsBarButtonY()),
                 DialogAssembly::setDialogToNewFont);
 
         // delete font button
         final MenuElement deleteFontButton = GraphicsUtils
                 .generateIconButton(IconCodes.DELETE_FONT, new Coord2D(
-                        newFontButton.getX() + Layout.BUTTON_INC,
+                        Layout.optionsBarNextButtonX(newFontButton),
                                 Layout.optionsBarButtonY()),
                         () -> fontIndex >= SEFonts.Code.values().length,
                         this::deleteFont);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
-                scaleLabel, decButton, incButton, scaleSlider,
+                scaleLabel, scale.decButton, scale.incButton,
+                scale.slider, scale.value,
                 alignmentLabel, alignmentToggle,
                 fontLabel, fontDropdown, newFontButton, deleteFontButton);
-    }
-
-    private int getScaleTextX() {
-        return Layout.getToolOptionsBarPosition().x +
-                (int)(Layout.getToolOptionsBarWidth() * 0.11);
-    }
-
-    private int getScaleDecrementButtonX() {
-        return Layout.getToolOptionsBarPosition().x +
-                (int)(Layout.getToolOptionsBarWidth() * 0.17);
-    }
-
-    private int getScaleIncrementButtonX() {
-        return getScaleDecrementButtonX() + Layout.BUTTON_INC;
-    }
-
-    private int getScaleSliderX() {
-        return getScaleIncrementButtonX() + Layout.BUTTON_INC;
-    }
-
-    private int getAlignmentTextX() {
-        return getScaleSliderX() + Layout.optionsBarSliderWidth() +
-                Layout.optionsBarSectionBuffer();
     }
 }

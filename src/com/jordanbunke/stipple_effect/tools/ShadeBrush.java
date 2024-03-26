@@ -74,8 +74,7 @@ public final class ShadeBrush extends ToolWithBreadth {
                 painted.clear();
 
             final GameImage edit = new GameImage(w, h),
-                    current = context.getState().getEditingLayer().getFrame(
-                            context.getState().getFrameIndex());
+                    current = context.getState().getActiveLayerFrame();
             populateAround(edit, current, tp, selection, w, h);
 
             fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(edit,

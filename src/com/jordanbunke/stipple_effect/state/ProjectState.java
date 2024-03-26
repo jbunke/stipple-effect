@@ -344,6 +344,10 @@ public class ProjectState {
         return layers.get(layerEditIndex);
     }
 
+    public GameImage getActiveLayerFrame() {
+        return layers.get(layerEditIndex).getFrame(frameIndex);
+    }
+
     public int getLayerEditIndex() {
         return layerEditIndex;
     }

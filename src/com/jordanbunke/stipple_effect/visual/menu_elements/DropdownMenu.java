@@ -52,6 +52,19 @@ public class DropdownMenu extends DeferredRenderMenuElement {
         );
     }
 
+    public static DropdownMenu forToolOptionsBar(
+            final int x, final String[] labels, final Runnable[] behaviours,
+            final Supplier<Integer> initialIndexFunction
+    ) {
+        return new DropdownMenu(new Coord2D(x,
+                Layout.getToolOptionsBarPosition().y +
+                        ((Layout.TOOL_OPTIONS_BAR_H -
+                                Layout.STD_TEXT_BUTTON_H) / 2)),
+                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
+                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+                labels, behaviours, initialIndexFunction);
+    }
+
     private VerticalScrollingMenuElement makeContainer(
             final Coord2D position, final Coord2D dimensions,
             final Runnable[] behaviours

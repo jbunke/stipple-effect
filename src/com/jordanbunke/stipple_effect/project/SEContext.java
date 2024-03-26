@@ -1025,9 +1025,7 @@ public class SEContext {
                     h = getState().getImageHeight();
 
             final Set<Coord2D> selection = getState().getSelection();
-            final SELayer layer = getState().getEditingLayer();
-            final int frameIndex = getState().getFrameIndex();
-            final GameImage canvas = layer.getFrame(frameIndex),
+            final GameImage canvas = getState().getActiveLayerFrame(),
                     source = switch (getState().getSelectionMode()) {
                         case CONTENTS -> getState().getSelectionContents()
                                 .getContentForCanvas(w, h);
@@ -1413,8 +1411,7 @@ public class SEContext {
                     selection.add(new Coord2D(x, y));
         }
 
-        final GameImage canvas = getState().getEditingLayer()
-                .getFrame(getState().getFrameIndex());
+        final GameImage canvas = getState().getActiveLayerFrame();
         final SelectionContents selectionContents =
                 new SelectionContents(canvas, selection);
 

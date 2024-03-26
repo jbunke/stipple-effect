@@ -110,14 +110,18 @@ public abstract class Tool {
     }
 
     public MenuElementGrouping buildToolOptionsBar() {
-        final int optionsBarTextX = Layout.getToolOptionsBarPosition().x +
-                        Layout.CONTENT_BUFFER_PX;
+        return new MenuElementGrouping(getOptionsLabel());
+    }
 
-        // options label
-        final TextLabel optionsLabel = TextLabel.make(
-                new Coord2D(optionsBarTextX, Layout.optionsBarTextY()),
+    private TextLabel getOptionsLabel() {
+        return TextLabel.make(new Coord2D(
+                Layout.getToolOptionsBarPosition().x +
+                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarTextY()),
                 "Tool Options", Constants.WHITE);
+    }
 
-        return new MenuElementGrouping(optionsLabel);
+    Coord2D getFirstOptionLabelPosition() {
+        return new Coord2D(Layout.optionsBarNextElementX(
+                getOptionsLabel(), true), Layout.optionsBarTextY());
     }
 }

@@ -37,8 +37,7 @@ public final class ColorPicker extends Tool {
                     ? StippleEffect.PRIMARY : StippleEffect.SECONDARY;
 
             final Color c = ImageProcessing.colorAtPixel(
-                    context.getState().getEditingLayer().getFrame(
-                            context.getState().getFrameIndex()), tp.x, tp.y);
+                    context.getState().getActiveLayerFrame(), tp.x, tp.y);
 
             StippleEffect.get().setColorIndexAndColor(index, c);
         }

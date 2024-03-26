@@ -175,9 +175,7 @@ public final class GradientTool extends ToolWithBreadth
         final Set<Coord2D> selection = context.getState().getSelection();
         final boolean hasSelection = !selection.isEmpty();
 
-        final int frameIndex = context.getState().getFrameIndex();
-        final GameImage frame = context.getState()
-                .getEditingLayer().getFrame(frameIndex);
+        final GameImage frame = context.getState().getActiveLayerFrame();
         final boolean anchorInBounds =
                 anchor.x >= 0 && anchor.x < w &&
                 anchor.y >= 0 && anchor.y < h;
@@ -385,48 +383,33 @@ public final class GradientTool extends ToolWithBreadth
 
         // dithered checkbox
         final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
-                ditheredLabel.getX() + ditheredLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarButtonY()),
-                MenuElement.Anchor.LEFT_TOP,
+                Layout.optionsBarNextElementX(ditheredLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
                 () -> dithered, this::setDithered);
 
         // shape label
         final TextLabel shapeLabel = TextLabel.make(new Coord2D(
-                        ditheredCheckbox.getX() + Layout.BUTTON_DIM +
-                                Layout.optionsBarSectionBuffer(),
+                        Layout.optionsBarNextElementX(ditheredCheckbox, true),
                         Layout.optionsBarTextY()), "Shape", Constants.WHITE);
 
         // shape dropdown
-        final DropdownMenu shapeDropdown = new DropdownMenu(new Coord2D(
-                shapeLabel.getX() + shapeLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX,
-                Layout.getToolOptionsBarPosition().y +
-                        ((Layout.TOOL_OPTIONS_BAR_H -
-                                Layout.STD_TEXT_BUTTON_H) / 2)),
-                Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
-                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+        final DropdownMenu shapeDropdown = DropdownMenu.forToolOptionsBar(
+                Layout.optionsBarNextElementX(shapeLabel, false),
                 Arrays.stream(Shape.values()).map(EnumUtils::formattedName)
                         .toArray(String[]::new),
                 Arrays.stream(Shape.values()).map(s -> (Runnable) () ->
-                        setShape(s)).toArray(Runnable[]::new), shape::ordinal);
+                        setShape(s)).toArray(Runnable[]::new),
+                shape::ordinal);
 
         // scope label
         final TextLabel scopeLabel = TextLabel.make(new Coord2D(
-                shapeDropdown.getX() + shapeDropdown.getWidth() +
-                        Layout.optionsBarSectionBuffer(),
+                Layout.optionsBarNextElementX(shapeDropdown, true),
                         Layout.optionsBarTextY()),
                 "Scope", Constants.WHITE);
 
         // scope dropdown
-        final DropdownMenu scopeDropdown = new DropdownMenu(new Coord2D(
-                scopeLabel.getX() + scopeLabel.getWidth() +
-                        Layout.CONTENT_BUFFER_PX,
-                Layout.getToolOptionsBarPosition().y +
-                        ((Layout.TOOL_OPTIONS_BAR_H -
-                                Layout.STD_TEXT_BUTTON_H) / 2)),
-                Layout.optionsBarSliderWidth(),
-                MenuElement.Anchor.LEFT_TOP,
-                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+        final DropdownMenu scopeDropdown = DropdownMenu.forToolOptionsBar(
+                Layout.optionsBarNextElementX(scopeLabel, false),
                 Arrays.stream(Scope.values())
                         .flatMap(scope -> Stream.of(
                                 new Pair<>(scope, false),
@@ -444,8 +427,11 @@ public final class GradientTool extends ToolWithBreadth
                         }).toArray(Runnable[]::new),
                 () -> (scope.ordinal() * 2) + (masked ? 1 : 0));
 
+        // TODO - tolerance extension elements
+
         return new MenuElementGrouping(super.buildToolOptionsBar(),
-                ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
+                ditheredLabel, ditheredCheckbox,
+                shapeLabel, shapeDropdown,
                 scopeLabel, scopeDropdown);
     }
 }
