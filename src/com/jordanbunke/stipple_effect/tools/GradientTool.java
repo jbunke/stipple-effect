@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -13,42 +14,24 @@ import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DropdownMenu;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.ToolOptionIncrementalRange;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
 
 public final class GradientTool extends ToolWithBreadth
         implements SnappableTool, ToggleModeTool {
     private static final GradientTool INSTANCE;
 
-    private boolean drawing, global, snap, backwards, dithered, masked;
+    private boolean drawing, global, snap, backwards, dithered,
+            masked, bounded, contiguous;
     private GameImage toolContentPreview;
     private Coord2D anchor;
     private List<Set<Coord2D>> gradientStages;
     private Shape shape;
-    private Scope scope;
-    private Color maskColor;
     private Set<Coord2D> accessible;
-
-    public enum Scope {
-        GLOBAL, RANGE, LOCAL;
-
-        public BiFunction<GameImage, Color, Set<Coord2D>> fSearch() {
-            return (frame, maskColor) -> switch (this) {
-                case GLOBAL, RANGE -> ToolThatSearches
-                        .globalSearch(frame, maskColor);
-                case LOCAL -> ToolThatSearches
-                        .adjacentSearch(frame, maskColor, INSTANCE.anchor);
-            };
-        }
-
-        public boolean validC(final double c) {
-            return this == GLOBAL || (c >= 0d && c <= 1d);
-        }
-    }
 
     public enum Shape {
         LINEAR, RADIAL, SPIRAL;
@@ -73,11 +56,11 @@ public final class GradientTool extends ToolWithBreadth
         backwards = false;
         dithered = false;
         masked = false;
+        bounded = false;
+        contiguous = true;
 
-        scope = Scope.GLOBAL;
         shape = Shape.LINEAR;
 
-        maskColor = null;
         accessible = new HashSet<>();
 
         toolContentPreview = GameImage.dummy();
@@ -116,16 +99,11 @@ public final class GradientTool extends ToolWithBreadth
                 h = context.getState().getImageHeight();
 
         final GameImage frame = context.getState().getActiveLayerFrame();
-        final boolean anchorInBounds =
-                anchor.x >= 0 && anchor.x < w &&
-                        anchor.y >= 0 && anchor.y < h;
 
-        maskColor = masked && anchorInBounds
+        final Color maskColor = masked && anchorInBounds(w, h)
                 ? ImageProcessing.colorAtPixel(frame, anchor.x, anchor.y)
                 : null;
-        accessible = maskColor != null
-                ? scope.fSearch().apply(frame, maskColor)
-                : new HashSet<>();
+        accessible = maskColor != null ? search(frame, maskColor) : new HashSet<>();
     }
 
     @Override
@@ -221,9 +199,9 @@ public final class GradientTool extends ToolWithBreadth
                 final double c = shape.cGetter().apply(pos, endpoint);
 
                 final boolean satisfiesMask = !masked ||
-                        (maskColor != null &&
+                        (anchorInBounds(w, h) &&
                                 accessible.contains(new Coord2D(x, y))),
-                        satisfiesScope = scope.validC(c),
+                        satisfiesScope = isCValid(c),
                         replacePixel = satisfiesMask && satisfiesScope;
 
                 if (replacePixel)
@@ -276,6 +254,25 @@ public final class GradientTool extends ToolWithBreadth
                 return (x - anchor.x) / (double) diffX;
             }
         }
+    }
+
+    private boolean isCValid(final double c) {
+        return !bounded || (c >= 0d && c <= 1d);
+    }
+
+    private boolean anchorInBounds(
+            final int w, final int h
+    ) {
+        return anchor.x >= 0 && anchor.x < w &&
+                anchor.y >= 0 && anchor.y < h;
+    }
+
+    private Set<Coord2D> search(
+            final GameImage frame, final Color maskColor
+    ) {
+        return contiguous
+                ? ToolThatSearches.contiguousSearch(frame, maskColor, anchor)
+                : ToolThatSearches.globalSearch(frame, maskColor);
     }
 
     private void drawGradientStages(final int w, final int h) {
@@ -365,8 +362,12 @@ public final class GradientTool extends ToolWithBreadth
         this.masked = masked;
     }
 
-    public void setScope(final Scope scope) {
-        this.scope = scope;
+    public void setBounded(final boolean bounded) {
+        this.bounded = bounded;
+    }
+
+    public void setContiguous(final boolean contiguous) {
+        this.contiguous = contiguous;
     }
 
     public void setShape(final Shape shape) {
@@ -402,10 +403,13 @@ public final class GradientTool extends ToolWithBreadth
 
     @Override
     public MenuElementGrouping buildToolOptionsBar() {
+        // inherited content called first to trigger correct ditherTextX assignment
+        final MenuElementGrouping inherited = super.buildToolOptionsBar();
+
         // dithered label
         final TextLabel ditheredLabel = TextLabel.make(
                 new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
-                "Dithered?", Constants.WHITE);
+                "Dithered", Constants.WHITE);
 
         // dithered checkbox
         final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
@@ -427,37 +431,69 @@ public final class GradientTool extends ToolWithBreadth
                         setShape(s)).toArray(Runnable[]::new),
                 shape::ordinal);
 
-        // scope label
-        final TextLabel scopeLabel = TextLabel.make(new Coord2D(
+        // bounded label
+        final TextLabel boundedLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(shapeDropdown, true),
-                        Layout.optionsBarTextY()),
-                "Scope", Constants.WHITE);
+                Layout.optionsBarTextY()), "Bounded", Constants.WHITE);
 
-        // scope dropdown
-        final DropdownMenu scopeDropdown = DropdownMenu.forToolOptionsBar(
-                Layout.optionsBarNextElementX(scopeLabel, false),
-                Arrays.stream(Scope.values())
-                        .flatMap(scope -> Stream.of(
-                                new Pair<>(scope, false),
-                                new Pair<>(scope, true)))
-                        .map(p -> EnumUtils.formattedName(p.first()) +
-                                (p.second() ? " (masked)" : ""))
-                        .toArray(String[]::new),
-                Arrays.stream(Scope.values())
-                        .flatMap(scope -> Stream.of(
-                                new Pair<>(scope, false),
-                                new Pair<>(scope, true)))
-                        .map(p -> (Runnable) () -> {
-                            setScope(p.first());
-                            setMasked(p.second());
-                        }).toArray(Runnable[]::new),
-                () -> (scope.ordinal() * 2) + (masked ? 1 : 0));
+        // bounded checkbox
+        final Checkbox boundedCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(boundedLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> bounded, this::setBounded);
 
-        // TODO - tolerance extension elements
+        // masked label
+        final TextLabel maskedLabel = TextLabel.make(new Coord2D(
+                Layout.optionsBarNextElementX(boundedCheckbox, true),
+                Layout.optionsBarTextY()), "Mask", Constants.WHITE);
 
-        return new MenuElementGrouping(super.buildToolOptionsBar(),
-                ditheredLabel, ditheredCheckbox,
-                shapeLabel, shapeDropdown,
-                scopeLabel, scopeDropdown);
+        // masked checkbox
+        final Checkbox maskedCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(maskedLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> masked, this::setMasked);
+
+        // contiguous label
+        final TextLabel contiguousLabel = TextLabel.make(new Coord2D(
+                Layout.optionsBarNextElementX(maskedCheckbox, true),
+                Layout.optionsBarTextY()), "Contiguous", Constants.WHITE);
+
+        // contiguous checkbox
+        final Checkbox contiguousCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(contiguousLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> contiguous, this::setContiguous);
+
+        // tolerance
+        final TextLabel toleranceLabel = Layout.optionsBarNextSectionLabel(
+                contiguousCheckbox, "Tol.");
+
+        final int PERCENT = 100;
+        final ToolOptionIncrementalRange<Double> tolerance =
+                ToolOptionIncrementalRange.makeForDouble(toleranceLabel,
+                        ToolThatSearches::decreaseTolerance,
+                        ToolThatSearches::increaseTolerance,
+                        Constants.EXACT_COLOR_MATCH, Constants.MAX_TOLERANCE,
+                        ToolThatSearches::setTolerance,
+                        ToolThatSearches::getTolerance,
+                        t -> (int) (PERCENT * t),
+                        sv -> sv / (double) PERCENT,
+                        t -> ((int) (PERCENT * t)) + "%",
+                        MathPlus.findBest(ToolThatSearches.NO_TOLERANCE,
+                                0, String::length, (a, b) -> a < b,
+                                ToolThatSearches.NO_TOLERANCE,
+                                ToolThatSearches.MAX_TOLERANCE));
+
+        final GatewayMenuElement maskUnlocks = new GatewayMenuElement(
+                new MenuElementGrouping(
+                        contiguousLabel, contiguousCheckbox,
+                        toleranceLabel, tolerance.decButton,
+                        tolerance.incButton, tolerance.slider,
+                        tolerance.value), () -> masked);
+
+        return new MenuElementGrouping(inherited,
+                ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
+                boundedLabel, boundedCheckbox,
+                maskedLabel, maskedCheckbox, maskUnlocks);
     }
 }

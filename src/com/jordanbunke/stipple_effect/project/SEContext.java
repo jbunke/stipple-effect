@@ -339,11 +339,12 @@ public class SEContext {
                         mse.markAsProcessed();
 
                         bt.setBreadth(bt.getBreadth() + mse.clicksScrolled);
-                    } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
+                    } else if (StippleEffect.get().getTool() instanceof ToolThatSearches) {
                         mse.markAsProcessed();
 
-                        tts.setTolerance(tts.getTolerance() + (mse.clicksScrolled *
-                                Constants.SMALL_TOLERANCE_INC));
+                        ToolThatSearches.setTolerance(
+                                ToolThatSearches.getTolerance() + (mse.clicksScrolled *
+                                        Constants.SMALL_TOLERANCE_INC));
                     } else if (StippleEffect.get().getTool() instanceof TextTool tt) {
                         mse.markAsProcessed();
 
@@ -692,19 +693,23 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> bt.setBreadth(bt.getBreadth() - Constants.BREADTH_INC));
-            } else if (tool instanceof ToolThatSearches tts) {
+            } else if (tool instanceof ToolThatSearches) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::decreaseTolerance);
+                        ToolThatSearches::decreaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::increaseTolerance);
+                        ToolThatSearches::increaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC));
+                        () -> ToolThatSearches.setTolerance(
+                                ToolThatSearches.getTolerance() +
+                                        Constants.BIG_TOLERANCE_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
+                        () -> ToolThatSearches.setTolerance(
+                                ToolThatSearches.getTolerance() -
+                                        Constants.BIG_TOLERANCE_INC));
             } else if (tool.equals(TextTool.get())) {
                 final TextTool tt = TextTool.get();
 

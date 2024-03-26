@@ -19,8 +19,13 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     private int breadth;
     private GameImage overlay;
 
+    // formatting only
+    private int ditherTextX;
+
     ToolWithBreadth() {
         breadth = Constants.DEFAULT_BRUSH_BREADTH;
+
+        ditherTextX = 0;
     }
 
     public static void redrawToolOverlays() {
@@ -92,6 +97,8 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
                                 Math.pow(sv, 3))) / SLIDER_MULT,
                         b -> b + " px", Constants.MAX_BREADTH + " px");
 
+        ditherTextX = Layout.optionsBarNextElementX(breadth.value, true);
+
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 breadthLabel, breadth.decButton, breadth.incButton,
                 breadth.slider, breadth.value);
@@ -99,8 +106,6 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
 
     @Override
     int getDitherTextX() {
-        // somewhat arbitrary
-        return getFirstOptionLabelPosition().x +
-                (int) (Layout.getToolOptionsBarWidth() * 0.25);
+        return ditherTextX;
     }
 }

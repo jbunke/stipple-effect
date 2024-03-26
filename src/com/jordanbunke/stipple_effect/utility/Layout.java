@@ -14,7 +14,7 @@ public class Layout {
 
     // layout constants
     private static final double
-            TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.03;
+            TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
@@ -197,7 +197,7 @@ public class Layout {
 
     // tool options bar layout
     public static int optionsBarSliderWidth() {
-        return getToolOptionsBarWidth() / 10;
+        return getToolOptionsBarWidth() / 12;
     }
 
     public static int optionsBarSectionBuffer() {
@@ -230,6 +230,14 @@ public class Layout {
             final MenuElement preceding
     ) {
         return preceding.getX() + preceding.getWidth() + BUTTON_OFFSET;
+    }
+
+    public static TextLabel optionsBarNextSectionLabel(
+            final MenuElement preceding, final String text
+    ) {
+        return TextLabel.make(new Coord2D(
+                optionsBarNextElementX(preceding, true),
+                optionsBarTextY()), text, Constants.WHITE);
     }
 
     public static int estimateDynamicLabelMaxWidth(

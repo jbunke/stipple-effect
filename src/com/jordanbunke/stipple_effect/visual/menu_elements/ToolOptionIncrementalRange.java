@@ -68,7 +68,7 @@ public class ToolOptionIncrementalRange<R extends Number> {
             final Function<Integer, R> fromSliderConversion
     ) {
         return new HorizontalSlider(new Coord2D(
-                Layout.optionsBarNextElementX(incButton, false),
+                Layout.optionsBarNextButtonX(incButton),
                 Layout.optionsBarButtonY()),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 toSliderConversion.apply(minimum), toSliderConversion.apply(maximum),

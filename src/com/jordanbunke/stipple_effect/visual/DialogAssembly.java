@@ -525,7 +525,7 @@ public class DialogAssembly {
         mb.add(spacingTextBox);
         // character-specific
         final TextLabel charSpecificLabel =
-                makeDialogRightLabel(spacingLabel, "Character-specific?");
+                makeDialogRightLabel(spacingLabel, "Character-specific spacing");
         final Checkbox charSpecificCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(charSpecificLabel),
                 MenuElement.Anchor.LEFT_TOP,

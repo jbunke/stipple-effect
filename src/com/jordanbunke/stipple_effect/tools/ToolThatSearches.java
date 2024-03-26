@@ -17,7 +17,7 @@ import java.awt.*;
 import java.util.*;
 
 public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill, Wand {
-    private static final String
+    static final String
             NO_TOLERANCE = "exact match",
             MAX_TOLERANCE = "trivial";
 
@@ -37,36 +37,36 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         return getName() + " (" + getToleranceText() + ")";
     }
 
-    private String getToleranceText() {
+    private static String getToleranceText() {
         return tolerance == Constants.EXACT_COLOR_MATCH
                 ? NO_TOLERANCE
                 : (tolerance == Constants.MAX_TOLERANCE
                         ? MAX_TOLERANCE : (int)(tolerance * 100) + "% tolerance");
     }
 
-    public double getTolerance() {
+    public static double getTolerance() {
         return tolerance;
     }
 
-    public boolean isSearchDiag() {
+    public static boolean isSearchDiag() {
         return searchDiag;
     }
 
-    public void setTolerance(final double tolerance) {
+    public static void setTolerance(final double tolerance) {
         ToolThatSearches.tolerance =
                 MathPlus.bounded(Constants.EXACT_COLOR_MATCH,
                         tolerance, Constants.MAX_TOLERANCE);
     }
 
-    public void increaseTolerance() {
+    public static void increaseTolerance() {
         setTolerance(tolerance + Constants.SMALL_TOLERANCE_INC);
     }
 
-    public void decreaseTolerance() {
+    public static void decreaseTolerance() {
         setTolerance(tolerance - Constants.SMALL_TOLERANCE_INC);
     }
 
-    public void setSearchDiag(final boolean searchDiag) {
+    public static void setSearchDiag(final boolean searchDiag) {
         ToolThatSearches.searchDiag = searchDiag;
     }
 
@@ -75,10 +75,10 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
     ) {
         return ToolWithMode.isGlobal()
                 ? globalSearch(image, initial)
-                : adjacentSearch(image, initial, target);
+                : contiguousSearch(image, initial, target);
     }
 
-    public static Set<Coord2D> adjacentSearch(
+    public static Set<Coord2D> contiguousSearch(
             final GameImage image, final Color initial, final Coord2D target
     ) {
         hasCheckedMap.clear();
@@ -189,9 +189,11 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         final int SLIDER_MULT = 100;
         final ToolOptionIncrementalRange<Double> tolerance =
                 ToolOptionIncrementalRange.makeForDouble(toleranceLabel,
-                        this::decreaseTolerance, this::increaseTolerance,
+                        ToolThatSearches::decreaseTolerance,
+                        ToolThatSearches::increaseTolerance,
                         Constants.EXACT_COLOR_MATCH, Constants.MAX_TOLERANCE,
-                        this::setTolerance, this::getTolerance,
+                        ToolThatSearches::setTolerance,
+                        ToolThatSearches::getTolerance,
                         t -> (int) (SLIDER_MULT * t),
                         sv -> sv / (double) SLIDER_MULT,
                         t -> getToleranceText().replace(" tolerance", ""),
@@ -200,16 +202,15 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
                                 (a, b) -> a < b, NO_TOLERANCE, MAX_TOLERANCE));
 
         // diagonal label
-        final TextLabel diagonalLabel = TextLabel.make(new Coord2D(
-                Layout.optionsBarNextElementX(tolerance.value, true),
-                        Layout.optionsBarTextY()),
-                "Search diagonally adjacent pixels?", Constants.WHITE);
+        final TextLabel diagonalLabel = Layout.optionsBarNextSectionLabel(
+                tolerance.value, "Search diagonally adjacent pixels?");
 
         // diagonal checkbox
         final Checkbox diagonalCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(diagonalLabel, false),
                 Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                this::isSearchDiag, this::setSearchDiag);
+                ToolThatSearches::isSearchDiag,
+                ToolThatSearches::setSearchDiag);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 toleranceLabel, tolerance.decButton, tolerance.incButton,
