@@ -178,17 +178,38 @@ public abstract class ToolThatDraws extends Tool {
             }
             case NOISE -> {
                 final Color primary = StippleEffect.get().getPrimary(),
-                        secondary = StippleEffect.get().getSecondary();
-                final int pr = primary.getRed(), pg = primary.getGreen(),
-                        pb = primary.getBlue(), pa = primary.getAlpha(),
-                        sr = secondary.getRed(), sg = secondary.getGreen(),
-                        sb = secondary.getBlue(), sa = secondary.getAlpha();
+                        secondary = StippleEffect.get().getSecondary(),
+                        reference, complement;
+
+                if (bias < Constants.UNBIASED) {
+                    reference = secondary;
+                    complement = primary;
+                } else {
+                    reference = primary;
+                    complement = secondary;
+                }
+
+                final double consideration = Constants.MAX_BIAS -
+                        (2 * Math.abs(Constants.UNBIASED - bias));
+
+                final int rr = reference.getRed(),
+                        rg = reference.getGreen(),
+                        rb = reference.getBlue(),
+                        ra = reference.getAlpha(),
+                        dr = (int) ((complement.getRed() - rr) * consideration),
+                        dg = (int) ((complement.getGreen() - rg) * consideration),
+                        db = (int) ((complement.getBlue() - rb) * consideration),
+                        da = (int) ((complement.getAlpha() - ra) * consideration);
+
                 yield (x, y) -> new Color(
-                        RNG.randomInRange(Math.min(pr, sr), Math.max(pr, sr)),
-                        RNG.randomInRange(Math.min(pg, sg), Math.max(pg, sg)),
-                        RNG.randomInRange(Math.min(pb, sb), Math.max(pb, sb)),
-                        RNG.randomInRange(Math.min(pa, sa), Math.max(pa, sa))
-                );
+                        RNG.randomInRange(Math.min(rr, rr + dr),
+                                Math.max(rr, rr + dr) + 1),
+                        RNG.randomInRange(Math.min(rg, rg + dg),
+                                Math.max(rg, rg + dg) + 1),
+                        RNG.randomInRange(Math.min(rb, rb + db),
+                                Math.max(rb, rb + db) + 1),
+                        RNG.randomInRange(Math.min(ra, ra + da),
+                                Math.max(ra, ra + da) + 1));
             }
             case DITHERING -> (x, y) ->
                     DitherStage.get(bias).condition(x, y)
