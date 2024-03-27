@@ -55,11 +55,13 @@ public class MenuAssembly {
                         IconCodes.SETTINGS,
                         IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
                         IconCodes.SAVE, IconCodes.SAVE_AS,
-                        IconCodes.RESIZE, IconCodes.PAD, IconCodes.PREVIEW,
+                        IconCodes.RESIZE, IconCodes.PAD,
+                        IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
                         IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO, IconCodes.REDO
                 },
                 getPreconditions(
+                        () -> true,
                         () -> true,
                         () -> true,
                         () -> true,
@@ -80,6 +82,7 @@ public class MenuAssembly {
                         DialogAssembly::setDialogToSave,
                         DialogAssembly::setDialogToResize,
                         DialogAssembly::setDialogToPad,
+                        () -> StippleEffect.get().stitchOrSplit(),
                         () -> PreviewWindow.set(c),
                         () -> c.getStateManager().undoToCheckpoint(),
                         () -> c.getStateManager().undo(true),

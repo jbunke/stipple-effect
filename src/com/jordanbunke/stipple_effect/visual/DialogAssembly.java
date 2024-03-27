@@ -336,7 +336,7 @@ public class DialogAssembly {
     }
 
 
-    public static void setDialogToPackFrames() {
+    public static void setDialogToStitchFramesTogether() {
         final SEContext c = StippleEffect.get().getContext();
         final MenuBuilder mb = new MenuBuilder();
 
@@ -345,8 +345,8 @@ public class DialogAssembly {
         final Supplier<Boolean> canPack = () -> false;
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
-        setDialog(assembleDialog("Pack frames...", contents,
-                canPack, Constants.GENERIC_APPROVAL_TEXT, c::pack, true));
+        setDialog(assembleDialog("Stitch frames together...", contents,
+                canPack, Constants.GENERIC_APPROVAL_TEXT, c::stitch, true));
     }
 
     public static void setDialogToSplitCanvasIntoFrames() {
@@ -1710,6 +1710,7 @@ public class DialogAssembly {
                         IconCodes.SAVE_AS,
                         IconCodes.RESIZE,
                         IconCodes.PAD,
+                        IconCodes.STITCH_SPLIT_FRAMES,
                         IconCodes.PREVIEW,
                         IconCodes.UNDO,
                         IconCodes.GRANULAR_UNDO,
@@ -1719,7 +1720,7 @@ public class DialogAssembly {
                 new String[] {
                         "Info", "Open panel manager", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
-                        "Resize", "Pad", "Preview",
+                        "Resize", "Pad", "Stitch or split frames", "Preview",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"
                 }, contentAssembler, contentStart, initialBottomY
         );

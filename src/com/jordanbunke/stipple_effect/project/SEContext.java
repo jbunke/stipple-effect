@@ -1631,7 +1631,7 @@ public class SEContext {
         snapToCenterOfImage();
     }
 
-    public void pack() {
+    public void stitch() {
         // TODO
     }
 

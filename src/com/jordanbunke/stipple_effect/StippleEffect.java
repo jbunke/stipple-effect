@@ -350,6 +350,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::toggleColorMenuMode);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
+                    this::stitchOrSplit);
         } else if (eventLogger.isPressed(Key.CTRL)) {
             // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
@@ -768,6 +771,13 @@ public class StippleEffect implements ProgramContext {
                 Layout.width(), Layout.BOTTOM_BAR_H);
 
         return bottomBar.submit();
+    }
+
+    public void stitchOrSplit() {
+        if (getContext().getState().getFrameCount() > 1)
+            DialogAssembly.setDialogToStitchFramesTogether();
+        else
+            DialogAssembly.setDialogToSplitCanvasIntoFrames();
     }
 
     public SEContext getContext() {

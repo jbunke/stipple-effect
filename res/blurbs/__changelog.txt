@@ -14,7 +14,7 @@ Fix:
 {TODO for 0.3.0}
 
 Add:
-> Add "Pack/Split Frames" dialog
+> Add "Stitch/Split Frames" dialog
 
 Change:
 > Overhaul preview window

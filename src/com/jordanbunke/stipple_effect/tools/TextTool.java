@@ -198,8 +198,11 @@ public final class TextTool extends Tool {
                                 }
                             }
                             case ESCAPE -> {
-                                keyEvent.markAsProcessed();
-                                setTyping(false);
+                                if (!(eventLogger.isPressed(Key.SHIFT) &&
+                                        eventLogger.isPressed(Key.CTRL))) {
+                                    keyEvent.markAsProcessed();
+                                    setTyping(false);
+                                }
                             }
                             case BACKSPACE -> {
                                 keyEvent.markAsProcessed();

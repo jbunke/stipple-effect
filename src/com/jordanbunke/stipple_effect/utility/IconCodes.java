@@ -10,6 +10,7 @@ public class IconCodes {
             SAVE_AS = "save_as",
             RESIZE = "resize",
             PAD = "pad",
+            STITCH_SPLIT_FRAMES = "stitch_split_frames",
             PREVIEW = "preview",
             UNDO = "undo",
             GRANULAR_UNDO = "granular_undo",
