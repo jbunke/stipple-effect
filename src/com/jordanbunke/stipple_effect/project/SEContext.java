@@ -253,6 +253,9 @@ public class SEContext {
         if (tool instanceof SnappableTool st)
             st.setSnap(eventLogger.isPressed(Key.SHIFT));
 
+        if (tool instanceof MoverTool mt)
+            mt.setSnapToggled(eventLogger.isPressed(Key.CTRL));
+
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
             if (e instanceof GameMouseEvent me) {
                 if (me.matchesAction(GameMouseEvent.Action.DOWN) &&
