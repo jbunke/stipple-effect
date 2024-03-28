@@ -19,11 +19,12 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
-import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
@@ -467,10 +468,10 @@ public class MenuAssembly {
             final int index, final Coord2D pos
     ) {
         final SEContext c = StippleEffect.get().getContext();
-        final String[] codes = Arrays.stream(OnionSkinMode.values())
+        final String[] codes = EnumUtils.stream(OnionSkinMode.class)
                 .map(OnionSkinMode::getIconCode).toArray(String[]::new);
 
-        final Runnable[] behaviours = Arrays.stream(OnionSkinMode.values()).map(
+        final Runnable[] behaviours = EnumUtils.stream(OnionSkinMode.class).map(
                 osm -> (Runnable) () -> {
                     final int nextIndex = (osm.ordinal() + 1) %
                             OnionSkinMode.values().length;
@@ -582,7 +583,7 @@ public class MenuAssembly {
                 default -> "Other";
             }, Constants.WHITE));
 
-            final ColorTextBox colorTextBox = ColorTextBox.make(textBoxPos, i);
+            final ColorTextbox colorTextBox = ColorTextbox.make(textBoxPos, i);
             mb.add(colorTextBox);
 
             final int index = i;
@@ -710,6 +711,7 @@ public class MenuAssembly {
         mb.add(hasPaletteContents
                 ? new DropdownMenu(dropdownPos, contentWidth,
                 MenuElement.Anchor.LEFT_TOP, dropDownHAllowance,
+                DropdownMenu.DEFAULT_RENDER_ORDER,
                 palettes.stream().map(Palette::getName).toArray(String[]::new),
                 behaviours.toArray(Runnable[]::new), () -> index)
                 : new StaticMenuElement(dropdownPos,

@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.visual.menu_elements;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menus.menu_elements.DeferredRenderMenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleToggleMenuButton;
@@ -17,10 +16,12 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalSc
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-public class DropdownMenu extends DeferredRenderMenuElement {
+public class DropdownMenu extends MenuElement {
+    public static final int DEFAULT_RENDER_ORDER = 1;
+
     private boolean droppedDown;
 
-    private final int length;
+    private final int size, renderOrder;
     private int index;
 
     private final String[] labels;
@@ -30,7 +31,7 @@ public class DropdownMenu extends DeferredRenderMenuElement {
 
     public DropdownMenu(
             final Coord2D position, final int width, final Anchor anchor,
-            final int dropDownHAllowance,
+            final int dropDownHAllowance, final int renderOrder,
             final String[] labels, final Runnable[] behaviours,
             final Supplier<Integer> initialIndexFunction
     ) {
@@ -38,8 +39,10 @@ public class DropdownMenu extends DeferredRenderMenuElement {
 
         droppedDown = false;
 
-        length = labels.length;
+        size = labels.length;
         index = initialIndexFunction.get();
+
+        this.renderOrder = renderOrder;
 
         this.labels = labels;
 
@@ -48,8 +51,18 @@ public class DropdownMenu extends DeferredRenderMenuElement {
         ddContainer = makeContainer(
                 position.displace(0, Layout.STD_TEXT_BUTTON_H),
                 new Coord2D(width, Math.min(dropDownHAllowance,
-                        Layout.STD_TEXT_BUTTON_H * length)), behaviours
+                        Layout.STD_TEXT_BUTTON_H * size)), behaviours
         );
+    }
+
+    public static DropdownMenu forDialog(
+            final Coord2D pos, final String[] labels, final Runnable[] behaviours,
+            final Supplier<Integer> initialIndexFunction
+    ) {
+        return new DropdownMenu(pos, Layout.optionsBarSliderWidth(),
+                MenuElement.Anchor.LEFT_TOP, Layout.height() / 5,
+                DEFAULT_RENDER_ORDER,
+                labels, behaviours, initialIndexFunction);
     }
 
     public static DropdownMenu forToolOptionsBar(
@@ -61,7 +74,7 @@ public class DropdownMenu extends DeferredRenderMenuElement {
                         ((Layout.TOOL_OPTIONS_BAR_H -
                                 Layout.STD_TEXT_BUTTON_H) / 2)),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
-                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5),
+                (int) (Layout.TOOL_OPTIONS_BAR_H * 5.5), DEFAULT_RENDER_ORDER,
                 labels, behaviours, initialIndexFunction);
     }
 
@@ -69,11 +82,11 @@ public class DropdownMenu extends DeferredRenderMenuElement {
             final Coord2D position, final Coord2D dimensions,
             final Runnable[] behaviours
     ) {
-        final MenuElement[] scrollables = new MenuElement[length];
+        final MenuElement[] scrollables = new MenuElement[size];
 
         final int buttonWidth = getWidth() - Layout.SLIDER_OFF_DIM;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < size; i++) {
             final int index = i;
 
             final GameImage nhi = GraphicsUtils.drawTextButton(
@@ -91,7 +104,7 @@ public class DropdownMenu extends DeferredRenderMenuElement {
                 Arrays.stream(scrollables)
                         .map(ScrollableMenuElement::new)
                         .toArray(ScrollableMenuElement[]::new),
-                position.y + (length * Layout.STD_TEXT_BUTTON_H), 0);
+                position.y + (size * Layout.STD_TEXT_BUTTON_H), 0);
     }
 
     private void onSelection(final int index, final Runnable behaviour) {
@@ -154,5 +167,10 @@ public class DropdownMenu extends DeferredRenderMenuElement {
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {
 
+    }
+
+    @Override
+    public int getRenderOrder() {
+        return droppedDown ? renderOrder : super.getRenderOrder();
     }
 }

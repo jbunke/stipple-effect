@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class TextBox extends MenuButtonStub {
+public class Textbox extends MenuButtonStub {
     private String text, lastText, prefix, suffix;
     private int cursorIndex, lastCursorIndex,
             selectionIndex, lastSelectionIndex;
@@ -35,7 +35,7 @@ public class TextBox extends MenuButtonStub {
 
     private GameImage validImage, invalidImage, highlightedImage, typingImage;
 
-    public TextBox(
+    public Textbox(
             final Coord2D position, final int width,
             final Anchor anchor, final String initialText,
             final Function<String, Boolean> textValidator,
@@ -46,7 +46,7 @@ public class TextBox extends MenuButtonStub {
                 textValidator, setter, () -> Constants.GREY, maxLength);
     }
 
-    public TextBox(
+    public Textbox(
             final Coord2D position, final int width, final Anchor anchor,
             final String prefix, final String initialText, final String suffix,
             final Function<String, Boolean> textValidator,
@@ -57,7 +57,7 @@ public class TextBox extends MenuButtonStub {
                 textValidator, setter, () -> Constants.GREY, maxLength);
     }
 
-    public TextBox(
+    public Textbox(
             final Coord2D position, final int width, final Anchor anchor,
             final Supplier<String> prefixGetter, final String initialText,
             final Supplier<String> suffixGetter,
@@ -159,7 +159,7 @@ public class TextBox extends MenuButtonStub {
     }
 
     private void processClickOff(final InputEventLogger eventLogger) {
-        if (typing && !isHighlighted()) {
+        if (isTyping() && !isHighlighted()) {
             final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
 
             for (GameEvent e : unprocessed)
@@ -177,7 +177,7 @@ public class TextBox extends MenuButtonStub {
     private void processTyping(final InputEventLogger eventLogger) {
         final int DELETE = 127, LOWEST_PRINTABLE = 32;
 
-        if (typing) {
+        if (isTyping()) {
             final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
 
             for (GameEvent e : unprocessed)
@@ -287,7 +287,7 @@ public class TextBox extends MenuButtonStub {
     public void execute() {
         typing = !typing;
 
-        if (typing)
+        if (isTyping())
             clickedOnBehaviour();
         else
             clickedOffBehaviour();
@@ -362,6 +362,14 @@ public class TextBox extends MenuButtonStub {
     }
 
     public void setText(final String text) {
-        this.text = text;
+        this.text = text.length() > maxLength
+                ? text.substring(0, maxLength)
+                : text;
+        cursorIndex = this.text.length();
+        selectionIndex = cursorIndex;
+    }
+
+    public String getText() {
+        return text;
     }
 }

@@ -4,24 +4,24 @@ import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.TextBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 
 import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ColorTextBox extends TextBox {
+public class ColorTextbox extends Textbox {
     private static final int HEX_CODE_LENGTH = 6;
 
     private final int index;
     private final Supplier<Color> getter;
 
-    private ColorTextBox(
+    private ColorTextbox(
             final Coord2D position, final int index, final String initialText,
             final Supplier<Color> getter, final Consumer<String> setter
     ) {
         super(position, Layout.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
-                initialText, () -> "", ColorTextBox::validateAsHexCode,
+                initialText, () -> "", ColorTextbox::validateAsHexCode,
                 setter, getter, HEX_CODE_LENGTH);
 
         this.index = index;
@@ -30,14 +30,14 @@ public class ColorTextBox extends TextBox {
         updateAssets();
     }
 
-    public static ColorTextBox make(final Coord2D position, final int index) {
+    public static ColorTextbox make(final Coord2D position, final int index) {
         final Supplier<Color> getter = () ->
                 StippleEffect.get().getColorAtIndex(index);
         final Consumer<String> setter = s ->
-                ColorTextBox.setColorFromHexCode(s, index);
+                ColorTextbox.setColorFromHexCode(s, index);
         final String initialText = colorToHexCode(getter.get());
 
-        return new ColorTextBox(position, index, initialText, getter, setter);
+        return new ColorTextbox(position, index, initialText, getter, setter);
     }
 
     public static void setColorFromHexCode(final String hexCode, final int index) {
@@ -113,7 +113,7 @@ public class ColorTextBox extends TextBox {
     }
 
     @Override
-    public void update(double deltaTime) {
+    public void update(final double deltaTime) {
         if (!isTyping())
             setText(colorToHexCode(getter.get()));
 

@@ -416,9 +416,9 @@ public final class GradientTool extends ToolWithBreadth
         // shape dropdown
         final DropdownMenu shapeDropdown = DropdownMenu.forToolOptionsBar(
                 Layout.optionsBarNextElementX(shapeLabel, false),
-                Arrays.stream(Shape.values()).map(EnumUtils::formattedName)
+                EnumUtils.stream(Shape.class).map(EnumUtils::formattedName)
                         .toArray(String[]::new),
-                Arrays.stream(Shape.values()).map(s -> (Runnable) () ->
+                EnumUtils.stream(Shape.class).map(s -> (Runnable) () ->
                         setShape(s)).toArray(Runnable[]::new),
                 shape::ordinal);
 

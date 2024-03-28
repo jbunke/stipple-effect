@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.error.GameError;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class EnumUtils {
     public static <T extends Enum<T>> T next(final T previous) {
@@ -34,5 +35,9 @@ public class EnumUtils {
 
     private static String capitalizeFirstLetter(final String word) {
         return word.charAt(0) + word.substring(1).toLowerCase();
+    }
+
+    public static <T extends Enum<T>> Stream<T> stream(final Class<T> enumClass) {
+        return Arrays.stream(enumClass.getEnumConstants());
     }
 }

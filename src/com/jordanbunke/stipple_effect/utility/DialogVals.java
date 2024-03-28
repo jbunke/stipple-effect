@@ -16,11 +16,17 @@ public class DialogVals {
             resizeWidth = Constants.DEFAULT_IMAGE_W,
             resizeHeight = Constants.DEFAULT_IMAGE_H,
             padLeft = 0, padRight = 0, padTop = 0, padBottom = 0,
-            newFontPixelSpacing = Constants.DEFAULT_FONT_PX_SPACING;
+            newFontPixelSpacing = Constants.DEFAULT_FONT_PX_SPACING,
+            framesPerDim = 1,
+            frameWidth = Constants.DEFAULT_IMAGE_W,
+            frameHeight = Constants.DEFAULT_IMAGE_H,
+            xDivs = 1, yDivs = 1;
     private static double layerOpacity = Constants.OPAQUE;
     private static boolean
             hasLatinEx = false,
-            charSpecificSpacing = true;
+            charSpecificSpacing = true,
+            truncateSplitX = true,
+            truncateSplitY = true;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -34,10 +40,32 @@ public class DialogVals {
     private static UploadStatus
             asciiStatus = UploadStatus.UNATTEMPTED,
             latinExStatus = UploadStatus.UNATTEMPTED;
+    private static SequenceOrder sequenceOrder = SequenceOrder.HORIZONTAL;
     private static GameImage
             asciiImage = null,
             latinExImage = null,
             fontPreviewImage = GameImage.dummy();
+
+    public enum SequenceOrder {
+        HORIZONTAL, VERTICAL;
+
+        @Override
+        public String toString() {
+            return EnumUtils.formattedName(this);
+        }
+
+        public String dimName() {
+            return switch (this) {
+                case HORIZONTAL -> "row";
+                case VERTICAL -> "column";
+            };
+        }
+
+        public String complementaryDimName() {
+            final SequenceOrder[] vs = values();
+            return vs[(vs.length - 1) - ordinal()].dimName();
+        }
+    }
 
     public enum UploadStatus {
         UNATTEMPTED, VALIDATED, INVALID;
@@ -192,6 +220,48 @@ public class DialogVals {
         setNewFontPixelSpacing(newFontPixelSpacing, true);
     }
 
+    public static void setFramesPerDim(final int framesPerDim) {
+        DialogVals.framesPerDim = framesPerDim;
+    }
+
+    public static void setFrameWidth(
+            final int frameWidth, final int canvasWidth
+    ) {
+        DialogVals.frameWidth = frameWidth;
+        setXDivs(canvasWidth / frameWidth);
+    }
+
+    public static void setFrameHeight(
+            final int frameHeight, final int canvasHeight
+    ) {
+        DialogVals.frameHeight = frameHeight;
+        setYDivs(canvasHeight / frameHeight);
+    }
+
+    public static void setXDivs(final int xDivs) {
+        DialogVals.xDivs = xDivs;
+    }
+
+    public static void setXDivs(final int xDivs, final int canvasWidth) {
+        setFrameWidth(canvasWidth / xDivs, canvasWidth);
+    }
+
+    public static void setYDivs(final int yDivs) {
+        DialogVals.yDivs = yDivs;
+    }
+
+    public static void setYDivs(final int yDivs, final int canvasHeight) {
+        setFrameHeight(canvasHeight / yDivs, canvasHeight);
+    }
+
+    public static void setTruncateSplitX(final boolean truncateSplitX) {
+        DialogVals.truncateSplitX = truncateSplitX;
+    }
+
+    public static void setTruncateSplitY(final boolean truncateSplitY) {
+        DialogVals.truncateSplitY = truncateSplitY;
+    }
+
     public static void setNewFontPixelSpacing(
             final int newFontPixelSpacing, final boolean attemptPreviewUpdate
     ) {
@@ -273,6 +343,10 @@ public class DialogVals {
             final GameImage fontPreviewImage
     ) {
         DialogVals.fontPreviewImage = fontPreviewImage;
+    }
+
+    public static void setSequenceOrder(final SequenceOrder sequenceOrder) {
+        DialogVals.sequenceOrder = sequenceOrder;
     }
 
     public static Path getPaletteFolder() {
@@ -381,6 +455,48 @@ public class DialogVals {
 
     public static GameImage getFontPreviewImage() {
         return fontPreviewImage;
+    }
+
+    public static SequenceOrder getSequenceOrder() {
+        return sequenceOrder;
+    }
+
+    public static int getFramesPerDim() {
+        return framesPerDim;
+    }
+
+    public static int calculateFramesPerComplementaryDim(
+            final int frameCount
+    ) {
+        final int fpd = getFramesPerDim(),
+                compTruncated = frameCount / fpd,
+                remainder = frameCount % fpd;
+
+        return compTruncated + (remainder == 0 ? 0 : 1);
+    }
+
+    public static int getFrameWidth() {
+        return frameWidth;
+    }
+
+    public static int getFrameHeight() {
+        return frameHeight;
+    }
+
+    public static int getXDivs() {
+        return xDivs;
+    }
+
+    public static int getYDivs() {
+        return yDivs;
+    }
+
+    public static boolean isTruncateSplitX() {
+        return truncateSplitX;
+    }
+
+    public static boolean isTruncateSplitY() {
+        return truncateSplitY;
     }
 
     public static boolean isThisOutlineSide(final int index) {
