@@ -280,7 +280,7 @@ public final class TextTool extends Tool {
 
         final Color caretColor = StippleEffect.get().isTimerToggle()
                 ? Constants.WHITE : Constants.BLACK;
-        final int caretX = getFormattedTextX() + textImage.getWidth() + 1;
+        final int caretX = getFormattedTextX() + textImage.getWidth();
         toolContentPreview.fillRectangle(caretColor, caretX, textPos.y,
                 Layout.TEXT_CARET_W * fontScale,
                 Layout.TEXT_CARET_H * fontScale);
