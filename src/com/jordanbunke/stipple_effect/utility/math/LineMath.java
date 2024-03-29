@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.utility.math;
 
 public class LineMath {
     public static boolean linesIntersect(

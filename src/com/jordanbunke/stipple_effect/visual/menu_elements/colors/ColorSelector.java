@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.invisible.InvisibleMenuElement;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;

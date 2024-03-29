@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.LayerMerger;
+import com.jordanbunke.stipple_effect.layer.LayerHelper;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
@@ -17,6 +17,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
@@ -1611,7 +1612,7 @@ public class SEContext {
                 .map(layer -> layer.returnPadded(left, top, w, h)).toList();
 
         final ProjectState result = getState().resize(w, h, layers)
-                .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
+                .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, Operation.PAD);
 
         snapToCenterOfImage();
@@ -1632,7 +1633,22 @@ public class SEContext {
     }
 
     public void stitch() {
-        // TODO
+        final int frameWidth = getState().getImageWidth(),
+                frameHeight = getState().getImageHeight(),
+                frameCount = getState().getFrameCount(),
+                w = StitchSplitMath.stitchedWidth(frameWidth, frameCount),
+                h = StitchSplitMath.stitchedHeight(frameHeight, frameCount);
+
+        final List<SELayer> layers = getState().getLayers().stream()
+                .map(layer -> layer.returnStitched(frameWidth,
+                        frameHeight, frameCount)).toList();
+
+        StitchSplitMath.stitchedWidth(frameWidth, frameCount);
+        final ProjectState result = getState().stitch(
+                w, h, layers).changeSelectionBounds(new HashSet<>());
+        stateManager.performAction(result, Operation.STITCH);
+
+        snapToCenterOfImage();
     }
 
     public void split() {
@@ -2064,7 +2080,7 @@ public class SEContext {
 
             final SELayer above = layers.get(aboveIndex),
                     below = layers.get(belowIndex);
-            final SELayer merged = LayerMerger.merge(above, below,
+            final SELayer merged = LayerHelper.merge(above, below,
                     getState().getFrameIndex(), getState().getFrameCount());
             layers.remove(above);
             layers.remove(below);

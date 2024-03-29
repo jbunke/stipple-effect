@@ -1,6 +1,7 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.utility.math;
 
 import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.function.Function;

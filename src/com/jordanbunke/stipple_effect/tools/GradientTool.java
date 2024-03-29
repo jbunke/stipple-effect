@@ -11,6 +11,8 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.Geometry;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DropdownMenu;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;

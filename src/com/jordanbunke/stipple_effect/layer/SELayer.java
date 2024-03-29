@@ -5,11 +5,14 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BinaryOperator;
 
 public final class SELayer {
     private final List<GameImage> frames, renders, onionSkins;
@@ -185,6 +188,36 @@ public final class SELayer {
 
         return new SELayer(paddedFrames, paddedFLC.submit(), opacity,
                 enabled, framesLinked, onionSkinMode, name);
+    }
+
+    public SELayer returnStitched(
+            final int fw, final int fh, final int fc
+    ) {
+        final int w = StitchSplitMath.stitchedWidth(fw, fc),
+                h = StitchSplitMath.stitchedHeight(fh, fc);
+
+        final GameImage frame = new GameImage(w, h);
+
+        final int fpd = DialogVals.getFramesPerDim();
+
+        final boolean isHorizontal = StitchSplitMath.isHorizontal();
+        final BinaryOperator<Integer>
+                horz = (a, b) -> a % b,
+                vert = (a, b) -> a / b,
+                xOp = isHorizontal ? horz : vert,
+                yOp = isHorizontal ? vert : horz;
+
+        for (int i = 0; i < fc; i++) {
+            final int x = xOp.apply(i, fpd) * fw,
+                    y = yOp.apply(i, fpd) * fh;
+
+            frame.draw(getFrame(i), x, y);
+        }
+
+        frame.free();
+
+        return new SELayer(new ArrayList<>(List.of(frame)), frame,
+                opacity, enabled, true, onionSkinMode, name);
     }
 
     public SELayer returnLinkedFrames(final int frameIndex) {

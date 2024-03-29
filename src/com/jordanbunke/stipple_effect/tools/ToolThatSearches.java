@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.MathPlus;
-import com.jordanbunke.stipple_effect.utility.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;

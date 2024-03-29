@@ -5,7 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LayerMerger {
+public class LayerHelper {
     public static SELayer merge(
             final SELayer above, final SELayer below,
             final int frameIndex, final int frameCount

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.utility.math;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 

@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
-import com.jordanbunke.stipple_effect.utility.Geometry;
+import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
 import java.awt.*;
 import java.util.Set;

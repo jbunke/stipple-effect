@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.delta_time.utility.RNG;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;

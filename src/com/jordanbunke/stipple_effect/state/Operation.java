@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.state;
 public enum Operation {
     // canvas sizing
     RESIZE, PAD, CROP_TO_SELECTION,
+    STITCH, SPLIT,
     // frame operations
     ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
     MOVE_FRAME_BACK, MOVE_FRAME_FORWARD,
@@ -27,7 +28,7 @@ public enum Operation {
 
     public boolean triggersCanvasAuxiliaryRedraw() {
         return switch (this) {
-            case RESIZE, PAD, CROP_TO_SELECTION -> true;
+            case RESIZE, PAD, CROP_TO_SELECTION, STITCH, SPLIT -> true;
             default -> false;
         };
     }
@@ -64,6 +65,7 @@ public enum Operation {
             case ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
                     MOVE_LAYER_DOWN, MOVE_LAYER_UP, MERGE_WITH_LAYER_BELOW,
                     CHANGE_LAYER_NAME -> ActionType.LAYER;
+            case STITCH, SPLIT -> ActionType.MAJOR;
             default -> ActionType.CANVAS;
         };
     }

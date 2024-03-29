@@ -31,6 +31,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.visual.*;
 
 import java.awt.*;

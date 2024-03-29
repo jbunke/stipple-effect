@@ -30,6 +30,7 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.TextTool;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
@@ -396,16 +397,16 @@ public class DialogAssembly {
         mb.add(framesPerCompDim);
 
         final Supplier<Boolean> fTooLarge =
-                () -> getPreviewWidth(h, fc) > Constants.MAX_IMAGE_W ||
-                        getPreviewHeight(h, fc) > Constants.MAX_IMAGE_H;
+                () -> StitchSplitMath.stitchedWidth(h, fc) > Constants.MAX_IMAGE_W ||
+                        StitchSplitMath.stitchedHeight(h, fc) > Constants.MAX_IMAGE_H;
 
         // canvas size preview
         final String CSP_PREFIX = "Canvas size preview: ", CSP_INFIX = " px",
                 CSP_OPT_SUFFIX = "... too large";
         final DynamicLabel canvasSizePreview = makeDynamicLabel(
                 textBelowPos(framesPerCompDim, 1),
-                () -> CSP_PREFIX + getPreviewWidth(w, fc) + "x" +
-                        getPreviewHeight(h, fc) + CSP_INFIX +
+                () -> CSP_PREFIX + StitchSplitMath.stitchedWidth(w, fc) + "x" +
+                        StitchSplitMath.stitchedHeight(h, fc) + CSP_INFIX +
                         (fTooLarge.get() ? CSP_OPT_SUFFIX : ""),
                 CSP_PREFIX + "XXXXxXXXX" + CSP_INFIX + CSP_OPT_SUFFIX);
         mb.add(canvasSizePreview);
@@ -541,7 +542,7 @@ public class DialogAssembly {
                 PRV_SUFFIX_SING = " px", PRV_SUFFIX = PRV_SUFFIX_SING + " each";
         final DynamicLabel dimsPreview = makeDynamicLabel(
                 textBelowPos(xRemainderLabel, 1), () -> {
-                    final int fc = getPreviewFrameCount(w, h);
+                    final int fc = StitchSplitMath.splitFrameCount(w, h);
 
                     return PRV_PREFIX + fc +
                             (fc == 1 ? PRV_INFIX_SING : PRV_INFIX) +
@@ -594,43 +595,6 @@ public class DialogAssembly {
                         frameWidthTextbox.isValid() &&
                         frameHeightTextbox.isValid(),
                 Constants.GENERIC_APPROVAL_TEXT, c::split, true));
-    }
-
-    private static boolean isHorizontal() {
-        return DialogVals.getSequenceOrder() ==
-                DialogVals.SequenceOrder.HORIZONTAL;
-    }
-
-    private static int getPreviewWidth(
-            final int frameWidth, final int frameCount
-    ) {
-        final int fpd = DialogVals.getFramesPerDim(), fpcd =
-                DialogVals.calculateFramesPerComplementaryDim(frameCount);
-        return frameWidth * (isHorizontal() ? fpd : fpcd);
-    }
-
-    private static int getPreviewHeight(
-            final int frameHeight, final int frameCount
-    ) {
-        final int fpd = DialogVals.getFramesPerDim(), fpcd =
-                DialogVals.calculateFramesPerComplementaryDim(frameCount);
-        return frameHeight * (isHorizontal() ? fpcd : fpd);
-    }
-
-    private static int getPreviewFrameCount(
-            final int w, final int h
-    ) {
-        final int xDivs = DialogVals.getXDivs(),
-                yDivs = DialogVals.getYDivs(),
-                fw = DialogVals.getFrameWidth(),
-                fh = DialogVals.getFrameHeight(),
-                remX = w % fw, remY = h % fh,
-                framesX = xDivs + (remX == 0 ||
-                        DialogVals.isTruncateSplitX() ? 0 : 1),
-                framesY = yDivs + (remY == 0 ||
-                        DialogVals.isTruncateSplitY() ? 0 : 1);
-
-        return framesX * framesY;
     }
 
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {

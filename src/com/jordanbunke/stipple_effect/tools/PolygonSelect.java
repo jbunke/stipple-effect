@@ -7,8 +7,8 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.LineMath;
-import com.jordanbunke.stipple_effect.utility.LineSegment;
+import com.jordanbunke.stipple_effect.utility.math.LineMath;
+import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 
 import java.awt.*;
 import java.util.ArrayList;

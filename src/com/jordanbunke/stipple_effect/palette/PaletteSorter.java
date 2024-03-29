@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.palette;
 
-import com.jordanbunke.stipple_effect.utility.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 
 import java.awt.*;

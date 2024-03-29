@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.Geometry;
+import com.jordanbunke.stipple_effect.utility.math.Geometry;
 import com.jordanbunke.stipple_effect.utility.Settings;
 
 import java.util.HashSet;
