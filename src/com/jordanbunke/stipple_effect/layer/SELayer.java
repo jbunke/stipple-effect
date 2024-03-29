@@ -194,11 +194,8 @@ public final class SELayer {
             final int fw, final int fh, final int fc
     ) {
         final int w = StitchSplitMath.stitchedWidth(fw, fc),
-                h = StitchSplitMath.stitchedHeight(fh, fc);
-
-        final GameImage frame = new GameImage(w, h);
-
-        final int fpd = DialogVals.getFramesPerDim();
+                h = StitchSplitMath.stitchedHeight(fh, fc),
+                fpd = DialogVals.getFramesPerDim();
 
         final boolean isHorizontal = StitchSplitMath.isHorizontal();
         final BinaryOperator<Integer>
@@ -206,6 +203,8 @@ public final class SELayer {
                 vert = (a, b) -> a / b,
                 xOp = isHorizontal ? horz : vert,
                 yOp = isHorizontal ? vert : horz;
+
+        final GameImage frame = new GameImage(w, h);
 
         for (int i = 0; i < fc; i++) {
             final int x = xOp.apply(i, fpd) * fw,
@@ -218,6 +217,40 @@ public final class SELayer {
 
         return new SELayer(new ArrayList<>(List.of(frame)), frame,
                 opacity, enabled, true, onionSkinMode, name);
+    }
+
+    public SELayer returnSplit(
+            final int w, final int h, final int fc
+    ) {
+        final int fw = DialogVals.getFrameWidth(),
+                fh = DialogVals.getFrameHeight(),
+                fx = StitchSplitMath.splitFramesX(w),
+                fy = StitchSplitMath.splitFramesY(h);
+
+        final boolean isHorizontal = StitchSplitMath.isHorizontal();
+        final BinaryOperator<Integer>
+                horz = (a, b) -> a % b,
+                vert = (a, b) -> a / b,
+                xOp = isHorizontal ? horz : vert,
+                yOp = isHorizontal ? vert : horz;
+
+        final int fpd = isHorizontal ? fx : fy;
+
+        final List<GameImage> frames = new ArrayList<>();
+        final GameImage canvas = getFrame(0);
+
+        for (int i = 0; i < fc; i++) {
+            final GameImage frame = new GameImage(fw, fh);
+
+            final int x = xOp.apply(i, fpd) * fw,
+                    y = yOp.apply(i, fpd) * fh;
+
+            frame.draw(canvas, -1 * x, -1 * y);
+            frames.add(frame.submit());
+        }
+
+        return new SELayer(frames, frames.get(0),
+                opacity, enabled, false, onionSkinMode, name);
     }
 
     public SELayer returnLinkedFrames(final int frameIndex) {

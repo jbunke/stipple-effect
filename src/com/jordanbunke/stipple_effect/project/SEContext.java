@@ -1643,16 +1643,27 @@ public class SEContext {
                 .map(layer -> layer.returnStitched(frameWidth,
                         frameHeight, frameCount)).toList();
 
-        StitchSplitMath.stitchedWidth(frameWidth, frameCount);
-        final ProjectState result = getState().stitch(
-                w, h, layers).changeSelectionBounds(new HashSet<>());
+        final ProjectState result = getState().stitch(w, h,
+                layers).changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, Operation.STITCH);
 
         snapToCenterOfImage();
     }
 
     public void split() {
-        // TODO
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight(),
+                frameCount = StitchSplitMath.splitFrameCount(w, h);
+
+        final List<SELayer> layers = getState().getLayers().stream()
+                .map(layer -> layer.returnSplit(w, h, frameCount)).toList();
+
+        final ProjectState result = getState().split(
+                DialogVals.getFrameWidth(), DialogVals.getFrameHeight(),
+                layers, frameCount).changeSelectionBounds(new HashSet<>());
+        stateManager.performAction(result, Operation.SPLIT);
+
+        snapToCenterOfImage();
     }
 
     // IMAGE EDITING
