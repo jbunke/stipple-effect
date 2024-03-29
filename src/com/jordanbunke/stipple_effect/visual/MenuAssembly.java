@@ -758,6 +758,10 @@ public class MenuAssembly {
             mb.add(toolButtonFromTool(all[i], i));
         }
 
+        addHidePanelToMenuBuilder(mb, Layout.getToolsPosition()
+                        .displace(Layout.getToolsWidth(), 0),
+                () -> Layout.setToolbarShowing(false));
+
         // outline button
         final Coord2D outlinePos = Layout.getToolsPosition()
                 .displace(Layout.BUTTON_OFFSET,
@@ -809,12 +813,8 @@ public class MenuAssembly {
 
         final Tool tool = StippleEffect.get().getTool();
 
-        if (tool.hasToolOptionsBar()) {
+        if (tool.hasToolOptionsBar())
             mb.add(tool.buildToolOptionsBar());
-            addHidePanelToMenuBuilder(mb, Layout.getToolOptionsBarPosition()
-                            .displace(Layout.getToolOptionsBarWidth(), 0),
-                    () -> Layout.setToolbarShowing(false));
-        }
 
         return mb.build();
     }
@@ -823,9 +823,8 @@ public class MenuAssembly {
             final Tool tool, final int index
     ) {
         final Coord2D position = Layout.getToolsPosition().displace(
-                Layout.BUTTON_OFFSET,
-                Layout.BUTTON_OFFSET + (Layout.BUTTON_INC * index)
-        );
+                Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET +
+                        (Layout.BUTTON_INC * (index + 1)));
 
         return new IconButton(tool.convertNameToFilename(),
                 position, () -> StippleEffect.get().setTool(tool),
