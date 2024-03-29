@@ -21,7 +21,7 @@ public class IncrementalRangeElements<R extends Number> {
     public final DynamicLabel value;
 
     public IncrementalRangeElements(
-            final TextLabel label, final int buttonY, final int textY,
+            final MenuElement preceding, final int buttonY, final int textY,
             Runnable fDecrement, Runnable fIncrement,
             final R unit, final R minimum, final R maximum,
             final ToolSettingType<R> settingType,
@@ -37,7 +37,7 @@ public class IncrementalRangeElements<R extends Number> {
         if (fIncrement == null)
             fIncrement = () -> setter.accept(settingType.addition().apply(getter.get(), unit));
 
-        decButton = makeDecrement(label, buttonY, fDecrement);
+        decButton = makeDecrement(preceding, buttonY, fDecrement);
         incButton = makeIncrement(buttonY, fIncrement);
         slider = makeSlider(buttonY, minimum, maximum, setter, getter,
                 toSliderConversion, fromSliderConversion);
@@ -47,11 +47,11 @@ public class IncrementalRangeElements<R extends Number> {
     }
 
     private IconButton makeDecrement(
-            final TextLabel label, final int buttonY,
+            final MenuElement preceding, final int buttonY,
             final Runnable fDecrement
     ) {
         return IconButton.makeNoTooltip(IconCodes.DECREMENT, new Coord2D(
-                Layout.optionsBarNextElementX(label, false),
+                Layout.optionsBarNextElementX(preceding, false),
                 buttonY), fDecrement);
     }
 
@@ -90,7 +90,7 @@ public class IncrementalRangeElements<R extends Number> {
     }
 
     public static IncrementalRangeElements<Integer> makeForInt(
-            final TextLabel label, final int buttonY, final int textY,
+            final MenuElement preceding, final int buttonY, final int textY,
             final int unit, final int minimum, final int maximum,
             final Consumer<Integer> setter, final Supplier<Integer> getter,
             final Function<Integer, Integer> toSliderConversion,
@@ -99,14 +99,14 @@ public class IncrementalRangeElements<R extends Number> {
             final String widestTextCase
     ) {
         return new IncrementalRangeElements<>(
-                label, buttonY, textY, null, null,
+                preceding, buttonY, textY, null, null,
                 unit, minimum, maximum, IntToolSettingType.get(),
                 setter, getter, toSliderConversion, fromSliderConversion,
                 valueFormatter, widestTextCase);
     }
 
     public static IncrementalRangeElements<Double> makeForDouble(
-            final TextLabel label, final int buttonY, final int textY,
+            final MenuElement preceding, final int buttonY, final int textY,
             final Runnable fDecrement, final Runnable fIncrement,
             final double minimum, final double maximum,
             final Consumer<Double> setter, final Supplier<Double> getter,
@@ -116,14 +116,14 @@ public class IncrementalRangeElements<R extends Number> {
             final String widestTextCase
     ) {
         return new IncrementalRangeElements<>(
-                label, buttonY, textY, fDecrement, fIncrement,
+                preceding, buttonY, textY, fDecrement, fIncrement,
                 null, minimum, maximum, DoubleToolSettingType.get(),
                 setter, getter, toSliderConversion, fromSliderConversion,
                 valueFormatter, widestTextCase);
     }
 
     public static IncrementalRangeElements<Float> makeForFloat(
-            final TextLabel label, final int buttonY, final int textY,
+            final MenuElement preceding, final int buttonY, final int textY,
             final Runnable fDecrement, final Runnable fIncrement,
             final float minimum, final float maximum,
             final Consumer<Float> setter, final Supplier<Float> getter,
@@ -133,7 +133,7 @@ public class IncrementalRangeElements<R extends Number> {
             final String widestTextCase
     ) {
         return new IncrementalRangeElements<>(
-                label, buttonY, textY, fDecrement, fIncrement,
+                preceding, buttonY, textY, fDecrement, fIncrement,
                 null, minimum, maximum, FloatToolSettingType.get(),
                 setter, getter, toSliderConversion, fromSliderConversion,
                 valueFormatter, widestTextCase);

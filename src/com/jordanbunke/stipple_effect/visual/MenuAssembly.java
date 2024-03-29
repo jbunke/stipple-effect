@@ -835,36 +835,49 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        // DYNAMIC LABELS
         final int bottomBarTextY = Layout.getBottomBarPosition().y +
-                Layout.TEXT_Y_OFFSET;
+                Layout.TEXT_Y_OFFSET,
+                bottomBarButtonY = Layout.getBottomBarPosition().y +
+                        Layout.BUTTON_OFFSET;
 
         // active tool
-        mb.add(new DynamicLabel(
-                new Coord2D(Layout.CONTENT_BUFFER_PX, bottomBarTextY),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+        final Indicator toolIndicator = new Indicator(new Coord2D(
+                Layout.BUTTON_OFFSET, bottomBarButtonY),
+                IconCodes.IND_TOOL);
+        final DynamicLabel toolLabel = new DynamicLabel(new Coord2D(
+                Layout.optionsBarNextElementX(toolIndicator, false),
+                bottomBarTextY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> StippleEffect.get().getTool().getBottomBarText(),
-                Layout.getBottomBarToolWidth()));
+                Layout.getBottomBarToolWidth());
+        mb.addAll(toolIndicator, toolLabel);
 
         // target pixel
-        mb.add(new DynamicLabel(
-                new Coord2D(Layout.getBottomBarTargetPixelX(), bottomBarTextY),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth()));
+        final Indicator targetIndicator = new Indicator(new Coord2D(
+                Layout.getBottomBarTargetPixelX(), bottomBarButtonY),
+                IconCodes.IND_TARGET);
+        final DynamicLabel targetLabel = new DynamicLabel(new Coord2D(
+                Layout.optionsBarNextElementX(targetIndicator, false),
+                bottomBarTextY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth());
+        mb.addAll(targetIndicator, targetLabel);
 
         // canvas size
-        mb.add(new DynamicLabel(new Coord2D(
-                Layout.getBottomBarCanvasSizeX(), bottomBarTextY),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth()));
+        final Indicator boundsIndicator = new Indicator(new Coord2D(
+                Layout.getBottomBarCanvasSizeX(), bottomBarButtonY),
+                IconCodes.IND_BOUNDS);
+        final DynamicLabel boundsLabel = new DynamicLabel(new Coord2D(
+                Layout.optionsBarNextElementX(boundsIndicator, false),
+                bottomBarTextY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth());
+        mb.addAll(boundsIndicator, boundsLabel);
 
         // zoom
         final float BASE = 2f;
-        final TextLabel zoomLabel = TextLabel.make(new Coord2D(
-                Layout.getBottomBarZoomPercentageX(), bottomBarTextY),
-                "Zoom", Constants.WHITE);
+        final Indicator zoomIndicator = new Indicator(
+                new Coord2D(Layout.getBottomBarZoomPercentageX(),
+                        bottomBarButtonY), IconCodes.IND_ZOOM);
         final IncrementalRangeElements<Float> zoom =
-                IncrementalRangeElements.makeForFloat(zoomLabel,
+                IncrementalRangeElements.makeForFloat(zoomIndicator,
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
                         bottomBarTextY, c.renderInfo::zoomOut,
                         () -> c.renderInfo.zoomIn(c.getTargetPixel()),
@@ -873,7 +886,7 @@ public class MenuAssembly {
                         f -> (int) (Math.log(f) / Math.log(BASE)),
                         sv -> (float) Math.pow(BASE, sv),
                         f -> c.renderInfo.getZoomText(), "XXX.XX%");
-        mb.addAll(zoomLabel, zoom.decButton, zoom.incButton,
+        mb.addAll(zoomIndicator, zoom.decButton, zoom.incButton,
                 zoom.slider, zoom.value);
 
         // selection

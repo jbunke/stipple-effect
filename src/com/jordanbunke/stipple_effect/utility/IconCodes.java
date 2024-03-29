@@ -100,5 +100,13 @@ public class IconCodes {
             FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking",
             FONT_EXAMPLE_TEXT = NO_ICON_PREFIX + "font_example_text";
 
+    private static final String INDICATOR_PREFIX = "indicator_";
+
+    public static final String
+            IND_TOOL = INDICATOR_PREFIX + "tool",
+            IND_ZOOM = INDICATOR_PREFIX + "zoom",
+            IND_TARGET = INDICATOR_PREFIX + "target",
+            IND_BOUNDS = INDICATOR_PREFIX + "bounds";
+
     public static final String NO_TOOLTIP = "no_tooltip";
 }
