@@ -52,16 +52,16 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                folderLabel = makeDialogLeftLabel(0, "Folder: "),
-                nameLabel = makeDialogLeftLabel(1, "File name: "),
-                scaleUpLabel = makeDialogLeftLabel(2, "Scale factor: "),
-                saveAsTypeLabel = makeDialogLeftLabel(3, "Save as: "),
-                xDivsLabel = makeDialogLeftLabel(4, "X frames: "),
-                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: "),
-                indexPrefixLabel = makeDialogLeftLabel(4, "Prefix: "),
-                indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix: "),
-                countFromLabel = makeDialogLeftLabel(5, "Count from: "),
-                fpsLabel = makeDialogLeftLabel(4, "Frame rate: ");
+                folderLabel = makeDialogLeftLabel(0, "Folder:"),
+                nameLabel = makeDialogLeftLabel(1, "File name:"),
+                scaleUpLabel = makeDialogLeftLabel(2, "Scale factor:"),
+                saveAsTypeLabel = makeDialogLeftLabel(3, "Save as:"),
+                xDivsLabel = makeDialogLeftLabel(4, "X frames:"),
+                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames:"),
+                indexPrefixLabel = makeDialogLeftLabel(4, "Prefix:"),
+                indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix:"),
+                countFromLabel = makeDialogLeftLabel(5, "Count from:"),
+                fpsLabel = makeDialogLeftLabel(4, "Frame rate:");
 
         // folder selection button
         final DynamicTextButton folderButton = makeFolderSelectionButton(
@@ -215,8 +215,8 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                widthLabel = makeDialogLeftLabel(1, "Width: "),
-                heightLabel = makeDialogLeftLabel(2, "Height: "),
+                widthLabel = makeDialogLeftLabel(1, "Width:"),
+                heightLabel = makeDialogLeftLabel(2, "Height:"),
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
                 explanation = makeValidDimensionsBottomLabel();
 
@@ -284,10 +284,10 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                leftLabel = makeDialogLeftLabel(1, "Left: "),
-                rightLabel = makeDialogLeftLabel(2, "Right: "),
-                topLabel = makeDialogLeftLabel(3, "Top: "),
-                bottomLabel = makeDialogLeftLabel(4, "Bottom: "),
+                leftLabel = makeDialogLeftLabel(1, "Left:"),
+                rightLabel = makeDialogLeftLabel(2, "Right:"),
+                topLabel = makeDialogLeftLabel(3, "Top:"),
+                bottomLabel = makeDialogLeftLabel(4, "Bottom:"),
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
                 explanation = makeValidDimensionsBottomLabel();
 
@@ -334,7 +334,6 @@ public class DialogAssembly {
                 Constants.GENERIC_APPROVAL_TEXT, c::pad, true));
     }
 
-
     public static void setDialogToStitchFramesTogether() {
         final SEContext c = StippleEffect.get().getContext();
         final MenuBuilder mb = new MenuBuilder();
@@ -353,7 +352,7 @@ public class DialogAssembly {
         // sequence order
         final TextLabel sequenceLabel = TextLabel.make(
                 textBelowPos(frameSize, 1),
-                "Sequence order: ", Constants.WHITE);
+                "Sequence order:", Constants.WHITE);
         final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
                 getDialogContentOffsetFollowingLabel(sequenceLabel),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
@@ -445,7 +444,7 @@ public class DialogAssembly {
         // sequence order
         final TextLabel sequenceLabel = TextLabel.make(
                 textBelowPos(canvasSize, 1),
-                "Sequence order: ", Constants.WHITE);
+                "Sequence order:", Constants.WHITE);
         final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
                 getDialogContentOffsetFollowingLabel(sequenceLabel),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
@@ -610,13 +609,13 @@ public class DialogAssembly {
         // text labels
         final TextLabel context = makeDialogLeftLabel(0,
                 "Current size: " + w + "x" + h + (tooBig
-                        ? " ... too big as singleton" : "")),
+                        ? " ... too big as singleton" :"")),
                 instruction = makeDialogLeftLabel(1,
                         "Scale down and/or split into more frames"),
-                widthLabel = makeDialogLeftLabel(2, "Width: "),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height: "),
-                xDivsLabel = makeDialogLeftLabel(4 - (tooBig ? 0 : 2), "X frames: "),
-                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames: "),
+                widthLabel = makeDialogLeftLabel(2, "Width:"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height:"),
+                xDivsLabel = makeDialogLeftLabel(4 - (tooBig ? 0 : 2), "X frames:"),
+                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames:"),
                 explanation = makeValidDimensionsBottomLabel();
 
         // downscale textboxes
@@ -685,8 +684,8 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                widthLabel = makeDialogLeftLabel(1, "Width: "),
-                heightLabel = makeDialogLeftLabel(2, "Height: "),
+                widthLabel = makeDialogLeftLabel(1, "Width:"),
+                heightLabel = makeDialogLeftLabel(2, "Height:"),
                 explanation = makeValidDimensionsBottomLabel();
 
         // dim textboxes
@@ -750,7 +749,7 @@ public class DialogAssembly {
         lines++;
 
         // pixel spacing
-        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing: ");
+        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing:");
         final Textbox spacingTextbox = makeDialogNumericalTextBox(spacingLabel,
                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                 DialogVals.getNewFontPixelSpacing(),
@@ -772,7 +771,7 @@ public class DialogAssembly {
 
         // ASCII
         final TextLabel asciiLabel = makeDialogLeftLabel(
-                lines, "Upload ASCII source: ");
+                lines, "ASCII source file:");
         final SimpleMenuButton asciiButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(asciiLabel),
@@ -795,7 +794,7 @@ public class DialogAssembly {
                 MenuElement.Anchor.LEFT_TOP,
                 DialogVals::hasLatinEx, DialogVals::setHasLatinEx);
         final TextLabel latinExLabel = makeDialogLeftLabel(
-                lines + 1, "Upload Latin Extended source: ");
+                lines + 1, "Latin Extended source file:");
         final SimpleMenuButton latinExButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(latinExLabel),
@@ -878,7 +877,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         // presets: single & double
-        final TextLabel presets = makeDialogLeftLabel(0, "Presets: ");
+        final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
         mb.add(presets);
 
         // no selection notification
@@ -936,7 +935,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         // presets: single & double
-        final TextLabel presets = makeDialogLeftLabel(0, "Presets: ");
+        final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
         mb.add(presets);
 
         // buttons for panel arrangement presets
@@ -1036,8 +1035,8 @@ public class DialogAssembly {
 
         // labels
         final TextLabel
-                folderLabel = makeDialogLeftLabel(0, "Folder: "),
-                nameLabel = makeDialogLeftLabel(1, "File name: ");
+                folderLabel = makeDialogLeftLabel(0, "Folder:"),
+                nameLabel = makeDialogLeftLabel(1, "File name:");
 
         mb.add(folderLabel);
         mb.add(nameLabel);
@@ -1173,7 +1172,7 @@ public class DialogAssembly {
         DialogVals.setPaletteName(palette.getName());
 
         // text labels
-        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name: ");
+        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name:");
 
         // name textbox
         DialogVals.setPaletteName(palette.getName());
@@ -1244,8 +1243,8 @@ public class DialogAssembly {
         DialogVals.setLayerName(layer.getName());
 
         // text labels
-        final TextLabel layerNameLabel = makeDialogLeftLabel(1, "Name: "),
-                opacityLabel = makeDialogLeftLabel(2, "Opacity: ");
+        final TextLabel layerNameLabel = makeDialogLeftLabel(1, "Name:"),
+                opacityLabel = makeDialogLeftLabel(2, "Opacity:");
 
         // name textbox
         final Textbox layerNameTextbox = makeDialogNameTextBox(
@@ -1601,9 +1600,9 @@ public class DialogAssembly {
             case STARTUP -> {
                 // text labels
                 final TextLabel screenModeLabel = makeDialogLeftLabel(
-                        initialYIndex, "Fullscreen on startup: "),
+                        initialYIndex, "Fullscreen on startup:"),
                         pixelGridDefaultLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Pixel grid on by default: ");
+                                initialYIndex + 1, "Pixel grid on by default:");
 
                 // toggle buttons
                 final GameImage[] smBases = makeBooleanToggleButtonSet();
@@ -1643,9 +1642,9 @@ public class DialogAssembly {
             case FORMAT -> {
                 // text labels
                 final TextLabel indexPrefixLabel = makeDialogLeftLabel(
-                        initialYIndex, "Default frame prefix: "),
+                        initialYIndex, "Default frame prefix:"),
                         indexSuffixLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Default frame suffix: ");
+                                initialYIndex + 1, "Default frame suffix:");
 
                 // textboxes
                 final Textbox indexPrefixTextbox = makeDialogCustomTextBox(
@@ -1672,20 +1671,20 @@ public class DialogAssembly {
             case VISUAL -> {
                 // text labels
                 final TextLabel fontLabel = makeDialogLeftLabel(
-                        initialYIndex, "Program font: "),
+                        initialYIndex, "Program font:"),
                         checkerboardXLabel = makeDialogLeftLabel(
-                                initialYIndex + 2, "Checkerboard size (X): "),
+                                initialYIndex + 2, "Checkerboard size (X):"),
                         checkerboardYLabel = makeDialogLeftLabel(
-                                initialYIndex + 3, "Checkerboard size (Y): "),
+                                initialYIndex + 3, "Checkerboard size (Y):"),
                         checkerboardContext = makeDialogLeftLabel(
                                 initialYIndex + 4,
                                 "Valid checkerboard size values range from " +
                                         Layout.CHECKERBOARD_MIN + " to " +
                                         Layout.CHECKERBOARD_MAX + " pixels."),
                         pixelGridXLabel = makeDialogLeftLabel(
-                                initialYIndex + 6, "Pixel grid size (X): "),
+                                initialYIndex + 6, "Pixel grid size (X):"),
                         pixelGridYLabel = makeDialogLeftLabel(
-                                initialYIndex + 7, "Pixel grid size (Y): "),
+                                initialYIndex + 7, "Pixel grid size (Y):"),
                         pixelGridContext = makeDialogLeftLabel(
                                 initialYIndex + 8,
                                 "Valid pixel grid size values range from " +
