@@ -9,7 +9,7 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
-import com.jordanbunke.stipple_effect.visual.menu_elements.ToolOptionIncrementalRange;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -88,9 +88,10 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
         final int ARTICULATIONS = 40,
                 SLIDER_MULT = (int) Math.pow(ARTICULATIONS, 3) /
                         Constants.MAX_BREADTH;
-        final ToolOptionIncrementalRange<Integer> breadth =
-                ToolOptionIncrementalRange.makeForInt(breadthLabel, 1,
-                        Constants.MIN_BREADTH, Constants.MAX_BREADTH,
+        final IncrementalRangeElements<Integer> breadth =
+                IncrementalRangeElements.makeForInt(breadthLabel,
+                        Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
+                        1, Constants.MIN_BREADTH, Constants.MAX_BREADTH,
                         this::setBreadth, this::getBreadth,
                         b -> (int) Math.cbrt(b * SLIDER_MULT),
                         sv -> ((int) Math.round(

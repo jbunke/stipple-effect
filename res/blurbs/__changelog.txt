@@ -29,6 +29,7 @@ Added:
 > Added tool options bar
 > Added dither option to gradient tool
 > Added second snap mode to pick up selection and move selection tools for pixel grid snapping
+> Added stitching and splitting
 
 Changed:
 > Redrew frame icons to feature purple film reels instead of orange motion blobs

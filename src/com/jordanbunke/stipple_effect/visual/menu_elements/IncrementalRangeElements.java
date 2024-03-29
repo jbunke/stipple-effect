@@ -6,6 +6,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.setting_group.DoubleToolSettingType;
+import com.jordanbunke.stipple_effect.utility.setting_group.FloatToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.IntToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.ToolSettingType;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
@@ -14,13 +15,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ToolOptionIncrementalRange<R extends Number> {
+public class IncrementalRangeElements<R extends Number> {
     public final IconButton decButton, incButton;
     public final HorizontalSlider slider;
     public final DynamicLabel value;
 
-    public ToolOptionIncrementalRange(
-            final TextLabel label,
+    public IncrementalRangeElements(
+            final TextLabel label, final int buttonY, final int textY,
             Runnable fDecrement, Runnable fIncrement,
             final R unit, final R minimum, final R maximum,
             final ToolSettingType<R> settingType,
@@ -36,40 +37,40 @@ public class ToolOptionIncrementalRange<R extends Number> {
         if (fIncrement == null)
             fIncrement = () -> setter.accept(settingType.addition().apply(getter.get(), unit));
 
-        decButton = makeDecrement(label, fDecrement);
-        incButton = makeIncrement(fIncrement);
-        slider = makeSlider(minimum, maximum, setter, getter,
+        decButton = makeDecrement(label, buttonY, fDecrement);
+        incButton = makeIncrement(buttonY, fIncrement);
+        slider = makeSlider(buttonY, minimum, maximum, setter, getter,
                 toSliderConversion, fromSliderConversion);
-        value = makeValue(getter, valueFormatter, widestTextCase);
+        value = makeValue(textY, getter, valueFormatter, widestTextCase);
 
         slider.updateAssets();
     }
 
     private IconButton makeDecrement(
-            final TextLabel label, final Runnable fDecrement
+            final TextLabel label, final int buttonY,
+            final Runnable fDecrement
     ) {
         return IconButton.makeNoTooltip(IconCodes.DECREMENT, new Coord2D(
                 Layout.optionsBarNextElementX(label, false),
-                Layout.optionsBarButtonY()), fDecrement);
+                buttonY), fDecrement);
     }
 
     private IconButton makeIncrement(
-            final Runnable fIncrement
+            final int buttonY, final Runnable fIncrement
     ) {
         return IconButton.makeNoTooltip(IconCodes.INCREMENT, new Coord2D(
-                Layout.optionsBarNextButtonX(decButton),
-                Layout.optionsBarButtonY()), fIncrement);
+                Layout.optionsBarNextButtonX(decButton), buttonY),
+                fIncrement);
     }
 
     private HorizontalSlider makeSlider(
-            final R minimum, final R maximum,
+            final int buttonY, final R minimum, final R maximum,
             final Consumer<R> setter, final Supplier<R> getter,
             final Function<R, Integer> toSliderConversion,
             final Function<Integer, R> fromSliderConversion
     ) {
         return new HorizontalSlider(new Coord2D(
-                Layout.optionsBarNextButtonX(incButton),
-                Layout.optionsBarButtonY()),
+                Layout.optionsBarNextButtonX(incButton), buttonY),
                 Layout.optionsBarSliderWidth(), MenuElement.Anchor.LEFT_TOP,
                 toSliderConversion.apply(minimum), toSliderConversion.apply(maximum),
                 () -> toSliderConversion.apply(getter.get()),
@@ -77,20 +78,19 @@ public class ToolOptionIncrementalRange<R extends Number> {
     }
 
     private DynamicLabel makeValue(
-            final Supplier<R> getter,
+            final int textY, final Supplier<R> getter,
             final Function<R, String> valueFormatter,
             final String widestTextCase
     ) {
         return new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(slider, false),
-                Layout.optionsBarTextY()),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                textY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> valueFormatter.apply(getter.get()),
                 Layout.estimateDynamicLabelMaxWidth(widestTextCase));
     }
 
-    public static ToolOptionIncrementalRange<Integer> makeForInt(
-            final TextLabel label,
+    public static IncrementalRangeElements<Integer> makeForInt(
+            final TextLabel label, final int buttonY, final int textY,
             final int unit, final int minimum, final int maximum,
             final Consumer<Integer> setter, final Supplier<Integer> getter,
             final Function<Integer, Integer> toSliderConversion,
@@ -98,15 +98,15 @@ public class ToolOptionIncrementalRange<R extends Number> {
             final Function<Integer, String> valueFormatter,
             final String widestTextCase
     ) {
-        return new ToolOptionIncrementalRange<>(
-                label, null, null,
+        return new IncrementalRangeElements<>(
+                label, buttonY, textY, null, null,
                 unit, minimum, maximum, IntToolSettingType.get(),
                 setter, getter, toSliderConversion, fromSliderConversion,
                 valueFormatter, widestTextCase);
     }
 
-    public static ToolOptionIncrementalRange<Double> makeForDouble(
-            final TextLabel label,
+    public static IncrementalRangeElements<Double> makeForDouble(
+            final TextLabel label, final int buttonY, final int textY,
             final Runnable fDecrement, final Runnable fIncrement,
             final double minimum, final double maximum,
             final Consumer<Double> setter, final Supplier<Double> getter,
@@ -115,9 +115,26 @@ public class ToolOptionIncrementalRange<R extends Number> {
             final Function<Double, String> valueFormatter,
             final String widestTextCase
     ) {
-        return new ToolOptionIncrementalRange<>(
-                label, fDecrement, fIncrement,
+        return new IncrementalRangeElements<>(
+                label, buttonY, textY, fDecrement, fIncrement,
                 null, minimum, maximum, DoubleToolSettingType.get(),
+                setter, getter, toSliderConversion, fromSliderConversion,
+                valueFormatter, widestTextCase);
+    }
+
+    public static IncrementalRangeElements<Float> makeForFloat(
+            final TextLabel label, final int buttonY, final int textY,
+            final Runnable fDecrement, final Runnable fIncrement,
+            final float minimum, final float maximum,
+            final Consumer<Float> setter, final Supplier<Float> getter,
+            final Function<Float, Integer> toSliderConversion,
+            final Function<Integer, Float> fromSliderConversion,
+            final Function<Float, String> valueFormatter,
+            final String widestTextCase
+    ) {
+        return new IncrementalRangeElements<>(
+                label, buttonY, textY, fDecrement, fIncrement,
+                null, minimum, maximum, FloatToolSettingType.get(),
                 setter, getter, toSliderConversion, fromSliderConversion,
                 valueFormatter, widestTextCase);
     }

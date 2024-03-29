@@ -11,7 +11,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
-import com.jordanbunke.stipple_effect.visual.menu_elements.ToolOptionIncrementalRange;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 
 import java.awt.*;
 import java.util.*;
@@ -187,8 +187,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
                 getFirstOptionLabelPosition(), "Tolerance", Constants.WHITE);
 
         final int SLIDER_MULT = 100;
-        final ToolOptionIncrementalRange<Double> tolerance =
-                ToolOptionIncrementalRange.makeForDouble(toleranceLabel,
+        final IncrementalRangeElements<Double> tolerance =
+                IncrementalRangeElements.makeForDouble(toleranceLabel,
+                        Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
                         ToolThatSearches::decreaseTolerance,
                         ToolThatSearches::increaseTolerance,
                         Constants.EXACT_COLOR_MATCH, Constants.MAX_TOLERANCE,

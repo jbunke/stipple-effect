@@ -11,7 +11,7 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
-import com.jordanbunke.stipple_effect.visual.menu_elements.ToolOptionIncrementalRange;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 
 import java.awt.*;
 import java.util.function.BiConsumer;
@@ -234,8 +234,9 @@ public abstract class ToolThatDraws extends Tool {
         // bias content
         final int PERCENT = 100;
         final String INFIX = "% towards ", SUFFIX = " color";
-        final ToolOptionIncrementalRange<Double> biasElems =
-                ToolOptionIncrementalRange.makeForDouble(biasLabel,
+        final IncrementalRangeElements<Double> biasElems =
+                IncrementalRangeElements.makeForDouble(biasLabel,
+                        Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
                         () -> setBias(bias - Constants.BIAS_INC),
                         () -> setBias(bias + Constants.BIAS_INC),
                         Constants.MIN_BIAS, Constants.MAX_BIAS,

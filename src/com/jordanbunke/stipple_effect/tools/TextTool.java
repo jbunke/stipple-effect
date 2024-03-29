@@ -383,10 +383,10 @@ public final class TextTool extends Tool {
         final TextLabel scaleLabel = TextLabel.make(
                 getFirstOptionLabelPosition(), "Scale", Constants.WHITE);
 
-        final ToolOptionIncrementalRange<Integer> scale =
-                ToolOptionIncrementalRange.makeForInt(
-                        scaleLabel, 1,
-                        Constants.MIN_FONT_SCALE, Constants.MAX_FONT_SCALE,
+        final IncrementalRangeElements<Integer> scale =
+                IncrementalRangeElements.makeForInt(scaleLabel,
+                        Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
+                        1, Constants.MIN_FONT_SCALE, Constants.MAX_FONT_SCALE,
                         this::setFontScale, this::getFontScale,
                         i -> i, i -> i, fs -> fs + "x",
                         Constants.MAX_FONT_SCALE + "x");

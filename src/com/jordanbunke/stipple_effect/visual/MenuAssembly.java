@@ -27,7 +27,6 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
 
@@ -237,45 +236,41 @@ public class MenuAssembly {
                         .displace(Layout.getFramesWidth(), 0),
                 () -> Layout.setFramesPanelShowing(false));
 
-        final Coord2D firstPos = Layout.getFramesPosition()
-                .displace(Layout.getSegmentContentDisplacement());
+        final int PLAY_STOP_INDEX = 8,
+                PLAYBACK_MODE_INDEX = 11,
+                AFTER_PLAYBACK_MODE = 13;
 
         // play/stop as toggle
-
         final Coord2D playStopTogglePos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X + (8 * Layout.BUTTON_INC),
+                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X +
+                        (PLAY_STOP_INDEX * Layout.BUTTON_INC),
                 Layout.ICON_BUTTON_OFFSET_Y);
-
         mb.add(generatePlayStopToggle(playStopTogglePos));
 
         // playback mode toggle button
-
         final Coord2D playbackModeTogglePos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X + (11 * Layout.BUTTON_INC),
+                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X +
+                        (PLAYBACK_MODE_INDEX * Layout.BUTTON_INC),
                 Layout.ICON_BUTTON_OFFSET_Y);
         mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
 
-        // playback speed slider and dynamic label for playback speed
-
+        // playback
         final Coord2D labelPos = Layout.getFramesPosition().displace(
-                Layout.getFramesWidth() - (Layout.CONTENT_BUFFER_PX +
-                        Layout.BUTTON_INC), Layout.TEXT_Y_OFFSET);
+                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X +
+                        (AFTER_PLAYBACK_MODE * Layout.BUTTON_INC),
+                Layout.TEXT_Y_OFFSET);
 
-        mb.add(new DynamicLabel(labelPos,
-                MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
-                () -> c.playbackInfo.getFps() + " fps",
-                Layout.DYNAMIC_LABEL_W_ALLOWANCE));
-
-        final Coord2D playbackSliderPos = Layout.getFramesPosition().displace(
-                Layout.getFramesWidth() - Layout.DYNAMIC_LABEL_W_ALLOWANCE,
-                Layout.ICON_BUTTON_OFFSET_Y);
-
-        final HorizontalSlider slider = new HorizontalSlider(playbackSliderPos,
-                Layout.getUISliderWidth(), MenuElement.Anchor.RIGHT_TOP,
-                Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                c.playbackInfo::getFps, c.playbackInfo::setFps);
-        slider.updateAssets();
-        mb.add(slider);
+        final TextLabel playbackLabel = TextLabel.make(
+                labelPos, "", Constants.WHITE);
+        final IncrementalRangeElements<Integer> playback =
+                IncrementalRangeElements.makeForInt(playbackLabel,
+                        Layout.ICON_BUTTON_OFFSET_Y, Layout.TEXT_Y_OFFSET, 1,
+                        Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                        c.playbackInfo::setFps, c.playbackInfo::getFps,
+                        fps -> fps, fps -> fps, fps -> fps + " fps",
+                        "XXX fps");
+        mb.addAll(playbackLabel, playback.decButton, playback.incButton,
+                playback.slider, playback.value);
 
         // frame content
 
@@ -284,6 +279,9 @@ public class MenuAssembly {
 
         final ScrollableMenuElement[] frameElements =
                 new ScrollableMenuElement[amount * elementsPerFrame];
+
+        final Coord2D firstPos = Layout.getFramesPosition()
+                .displace(Layout.getSegmentContentDisplacement());
 
         int realRightX = firstPos.x;
 
@@ -860,11 +858,23 @@ public class MenuAssembly {
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth()));
 
-        // zoom percentage
-        mb.add(new DynamicLabel(new Coord2D(
+        // zoom
+        final float BASE = 2f;
+        final TextLabel zoomLabel = TextLabel.make(new Coord2D(
                 Layout.getBottomBarZoomPercentageX(), bottomBarTextY),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                c.renderInfo::getZoomText, Layout.getBottomBarZoomPercentageWidth()));
+                "Zoom", Constants.WHITE);
+        final IncrementalRangeElements<Float> zoom =
+                IncrementalRangeElements.makeForFloat(zoomLabel,
+                        Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
+                        bottomBarTextY, c.renderInfo::zoomOut,
+                        () -> c.renderInfo.zoomIn(c.getTargetPixel()),
+                        Constants.MIN_ZOOM, Constants.MAX_ZOOM,
+                        c.renderInfo::setZoomFactor, c.renderInfo::getZoomFactor,
+                        f -> (int) (Math.log(f) / Math.log(BASE)),
+                        sv -> (float) Math.pow(BASE, sv),
+                        f -> c.renderInfo.getZoomText(), "XXX.XX%");
+        mb.addAll(zoomLabel, zoom.decButton, zoom.incButton,
+                zoom.slider, zoom.value);
 
         // selection
         mb.add(new DynamicLabel(new Coord2D(Layout.width() -
@@ -872,23 +882,6 @@ public class MenuAssembly {
                 MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
                 c::getSelectionText, Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
-
-
-        // zoom slider
-        final float base = 2f;
-        final HorizontalSlider zoomSlider = new HorizontalSlider(
-                Layout.getBottomBarPosition().displace(
-                        Layout.getBottomBarZoomSliderX(),
-                        Layout.BUTTON_OFFSET),
-                Layout.getUISliderWidth(),
-                MenuElement.Anchor.LEFT_TOP,
-                (int)(Math.log(Constants.MIN_ZOOM) / Math.log(base)),
-                (int)(Math.log(Constants.MAX_ZOOM) / Math.log(base)),
-                () -> (int)(Math.log(c.renderInfo.getZoomFactor()) / Math.log(base)),
-                i -> c.renderInfo.setZoomFactor((float)Math.pow(base, i)));
-        zoomSlider.updateAssets();
-
-        mb.add(zoomSlider);
 
         // help button
         final Coord2D helpButtonPos = Layout.getBottomBarPosition().displace(
