@@ -122,10 +122,10 @@ public class DialogAssembly {
                 highlightedSet, behaviours, updateIndexLogic, () -> {});
 
         // frameDims iff saveType is PNG_STITCHED
-        final Textbox xDivsTextbox = DialogAssembly.makeDialogNumericalTextBox(xDivsLabel,
+        final Textbox xDivsTextbox = makeDialogNumericalTextBox(xDivsLabel,
                 c.projectInfo.getFrameDimsX(), 1, Constants.MAX_NUM_FRAMES,
                 "", c.projectInfo::setFrameDimsX, 3);
-        final Textbox yDivsTextbox = DialogAssembly.makeDialogNumericalTextBox(yDivsLabel,
+        final Textbox yDivsTextbox = makeDialogNumericalTextBox(yDivsLabel,
                 c.projectInfo.getFrameDimsY(), 1, Constants.MAX_NUM_FRAMES,
                 "", c.projectInfo::setFrameDimsY, 3);
 
@@ -222,10 +222,10 @@ public class DialogAssembly {
                 explanation = makeValidDimensionsBottomLabel();
 
         // dim textboxes
-        final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
+        final Textbox widthTextbox = makeDialogNumericalTextBox(
                 widthLabel, w, Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                 "px", DialogVals::setResizeWidth, 3);
-        final Textbox heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
+        final Textbox heightTextbox = makeDialogNumericalTextBox(
                 heightLabel, h, Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                 "px", DialogVals::setResizeHeight, 3);
 
@@ -482,10 +482,9 @@ public class DialogAssembly {
                 textBelowPos(xDivsLabel), "Frame width:",
                 Constants.WHITE);
         final DynamicTextbox frameWidthTextbox =
-                makeDialogDynamicTextbox(frameWidthLabel,
+                makeDialogPixelDynamicTextbox(frameWidthLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Constants.MIN_CANVAS_W, DialogVals.getFrameWidth(),
-                        Constants.MAX_CANVAS_W, "px",
+                        Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         fw -> DialogVals.setFrameWidth(fw, w),
                         DialogVals::getFrameWidth,
                         String.valueOf(Constants.MAX_CANVAS_W).length());
@@ -495,10 +494,9 @@ public class DialogAssembly {
         final TextLabel frameHeightLabel = makeDialogRightLabel(
                 frameWidthLabel, "Frame height:");
         final DynamicTextbox frameHeightTextbox =
-                makeDialogDynamicTextbox(frameHeightLabel,
+                makeDialogPixelDynamicTextbox(frameHeightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Constants.MIN_CANVAS_H, DialogVals.getFrameHeight(),
-                        Constants.MAX_CANVAS_H, "px",
+                        Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                         fh -> DialogVals.setFrameHeight(fh, h),
                         DialogVals::getFrameHeight,
                         String.valueOf(Constants.MAX_CANVAS_H).length());
@@ -620,18 +618,18 @@ public class DialogAssembly {
                 explanation = makeValidDimensionsBottomLabel();
 
         // downscale textboxes
-        final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
+        final Textbox widthTextbox = makeDialogNumericalTextBox(
                 widthLabel, w, Constants.MIN_CANVAS_W, w,
                 "px", DialogVals::setResizeWidth, 4);
-        final Textbox heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
+        final Textbox heightTextbox = makeDialogNumericalTextBox(
                 heightLabel, h, Constants.MIN_CANVAS_H, h,
                 "px", DialogVals::setResizeHeight, 4);
 
         // division textboxes
-        final Textbox xDivsTextbox = DialogAssembly.makeDialogNumericalTextBox(
+        final Textbox xDivsTextbox = makeDialogNumericalTextBox(
                 xDivsLabel, 1, 1, Constants.MAX_NUM_FRAMES,
                 "", DialogVals::setNewProjectXDivs, 3);
-        final Textbox yDivsTextbox = DialogAssembly.makeDialogNumericalTextBox(
+        final Textbox yDivsTextbox = makeDialogNumericalTextBox(
                 yDivsLabel, 1, 1, Constants.MAX_NUM_FRAMES,
                 "", DialogVals::setNewProjectYDivs, 3);
 
@@ -1233,6 +1231,8 @@ public class DialogAssembly {
     public static void setDialogToProgramSettings() {
         final MenuBuilder mb = new MenuBuilder();
 
+        Settings.initializeMenu();
+
         Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
             final GameImage baseSS = GraphicsUtils.drawTextButton(
                     Layout.STD_TEXT_BUTTON_W, ss.toString(),
@@ -1266,8 +1266,8 @@ public class DialogAssembly {
         final MenuElementGrouping contents = new MenuElementGrouping(
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 screenDecider);
-        setDialog(assembleDialog("Program Settings", contents, () -> false,
-                Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
+        setDialog(assembleDialog("Program Settings", contents, () -> true,
+                "Apply", Settings::apply, true));
     }
 
     public static void setDialogToLayerSettings(final int index) {
@@ -1449,6 +1449,17 @@ public class DialogAssembly {
                 Constants.WHITE, getter, Layout.DIALOG_DYNAMIC_W_ALLOWANCE);
     }
 
+    private static DynamicTextbox makeDialogPixelDynamicTextbox(
+            final MenuElement label,
+            final Function<MenuElement, Coord2D> offsetFunction,
+            final int min, final int max,
+            final Consumer<Integer> setter, final Supplier<Integer> getter,
+            final int maxLength
+    ) {
+        return makeDialogDynamicTextbox(label, offsetFunction, min,
+                getter.get(), max, "px", setter, getter, maxLength);
+    }
+
     private static DynamicTextbox makeDialogDynamicTextbox(
             final MenuElement label,
             final Function<MenuElement, Coord2D> offsetFunction,
@@ -1463,6 +1474,18 @@ public class DialogAssembly {
                 Textbox.getIntTextValidator(min, max),
                 s -> setter.accept(Integer.parseInt(s)),
                 () -> String.valueOf(getter.get()), maxLength);
+    }
+
+    private static DynamicTextbox makeDialogAffixDynamicTextbox(
+            final MenuElement label, final Consumer<String> setter,
+            final Supplier<String> getter
+    ) {
+        return new DynamicTextbox(
+                getDialogContentOffsetFollowingLabel(label),
+                Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                "", getter.get(), "",
+                Textbox::validateAsOptionallyEmptyFilename,
+                setter, getter, 5);
     }
 
     private static Textbox makeDialogPadTextBox(
@@ -1628,7 +1651,7 @@ public class DialogAssembly {
 
         // initialize in every execution path
         final MenuElement bottomLabel = switch (settingScreen) {
-            case STARTUP -> {
+            case DEFAULT -> {
                 // text labels
                 final TextLabel fullscreenLabel = makeDialogLeftLabel(
                         initialYIndex, "Fullscreen on startup:"),
@@ -1648,27 +1671,27 @@ public class DialogAssembly {
                 final Checkbox fullscreenCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(fullscreenLabel),
                         MenuElement.Anchor.LEFT_TOP,
-                        Settings::isFullscreenOnStartup,
+                        Settings::checkIsFullscreenOnStartup,
                         Settings::setFullscreenOnStartup),
                         pixelGridCheckbox = new Checkbox(
                                 getDialogContentOffsetFollowingLabel(
                                         pixelGridDefaultLabel),
                                 MenuElement.Anchor.LEFT_TOP,
-                                Settings::isPixelGridOnByDefault,
+                                Settings::checkIsPixelGridOnByDefault,
                                 Settings::setPixelGridOnByDefault);
 
-                final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
+                final DynamicTextbox widthTextbox = makeDialogPixelDynamicTextbox(
                         newProjectWidthLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getDefaultCanvasWPixels(),
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
-                        "px", Settings::setDefaultCanvasWPixels, 3),
-                        heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
+                        Settings::setDefaultCanvasWPixels,
+                        Settings::checkDefaultCanvasWPixels, 3),
+                        heightTextbox = makeDialogPixelDynamicTextbox(
                                 newProjectHeightLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
-                                Settings.getDefaultCanvasHPixels(),
                                 Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
-                                "px", Settings::setDefaultCanvasHPixels, 3);
+                                Settings::setDefaultCanvasHPixels,
+                                Settings::checkDefaultCanvasHPixels, 3);
 
                 mb.addAll(fullscreenLabel, fullscreenCheckbox,
                         pixelGridDefaultLabel, pixelGridCheckbox,
@@ -1696,18 +1719,13 @@ public class DialogAssembly {
                         FA_EXAMPLE + FA_MAX_VALUE + "0" + FA_MAX_VALUE + ".png");
 
                 // textboxes
-                final Textbox prefixTextbox = makeDialogCustomTextBox(
-                        prefixLabel, Layout.SMALL_TEXT_BOX_W,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        () -> "", Settings.getDefaultIndexPrefix(), () -> "",
-                        Textbox::validateAsOptionallyEmptyFilename,
-                        Settings::setDefaultIndexPrefix, 5);
-                final Textbox suffixTextbox = makeDialogCustomTextBox(
-                        suffixLabel, Layout.SMALL_TEXT_BOX_W,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        () -> "", Settings.getDefaultIndexSuffix(), () -> "",
-                        Textbox::validateAsOptionallyEmptyFilename,
-                        Settings::setDefaultIndexSuffix, 5);
+                final DynamicTextbox prefixTextbox =
+                        makeDialogAffixDynamicTextbox(prefixLabel,
+                                Settings::setDefaultIndexPrefix,
+                                Settings::checkDefaultIndexPrefix),
+                        suffixTextbox = makeDialogAffixDynamicTextbox(
+                                suffixLabel, Settings::setDefaultIndexSuffix,
+                                Settings::checkDefaultIndexSuffix);
 
                 mb.addAll(frameAffixLabel, prefixLabel, suffixLabel,
                         frameAffixExample, prefixTextbox, suffixTextbox);
@@ -1767,33 +1785,37 @@ public class DialogAssembly {
                                 .map(code -> (Runnable) () -> Settings
                                         .setProgramFont(code))
                                 .toArray(Runnable[]::new),
-                        () -> Settings.getProgramFont().ordinal());
+                        () -> Settings.checkProgramFont().ordinal());
 
                 // textboxes
-                final Textbox checkerboardXTextbox = makeDialogNumericalTextBox(
-                        checkerboardWidthLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getCheckerboardWPixels(),
-                        Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
-                        "px", Settings::setCheckerboardWPixels, 3);
-                final Textbox checkerboardYTextbox = makeDialogNumericalTextBox(
-                        checkerboardHeightLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getCheckerboardHPixels(),
-                        Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
-                        "px", Settings::setCheckerboardHPixels, 3);
-                final Textbox pixelGridXTextbox = makeDialogNumericalTextBox(
-                        pixelGridXLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getPixelGridXPixels(),
-                        Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
-                        "px", Settings::setPixelGridXPixels, 3);
-                final Textbox pixelGridYTextbox = makeDialogNumericalTextBox(
-                        pixelGridYLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getPixelGridYPixels(),
-                        Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
-                        "px", Settings::setPixelGridYPixels, 3);
+                final DynamicTextbox checkerboardXTextbox =
+                        makeDialogPixelDynamicTextbox(checkerboardWidthLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Layout.CHECKERBOARD_MIN,
+                                Layout.CHECKERBOARD_MAX,
+                                Settings::setCheckerboardWPixels,
+                                Settings::checkCheckerboardWPixels, 3);
+                final DynamicTextbox checkerboardYTextbox =
+                        makeDialogPixelDynamicTextbox(checkerboardHeightLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Layout.CHECKERBOARD_MIN,
+                                Layout.CHECKERBOARD_MAX,
+                                Settings::setCheckerboardHPixels,
+                                Settings::checkCheckerboardHPixels, 3);
+                final DynamicTextbox pixelGridXTextbox =
+                        makeDialogPixelDynamicTextbox(pixelGridXLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Layout.PIXEL_GRID_MIN,
+                                Layout.PIXEL_GRID_MAX,
+                                Settings::setPixelGridXPixels,
+                                Settings::checkPixelGridXPixels, 3);
+                final DynamicTextbox pixelGridYTextbox =
+                        makeDialogPixelDynamicTextbox(pixelGridYLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Layout.PIXEL_GRID_MIN,
+                                Layout.PIXEL_GRID_MAX,
+                                Settings::setPixelGridYPixels,
+                                Settings::checkPixelGridYPixels, 3);
 
                 mb.addAll(fontLabel, fontDropdown, checkerboardLabel,
                         checkerboardWidthLabel, checkerboardXTextbox,

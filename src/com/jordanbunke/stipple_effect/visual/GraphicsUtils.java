@@ -165,7 +165,7 @@ public class GraphicsUtils {
             final boolean isSelected, final Color backgroundColor
     ) {
         final GameImage base = drawTextButton(width, text, isSelected,
-                backgroundColor, true);
+                backgroundColor, true, true);
 
         final GameImage icon = GraphicsUtils.loadIcon(isSelected
                 ? IconCodes.COLLAPSE : IconCodes.EXPAND);
@@ -178,7 +178,7 @@ public class GraphicsUtils {
     public static GameImage drawTextButton(
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor,
-            final boolean leftAligned
+            final boolean leftAligned, final boolean drawBorder
     ) {
         final Color textColor = textButtonColorFromBackgroundColor(
                 backgroundColor, true);
@@ -197,8 +197,11 @@ public class GraphicsUtils {
                 : (w - textImage.getWidth()) / 2;
 
         nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
-        final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
-        nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+
+        if (drawBorder) {
+            final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
+            nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+        }
 
         return nhi.submit();
     }
@@ -207,7 +210,7 @@ public class GraphicsUtils {
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
     ) {
-        return drawTextButton(width, text, isSelected, backgroundColor, false);
+        return drawTextButton(width, text, isSelected, backgroundColor, false, true);
     }
 
     public static SimpleMenuButton makeStandardTextButton(

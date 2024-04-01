@@ -10,7 +10,7 @@ public class Setting<T> {
     public final T defaultValue;
     public final Consumer<T> nonStartupBehaviour;
 
-    public T value;
+    private T value, assignment;
 
     public Setting(
             final SettingType<T> type, final T defaultValue
@@ -27,6 +27,7 @@ public class Setting<T> {
         this.nonStartupBehaviour = nonStartupBehaviour;
 
         this.value = defaultValue;
+        this.assignment = defaultValue;
     }
 
     public void setFromRead(final String value) {
@@ -34,12 +35,22 @@ public class Setting<T> {
         set(ifValue.orElse(defaultValue));
     }
 
+    public void initializeMenu() {
+        assignment = value;
+    }
+
     public void trySet(final Object value) {
-        if (value.getClass().isAssignableFrom(type.getValueClass())) {
-            final T validated = type.getValueClass().cast(value);
-            set(validated);
-            nonStartupBehaviour.accept(validated);
-        }
+        if (value.getClass().isAssignableFrom(type.getValueClass()))
+            assignment = type.getValueClass().cast(value);
+    }
+
+    public void apply() {
+        final boolean isChanging = !assignment.equals(value);
+
+        set(assignment);
+
+        if (isChanging)
+            nonStartupBehaviour.accept(get());
     }
 
     private void set(final T value) {
@@ -48,5 +59,9 @@ public class Setting<T> {
 
     public T get() {
         return value;
+    }
+
+    public T check() {
+        return assignment;
     }
 }

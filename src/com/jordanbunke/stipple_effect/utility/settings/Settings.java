@@ -89,7 +89,7 @@ public class Settings {
             }
         }
 
-        public <T> void set(final T value) {
+        private <T> void set(final T value) {
             setting.trySet(value);
         }
 
@@ -135,6 +135,18 @@ public class Settings {
                     .append(Constants.CLOSE_SETTING_VAL).append("\n");
 
         FileIO.writeFile(SETTINGS_FILE, sb.toString());
+    }
+
+    public static void initializeMenu() {
+        for (Code code : Code.values())
+            code.setting.initializeMenu();
+    }
+
+    public static void apply() {
+        for (Code code : Code.values())
+            code.setting.apply();
+
+        write();
     }
 
     // setters
@@ -196,6 +208,51 @@ public class Settings {
 
     public static void setProgramFont(final SEFonts.Code fontCode) {
         Code.PROGRAM_FONT.set(fontCode);
+    }
+
+    // checkers
+    public static boolean checkIsFullscreenOnStartup() {
+        return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.check();
+    }
+
+    public static boolean checkIsPixelGridOnByDefault() {
+        return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.check();
+    }
+
+    public static int checkCheckerboardWPixels() {
+        return (int) Code.CHECKERBOARD_W_PX.setting.check();
+    }
+
+    public static int checkCheckerboardHPixels() {
+        return (int) Code.CHECKERBOARD_H_PX.setting.check();
+    }
+
+    public static int checkPixelGridXPixels() {
+        return (int) Code.PIXEL_GRID_X_PX.setting.check();
+    }
+
+    public static int checkPixelGridYPixels() {
+        return (int) Code.PIXEL_GRID_Y_PX.setting.check();
+    }
+
+    public static int checkDefaultCanvasWPixels() {
+        return (int) Code.DEFAULT_CANVAS_W_PX.setting.check();
+    }
+
+    public static int checkDefaultCanvasHPixels() {
+        return (int) Code.DEFAULT_CANVAS_H_PX.setting.check();
+    }
+
+    public static String checkDefaultIndexPrefix() {
+        return (String) Code.DEFAULT_INDEX_PREFIX.setting.check();
+    }
+
+    public static String checkDefaultIndexSuffix() {
+        return (String) Code.DEFAULT_INDEX_SUFFIX.setting.check();
+    }
+
+    public static SEFonts.Code checkProgramFont() {
+        return (SEFonts.Code) Code.PROGRAM_FONT.setting.check();
     }
 
     // getters

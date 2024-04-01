@@ -51,8 +51,7 @@ public class DropdownMenu extends MenuElement {
         ddContainer = makeContainer(
                 position.displace(0, Layout.STD_TEXT_BUTTON_H),
                 new Coord2D(width, Math.min(dropDownHAllowance,
-                        Layout.STD_TEXT_BUTTON_H * size)), behaviours
-        );
+                        Layout.STD_TEXT_BUTTON_H * size)), behaviours);
     }
 
     public static DropdownMenu forDialog(
@@ -90,7 +89,8 @@ public class DropdownMenu extends MenuElement {
             final int index = i;
 
             final GameImage nhi = GraphicsUtils.drawTextButton(
-                    buttonWidth, labels[i], false, Constants.DARK, true);
+                    buttonWidth, labels[i], false,
+                    Constants.BLACK, true, false);
 
             scrollables[i] = new SimpleMenuButton(
                     position.displace(0, index * Layout.STD_TEXT_BUTTON_H),

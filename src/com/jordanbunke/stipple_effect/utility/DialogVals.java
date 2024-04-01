@@ -34,7 +34,7 @@ public class DialogVals {
             fontName = "";
     private static Path paletteFolder = null;
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
-    private static SettingScreen settingScreen = SettingScreen.STARTUP;
+    private static SettingScreen settingScreen = SettingScreen.DEFAULT;
     private static PaletteSorter paletteSorter = PaletteSorter.HUE;
     private static ContentType contentType = ContentType.SELECTION;
     private static UploadStatus
@@ -97,10 +97,10 @@ public class DialogVals {
     }
 
     public enum SettingScreen {
-        STARTUP, FORMAT, VISUAL;
+        DEFAULT, FORMAT, VISUAL;
 
         public String getTitle() {
-            return (this == STARTUP ? this + " / default" : this) + " settings";
+            return (this == DEFAULT ? this + " and startup" : this) + " settings";
         }
 
         @Override
