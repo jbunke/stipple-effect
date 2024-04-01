@@ -112,6 +112,18 @@ public class Textbox extends MenuButtonStub {
         };
     }
 
+    public static Function<String, Boolean> getPositiveFloatValidator() {
+        return s -> {
+            try {
+                final double value = Double.parseDouble(s);
+
+                return value > 0d;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        };
+    }
+
     public static boolean validateAsFileName(final String text) {
         return validateAsFileName(text, false);
     }

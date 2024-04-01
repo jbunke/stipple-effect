@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
@@ -21,12 +22,16 @@ public class DialogVals {
             frameWidth = Constants.DEFAULT_CANVAS_W,
             frameHeight = Constants.DEFAULT_CANVAS_H,
             xDivs = 1, yDivs = 1;
-    private static double layerOpacity = Constants.OPAQUE;
+    private static double
+            layerOpacity = Constants.OPAQUE,
+            resizeScale = 1d,
+            resizeScaleX = resizeScale, resizeScaleY = resizeScale;
     private static boolean
             hasLatinEx = false,
             charSpecificSpacing = true,
             truncateSplitX = true,
-            truncateSplitY = true;
+            truncateSplitY = true,
+            resizePreserveAspectRatio = false;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -41,10 +46,22 @@ public class DialogVals {
             asciiStatus = UploadStatus.UNATTEMPTED,
             latinExStatus = UploadStatus.UNATTEMPTED;
     private static SequenceOrder sequenceOrder = SequenceOrder.HORIZONTAL;
+    private static ResizeBy resizeBy = ResizeBy.PIXELS;
     private static GameImage
             asciiImage = null,
             latinExImage = null,
             fontPreviewImage = GameImage.dummy();
+
+    public enum ResizeBy {
+        PIXELS, SCALE_FACTOR;
+
+        @Override
+        public String toString() {
+            return this == SCALE_FACTOR
+                    ? "Scale factor"
+                    : EnumUtils.formattedName(this);
+        }
+    }
 
     public enum SequenceOrder {
         HORIZONTAL, VERTICAL;
@@ -176,6 +193,18 @@ public class DialogVals {
         DialogVals.layerOpacity = layerOpacity;
     }
 
+    public static void setResizeScale(final double resizeScale) {
+        DialogVals.resizeScale = resizeScale;
+    }
+
+    public static void setResizeScaleX(final double resizeScaleX) {
+        DialogVals.resizeScaleX = resizeScaleX;
+    }
+
+    public static void setResizeScaleY(final double resizeScaleY) {
+        DialogVals.resizeScaleY = resizeScaleY;
+    }
+
     public static void setNewProjectHeight(final int newProjectHeight) {
         DialogVals.newProjectHeight = newProjectHeight;
     }
@@ -200,12 +229,36 @@ public class DialogVals {
         DialogVals.padTop = padTop;
     }
 
-    public static void setResizeHeight(final int resizeHeight) {
+    public static void setResizeHeight(
+            final int resizeHeight, final int refWidth, final int refHeight,
+            final boolean adjustComplement
+    ) {
         DialogVals.resizeHeight = resizeHeight;
+
+        if (resizePreserveAspectRatio && adjustComplement) {
+            final double ratio = refWidth / (double) refHeight;
+            final int resizeWidth = MathPlus.bounded(
+                    Constants.MIN_CANVAS_W,
+                    (int) Math.round(ratio * resizeHeight),
+                    Constants.MAX_CANVAS_W);
+            setResizeWidth(resizeWidth, refWidth, refHeight, false);
+        }
     }
 
-    public static void setResizeWidth(final int resizeWidth) {
+    public static void setResizeWidth(
+            final int resizeWidth, final int refWidth, final int refHeight,
+            final boolean adjustComplement
+    ) {
         DialogVals.resizeWidth = resizeWidth;
+
+        if (resizePreserveAspectRatio && adjustComplement) {
+            final double ratio = refHeight / (double) refWidth;
+            final int resizeHeight = MathPlus.bounded(
+                    Constants.MIN_CANVAS_H,
+                    (int) Math.round(ratio * resizeWidth),
+                    Constants.MAX_CANVAS_H);
+            setResizeHeight(resizeHeight, refWidth, refHeight, false);
+        }
     }
 
     public static void setNewProjectXDivs(final int newProjectXDivs) {
@@ -252,6 +305,12 @@ public class DialogVals {
 
     public static void setYDivs(final int yDivs, final int canvasHeight) {
         setFrameHeight(canvasHeight / yDivs, canvasHeight);
+    }
+
+    public static void setResizePreserveAspectRatio(
+            final boolean resizePreserveAspectRatio
+    ) {
+        DialogVals.resizePreserveAspectRatio = resizePreserveAspectRatio;
     }
 
     public static void setTruncateSplitX(final boolean truncateSplitX) {
@@ -349,6 +408,10 @@ public class DialogVals {
         DialogVals.sequenceOrder = sequenceOrder;
     }
 
+    public static void setResizeBy(final ResizeBy resizeBy) {
+        DialogVals.resizeBy = resizeBy;
+    }
+
     public static Path getPaletteFolder() {
         return paletteFolder;
     }
@@ -401,8 +464,34 @@ public class DialogVals {
         return resizeWidth;
     }
 
+    public static int calculcateResizeWidth(final int refWidth) {
+        return resizeBy == ResizeBy.PIXELS ? resizeWidth
+                : (int) Math.round(refWidth * (
+                        resizePreserveAspectRatio
+                                ? resizeScale : resizeScaleX));
+    }
+
+    public static int calculateResizeHeight(final int refHeight) {
+        return resizeBy == ResizeBy.PIXELS ? resizeHeight
+                : (int) Math.round(refHeight * (
+                resizePreserveAspectRatio
+                        ? resizeScale : resizeScaleY));
+    }
+
     public static double getLayerOpacity() {
         return layerOpacity;
+    }
+
+    public static double getResizeScale() {
+        return resizeScale;
+    }
+
+    public static double getResizeScaleX() {
+        return resizeScaleX;
+    }
+
+    public static double getResizeScaleY() {
+        return resizeScaleY;
     }
 
     public static String getLayerName() {
@@ -461,6 +550,10 @@ public class DialogVals {
         return sequenceOrder;
     }
 
+    public static ResizeBy getResizeBy() {
+        return resizeBy;
+    }
+
     public static int getFramesPerDim() {
         return framesPerDim;
     }
@@ -497,6 +590,10 @@ public class DialogVals {
 
     public static boolean isTruncateSplitY() {
         return truncateSplitY;
+    }
+
+    public static boolean isResizePreserveAspectRatio() {
+        return resizePreserveAspectRatio;
     }
 
     public static boolean isThisOutlineSide(final int index) {

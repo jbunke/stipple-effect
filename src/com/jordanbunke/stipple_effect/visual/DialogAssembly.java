@@ -211,67 +211,132 @@ public class DialogAssembly {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
-        DialogVals.setResizeWidth(w);
-        DialogVals.setResizeHeight(h);
+        DialogVals.setResizeScale(1d);
+        DialogVals.setResizeScaleX(1d);
+        DialogVals.setResizeScaleY(1d);
+
+        DialogVals.setResizeWidth(w, w, h, false);
+        DialogVals.setResizeHeight(h, w, h, false);
+
+        final MenuBuilder mb = new MenuBuilder();
 
         // text labels
-        final TextLabel
-                widthLabel = makeDialogLeftLabel(1, "Width:"),
-                heightLabel = makeDialogLeftLabel(2, "Height:"),
-                context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
+        final TextLabel context =
+                makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
                 explanation = makeValidDimensionsBottomLabel();
+        mb.addAll(context, explanation);
 
-        // dim textboxes
-        final Textbox widthTextbox = makeDialogNumericalTextBox(
-                widthLabel, w, Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
-                "px", DialogVals::setResizeWidth, 3);
-        final Textbox heightTextbox = makeDialogNumericalTextBox(
-                heightLabel, h, Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
-                "px", DialogVals::setResizeHeight, 3);
+        final TextLabel preserveAspectRatioLabel =
+                TextLabel.make(textBelowPos(context, 1),
+                        "Preserve aspect ratio?", Constants.WHITE);
+        final Checkbox preserveAspectRatioCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(preserveAspectRatioLabel),
+                MenuElement.Anchor.LEFT_TOP,
+                DialogVals::isResizePreserveAspectRatio,
+                DialogVals::setResizePreserveAspectRatio);
+        mb.addAll(preserveAspectRatioLabel, preserveAspectRatioCheckbox);
+
+        final TextLabel resizeTypeLabel =
+                TextLabel.make(textBelowPos(preserveAspectRatioLabel),
+                        "Resize by:", Constants.WHITE);
+        final DropdownMenu resizeByDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(resizeTypeLabel),
+                EnumUtils.stream(DialogVals.ResizeBy.class)
+                        .map(DialogVals.ResizeBy::toString)
+                        .toArray(String[]::new),
+                EnumUtils.stream(DialogVals.ResizeBy.class)
+                        .map(rb -> (Runnable) () -> DialogVals.setResizeBy(rb))
+                        .toArray(Runnable[]::new),
+                () -> DialogVals.getResizeBy().ordinal());
+        mb.addAll(resizeTypeLabel, resizeByDropdown);
+
+        // case 1: resize by scale and preserve aspect ratio
+        final TextLabel universalScaleLabel = TextLabel.make(
+                textBelowPos(resizeTypeLabel, 1),
+                "Scale factor:", Constants.WHITE);
+        final Textbox universalScaleTextbox = makeDialogCustomTextBox(
+                universalScaleLabel, Layout.SMALL_TEXT_BOX_W,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                () -> "", String.valueOf(DialogVals.getResizeScale()), () -> "",
+                Textbox.getPositiveFloatValidator(),
+                s -> DialogVals.setResizeScale(Double.parseDouble(s)), 5);
+
+        // case 2: resize by scale but aspect ratio is free
+        final TextLabel scaleXLabel = TextLabel.make(
+                textBelowPos(resizeTypeLabel, 1),
+                "Scale factor (X):", Constants.WHITE),
+                scaleYLabel = makeDialogRightLabel(
+                        scaleXLabel, "Scale factor (Y):");
+        final Textbox scaleXTextbox = makeDialogCustomTextBox(
+                scaleXLabel, Layout.SMALL_TEXT_BOX_W,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                () -> "", String.valueOf(DialogVals.getResizeScaleX()),
+                () -> "", Textbox.getPositiveFloatValidator(),
+                s -> DialogVals.setResizeScaleX(Double.parseDouble(s)), 5),
+                scaleYTextbox = makeDialogCustomTextBox(
+                        scaleYLabel, Layout.SMALL_TEXT_BOX_W,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        () -> "", String.valueOf(DialogVals.getResizeScaleY()),
+                        () -> "", Textbox.getPositiveFloatValidator(),
+                        s -> DialogVals.setResizeScaleY(Double.parseDouble(s)), 5);
+
+        // case 3: resize by pixels
+        final TextLabel widthLabel = TextLabel.make(
+                textBelowPos(resizeTypeLabel, 1),
+                "Width:", Constants.WHITE),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height:");
+        final DynamicTextbox widthTextbox =
+                makeDialogPixelDynamicTextbox(widthLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
+                        rw -> DialogVals.setResizeWidth(rw, w, h,
+                                DialogVals.isResizePreserveAspectRatio()),
+                        DialogVals::getResizeWidth, 3),
+                heightTextbox = makeDialogPixelDynamicTextbox(
+                        heightLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
+                        rh -> DialogVals.setResizeHeight(rh, w, h,
+                                DialogVals.isResizePreserveAspectRatio()),
+                        DialogVals::getResizeHeight, 3);
+
+        final ThinkingMenuElement resizeDecider = new ThinkingMenuElement(() -> {
+            if (DialogVals.getResizeBy() == DialogVals.ResizeBy.PIXELS)
+                return new MenuElementGrouping(widthLabel, heightLabel,
+                        widthTextbox, heightTextbox);
+            else if (DialogVals.isResizePreserveAspectRatio())
+                return new MenuElementGrouping(
+                        universalScaleLabel, universalScaleTextbox);
+
+            return new MenuElementGrouping(
+                    scaleXLabel, scaleXTextbox, scaleYLabel, scaleYTextbox);
+        });
+        mb.add(resizeDecider);
 
         // dynamic scale checker
-        final DynamicLabel scaleChecker = new DynamicLabel(
-                heightLabel.getRenderPosition().displace(0,
-                        Layout.DIALOG_CONTENT_INC_Y),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                () -> {
-                    final int rw = DialogVals.getResizeWidth(),
-                            rh = DialogVals.getResizeHeight();
+        final String PREVIEW_PREFIX = "Preview size: ";
+        final DynamicLabel preview = makeDynamicLabel(
+                textBelowPos(resizeTypeLabel, 3), () -> {
+                    final int widthCalc = DialogVals.calculcateResizeWidth(w),
+                            heightCalc = DialogVals.calculateResizeHeight(h);
+                    return PREVIEW_PREFIX + widthCalc + "x" + heightCalc;
+                }, PREVIEW_PREFIX + "XXXXxXXXX");
+        mb.add(preview);
 
-                    final double initialRatio = w / (double) h,
-                            previewRatio = rw / (double) rh;
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
+        setDialog(assembleDialog("Resize canvas...", contents, () -> {
+                    final int widthCalc = DialogVals.calculcateResizeWidth(w),
+                            heightCalc = DialogVals.calculateResizeHeight(h);
 
-                    final StringBuilder sb = new StringBuilder();
-
-                    sb.append("Ratio ").append(initialRatio == previewRatio
-                            ? "preserved" : "changed");
-
-                    if (w == rw)
-                        sb.append("; X: no change");
-                    else if (rw % w == 0)
-                        sb.append("; X: ").append(rw / w).append("x bigger");
-                    else if (w % rw == 0)
-                        sb.append("; X: ").append(w / rw).append("x smaller");
-
-                    if (h == rh)
-                        sb.append("; Y: no change");
-                    else if (rh % h == 0)
-                        sb.append("; Y: ").append(rh / h).append("x bigger");
-                    else if (h % rh == 0)
-                        sb.append("; Y: ").append(h / rh).append("x smaller");
-
-                    return sb.toString();
-                }, Layout.getDialogWidth() - (2 * Layout.CONTENT_BUFFER_PX)
-        );
-
-        final MenuElementGrouping contents = new MenuElementGrouping(
-                context, widthLabel, heightLabel, scaleChecker, explanation,
-                widthTextbox, heightTextbox);
-        setDialog(assembleDialog("Resize Canvas...", contents,
-                () -> widthTextbox.isValid() && heightTextbox.isValid(),
-                Constants.GENERIC_APPROVAL_TEXT, c::resize, true));
+                    return widthCalc >= Constants.MIN_CANVAS_W &&
+                            widthCalc <= Constants.MAX_CANVAS_W &&
+                            heightCalc >= Constants.MIN_CANVAS_H &&
+                            heightCalc <= Constants.MAX_CANVAS_H;
+                }, Constants.GENERIC_APPROVAL_TEXT, c::resize, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToPad() {
         final SEContext c = StippleEffect.get().getContext();
 
@@ -595,12 +660,13 @@ public class DialogAssembly {
                 Constants.GENERIC_APPROVAL_TEXT, c::split, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {
         final int w = image.getWidth(), h = image.getHeight();
         final boolean tooBig = w > Constants.MAX_CANVAS_W || h > Constants.MAX_CANVAS_H;
 
-        DialogVals.setResizeWidth(w);
-        DialogVals.setResizeHeight(h);
+        DialogVals.setResizeWidth(w, w, h, false);
+        DialogVals.setResizeHeight(h, w, h, false);
 
         DialogVals.setNewProjectXDivs(1);
         DialogVals.setNewProjectYDivs(1);
@@ -619,11 +685,13 @@ public class DialogAssembly {
 
         // downscale textboxes
         final Textbox widthTextbox = makeDialogNumericalTextBox(
-                widthLabel, w, Constants.MIN_CANVAS_W, w,
-                "px", DialogVals::setResizeWidth, 4);
+                widthLabel, w, Constants.MIN_CANVAS_W, w, "px",
+                rw -> DialogVals.setResizeWidth(rw, w, h,
+                        DialogVals.isResizePreserveAspectRatio()), 4);
         final Textbox heightTextbox = makeDialogNumericalTextBox(
-                heightLabel, h, Constants.MIN_CANVAS_H, h,
-                "px", DialogVals::setResizeHeight, 4);
+                heightLabel, h, Constants.MIN_CANVAS_H, h, "px",
+                rh -> DialogVals.setResizeHeight(rh, w, h,
+                        DialogVals.isResizePreserveAspectRatio()), 4);
 
         // division textboxes
         final Textbox xDivsTextbox = makeDialogNumericalTextBox(

@@ -1620,13 +1620,15 @@ public class SEContext {
     }
 
     public void resize() {
-        final int w = DialogVals.getResizeWidth(),
-                h = DialogVals.getResizeHeight();
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight(),
+                rw = DialogVals.calculcateResizeWidth(w),
+                rh = DialogVals.calculateResizeHeight(h);
 
         final List<SELayer> layers = getState().getLayers().stream()
-                .map(layer -> layer.returnResized(w, h)).toList();
+                .map(layer -> layer.returnResized(rw, rh)).toList();
 
-        final ProjectState result = getState().resize(w, h, layers)
+        final ProjectState result = getState().resize(rw, rh, layers)
                 .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, Operation.RESIZE);
 
