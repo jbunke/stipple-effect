@@ -848,8 +848,8 @@ public class SEContext {
 
         final GameImage image = new GameImage(w, h);
 
-        final int cbx = Settings.getCheckerboardXPixels(),
-                cby = Settings.getCheckerboardYPixels();
+        final int cbx = Settings.getCheckerboardWPixels(),
+                cby = Settings.getCheckerboardHPixels();
 
         for (int x = 0; x < w; x += cbx) {
             for (int y = 0; y < h; y += cby) {

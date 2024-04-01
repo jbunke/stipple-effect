@@ -10,16 +10,16 @@ import java.nio.file.Path;
 
 public class DialogVals {
     private static int
-            newProjectWidth = Constants.DEFAULT_IMAGE_W,
-            newProjectHeight = Constants.DEFAULT_IMAGE_H,
+            newProjectWidth = Constants.DEFAULT_CANVAS_W,
+            newProjectHeight = Constants.DEFAULT_CANVAS_H,
             newProjectXDivs = 1, newProjectYDivs = 1,
-            resizeWidth = Constants.DEFAULT_IMAGE_W,
-            resizeHeight = Constants.DEFAULT_IMAGE_H,
+            resizeWidth = Constants.DEFAULT_CANVAS_W,
+            resizeHeight = Constants.DEFAULT_CANVAS_H,
             padLeft = 0, padRight = 0, padTop = 0, padBottom = 0,
             newFontPixelSpacing = Constants.DEFAULT_FONT_PX_SPACING,
             framesPerDim = 1,
-            frameWidth = Constants.DEFAULT_IMAGE_W,
-            frameHeight = Constants.DEFAULT_IMAGE_H,
+            frameWidth = Constants.DEFAULT_CANVAS_W,
+            frameHeight = Constants.DEFAULT_CANVAS_H,
             xDivs = 1, yDivs = 1;
     private static double layerOpacity = Constants.OPAQUE;
     private static boolean

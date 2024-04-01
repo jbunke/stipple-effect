@@ -222,10 +222,10 @@ public class DialogAssembly {
 
         // dim textboxes
         final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
-                widthLabel, w, Constants.MIN_IMAGE_W, Constants.MAX_IMAGE_W,
+                widthLabel, w, Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                 "px", DialogVals::setResizeWidth, 3);
         final Textbox heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
-                heightLabel, h, Constants.MIN_IMAGE_H, Constants.MAX_IMAGE_H,
+                heightLabel, h, Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                 "px", DialogVals::setResizeHeight, 3);
 
         // dynamic scale checker
@@ -294,19 +294,19 @@ public class DialogAssembly {
         // pad textboxes
         final Textbox leftTextbox = makeDialogPadTextBox(leftLabel, i -> {
             final int pw = i + DialogVals.getPadRight() + w;
-            return pw <= Constants.MAX_IMAGE_W && pw > 0;
+            return pw <= Constants.MAX_CANVAS_W && pw > 0;
         }, DialogVals::setPadLeft);
         final Textbox topTextbox = makeDialogPadTextBox(topLabel, i -> {
             final int ph = i + DialogVals.getPadBottom() + h;
-            return ph <= Constants.MAX_IMAGE_H && ph > 0;
+            return ph <= Constants.MAX_CANVAS_H && ph > 0;
         }, DialogVals::setPadTop);
         final Textbox rightTextbox = makeDialogPadTextBox(rightLabel, i -> {
             final int pw = i + DialogVals.getPadLeft() + w;
-            return pw <= Constants.MAX_IMAGE_W && pw > 0;
+            return pw <= Constants.MAX_CANVAS_W && pw > 0;
         }, DialogVals::setPadRight);
         final Textbox bottomTextbox = makeDialogPadTextBox(bottomLabel, i -> {
             final int ph = i + DialogVals.getPadTop() + h;
-            return ph <= Constants.MAX_IMAGE_W && ph > 0;
+            return ph <= Constants.MAX_CANVAS_W && ph > 0;
         }, DialogVals::setPadBottom);
 
         // size preview
@@ -396,8 +396,8 @@ public class DialogAssembly {
         mb.add(framesPerCompDim);
 
         final Supplier<Boolean> fTooLarge =
-                () -> StitchSplitMath.stitchedWidth(h, fc) > Constants.MAX_IMAGE_W ||
-                        StitchSplitMath.stitchedHeight(h, fc) > Constants.MAX_IMAGE_H;
+                () -> StitchSplitMath.stitchedWidth(h, fc) > Constants.MAX_CANVAS_W ||
+                        StitchSplitMath.stitchedHeight(h, fc) > Constants.MAX_CANVAS_H;
 
         // canvas size preview
         final String CSP_PREFIX = "Canvas size preview: ", CSP_INFIX = " px",
@@ -427,8 +427,8 @@ public class DialogAssembly {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
-        DialogVals.setFrameWidth(Settings.getCheckerboardXPixels(), w);
-        DialogVals.setFrameHeight(Settings.getCheckerboardYPixels(), h);
+        DialogVals.setFrameWidth(Settings.getCheckerboardWPixels(), w);
+        DialogVals.setFrameHeight(Settings.getCheckerboardHPixels(), h);
 
         final int initialXDivs = w / DialogVals.getFrameWidth(),
                 initialYDivs = h / DialogVals.getFrameHeight();
@@ -459,7 +459,7 @@ public class DialogAssembly {
         final TextLabel xDivsLabel = TextLabel.make(
                 textBelowPos(sequenceLabel), "X-axis divisions:",
                 Constants.WHITE);
-        final DynamicTextbox xDivsTextbox = makeDialogDimDivsDynamicTextbox(
+        final DynamicTextbox xDivsTextbox = makeDialogDynamicTextbox(
                 xDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 1, initialXDivs, Constants.MAX_NUM_FRAMES, "",
                 x -> DialogVals.setXDivs(x, w), DialogVals::getXDivs,
@@ -469,7 +469,7 @@ public class DialogAssembly {
         // Y-axis divisions
         final TextLabel yDivsLabel = makeDialogRightLabel(
                 xDivsLabel, "Y-axis divisions:");
-        final DynamicTextbox yDivsTextbox = makeDialogDimDivsDynamicTextbox(
+        final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
                 yDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 1, initialYDivs, Constants.MAX_NUM_FRAMES, "",
                 y -> DialogVals.setYDivs(y, h), DialogVals::getYDivs,
@@ -481,26 +481,26 @@ public class DialogAssembly {
                 textBelowPos(xDivsLabel), "Frame width:",
                 Constants.WHITE);
         final DynamicTextbox frameWidthTextbox =
-                makeDialogDimDivsDynamicTextbox(frameWidthLabel,
+                makeDialogDynamicTextbox(frameWidthLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Constants.MIN_IMAGE_W, DialogVals.getFrameWidth(),
-                        Constants.MAX_IMAGE_W, "px",
+                        Constants.MIN_CANVAS_W, DialogVals.getFrameWidth(),
+                        Constants.MAX_CANVAS_W, "px",
                         fw -> DialogVals.setFrameWidth(fw, w),
                         DialogVals::getFrameWidth,
-                        String.valueOf(Constants.MAX_IMAGE_W).length());
+                        String.valueOf(Constants.MAX_CANVAS_W).length());
         mb.addAll(frameWidthLabel, frameWidthTextbox);
 
         // frame height
         final TextLabel frameHeightLabel = makeDialogRightLabel(
                 frameWidthLabel, "Frame height:");
         final DynamicTextbox frameHeightTextbox =
-                makeDialogDimDivsDynamicTextbox(frameHeightLabel,
+                makeDialogDynamicTextbox(frameHeightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Constants.MIN_IMAGE_H, DialogVals.getFrameHeight(),
-                        Constants.MAX_IMAGE_H, "px",
+                        Constants.MIN_CANVAS_H, DialogVals.getFrameHeight(),
+                        Constants.MAX_CANVAS_H, "px",
                         fh -> DialogVals.setFrameHeight(fh, h),
                         DialogVals::getFrameHeight,
-                        String.valueOf(Constants.MAX_IMAGE_H).length());
+                        String.valueOf(Constants.MAX_CANVAS_H).length());
         mb.addAll(frameHeightLabel, frameHeightTextbox);
 
         final String[] remainderLabels =
@@ -550,7 +550,7 @@ public class DialogAssembly {
                             (fc == 1 ? PRV_SUFFIX_SING : PRV_SUFFIX);
                 },
                 PRV_PREFIX + Constants.MAX_NUM_FRAMES + PRV_INFIX +
-                        Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + PRV_SUFFIX);
+                        Constants.MAX_CANVAS_W + "x" + Constants.MAX_CANVAS_H + PRV_SUFFIX);
         mb.add(dimsPreview);
 
         // pixel loss
@@ -583,8 +583,8 @@ public class DialogAssembly {
                             (!(perfectX || perfectY) ? "; " : "") + yText);
                     return pixelLossText.substring(0, 1).toUpperCase() +
                             pixelLossText.substring(1);
-                }, TRUNC + RIGHT + Constants.MAX_IMAGE_W + PIXELS + "; " +
-                        TRUNC + BOTTOM + Constants.MAX_IMAGE_H + PIXELS);
+                }, TRUNC + RIGHT + Constants.MAX_CANVAS_W + PIXELS + "; " +
+                        TRUNC + BOTTOM + Constants.MAX_CANVAS_H + PIXELS);
         mb.add(pixelLoss);
 
         final MenuElementGrouping contents =
@@ -598,7 +598,7 @@ public class DialogAssembly {
 
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {
         final int w = image.getWidth(), h = image.getHeight();
-        final boolean tooBig = w > Constants.MAX_IMAGE_W || h > Constants.MAX_IMAGE_H;
+        final boolean tooBig = w > Constants.MAX_CANVAS_W || h > Constants.MAX_CANVAS_H;
 
         DialogVals.setResizeWidth(w);
         DialogVals.setResizeHeight(h);
@@ -620,10 +620,10 @@ public class DialogAssembly {
 
         // downscale textboxes
         final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
-                widthLabel, w, Constants.MIN_IMAGE_W, w,
+                widthLabel, w, Constants.MIN_CANVAS_W, w,
                 "px", DialogVals::setResizeWidth, 4);
         final Textbox heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
-                heightLabel, h, Constants.MIN_IMAGE_H, h,
+                heightLabel, h, Constants.MIN_CANVAS_H, h,
                 "px", DialogVals::setResizeHeight, 4);
 
         // division textboxes
@@ -649,8 +649,8 @@ public class DialogAssembly {
                     heightTextbox.isValid() && xDivsTextbox.isValid() &&
                     yDivsTextbox.isValid();
 
-            return boxesValid && fw <= Constants.MAX_IMAGE_W &&
-                    fh <= Constants.MAX_IMAGE_H;
+            return boxesValid && fw <= Constants.MAX_CANVAS_W &&
+                    fh <= Constants.MAX_CANVAS_H;
         };
 
         final MenuElementGrouping contents = new MenuElementGrouping(context,
@@ -663,7 +663,9 @@ public class DialogAssembly {
 
     public static void setDialogToNewProject() {
         // initial canvas size suggestion determination
-        final int initialW, initialH;
+        final int NO_CLIPBOARD = 0;
+
+        final int initialW, initialH, clipboardW, clipboardH;
         final boolean hasClipboard = SEClipboard.get().hasContents();
 
         if (hasClipboard) {
@@ -672,11 +674,17 @@ public class DialogAssembly {
             final Coord2D tl = SelectionUtils.topLeft(clipboard),
                     br = SelectionUtils.bottomRight(clipboard);
 
-            initialW = br.x - tl.x;
-            initialH = br.y - tl.y;
+            clipboardW = br.x - tl.x;
+            clipboardH = br.y - tl.y;
+
+            initialW = clipboardW;
+            initialH = clipboardH;
         } else {
-            initialW = Constants.DEFAULT_IMAGE_W;
-            initialH = Constants.DEFAULT_IMAGE_H;
+            clipboardW = NO_CLIPBOARD;
+            clipboardH = NO_CLIPBOARD;
+
+            initialW = Settings.getDefaultCanvasWPixels();
+            initialH = Settings.getDefaultCanvasHPixels();
         }
 
         DialogVals.setNewProjectWidth(initialW);
@@ -684,21 +692,47 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                widthLabel = makeDialogLeftLabel(1, "Width:"),
-                heightLabel = makeDialogLeftLabel(2, "Height:"),
+                presetLabel = makeDialogLeftLabel(0, "Size presets:"),
+                widthLabel = TextLabel.make(
+                        textBelowPos(presetLabel, 1),
+                        "Width:", Constants.WHITE),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height:"),
                 explanation = makeValidDimensionsBottomLabel();
 
+        // preset buttons
+        final SimpleMenuButton defaultPreset =
+                GraphicsUtils.makeBespokeTextButton("From default",
+                        getDialogContentOffsetFollowingLabel(presetLabel),
+                        () -> {
+                    DialogVals.setNewProjectWidth(Settings.getDefaultCanvasWPixels());
+                    DialogVals.setNewProjectHeight(Settings.getDefaultCanvasHPixels());
+                });
+        final GatewayMenuElement clipboardPreset = new GatewayMenuElement(
+                GraphicsUtils.makeBespokeTextButton("Clipboard contents",
+                        defaultPreset.getRenderPosition()
+                                .displace(defaultPreset.getWidth() +
+                                        Layout.CONTENT_BUFFER_PX, 0), () -> {
+                            DialogVals.setNewProjectWidth(clipboardW);
+                            DialogVals.setNewProjectHeight(clipboardH);
+                }), () -> hasClipboard);
+
         // dim textboxes
-        final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
-                widthLabel, initialW, Constants.MIN_IMAGE_W,
-                Constants.MAX_IMAGE_W, "px", DialogVals::setNewProjectWidth, 3);
-        final Textbox heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
-                heightLabel, initialH, Constants.MIN_IMAGE_H,
-                Constants.MAX_IMAGE_H, "px", DialogVals::setNewProjectHeight, 3);
+        final DynamicTextbox widthTextbox = makeDialogDynamicTextbox(
+                widthLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
+                Constants.MIN_CANVAS_W, initialW, Constants.MAX_CANVAS_W, "px",
+                DialogVals::setNewProjectWidth,
+                DialogVals::getNewProjectWidth, 3);
+        final DynamicTextbox heightTextbox = makeDialogDynamicTextbox(
+                heightLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
+                Constants.MIN_CANVAS_H, initialW, Constants.MAX_CANVAS_H, "px",
+                DialogVals::setNewProjectHeight,
+                DialogVals::getNewProjectHeight, 3);
 
         final MenuElementGrouping contents = new MenuElementGrouping(
-                widthLabel, heightLabel, explanation, widthTextbox, heightTextbox);
-        setDialog(assembleDialog("New Project...", contents,
+                presetLabel, defaultPreset, clipboardPreset,
+                widthLabel, heightLabel, explanation,
+                widthTextbox, heightTextbox);
+        setDialog(assembleDialog("New project...", contents,
                 () -> widthTextbox.isValid() && heightTextbox.isValid(),
                 "Create", () -> StippleEffect.get().newProject(), true));
     }
@@ -1414,7 +1448,7 @@ public class DialogAssembly {
                 Constants.WHITE, getter, Layout.DIALOG_DYNAMIC_W_ALLOWANCE);
     }
 
-    private static DynamicTextbox makeDialogDimDivsDynamicTextbox(
+    private static DynamicTextbox makeDialogDynamicTextbox(
             final MenuElement label,
             final Function<MenuElement, Coord2D> offsetFunction,
             final int min, final int initial, final int max,
@@ -1511,8 +1545,8 @@ public class DialogAssembly {
 
     private static TextLabel makeValidDimensionsBottomLabel() {
         return makeDialogLeftLabelAtBottom("(Canvas sizes can range from " +
-                Constants.MIN_IMAGE_W + "x" + Constants.MIN_IMAGE_H + " to " +
-                Constants.MAX_IMAGE_W + "x" + Constants.MAX_IMAGE_H + ")");
+                Constants.MIN_CANVAS_W + "x" + Constants.MIN_CANVAS_H + " to " +
+                Constants.MAX_CANVAS_W + "x" + Constants.MAX_CANVAS_H + ")");
     }
 
     private static TextLabel makeDialogLeftLabelAtBottom(final String text) {
@@ -1598,8 +1632,17 @@ public class DialogAssembly {
                 final TextLabel fullscreenLabel = makeDialogLeftLabel(
                         initialYIndex, "Fullscreen on startup:"),
                         pixelGridDefaultLabel = TextLabel.make(
-                                textBelowPos(fullscreenLabel),
-                                "Pixel grid on by default:", Constants.WHITE);
+                                textBelowPos(fullscreenLabel, 1),
+                                "Pixel grid on by default:", Constants.WHITE),
+                        defaultNewProjectSizeLabel = TextLabel.make(
+                                textBelowPos(pixelGridDefaultLabel, 1),
+                                "Default canvas size for new projects",
+                                Constants.WHITE),
+                        newProjectWidthLabel = TextLabel.make(
+                                textBelowPos(defaultNewProjectSizeLabel),
+                                "Width:", Constants.WHITE),
+                        newProjectHeightLabel = makeDialogRightLabel(
+                                newProjectWidthLabel, "Height:");
 
                 final Checkbox fullscreenCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(fullscreenLabel),
@@ -1613,8 +1656,24 @@ public class DialogAssembly {
                                 Settings::isPixelGridOnByDefault,
                                 Settings::setPixelGridOnByDefault);
 
+                final Textbox widthTextbox = DialogAssembly.makeDialogNumericalTextBox(
+                        newProjectWidthLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Settings.getDefaultCanvasWPixels(),
+                        Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
+                        "px", Settings::setDefaultCanvasWPixels, 3),
+                        heightTextbox = DialogAssembly.makeDialogNumericalTextBox(
+                                newProjectHeightLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Settings.getDefaultCanvasHPixels(),
+                                Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
+                                "px", Settings::setDefaultCanvasHPixels, 3);
+
                 mb.addAll(fullscreenLabel, fullscreenCheckbox,
-                        pixelGridDefaultLabel, pixelGridCheckbox);
+                        pixelGridDefaultLabel, pixelGridCheckbox,
+                        defaultNewProjectSizeLabel,
+                        newProjectWidthLabel, widthTextbox,
+                        newProjectHeightLabel, heightTextbox);
 
                 // update as new settings are added to category
                 yield pixelGridDefaultLabel;
@@ -1713,15 +1772,15 @@ public class DialogAssembly {
                 final Textbox checkerboardXTextbox = makeDialogNumericalTextBox(
                         checkerboardWidthLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getCheckerboardXPixels(),
+                        Settings.getCheckerboardWPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
-                        "px", i -> Settings.setCheckerboardXPixels(i, false), 3);
+                        "px", i -> Settings.setCheckerboardWPixels(i, false), 3);
                 final Textbox checkerboardYTextbox = makeDialogNumericalTextBox(
                         checkerboardHeightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Settings.getCheckerboardYPixels(),
+                        Settings.getCheckerboardHPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
-                        "px", i -> Settings.setCheckerboardYPixels(i, false), 3);
+                        "px", i -> Settings.setCheckerboardHPixels(i, false), 3);
                 final Textbox pixelGridXTextbox = makeDialogNumericalTextBox(
                         pixelGridXLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,

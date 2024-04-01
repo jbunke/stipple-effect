@@ -220,6 +220,20 @@ public class GraphicsUtils {
                 true, onClick, base, drawHighlightedButton(base));
     }
 
+    public static SimpleMenuButton makeBespokeTextButton(
+            final String text, final Coord2D pos, final Runnable onClick
+    ) {
+        final int w = GraphicsUtils.uiText(Constants.BLACK)
+                .addText(text).build().draw()
+                .getWidth() + Layout.CONTENT_BUFFER_PX;
+
+        final GameImage base = drawTextButton(w,
+                text, false, Constants.GREY);
+        return new SimpleMenuButton(pos, new Coord2D(w,
+                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
+                true, onClick, base, drawHighlightedButton(base));
+    }
+
     private static Color textButtonColorFromBackgroundColor(
             final Color b, final boolean main
     ) {

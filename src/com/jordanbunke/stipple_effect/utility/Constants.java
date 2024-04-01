@@ -59,8 +59,8 @@ public class Constants {
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
             OVERLAY_FILL_C = new Color(50, 80, 255, 50);
 
-    public static final int DEFAULT_IMAGE_W = 32, DEFAULT_IMAGE_H = 32,
-            MIN_IMAGE_W = 1, MIN_IMAGE_H = 1, MAX_IMAGE_W = 800, MAX_IMAGE_H = 800,
+    public static final int DEFAULT_CANVAS_W = 32, DEFAULT_CANVAS_H = 32,
+            MIN_CANVAS_W = 1, MIN_CANVAS_H = 1, MAX_CANVAS_W = 800, MAX_CANVAS_H = 800,
             OVERLAY_BORDER_PX = 6, SPLASH_TIMEOUT_SECS = 1800, NO_SELECTION = -1,
             MAX_PALETTE_SIZE = 300;
 
