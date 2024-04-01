@@ -31,6 +31,7 @@ import com.jordanbunke.stipple_effect.tools.TextTool;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
@@ -1700,13 +1701,13 @@ public class DialogAssembly {
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         () -> "", Settings.getDefaultIndexPrefix(), () -> "",
                         Textbox::validateAsOptionallyEmptyFilename,
-                        s -> Settings.setDefaultIndexPrefix(s, false), 5);
+                        Settings::setDefaultIndexPrefix, 5);
                 final Textbox suffixTextbox = makeDialogCustomTextBox(
                         suffixLabel, Layout.SMALL_TEXT_BOX_W,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         () -> "", Settings.getDefaultIndexSuffix(), () -> "",
                         Textbox::validateAsOptionallyEmptyFilename,
-                        s -> Settings.setDefaultIndexSuffix(s, false), 5);
+                        Settings::setDefaultIndexSuffix, 5);
 
                 mb.addAll(frameAffixLabel, prefixLabel, suffixLabel,
                         frameAffixExample, prefixTextbox, suffixTextbox);
@@ -1764,7 +1765,7 @@ public class DialogAssembly {
                                 .toArray(String[]::new),
                         EnumUtils.stream(SEFonts.Code.class)
                                 .map(code -> (Runnable) () -> Settings
-                                        .setProgramFont(code.name(), false))
+                                        .setProgramFont(code))
                                 .toArray(Runnable[]::new),
                         () -> Settings.getProgramFont().ordinal());
 
@@ -1774,25 +1775,25 @@ public class DialogAssembly {
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getCheckerboardWPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
-                        "px", i -> Settings.setCheckerboardWPixels(i, false), 3);
+                        "px", Settings::setCheckerboardWPixels, 3);
                 final Textbox checkerboardYTextbox = makeDialogNumericalTextBox(
                         checkerboardHeightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getCheckerboardHPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
-                        "px", i -> Settings.setCheckerboardHPixels(i, false), 3);
+                        "px", Settings::setCheckerboardHPixels, 3);
                 final Textbox pixelGridXTextbox = makeDialogNumericalTextBox(
                         pixelGridXLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getPixelGridXPixels(),
                         Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
-                        "px", i -> Settings.setPixelGridXPixels(i, false), 3);
+                        "px", Settings::setPixelGridXPixels, 3);
                 final Textbox pixelGridYTextbox = makeDialogNumericalTextBox(
                         pixelGridYLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getPixelGridYPixels(),
                         Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
-                        "px", i -> Settings.setPixelGridYPixels(i, false), 3);
+                        "px", Settings::setPixelGridYPixels, 3);
 
                 mb.addAll(fontLabel, fontDropdown, checkerboardLabel,
                         checkerboardWidthLabel, checkerboardXTextbox,

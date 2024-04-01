@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.*;

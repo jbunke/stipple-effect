@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.Settings;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 public class RenderInfo {
     private Coord2D anchor;

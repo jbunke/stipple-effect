@@ -18,6 +18,7 @@ import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;

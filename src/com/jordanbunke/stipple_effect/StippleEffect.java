@@ -32,6 +32,7 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.*;
 
 import java.awt.*;
@@ -149,7 +150,8 @@ public class StippleEffect implements ProgramContext {
         mousePos = new Coord2D();
 
         contexts = new ArrayList<>(List.of(new SEContext(
-                DialogVals.getNewProjectWidth(), DialogVals.getNewProjectHeight())));
+                Settings.getDefaultCanvasWPixels(),
+                Settings.getDefaultCanvasHPixels())));
         contextIndex = 0;
         toImport = new ArrayList<>();
 
