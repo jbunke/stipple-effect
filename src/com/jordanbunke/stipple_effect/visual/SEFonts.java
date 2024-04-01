@@ -22,12 +22,9 @@ public class SEFonts {
     public static final Code DEFAULT_FONT = Code.DELTAN;
 
     public enum Code {
-        DELTAN, SKINNY_DELTAN, CLASSIC, SCHIEF, ZIFFER;
+        DELTAN, SKINNY, CLASSIC, SCHIEF, ZIFFER;
 
         public String forButtonText() {
-            if (this == SKINNY_DELTAN)
-                return "Skinny Deltan";
-
             return EnumUtils.formattedName(this);
         }
 
@@ -36,7 +33,7 @@ public class SEFonts {
                 case CLASSIC -> SEFonts.CLASSIC.getStandard();
                 case SCHIEF -> SEFonts.CLASSIC.getItalics();
                 case ZIFFER -> SEFonts.ZIFFER;
-                case SKINNY_DELTAN -> SEFonts.DELTAN.getBold();
+                case SKINNY -> SEFonts.DELTAN.getBold();
                 case DELTAN -> SEFonts.DELTAN.getStandard();
             };
         }

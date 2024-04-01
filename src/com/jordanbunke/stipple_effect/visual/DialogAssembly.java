@@ -1394,10 +1394,6 @@ public class DialogAssembly {
                 });
     }
 
-    private static GameImage[] makeBooleanToggleButtonSet() {
-        return makeToggleButtonSet("Yes", "No");
-    }
-
     private static GameImage[] makeToggleButtonSet(
             final String... buttonTexts
     ) {
@@ -1599,164 +1595,153 @@ public class DialogAssembly {
         final MenuElement bottomLabel = switch (settingScreen) {
             case STARTUP -> {
                 // text labels
-                final TextLabel screenModeLabel = makeDialogLeftLabel(
+                final TextLabel fullscreenLabel = makeDialogLeftLabel(
                         initialYIndex, "Fullscreen on startup:"),
-                        pixelGridDefaultLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Pixel grid on by default:");
+                        pixelGridDefaultLabel = TextLabel.make(
+                                textBelowPos(fullscreenLabel),
+                                "Pixel grid on by default:", Constants.WHITE);
 
-                // toggle buttons
-                final GameImage[] smBases = makeBooleanToggleButtonSet();
-                final SimpleToggleMenuButton screenModeButton = new SimpleToggleMenuButton(
-                        getDialogContentBigOffsetFromLabel(screenModeLabel),
-                        new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                                Layout.STD_TEXT_BUTTON_H),
-                        MenuElement.Anchor.LEFT_TOP, true,
-                        smBases, Arrays.stream(smBases)
-                        .map(GraphicsUtils::drawHighlightedButton)
-                        .toArray(GameImage[]::new),
-                        new Runnable[] {
-                                () -> Settings.setFullscreenOnStartup(false),
-                                () -> Settings.setFullscreenOnStartup(true)
-                        }, () -> Settings.isFullscreenOnStartup() ? 0 : 1, () -> {}),
-                        pixelGridDefaultButton = new SimpleToggleMenuButton(
-                                getDialogContentBigOffsetFromLabel(pixelGridDefaultLabel),
-                                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                                        Layout.STD_TEXT_BUTTON_H),
-                                MenuElement.Anchor.LEFT_TOP, true,
-                                smBases, Arrays.stream(smBases)
-                                .map(GraphicsUtils::drawHighlightedButton)
-                                .toArray(GameImage[]::new),
-                                new Runnable[] {
-                                        () -> Settings.setPixelGridOnByDefault(false),
-                                        () -> Settings.setPixelGridOnByDefault(true)
-                                }, () -> Settings.isPixelGridOnByDefault() ? 0 : 1, () -> {});
+                final Checkbox fullscreenCheckbox = new Checkbox(
+                        getDialogContentOffsetFollowingLabel(fullscreenLabel),
+                        MenuElement.Anchor.LEFT_TOP,
+                        Settings::isFullscreenOnStartup,
+                        Settings::setFullscreenOnStartup),
+                        pixelGridCheckbox = new Checkbox(
+                                getDialogContentOffsetFollowingLabel(
+                                        pixelGridDefaultLabel),
+                                MenuElement.Anchor.LEFT_TOP,
+                                Settings::isPixelGridOnByDefault,
+                                Settings::setPixelGridOnByDefault);
 
-                mb.add(screenModeLabel);
-                mb.add(screenModeButton);
-                mb.add(pixelGridDefaultLabel);
-                mb.add(pixelGridDefaultButton);
+                mb.addAll(fullscreenLabel, fullscreenCheckbox,
+                        pixelGridDefaultLabel, pixelGridCheckbox);
 
                 // update as new settings are added to category
                 yield pixelGridDefaultLabel;
             }
             case FORMAT -> {
                 // text labels
-                final TextLabel indexPrefixLabel = makeDialogLeftLabel(
-                        initialYIndex, "Default frame prefix:"),
-                        indexSuffixLabel = makeDialogLeftLabel(
-                                initialYIndex + 1, "Default frame suffix:");
+                final TextLabel frameAffixLabel = makeDialogLeftLabel(initialYIndex,
+                        "Default separate PNGs frame affixes"),
+                        prefixLabel = TextLabel.make(
+                                textBelowPos(frameAffixLabel),
+                                "Prefix:", Constants.WHITE),
+                        suffixLabel = makeDialogRightLabel(prefixLabel,
+                                "Suffix:");
+                final String FA_EXAMPLE = "Example: base_name", FA_MAX_VALUE = "WWWWW";
+                final DynamicLabel frameAffixExample = makeDynamicLabel(
+                        textBelowPos(prefixLabel), () -> FA_EXAMPLE +
+                                Settings.getDefaultIndexPrefix() + "0" +
+                                Settings.getDefaultIndexSuffix() + ".png",
+                        FA_EXAMPLE + FA_MAX_VALUE + "0" + FA_MAX_VALUE + ".png");
 
                 // textboxes
-                final Textbox indexPrefixTextbox = makeDialogCustomTextBox(
-                        indexPrefixLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                final Textbox prefixTextbox = makeDialogCustomTextBox(
+                        prefixLabel, Layout.SMALL_TEXT_BOX_W,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
                         () -> "", Settings.getDefaultIndexPrefix(), () -> "",
                         Textbox::validateAsOptionallyEmptyFilename,
                         s -> Settings.setDefaultIndexPrefix(s, false), 5);
-                final Textbox indexSuffixTextbox = makeDialogCustomTextBox(
-                        indexSuffixLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                final Textbox suffixTextbox = makeDialogCustomTextBox(
+                        suffixLabel, Layout.SMALL_TEXT_BOX_W,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
                         () -> "", Settings.getDefaultIndexSuffix(), () -> "",
                         Textbox::validateAsOptionallyEmptyFilename,
                         s -> Settings.setDefaultIndexSuffix(s, false), 5);
 
-                mb.add(indexPrefixLabel);
-                mb.add(indexSuffixLabel);
-                mb.add(indexPrefixTextbox);
-                mb.add(indexSuffixTextbox);
+                mb.addAll(frameAffixLabel, prefixLabel, suffixLabel,
+                        frameAffixExample, prefixTextbox, suffixTextbox);
 
                 // update as new settings are added to category
-                yield indexSuffixLabel;
+                yield suffixLabel;
             }
             case VISUAL -> {
                 // text labels
                 final TextLabel fontLabel = makeDialogLeftLabel(
                         initialYIndex, "Program font:"),
-                        checkerboardXLabel = makeDialogLeftLabel(
-                                initialYIndex + 2, "Checkerboard size (X):"),
-                        checkerboardYLabel = makeDialogLeftLabel(
-                                initialYIndex + 3, "Checkerboard size (Y):"),
-                        checkerboardContext = makeDialogLeftLabel(
-                                initialYIndex + 4,
+                        checkerboardLabel = TextLabel.make(
+                                textBelowPos(fontLabel, 1),
+                                "Checkerboard size", Constants.WHITE),
+                        checkerboardWidthLabel = TextLabel.make(
+                                textBelowPos(checkerboardLabel),
+                                "Cell width:", Constants.WHITE),
+                        checkerboardHeightLabel = makeDialogRightLabel(
+                                checkerboardWidthLabel, "Cell height:"),
+                        checkerboardContext = TextLabel.make(
+                                textBelowPos(checkerboardWidthLabel),
                                 "Valid checkerboard size values range from " +
                                         Layout.CHECKERBOARD_MIN + " to " +
-                                        Layout.CHECKERBOARD_MAX + " pixels."),
-                        pixelGridXLabel = makeDialogLeftLabel(
-                                initialYIndex + 6, "Pixel grid size (X):"),
-                        pixelGridYLabel = makeDialogLeftLabel(
-                                initialYIndex + 7, "Pixel grid size (Y):"),
-                        pixelGridContext = makeDialogLeftLabel(
-                                initialYIndex + 8,
+                                        Layout.CHECKERBOARD_MAX + " pixels.",
+                                Constants.WHITE),
+                        pixelGridLabel = TextLabel.make(
+                                textBelowPos(checkerboardContext, 1),
+                                "Pixel grid", Constants.WHITE),
+                        pixelGridXLabel = TextLabel.make(
+                                textBelowPos(pixelGridLabel),
+                                "X-axis increment:", Constants.WHITE),
+                        pixelGridYLabel = makeDialogRightLabel(
+                                pixelGridXLabel, "Y-axis increment:"),
+                        pixelGridContext = TextLabel.make(
+                                textBelowPos(pixelGridXLabel),
                                 "Valid pixel grid size values range from " +
                                         Layout.PIXEL_GRID_MIN + " to " +
-                                        Layout.PIXEL_GRID_MAX + " pixels."),
-                        pixelGridLimits1 = makeDialogLeftLabel(
-                                initialYIndex + 9, "There can be up to " +
+                                        Layout.PIXEL_GRID_MAX + " pixels.",
+                                Constants.WHITE),
+                        pixelGridLimits1 = TextLabel.make(
+                                textBelowPos(pixelGridContext),
+                                "There can be up to " +
                                         Layout.MAX_PIXEL_GRID_LINES +
-                                        " pixel grid lines (X + Y) on"),
-                        pixelGridLimits2 = makeDialogLeftLabel(
-                                initialYIndex + 10,
-                                "the canvas due to performance constraints.");
+                                        " pixel grid lines (X + Y) on",
+                                Constants.WHITE),
+                        pixelGridLimits2 = TextLabel.make(
+                                textBelowPos(pixelGridLimits1),
+                                "the canvas due to performance constraints.",
+                                Constants.WHITE);
 
-                // toggle buttons
-                final GameImage[] fontBases = makeToggleButtonSet(
+                final DropdownMenu fontDropdown = DropdownMenu.forDialog(
+                        getDialogContentOffsetFollowingLabel(fontLabel),
                         EnumUtils.stream(SEFonts.Code.class)
                                 .map(SEFonts.Code::forButtonText)
-                                .toArray(String[]::new));
-                final SimpleToggleMenuButton fontButton = new SimpleToggleMenuButton(
-                        getDialogContentBigOffsetFromLabel(fontLabel),
-                        new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                                Layout.STD_TEXT_BUTTON_H),
-                        MenuElement.Anchor.LEFT_TOP, true,
-                        fontBases, Arrays.stream(fontBases)
-                        .map(GraphicsUtils::drawHighlightedButton)
-                        .toArray(GameImage[]::new),
-                        EnumUtils.stream(SEFonts.Code.class).map(
-                                code -> (Runnable) () -> Settings.setProgramFont(
-                                        EnumUtils.next(code).name(), false)
-                        ).toArray(Runnable[]::new),
-                        () -> Settings.getProgramFont().ordinal(), () -> {});
+                                .toArray(String[]::new),
+                        EnumUtils.stream(SEFonts.Code.class)
+                                .map(code -> (Runnable) () -> Settings
+                                        .setProgramFont(code.name(), false))
+                                .toArray(Runnable[]::new),
+                        () -> Settings.getProgramFont().ordinal());
 
                 // textboxes
                 final Textbox checkerboardXTextbox = makeDialogNumericalTextBox(
-                        checkerboardXLabel,
-                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        checkerboardWidthLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getCheckerboardXPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
                         "px", i -> Settings.setCheckerboardXPixels(i, false), 3);
                 final Textbox checkerboardYTextbox = makeDialogNumericalTextBox(
-                        checkerboardYLabel,
-                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        checkerboardHeightLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getCheckerboardYPixels(),
                         Layout.CHECKERBOARD_MIN, Layout.CHECKERBOARD_MAX,
                         "px", i -> Settings.setCheckerboardYPixels(i, false), 3);
                 final Textbox pixelGridXTextbox = makeDialogNumericalTextBox(
                         pixelGridXLabel,
-                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getPixelGridXPixels(),
                         Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
                         "px", i -> Settings.setPixelGridXPixels(i, false), 3);
                 final Textbox pixelGridYTextbox = makeDialogNumericalTextBox(
                         pixelGridYLabel,
-                        DialogAssembly::getDialogContentBigOffsetFromLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Settings.getPixelGridYPixels(),
                         Layout.PIXEL_GRID_MIN, Layout.PIXEL_GRID_MAX,
                         "px", i -> Settings.setPixelGridYPixels(i, false), 3);
 
-                mb.add(checkerboardXLabel);
-                mb.add(checkerboardYLabel);
-                mb.add(checkerboardContext);
-                mb.add(checkerboardXTextbox);
-                mb.add(checkerboardYTextbox);
-                mb.add(pixelGridXLabel);
-                mb.add(pixelGridYLabel);
-                mb.add(pixelGridContext);
-                mb.add(pixelGridLimits1);
-                mb.add(pixelGridLimits2);
-                mb.add(pixelGridXTextbox);
-                mb.add(pixelGridYTextbox);
-                mb.add(fontLabel);
-                mb.add(fontButton);
+                mb.addAll(fontLabel, fontDropdown, checkerboardLabel,
+                        checkerboardWidthLabel, checkerboardXTextbox,
+                        checkerboardHeightLabel, checkerboardYTextbox,
+                        checkerboardContext, pixelGridLabel,
+                        pixelGridXLabel, pixelGridXTextbox,
+                        pixelGridYLabel, pixelGridYTextbox,
+                        pixelGridContext, pixelGridLimits1, pixelGridLimits2);
 
                 // update as new settings are added to category
                 yield pixelGridLimits2;

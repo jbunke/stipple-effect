@@ -71,4 +71,25 @@ public class ScrollableMenuElement extends InvisibleMenuElement {
     public Coord2D getRenderPosition() {
         return associated.getRenderPosition();
     }
+
+    @Override
+    public int getRenderOrder() {
+        return associated.getRenderOrder();
+    }
+
+    @Override
+    public void setX(int x) {
+        final int was = getX();
+        super.setX(x);
+
+        associated.setX(x + (associated.getX() - was));
+    }
+
+    @Override
+    public void setY(int y) {
+        final int was = getY();
+        super.setY(y);
+
+        associated.setY(y + (associated.getY() - was));
+    }
 }

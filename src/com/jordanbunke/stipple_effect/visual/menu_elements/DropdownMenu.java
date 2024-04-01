@@ -173,4 +173,20 @@ public class DropdownMenu extends MenuElement {
     public int getRenderOrder() {
         return droppedDown ? renderOrder : super.getRenderOrder();
     }
+
+    @Override
+    public void setX(final int x) {
+        super.setX(x);
+
+        ddButton.setX(x);
+        ddContainer.setX(x);
+    }
+
+    @Override
+    public void setY(final int y) {
+        super.setY(y);
+
+        ddButton.setY(y);
+        ddContainer.setY(y + Layout.STD_TEXT_BUTTON_H);
+    }
 }
