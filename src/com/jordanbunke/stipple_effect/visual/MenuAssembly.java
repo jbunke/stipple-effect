@@ -880,7 +880,7 @@ public class MenuAssembly {
                 IncrementalRangeElements.makeForFloat(zoomIndicator,
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
                         bottomBarTextY, c.renderInfo::zoomOut,
-                        () -> c.renderInfo.zoomIn(c.getTargetPixel()),
+                        () -> c.renderInfo.zoomIn(Constants.NO_VALID_TARGET),
                         Constants.MIN_ZOOM, Constants.MAX_ZOOM,
                         c.renderInfo::setZoomFactor, c.renderInfo::getZoomFactor,
                         f -> (int) (Math.log(f) / Math.log(BASE)),

@@ -28,9 +28,11 @@ public class RenderInfo {
     }
 
     private void adjustAnchorFromZoom(final Coord2D targetPixel) {
-        final Coord2D adjusted = new Coord2D((anchor.x + targetPixel.x) / 2,
-                (anchor.y + targetPixel.y) / 2);
-        setAnchor(adjusted);
+        if (!targetPixel.equals(Constants.NO_VALID_TARGET)) {
+            final Coord2D adjusted = new Coord2D((anchor.x + targetPixel.x) / 2,
+                    (anchor.y + targetPixel.y) / 2);
+            setAnchor(adjusted);
+        }
     }
 
     public void setZoomFactor(final float zoomFactor) {
