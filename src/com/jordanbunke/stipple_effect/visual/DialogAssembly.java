@@ -48,6 +48,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DialogAssembly {
+    // TODO - redesign and refactor
     public static void setDialogToSave() {
         final SEContext c = StippleEffect.get().getContext();
 
@@ -162,12 +163,12 @@ public class DialogAssembly {
                 Textbox::validateAsOptionallyEmptyFilename,
                 c.projectInfo::setIndexSuffix, 5);
         final Textbox countFromTextbox = makeDialogCustomTextBox(
-                countFromLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                countFromLabel, Layout.SMALL_TEXT_BOX_W,
                 DialogAssembly::getDialogContentOffsetFromLabel,
                 c.projectInfo::getIndexPrefix,
                 String.valueOf(c.projectInfo.getCountFrom()),
                 c.projectInfo::getIndexSuffix,
-                Textbox.getIntTextValidator(0, Constants.ARBITRARY_MAX_COUNT),
+                Textbox.getIntTextValidator(i -> true),
                 s -> c.projectInfo.setCountFrom(Integer.parseInt(s)), 4);
 
         final MenuElementGrouping pngSeparateContents = new MenuElementGrouping(
@@ -776,9 +777,7 @@ public class DialogAssembly {
                 });
         final GatewayMenuElement clipboardPreset = new GatewayMenuElement(
                 GraphicsUtils.makeBespokeTextButton("Clipboard contents",
-                        defaultPreset.getRenderPosition()
-                                .displace(defaultPreset.getWidth() +
-                                        Layout.CONTENT_BUFFER_PX, 0), () -> {
+                        getDialogContentToRightOfContent(defaultPreset), () -> {
                             DialogVals.setNewProjectWidth(clipboardW);
                             DialogVals.setNewProjectHeight(clipboardH);
                 }), () -> hasClipboard);
@@ -840,7 +839,7 @@ public class DialogAssembly {
         // name
         final TextLabel nameLabel = makeDialogLeftLabel(lines, "Font name:");
         final Textbox nameTextbox = makeDialogCustomTextBox(nameLabel,
-                Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                Layout.LONG_NAME_TEXTBOX_W,
                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                 () -> "", DialogVals.getFontName(), () -> "",
                 Textbox::validateAsFileName, DialogVals::setFontName,
@@ -992,13 +991,10 @@ public class DialogAssembly {
                         () -> DialogVals.setOutlineSideMask(
                                 Outliner.getSingleOutlineMask())),
                 doublePreset = GraphicsUtils.makeStandardTextButton("Double",
-                        singlePreset.getRenderPosition()
-                                .displace(singlePreset.getWidth() +
-                                        Layout.CONTENT_BUFFER_PX, 0),
+                        getDialogContentToRightOfContent(singlePreset),
                         () -> DialogVals.setOutlineSideMask(
                                 Outliner.getDoubleOutlineMask()));
-        mb.add(singlePreset);
-        mb.add(doublePreset);
+        mb.addAll(singlePreset, doublePreset);
 
         // direction buttons
         final Coord2D buttonPos = Layout.getCanvasMiddle();
@@ -1042,18 +1038,14 @@ public class DialogAssembly {
         mb.add(presets);
 
         // buttons for panel arrangement presets
-        final Coord2D showAllPos = getDialogContentOffsetFromLabel(presets),
-                minimalUIPos = getDialogContentBigOffsetFromLabel(presets),
-                noAnimationPos = minimalUIPos.displace(
-                        minimalUIPos.x - showAllPos.x, 0);
-
         final SimpleMenuButton showAllPreset =
-                GraphicsUtils.makeStandardTextButton(
-                        "All", showAllPos, Layout::showAllPanels),
-                minimalUIPreset = GraphicsUtils.makeStandardTextButton(
-                        "Minimal", minimalUIPos, Layout::minimalUI),
+                GraphicsUtils.makeStandardTextButton("All",
+                        getDialogContentOffsetFollowingLabel(presets),
+                        Layout::showAllPanels),
+                minimalUIPreset = GraphicsUtils.makeStandardTextButton("Minimal",
+                        getDialogContentToRightOfContent(showAllPreset), Layout::minimalUI),
                 noAnimationPreset = GraphicsUtils.makeStandardTextButton(
-                        "No Anim", noAnimationPos,
+                        "No Anim", getDialogContentToRightOfContent(minimalUIPreset),
                         () -> Layout.adjustPanels(() -> {
                             Layout.setToolbarShowing(true);
                             Layout.setColorsPanelShowing(true);
@@ -1061,14 +1053,11 @@ public class DialogAssembly {
                             Layout.setFramesPanelShowing(false);
                             Layout.setProjectsExpanded(false);
                         }));
-        mb.add(showAllPreset);
-        mb.add(minimalUIPreset);
-        mb.add(noAnimationPreset);
+        mb.addAll(showAllPreset, minimalUIPreset, noAnimationPreset);
 
         // vars
         final String TOOLBAR = "Toolbar", LAYERS = "Layers",
                 COLORS = "Colors", FRAMES = "Frames", PROJECTS = "Projects";
-        final int initialIndex = 2;
         final String[] labelTexts = new String[] { TOOLBAR,
                 FRAMES, LAYERS, COLORS, PROJECTS };
         final Map<String, Consumer<Boolean>> adjustmentFunctionMap =
@@ -1090,40 +1079,41 @@ public class DialogAssembly {
             final boolean isProject = labelTexts[i].equals(PROJECTS);
 
             // panel label
-            final TextLabel label = makeDialogLeftLabel(
-                    initialIndex + i, labelTexts[i] + ":");
+            final TextLabel label = TextLabel.make(textBelowPos(presets, 1 + i),
+                    labelTexts[i] + ":", Constants.WHITE);
 
             // panel toggle
-            final String[] toggleText = isProject
-                    ? new String[] { "Expanded", "Collapsed" }
-                    : new String[] { "Visible", "Hidden" };
-            final GameImage[] bases = makeToggleButtonSet(toggleText);
             final Consumer<Boolean> adj =
                     adjustmentFunctionMap.get(labelTexts[i]);
             final Supplier<Boolean> ret =
                     retrievalFunctionMap.get(labelTexts[i]);
 
-            final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
-                    getDialogContentOffsetFromLabel(label),
-                    new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                            Layout.STD_TEXT_BUTTON_H),
-                    MenuElement.Anchor.LEFT_TOP, true,
-                    bases, Arrays.stream(bases)
-                    .map(GraphicsUtils::drawHighlightedButton)
-                    .toArray(GameImage[]::new),
-                    new Runnable[] {
-                            () -> Layout.adjustPanels(() -> adj.accept(false)),
-                            () -> Layout.adjustPanels(() -> adj.accept(true))
-                    },
-                    () -> ret.get() ? 0 : 1, () -> {});
-
             if (isProject) {
+                final String[] toggleText =
+                        new String[] { "Expanded", "Collapsed" };
+                final GameImage[] bases = makeToggleButtonSet(toggleText);
+
+                final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
+                        getDialogContentOffsetFollowingLabel(label),
+                        new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                                Layout.STD_TEXT_BUTTON_H),
+                        MenuElement.Anchor.LEFT_TOP, true, bases,
+                        Arrays.stream(bases)
+                                .map(GraphicsUtils::drawHighlightedButton)
+                                .toArray(GameImage[]::new),
+                        new Runnable[] {
+                                () -> Layout.adjustPanels(() -> adj.accept(false)),
+                                () -> Layout.adjustPanels(() -> adj.accept(true))
+                        }, () -> ret.get() ? 0 : 1, () -> {});
+
                 mb.add(new GatewayMenuElement(
                         new MenuElementGrouping(label, toggle),
                         () -> !Layout.isFramesPanelShowing()));
             } else {
-                mb.add(label);
-                mb.add(toggle);
+                final Checkbox panelCheckbox = new Checkbox(
+                        getDialogContentOffsetFollowingLabel(label),
+                        MenuElement.Anchor.LEFT_TOP, ret, adj);
+                mb.addAll(label, panelCheckbox);
             }
         }
 
@@ -1133,6 +1123,7 @@ public class DialogAssembly {
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToSavePalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
 
@@ -1172,6 +1163,7 @@ public class DialogAssembly {
                 }, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToSortPalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final PaletteSorter[] vs = PaletteSorter.values();
@@ -1181,7 +1173,8 @@ public class DialogAssembly {
 
         // toggle
         final GameImage[] bases = makeToggleButtonSet(Arrays.stream(vs)
-                .map(PaletteSorter::toString).toArray(String[]::new));
+                .map(PaletteSorter::toString)
+                .toArray(String[]::new));
 
         final Runnable[] behaviours = new Runnable[vs.length];
         Arrays.fill(behaviours, (Runnable) () -> {});
@@ -1209,6 +1202,7 @@ public class DialogAssembly {
                 }, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToAddContentsToPalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
@@ -1224,6 +1218,7 @@ public class DialogAssembly {
                 }, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToPalettize(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
@@ -1251,7 +1246,8 @@ public class DialogAssembly {
 
         // toggle
         final GameImage[] bases = makeToggleButtonSet(Arrays.stream(vs)
-                .map(DialogVals.ContentType::toString).toArray(String[]::new));
+                .map(DialogVals.ContentType::toString)
+                .toArray(String[]::new));
 
         final Runnable[] behaviours = new Runnable[vs.length];
         Arrays.fill(behaviours, (Runnable) () -> {});
@@ -1271,6 +1267,7 @@ public class DialogAssembly {
         mb.add(toggle);
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToPaletteSettings(final Palette palette) {
         DialogVals.setPaletteName(palette.getName());
 
@@ -1340,6 +1337,7 @@ public class DialogAssembly {
                 "Apply", Settings::apply, true));
     }
 
+    // TODO - redesign and refactor
     public static void setDialogToLayerSettings(final int index) {
         final SEContext c = StippleEffect.get().getContext();
         final SELayer layer = c.getState().getLayers().get(index);
@@ -1348,8 +1346,10 @@ public class DialogAssembly {
         DialogVals.setLayerName(layer.getName());
 
         // text labels
-        final TextLabel layerNameLabel = makeDialogLeftLabel(1, "Name:"),
-                opacityLabel = makeDialogLeftLabel(2, "Opacity:");
+        final TextLabel layerNameLabel =
+                makeDialogLeftLabel(0, "Name:"),
+                opacityLabel = TextLabel.make(textBelowPos(layerNameLabel),
+                        "Opacity:", Constants.WHITE);
 
         // name textbox
         final Textbox layerNameTextbox = makeDialogNameTextBox(
@@ -1359,21 +1359,30 @@ public class DialogAssembly {
         final int MAX_OPACITY = 255;
         DialogVals.setLayerOpacity(layer.getOpacity());
 
-        final HorizontalSlider opacitySlider = new HorizontalSlider(
-                getDialogContentOffsetFromLabel(opacityLabel),
-                Layout.getDialogContentWidthAllowance(),
-                MenuElement.Anchor.LEFT_TOP, 0, MAX_OPACITY,
-                () -> (int)(DialogVals.getLayerOpacity() * MAX_OPACITY),
-                o -> DialogVals.setLayerOpacity(o / (double) MAX_OPACITY));
-        opacitySlider.updateAssets();
-
-        // opacity value
-        final DynamicLabel opacityValue = makeDynamicFromLeftLabel(opacityLabel,
-                () -> String.valueOf((int)(DialogVals.getLayerOpacity() * MAX_OPACITY)));
+        final Runnable fDecrement = () -> {
+            final double was = DialogVals.getLayerOpacity();
+            DialogVals.setLayerOpacity(Math.max(0d,
+                    was - (1d / (double) MAX_OPACITY)));
+        }, fIncrement = () -> {
+            final double was = DialogVals.getLayerOpacity();
+            DialogVals.setLayerOpacity(Math.min(Constants.OPAQUE,
+                    was + (1d / (double) MAX_OPACITY)));
+        };
+        final IncrementalRangeElements<Double> opacity =
+                IncrementalRangeElements.makeForDouble(opacityLabel,
+                        opacityLabel.getY() +
+                                Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        opacityLabel.getY(), fDecrement, fIncrement,
+                        0, Constants.OPAQUE, DialogVals::setLayerOpacity,
+                        DialogVals::getLayerOpacity,
+                        o -> (int)(o * MAX_OPACITY),
+                        sv -> sv / (double) MAX_OPACITY,
+                        o -> String.valueOf((int) (o * MAX_OPACITY)), "XXX");
 
         final MenuElementGrouping contents = new MenuElementGrouping(
                 layerNameLabel, opacityLabel, layerNameTextbox,
-                opacitySlider, opacityValue);
+                opacity.decButton, opacity.incButton,
+                opacity.slider, opacity.value);
         setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
                 contents, layerNameTextbox::isValid,
                 Constants.GENERIC_APPROVAL_TEXT, () -> {
@@ -1500,13 +1509,12 @@ public class DialogAssembly {
     }
 
     private static GameImage[] makeToggleButtonSet(
-            final String... buttonTexts
-    ) {
-        return Arrays.stream(buttonTexts).map(
-                t -> GraphicsUtils.drawTextButton(
+            final String... buttonTexts) {
+        return Arrays.stream(buttonTexts)
+                .map(t -> GraphicsUtils.drawTextButton(
                         Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE, t,
-                        false, Constants.GREY)
-        ).toArray(GameImage[]::new);
+                        false, Constants.GREY))
+                .toArray(GameImage[]::new);
     }
 
     private static DynamicLabel makeDynamicFromLeftLabel(
@@ -1624,8 +1632,8 @@ public class DialogAssembly {
             final MenuElement label, final String initial,
             final Consumer<String> setter
     ) {
-        return new Textbox(getDialogContentOffsetFromLabel(label),
-                Layout.getDialogContentWidthAllowance(), MenuElement.Anchor.LEFT_TOP,
+        return new Textbox(getDialogContentOffsetFollowingLabel(label),
+                Layout.LONG_NAME_TEXTBOX_W, MenuElement.Anchor.LEFT_TOP,
                 initial, Textbox::validateAsFileName, setter,
                 Constants.MAX_NAME_LENGTH);
     }
@@ -1696,16 +1704,17 @@ public class DialogAssembly {
                 Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 
-    private static Coord2D getDialogContentBigOffsetFromLabel(final MenuElement label) {
-        return label.getRenderPosition().displace(
-                Layout.DIALOG_CONTENT_BIG_OFFSET_X,
-                Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
-    }
-
-    private static Coord2D getDialogContentOffsetFollowingLabel(final MenuElement label) {
+    private static Coord2D getDialogContentOffsetFollowingLabel(
+            final MenuElement label) {
         return label.getRenderPosition().displace(
                 label.getWidth() + Layout.CONTENT_BUFFER_PX,
                 Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
+    }
+
+    private static Coord2D getDialogContentToRightOfContent(
+            final MenuElement preceding) {
+        return preceding.getRenderPosition()
+                .displace(preceding.getWidth() + Layout.CONTENT_BUFFER_PX, 0);
     }
 
     private static VerticalScrollingMenuElement assembleScroller(
