@@ -37,9 +37,10 @@ public class Layout {
             PROJECTS_BEFORE_TO_DISPLAY = 1, DIALOG_CONTENT_INC_Y = 32,
             VERT_SCROLL_WINDOW_W = RIGHT_PANEL_W - (2 * CONTENT_BUFFER_PX),
             TOP_PANEL_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
-            DIALOG_CONTENT_COMP_OFFSET_Y = 5, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
-            DIALOG_CONTENT_OFFSET_X = 150, DIALOG_CONTENT_BIG_OFFSET_X = DIALOG_CONTENT_OFFSET_X + 100,
-            DIALOG_CONTENT_SMALL_W_ALLOWANCE = 120, LONG_NAME_TEXTBOX_W = 400,
+            DIALOG_CONTENT_COMP_OFFSET_Y = 5,
+            DIALOG_CONTENT_OFFSET_X = 150, LONG_NAME_TEXTBOX_W = 400,
+            DIALOG_CONTENT_SMALL_W_ALLOWANCE = 120,
+            DIALOG_CONTENT_BIG_W_ALLOWANCE = LONG_NAME_TEXTBOX_W - DIALOG_CONTENT_SMALL_W_ALLOWANCE,
             SMALL_TEXT_BOX_W = 80, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -4,
             COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_AVG_C_THRESHOLD = 100, COLOR_TEXTBOX_W = 116,
@@ -377,10 +378,6 @@ public class Layout {
         return height() / 2;
     }
 
-    public static int getDialogContentWidthAllowance() {
-        return getDialogWidth() - (DIALOG_DYNAMIC_W_ALLOWANCE + DIALOG_CONTENT_BIG_OFFSET_X);
-    }
-
     public static Coord2D getDialogPosition() {
         return getCanvasMiddle().displace(-getDialogWidth() / 2,
                 -getDialogHeight() / 2);
@@ -391,9 +388,5 @@ public class Layout {
                 CONTENT_BUFFER_PX + BUTTON_BORDER_PX,
                 TEXT_Y_OFFSET + BUTTON_BORDER_PX +
                         (int)(1.5 * STD_TEXT_BUTTON_INC));
-    }
-
-    public static int getDialogContentRightBound() {
-        return width() - (getDialogContentInitial().x + BUTTON_INC);
     }
 }

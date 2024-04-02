@@ -36,7 +36,6 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
 
@@ -52,77 +51,88 @@ public class DialogAssembly {
     public static void setDialogToSave() {
         final SEContext c = StippleEffect.get().getContext();
 
+        final MenuBuilder mb = new MenuBuilder();
+
         // text labels
         final TextLabel
                 folderLabel = makeDialogLeftLabel(0, "Folder:"),
-                nameLabel = makeDialogLeftLabel(1, "File name:"),
-                scaleUpLabel = makeDialogLeftLabel(2, "Scale factor:"),
-                saveAsTypeLabel = makeDialogLeftLabel(3, "Save as:"),
-                xDivsLabel = makeDialogLeftLabel(4, "X frames:"),
+                nameLabel = TextLabel.make(textBelowPos(folderLabel),
+                        "File name:", Constants.WHITE),
+                saveAsTypeLabel = TextLabel.make(textBelowPos(nameLabel),
+                        "Save as:", Constants.WHITE),
+                scaleUpLabel = TextLabel.make(textBelowPos(saveAsTypeLabel),
+                        "Scale factor:", Constants.WHITE);
+        mb.addAll(folderLabel, nameLabel, saveAsTypeLabel);
+
+        // TODO - and associated
+        final TextLabel xDivsLabel = TextLabel.make(
+                textBelowPos(scaleUpLabel, 1),
+                "X frames:", Constants.WHITE),
                 yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames:"),
-                indexPrefixLabel = makeDialogLeftLabel(4, "Prefix:"),
+                indexPrefixLabel = TextLabel.make(
+                        textBelowPos(scaleUpLabel, 1),
+                        "Prefix:", Constants.WHITE),
                 indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix:"),
-                countFromLabel = makeDialogLeftLabel(5, "Count from:"),
-                fpsLabel = makeDialogLeftLabel(4, "Frame rate:");
+                countFromLabel = TextLabel.make(textBelowPos(indexPrefixLabel),
+                        "Count from:", Constants.WHITE),
+                fpsLabel = TextLabel.make(
+                        textBelowPos(scaleUpLabel, 1),
+                        "Frame rate:", Constants.WHITE);
 
         // folder selection button
         final DynamicTextButton folderButton = makeFolderSelectionButton(
                 folderLabel, c.projectInfo::getFolder, c.projectInfo::setFolder);
+        mb.add(folderButton);
 
         // name text box
         final Textbox nameTextbox = makeDialogNameTextBox(nameLabel,
                 c.projectInfo.getName(), c.projectInfo::setName);
+        mb.add(nameTextbox);
 
-        // scale up slider
-        final HorizontalSlider scaleUpSlider = new HorizontalSlider(
-                getDialogContentOffsetFromLabel(scaleUpLabel),
-                Layout.getDialogContentWidthAllowance(), MenuElement.Anchor.LEFT_TOP,
-                Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
-                c.projectInfo::getScaleUp, c.projectInfo::setScaleUp);
-        scaleUpSlider.updateAssets();
-
-        final DynamicLabel scaleUpValue = makeDynamicFromLeftLabel(
-                scaleUpLabel, () -> c.projectInfo.getScaleUp() + "x");
-
-        // save as toggle
+        // save as type dropdown
         final ProjectInfo.SaveType[] saveOptions = ProjectInfo.SaveType.validOptions();
+        final DropdownMenu saveAsTypeDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(saveAsTypeLabel),
+                Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
+                Arrays.stream(saveOptions)
+                        .map(ProjectInfo.SaveType::getButtonText)
+                        .toArray(String[]::new),
+                Arrays.stream(saveOptions)
+                        .map(type -> (Runnable) () -> c.projectInfo.setSaveType(type))
+                        .toArray(Runnable[]::new), () -> {
+                    final ProjectInfo.SaveType saveType = c.projectInfo.getSaveType();
 
-        final int toggleWidth = Layout.getDialogContentWidthAllowance();
+                    for (int i = 0; i < saveOptions.length; i++)
+                        if (saveType == saveOptions[i])
+                            return i;
 
-        final GameImage[] baseSet = Arrays.stream(saveOptions)
-                .map(so -> GraphicsUtils.drawTextButton(toggleWidth,
-                        so.getButtonText(), false, Constants.GREY))
-                .toArray(GameImage[]::new),
-                highlightedSet = Arrays.stream(baseSet).map(GraphicsUtils::drawHighlightedButton)
-                        .toArray(GameImage[]::new);
+                    c.projectInfo.setSaveType(saveOptions[0]);
+                    return 0;
+                });
+        mb.add(saveAsTypeDropdown);
 
-        final Runnable[] behaviours = new Runnable[saveOptions.length];
+        // scale up
+        final IncrementalRangeElements<Integer> scaleUp =
+                IncrementalRangeElements.makeForInt(
+                        scaleUpLabel, scaleUpLabel.getY() +
+                                Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        scaleUpLabel.getY(), 1,
+                        Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
+                        c.projectInfo::setScaleUp, c.projectInfo::getScaleUp,
+                        i -> i, i -> i, i -> i + "x", "XXx");
+        final GatewayMenuElement scaleUpGateway = new GatewayMenuElement(
+                new MenuElementGrouping(scaleUpLabel,
+                        scaleUp.decButton, scaleUp.incButton,
+                        scaleUp.slider, scaleUp.value),
+                () -> !c.projectInfo.getSaveType()
+                        .equals(ProjectInfo.SaveType.NATIVE));
+        mb.add(scaleUpGateway);
 
-        for (int i = 0; i < saveOptions.length; i++) {
-            final ProjectInfo.SaveType next =
-                    saveOptions[(i + 1) % saveOptions.length];
+        // TODO - frame bounds: (only save from frame A to B)
+        // checkbox to enable
+        // textboxes for lower and upper bounds and validation that lower < upper and both within frame count bounds
 
-            behaviours[i] = () -> c.projectInfo.setSaveType(next);
-        }
-
-        final Supplier<Integer> updateIndexLogic = () -> {
-            final ProjectInfo.SaveType saveType = StippleEffect.get()
-                    .getContext().projectInfo.getSaveType();
-
-            for (int i = 0; i < saveOptions.length; i++)
-                if (saveType == saveOptions[i])
-                    return i;
-
-            return 0;
-        };
-
-        final SimpleToggleMenuButton saveAsToggle = new SimpleToggleMenuButton(
-                getDialogContentOffsetFromLabel(saveAsTypeLabel),
-                new Coord2D(toggleWidth, Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true, baseSet,
-                highlightedSet, behaviours, updateIndexLogic, () -> {});
-
-        // frameDims iff saveType is PNG_STITCHED
+        // TODO - frameDims iff saveType is PNG_STITCHED
         final Textbox xDivsTextbox = makeDialogNumericalTextBox(xDivsLabel,
                 c.projectInfo.getFrameDimsX(), 1, Constants.MAX_NUM_FRAMES,
                 "", c.projectInfo::setFrameDimsX, 3);
@@ -134,37 +144,31 @@ public class DialogAssembly {
                 xDivsLabel, yDivsLabel, xDivsTextbox, yDivsTextbox);
 
         // GIF playback speed iff saveType is GIF
-        final HorizontalSlider playbackSpeedSlider = new HorizontalSlider(
-                getDialogContentOffsetFromLabel(fpsLabel),
-                (int)(Layout.getDialogContentWidthAllowance() * 0.9),
-                MenuElement.Anchor.LEFT_TOP,
-                Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                c.projectInfo::getFps, c.projectInfo::setFps);
-        playbackSpeedSlider.updateAssets();
+        final IncrementalRangeElements<Integer> playbackSpeed =
+                IncrementalRangeElements.makeForInt(fpsLabel,
+                        fpsLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        fpsLabel.getY(), 1, Constants.MIN_PLAYBACK_FPS,
+                        Constants.MAX_PLAYBACK_FPS,
+                        c.projectInfo::setFps, c.projectInfo::getFps,
+                        i -> i, sv -> sv, i -> i + " fps", "XXX fps");
 
-        final DynamicLabel fpsValue = makeDynamicFromLeftLabel(
-                fpsLabel, () -> c.projectInfo.getFps() + " fps");
-
+        // GIF and MP4 contents
         final MenuElementGrouping gifContents = new MenuElementGrouping(
-                fpsLabel, playbackSpeedSlider, fpsValue
-        );
+                fpsLabel, playbackSpeed.decButton, playbackSpeed.incButton,
+                playbackSpeed.slider, playbackSpeed.value);
 
         // Extra file naming options IFF saveType is PNG_SEPARATE
-        final Textbox indexPrefixTextbox = makeDialogCustomTextBox(
-                indexPrefixLabel, Layout.SMALL_TEXT_BOX_W,
-                DialogAssembly::getDialogContentOffsetFromLabel,
-                () -> "", c.projectInfo.getIndexPrefix(), () -> "",
-                Textbox::validateAsOptionallyEmptyFilename,
-                c.projectInfo::setIndexPrefix, 5);
-        final Textbox indexSuffixTextbox = makeDialogCustomTextBox(
-                indexSuffixLabel, Layout.SMALL_TEXT_BOX_W,
-                DialogAssembly::getDialogContentOffsetFromLabel,
-                () -> "", c.projectInfo.getIndexSuffix(), () -> "",
-                Textbox::validateAsOptionallyEmptyFilename,
-                c.projectInfo::setIndexSuffix, 5);
+        final DynamicTextbox indexPrefixTextbox =
+                makeDialogAffixDynamicTextbox(indexPrefixLabel,
+                        c.projectInfo::setIndexPrefix,
+                        c.projectInfo::getIndexPrefix),
+                indexSuffixTextbox =
+                        makeDialogAffixDynamicTextbox(indexSuffixLabel,
+                                c.projectInfo::setIndexSuffix,
+                                c.projectInfo::getIndexSuffix);
         final Textbox countFromTextbox = makeDialogCustomTextBox(
-                countFromLabel, Layout.SMALL_TEXT_BOX_W,
-                DialogAssembly::getDialogContentOffsetFromLabel,
+                countFromLabel, Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
                 c.projectInfo::getIndexPrefix,
                 String.valueOf(c.projectInfo.getCountFrom()),
                 c.projectInfo::getIndexSuffix,
@@ -177,7 +181,6 @@ public class DialogAssembly {
                 countFromLabel, countFromTextbox);
 
         // save type decision maker
-
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
                 switch (c.projectInfo.getSaveType()) {
                     case PNG_STITCHED -> c.getState().getFrameCount() > 1
@@ -186,12 +189,42 @@ public class DialogAssembly {
                     case GIF, MP4 -> gifContents;
                     default -> new PlaceholderMenuElement();
         });
+        mb.add(basedOnSaveType);
+
+        // dynamic label preview
+        final DynamicLabel preview = makeDialogLeftDynamicLabelAtBottom(() -> {
+            if (c.projectInfo.getFolder() == null ||
+                    c.projectInfo.getName().equals(""))
+                return "[ Select a folder and provide a name ]";
+
+            final int PRINT_LETTERS = 64, ENDS = (PRINT_LETTERS / 2) - 1;
+
+            final boolean multipleFiles = c.projectInfo
+                    .getSaveType().equals(ProjectInfo.SaveType.PNG_SEPARATE);
+
+            final String extension = "." + c.projectInfo
+                    .getSaveType().getFileSuffix(),
+                    folder = c.projectInfo.getFolder().toString(),
+                    file = File.separator + c.projectInfo.getName() +
+                            (multipleFiles
+                                    ? (c.projectInfo.getIndexPrefix() +
+                                    c.projectInfo.getCountFrom() +
+                                    c.projectInfo.getIndexSuffix())
+                                    : ""),
+                    composed = folder + file + extension +
+                            (multipleFiles ? " + others" : "");
+
+            return composed.length() <= PRINT_LETTERS
+                    ? composed : composed.substring(0, ENDS) + "..." +
+                    composed.substring(composed.length() - ENDS);
+        });
+        final TextLabel destinationLabel = TextLabel.make(textBelowPos(
+                preview, -2), "Destination:", Constants.WHITE);
+        mb.addAll(preview, destinationLabel);
 
         // content assembly
         final MenuElementGrouping contents = new MenuElementGrouping(
-                folderLabel, nameLabel, scaleUpLabel, saveAsTypeLabel,
-                folderButton, nameTextbox, scaleUpSlider, scaleUpValue,
-                saveAsToggle, basedOnSaveType);
+                mb.build().getMenuElements());
         setDialog(assembleDialog("Save project...", contents,
                 () -> {
             if (c.projectInfo.getSaveType() == ProjectInfo.SaveType.PNG_STITCHED) {
@@ -1456,8 +1489,8 @@ public class DialogAssembly {
             final Supplier<Path> getter, final Consumer<Path> setter
     ) {
         return new DynamicTextButton(
-                getDialogContentOffsetFromLabel(label),
-                Layout.getDialogContentWidthAllowance(),
+                getDialogContentOffsetFollowingLabel(label),
+                Layout.LONG_NAME_TEXTBOX_W,
                 MenuElement.Anchor.LEFT_TOP,
                 () -> {
                     FileIO.setDialogToFoldersOnly();
@@ -1514,16 +1547,6 @@ public class DialogAssembly {
                         Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE, t,
                         false, Constants.GREY))
                 .toArray(GameImage[]::new);
-    }
-
-    private static DynamicLabel makeDynamicFromLeftLabel(
-            final MenuElement label, final Supplier<String> getter
-    ) {
-        final Coord2D pos = new Coord2D(
-                Layout.getDialogContentRightBound(), label.getY());
-
-        return new DynamicLabel(pos, MenuElement.Anchor.RIGHT_TOP,
-                Constants.WHITE, getter, Layout.DIALOG_DYNAMIC_W_ALLOWANCE);
     }
 
     private static DynamicTextbox makeDialogPixelDynamicTextbox(
@@ -1650,6 +1673,19 @@ public class DialogAssembly {
         return makeDialogLeftLabelAtBottom("(Canvas sizes can range from " +
                 Constants.MIN_CANVAS_W + "x" + Constants.MIN_CANVAS_H + " to " +
                 Constants.MAX_CANVAS_W + "x" + Constants.MAX_CANVAS_H + ")");
+    }
+
+    private static DynamicLabel makeDialogLeftDynamicLabelAtBottom(
+            final Supplier<String> getter) {
+        final int y = Layout.getCanvasMiddle()
+                .displace(0, Layout.getDialogHeight() / 2)
+                .displace(0, -(Layout.DIALOG_CONTENT_INC_Y +
+                        Layout.CONTENT_BUFFER_PX)).y;
+
+        return new DynamicLabel(
+                new Coord2D(Layout.getDialogContentInitial().x, y),
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE, getter,
+                Layout.getDialogWidth());
     }
 
     private static TextLabel makeDialogLeftLabelAtBottom(final String text) {

@@ -58,7 +58,16 @@ public class DropdownMenu extends MenuElement {
             final Coord2D pos, final String[] labels, final Runnable[] behaviours,
             final Supplier<Integer> initialIndexFunction
     ) {
-        return new DropdownMenu(pos, Layout.optionsBarSliderWidth(),
+        return forDialog(pos, Layout.optionsBarSliderWidth(),
+                labels, behaviours, initialIndexFunction);
+    }
+
+    public static DropdownMenu forDialog(
+            final Coord2D pos, final int width,
+            final String[] labels, final Runnable[] behaviours,
+            final Supplier<Integer> initialIndexFunction
+    ) {
+        return new DropdownMenu(pos, width,
                 MenuElement.Anchor.LEFT_TOP, Layout.height() / 5,
                 DEFAULT_RENDER_ORDER,
                 labels, behaviours, initialIndexFunction);
