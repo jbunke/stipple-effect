@@ -38,6 +38,7 @@ Changed:
 > Modified polygon select behaviour: middle vertices can be placed off the canvas
 > Changed brush select hotkey from {T} to {V}
 > Changed pixel grid validation so that # of grid lines is checked instead of image bounds
+> State stack is now dynamically sized; states are dumped based on insufficient available memory
 
 Fixed:
 > Bug: Palettes were saved with the palette name instead of the filename

@@ -76,15 +76,46 @@ public class StateManager {
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
 
-        // trim to max state size allowed
-        while (states.size() > Constants.MAX_NUM_STATES)
-            states.remove(0);
+        manageMemory();
 
         // add to state stack and set as active state
         states.add(resultantState);
         index = states.size() - 1;
 
         updateStateMetadataAndAssets(resultantState);
+    }
+
+    private void manageMemory() {
+        final long BYTES_IN_KB = 0x400L; // 1024
+        final int GC_EVERY_X_DUMPS = 10;
+
+        final Runtime r = Runtime.getRuntime();
+        final long mem = r.freeMemory();
+
+        if (mem < Constants.DUMP_STATES_MEM_THRESHOLD &&
+                canDumpState()) {
+            final long entryMem = mem / BYTES_IN_KB;
+            int dumped = 0;
+
+            while (canDumpState() &&
+                    r.freeMemory() < Constants.DUMP_STATES_MEM_THRESHOLD *
+                            Constants.DUMP_STATES_CUSHION_FACTOR) {
+                states.remove(0);
+                dumped++;
+
+                if (dumped % GC_EVERY_X_DUMPS == 0)
+                    System.gc();
+            }
+
+            System.gc();
+            final long exitMem = r.freeMemory() / BYTES_IN_KB;
+
+            StatusUpdates.dumpedStates(dumped, exitMem - entryMem);
+        }
+    }
+
+    private boolean canDumpState() {
+        return states.size() > Constants.MIN_NUM_STATES && index > 0;
     }
 
     private void updateStateMetadataAndAssets(final int was) {

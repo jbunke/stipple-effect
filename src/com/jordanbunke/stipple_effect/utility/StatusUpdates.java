@@ -4,7 +4,6 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
-import com.jordanbunke.stipple_effect.visual.SEFonts;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -274,6 +273,14 @@ public class StatusUpdates {
         );
     }
 
+    public static void dumpedStates(
+            final int dumped, final long kbsFreed
+    ) {
+        StippleEffect.get().sendStatusUpdate("Dumped " + dumped + " state" +
+                (dumped > 1 ? "s" : "") + " due to low memory; freed " +
+                kbsFreed + " KBs of memory");
+    }
+
     public static void sendToClipboard(
             final boolean copied, final Set<Coord2D> selection
     ) {
@@ -294,12 +301,6 @@ public class StatusUpdates {
     public static void pasteFailed() {
         StippleEffect.get().sendStatusUpdate("Cannot paste; the " +
                 StippleEffect.PROGRAM_NAME + " clipboard is empty");
-    }
-
-    public static void invalidFontCode(final String attempt) {
-        StippleEffect.get().sendStatusUpdate("The font code \"" + attempt +
-                "\" is invalid; assigned to \"" + SEFonts.Code.CLASSIC.forButtonText() +
-                "\" instead");
     }
 
     public static void saving() {

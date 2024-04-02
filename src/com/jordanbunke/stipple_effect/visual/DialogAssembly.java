@@ -336,7 +336,6 @@ public class DialogAssembly {
                 }, Constants.GENERIC_APPROVAL_TEXT, c::resize, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToPad() {
         final SEContext c = StippleEffect.get().getContext();
 
@@ -348,52 +347,53 @@ public class DialogAssembly {
         DialogVals.setPadTop(0);
         DialogVals.setPadRight(0);
 
+        final MenuBuilder mb = new MenuBuilder();
+
         // text labels
         final TextLabel
-                leftLabel = makeDialogLeftLabel(1, "Left:"),
-                rightLabel = makeDialogLeftLabel(2, "Right:"),
-                topLabel = makeDialogLeftLabel(3, "Top:"),
-                bottomLabel = makeDialogLeftLabel(4, "Bottom:"),
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
+                leftLabel = TextLabel.make(textBelowPos(context, 1), "Left:", Constants.WHITE),
+                rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right:", Constants.WHITE),
+                topLabel = TextLabel.make(textBelowPos(rightLabel), "Top:", Constants.WHITE),
+                bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom:", Constants.WHITE),
                 explanation = makeValidDimensionsBottomLabel();
+        mb.addAll(context, explanation, leftLabel, rightLabel,
+                topLabel, bottomLabel);
 
         // pad textboxes
         final Textbox leftTextbox = makeDialogPadTextBox(leftLabel, i -> {
             final int pw = i + DialogVals.getPadRight() + w;
             return pw <= Constants.MAX_CANVAS_W && pw > 0;
-        }, DialogVals::setPadLeft);
+        }, DialogVals::setPadLeft, DialogVals::getPadLeft);
         final Textbox topTextbox = makeDialogPadTextBox(topLabel, i -> {
             final int ph = i + DialogVals.getPadBottom() + h;
             return ph <= Constants.MAX_CANVAS_H && ph > 0;
-        }, DialogVals::setPadTop);
+        }, DialogVals::setPadTop, DialogVals::getPadTop);
         final Textbox rightTextbox = makeDialogPadTextBox(rightLabel, i -> {
             final int pw = i + DialogVals.getPadLeft() + w;
             return pw <= Constants.MAX_CANVAS_W && pw > 0;
-        }, DialogVals::setPadRight);
+        }, DialogVals::setPadRight, DialogVals::getPadRight);
         final Textbox bottomTextbox = makeDialogPadTextBox(bottomLabel, i -> {
             final int ph = i + DialogVals.getPadTop() + h;
             return ph <= Constants.MAX_CANVAS_W && ph > 0;
-        }, DialogVals::setPadBottom);
+        }, DialogVals::setPadBottom, DialogVals::getPadBottom);
+        mb.addAll(leftTextbox, rightTextbox, topTextbox, bottomTextbox);
 
         // size preview
-        final DynamicLabel preview = new DynamicLabel(
-                bottomLabel.getRenderPosition().displace(0,
-                        Layout.DIALOG_CONTENT_INC_Y),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                () -> {
+        final String PREVIEW_PREFIX = "Preview size: ";
+        final DynamicLabel preview = makeDynamicLabel(
+                textBelowPos(bottomLabel, 1), () -> {
                     final int pw = DialogVals.getPadLeft() +
                             DialogVals.getPadRight() + w,
                             ph = DialogVals.getPadTop() +
                                     DialogVals.getPadBottom() + h;
 
-                    return "Preview size: " + pw + "x" + ph;
-                }, Layout.getDialogWidth() - (2 * Layout.CONTENT_BUFFER_PX)
-        );
+                    return PREVIEW_PREFIX + pw + "x" + ph;
+                }, PREVIEW_PREFIX + "XXXXxXXXX");
+        mb.add(preview);
 
-        final MenuElementGrouping contents = new MenuElementGrouping(
-                context, leftLabel, rightLabel, topLabel, bottomLabel,
-                preview, explanation,
-                leftTextbox, rightTextbox, topTextbox, bottomTextbox);
+        final MenuElementGrouping contents =
+                new MenuElementGrouping(mb.build().getMenuElements());
         setDialog(assembleDialog("Pad canvas...", contents,
                 () -> leftTextbox.isValid() && rightTextbox.isValid() &&
                         topTextbox.isValid() && bottomTextbox.isValid(),
@@ -1556,16 +1556,18 @@ public class DialogAssembly {
                 setter, getter, 5);
     }
 
-    private static Textbox makeDialogPadTextBox(
+    private static DynamicTextbox makeDialogPadTextBox(
             final MenuElement label,
             final Function<Integer, Boolean> validatorLogic,
-            final Consumer<Integer> setter
+            final Consumer<Integer> setter, final Supplier<Integer> getter
     ) {
-        return makeDialogNumericalTextBox(label,
-                DialogAssembly::getDialogContentOffsetFromLabel,
-                String.valueOf(0), "px",
+        return new DynamicTextbox(
+                getDialogContentOffsetFromLabel(label),
+                Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                "", String.valueOf(0), "px",
                 Textbox.getIntTextValidator(validatorLogic),
-                s -> setter.accept(Integer.parseInt(s)), 4);
+                s -> setter.accept(Integer.parseInt(s)),
+                () -> String.valueOf(getter.get()), 4);
     }
 
     private static Textbox makeDialogNumericalTextBox(
