@@ -82,15 +82,16 @@ public class StatusUpdates {
     }
 
     public static void cannotShiftColorPalette(
-            final boolean left, final Palette p, final Color c
+            final Palette p, final Color c, final boolean isLeft
     ) {
         final boolean colorInPalette = p.canRemove(c);
 
+        final String dir = isLeft ? "left" : "right";
+
         actionNotPermitted("shift the selected color " + processColor(c) +
-                        " to the " + (left ? "left" : "right") + " in \"" +
-                        p.getName() + "\"",
+                        " to the " + dir + " in \"" + p.getName() + "\"",
                 p.isMutable() ? (colorInPalette
-                        ? ("it is already the " + (left ? "left" : "right") + "most color")
+                        ? ("it is already the " + dir + "most color")
                         : "it is not in the palette")
                         : "\"" + p.getName() + "\" is immutable");
     }
@@ -103,6 +104,17 @@ public class StatusUpdates {
                         "\"" + p.getName() + "\"",
                 processColor(c) + (add ? " is already" : " is not") +
                         " in the palette");
+    }
+
+    public static void cannotSelectColorPalette(
+            final Palette p, final Color c, final boolean isLeft
+    ) {
+        final String dir = isLeft ? "left" : "right";
+
+        actionNotPermitted("select the next included color to the " + dir +
+                        " in the palette \"" + p.getName() + "\"",
+                "the current selected color " + processColor(c) +
+                        " is not included in the palette");
     }
 
     private static void actionNotPermitted(
@@ -153,6 +165,18 @@ public class StatusUpdates {
     public static void moveRightInPalette(final Palette p, final Color c) {
         StippleEffect.get().sendStatusUpdate("Shifted " + processColor(c) +
                 " to the right in \"" + p.getName() + "\"");
+    }
+
+    public static void selectNextPaletteColor(
+            final Palette p, final Color c, final boolean isLeft
+    ) {
+        final Color next = isLeft ? p.nextLeft(c) : p.nextRight(c);
+
+        StippleEffect.get().sendStatusUpdate(
+                "Selected next included color to the " +
+                        (isLeft ? "left" : "right") + " of " +
+                        processColor(c) + " in \"" + p.getName() +
+                        "\": " + processColor(next));
     }
 
     private static String processColor(final Color c) {

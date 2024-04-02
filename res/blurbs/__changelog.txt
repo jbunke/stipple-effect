@@ -27,6 +27,7 @@ Added:
 > Added second snap mode to pick up selection and move selection tools for pixel grid snapping
 > Added stitching and splitting
 > Added hotkeys {1} - {9} to quickly select one of the first 9 projects loaded into the program
+> Added shortcuts to iterate through included palette colors
 
 Changed:
 > Redrew frame icons to feature purple film reels instead of orange motion blobs

@@ -386,6 +386,12 @@ public class StippleEffect implements ProgramContext {
                         if (tool.equals(TextTool.get()))
                             TextTool.get().toggleAlignment();
                     });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
+                    this::selectPaletteColorToTheLeft);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
+                    this::selectPaletteColorToTheRight);
         } else if (eventLogger.isPressed(Key.SHIFT)) {
             // Shift + ?
             eventLogger.checkForMatchingKeyStroke(
@@ -1102,13 +1108,29 @@ public class StippleEffect implements ProgramContext {
     public void moveColorLeftInPalette() {
         paletteSelectedColorAction(Palette::moveLeft,
                 Palette::canMoveLeft, StatusUpdates::moveLeftInPalette,
-                (p, c) -> StatusUpdates.cannotShiftColorPalette(true, p, c));
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(p, c, true));
     }
 
     public void moveColorRightInPalette() {
         paletteSelectedColorAction(Palette::moveRight,
                 Palette::canMoveRight, StatusUpdates::moveRightInPalette,
-                (p, c) -> StatusUpdates.cannotShiftColorPalette(false, p, c));
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(p, c, false));
+    }
+
+    public void selectPaletteColorToTheLeft() {
+        paletteSelectedColorAction(
+                (p, c) -> setSelectedColor(p.nextLeft(c),
+                        ColorMath.LastHSVEdit.NONE), Palette::isIncluded,
+                (p, c) -> StatusUpdates.selectNextPaletteColor(p, c, true),
+                (p, c) -> StatusUpdates.cannotSelectColorPalette(p, c, true));
+    }
+
+    public void selectPaletteColorToTheRight() {
+        paletteSelectedColorAction(
+                (p, c) -> setSelectedColor(p.nextRight(c),
+                        ColorMath.LastHSVEdit.NONE), Palette::isIncluded,
+                (p, c) -> StatusUpdates.selectNextPaletteColor(p, c, false),
+                (p, c) -> StatusUpdates.cannotSelectColorPalette(p, c, false));
     }
 
     private void paletteSelectedColorAction(
