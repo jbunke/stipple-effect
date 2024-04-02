@@ -13,15 +13,11 @@ Fix:
 
 {TODO for 0.3.0}
 
-Add:
-> Add "Stitch/Split Frames" dialog
-
 Change:
 > Overhaul preview window
 > Redesign and expand project dialogs
-> Optimize selection overlays
 
-{0.3.0} - 2024-??-??
+{0.3.0} - 2024-04-0?
 
 Added:
 > Added text tool
@@ -30,6 +26,7 @@ Added:
 > Added dither option to gradient tool
 > Added second snap mode to pick up selection and move selection tools for pixel grid snapping
 > Added stitching and splitting
+> Added hotkeys {1} - {9} to quickly select one of the first 9 projects loaded into the program
 
 Changed:
 > Redrew frame icons to feature purple film reels instead of orange motion blobs

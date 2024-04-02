@@ -454,6 +454,35 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     this::toggleFullscreen);
 
+            // quick context select
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(0));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(1));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(2));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(3));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(4));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._6, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(5));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._7, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(6));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._8, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(7));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(8));
+
             // set tools
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),

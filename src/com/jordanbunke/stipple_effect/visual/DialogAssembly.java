@@ -1337,7 +1337,6 @@ public class DialogAssembly {
                 "Apply", Settings::apply, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToLayerSettings(final int index) {
         final SEContext c = StippleEffect.get().getContext();
         final SELayer layer = c.getState().getLayers().get(index);
