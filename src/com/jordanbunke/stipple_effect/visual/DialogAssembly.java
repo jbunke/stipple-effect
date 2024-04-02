@@ -988,11 +988,13 @@ public class DialogAssembly {
         // buttons for setting presets
         final SimpleMenuButton singlePreset =
                 GraphicsUtils.makeStandardTextButton("Single",
-                getDialogContentOffsetFromLabel(presets),
+                getDialogContentOffsetFollowingLabel(presets),
                         () -> DialogVals.setOutlineSideMask(
                                 Outliner.getSingleOutlineMask())),
                 doublePreset = GraphicsUtils.makeStandardTextButton("Double",
-                        getDialogContentBigOffsetFromLabel(presets),
+                        singlePreset.getRenderPosition()
+                                .displace(singlePreset.getWidth() +
+                                        Layout.CONTENT_BUFFER_PX, 0),
                         () -> DialogVals.setOutlineSideMask(
                                 Outliner.getDoubleOutlineMask()));
         mb.add(singlePreset);
