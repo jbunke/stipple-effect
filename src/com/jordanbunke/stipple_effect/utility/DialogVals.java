@@ -559,10 +559,15 @@ public class DialogVals {
     }
 
     public static int calculateFramesPerComplementaryDim(
-            final int frameCount
+            final int frameCount) {
+        return calculateFramesPerComplementaryDim(
+                frameCount, getFramesPerDim());
+    }
+
+    public static int calculateFramesPerComplementaryDim(
+            final int frameCount, final int fpd
     ) {
-        final int fpd = getFramesPerDim(),
-                compTruncated = frameCount / fpd,
+        final int compTruncated = frameCount / fpd,
                 remainder = frameCount % fpd;
 
         return compTruncated + (remainder == 0 ? 0 : 1);

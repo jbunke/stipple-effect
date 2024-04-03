@@ -333,6 +333,11 @@ public class StatusUpdates {
                         " until the project has been saved");
     }
 
+    public static void saveFailed() {
+        StippleEffect.get().sendStatusUpdate("Failed to save file(s);" +
+                " the project's save settings are invalid.");
+    }
+
     public static void saved(final Path filepath) {
         StippleEffect.get().sendStatusUpdate("Saved project to \"" +
                 filepath + "\"");

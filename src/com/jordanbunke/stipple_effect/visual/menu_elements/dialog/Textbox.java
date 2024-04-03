@@ -25,7 +25,7 @@ public class Textbox extends MenuButtonStub {
     private String text, lastText, prefix, suffix;
     private int cursorIndex, lastCursorIndex,
             selectionIndex, lastSelectionIndex;
-    private boolean typing;
+    private boolean typing, valid;
 
     private final Supplier<String> prefixGetter, suffixGetter;
     private final Supplier<Color> backgroundColorGetter;
@@ -81,6 +81,7 @@ public class Textbox extends MenuButtonStub {
         this.setter = setter;
         this.maxLength = maxLength;
 
+        validate();
         updateAssets();
     }
 
@@ -145,6 +146,9 @@ public class Textbox extends MenuButtonStub {
         prefix = prefixGetter.get();
         suffix = suffixGetter.get();
 
+        final Color typingBackground = valid
+                ? backgroundColorGetter.get() : Constants.INVALID;
+
         validImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
                 text, suffix, cursorIndex, selectionIndex, false,
                 Constants.BLACK, backgroundColorGetter.get());
@@ -156,7 +160,7 @@ public class Textbox extends MenuButtonStub {
                 Constants.BLACK, backgroundColorGetter.get());
         typingImage = GraphicsUtils.drawTextBox(getWidth(), prefix,
                 text, suffix, cursorIndex, selectionIndex, false,
-                Constants.HIGHLIGHT_1, backgroundColorGetter.get());
+                Constants.HIGHLIGHT_1, typingBackground);
 
         lastText = text;
         lastCursorIndex = cursorIndex;
@@ -188,6 +192,8 @@ public class Textbox extends MenuButtonStub {
 
     private void processTyping(final InputEventLogger eventLogger) {
         final int DELETE = 127, LOWEST_PRINTABLE = 32;
+
+        final String textWas = text;
 
         if (isTyping()) {
             final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
@@ -293,6 +299,9 @@ public class Textbox extends MenuButtonStub {
                     }
                 }
         }
+
+        if (!text.equals(textWas))
+            validate();
     }
 
     @Override
@@ -320,12 +329,16 @@ public class Textbox extends MenuButtonStub {
     }
 
     private void attemptAccept() {
-        if (isValid())
+        validate();
+
+        if (valid)
             setter.accept(text);
     }
 
     @Override
     public void update(final double deltaTime) {
+        validate();
+
         if (!text.equals(lastText) || cursorIndex != lastCursorIndex ||
                 selectionIndex != lastSelectionIndex ||
                 !prefix.equals(prefixGetter.get()) ||
@@ -337,7 +350,7 @@ public class Textbox extends MenuButtonStub {
     public void render(final GameImage canvas) {
         draw(typing ? typingImage :
                         (isHighlighted() ? highlightedImage :
-                                (isValid() ? validImage : invalidImage)),
+                                (valid ? validImage : invalidImage)),
                 canvas);
     }
 
@@ -346,8 +359,12 @@ public class Textbox extends MenuButtonStub {
 
     }
 
+    public void validate() {
+        valid = textValidator.apply(text);
+    }
+
     public boolean isValid() {
-        return textValidator.apply(text);
+        return valid;
     }
 
     public boolean isTyping() {
@@ -379,6 +396,8 @@ public class Textbox extends MenuButtonStub {
                 : text;
         cursorIndex = this.text.length();
         selectionIndex = cursorIndex;
+
+        validate();
     }
 
     public String getText() {

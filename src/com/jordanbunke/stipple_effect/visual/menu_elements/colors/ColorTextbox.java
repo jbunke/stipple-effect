@@ -47,7 +47,7 @@ public class ColorTextbox extends Textbox {
                 g = hexToInt(hexCode.substring(G, G + LENGTH_OF_SECTION)),
                 b = hexToInt(hexCode.substring(B, B + LENGTH_OF_SECTION));
 
-        final int alpha = StippleEffect.get().getSelectedColor().getAlpha();
+        final int alpha = StippleEffect.get().getColorAtIndex(index).getAlpha();
 
         StippleEffect.get().setColorIndexAndColor(index, new Color(r, g, b, alpha));
     }

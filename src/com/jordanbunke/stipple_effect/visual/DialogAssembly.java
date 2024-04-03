@@ -47,9 +47,18 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DialogAssembly {
-    // TODO - redesign and refactor
     public static void setDialogToSave() {
         final SEContext c = StippleEffect.get().getContext();
+
+        // preprocessing logic
+        // ensure frame bounds validity
+        c.projectInfo.setLowerBound(
+                c.projectInfo.isSaveRangeOfFrames()
+                        ? c.projectInfo.getLowerBound() : 0);
+        c.projectInfo.setUpperBound(
+                c.projectInfo.isSaveRangeOfFrames()
+                        ? c.projectInfo.getUpperBound()
+                        : c.getState().getFrameCount() - 1);
 
         final MenuBuilder mb = new MenuBuilder();
 
@@ -61,22 +70,23 @@ public class DialogAssembly {
                 saveAsTypeLabel = TextLabel.make(textBelowPos(nameLabel),
                         "Save as:", Constants.WHITE),
                 scaleUpLabel = TextLabel.make(textBelowPos(saveAsTypeLabel),
-                        "Scale factor:", Constants.WHITE);
+                        "Scale factor:", Constants.WHITE),
+                frameBoundsLabel = TextLabel.make(textBelowPos(scaleUpLabel),
+                        "Save limited range of frames?", Constants.WHITE),
+                lowerBoundsLabel = TextLabel.make(textBelowPos(frameBoundsLabel),
+                        "Lower bound:", Constants.WHITE),
+                upperBoundsLabel = makeDialogRightLabel(
+                        lowerBoundsLabel, "Upper bound:");
         mb.addAll(folderLabel, nameLabel, saveAsTypeLabel);
 
-        // TODO - and associated
-        final TextLabel xDivsLabel = TextLabel.make(
-                textBelowPos(scaleUpLabel, 1),
-                "X frames:", Constants.WHITE),
-                yDivsLabel = makeDialogRightLabel(xDivsLabel, "Y frames:"),
-                indexPrefixLabel = TextLabel.make(
-                        textBelowPos(scaleUpLabel, 1),
+        final TextLabel indexPrefixLabel = TextLabel.make(
+                        textBelowPos(lowerBoundsLabel, 1),
                         "Prefix:", Constants.WHITE),
                 indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix:"),
                 countFromLabel = TextLabel.make(textBelowPos(indexPrefixLabel),
                         "Count from:", Constants.WHITE),
                 fpsLabel = TextLabel.make(
-                        textBelowPos(scaleUpLabel, 1),
+                        textBelowPos(lowerBoundsLabel, 1),
                         "Frame rate:", Constants.WHITE);
 
         // folder selection button
@@ -90,15 +100,16 @@ public class DialogAssembly {
         mb.add(nameTextbox);
 
         // save as type dropdown
-        final ProjectInfo.SaveType[] saveOptions = ProjectInfo.SaveType.validOptions();
+        final ProjectInfo.SaveType[] saveOptions = c.projectInfo.getSaveOptions();
         final DropdownMenu saveAsTypeDropdown = DropdownMenu.forDialog(
                 getDialogContentOffsetFollowingLabel(saveAsTypeLabel),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
                 Arrays.stream(saveOptions)
-                        .map(ProjectInfo.SaveType::getButtonText)
+                        .map(st -> st.getButtonText(c.projectInfo))
                         .toArray(String[]::new),
                 Arrays.stream(saveOptions)
-                        .map(type -> (Runnable) () -> c.projectInfo.setSaveType(type))
+                        .map(type -> (Runnable)
+                                () -> c.projectInfo.setSaveType(type))
                         .toArray(Runnable[]::new), () -> {
                     final ProjectInfo.SaveType saveType = c.projectInfo.getSaveType();
 
@@ -128,20 +139,107 @@ public class DialogAssembly {
                         .equals(ProjectInfo.SaveType.NATIVE));
         mb.add(scaleUpGateway);
 
-        // TODO - frame bounds: (only save from frame A to B)
-        // checkbox to enable
-        // textboxes for lower and upper bounds and validation that lower < upper and both within frame count bounds
+        // frame bounds: (only save from frame A to B)
+        final Supplier<Boolean> frameBoundsCondition =
+                () -> c.projectInfo.isAnimation() &&
+                        !c.projectInfo.getSaveType()
+                                .equals(ProjectInfo.SaveType.NATIVE);
+        final Checkbox frameBoundsCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(frameBoundsLabel),
+                MenuElement.Anchor.LEFT_TOP,
+                c.projectInfo::isSaveRangeOfFrames,
+                c.projectInfo::setSaveRangeOfFrames);
+        // TODO: validation that lower < upper and both within frame count bounds
+        final String FRAME_NUM_PREFIX = "Frm. ";
+        final DynamicTextbox lowerBoundTextbox =
+                makeDialogNumericalDynamicTextbox(lowerBoundsLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        FRAME_NUM_PREFIX, c.projectInfo.getLowerBound() + 1,
+                        "", tbv -> {
+                    final int boundValue = tbv - 1;
 
-        // TODO - frameDims iff saveType is PNG_STITCHED
-        final Textbox xDivsTextbox = makeDialogNumericalTextBox(xDivsLabel,
-                c.projectInfo.getFrameDimsX(), 1, Constants.MAX_NUM_FRAMES,
-                "", c.projectInfo::setFrameDimsX, 3);
-        final Textbox yDivsTextbox = makeDialogNumericalTextBox(yDivsLabel,
-                c.projectInfo.getFrameDimsY(), 1, Constants.MAX_NUM_FRAMES,
-                "", c.projectInfo::setFrameDimsY, 3);
+                    final boolean inBounds = boundValue >= 0 &&
+                            boundValue < c.getState().getFrameCount();
+                    final boolean lowerThanUpper = boundValue <=
+                            c.projectInfo.getUpperBound();
 
-        final MenuElementGrouping pngStitchedContents = new MenuElementGrouping(
-                xDivsLabel, yDivsLabel, xDivsTextbox, yDivsTextbox);
+                    return inBounds && lowerThanUpper;
+                    }, tbv -> c.projectInfo.setLowerBound(tbv - 1),
+                        () -> c.projectInfo.getLowerBound() + 1, 3),
+                upperBoundTextbox = makeDialogNumericalDynamicTextbox(
+                        upperBoundsLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        FRAME_NUM_PREFIX, c.projectInfo.getUpperBound() + 1,
+                        "", tbv -> {
+                            final int boundValue = tbv - 1;
+
+                            final boolean inBounds = boundValue >= 0 &&
+                                    boundValue < c.getState().getFrameCount();
+                            final boolean higherThanLower = boundValue >=
+                                    c.projectInfo.getLowerBound();
+
+                            return inBounds && higherThanLower;
+                        }, tbv -> c.projectInfo.setUpperBound(tbv - 1),
+                        () -> c.projectInfo.getUpperBound() + 1, 3);
+        final GatewayMenuElement nestedBoundsGateway = new GatewayMenuElement(
+                new MenuElementGrouping(
+                        lowerBoundsLabel, lowerBoundTextbox,
+                        upperBoundsLabel, upperBoundTextbox),
+                () -> frameBoundsCondition.get() &&
+                        c.projectInfo.isSaveRangeOfFrames()),
+                frameBoundsGateway = new GatewayMenuElement(
+                        new MenuElementGrouping(
+                                frameBoundsLabel, frameBoundsCheckbox,
+                                nestedBoundsGateway),
+                        frameBoundsCondition);
+        mb.add(frameBoundsGateway);
+
+        // sequence order
+        final TextLabel sequenceLabel = TextLabel.make(
+                textBelowPos(lowerBoundsLabel, 1),
+                "Sequence order:", Constants.WHITE);
+        final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(sequenceLabel),
+                EnumUtils.stream(DialogVals.SequenceOrder.class)
+                        .map(EnumUtils::formattedName).toArray(String[]::new),
+                EnumUtils.stream(DialogVals.SequenceOrder.class)
+                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
+                        .toArray(Runnable[]::new),
+                () -> DialogVals.getSequenceOrder().ordinal());
+
+        // TODO - refactor ProjectInfo to comply; frames per [dim]
+        final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
+        final DynamicLabel framesPerDimLabel = makeDynamicLabel(
+                textBelowPos(sequenceLabel), () -> FPD_PREFIX +
+                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
+                FPD_PREFIX + "column" + FPD_SUFFIX);
+        final DynamicTextbox framesPerDimTextbox =
+                makeDialogNumericalDynamicTextbox(framesPerDimLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        "", c.projectInfo.calculateNumFrames(), "",
+                        tbv -> tbv <= c.projectInfo.calculateNumFrames() &&
+                                tbv >= 1,
+                        c.projectInfo::setFramesPerDim,
+                        c.projectInfo::getFramesPerDim,
+                        String.valueOf(Constants.MAX_NUM_FRAMES).length());
+        final String FPCD_PREFIX = "... and ", FPCD_INFIX = " frames per ",
+                FPCD_INFIX_SING = FPCD_INFIX.replace("s ", " ");
+        final DynamicLabel framesPerCompDim = makeDynamicLabel(
+                textBelowPos(framesPerDimLabel), () -> {
+                    final int comp = c.projectInfo.getFramesPerCompDim();
+
+                    return FPCD_PREFIX + comp + (
+                            comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
+                    ) + DialogVals.getSequenceOrder()
+                            .complementaryDimName();
+                }, FPCD_PREFIX + Constants.MAX_NUM_FRAMES +
+                        FPCD_INFIX + "column");
+
+        final MenuElementGrouping pngStitchedContents =
+                new MenuElementGrouping(
+                        sequenceLabel, framesPerDimLabel,
+                        sequenceDropdown, framesPerDimTextbox,
+                        framesPerCompDim);
 
         // GIF playback speed iff saveType is GIF
         final IncrementalRangeElements<Integer> playbackSpeed =
@@ -202,16 +300,11 @@ public class DialogAssembly {
             final boolean multipleFiles = c.projectInfo
                     .getSaveType().equals(ProjectInfo.SaveType.PNG_SEPARATE);
 
-            final String extension = "." + c.projectInfo
-                    .getSaveType().getFileSuffix(),
-                    folder = c.projectInfo.getFolder().toString(),
-                    file = File.separator + c.projectInfo.getName() +
-                            (multipleFiles
-                                    ? (c.projectInfo.getIndexPrefix() +
-                                    c.projectInfo.getCountFrom() +
-                                    c.projectInfo.getIndexSuffix())
-                                    : ""),
-                    composed = folder + file + extension +
+            final Path filepath = multipleFiles
+                    ? c.projectInfo.buildFilepath(c.projectInfo.getCountFrom())
+                    : c.projectInfo.buildFilepath();
+
+            final String composed = filepath +
                             (multipleFiles ? " + others" : "");
 
             return composed.length() <= PRINT_LETTERS
@@ -228,11 +321,8 @@ public class DialogAssembly {
         setDialog(assembleDialog("Save project...", contents,
                 () -> {
             if (c.projectInfo.getSaveType() == ProjectInfo.SaveType.PNG_STITCHED) {
-                final boolean enoughFrames = c.projectInfo.getFrameDimsX() *
-                        c.projectInfo.getFrameDimsY() >= c.getState().getFrameCount();
-                return c.projectInfo.hasSaveAssociation() &&
-                        xDivsTextbox.isValid() && yDivsTextbox.isValid() &&
-                        enoughFrames;
+                // TODO - redo validation from scratch
+                return c.projectInfo.hasSaveAssociation();
             }
 
             return c.projectInfo.hasSaveAssociation();
@@ -461,8 +551,7 @@ public class DialogAssembly {
                         .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
                         .toArray(Runnable[]::new),
                 () -> DialogVals.getSequenceOrder().ordinal());
-        mb.add(sequenceLabel);
-        mb.add(sequenceDropdown);
+        mb.addAll(sequenceLabel, sequenceDropdown);
 
         // frames per [dim]
         final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
@@ -476,8 +565,7 @@ public class DialogAssembly {
                 fc, 1, Constants.MAX_NUM_FRAMES, "",
                 DialogVals::setFramesPerDim,
                 String.valueOf(Constants.MAX_NUM_FRAMES).length());
-        mb.add(framesPerDimLabel);
-        mb.add(framesPerDimTextbox);
+        mb.addAll(framesPerDimLabel, framesPerDimTextbox);
 
         // frames per complementary dim
         final String FPCD_PREFIX = "... and ", FPCD_INFIX = " frames per ",
@@ -1560,6 +1648,22 @@ public class DialogAssembly {
                 getter.get(), max, "px", setter, getter, maxLength);
     }
 
+    private static DynamicTextbox makeDialogNumericalDynamicTextbox(
+            final MenuElement label,
+            final Function<MenuElement, Coord2D> offsetFunction,
+            final String prefix, final int initial, final String suffix,
+            final Function<Integer, Boolean> numValidator,
+            final Consumer<Integer> setter, final Supplier<Integer> getter,
+            final int maxLength
+    ) {
+        return new DynamicTextbox(offsetFunction.apply(label),
+                Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
+                prefix, String.valueOf(initial), suffix,
+                Textbox.getIntTextValidator(numValidator),
+                s -> setter.accept(Integer.parseInt(s)),
+                () -> String.valueOf(getter.get()), maxLength);
+    }
+
     private static DynamicTextbox makeDialogDynamicTextbox(
             final MenuElement label,
             final Function<MenuElement, Coord2D> offsetFunction,
@@ -1593,13 +1697,9 @@ public class DialogAssembly {
             final Function<Integer, Boolean> validatorLogic,
             final Consumer<Integer> setter, final Supplier<Integer> getter
     ) {
-        return new DynamicTextbox(
-                getDialogContentOffsetFromLabel(label),
-                Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
-                "", String.valueOf(0), "px",
-                Textbox.getIntTextValidator(validatorLogic),
-                s -> setter.accept(Integer.parseInt(s)),
-                () -> String.valueOf(getter.get()), 4);
+        return makeDialogNumericalDynamicTextbox(
+                label, DialogAssembly::getDialogContentOffsetFromLabel,
+                "", 0, "px", validatorLogic, setter, getter, 4);
     }
 
     private static Textbox makeDialogNumericalTextBox(
