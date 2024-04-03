@@ -151,7 +151,6 @@ public class DialogAssembly {
                 MenuElement.Anchor.LEFT_TOP,
                 c.projectInfo::isSaveRangeOfFrames,
                 c.projectInfo::setSaveRangeOfFrames);
-        // TODO: validation that lower < upper and both within frame count bounds
         final String FRAME_NUM_PREFIX = "Frm. ";
         final DynamicTextbox lowerBoundTextbox =
                 makeDialogNumericalDynamicTextbox(lowerBoundsLabel,
@@ -196,52 +195,13 @@ public class DialogAssembly {
                         frameBoundsCondition);
         mb.add(frameBoundsGateway);
 
-        // sequence order
-        final TextLabel sequenceLabel = TextLabel.make(
-                textBelowPos(lowerBoundsLabel, 1),
-                "Sequence order:", Constants.WHITE);
-        final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
-                getDialogContentOffsetFollowingLabel(sequenceLabel),
-                EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(EnumUtils::formattedName).toArray(String[]::new),
-                EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
-                        .toArray(Runnable[]::new),
-                () -> DialogVals.getSequenceOrder().ordinal());
+        final MenuBuilder stitchMB = new MenuBuilder();
 
-        // TODO - refactor ProjectInfo to comply; frames per [dim]
-        final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
-        final DynamicLabel framesPerDimLabel = makeDynamicLabel(
-                textBelowPos(sequenceLabel), () -> FPD_PREFIX +
-                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
-                FPD_PREFIX + "column" + FPD_SUFFIX);
-        final DynamicTextbox framesPerDimTextbox =
-                makeDialogNumericalDynamicTextbox(framesPerDimLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        "", c.projectInfo.calculateNumFrames(), "",
-                        tbv -> tbv <= c.projectInfo.calculateNumFrames() &&
-                                tbv >= 1,
-                        c.projectInfo::setFramesPerDim,
-                        c.projectInfo::getFramesPerDim,
-                        String.valueOf(Constants.MAX_NUM_FRAMES).length());
-        final String FPCD_PREFIX = "... and ", FPCD_INFIX = " frames per ",
-                FPCD_INFIX_SING = FPCD_INFIX.replace("s ", " ");
-        final DynamicLabel framesPerCompDim = makeDynamicLabel(
-                textBelowPos(framesPerDimLabel), () -> {
-                    final int comp = c.projectInfo.getFramesPerCompDim();
-
-                    return FPCD_PREFIX + comp + (
-                            comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
-                    ) + DialogVals.getSequenceOrder()
-                            .complementaryDimName();
-                }, FPCD_PREFIX + Constants.MAX_NUM_FRAMES +
-                        FPCD_INFIX + "column");
+        makeStitchElements(stitchMB,
+                c.projectInfo::calculateNumFrames, lowerBoundsLabel);
 
         final MenuElementGrouping pngStitchedContents =
-                new MenuElementGrouping(
-                        sequenceLabel, framesPerDimLabel,
-                        sequenceDropdown, framesPerDimTextbox,
-                        framesPerCompDim);
+                new MenuElementGrouping(stitchMB.build().getMenuElements());
 
         // GIF playback speed iff saveType is GIF
         final IncrementalRangeElements<Integer> playbackSpeed =
@@ -541,49 +501,7 @@ public class DialogAssembly {
                 "Frame size: " + w + "x" + h + " px");
         mb.add(frameSize);
 
-        // sequence order
-        final TextLabel sequenceLabel = TextLabel.make(
-                textBelowPos(frameSize, 1),
-                "Sequence order:", Constants.WHITE);
-        final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
-                getDialogContentOffsetFollowingLabel(sequenceLabel),
-                EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(EnumUtils::formattedName).toArray(String[]::new),
-                EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
-                        .toArray(Runnable[]::new),
-                () -> DialogVals.getSequenceOrder().ordinal());
-        mb.addAll(sequenceLabel, sequenceDropdown);
-
-        // frames per [dim]
-        final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
-        final DynamicLabel framesPerDimLabel = makeDynamicLabel(
-                textBelowPos(sequenceLabel), () -> FPD_PREFIX +
-                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
-                FPD_PREFIX + "column" + FPD_SUFFIX);
-        final Textbox framesPerDimTextbox = makeDialogNumericalTextBox(
-                framesPerDimLabel,
-                DialogAssembly::getDialogContentOffsetFollowingLabel,
-                fc, 1, Constants.MAX_NUM_FRAMES, "",
-                DialogVals::setFramesPerDim,
-                String.valueOf(Constants.MAX_NUM_FRAMES).length());
-        mb.addAll(framesPerDimLabel, framesPerDimTextbox);
-
-        // frames per complementary dim
-        final String FPCD_PREFIX = "... and ", FPCD_INFIX = " frames per ",
-                FPCD_INFIX_SING = FPCD_INFIX.replace("s ", " ");
-        final DynamicLabel framesPerCompDim = makeDynamicLabel(
-                textBelowPos(framesPerDimLabel), () -> {
-                    final int comp = DialogVals
-                            .calculateFramesPerComplementaryDim(fc);
-
-                    return FPCD_PREFIX + comp + (
-                            comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
-                            ) + DialogVals.getSequenceOrder()
-                            .complementaryDimName();
-                }, FPCD_PREFIX +
-                        Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
-        mb.add(framesPerCompDim);
+        makeStitchElements(mb, () -> fc, frameSize);
 
         final Supplier<Boolean> fTooLarge =
                 () -> StitchSplitMath.stitchedWidth(h, fc) > Constants.MAX_CANVAS_W ||
@@ -593,7 +511,7 @@ public class DialogAssembly {
         final String CSP_PREFIX = "Canvas size preview: ", CSP_INFIX = " px",
                 CSP_OPT_SUFFIX = "... too large";
         final DynamicLabel canvasSizePreview = makeDynamicLabel(
-                textBelowPos(framesPerCompDim, 1),
+                textBelowPos(frameSize, 5),
                 () -> CSP_PREFIX + StitchSplitMath.stitchedWidth(w, fc) + "x" +
                         StitchSplitMath.stitchedHeight(h, fc) + CSP_INFIX +
                         (fTooLarge.get() ? CSP_OPT_SUFFIX : ""),
@@ -606,8 +524,8 @@ public class DialogAssembly {
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
         setDialog(assembleDialog("Stitch frames together...", contents,
-                () -> framesPerDimTextbox.isValid() && !fTooLarge.get(),
-                Constants.GENERIC_APPROVAL_TEXT, c::stitch, true));
+                () -> !fTooLarge.get(), Constants.GENERIC_APPROVAL_TEXT,
+                c::stitch, true));
     }
 
     public static void setDialogToSplitCanvasIntoFrames() {
@@ -620,107 +538,12 @@ public class DialogAssembly {
         DialogVals.setFrameWidth(Settings.getCheckerboardWPixels(), w);
         DialogVals.setFrameHeight(Settings.getCheckerboardHPixels(), h);
 
-        final int initialXDivs = w / DialogVals.getFrameWidth(),
-                initialYDivs = h / DialogVals.getFrameHeight();
-
-        DialogVals.setSplitColumns(initialXDivs);
-        DialogVals.setSplitRows(initialYDivs);
-
         // current canvas size
         final TextLabel canvasSize = makeDialogLeftLabel(0,
                 "Canvas size: " + w + "x" + h + " px");
         mb.add(canvasSize);
 
-        // sequence order
-        final TextLabel sequenceLabel = TextLabel.make(
-                textBelowPos(canvasSize, 1),
-                "Sequence order:", Constants.WHITE);
-        final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
-                getDialogContentOffsetFollowingLabel(sequenceLabel),
-                EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(EnumUtils::formattedName).toArray(String[]::new),
-                EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
-                        .toArray(Runnable[]::new),
-                () -> DialogVals.getSequenceOrder().ordinal());
-        mb.addAll(sequenceLabel, sequenceDropdown);
-
-        // columns
-        final TextLabel columnsLabel = TextLabel.make(
-                textBelowPos(sequenceLabel), "Columns:", Constants.WHITE);
-        final DynamicTextbox columnsTextbox = makeDialogDynamicTextbox(
-                columnsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
-                1, initialXDivs, Constants.MAX_NUM_FRAMES, "",
-                x -> DialogVals.setSplitColumns(x, w), DialogVals::getSplitColumns,
-                String.valueOf(Constants.MAX_NUM_FRAMES).length());
-        mb.addAll(columnsLabel, columnsTextbox);
-
-        // rows
-        final TextLabel yDivsLabel = makeDialogRightLabel(
-                columnsLabel, "Rows:");
-        final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
-                yDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
-                1, initialYDivs, Constants.MAX_NUM_FRAMES, "",
-                y -> DialogVals.setSplitRows(y, h), DialogVals::getSplitRows,
-                String.valueOf(Constants.MAX_NUM_FRAMES).length());
-        mb.addAll(yDivsLabel, yDivsTextbox);
-
-        // frame width
-        final TextLabel frameWidthLabel = TextLabel.make(
-                textBelowPos(columnsLabel), "Frame width:",
-                Constants.WHITE);
-        final DynamicTextbox frameWidthTextbox =
-                makeDialogPixelDynamicTextbox(frameWidthLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
-                        fw -> DialogVals.setFrameWidth(fw, w),
-                        DialogVals::getFrameWidth,
-                        String.valueOf(Constants.MAX_CANVAS_W).length());
-        mb.addAll(frameWidthLabel, frameWidthTextbox);
-
-        // frame height
-        final TextLabel frameHeightLabel = makeDialogRightLabel(
-                frameWidthLabel, "Frame height:");
-        final DynamicTextbox frameHeightTextbox =
-                makeDialogPixelDynamicTextbox(frameHeightLabel,
-                        DialogAssembly::getDialogContentOffsetFollowingLabel,
-                        Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
-                        fh -> DialogVals.setFrameHeight(fh, h),
-                        DialogVals::getFrameHeight,
-                        String.valueOf(Constants.MAX_CANVAS_H).length());
-        mb.addAll(frameHeightLabel, frameHeightTextbox);
-
-        final String[] remainderLabels =
-                new String[] { "Extra frame", "Truncate" };
-
-        // X-axis remainder
-        final TextLabel xRemainderLabel = TextLabel.make(
-                textBelowPos(frameWidthLabel), "X-axis remainder:",
-                Constants.WHITE);
-        final DropdownMenu xRemainderDropdown = DropdownMenu.forDialog(
-                getDialogContentOffsetFollowingLabel(xRemainderLabel),
-                remainderLabels, new Runnable[] {
-                        () -> DialogVals.setTruncateSplitX(false),
-                        () -> DialogVals.setTruncateSplitX(true)
-                }, () -> DialogVals.isTruncateSplitX() ? 1 : 0);
-        final GatewayMenuElement xRemainder = new GatewayMenuElement(
-                new MenuElementGrouping(xRemainderLabel, xRemainderDropdown),
-                () -> w % DialogVals.getFrameWidth() != 0);
-        mb.add(xRemainder);
-
-        // Y-axis remainder
-        final TextLabel yRemainderLabel = makeDialogRightLabel(
-                xRemainderLabel, "Y-axis remainder:");
-        final DropdownMenu yRemainderDropdown = DropdownMenu.forDialog(
-                getDialogContentOffsetFollowingLabel(yRemainderLabel),
-                remainderLabels, new Runnable[] {
-                        () -> DialogVals.setTruncateSplitY(false),
-                        () -> DialogVals.setTruncateSplitY(true)
-                }, () -> DialogVals.isTruncateSplitY() ? 1 : 0);
-        final GatewayMenuElement yRemainder = new GatewayMenuElement(
-                new MenuElementGrouping(yRemainderLabel, yRemainderDropdown),
-                () -> h % DialogVals.getFrameHeight() != 0);
-        mb.add(yRemainder);
+        makeSplitElements(mb, w, h, canvasSize);
 
         // pixel loss
         final String NO_LOSS = "Perfect split!",
@@ -776,10 +599,7 @@ public class DialogAssembly {
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
         setDialog(assembleDialog("Split canvas into frames...", contents,
-                () -> columnsTextbox.isValid() && yDivsTextbox.isValid() &&
-                        frameWidthTextbox.isValid() &&
-                        frameHeightTextbox.isValid(),
-                Constants.GENERIC_APPROVAL_TEXT, c::split, true));
+                () -> true, Constants.GENERIC_APPROVAL_TEXT, c::split, true));
     }
 
     // TODO - redesign and refactor
@@ -1570,6 +1390,156 @@ public class DialogAssembly {
 
     private static void setDialog(final Menu dialog) {
         StippleEffect.get().setDialog(dialog);
+    }
+
+    private static void makeStitchElements(
+            final MenuBuilder mb,
+            final Supplier<Integer> fcGetter,
+            final TextLabel referenceLabel
+    ) {
+        // sequence order
+        makeSequenceOrderElements(mb, referenceLabel);
+
+        // frames per [dim]
+        final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
+        final DynamicLabel framesPerDimLabel = makeDynamicLabel(
+                textBelowPos(referenceLabel, 2), () -> FPD_PREFIX +
+                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
+                FPD_PREFIX + "column" + FPD_SUFFIX);
+        final DynamicTextbox framesPerDimTextbox = makeDialogNumericalDynamicTextbox(
+                framesPerDimLabel,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                "", fcGetter.get(), "",
+                tbv -> tbv >= 1 && tbv <= Constants.MAX_NUM_FRAMES,
+                DialogVals::setFramesPerDim, DialogVals::getFramesPerDim,
+                String.valueOf(Constants.MAX_NUM_FRAMES).length());
+        mb.addAll(framesPerDimLabel, framesPerDimTextbox);
+
+        // frames per complementary dim
+        final String FPCD_PREFIX = "... and ", FPCD_INFIX = " frames per ",
+                FPCD_INFIX_SING = FPCD_INFIX.replace("s ", " ");
+        final DynamicLabel framesPerCompDim = makeDynamicLabel(
+                textBelowPos(framesPerDimLabel), () -> {
+                    final int comp = DialogVals
+                            .calculateFramesPerComplementaryDim(fcGetter.get());
+
+                    return FPCD_PREFIX + comp + (
+                            comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
+                    ) + DialogVals.getSequenceOrder()
+                            .complementaryDimName();
+                }, FPCD_PREFIX +
+                        Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
+        mb.add(framesPerCompDim);
+    }
+
+    private static void makeSplitElements(
+            final MenuBuilder mb,
+            final int w, final int h,
+            final TextLabel referenceLabel
+    ) {
+        // pre-processing
+        final int initialColumns = w / DialogVals.getFrameWidth(),
+                initialRows = h / DialogVals.getFrameHeight();
+
+        DialogVals.setSplitColumns(initialColumns);
+        DialogVals.setSplitRows(initialRows);
+
+        // sequence order
+        makeSequenceOrderElements(mb, referenceLabel);
+
+        // columns
+        final TextLabel columnsLabel = TextLabel.make(
+                textBelowPos(referenceLabel, 2), "Columns:", Constants.WHITE);
+        final DynamicTextbox columnsTextbox = makeDialogDynamicTextbox(
+                columnsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
+                1, initialColumns, Constants.MAX_NUM_FRAMES, "",
+                x -> DialogVals.setSplitColumns(x, w), DialogVals::getSplitColumns,
+                String.valueOf(Constants.MAX_NUM_FRAMES).length());
+        mb.addAll(columnsLabel, columnsTextbox);
+
+        // rows
+        final TextLabel yDivsLabel = makeDialogRightLabel(
+                columnsLabel, "Rows:");
+        final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
+                yDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
+                1, initialRows, Constants.MAX_NUM_FRAMES, "",
+                y -> DialogVals.setSplitRows(y, h), DialogVals::getSplitRows,
+                String.valueOf(Constants.MAX_NUM_FRAMES).length());
+        mb.addAll(yDivsLabel, yDivsTextbox);
+
+        // frame width
+        final TextLabel frameWidthLabel = TextLabel.make(
+                textBelowPos(columnsLabel), "Frame width:",
+                Constants.WHITE);
+        final DynamicTextbox frameWidthTextbox =
+                makeDialogPixelDynamicTextbox(frameWidthLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
+                        fw -> DialogVals.setFrameWidth(fw, w),
+                        DialogVals::getFrameWidth,
+                        String.valueOf(Constants.MAX_CANVAS_W).length());
+        mb.addAll(frameWidthLabel, frameWidthTextbox);
+
+        // frame height
+        final TextLabel frameHeightLabel = makeDialogRightLabel(
+                frameWidthLabel, "Frame height:");
+        final DynamicTextbox frameHeightTextbox =
+                makeDialogPixelDynamicTextbox(frameHeightLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
+                        fh -> DialogVals.setFrameHeight(fh, h),
+                        DialogVals::getFrameHeight,
+                        String.valueOf(Constants.MAX_CANVAS_H).length());
+        mb.addAll(frameHeightLabel, frameHeightTextbox);
+
+        final String[] remainderLabels =
+                new String[] { "Extra frame", "Truncate" };
+
+        // X-axis remainder
+        final TextLabel xRemainderLabel = TextLabel.make(
+                textBelowPos(frameWidthLabel), "X-axis remainder:",
+                Constants.WHITE);
+        final DropdownMenu xRemainderDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(xRemainderLabel),
+                remainderLabels, new Runnable[] {
+                        () -> DialogVals.setTruncateSplitX(false),
+                        () -> DialogVals.setTruncateSplitX(true)
+                }, () -> DialogVals.isTruncateSplitX() ? 1 : 0);
+        final GatewayMenuElement xRemainder = new GatewayMenuElement(
+                new MenuElementGrouping(xRemainderLabel, xRemainderDropdown),
+                () -> w % DialogVals.getFrameWidth() != 0);
+        mb.add(xRemainder);
+
+        // Y-axis remainder
+        final TextLabel yRemainderLabel = makeDialogRightLabel(
+                xRemainderLabel, "Y-axis remainder:");
+        final DropdownMenu yRemainderDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(yRemainderLabel),
+                remainderLabels, new Runnable[] {
+                        () -> DialogVals.setTruncateSplitY(false),
+                        () -> DialogVals.setTruncateSplitY(true)
+                }, () -> DialogVals.isTruncateSplitY() ? 1 : 0);
+        final GatewayMenuElement yRemainder = new GatewayMenuElement(
+                new MenuElementGrouping(yRemainderLabel, yRemainderDropdown),
+                () -> h % DialogVals.getFrameHeight() != 0);
+        mb.add(yRemainder);
+    }
+
+    private static void makeSequenceOrderElements(
+            final MenuBuilder mb, final TextLabel referenceLabel
+    ) {
+        final TextLabel sequenceLabel = TextLabel.make(
+                textBelowPos(referenceLabel, 1),
+                "Sequence order:", Constants.WHITE);
+        final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(sequenceLabel),
+                EnumUtils.stream(DialogVals.SequenceOrder.class)
+                        .map(EnumUtils::formattedName).toArray(String[]::new),
+                EnumUtils.stream(DialogVals.SequenceOrder.class)
+                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
+                        .toArray(Runnable[]::new),
+                () -> DialogVals.getSequenceOrder().ordinal());
+        mb.addAll(sequenceLabel, sequenceDropdown);
     }
 
     private static DynamicTextButton makeFolderSelectionButton(

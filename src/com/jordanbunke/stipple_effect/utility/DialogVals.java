@@ -280,15 +280,21 @@ public class DialogVals {
     public static void setFrameWidth(
             final int frameWidth, final int canvasWidth
     ) {
-        DialogVals.frameWidth = frameWidth;
-        setSplitColumns(canvasWidth / frameWidth);
+        final int clampedFW = MathPlus.bounded(Constants.MIN_CANVAS_W,
+                frameWidth, canvasWidth);
+
+        DialogVals.frameWidth = clampedFW;
+        setSplitColumns(canvasWidth / clampedFW);
     }
 
     public static void setFrameHeight(
             final int frameHeight, final int canvasHeight
     ) {
-        DialogVals.frameHeight = frameHeight;
-        setSplitRows(canvasHeight / frameHeight);
+        final int clampedFH = MathPlus.bounded(Constants.MIN_CANVAS_H,
+                frameHeight, canvasHeight);
+
+        DialogVals.frameHeight = clampedFH;
+        setSplitRows(canvasHeight / clampedFH);
     }
 
     public static void setSplitColumns(final int splitColumns) {
