@@ -47,6 +47,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DialogAssembly {
+    private static final int LINE_ABOVE = -2;
+
     public static void setDialogToSave() {
         final SEContext c = StippleEffect.get().getContext();
 
@@ -312,7 +314,7 @@ public class DialogAssembly {
                     composed.substring(composed.length() - ENDS);
         });
         final TextLabel destinationLabel = TextLabel.make(textBelowPos(
-                preview, -2), "Destination:", Constants.WHITE);
+                preview, LINE_ABOVE), "Destination:", Constants.WHITE);
         mb.addAll(preview, destinationLabel);
 
         // content assembly
@@ -621,8 +623,8 @@ public class DialogAssembly {
         final int initialXDivs = w / DialogVals.getFrameWidth(),
                 initialYDivs = h / DialogVals.getFrameHeight();
 
-        DialogVals.setXDivs(initialXDivs);
-        DialogVals.setYDivs(initialYDivs);
+        DialogVals.setSplitColumns(initialXDivs);
+        DialogVals.setSplitRows(initialYDivs);
 
         // current canvas size
         final TextLabel canvasSize = makeDialogLeftLabel(0,
@@ -643,30 +645,29 @@ public class DialogAssembly {
                 () -> DialogVals.getSequenceOrder().ordinal());
         mb.addAll(sequenceLabel, sequenceDropdown);
 
-        // X-axis divisions
-        final TextLabel xDivsLabel = TextLabel.make(
-                textBelowPos(sequenceLabel), "X-axis divisions:",
-                Constants.WHITE);
-        final DynamicTextbox xDivsTextbox = makeDialogDynamicTextbox(
-                xDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
+        // columns
+        final TextLabel columnsLabel = TextLabel.make(
+                textBelowPos(sequenceLabel), "Columns:", Constants.WHITE);
+        final DynamicTextbox columnsTextbox = makeDialogDynamicTextbox(
+                columnsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 1, initialXDivs, Constants.MAX_NUM_FRAMES, "",
-                x -> DialogVals.setXDivs(x, w), DialogVals::getXDivs,
+                x -> DialogVals.setSplitColumns(x, w), DialogVals::getSplitColumns,
                 String.valueOf(Constants.MAX_NUM_FRAMES).length());
-        mb.addAll(xDivsLabel, xDivsTextbox);
+        mb.addAll(columnsLabel, columnsTextbox);
 
-        // Y-axis divisions
+        // rows
         final TextLabel yDivsLabel = makeDialogRightLabel(
-                xDivsLabel, "Y-axis divisions:");
+                columnsLabel, "Rows:");
         final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
                 yDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 1, initialYDivs, Constants.MAX_NUM_FRAMES, "",
-                y -> DialogVals.setYDivs(y, h), DialogVals::getYDivs,
+                y -> DialogVals.setSplitRows(y, h), DialogVals::getSplitRows,
                 String.valueOf(Constants.MAX_NUM_FRAMES).length());
         mb.addAll(yDivsLabel, yDivsTextbox);
 
         // frame width
         final TextLabel frameWidthLabel = TextLabel.make(
-                textBelowPos(xDivsLabel), "Frame width:",
+                textBelowPos(columnsLabel), "Frame width:",
                 Constants.WHITE);
         final DynamicTextbox frameWidthTextbox =
                 makeDialogPixelDynamicTextbox(frameWidthLabel,
@@ -721,31 +722,13 @@ public class DialogAssembly {
                 () -> h % DialogVals.getFrameHeight() != 0);
         mb.add(yRemainder);
 
-        // preview
-        final String PRV_PREFIX = "Preview: ",
-                PRV_INFIX = " frames of ", PRV_INFIX_SING = " frame of ",
-                PRV_SUFFIX_SING = " px", PRV_SUFFIX = PRV_SUFFIX_SING + " each";
-        final DynamicLabel dimsPreview = makeDynamicLabel(
-                textBelowPos(xRemainderLabel, 1), () -> {
-                    final int fc = StitchSplitMath.splitFrameCount(w, h);
-
-                    return PRV_PREFIX + fc +
-                            (fc == 1 ? PRV_INFIX_SING : PRV_INFIX) +
-                            DialogVals.getFrameWidth() + "x" +
-                            DialogVals.getFrameHeight() +
-                            (fc == 1 ? PRV_SUFFIX_SING : PRV_SUFFIX);
-                },
-                PRV_PREFIX + Constants.MAX_NUM_FRAMES + PRV_INFIX +
-                        Constants.MAX_CANVAS_W + "x" + Constants.MAX_CANVAS_H + PRV_SUFFIX);
-        mb.add(dimsPreview);
-
         // pixel loss
         final String NO_LOSS = "Perfect split!",
                 TRUNC = "truncating ", PAD = "padding ",
                 RIGHT = "rightmost ", BOTTOM = "bottommost ",
                 PIXELS = " pixels";
-        final DynamicLabel pixelLoss = makeDynamicLabel(
-                textBelowPos(dimsPreview), () -> {
+        final DynamicLabel pixelLoss = makeDialogLeftDynamicLabelAtBottom(
+                () -> {
                     final boolean truncX = DialogVals.isTruncateSplitX(),
                             truncY = DialogVals.isTruncateSplitY();
                     final int fw = DialogVals.getFrameWidth(),
@@ -769,14 +752,31 @@ public class DialogAssembly {
                             (!(perfectX || perfectY) ? "; " : "") + yText);
                     return pixelLossText.substring(0, 1).toUpperCase() +
                             pixelLossText.substring(1);
-                }, TRUNC + RIGHT + Constants.MAX_CANVAS_W + PIXELS + "; " +
-                        TRUNC + BOTTOM + Constants.MAX_CANVAS_H + PIXELS);
+                });
         mb.add(pixelLoss);
+
+        // preview
+        final String PRV_PREFIX = "Preview: ",
+                PRV_INFIX = " frames of ", PRV_INFIX_SING = " frame of ",
+                PRV_SUFFIX_SING = " px", PRV_SUFFIX = PRV_SUFFIX_SING + " each";
+        final DynamicLabel dimsPreview = makeDynamicLabel(
+                textBelowPos(pixelLoss, LINE_ABOVE), () -> {
+                    final int fc = StitchSplitMath.splitFrameCount(w, h);
+
+                    return PRV_PREFIX + fc +
+                            (fc == 1 ? PRV_INFIX_SING : PRV_INFIX) +
+                            DialogVals.getFrameWidth() + "x" +
+                            DialogVals.getFrameHeight() +
+                            (fc == 1 ? PRV_SUFFIX_SING : PRV_SUFFIX);
+                },
+                PRV_PREFIX + Constants.MAX_NUM_FRAMES + PRV_INFIX +
+                        Constants.MAX_CANVAS_W + "x" + Constants.MAX_CANVAS_H + PRV_SUFFIX);
+        mb.add(dimsPreview);
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
         setDialog(assembleDialog("Split canvas into frames...", contents,
-                () -> xDivsTextbox.isValid() && yDivsTextbox.isValid() &&
+                () -> columnsTextbox.isValid() && yDivsTextbox.isValid() &&
                         frameWidthTextbox.isValid() &&
                         frameHeightTextbox.isValid(),
                 Constants.GENERIC_APPROVAL_TEXT, c::split, true));

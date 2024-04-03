@@ -21,7 +21,7 @@ public class DialogVals {
             framesPerDim = 1,
             frameWidth = Constants.DEFAULT_CANVAS_W,
             frameHeight = Constants.DEFAULT_CANVAS_H,
-            xDivs = 1, yDivs = 1;
+            splitColumns = 1, splitRows = 1;
     private static double
             layerOpacity = Constants.OPAQUE,
             resizeScale = 1d,
@@ -281,30 +281,30 @@ public class DialogVals {
             final int frameWidth, final int canvasWidth
     ) {
         DialogVals.frameWidth = frameWidth;
-        setXDivs(canvasWidth / frameWidth);
+        setSplitColumns(canvasWidth / frameWidth);
     }
 
     public static void setFrameHeight(
             final int frameHeight, final int canvasHeight
     ) {
         DialogVals.frameHeight = frameHeight;
-        setYDivs(canvasHeight / frameHeight);
+        setSplitRows(canvasHeight / frameHeight);
     }
 
-    public static void setXDivs(final int xDivs) {
-        DialogVals.xDivs = xDivs;
+    public static void setSplitColumns(final int splitColumns) {
+        DialogVals.splitColumns = splitColumns;
     }
 
-    public static void setXDivs(final int xDivs, final int canvasWidth) {
-        setFrameWidth(canvasWidth / xDivs, canvasWidth);
+    public static void setSplitColumns(final int splitColumns, final int canvasWidth) {
+        setFrameWidth(canvasWidth / splitColumns, canvasWidth);
     }
 
-    public static void setYDivs(final int yDivs) {
-        DialogVals.yDivs = yDivs;
+    public static void setSplitRows(final int splitRows) {
+        DialogVals.splitRows = splitRows;
     }
 
-    public static void setYDivs(final int yDivs, final int canvasHeight) {
-        setFrameHeight(canvasHeight / yDivs, canvasHeight);
+    public static void setSplitRows(final int splitRows, final int canvasHeight) {
+        setFrameHeight(canvasHeight / splitRows, canvasHeight);
     }
 
     public static void setResizePreserveAspectRatio(
@@ -581,12 +581,12 @@ public class DialogVals {
         return frameHeight;
     }
 
-    public static int getXDivs() {
-        return xDivs;
+    public static int getSplitColumns() {
+        return splitColumns;
     }
 
-    public static int getYDivs() {
-        return yDivs;
+    public static int getSplitRows() {
+        return splitRows;
     }
 
     public static boolean isTruncateSplitX() {

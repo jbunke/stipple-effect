@@ -39,7 +39,7 @@ public class StitchSplitMath {
     }
 
     public static int splitFramesX(final int w) {
-        final int xDivs = DialogVals.getXDivs(),
+        final int xDivs = DialogVals.getSplitColumns(),
                 fw = DialogVals.getFrameWidth(),
                 remX = w % fw;
 
@@ -47,7 +47,7 @@ public class StitchSplitMath {
     }
 
     public static int splitFramesY(final int h) {
-        final int yDivs = DialogVals.getYDivs(),
+        final int yDivs = DialogVals.getSplitRows(),
                 fh = DialogVals.getFrameHeight(),
                 remY = h % fh;
 
