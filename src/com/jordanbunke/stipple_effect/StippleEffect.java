@@ -32,6 +32,7 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.*;
 
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -991,19 +993,30 @@ public class StippleEffect implements ProgramContext {
     ) {
         final int w = DialogVals.getResizeWidth(),
                 h = DialogVals.getResizeHeight(),
-                xDivs = DialogVals.getNewProjectXDivs(),
-                yDivs = DialogVals.getNewProjectYDivs(),
-                fw = w / xDivs, fh = h /  yDivs,
-                frameCount = Math.min(Constants.MAX_NUM_FRAMES, xDivs * yDivs);
+                columns = DialogVals.getNewProjectColumns(),
+                rows = DialogVals.getNewProjectRows(),
+                fw = w / columns, fh = h /  rows,
+                frameCount = Math.min(Constants.MAX_NUM_FRAMES,
+                        columns * rows);
 
         final GameImage resized = ImageProcessing.scale(image, w, h);
         final List<GameImage> frames = new ArrayList<>();
 
-        for (int y = 0; y < yDivs; y++)
-            for (int x = 0; x < xDivs; x++)
-                if (frames.size() < frameCount)
-                    frames.add(new GameImage(resized.getSubimage(
-                            x * fw, y * fh, fw, fh)));
+        final boolean isHorizontal = StitchSplitMath.isHorizontal();
+        final BinaryOperator<Integer>
+                horz = (a, b) -> a % b,
+                vert = (a, b) -> a / b,
+                xOp = isHorizontal ? horz : vert,
+                yOp = isHorizontal ? vert : horz;
+        final int fpd = isHorizontal ? columns : rows;
+
+        for (int i = 0; i < frameCount; i++) {
+            final int x = xOp.apply(i, fpd) * w,
+                    y = yOp.apply(i, fpd) * h;
+
+            frames.add(new GameImage(resized.getSubimage(
+                    x * fw, y * fh, fw, fh)));
+        }
 
         final SELayer firstLayer = new SELayer(frames,
                 new GameImage(fw, fh), Constants.OPAQUE, true, false,

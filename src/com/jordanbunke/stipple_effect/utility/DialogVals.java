@@ -13,7 +13,7 @@ public class DialogVals {
     private static int
             newProjectWidth = Constants.DEFAULT_CANVAS_W,
             newProjectHeight = Constants.DEFAULT_CANVAS_H,
-            newProjectXDivs = 1, newProjectYDivs = 1,
+            newProjectColumns = 1, newProjectRows = 1,
             resizeWidth = Constants.DEFAULT_CANVAS_W,
             resizeHeight = Constants.DEFAULT_CANVAS_H,
             padLeft = 0, padRight = 0, padTop = 0, padBottom = 0,
@@ -209,8 +209,28 @@ public class DialogVals {
         DialogVals.newProjectHeight = newProjectHeight;
     }
 
+    public static void setNewProjectHeight(
+            final int newProjectHeight, final int canvasHeight
+    ) {
+        final int clampedNPH = MathPlus.bounded(Constants.MIN_CANVAS_H,
+                newProjectHeight, canvasHeight);
+
+        DialogVals.newProjectHeight = clampedNPH;
+        setNewProjectRows(canvasHeight / clampedNPH);
+    }
+
     public static void setNewProjectWidth(final int newProjectWidth) {
         DialogVals.newProjectWidth = newProjectWidth;
+    }
+
+    public static void setNewProjectWidth(
+            final int newProjectWidth, final int canvasWidth
+    ) {
+        final int clampedNPW = MathPlus.bounded(Constants.MIN_CANVAS_W,
+                newProjectWidth, canvasWidth);
+
+        DialogVals.newProjectWidth = clampedNPW;
+        setNewProjectColumns(canvasWidth / clampedNPW);
     }
 
     public static void setPadBottom(final int padBottom) {
@@ -261,12 +281,24 @@ public class DialogVals {
         }
     }
 
-    public static void setNewProjectXDivs(final int newProjectXDivs) {
-        DialogVals.newProjectXDivs = newProjectXDivs;
+    public static void setNewProjectColumns(final int newProjectColumns) {
+        DialogVals.newProjectColumns = newProjectColumns;
     }
 
-    public static void setNewProjectYDivs(final int newProjectYDivs) {
-        DialogVals.newProjectYDivs = newProjectYDivs;
+    public static void setNewProjectColumns(
+            final int newProjectColumns, final int canvasWidth
+    ) {
+        setNewProjectWidth(canvasWidth / newProjectColumns, canvasWidth);
+    }
+
+    public static void setNewProjectRows(final int newProjectRows) {
+        DialogVals.newProjectRows = newProjectRows;
+    }
+
+    public static void setNewProjectRows(
+            final int newProjectRows, final int canvasHeight
+    ) {
+        setNewProjectHeight(canvasHeight / newProjectRows, canvasHeight);
     }
 
     public static void setNewFontPixelSpacing(final int newFontPixelSpacing) {
@@ -508,12 +540,12 @@ public class DialogVals {
         return paletteName;
     }
 
-    public static int getNewProjectXDivs() {
-        return newProjectXDivs;
+    public static int getNewProjectColumns() {
+        return newProjectColumns;
     }
 
-    public static int getNewProjectYDivs() {
-        return newProjectYDivs;
+    public static int getNewProjectRows() {
+        return newProjectRows;
     }
 
     public static int getNewFontPixelSpacing() {
