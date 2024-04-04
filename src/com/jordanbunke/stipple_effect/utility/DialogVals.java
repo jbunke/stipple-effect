@@ -45,7 +45,7 @@ public class DialogVals {
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
     private static SettingScreen settingScreen = SettingScreen.DEFAULT;
     private static PaletteSorter paletteSorter = PaletteSorter.HUE;
-    private static ContentType contentType = ContentType.SELECTION;
+    private static Scope scope = Scope.SELECTION;
     private static UploadStatus
             asciiStatus = UploadStatus.UNATTEMPTED,
             latinExStatus = UploadStatus.UNATTEMPTED;
@@ -130,17 +130,17 @@ public class DialogVals {
         }
     }
 
-    public enum ContentType {
+    public enum Scope {
         SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
 
-        public ContentType next(final SEContext c) {
-            final ContentType[] vs = values();
-            final ContentType next = vs[(ordinal() + 1) % vs.length];
+        public Scope next(final SEContext c) {
+            final Scope[] vs = values();
+            final Scope next = vs[(ordinal() + 1) % vs.length];
 
             return next.get(c);
         }
 
-        public ContentType get(final SEContext c) {
+        public Scope get(final SEContext c) {
             // skip SELECTION iff context has no selection
             if (!c.getState().hasSelection() && this == SELECTION)
                 return next(c);
@@ -181,8 +181,8 @@ public class DialogVals {
         paletteSorter = EnumUtils.next(paletteSorter);
     }
 
-    public static void cycleContentType(final SEContext c) {
-        contentType = contentType.get(c).next(c);
+    public static void setScope(final Scope scope) {
+        DialogVals.scope = scope;
     }
 
     public static void setLayerName(final String layerName) {
@@ -502,8 +502,8 @@ public class DialogVals {
         return paletteSorter;
     }
 
-    public static ContentType getContentType(final SEContext c) {
-        return contentType.get(c);
+    public static Scope getContentType(final SEContext c) {
+        return scope.get(c);
     }
 
     public static int getImportFrameHeight() {

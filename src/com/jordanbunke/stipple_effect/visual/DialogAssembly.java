@@ -1152,12 +1152,11 @@ public class DialogAssembly {
                 }, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToAddContentsToPalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        contentTypeCycleToggle(mb, c);
+        makeContentScopeDropdown(mb, c);
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
@@ -1168,12 +1167,11 @@ public class DialogAssembly {
                 }, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToPalettize(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        contentTypeCycleToggle(mb, c);
+        makeContentScopeDropdown(mb, c);
 
         if (palette.size() == 0)
             mb.add(makeDialogLeftLabelAtBottom(
@@ -1186,38 +1184,6 @@ public class DialogAssembly {
                 () -> c.palettize(palette), true));
     }
 
-    private static void contentTypeCycleToggle(
-            final MenuBuilder mb, final SEContext c
-    ) {
-        final DialogVals.ContentType[] vs = DialogVals.ContentType.values();
-
-        // label
-        final TextLabel label = makeDialogLeftLabel(0, "Scope:");
-
-        // toggle
-        final GameImage[] bases = makeToggleButtonSet(Arrays.stream(vs)
-                .map(DialogVals.ContentType::toString)
-                .toArray(String[]::new));
-
-        final Runnable[] behaviours = new Runnable[vs.length];
-        Arrays.fill(behaviours, (Runnable) () -> {});
-
-        final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
-                getDialogContentOffsetFromLabel(label),
-                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true,
-                bases, Arrays.stream(bases)
-                .map(GraphicsUtils::drawHighlightedButton)
-                .toArray(GameImage[]::new), behaviours,
-                () -> DialogVals.getContentType(c).ordinal(),
-                () -> DialogVals.cycleContentType(c));
-
-        mb.add(label);
-        mb.add(toggle);
-    }
-
-    // TODO - redesign and refactor
     public static void setDialogToPaletteSettings(final Palette palette) {
         DialogVals.setPaletteName(palette.getName());
 
@@ -1399,6 +1365,32 @@ public class DialogAssembly {
 
     private static void setDialog(final Menu dialog) {
         StippleEffect.get().setDialog(dialog);
+    }
+
+    private static void makeContentScopeDropdown(
+            final MenuBuilder mb, final SEContext c
+    ) {
+        final DialogVals.Scope[] vs =
+                Arrays.stream(DialogVals.Scope.values())
+                        .filter(s -> s != DialogVals.Scope.SELECTION ||
+                                c.getState().hasSelection())
+                        .toArray(DialogVals.Scope[]::new);
+
+        DialogVals.setScope(vs[0]);
+
+        final TextLabel label = makeDialogLeftLabel(0, "Scope:");
+        final DropdownMenu dropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(label),
+                Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
+                Arrays.stream(vs)
+                        .map(DialogVals.Scope::toString)
+                        .toArray(String[]::new),
+                Arrays.stream(vs)
+                        .map(s -> (Runnable) () -> DialogVals.setScope(s))
+                        .toArray(Runnable[]::new),
+                () -> 0);
+
+        mb.addAll(label, dropdown);
     }
 
     private static void makeStitchElements(

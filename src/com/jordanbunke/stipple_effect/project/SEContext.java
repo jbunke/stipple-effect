@@ -997,12 +997,12 @@ public class SEContext {
 
     // contents to palette
     public void contentsToPalette(final Palette palette) {
-        final DialogVals.ContentType contentType = DialogVals
+        final DialogVals.Scope scope = DialogVals
                 .getContentType(this);
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
-        switch (contentType) {
+        switch (scope) {
             case SELECTION -> extractColorsFromSelection(colors);
             case LAYER_FRAME -> extractColorsFromFrame(colors, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
@@ -1072,10 +1072,10 @@ public class SEContext {
 
     // palettize
     public void palettize(final Palette palette) {
-        final DialogVals.ContentType contentType = DialogVals.getContentType(this);
+        final DialogVals.Scope scope = DialogVals.getContentType(this);
         ProjectState state = getState();
 
-        switch (contentType) {
+        switch (scope) {
             case SELECTION -> palettizeSelection(palette);
             case LAYER_FRAME -> state = palettizeFrame(palette, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
@@ -1115,7 +1115,7 @@ public class SEContext {
             }
         }
 
-        if (contentType != DialogVals.ContentType.SELECTION) {
+        if (scope != DialogVals.Scope.SELECTION) {
             state.markAsCheckpoint(false);
             stateManager.performAction(state, Operation.PALETTIZE);
         }
