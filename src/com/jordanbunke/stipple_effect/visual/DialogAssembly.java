@@ -282,14 +282,8 @@ public class DialogAssembly {
         final MenuElementGrouping contents = new MenuElementGrouping(
                 mb.build().getMenuElements());
         setDialog(assembleDialog("Save project...", contents,
-                () -> {
-            if (c.projectInfo.getSaveType() == ProjectInfo.SaveType.PNG_STITCHED) {
-                // TODO - redo validation from scratch
-                return c.projectInfo.hasSaveAssociation();
-            }
-
-            return c.projectInfo.hasSaveAssociation();
-            }, "Save", c.projectInfo::save, true));
+                c.projectInfo::hasSaveAssociation,
+                "Save", c.projectInfo::save, true));
     }
 
     public static void setDialogToResize() {
@@ -603,17 +597,16 @@ public class DialogAssembly {
                 () -> true, Constants.GENERIC_APPROVAL_TEXT, c::split, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToOpenPNG(final GameImage image, final Path filepath) {
         final int w = image.getWidth(), h = image.getHeight();
         final boolean tooBig = w > Constants.MAX_CANVAS_W ||
                 h > Constants.MAX_CANVAS_H;
 
-        DialogVals.setResizeWidth(w, w, h, false);
-        DialogVals.setResizeHeight(h, w, h, false);
+        DialogVals.setImportWidth(w, w, h, false);
+        DialogVals.setImportHeight(h, w, h, false);
 
-        DialogVals.setNewProjectColumns(1);
-        DialogVals.setNewProjectRows(1);
+        DialogVals.setImportColumns(1, w);
+        DialogVals.setImportRows(1, h);
 
         final MenuBuilder mb = new MenuBuilder();
 
@@ -623,32 +616,66 @@ public class DialogAssembly {
                         ? " ... must be split or downscaled" :""));
         mb.add(context);
 
-        // TODO - refactor resize code to populate
+        final TextLabel resizeLabel = TextLabel.make(
+                textBelowPos(context, 1), "Resize...", Constants.WHITE),
+                preserveAspectRatioLabel = TextLabel.make(textBelowPos(
+                        resizeLabel), "Preserve aspect ratio?", Constants.WHITE),
+                widthLabel = TextLabel.make(textBelowPos(
+                        preserveAspectRatioLabel), "Width:", Constants.WHITE),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height:");
+        final Checkbox preserveAspectRatioCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(preserveAspectRatioLabel),
+                MenuElement.Anchor.LEFT_TOP,
+                DialogVals::isResizePreserveAspectRatio,
+                DialogVals::setResizePreserveAspectRatio);
+        final DynamicTextbox widthTextbox =
+                makeDialogPixelDynamicTextbox(widthLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Constants.MIN_CANVAS_W, Integer.MAX_VALUE,
+                        iw -> DialogVals.setImportWidth(iw, w, h,
+                                DialogVals.isResizePreserveAspectRatio()),
+                        DialogVals::getImportWidth, 3),
+                heightTextbox = makeDialogPixelDynamicTextbox(heightLabel,
+                        DialogAssembly::getDialogContentOffsetFollowingLabel,
+                        Constants.MIN_CANVAS_H, Integer.MAX_VALUE,
+                        ih -> DialogVals.setImportHeight(ih, w, h,
+                                DialogVals.isResizePreserveAspectRatio()),
+                        DialogVals::getImportHeight, 3);
+        mb.addAll(resizeLabel,
+                preserveAspectRatioLabel, preserveAspectRatioCheckbox,
+                widthLabel, heightLabel,
+                widthTextbox, heightTextbox);
 
-        // downscale textboxes
-//        final Textbox widthTextbox = makeDialogNumericalTextBox(
-//                widthLabel, w, Constants.MIN_CANVAS_W, w, "px",
-//                rw -> DialogVals.setResizeWidth(rw, w, h,
-//                        DialogVals.isResizePreserveAspectRatio()), 4);
-//        final Textbox heightTextbox = makeDialogNumericalTextBox(
-//                heightLabel, h, Constants.MIN_CANVAS_H, h, "px",
-//                rh -> DialogVals.setResizeHeight(rh, w, h,
-//                        DialogVals.isResizePreserveAspectRatio()), 4);
+        final TextLabel splitLabel = TextLabel.make(
+                textBelowPos(widthLabel, 1), "Split...", Constants.WHITE),
+                invisibleReference = TextLabel.make(textBelowPos(
+                        splitLabel, LINE_ABOVE), "", Constants.WHITE);
+        mb.add(splitLabel);
 
-        final TextLabel invisibleReference = TextLabel.make(
-                textBelowPos(context, 3), "Placeholder", Constants.WHITE);
-
-        makeSplitElementsForOpenPNG(mb, w, h, invisibleReference);
+        makeSplitElementsForOpenPNG(mb, invisibleReference);
 
         mb.add(makeValidDimensionsBottomLabel());
 
-        // TODO - precondition
+        final Supplier<Boolean> precondition = () -> {
+            final int iw = DialogVals.getImportWidth(),
+                    ih = DialogVals.getImportHeight(),
+                    columns = StitchSplitMath.importColumns(iw),
+                    rows = StitchSplitMath.importRows(ih),
+                    fw = DialogVals.getImportFrameWidth(),
+                    fh = DialogVals.getImportFrameHeight();
+
+            return fw >= Constants.MIN_CANVAS_H &&
+                    fh >= Constants.MIN_CANVAS_H &&
+                    fw <= Constants.MAX_CANVAS_W &&
+                    fh <= Constants.MAX_CANVAS_H &&
+                    rows * columns <= Constants.MAX_NUM_FRAMES;
+        };
 
         final MenuElementGrouping contents = new MenuElementGrouping(
                 mb.build().getMenuElements());
         setDialog(assembleDialog("Import file " +
                         filepath.getFileName().toString(), contents,
-                () -> true, "Import", () -> StippleEffect.get()
+                precondition, "Import", () -> StippleEffect.get()
                         .newProjectFromFile(image, filepath), false));
     }
 
@@ -773,11 +800,11 @@ public class DialogAssembly {
 
         // pixel spacing
         final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing:");
-        final Textbox spacingTextbox = makeDialogNumericalTextBox(spacingLabel,
-                DialogAssembly::getDialogContentOffsetFollowingLabel,
-                DialogVals.getNewFontPixelSpacing(),
+        final Textbox spacingTextbox = makeDialogPixelDynamicTextbox(
+                spacingLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
-                "px", DialogVals::setNewFontPixelSpacing, 2);
+                DialogVals::setNewFontPixelSpacing,
+                DialogVals::getNewFontPixelSpacing, 2);
         mb.add(spacingLabel);
         mb.add(spacingTextbox);
         // character-specific
@@ -1419,7 +1446,7 @@ public class DialogAssembly {
             final int w, final int h,
             final TextLabel reference
     ) {
-        makeSplitElements(mb, w, h,
+        makeSplitElements(mb, () -> w, () -> h,
                 DialogVals::setSplitColumns, DialogVals::setSplitRows,
                 DialogVals::setSplitColumns, DialogVals::setSplitRows,
                 DialogVals::getSplitColumns, DialogVals::getSplitRows,
@@ -1430,21 +1457,22 @@ public class DialogAssembly {
 
     private static void makeSplitElementsForOpenPNG(
             final MenuBuilder mb,
-            final int w, final int h,
             final TextLabel reference
     ) {
-        makeSplitElements(mb, w, h,
-                DialogVals::setNewProjectColumns, DialogVals::setNewProjectRows,
-                DialogVals::setNewProjectColumns, DialogVals::setNewProjectRows,
-                DialogVals::getNewProjectColumns, DialogVals::getNewProjectRows,
-                DialogVals::setNewProjectWidth, DialogVals::setNewProjectHeight,
-                DialogVals::getNewProjectWidth, DialogVals::getNewProjectHeight,
+        makeSplitElements(mb,
+                DialogVals::getImportWidth, DialogVals::getImportHeight,
+                DialogVals::setImportColumns, DialogVals::setImportRows,
+                DialogVals::setImportColumns, DialogVals::setImportRows,
+                DialogVals::getImportColumns, DialogVals::getImportRows,
+                DialogVals::setImportFrameWidth, DialogVals::setImportFrameHeight,
+                DialogVals::getImportFrameWidth, DialogVals::getImportFrameHeight,
                 reference);
     }
 
     private static void makeSplitElements(
             final MenuBuilder mb,
-            final int w, final int h,
+            final Supplier<Integer> canvasWidthGetter,
+            final Supplier<Integer> canvasHeightGetter,
             final Consumer<Integer> colSetter,
             final Consumer<Integer> rowSetter,
             final BiConsumer<Integer, Integer> biColSetter,
@@ -1458,8 +1486,8 @@ public class DialogAssembly {
             final TextLabel referenceLabel
     ) {
         // pre-processing
-        final int initialColumns = w / widthGetter.get(),
-                initialRows = h / heightGetter.get();
+        final int initialColumns = canvasWidthGetter.get() / widthGetter.get(),
+                initialRows = canvasHeightGetter.get() / heightGetter.get();
 
         colSetter.accept(initialColumns);
         rowSetter.accept(initialRows);
@@ -1473,7 +1501,7 @@ public class DialogAssembly {
         final DynamicTextbox columnsTextbox = makeDialogDynamicTextbox(
                 columnsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 1, initialColumns, Constants.MAX_NUM_FRAMES, "",
-                x -> biColSetter.accept(x, w), colGetter,
+                x -> biColSetter.accept(x, canvasWidthGetter.get()), colGetter,
                 String.valueOf(Constants.MAX_NUM_FRAMES).length());
         mb.addAll(columnsLabel, columnsTextbox);
 
@@ -1483,7 +1511,7 @@ public class DialogAssembly {
         final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
                 yDivsLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 1, initialRows, Constants.MAX_NUM_FRAMES, "",
-                y -> biRowSetter.accept(y, h), rowGetter,
+                y -> biRowSetter.accept(y, canvasHeightGetter.get()), rowGetter,
                 String.valueOf(Constants.MAX_NUM_FRAMES).length());
         mb.addAll(yDivsLabel, yDivsTextbox);
 
@@ -1495,7 +1523,7 @@ public class DialogAssembly {
                 makeDialogPixelDynamicTextbox(frameWidthLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
-                        fw -> widthSetter.accept(fw, w), widthGetter,
+                        fw -> widthSetter.accept(fw, canvasWidthGetter.get()), widthGetter,
                         String.valueOf(Constants.MAX_CANVAS_W).length());
         mb.addAll(frameWidthLabel, frameWidthTextbox);
 
@@ -1506,7 +1534,7 @@ public class DialogAssembly {
                 makeDialogPixelDynamicTextbox(frameHeightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
-                        fh -> heightSetter.accept(fh, h), heightGetter,
+                        fh -> heightSetter.accept(fh, canvasHeightGetter.get()), heightGetter,
                         String.valueOf(Constants.MAX_CANVAS_H).length());
         mb.addAll(frameHeightLabel, frameHeightTextbox);
 
@@ -1525,7 +1553,7 @@ public class DialogAssembly {
                 }, () -> DialogVals.isTruncateSplitX() ? 1 : 0);
         final GatewayMenuElement xRemainder = new GatewayMenuElement(
                 new MenuElementGrouping(xRemainderLabel, xRemainderDropdown),
-                () -> w % widthGetter.get() != 0);
+                () -> canvasWidthGetter.get() % widthGetter.get() != 0);
         mb.add(xRemainder);
 
         // Y-axis remainder
@@ -1539,7 +1567,7 @@ public class DialogAssembly {
                 }, () -> DialogVals.isTruncateSplitY() ? 1 : 0);
         final GatewayMenuElement yRemainder = new GatewayMenuElement(
                 new MenuElementGrouping(yRemainderLabel, yRemainderDropdown),
-                () -> h % heightGetter.get() != 0);
+                () -> canvasHeightGetter.get() % heightGetter.get() != 0);
         mb.add(yRemainder);
     }
 
@@ -1688,31 +1716,6 @@ public class DialogAssembly {
         return makeDialogNumericalDynamicTextbox(
                 label, DialogAssembly::getDialogContentOffsetFromLabel,
                 "", 0, "px", validatorLogic, setter, getter, 4);
-    }
-
-    private static Textbox makeDialogNumericalTextBox(
-            final MenuElement label,
-            final Function<MenuElement, Coord2D> offsetFunction,
-            final int initial, final int min, final int max,
-            final String suffix, final Consumer<Integer> setter,
-            final int maxLength
-    ) {
-        return makeDialogNumericalTextBox(label, offsetFunction,
-                String.valueOf(initial), suffix,
-                Textbox.getIntTextValidator(min, max),
-                s -> setter.accept(Integer.parseInt(s)), maxLength);
-    }
-
-    private static Textbox makeDialogNumericalTextBox(
-            final MenuElement label,
-            final Function<MenuElement, Coord2D> offsetFunction,
-            final String initial, final String suffix,
-            final Function<String, Boolean> textValidator,
-            final Consumer<String> setter, final int maxLength
-    ) {
-        return new Textbox(offsetFunction.apply(label),
-                Layout.SMALL_TEXT_BOX_W, MenuElement.Anchor.LEFT_TOP,
-                "", initial, suffix, textValidator, setter, maxLength);
     }
 
     private static Textbox makeDialogCustomTextBox(

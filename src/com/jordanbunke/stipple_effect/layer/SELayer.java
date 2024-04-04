@@ -224,8 +224,8 @@ public final class SELayer {
     ) {
         final int fw = DialogVals.getFrameWidth(),
                 fh = DialogVals.getFrameHeight(),
-                fx = StitchSplitMath.splitFramesX(w),
-                fy = StitchSplitMath.splitFramesY(h);
+                fx = StitchSplitMath.splitColumns(w),
+                fy = StitchSplitMath.splitRows(h);
 
         final boolean isHorizontal = StitchSplitMath.isHorizontal();
         final BinaryOperator<Integer>

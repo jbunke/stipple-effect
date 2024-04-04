@@ -13,7 +13,11 @@ public class DialogVals {
     private static int
             newProjectWidth = Constants.DEFAULT_CANVAS_W,
             newProjectHeight = Constants.DEFAULT_CANVAS_H,
-            newProjectColumns = 1, newProjectRows = 1,
+            importFrameWidth = Constants.DEFAULT_CANVAS_W,
+            importFrameHeight = Constants.DEFAULT_CANVAS_H,
+            importWidth = Constants.DEFAULT_CANVAS_W,
+            importHeight = Constants.DEFAULT_CANVAS_H,
+            importColumns = 1, importRows = 1,
             resizeWidth = Constants.DEFAULT_CANVAS_W,
             resizeHeight = Constants.DEFAULT_CANVAS_H,
             padLeft = 0, padRight = 0, padTop = 0, padBottom = 0,
@@ -209,28 +213,58 @@ public class DialogVals {
         DialogVals.newProjectHeight = newProjectHeight;
     }
 
-    public static void setNewProjectHeight(
-            final int newProjectHeight, final int canvasHeight
-    ) {
-        final int clampedNPH = MathPlus.bounded(Constants.MIN_CANVAS_H,
-                newProjectHeight, canvasHeight);
-
-        DialogVals.newProjectHeight = clampedNPH;
-        setNewProjectRows(canvasHeight / clampedNPH);
-    }
-
     public static void setNewProjectWidth(final int newProjectWidth) {
         DialogVals.newProjectWidth = newProjectWidth;
     }
 
-    public static void setNewProjectWidth(
-            final int newProjectWidth, final int canvasWidth
+    public static void setImportFrameHeight(
+            final int importFrameHeight, final int canvasHeight
     ) {
-        final int clampedNPW = MathPlus.bounded(Constants.MIN_CANVAS_W,
-                newProjectWidth, canvasWidth);
+        final int clampedIFH = MathPlus.bounded(Constants.MIN_CANVAS_H,
+                importFrameHeight, canvasHeight);
 
-        DialogVals.newProjectWidth = clampedNPW;
-        setNewProjectColumns(canvasWidth / clampedNPW);
+        DialogVals.importFrameHeight = clampedIFH;
+        setImportRows(canvasHeight / clampedIFH);
+    }
+
+    public static void setImportFrameWidth(
+            final int importFrameWidth, final int canvasWidth
+    ) {
+        final int clampedIFW = MathPlus.bounded(Constants.MIN_CANVAS_W,
+                importFrameWidth, canvasWidth);
+
+        DialogVals.importFrameWidth = clampedIFW;
+        setImportColumns(canvasWidth / clampedIFW);
+    }
+
+    public static void setImportHeight(
+            final int importHeight, final int refWidth, final int refHeight,
+            final boolean adjustComplement
+    ) {
+        DialogVals.importHeight = importHeight;
+        setImportRows(importRows, importHeight);
+
+        if (resizePreserveAspectRatio && adjustComplement) {
+            final double ratio = refWidth / (double) refHeight;
+            final int importWidth = Math.max(Constants.MIN_CANVAS_W,
+                    (int) Math.round(ratio * importHeight));
+            setImportWidth(importWidth, refWidth, refHeight, false);
+        }
+    }
+
+    public static void setImportWidth(
+            final int importWidth, final int refWidth, final int refHeight,
+            final boolean adjustComplement
+    ) {
+        DialogVals.importWidth = importWidth;
+        setImportColumns(importColumns, importWidth);
+
+        if (resizePreserveAspectRatio && adjustComplement) {
+            final double ratio = refHeight / (double) refWidth;
+            final int importHeight = Math.max(Constants.MIN_CANVAS_H,
+                    (int) Math.round(ratio * importWidth));
+            setImportHeight(importHeight, refWidth, refHeight, false);
+        }
     }
 
     public static void setPadBottom(final int padBottom) {
@@ -281,24 +315,26 @@ public class DialogVals {
         }
     }
 
-    public static void setNewProjectColumns(final int newProjectColumns) {
-        DialogVals.newProjectColumns = newProjectColumns;
+    public static void setImportColumns(final int importColumns) {
+        DialogVals.importColumns = MathPlus.bounded(1, importColumns,
+                Constants.MAX_NUM_FRAMES);
     }
 
-    public static void setNewProjectColumns(
-            final int newProjectColumns, final int canvasWidth
+    public static void setImportColumns(
+            final int importColumns, final int canvasWidth
     ) {
-        setNewProjectWidth(canvasWidth / newProjectColumns, canvasWidth);
+        setImportFrameWidth(canvasWidth / importColumns, canvasWidth);
     }
 
-    public static void setNewProjectRows(final int newProjectRows) {
-        DialogVals.newProjectRows = newProjectRows;
+    public static void setImportRows(final int importRows) {
+        DialogVals.importRows = MathPlus.bounded(1, importRows,
+                Constants.MAX_NUM_FRAMES);
     }
 
-    public static void setNewProjectRows(
-            final int newProjectRows, final int canvasHeight
+    public static void setImportRows(
+            final int importRows, final int canvasHeight
     ) {
-        setNewProjectHeight(canvasHeight / newProjectRows, canvasHeight);
+        setImportFrameHeight(canvasHeight / importRows, canvasHeight);
     }
 
     public static void setNewFontPixelSpacing(final int newFontPixelSpacing) {
@@ -470,6 +506,22 @@ public class DialogVals {
         return contentType.get(c);
     }
 
+    public static int getImportFrameHeight() {
+        return importFrameHeight;
+    }
+
+    public static int getImportFrameWidth() {
+        return importFrameWidth;
+    }
+
+    public static int getImportHeight() {
+        return importHeight;
+    }
+
+    public static int getImportWidth() {
+        return importWidth;
+    }
+
     public static int getNewProjectHeight() {
         return newProjectHeight;
     }
@@ -540,12 +592,12 @@ public class DialogVals {
         return paletteName;
     }
 
-    public static int getNewProjectColumns() {
-        return newProjectColumns;
+    public static int getImportColumns() {
+        return importColumns;
     }
 
-    public static int getNewProjectRows() {
-        return newProjectRows;
+    public static int getImportRows() {
+        return importRows;
     }
 
     public static int getNewFontPixelSpacing() {

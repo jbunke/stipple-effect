@@ -991,15 +991,15 @@ public class StippleEffect implements ProgramContext {
     public void newProjectFromFile(
             final GameImage image, final Path filepath
     ) {
-        final int w = DialogVals.getResizeWidth(),
-                h = DialogVals.getResizeHeight(),
-                columns = DialogVals.getNewProjectColumns(),
-                rows = DialogVals.getNewProjectRows(),
-                fw = w / columns, fh = h /  rows,
-                frameCount = Math.min(Constants.MAX_NUM_FRAMES,
-                        columns * rows);
+        final int iw = DialogVals.getImportWidth(),
+                ih = DialogVals.getImportHeight(),
+                fw = DialogVals.getImportFrameWidth(),
+                fh = DialogVals.getImportFrameHeight(),
+                columns = StitchSplitMath.importColumns(iw),
+                rows = StitchSplitMath.importRows(ih),
+                frameCount = columns * rows;
 
-        final GameImage resized = ImageProcessing.scale(image, w, h);
+        final GameImage resized = ImageProcessing.scale(image, iw, ih);
         final List<GameImage> frames = new ArrayList<>();
 
         final boolean isHorizontal = StitchSplitMath.isHorizontal();
@@ -1011,11 +1011,13 @@ public class StippleEffect implements ProgramContext {
         final int fpd = isHorizontal ? columns : rows;
 
         for (int i = 0; i < frameCount; i++) {
-            final int x = xOp.apply(i, fpd) * w,
-                    y = yOp.apply(i, fpd) * h;
+            final GameImage frame = new GameImage(fw, fh);
 
-            frames.add(new GameImage(resized.getSubimage(
-                    x * fw, y * fh, fw, fh)));
+            final int x = xOp.apply(i, fpd) * fw,
+                    y = yOp.apply(i, fpd) * fh;
+
+            frame.draw(resized, -1 * x, -1 * y);
+            frames.add(frame.submit());
         }
 
         final SELayer firstLayer = new SELayer(frames,

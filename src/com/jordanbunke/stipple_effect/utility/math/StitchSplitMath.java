@@ -35,22 +35,38 @@ public class StitchSplitMath {
     public static int splitFrameCount(
             final int w, final int h
     ) {
-        return splitFramesX(w) * splitFramesY(h);
+        return splitColumns(w) * splitRows(h);
     }
 
-    public static int splitFramesX(final int w) {
-        final int xDivs = DialogVals.getSplitColumns(),
+    public static int splitColumns(final int w) {
+        final int columns = DialogVals.getSplitColumns(),
                 fw = DialogVals.getFrameWidth(),
                 remX = w % fw;
 
-        return xDivs + (remX == 0 || DialogVals.isTruncateSplitX() ? 0 : 1);
+        return columns + (remX == 0 || DialogVals.isTruncateSplitX() ? 0 : 1);
     }
 
-    public static int splitFramesY(final int h) {
-        final int yDivs = DialogVals.getSplitRows(),
+    public static int splitRows(final int h) {
+        final int rows = DialogVals.getSplitRows(),
                 fh = DialogVals.getFrameHeight(),
                 remY = h % fh;
 
-        return yDivs + (remY == 0 || DialogVals.isTruncateSplitY() ? 0 : 1);
+        return rows + (remY == 0 || DialogVals.isTruncateSplitY() ? 0 : 1);
+    }
+
+    public static int importColumns(final int w) {
+        final int columns = DialogVals.getImportColumns(),
+                fw = DialogVals.getImportFrameWidth(),
+                remX = w % fw;
+
+        return columns + (remX == 0 || DialogVals.isTruncateSplitX() ? 0 : 1);
+    }
+
+    public static int importRows(final int h) {
+        final int rows = DialogVals.getImportRows(),
+                fh = DialogVals.getImportFrameHeight(),
+                remY = h % fh;
+
+        return rows + (remY == 0 || DialogVals.isTruncateSplitY() ? 0 : 1);
     }
 }
