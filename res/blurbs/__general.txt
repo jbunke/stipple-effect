@@ -1,8 +1,12 @@
+Window / layout:
 Toggle fullscreen / windowed mode: {Escape}
 Recenter canvas in workspace: {Enter}
 Toggle show all UI / minimal UI mode: {Ctrl + Shift + A}
+Set checkerboard and pixel grid cell dimensions to project bounds: {Ctrl + B}
 
+Projects:
 Quick select one of the first nine projects: {1} - {9}
 
+Layers:
 Navigate to layer above: {Ctrl + Up Arrow Key}
 Navigate to layer below: {Ctrl + Down Arrow Key}

@@ -454,6 +454,24 @@ public class SEContext {
                             StatusUpdates.cannotSetPixelGrid();
                     });
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        final int w = getState().getImageWidth(),
+                                h = getState().getImageHeight();
+
+                        if (w < Layout.PIXEL_GRID_MAX && h < Layout.PIXEL_GRID_MAX) {
+                            Settings.setCheckerboardWPixels(w);
+                            Settings.setCheckerboardHPixels(h);
+                            Settings.setPixelGridXPixels(w);
+                            Settings.setPixelGridYPixels(h);
+
+                            Settings.apply();
+
+                            StatusUpdates.setCheckAndGridToBounds(w, h);
+                        } else
+                            StatusUpdates.cannotSetCheckAndGridToBounds();
+                    });
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     this::addFrame);
             eventLogger.checkForMatchingKeyStroke(

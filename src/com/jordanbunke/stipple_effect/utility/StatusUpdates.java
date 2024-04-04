@@ -11,6 +11,13 @@ import java.util.Set;
 
 public class StatusUpdates {
     // not permitted
+    public static void cannotSetCheckAndGridToBounds() {
+        actionNotPermitted(
+                "set the checkerboard and pixel grid cell dimensions to the bounds of the canvas",
+                "the width and/or height of the canvas is too big"
+        );
+    }
+
     public static void cannotSetPixelGrid() {
         actionNotPermitted(
                 "turn pixel grid on or off",
@@ -303,6 +310,15 @@ public class StatusUpdates {
         StippleEffect.get().sendStatusUpdate("Dumped " + dumped + " state" +
                 (dumped > 1 ? "s" : "") + " due to low memory; freed " +
                 kbsFreed + " KBs of memory");
+    }
+
+    public static void setCheckAndGridToBounds(
+            final int width, final int height
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Set the dimensions of the checkerboard and pixel grid" +
+                        " cells to the bounds of the project canvas: " +
+                        width + "x" + height);
     }
 
     public static void sendToClipboard(
