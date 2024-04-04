@@ -9,6 +9,7 @@ import java.nio.file.Path;
 public class Constants {
     public static final String ABOUT = "about",
             NAME_CODE = "name", VERSION_CODE = "version",
+            IS_DEVBUILD_CODE = "devbuild",
             NATIVE_STANDARD_CODE = "native_standard",
             PALETTE_STANDARD_CODE = "palette_standard";
 

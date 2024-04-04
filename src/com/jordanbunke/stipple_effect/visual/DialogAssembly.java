@@ -1362,7 +1362,7 @@ public class DialogAssembly {
         // version
         final GameImage version = GraphicsUtils.uiText(
                 Constants.ACCENT_BACKGROUND_LIGHT)
-                .addText("v" + StippleEffect.VERSION).build().draw();
+                .addText(StippleEffect.getVersion()).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
                 new Coord2D(version.getWidth(), version.getHeight()),
@@ -2385,7 +2385,7 @@ public class DialogAssembly {
         mb.add(TextLabel.make(background.getRenderPosition().displace(
                         Layout.CONTENT_BUFFER_PX + Layout.BUTTON_BORDER_PX,
                         Layout.TEXT_Y_OFFSET + Layout.BUTTON_BORDER_PX),
-                StippleEffect.PROGRAM_NAME + " v" + StippleEffect.VERSION +
+                StippleEffect.PROGRAM_NAME + " " + StippleEffect.getVersion() +
                         "  |  Help & Information", Constants.WHITE));
 
         // close button

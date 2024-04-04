@@ -99,4 +99,12 @@ public class ParserUtils {
 
         return new String[] { code, value };
     }
+
+    public static String encloseSetting(final String code, final String value) {
+        final String sep = Constants.SETTING_SEPARATOR,
+                o = Constants.OPEN_SETTING_VAL,
+                c = Constants.CLOSE_SETTING_VAL;
+
+        return code + sep + o + value + c + "\n";
+    }
 }

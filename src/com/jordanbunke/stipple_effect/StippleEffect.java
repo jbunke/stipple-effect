@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.OnStartup;
 import com.jordanbunke.delta_time.contexts.ProgramContext;
 import com.jordanbunke.delta_time.debug.DebugChannel;
 import com.jordanbunke.delta_time.debug.GameDebugger;
+import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
@@ -19,6 +20,7 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.utility.Version;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
@@ -49,8 +51,10 @@ import java.util.function.BinaryOperator;
 
 public class StippleEffect implements ProgramContext {
     public static String
-            PROGRAM_NAME = "Stipple Effect", VERSION = "dev_build",
+            PROGRAM_NAME = "Stipple Effect",
             NATIVE_STANDARD = "1.0", PALETTE_STANDARD = "1.0";
+    private static Version VERSION = new Version(1, 0, 0);
+    private static boolean IS_DEVBUILD = false;
 
     public static final int PRIMARY = 0, SECONDARY = 1;
 
@@ -139,13 +143,57 @@ public class StippleEffect implements ProgramContext {
 
             switch (code) {
                 case Constants.NAME_CODE -> PROGRAM_NAME = value;
-                case Constants.VERSION_CODE -> VERSION = value;
+                case Constants.VERSION_CODE -> {
+                    try {
+                        final Integer[] components = Arrays
+                                .stream(value.split("\\."))
+                                .map(Integer::parseInt).toArray(Integer[]::new);
+
+                        final int MAJOR = 0, MINOR = 1, PATCH = 2,
+                                BUILD = 3, HAS_BUILD_LENGTH = 4;
+
+                        if (components.length == HAS_BUILD_LENGTH)
+                            VERSION = new Version(components[MAJOR],
+                                    components[MINOR], components[PATCH],
+                                    components[BUILD]);
+                        else if (components.length > PATCH)
+                            VERSION = new Version(components[MAJOR],
+                                    components[MINOR], components[PATCH]);
+                    } catch (NumberFormatException e) {
+                        GameError.send("Could not read program version from data file.");
+                    }
+                }
+                case Constants.IS_DEVBUILD_CODE ->
+                        IS_DEVBUILD = Boolean.parseBoolean(value);
                 case Constants.NATIVE_STANDARD_CODE ->
                         NATIVE_STANDARD = value;
                 case Constants.PALETTE_STANDARD_CODE ->
                         PALETTE_STANDARD = value;
             }
         }
+
+        if (IS_DEVBUILD) {
+            VERSION.incrementBuild();
+
+            final Path toSave = Path.of("res").resolve(Constants.PROGRAM_FILE);
+
+            final String write = ParserUtils.encloseSetting(
+                    Constants.NAME_CODE, PROGRAM_NAME) +
+                    ParserUtils.encloseSetting(Constants.VERSION_CODE,
+                            VERSION.toString()) +
+                    ParserUtils.encloseSetting(Constants.IS_DEVBUILD_CODE,
+                            String.valueOf(IS_DEVBUILD)) +
+                    ParserUtils.encloseSetting(
+                            Constants.NATIVE_STANDARD_CODE, NATIVE_STANDARD) +
+                    ParserUtils.encloseSetting(
+                            Constants.PALETTE_STANDARD_CODE, PALETTE_STANDARD);
+
+            FileIO.writeFile(toSave, write);
+        }
+    }
+
+    public static String getVersion() {
+        return "v" + VERSION + (IS_DEVBUILD ? " (devbuild)" : "");
     }
 
     public StippleEffect() {
@@ -252,7 +300,7 @@ public class StippleEffect implements ProgramContext {
     private GameWindow makeWindow() {
         final Coord2D size = determineWindowSize();
         Layout.setSize(size.x, size.y);
-        final GameWindow window = new GameWindow(PROGRAM_NAME + " v" + VERSION,
+        final GameWindow window = new GameWindow(PROGRAM_NAME + " " + getVersion(),
                 size.x, size.y, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
