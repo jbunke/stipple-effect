@@ -997,8 +997,7 @@ public class SEContext {
 
     // contents to palette
     public void contentsToPalette(final Palette palette) {
-        final DialogVals.Scope scope = DialogVals
-                .getContentType(this);
+        final DialogVals.Scope scope = DialogVals.getScope();
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
@@ -1072,7 +1071,7 @@ public class SEContext {
 
     // palettize
     public void palettize(final Palette palette) {
-        final DialogVals.Scope scope = DialogVals.getContentType(this);
+        final DialogVals.Scope scope = DialogVals.getScope();
         ProjectState state = getState();
 
         switch (scope) {

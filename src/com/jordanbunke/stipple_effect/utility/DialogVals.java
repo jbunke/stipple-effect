@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.utility;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
@@ -132,21 +131,6 @@ public class DialogVals {
 
     public enum Scope {
         SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
-
-        public Scope next(final SEContext c) {
-            final Scope[] vs = values();
-            final Scope next = vs[(ordinal() + 1) % vs.length];
-
-            return next.get(c);
-        }
-
-        public Scope get(final SEContext c) {
-            // skip SELECTION iff context has no selection
-            if (!c.getState().hasSelection() && this == SELECTION)
-                return next(c);
-
-            return this;
-        }
 
         @Override
         public String toString() {
@@ -502,8 +486,8 @@ public class DialogVals {
         return paletteSorter;
     }
 
-    public static Scope getContentType(final SEContext c) {
-        return scope.get(c);
+    public static Scope getScope() {
+        return scope;
     }
 
     public static int getImportFrameHeight() {
