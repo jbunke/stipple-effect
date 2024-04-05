@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -107,8 +108,11 @@ public class Palette {
         inclusionMap.put(c, !inclusionMap.get(c));
     }
 
-    public void sort(final PaletteSorter sorter) {
-        colorSequence.sort(sorter.getComparator());
+    public void sort() {
+        colorSequence.sort(DialogVals.getPaletteSorter().getComparator());
+
+        if (DialogVals.isSortPaletteBackwards())
+            Collections.reverse(colorSequence);
     }
 
     public GameImage palettize(final GameImage source) {

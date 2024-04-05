@@ -34,7 +34,8 @@ public class DialogVals {
             charSpecificSpacing = true,
             truncateSplitX = true,
             truncateSplitY = true,
-            resizePreserveAspectRatio = false;
+            resizePreserveAspectRatio = false,
+            sortPaletteBackwards = false;
     private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -161,8 +162,8 @@ public class DialogVals {
         DialogVals.settingScreen = settingScreen;
     }
 
-    public static void cyclePaletteSorter() {
-        paletteSorter = EnumUtils.next(paletteSorter);
+    public static void setPaletteSorter(final PaletteSorter paletteSorter) {
+        DialogVals.paletteSorter = paletteSorter;
     }
 
     public static void setScope(final Scope scope) {
@@ -412,6 +413,10 @@ public class DialogVals {
 
         if (attemptPreviewUpdate)
             SEFonts.attemptPreviewUpdate();
+    }
+
+    public static void setSortPaletteBackwards(final boolean sortPaletteBackwards) {
+        DialogVals.sortPaletteBackwards = sortPaletteBackwards;
     }
 
     public static void setFontName(final String fontName) {
@@ -673,6 +678,10 @@ public class DialogVals {
 
     public static boolean isResizePreserveAspectRatio() {
         return resizePreserveAspectRatio;
+    }
+
+    public static boolean isSortPaletteBackwards() {
+        return sortPaletteBackwards;
     }
 
     public static boolean isThisOutlineSide(final int index) {

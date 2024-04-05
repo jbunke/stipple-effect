@@ -15,7 +15,6 @@ Fix:
 
 Change:
 > Overhaul preview window
-> Redesign and expand project dialogs
 
 {0.3.0} - 2024-04-0?
 

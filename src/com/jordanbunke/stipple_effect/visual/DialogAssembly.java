@@ -634,13 +634,13 @@ public class DialogAssembly {
                         Constants.MIN_CANVAS_W, Integer.MAX_VALUE,
                         iw -> DialogVals.setImportWidth(iw, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getImportWidth, 3),
+                        DialogVals::getImportWidth, 5),
                 heightTextbox = makeDialogPixelDynamicTextbox(heightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_H, Integer.MAX_VALUE,
                         ih -> DialogVals.setImportHeight(ih, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getImportHeight, 3);
+                        DialogVals::getImportHeight, 5);
         mb.addAll(resizeLabel,
                 preserveAspectRatioLabel, preserveAspectRatioCheckbox,
                 widthLabel, heightLabel,
@@ -1111,41 +1111,37 @@ public class DialogAssembly {
                 }, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToSortPalette(final Palette palette) {
+        DialogVals.setSortPaletteBackwards(false);
+
         final MenuBuilder mb = new MenuBuilder();
-        final PaletteSorter[] vs = PaletteSorter.values();
 
-        // label
-        final TextLabel label = makeDialogLeftLabel(0, "Sort colors by:");
-
-        // toggle
-        final GameImage[] bases = makeToggleButtonSet(Arrays.stream(vs)
-                .map(PaletteSorter::toString)
-                .toArray(String[]::new));
-
-        final Runnable[] behaviours = new Runnable[vs.length];
-        Arrays.fill(behaviours, (Runnable) () -> {});
-
-        final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
-                getDialogContentOffsetFromLabel(label),
-                new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                        Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, true,
-                bases, Arrays.stream(bases)
-                .map(GraphicsUtils::drawHighlightedButton)
-                .toArray(GameImage[]::new), behaviours,
-                () -> DialogVals.getPaletteSorter().ordinal(),
-                DialogVals::cyclePaletteSorter);
-
-        mb.add(label);
-        mb.add(toggle);
+        final TextLabel sortLabel = makeDialogLeftLabel(0, "Sort colors by:"),
+                backwardsLabel = TextLabel.make(textBelowPos(sortLabel),
+                        "Backwards?", Constants.WHITE);
+        final DropdownMenu sortDropdown = DropdownMenu.forDialog(
+                getDialogContentOffsetFollowingLabel(sortLabel),
+                Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                EnumUtils.stream(PaletteSorter.class)
+                        .map(PaletteSorter::toString)
+                        .toArray(String[]::new),
+                EnumUtils.stream(PaletteSorter.class)
+                        .map(ps -> (Runnable)
+                                () -> DialogVals.setPaletteSorter(ps))
+                        .toArray(Runnable[]::new),
+                () -> DialogVals.getPaletteSorter().ordinal());
+        final Checkbox backwardsCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(backwardsLabel),
+                MenuElement.Anchor.LEFT_TOP,
+                DialogVals::isSortPaletteBackwards,
+                DialogVals::setSortPaletteBackwards);
+        mb.addAll(sortLabel, sortDropdown, backwardsLabel, backwardsCheckbox);
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
         setDialog(assembleDialog(palette.getName() + " | Sort colors",
                 contents, () -> true, "Sort", () -> {
-                    palette.sort(DialogVals.getPaletteSorter());
+                    palette.sort();
                     StippleEffect.get().rebuildColorsMenu();
                 }, true));
     }
