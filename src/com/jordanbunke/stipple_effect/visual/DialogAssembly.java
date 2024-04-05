@@ -1073,17 +1073,15 @@ public class DialogAssembly {
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
-    // TODO - redesign and refactor
     public static void setDialogToSavePalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
 
         // labels
         final TextLabel
                 folderLabel = makeDialogLeftLabel(0, "Folder:"),
-                nameLabel = makeDialogLeftLabel(1, "File name:");
-
-        mb.add(folderLabel);
-        mb.add(nameLabel);
+                nameLabel = TextLabel.make(textBelowPos(folderLabel),
+                        "File name:", Constants.WHITE);
+        mb.addAll(folderLabel, nameLabel);
 
         // folder button
         final DynamicTextButton folderButton =

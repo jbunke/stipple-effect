@@ -1,6 +1,5 @@
 package com.jordanbunke.stipple_effect.project;
 
-import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
@@ -141,7 +140,6 @@ public class PlaybackInfo {
 
     public void incrementFps(final int delta) {
         setFps(fps + delta);
-        StippleEffect.get().rebuildFramesMenu();
     }
 
     public boolean isPlaying() {
