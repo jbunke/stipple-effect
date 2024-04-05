@@ -8,8 +8,6 @@ import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementConta
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-import java.util.Arrays;
-
 public abstract class ScrollingMenuElement extends MenuElementContainer {
     final ScrollableMenuElement[] menuElements;
 
@@ -51,14 +49,8 @@ public abstract class ScrollingMenuElement extends MenuElementContainer {
         // background
         draw(background, canvas);
 
-        final ScrollableMenuElement[] renderOrder =
-                Arrays.stream(MenuElement.sortForRender(menuElements))
-                        .filter(me -> me instanceof ScrollableMenuElement)
-                        .map(me -> (ScrollableMenuElement) me)
-                        .toArray(ScrollableMenuElement[]::new);
-
         // contents
-        for (ScrollableMenuElement sme : renderOrder)
+        for (ScrollableMenuElement sme : menuElements)
             if (renderAndProcessChild(sme))
                 sme.render(canvas);
     }
