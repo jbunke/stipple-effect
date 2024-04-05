@@ -1,1 +1,10 @@
 Shortcut: {Shift + Escape}
+
+Opens a dialog that lets the user customize their workspace, determining which of the
+following panels are displayed:
+
+> Frames
+> Layers
+> Colors
+> Toolbar
+> Projects (collapsed or expanded)

@@ -446,9 +446,8 @@ public class MenuAssembly {
             // layer settings
             final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
             layerButtons[(4 * amount) + i] = new ScrollableMenuElement(
-                    GraphicsUtils.generateIconButton(IconCodes.LAYER_SETTINGS,
-                            lsPos, () -> true,
-                            () -> DialogAssembly.setDialogToLayerSettings(index)));
+                    IconButton.make(IconCodes.LAYER_SETTINGS, lsPos, () ->
+                            DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + dims.y;
         }
