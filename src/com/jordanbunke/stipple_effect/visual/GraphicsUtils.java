@@ -63,7 +63,7 @@ public class GraphicsUtils {
         final int w = dims.x, h = dims.y;
 
         final GameImage checkbox = new GameImage(w, h);
-        checkbox.fillRectangle(Constants.WHITE, 0, 0, w, h);
+        checkbox.fillRectangle(Constants.GREY, 0, 0, w, h);
 
         if (isChecked)
             checkbox.draw(CHECKMARK);

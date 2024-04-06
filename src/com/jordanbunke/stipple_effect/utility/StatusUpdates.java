@@ -11,11 +11,15 @@ import java.util.Set;
 
 public class StatusUpdates {
     // not permitted
-    public static void cannotSetCheckAndGridToBounds() {
+    public static void cannotSetCheckAndGridToBounds(
+            final boolean fromSelection
+    ) {
         actionNotPermitted(
-                "set the checkerboard and pixel grid cell dimensions to the bounds of the canvas",
-                "the width and/or height of the canvas is too big"
-        );
+                "set the checkerboard and pixel grid cell dimensions",
+                "the width and/or height of the " +
+                        (fromSelection ? "selection" : "canvas") +
+                        " is out of bounds (" + Layout.PIXEL_GRID_MIN +
+                        "<= px <= " + Layout.PIXEL_GRID_MAX + ")");
     }
 
     public static void cannotSetPixelGrid() {
@@ -313,12 +317,13 @@ public class StatusUpdates {
     }
 
     public static void setCheckAndGridToBounds(
-            final int width, final int height
+            final int width, final int height, final boolean fromSelection
     ) {
         StippleEffect.get().sendStatusUpdate(
                 "Set the dimensions of the checkerboard and pixel grid" +
-                        " cells to the bounds of the project canvas: " +
-                        width + "x" + height);
+                        " cells to the bounds of the " +
+                        (fromSelection ? "selection" : "project canvas") +
+                        ": " + width + "x" + height);
     }
 
     public static void sendToClipboard(

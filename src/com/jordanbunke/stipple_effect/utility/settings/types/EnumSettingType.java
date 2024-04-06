@@ -1,6 +1,5 @@
 package com.jordanbunke.stipple_effect.utility.settings.types;
 
-import java.util.IllegalFormatException;
 import java.util.Optional;
 
 public final class EnumSettingType<T extends Enum<T>> implements SettingType<T> {
@@ -14,7 +13,7 @@ public final class EnumSettingType<T extends Enum<T>> implements SettingType<T> 
     public Optional<T> parseValueFromRead(final String value) {
         try {
             return Optional.of(Enum.valueOf(enumClass, value));
-        } catch (IllegalFormatException e) {
+        } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
     }

@@ -43,7 +43,7 @@ public class DialogVals {
             fontName = "";
     private static Path paletteFolder = null;
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
-    private static SettingScreen settingScreen = SettingScreen.DEFAULT;
+    private static SettingScreen settingScreen = SettingScreen.DEFAULTS;
     private static PaletteSorter paletteSorter = PaletteSorter.HUE;
     private static Scope scope = Scope.SELECTION;
     private static UploadStatus
@@ -105,7 +105,7 @@ public class DialogVals {
     }
 
     public enum InfoScreen {
-        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG, ROADMAP;
+        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, ROADMAP, CHANGELOG;
 
         public String getTitle() {
             return this == MORE ? "More Shortcuts & Advanced Info" : toString();
@@ -118,10 +118,10 @@ public class DialogVals {
     }
 
     public enum SettingScreen {
-        DEFAULT, VISUAL;
+        DEFAULTS, CONTROLS, VISUAL, ADVANCED;
 
         public String getTitle() {
-            return (this == DEFAULT ? this + " and startup" : this) + " settings";
+            return (this == DEFAULTS ? this + " and startup" : this) + " settings";
         }
 
         @Override

@@ -4,6 +4,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.*;
 
@@ -76,7 +77,8 @@ public class StateManager {
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
 
-        manageMemory();
+        if (Settings.isDumpStates())
+            manageMemory();
 
         // add to state stack and set as active state
         states.add(resultantState);

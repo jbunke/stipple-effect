@@ -343,22 +343,33 @@ public class SEContext {
                     if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
                         mse.markAsProcessed();
 
-                        bt.setBreadth(bt.getBreadth() + mse.clicksScrolled);
+                        final int cs = Settings.getScrollClicks(
+                                mse.clicksScrolled,
+                                Settings.Code.INVERT_BREADTH_DIRECTION);
+
+                        bt.setBreadth(bt.getBreadth() + cs);
                     } else if (StippleEffect.get().getTool() instanceof ToolThatSearches) {
                         mse.markAsProcessed();
 
+                        final int cs = Settings.getScrollClicks(mse.clicksScrolled,
+                                Settings.Code.INVERT_TOLERANCE_DIRECTION);
+
                         ToolThatSearches.setTolerance(
-                                ToolThatSearches.getTolerance() + (mse.clicksScrolled *
-                                        Constants.SMALL_TOLERANCE_INC));
+                                ToolThatSearches.getTolerance() +
+                                        (cs * Constants.SMALL_TOLERANCE_INC));
                     } else if (StippleEffect.get().getTool() instanceof TextTool tt) {
                         mse.markAsProcessed();
 
-                        tt.setFontScale(tt.getFontScale() + mse.clicksScrolled);
+                        final int cs = Settings.getScrollClicks(mse.clicksScrolled,
+                                Settings.Code.INVERT_FONT_SIZE_DIRECTION);
+
+                        tt.setFontScale(tt.getFontScale() + cs);
                     }
                 } else if (inWorkspaceBounds) {
                     mse.markAsProcessed();
 
-                    if (mse.clicksScrolled < 0)
+                    if (Settings.getScrollClicks(mse.clicksScrolled,
+                            Settings.Code.INVERT_ZOOM_DIRECTION) < 0)
                         renderInfo.zoomIn(targetPixel);
                     else
                         renderInfo.zoomOut();
@@ -455,22 +466,7 @@ public class SEContext {
                     });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        final int w = getState().getImageWidth(),
-                                h = getState().getImageHeight();
-
-                        if (w < Layout.PIXEL_GRID_MAX && h < Layout.PIXEL_GRID_MAX) {
-                            Settings.setCheckerboardWPixels(w);
-                            Settings.setCheckerboardHPixels(h);
-                            Settings.setPixelGridXPixels(w);
-                            Settings.setPixelGridYPixels(h);
-
-                            Settings.apply();
-
-                            StatusUpdates.setCheckAndGridToBounds(w, h);
-                        } else
-                            StatusUpdates.cannotSetCheckAndGridToBounds();
-                    });
+                    this::setPixelGridAndCheckerboard);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     this::addFrame);
@@ -993,6 +989,34 @@ public class SEContext {
                     SEClipboard.get().getContents().getPixels());
         } else
             StatusUpdates.clipboardSendFailed(true);
+    }
+
+    private void setPixelGridAndCheckerboard() {
+        final boolean fromSelection = getState().hasSelection();
+        final int w, h;
+
+        if (fromSelection) {
+            final Set<Coord2D> selection = getState().getSelection();
+
+            w = SelectionUtils.width(selection);
+            h = SelectionUtils.height(selection);
+        } else {
+            w = getState().getImageWidth();
+            h = getState().getImageHeight();
+        }
+
+        if (w <= Layout.PIXEL_GRID_MAX && h <= Layout.PIXEL_GRID_MAX &&
+                w >= Layout.PIXEL_GRID_MIN && h >= Layout.PIXEL_GRID_MIN) {
+            Settings.setCheckerboardWPixels(w);
+            Settings.setCheckerboardHPixels(h);
+            Settings.setPixelGridXPixels(w);
+            Settings.setPixelGridYPixels(h);
+
+            Settings.apply();
+
+            StatusUpdates.setCheckAndGridToBounds(w, h, fromSelection);
+        } else
+            StatusUpdates.cannotSetCheckAndGridToBounds(fromSelection);
     }
 
     // contents to palette

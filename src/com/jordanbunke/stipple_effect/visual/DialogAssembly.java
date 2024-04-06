@@ -1834,7 +1834,7 @@ public class DialogAssembly {
 
         // initialize in every execution path
         final MenuElement bottomLabel = switch (settingScreen) {
-            case DEFAULT -> {
+            case DEFAULTS -> {
                 // text labels
                 final TextLabel fullscreenLabel = makeDialogLeftLabel(
                         initialYIndex, "Fullscreen on startup:"),
@@ -1910,6 +1910,57 @@ public class DialogAssembly {
 
                 // update as new settings are added to category
                 yield suffixLabel;
+            }
+            case CONTROLS -> {
+                final TextLabel scrollDirectionLabel = makeDialogLeftLabel(
+                        initialYIndex, "Direction inversion settings:"),
+                        invertZoomLabel = TextLabel.make(
+                                textBelowPos(scrollDirectionLabel),
+                                "Invert zoom direction?", Constants.WHITE),
+                        invertBreadthLabel = TextLabel.make(
+                                textBelowPos(invertZoomLabel),
+                                "Invert tool breadth incrementation direction?",
+                                Constants.WHITE),
+                        invertToleranceLabel = TextLabel.make(
+                                textBelowPos(invertBreadthLabel),
+                                "Invert search tolerance incrementation direction?",
+                                Constants.WHITE),
+                        invertFontSizeLabel = TextLabel.make(
+                                textBelowPos(invertToleranceLabel),
+                                "Invert font size incrementation direction?",
+                                Constants.WHITE);
+
+                final Checkbox invertZoomCheckbox = new Checkbox(
+                        getDialogContentOffsetFollowingLabel(invertZoomLabel),
+                        MenuElement.Anchor.LEFT_TOP,
+                        Settings::checkIsInvertZoomDirection,
+                        Settings::setInvertZoomDirection),
+                        invertBreadthCheckbox = new Checkbox(
+                                getDialogContentOffsetFollowingLabel(
+                                        invertBreadthLabel),
+                                MenuElement.Anchor.LEFT_TOP,
+                                Settings::checkIsInvertBreadthDirection,
+                                Settings::setInvertBreadthDirection),
+                        invertToleranceCheckbox = new Checkbox(
+                                getDialogContentOffsetFollowingLabel(
+                                        invertToleranceLabel),
+                                MenuElement.Anchor.LEFT_TOP,
+                                Settings::checkIsInvertToleranceDirection,
+                                Settings::setInvertToleranceDirection),
+                        invertFontSizeCheckbox = new Checkbox(
+                                getDialogContentOffsetFollowingLabel(
+                                        invertFontSizeLabel),
+                                MenuElement.Anchor.LEFT_TOP,
+                                Settings::checkIsInvertFontSizeDirection,
+                                Settings::setInvertFontSizeDirection);
+
+                mb.addAll(scrollDirectionLabel,
+                        invertZoomLabel, invertZoomCheckbox,
+                        invertBreadthLabel, invertBreadthCheckbox,
+                        invertToleranceLabel, invertToleranceCheckbox,
+                        invertFontSizeLabel, invertFontSizeCheckbox);
+
+                yield invertFontSizeLabel;
             }
             case VISUAL -> {
                 // text labels
@@ -2005,6 +2056,33 @@ public class DialogAssembly {
 
                 // update as new settings are added to category
                 yield pixelGridLimits2;
+            }
+            case ADVANCED -> {
+                final TextLabel dumpStatesLabel = makeDialogLeftLabel(
+                        initialYIndex,
+                        "Dump old project states when memory is low?"),
+                        dsContext1 = TextLabel.make(textBelowPos(dumpStatesLabel),
+                                "This will dump previous project state iterations from",
+                                Constants.WHITE),
+                        dsContext2 = TextLabel.make(textBelowPos(dsContext1),
+                                "the state stack, making them inaccessible via undo/redo.",
+                                Constants.WHITE),
+                        dsContext3 = TextLabel.make(textBelowPos(dsContext2),
+                                "Disabling this may lead the program to crash;",
+                                Constants.WHITE),
+                        dsContext4 = TextLabel.make(textBelowPos(dsContext3),
+                                "this instability will be addressed in future updates.",
+                                Constants.WHITE);
+
+                final Checkbox dumpStatesCheckbox = new Checkbox(
+                        getDialogContentOffsetFollowingLabel(dumpStatesLabel),
+                        MenuElement.Anchor.LEFT_TOP,
+                        Settings::checkIsDumpStates, Settings::setDumpStates);
+
+                mb.addAll(dumpStatesLabel, dumpStatesCheckbox,
+                        dsContext1, dsContext2, dsContext3, dsContext4);
+
+                yield dsContext4;
             }
         };
 

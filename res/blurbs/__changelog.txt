@@ -1,10 +1,4 @@
-{TODO for 0.3.0}
-
-To add:
-> Settings for:
-    > Mouse scroll wheel inversion
-
-{0.3.0} - The Settings and Options Update - 2024-04-0?
+{0.3.0} - The Settings and Options Update - 2024-04-07
 
 Added:
 > Added text tool
@@ -16,7 +10,14 @@ Added:
 > Added hotkeys and shortcuts:
     > {1} - {9} to quickly select one of the first 9 projects loaded into the program
     > Iterate through included palette colors ({Ctrl + ,} and {Ctrl + .})
-    > Set the checkerboard and pixel grid cell size to the size of the canvas ({Ctrl + B})
+    > Set the checkerboard and grid cell size to the bounds of the selection/project ({Ctrl + B})
+> Added settings for:
+    > Enabling/disabling state dumping
+    > Direction inversion:
+        > Zoom
+        > Tool breadth incrementation (brush, eraser, shade brush, etc.)
+        > Search tool tolerance incrementation (fill, wand)
+        > Font size incrementation
 
 Changed:
 > Redrew frame icons to feature purple film reels instead of orange motion blobs

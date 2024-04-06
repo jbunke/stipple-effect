@@ -22,6 +22,11 @@ public class Settings {
         // boolean settings
         FULLSCREEN_ON_STARTUP(new Setting<>(BooleanSettingType.get(), false)),
         PIXEL_GRID_ON_BY_DEFAULT(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_ZOOM_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_FONT_SIZE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        DUMP_STATES(new Setting<>(BooleanSettingType.get(), true)),
 
         // int settings
         CHECKERBOARD_W_PX(new Setting<>(
@@ -158,6 +163,26 @@ public class Settings {
         Code.PIXEL_GRID_ON_BY_DEFAULT.set(pixelGridOnByDefault);
     }
 
+    public static void setInvertZoomDirection(final boolean invertZoomDirection) {
+        Code.INVERT_ZOOM_DIRECTION.set(invertZoomDirection);
+    }
+
+    public static void setInvertBreadthDirection(final boolean invertBreadthDirection) {
+        Code.INVERT_BREADTH_DIRECTION.set(invertBreadthDirection);
+    }
+
+    public static void setInvertToleranceDirection(final boolean invertToleranceDirection) {
+        Code.INVERT_TOLERANCE_DIRECTION.set(invertToleranceDirection);
+    }
+
+    public static void setInvertFontSizeDirection(final boolean invertFontSizeDirection) {
+        Code.INVERT_FONT_SIZE_DIRECTION.set(invertFontSizeDirection);
+    }
+
+    public static void setDumpStates(final boolean dumpStates) {
+        Code.DUMP_STATES.set(dumpStates);
+    }
+
     public static void setCheckerboardWPixels(
             final int checkerboardWPixels
     ) {
@@ -219,6 +244,26 @@ public class Settings {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.check();
     }
 
+    public static boolean checkIsInvertZoomDirection() {
+        return (boolean) Code.INVERT_ZOOM_DIRECTION.setting.check();
+     }
+
+     public static boolean checkIsInvertBreadthDirection() {
+        return (boolean) Code.INVERT_BREADTH_DIRECTION.setting.check();
+     }
+
+    public static boolean checkIsInvertToleranceDirection() {
+        return (boolean) Code.INVERT_TOLERANCE_DIRECTION.setting.check();
+    }
+
+    public static boolean checkIsInvertFontSizeDirection() {
+        return (boolean) Code.INVERT_FONT_SIZE_DIRECTION.setting.check();
+    }
+
+    public static boolean checkIsDumpStates() {
+        return (boolean) Code.DUMP_STATES.setting.check();
+    }
+
     public static int checkCheckerboardWPixels() {
         return (int) Code.CHECKERBOARD_W_PX.setting.check();
     }
@@ -264,6 +309,10 @@ public class Settings {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.get();
     }
 
+    public static boolean isDumpStates() {
+        return (boolean) Code.DUMP_STATES.setting.get();
+    }
+
     public static int getCheckerboardWPixels() {
         return (int) Code.CHECKERBOARD_W_PX.setting.get();
     }
@@ -298,5 +347,17 @@ public class Settings {
 
     public static SEFonts.Code getProgramFont() {
         return (SEFonts.Code) Code.PROGRAM_FONT.setting.get();
+    }
+
+    public static int getScrollClicks(
+            final int nativeClicksScrolled, final Code setting
+    ) {
+        try {
+            final boolean inverted = (boolean) setting.setting.get();
+
+            return nativeClicksScrolled * (inverted ? -1 : 1);
+        } catch (ClassCastException cce) {
+            return nativeClicksScrolled;
+        }
     }
 }

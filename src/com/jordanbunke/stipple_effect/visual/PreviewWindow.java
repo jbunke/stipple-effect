@@ -22,6 +22,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
@@ -218,7 +219,8 @@ public class PreviewWindow implements ProgramContext {
                 if (mouseInBounds) {
                     mse.markAsProcessed();
 
-                    if (mse.clicksScrolled < 0)
+                    if (Settings.getScrollClicks(mse.clicksScrolled,
+                            Settings.Code.INVERT_ZOOM_DIRECTION) < 0)
                         zoomIn();
                     else
                         zoomOut();
