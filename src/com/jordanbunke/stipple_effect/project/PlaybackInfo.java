@@ -45,13 +45,21 @@ public class PlaybackInfo {
     }
 
     public PlaybackInfo() {
+        this(Mode.FORWARDS);
+    }
+
+    private PlaybackInfo(final Mode mode) {
         this.playing = false;
         this.fps = Constants.DEFAULT_PLAYBACK_FPS;
         updateMillisPerFrame();
-        this.mode = Mode.FORWARDS;
+        this.mode = mode;
 
         millisAccumulated = 0;
         nanosAccumulated = 0d;
+    }
+
+    public static PlaybackInfo forPreview() {
+        return new PlaybackInfo(Mode.LOOP);
     }
 
     public void play() {
@@ -96,6 +104,39 @@ public class PlaybackInfo {
                     setMode(Mode.PONG_FORWARDS);
             }
         }
+    }
+
+    public int nextAnimationFrameForPreview(
+            final int lastFrame, final int frameCount
+    ) {
+        final int next = (lastFrame + 1) % frameCount,
+                previous = (lastFrame == 0 ? frameCount - 1 : lastFrame - 1);
+
+        switch (mode) {
+            case PONG_FORWARDS, FORWARDS -> {
+                if (lastFrame + 1 < frameCount)
+                    return next;
+
+                if (mode == Mode.PONG_FORWARDS)
+                    setMode(Mode.PONG_BACKWARDS);
+                else
+                    stop();
+            }
+            case PONG_BACKWARDS, BACKWARDS -> {
+                if (lastFrame > 0)
+                    return previous;
+
+                if (mode == Mode.PONG_BACKWARDS)
+                    setMode(Mode.PONG_FORWARDS);
+                else
+                    stop();
+            }
+            case LOOP -> {
+                return next;
+            }
+        }
+
+        return lastFrame;
     }
 
     private void updateMillisPerFrame() {

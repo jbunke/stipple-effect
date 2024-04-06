@@ -2174,4 +2174,8 @@ public class SEContext {
     public StateManager getStateManager() {
         return stateManager;
     }
+
+    public GameImage getCheckerboard() {
+        return checkerboard;
+    }
 }

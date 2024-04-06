@@ -1849,7 +1849,16 @@ public class DialogAssembly {
                                 textBelowPos(defaultNewProjectSizeLabel),
                                 "Width:", Constants.WHITE),
                         newProjectHeightLabel = makeDialogRightLabel(
-                                newProjectWidthLabel, "Height:");
+                                newProjectWidthLabel, "Height:"),
+                        frameAffixLabel = TextLabel.make(
+                                textBelowPos(newProjectWidthLabel, 1),
+                                "Default separate PNGs frame affixes",
+                                Constants.WHITE),
+                        prefixLabel = TextLabel.make(
+                                textBelowPos(frameAffixLabel),
+                                "Prefix:", Constants.WHITE),
+                        suffixLabel = makeDialogRightLabel(prefixLabel,
+                                "Suffix:");
 
                 final Checkbox fullscreenCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(fullscreenLabel),
@@ -1876,24 +1885,6 @@ public class DialogAssembly {
                                 Settings::setDefaultCanvasHPixels,
                                 Settings::checkDefaultCanvasHPixels, 3);
 
-                mb.addAll(fullscreenLabel, fullscreenCheckbox,
-                        pixelGridDefaultLabel, pixelGridCheckbox,
-                        defaultNewProjectSizeLabel,
-                        newProjectWidthLabel, widthTextbox,
-                        newProjectHeightLabel, heightTextbox);
-
-                // update as new settings are added to category
-                yield pixelGridDefaultLabel;
-            }
-            case FORMAT -> {
-                // text labels
-                final TextLabel frameAffixLabel = makeDialogLeftLabel(initialYIndex,
-                        "Default separate PNGs frame affixes"),
-                        prefixLabel = TextLabel.make(
-                                textBelowPos(frameAffixLabel),
-                                "Prefix:", Constants.WHITE),
-                        suffixLabel = makeDialogRightLabel(prefixLabel,
-                                "Suffix:");
                 final String FA_EXAMPLE = "Example: base_name", FA_MAX_VALUE = "WWWWW";
                 final DynamicLabel frameAffixExample = makeDynamicLabel(
                         textBelowPos(prefixLabel), () -> FA_EXAMPLE +
@@ -1901,7 +1892,6 @@ public class DialogAssembly {
                                 Settings.getDefaultIndexSuffix() + ".png",
                         FA_EXAMPLE + FA_MAX_VALUE + "0" + FA_MAX_VALUE + ".png");
 
-                // textboxes
                 final DynamicTextbox prefixTextbox =
                         makeDialogAffixDynamicTextbox(prefixLabel,
                                 Settings::setDefaultIndexPrefix,
@@ -1910,8 +1900,13 @@ public class DialogAssembly {
                                 suffixLabel, Settings::setDefaultIndexSuffix,
                                 Settings::checkDefaultIndexSuffix);
 
-                mb.addAll(frameAffixLabel, prefixLabel, suffixLabel,
-                        frameAffixExample, prefixTextbox, suffixTextbox);
+                mb.addAll(fullscreenLabel, fullscreenCheckbox,
+                        pixelGridDefaultLabel, pixelGridCheckbox,
+                        defaultNewProjectSizeLabel,
+                        newProjectWidthLabel, widthTextbox,
+                        newProjectHeightLabel, heightTextbox)
+                        .addAll(frameAffixLabel, prefixLabel, suffixLabel,
+                                frameAffixExample, prefixTextbox, suffixTextbox);
 
                 // update as new settings are added to category
                 yield suffixLabel;
@@ -2090,13 +2085,15 @@ public class DialogAssembly {
                             "Selection shortcuts",
                             "Advanced color shortcuts"
                     },
-                    contentAssembler, contentStart, initialbottomY
-            );
+                    contentAssembler, contentStart, initialbottomY);
             case CHANGELOG -> assembleInfoScreenContents(
                     new String[] { IconCodes.CHANGELOG },
                     new String[] { "" },
-                    contentAssembler, contentStart, initialbottomY
-            );
+                    contentAssembler, contentStart, initialbottomY);
+            case ROADMAP -> assembleInfoScreenContents(
+                    new String[] { IconCodes.ROADMAP },
+                    new String[] { "" },
+                    contentAssembler, contentStart, initialbottomY);
         };
 
         final ScrollableMenuElement[] scrollingElements =

@@ -19,12 +19,12 @@ public class RenderInfo {
     }
 
     public void zoomIn(final Coord2D targetPixel) {
-        setZoomFactor(zoomFactor * 2f);
+        setZoomFactor(zoomFactor * Constants.ZOOM_CHANGE_LEVEL);
         adjustAnchorFromZoom(targetPixel);
     }
 
     public void zoomOut() {
-        setZoomFactor(zoomFactor * 0.5f);
+        setZoomFactor(zoomFactor / Constants.ZOOM_CHANGE_LEVEL);
     }
 
     private void adjustAnchorFromZoom(final Coord2D targetPixel) {

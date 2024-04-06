@@ -41,10 +41,8 @@ import com.jordanbunke.stipple_effect.visual.*;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -111,6 +109,12 @@ public class StippleEffect implements ProgramContext {
     // timer
     private int timerCounter, timerMillis;
     private boolean timerToggle;
+
+    /**
+     * This exists to ensure that the standard execution thread executes
+     * the jobs that are scheduled, thus avoiding race conditions etc.
+     * */
+    private final Queue<Runnable> jobScheduler;
 
     static {
         OnStartup.run();
@@ -248,6 +252,8 @@ public class StippleEffect implements ProgramContext {
         timerToggle = false;
         timerMillis = 0;
 
+        jobScheduler = new LinkedList<>();
+
         configureDebugger();
     }
 
@@ -257,12 +263,12 @@ public class StippleEffect implements ProgramContext {
 
     public static void main(final String[] args) {
         if (args.length > 0)
-            launchWithFile(Path.of(Arrays.stream(args)
-                    .reduce("", (a, b) -> a + b)));
+            get().launchWithFile(Path.of(Arrays.stream(args)
+                    .reduce("", (a, b) -> a + " " + b).trim()));
     }
 
-    private static void launchWithFile(final Path filepath) {
-        get().verifyFilepath(filepath);
+    private void launchWithFile(final Path filepath) {
+        jobScheduler.add(() -> verifyFilepath(filepath));
     }
 
     private void configureDebugger() {
@@ -601,6 +607,9 @@ public class StippleEffect implements ProgramContext {
     public void update(final double deltaTime) {
         provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
 
+        while (!jobScheduler.isEmpty())
+            jobScheduler.poll().run();
+
         if (dialog == null) {
             getContext().animate(deltaTime);
 
@@ -745,7 +754,6 @@ public class StippleEffect implements ProgramContext {
             final GameImage frames = drawFrames();
             canvas.draw(frames, fp.x, fp.y);
         }
-
 
         // borders
         final float strokeWidth = 2f;

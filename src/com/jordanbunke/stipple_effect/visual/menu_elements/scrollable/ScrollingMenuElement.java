@@ -49,8 +49,12 @@ public abstract class ScrollingMenuElement extends MenuElementContainer {
         // background
         draw(background, canvas);
 
+        final ScrollableMenuElement[] renderOrder =
+                MenuElement.sortForRender(menuElements,
+                        ScrollableMenuElement[]::new);
+
         // contents
-        for (ScrollableMenuElement sme : menuElements)
+        for (ScrollableMenuElement sme : renderOrder)
             if (renderAndProcessChild(sme))
                 sme.render(canvas);
     }

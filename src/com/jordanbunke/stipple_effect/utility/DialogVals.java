@@ -105,7 +105,7 @@ public class DialogVals {
     }
 
     public enum InfoScreen {
-        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG;
+        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, CHANGELOG, ROADMAP;
 
         public String getTitle() {
             return this == MORE ? "More Shortcuts & Advanced Info" : toString();
@@ -118,7 +118,7 @@ public class DialogVals {
     }
 
     public enum SettingScreen {
-        DEFAULT, FORMAT, VISUAL;
+        DEFAULT, VISUAL;
 
         public String getTitle() {
             return (this == DEFAULT ? this + " and startup" : this) + " settings";
