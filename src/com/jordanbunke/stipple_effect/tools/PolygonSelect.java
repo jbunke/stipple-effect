@@ -7,8 +7,8 @@ import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.LineMath;
-import com.jordanbunke.stipple_effect.utility.LineSegment;
+import com.jordanbunke.stipple_effect.utility.math.LineMath;
+import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -72,9 +72,6 @@ public final class PolygonSelect extends ToolWithMode {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
 
-            if (tp.x < 0 || tp.x >= w || tp.y < 0 || tp.y >= h)
-                return;
-
             if (selecting) {
                 // add to selection
                 addEdge(getLastVertex(), tp);
@@ -82,8 +79,9 @@ public final class PolygonSelect extends ToolWithMode {
 
                 if (tp.equals(vertices.get(0)))
                     finish(context);
-            } else {
+            } else if (tp.x >= 0 && tp.x < w && tp.y >= 0 && tp.y < h) {
                 // Start selection
+                // bounds check only necessary for first vertex
                 selecting = true;
                 vertices = new ArrayList<>();
                 vertices.add(tp);
@@ -105,9 +103,6 @@ public final class PolygonSelect extends ToolWithMode {
 
         lastTP = tp;
     }
-
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {}
 
     private void finish(final SEContext context) {
         // define bounding box

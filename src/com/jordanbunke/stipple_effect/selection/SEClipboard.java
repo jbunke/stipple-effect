@@ -22,8 +22,8 @@ public class SEClipboard {
 
     public void sendSelectionToClipboard(final ProjectState state) {
         contents = switch (state.getSelectionMode()) {
-            case BOUNDS -> new SelectionContents(state.getEditingLayer()
-                    .getFrame(state.getFrameIndex()), state.getSelection());
+            case BOUNDS -> new SelectionContents(
+                    state.getActiveLayerFrame(), state.getSelection());
             case CONTENTS -> state.getSelectionContents();
         };
     }

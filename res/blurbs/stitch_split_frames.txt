@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Shift + G}
+
+Displays a dialog allowing the user to either split a single-frame project into multiple frames,
+or to stitch a multi-frame project into a sprite sheet.

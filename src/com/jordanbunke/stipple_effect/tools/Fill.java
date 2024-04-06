@@ -39,8 +39,7 @@ public final class Fill extends ToolThatSearches {
                     h = context.getState().getImageHeight();
             final Coord2D tp = context.getTargetPixel();
 
-            final GameImage image = context.getState().getEditingLayer()
-                    .getFrame(context.getState().getFrameIndex());
+            final GameImage image = context.getState().getActiveLayerFrame();
             final Color initial = ImageProcessing.colorAtPixel(image, tp.x, tp.y),
                     fillColor = me.button == GameMouseEvent.Button.LEFT
                             ? StippleEffect.get().getPrimary()
@@ -61,15 +60,5 @@ public final class Fill extends ToolThatSearches {
             context.stampImage(edit.submit(), matched);
             context.getState().markAsCheckpoint(true);
         }
-    }
-
-    @Override
-    public void update(final SEContext context, final Coord2D mousePosition) {
-
-    }
-
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-
     }
 }

@@ -10,6 +10,7 @@ public class IconCodes {
             SAVE_AS = "save_as",
             RESIZE = "resize",
             PAD = "pad",
+            STITCH_SPLIT_FRAMES = "stitch_split_frames",
             PREVIEW = "preview",
             UNDO = "undo",
             GRANULAR_UNDO = "granular_undo",
@@ -67,6 +68,8 @@ public class IconCodes {
             HORIZONTAL_REFLECTION = "horizontal_reflection",
             PIXEL_GRID_OFF = "pixel_grid_off",
             PIXEL_GRID_ON = "pixel_grid_on",
+            NEW_FONT = "new_font",
+            DELETE_FONT = "delete_font",
             INCLUDED = "included",
             EXCLUDED = "excluded",
             SETTINGS = "settings",
@@ -87,6 +90,7 @@ public class IconCodes {
 
     public static final String
             CHANGELOG = NO_ICON_PREFIX + "changelog",
+            ROADMAP = NO_ICON_PREFIX + "roadmap",
             GENERAL = NO_ICON_PREFIX + "general",
             CLIPBOARD_SHORTCUTS = NO_ICON_PREFIX + "clipboard_shortcuts",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",
@@ -94,5 +98,16 @@ public class IconCodes {
             PLAYBACK_MODES = NO_ICON_PREFIX + "playback",
             LAYER_VISIBILITY = NO_ICON_PREFIX + "visibility",
             ONION_SKIN = NO_ICON_PREFIX + "onion_skin",
-            FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking";
+            FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking",
+            FONT_EXAMPLE_TEXT = NO_ICON_PREFIX + "font_example_text";
+
+    private static final String INDICATOR_PREFIX = "indicator_";
+
+    public static final String
+            IND_TOOL = INDICATOR_PREFIX + "tool",
+            IND_ZOOM = INDICATOR_PREFIX + "zoom",
+            IND_TARGET = INDICATOR_PREFIX + "target",
+            IND_BOUNDS = INDICATOR_PREFIX + "bounds";
+
+    public static final String NO_TOOLTIP = "no_tooltip";
 }

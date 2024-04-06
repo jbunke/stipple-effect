@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.palette;
 
-import com.jordanbunke.stipple_effect.utility.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
 
 import java.awt.*;
 import java.util.Comparator;
@@ -11,12 +12,7 @@ public enum PaletteSorter {
 
     @Override
     public String toString() {
-        return name().charAt(0) + name().substring(1).toLowerCase();
-    }
-
-    public PaletteSorter next() {
-        final PaletteSorter[] vs = values();
-        return vs[(ordinal() + 1) % vs.length];
+        return EnumUtils.formattedName(this);
     }
 
     private static final Function<Color, Double>

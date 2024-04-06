@@ -1,0 +1,363 @@
+package com.jordanbunke.stipple_effect.utility.settings;
+
+import com.jordanbunke.delta_time.io.FileIO;
+import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.ParserUtils;
+import com.jordanbunke.stipple_effect.utility.settings.types.BooleanSettingType;
+import com.jordanbunke.stipple_effect.utility.settings.types.EnumSettingType;
+import com.jordanbunke.stipple_effect.utility.settings.types.IntSettingType;
+import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.SEFonts;
+
+import java.nio.file.Path;
+
+public class Settings {
+    private static final Path SETTINGS_FILE = Path.of("data", ".settings");
+
+    public enum Code {
+        // boolean settings
+        FULLSCREEN_ON_STARTUP(new Setting<>(BooleanSettingType.get(), false)),
+        PIXEL_GRID_ON_BY_DEFAULT(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_ZOOM_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        INVERT_FONT_SIZE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
+        DUMP_STATES(new Setting<>(BooleanSettingType.get(), true)),
+
+        // int settings
+        CHECKERBOARD_W_PX(new Setting<>(
+                IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
+                cbw -> StippleEffect.get().getContext().redrawCheckerboard())),
+        CHECKERBOARD_H_PX(new Setting<>(
+                IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
+                cbh -> StippleEffect.get().getContext().redrawCheckerboard())),
+        PIXEL_GRID_X_PX(new Setting<>(
+                IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgx -> {
+                    final SEContext c = StippleEffect.get().getContext();
+                    c.renderInfo.setPixelGrid(true);
+                    c.redrawPixelGrid();
+                })),
+        PIXEL_GRID_Y_PX(new Setting<>(
+                IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgy -> {
+                    final SEContext c = StippleEffect.get().getContext();
+                    c.renderInfo.setPixelGrid(true);
+                    c.redrawPixelGrid();
+                })),
+        DEFAULT_CANVAS_W_PX(new Setting<>(
+                IntSettingType.get(), Constants.DEFAULT_CANVAS_W)),
+        DEFAULT_CANVAS_H_PX(new Setting<>(
+                IntSettingType.get(), Constants.DEFAULT_CANVAS_H)),
+
+        // string settings
+        DEFAULT_INDEX_PREFIX(new Setting<>(
+                StringSettingType.get(), "", prefix -> {
+                    StippleEffect.get().getContexts().forEach(
+                            c -> c.projectInfo.setIndexPrefix(prefix));
+                })),
+        DEFAULT_INDEX_SUFFIX(new Setting<>(
+                StringSettingType.get(), "", suffix -> {
+                    StippleEffect.get().getContexts().forEach(
+                            c -> c.projectInfo.setIndexSuffix(suffix));
+                })),
+
+        // enum settings
+        PROGRAM_FONT(new Setting<>(
+                new EnumSettingType<>(SEFonts.Code.class),
+                SEFonts.DEFAULT_FONT, code -> {
+                    DialogAssembly.setDialogToProgramSettings();
+                    StippleEffect.get().rebuildAllMenus();
+                }));
+
+        private final Setting<?> setting;
+
+        <T> Code(final Setting<T> setting) {
+            this.setting = setting;
+        }
+        @Override
+        public String toString() {
+            final String name = name();
+
+            return name.toLowerCase().replace("default", "def");
+        }
+
+        public static Code fromString(final String code) {
+            try {
+                final String formattedCode = code
+                        .replace("def_", "default_").toUpperCase();
+                return Code.valueOf(formattedCode);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
+        private <T> void set(final T value) {
+            setting.trySet(value);
+        }
+
+        private void read(final String value) {
+            setting.setFromRead(value);
+        }
+    }
+
+    public static void read() {
+        final String file = FileIO.readFile(SETTINGS_FILE);
+
+        if (file == null)
+            return;
+
+        final String[] settingsLines = FileIO.readFile(SETTINGS_FILE).split("\n");
+
+        for (String line : settingsLines) {
+            final String[] codeAndValue =
+                    ParserUtils.splitIntoCodeAndValue(line);
+
+            if (codeAndValue.length != ParserUtils.DESIRED)
+                continue;
+
+            final String code = codeAndValue[ParserUtils.CODE],
+                    value = codeAndValue[ParserUtils.VALUE];
+
+            final Code matched = Code.fromString(code);
+
+            if (matched != null)
+                matched.read(value);
+        }
+    }
+
+    public static void write() {
+        FileIO.safeMakeDirectory(SETTINGS_FILE.getParent());
+
+        final StringBuilder sb = new StringBuilder();
+
+        for (Code code : Code.values())
+            sb.append(code).append(Constants.SETTING_SEPARATOR)
+                    .append(Constants.OPEN_SETTING_VAL)
+                    .append(code.setting.get())
+                    .append(Constants.CLOSE_SETTING_VAL).append("\n");
+
+        FileIO.writeFile(SETTINGS_FILE, sb.toString());
+    }
+
+    public static void initializeMenu() {
+        for (Code code : Code.values())
+            code.setting.initializeMenu();
+    }
+
+    public static void apply() {
+        for (Code code : Code.values())
+            code.setting.apply();
+
+        write();
+    }
+
+    // setters
+    public static void setFullscreenOnStartup(final boolean fullscreenOnStartup) {
+        Code.FULLSCREEN_ON_STARTUP.set(fullscreenOnStartup);
+    }
+
+    public static void setPixelGridOnByDefault(final boolean pixelGridOnByDefault) {
+        Code.PIXEL_GRID_ON_BY_DEFAULT.set(pixelGridOnByDefault);
+    }
+
+    public static void setInvertZoomDirection(final boolean invertZoomDirection) {
+        Code.INVERT_ZOOM_DIRECTION.set(invertZoomDirection);
+    }
+
+    public static void setInvertBreadthDirection(final boolean invertBreadthDirection) {
+        Code.INVERT_BREADTH_DIRECTION.set(invertBreadthDirection);
+    }
+
+    public static void setInvertToleranceDirection(final boolean invertToleranceDirection) {
+        Code.INVERT_TOLERANCE_DIRECTION.set(invertToleranceDirection);
+    }
+
+    public static void setInvertFontSizeDirection(final boolean invertFontSizeDirection) {
+        Code.INVERT_FONT_SIZE_DIRECTION.set(invertFontSizeDirection);
+    }
+
+    public static void setDumpStates(final boolean dumpStates) {
+        Code.DUMP_STATES.set(dumpStates);
+    }
+
+    public static void setCheckerboardWPixels(
+            final int checkerboardWPixels
+    ) {
+        Code.CHECKERBOARD_W_PX.set(checkerboardWPixels);
+    }
+
+    public static void setCheckerboardHPixels(
+            final int checkerboardHPixels
+    ) {
+        Code.CHECKERBOARD_H_PX.set(checkerboardHPixels);
+    }
+
+    public static void setPixelGridXPixels(
+            final int pixelGridXPixels
+    ) {
+        Code.PIXEL_GRID_X_PX.set(pixelGridXPixels);
+    }
+
+    public static void setPixelGridYPixels(
+            final int pixelGridYPixels
+    ) {
+        Code.PIXEL_GRID_Y_PX.set(pixelGridYPixels);
+    }
+
+    public static void setDefaultCanvasWPixels(
+            final int defaultCanvasWPixels
+    ) {
+        Code.DEFAULT_CANVAS_W_PX.set(defaultCanvasWPixels);
+    }
+
+    public static void setDefaultCanvasHPixels(
+            final int defaultCanvasHPixels
+    ) {
+        Code.DEFAULT_CANVAS_H_PX.set(defaultCanvasHPixels);
+    }
+
+    public static void setDefaultIndexPrefix(
+            final String defIndexPrefix
+    ) {
+        Code.DEFAULT_INDEX_PREFIX.set(defIndexPrefix);
+    }
+
+    public static void setDefaultIndexSuffix(
+            final String defIndexSuffix
+    ) {
+        Code.DEFAULT_INDEX_SUFFIX.set(defIndexSuffix);
+    }
+
+    public static void setProgramFont(final SEFonts.Code fontCode) {
+        Code.PROGRAM_FONT.set(fontCode);
+    }
+
+    // checkers
+    public static boolean checkIsFullscreenOnStartup() {
+        return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.check();
+    }
+
+    public static boolean checkIsPixelGridOnByDefault() {
+        return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.check();
+    }
+
+    public static boolean checkIsInvertZoomDirection() {
+        return (boolean) Code.INVERT_ZOOM_DIRECTION.setting.check();
+     }
+
+     public static boolean checkIsInvertBreadthDirection() {
+        return (boolean) Code.INVERT_BREADTH_DIRECTION.setting.check();
+     }
+
+    public static boolean checkIsInvertToleranceDirection() {
+        return (boolean) Code.INVERT_TOLERANCE_DIRECTION.setting.check();
+    }
+
+    public static boolean checkIsInvertFontSizeDirection() {
+        return (boolean) Code.INVERT_FONT_SIZE_DIRECTION.setting.check();
+    }
+
+    public static boolean checkIsDumpStates() {
+        return (boolean) Code.DUMP_STATES.setting.check();
+    }
+
+    public static int checkCheckerboardWPixels() {
+        return (int) Code.CHECKERBOARD_W_PX.setting.check();
+    }
+
+    public static int checkCheckerboardHPixels() {
+        return (int) Code.CHECKERBOARD_H_PX.setting.check();
+    }
+
+    public static int checkPixelGridXPixels() {
+        return (int) Code.PIXEL_GRID_X_PX.setting.check();
+    }
+
+    public static int checkPixelGridYPixels() {
+        return (int) Code.PIXEL_GRID_Y_PX.setting.check();
+    }
+
+    public static int checkDefaultCanvasWPixels() {
+        return (int) Code.DEFAULT_CANVAS_W_PX.setting.check();
+    }
+
+    public static int checkDefaultCanvasHPixels() {
+        return (int) Code.DEFAULT_CANVAS_H_PX.setting.check();
+    }
+
+    public static String checkDefaultIndexPrefix() {
+        return (String) Code.DEFAULT_INDEX_PREFIX.setting.check();
+    }
+
+    public static String checkDefaultIndexSuffix() {
+        return (String) Code.DEFAULT_INDEX_SUFFIX.setting.check();
+    }
+
+    public static SEFonts.Code checkProgramFont() {
+        return (SEFonts.Code) Code.PROGRAM_FONT.setting.check();
+    }
+
+    // getters
+    public static boolean isFullscreenOnStartup() {
+        return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.get();
+    }
+
+    public static boolean isPixelGridOnByDefault() {
+        return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.get();
+    }
+
+    public static boolean isDumpStates() {
+        return (boolean) Code.DUMP_STATES.setting.get();
+    }
+
+    public static int getCheckerboardWPixels() {
+        return (int) Code.CHECKERBOARD_W_PX.setting.get();
+    }
+
+    public static int getCheckerboardHPixels() {
+        return (int) Code.CHECKERBOARD_H_PX.setting.get();
+    }
+
+    public static int getPixelGridXPixels() {
+        return (int) Code.PIXEL_GRID_X_PX.setting.get();
+    }
+
+    public static int getPixelGridYPixels() {
+        return (int) Code.PIXEL_GRID_Y_PX.setting.get();
+    }
+
+    public static int getDefaultCanvasWPixels() {
+        return (int) Code.DEFAULT_CANVAS_W_PX.setting.get();
+    }
+
+    public static int getDefaultCanvasHPixels() {
+        return (int) Code.DEFAULT_CANVAS_H_PX.setting.get();
+    }
+
+    public static String getDefaultIndexPrefix() {
+        return (String) Code.DEFAULT_INDEX_PREFIX.setting.get();
+    }
+
+    public static String getDefaultIndexSuffix() {
+        return (String) Code.DEFAULT_INDEX_SUFFIX.setting.get();
+    }
+
+    public static SEFonts.Code getProgramFont() {
+        return (SEFonts.Code) Code.PROGRAM_FONT.setting.get();
+    }
+
+    public static int getScrollClicks(
+            final int nativeClicksScrolled, final Code setting
+    ) {
+        try {
+            final boolean inverted = (boolean) setting.setting.get();
+
+            return nativeClicksScrolled * (inverted ? -1 : 1);
+        } catch (ClassCastException cce) {
+            return nativeClicksScrolled;
+        }
+    }
+}

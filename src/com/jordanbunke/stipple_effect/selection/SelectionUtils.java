@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.selection;
 
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
-import com.jordanbunke.stipple_effect.utility.Geometry;
+import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
 import java.util.HashSet;
 import java.util.Set;

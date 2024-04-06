@@ -11,7 +11,7 @@ import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
-import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -260,13 +260,13 @@ public class ParserSerializer {
 
         final int LENGTH_OF_SECTION = 2, R = 0, G = 2, B = 4, A = 6;
 
-        final int r = ColorTextBox.hexToInt(contents.substring(
+        final int r = ColorTextbox.hexToInt(contents.substring(
                 R, R + LENGTH_OF_SECTION)),
-                g = ColorTextBox.hexToInt(contents.substring(
+                g = ColorTextbox.hexToInt(contents.substring(
                         G, G + LENGTH_OF_SECTION)),
-                b = ColorTextBox.hexToInt(contents.substring(
+                b = ColorTextbox.hexToInt(contents.substring(
                         B, B + LENGTH_OF_SECTION)),
-                a = ColorTextBox.hexToInt(contents.substring(
+                a = ColorTextbox.hexToInt(contents.substring(
                         A, A + LENGTH_OF_SECTION));
 
         return new Color(r, g, b, a);

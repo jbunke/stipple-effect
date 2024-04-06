@@ -169,6 +169,26 @@ public class ProjectState {
                 new HashSet<>(selection), selectionContents);
     }
 
+    public ProjectState stitch(
+            final int imageWidth, final int imageHeight,
+            final List<SELayer> layers
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                1, 0, selectionMode,
+                new HashSet<>(selection), selectionContents);
+    }
+
+    public ProjectState split(
+            final int imageWidth, final int imageHeight,
+            final List<SELayer> layers, final int frameCount
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                new ArrayList<>(layers), layerEditIndex,
+                frameCount, 0, selectionMode,
+                new HashSet<>(selection), selectionContents);
+    }
+
     public GameImage draw(
             final boolean includeOnionSkins, final boolean inProjectRender,
             final int frameIndex
@@ -342,6 +362,10 @@ public class ProjectState {
 
     public SELayer getEditingLayer() {
         return layers.get(layerEditIndex);
+    }
+
+    public GameImage getActiveLayerFrame() {
+        return layers.get(layerEditIndex).getFrame(frameIndex);
     }
 
     public int getLayerEditIndex() {

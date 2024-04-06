@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.Settings;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 public class RenderInfo {
     private Coord2D anchor;
@@ -19,18 +19,20 @@ public class RenderInfo {
     }
 
     public void zoomIn(final Coord2D targetPixel) {
-        setZoomFactor(zoomFactor * 2f);
+        setZoomFactor(zoomFactor * Constants.ZOOM_CHANGE_LEVEL);
         adjustAnchorFromZoom(targetPixel);
     }
 
     public void zoomOut() {
-        setZoomFactor(zoomFactor * 0.5f);
+        setZoomFactor(zoomFactor / Constants.ZOOM_CHANGE_LEVEL);
     }
 
     private void adjustAnchorFromZoom(final Coord2D targetPixel) {
-        final Coord2D adjusted = new Coord2D((anchor.x + targetPixel.x) / 2,
-                (anchor.y + targetPixel.y) / 2);
-        setAnchor(adjusted);
+        if (!targetPixel.equals(Constants.NO_VALID_TARGET)) {
+            final Coord2D adjusted = new Coord2D((anchor.x + targetPixel.x) / 2,
+                    (anchor.y + targetPixel.y) / 2);
+            setAnchor(adjusted);
+        }
     }
 
     public void setZoomFactor(final float zoomFactor) {

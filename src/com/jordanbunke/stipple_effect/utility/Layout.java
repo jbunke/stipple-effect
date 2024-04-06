@@ -1,7 +1,9 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 
@@ -11,15 +13,20 @@ public class Layout {
             colorsPanelShowing, toolbarShowing, projectsExpanded;
 
     // layout constants
+    private static final double
+            TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
-            BOTTOM_BAR_H = 24, SCREEN_H_BUFFER = 120,
+            BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
-            CONTENT_BUFFER_PX = 8,
+            TEXT_CARET_W = 1, TEXT_CARET_H = 23,
+            TEXT_CARET_Y_OFFSET = -11, TEXT_LINE_PX_H = TEXT_CARET_H + 2,
+            CONTENT_BUFFER_PX = 8, PREVIEW_WINDOW_BUFFER_PX = 20,
             DEFAULT_CHECKERBOARD_DIM = 4, CHECKERBOARD_MIN = 1, CHECKERBOARD_MAX = 256,
-            DEFAULT_PIXEL_GRID_DIM = 1, PIXEL_GRID_MIN = 1, PIXEL_GRID_MAX = 64,
-            PIXEL_GRID_IMAGE_DIM_MAX = 128, PIXEL_GRID_COLOR_ALT_DIVS = 4,
+            DEFAULT_PIXEL_GRID_DIM = 1, PIXEL_GRID_MIN = 1, PIXEL_GRID_MAX = 128,
+            MAX_PIXEL_GRID_LINES = 1000, PIXEL_GRID_COLOR_ALT_DIVS = 4,
+            PIXEL_GRID_ZOOM_DIM_MAX = 19200,
             CURSOR_DIM = 40, BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
             SEGMENT_TITLE_BUTTON_OFFSET_X = 84, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
@@ -30,9 +37,10 @@ public class Layout {
             PROJECTS_BEFORE_TO_DISPLAY = 1, DIALOG_CONTENT_INC_Y = 32,
             VERT_SCROLL_WINDOW_W = RIGHT_PANEL_W - (2 * CONTENT_BUFFER_PX),
             TOP_PANEL_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
-            DIALOG_CONTENT_COMP_OFFSET_Y = 7, DIALOG_DYNAMIC_W_ALLOWANCE = 80,
-            DIALOG_CONTENT_OFFSET_X = 150, DIALOG_CONTENT_BIG_OFFSET_X = DIALOG_CONTENT_OFFSET_X + 100,
-            DIALOG_CONTENT_SMALL_W_ALLOWANCE = 180,
+            DIALOG_CONTENT_COMP_OFFSET_Y = 5,
+            DIALOG_CONTENT_OFFSET_X = 150, LONG_NAME_TEXTBOX_W = 400,
+            DIALOG_CONTENT_SMALL_W_ALLOWANCE = 120,
+            DIALOG_CONTENT_BIG_W_ALLOWANCE = LONG_NAME_TEXTBOX_W - DIALOG_CONTENT_SMALL_W_ALLOWANCE,
             SMALL_TEXT_BOX_W = 80, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET, BUTTON_TEXT_OFFSET_Y = -4,
             COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_AVG_C_THRESHOLD = 100, COLOR_TEXTBOX_W = 116,
@@ -184,8 +192,57 @@ public class Layout {
         return getBottomBarZoomPercentageX() - getBottomBarCanvasSizeX();
     }
 
-    public static int getBottomBarZoomPercentageWidth() {
-        return getBottomBarZoomSliderX() - getBottomBarZoomPercentageX();
+    // tool options bar layout
+    public static int optionsBarSliderWidth() {
+        return getToolOptionsBarWidth() / 12;
+    }
+
+    public static int optionsBarSectionBuffer() {
+        return (int) (getToolOptionsBarWidth() *
+                TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION);
+    }
+
+    public static int optionsBarTextY() {
+        return getToolOptionsBarPosition().y + TEXT_Y_OFFSET +
+                optionsBarRelativeYOffsetToBottomBar();
+    }
+
+    public static int optionsBarButtonY() {
+        return getToolOptionsBarPosition().y + BUTTON_OFFSET +
+                optionsBarRelativeYOffsetToBottomBar();
+    }
+
+    private static int optionsBarRelativeYOffsetToBottomBar() {
+        return ((TOOL_OPTIONS_BAR_H - BOTTOM_BAR_H) / 2);
+    }
+
+    public static int optionsBarNextElementX(
+            final MenuElement preceding, final boolean sectionGap
+    ) {
+        return preceding.getX() + preceding.getWidth() + (sectionGap
+                ? optionsBarSectionBuffer() : CONTENT_BUFFER_PX);
+    }
+
+    public static int optionsBarNextButtonX(
+            final MenuElement preceding
+    ) {
+        return preceding.getX() + preceding.getWidth() + BUTTON_OFFSET;
+    }
+
+    public static TextLabel optionsBarNextSectionLabel(
+            final MenuElement preceding, final String text
+    ) {
+        return TextLabel.make(new Coord2D(
+                optionsBarNextElementX(preceding, true),
+                optionsBarTextY()), text, Constants.WHITE);
+    }
+
+    public static int estimateDynamicLabelMaxWidth(
+            final String widestTextCase
+    ) {
+        return TextLabel
+                .make(new Coord2D(), widestTextCase, Constants.WHITE)
+                .getWidth();
     }
 
     // segments layout
@@ -201,6 +258,10 @@ public class Layout {
     public static int getWorkspaceWidth() {
         return width() - (getToolsWidth() + Math.max(getLayersWidth(),
                 getColorsWidth()));
+    }
+
+    public static int getToolOptionsBarWidth() {
+        return getToolsWidth() + getWorkspaceWidth();
     }
 
     public static int getToolsWidth() {
@@ -219,24 +280,36 @@ public class Layout {
         return isProjectsExpanded() ? CONTEXTS_H : COLLAPSED_CONTEXTS_H;
     }
 
+    public static int getToolOptionsBarHeight() {
+        return isToolbarShowing() && StippleEffect.get().getTool()
+                .hasToolOptionsBar() ? TOOL_OPTIONS_BAR_H : 0;
+    }
+
+    public static int getToolsHeight() {
+        return height() - (getTopPanelHeight() +
+                getToolOptionsBarHeight() + BOTTOM_BAR_H);
+    }
+
     public static int getWorkspaceHeight() {
-        return height() - (getTopPanelHeight() + BOTTOM_BAR_H);
+        return getToolsHeight();
     }
 
     public static int getLayersHeight() {
         if (!isLayersPanelShowing())
             return 0;
 
-        final int workspaceH = getWorkspaceHeight();
+        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
 
-        return isColorsPanelShowing() ? workspaceH / 2 : workspaceH;
+        return isColorsPanelShowing() ? middleH / 2 : middleH;
     }
 
     public static int getColorsHeight() {
         if (!isColorsPanelShowing())
             return 0;
 
-        return getWorkspaceHeight() - getLayersHeight();
+        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
+
+        return middleH - getLayersHeight();
     }
 
     public static Coord2D getProjectsPosition() {
@@ -248,6 +321,10 @@ public class Layout {
     }
 
     public static Coord2D getToolsPosition() {
+        return getToolOptionsBarPosition().displace(0, getToolOptionsBarHeight());
+    }
+
+    public static Coord2D getToolOptionsBarPosition() {
         return getProjectsPosition().displace(0, getTopPanelHeight());
     }
 
@@ -256,7 +333,7 @@ public class Layout {
     }
 
     public static Coord2D getLayersPosition() {
-        return getWorkspacePosition().displace(getWorkspaceWidth(), 0);
+        return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
     }
 
     public static Coord2D getColorsPosition() {
@@ -264,7 +341,7 @@ public class Layout {
     }
 
     public static Coord2D getBottomBarPosition() {
-        return getToolsPosition().displace(0, getWorkspaceHeight());
+        return getToolsPosition().displace(0, getToolsHeight());
     }
 
     public static Coord2D getSegmentContentDisplacement() {
@@ -299,10 +376,6 @@ public class Layout {
 
     public static int getDialogHeight() {
         return height() / 2;
-    }
-
-    public static int getDialogContentWidthAllowance() {
-        return getDialogWidth() - (DIALOG_DYNAMIC_W_ALLOWANCE + DIALOG_CONTENT_BIG_OFFSET_X);
     }
 
     public static Coord2D getDialogPosition() {

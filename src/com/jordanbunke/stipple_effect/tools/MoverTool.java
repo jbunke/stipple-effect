@@ -8,7 +8,8 @@ import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.Geometry;
+import com.jordanbunke.stipple_effect.utility.math.Geometry;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +32,7 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
         }
     }
 
-    private boolean snap = false;
+    private boolean snap = false, snapToggled = false;
 
     private TransformType transformType, prospectiveType;
     private Direction direction;
@@ -215,13 +216,29 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
                 ).displace(startTopLeft.x - topLeft.x, startTopLeft.y - topLeft.y);
 
                 if (isSnap()) {
-                    final Coord2D bounds = SelectionUtils.bounds(selection);
+                    if (!snapToggled) {
+                        // displace in multiples of own bounds
+                        final Coord2D bounds = SelectionUtils.bounds(selection);
 
-                    final int snappedX = bounds.x * (int)Math.round(
-                            displacement.x / (double) bounds.x),
-                            snappedY = bounds.y * (int)Math.round(
-                                    displacement.y / (double) bounds.y);
-                    displacement = new Coord2D(snappedX, snappedY);
+                        final int snappedX = bounds.x * (int)Math.round(
+                                displacement.x / (double) bounds.x),
+                                snappedY = bounds.y * (int)Math.round(
+                                        displacement.y / (double) bounds.y);
+                        displacement = new Coord2D(snappedX, snappedY);
+                    } else if (canSnapToGrid(context)) {
+                        // snap to top left of pixel grid
+                        final int px = Settings.getPixelGridXPixels(),
+                                py = Settings.getPixelGridYPixels();
+                        final Coord2D prospective = topLeft.displace(displacement),
+                                gridPos = new Coord2D(
+                                        (prospective.x / px) * px,
+                                        (prospective.y / py) * py),
+                                shift = new Coord2D(
+                                        gridPos.x - prospective.x,
+                                        gridPos.y - prospective.y);
+
+                        displacement = displacement.displace(shift);
+                    }
                 }
 
                 getMoverFunction(context).accept(displacement, false);
@@ -287,6 +304,15 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
             getMouseUpConsequence(context).run();
             me.markAsProcessed();
         }
+    }
+
+    private boolean canSnapToGrid(final SEContext context) {
+        return context.renderInfo.isPixelGridOn() &&
+                context.couldRenderPixelGrid();
+    }
+
+    public void setSnapToggled(final boolean snapToggled) {
+        this.snapToggled = snapToggled;
     }
 
     @Override

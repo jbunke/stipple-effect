@@ -1,7 +1,11 @@
 Shortcut: {U}
 
 Move: {Click & Drag} or {Arrow Keys}
-Snap to the nearest multiple of the selection dimensions by holding {Shift}.
+[ Move Modifiers ]
+- Snap to the nearest multiple of the selection dimensions by holding {Shift}.
+- Snap to the top left of the occupying pixel grid cell by holding {Ctrl + Shift}. *
+
+* Only works with {Click & Drag}, not with {Arrow Keys}
 
 Stretch: {Click & Drag} on one of the transform nodes
 

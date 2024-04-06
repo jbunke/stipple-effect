@@ -4,7 +4,6 @@ import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
-import com.jordanbunke.stipple_effect.visual.SEFonts;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -12,6 +11,17 @@ import java.util.Set;
 
 public class StatusUpdates {
     // not permitted
+    public static void cannotSetCheckAndGridToBounds(
+            final boolean fromSelection
+    ) {
+        actionNotPermitted(
+                "set the checkerboard and pixel grid cell dimensions",
+                "the width and/or height of the " +
+                        (fromSelection ? "selection" : "canvas") +
+                        " is out of bounds (" + Layout.PIXEL_GRID_MIN +
+                        "<= px <= " + Layout.PIXEL_GRID_MAX + ")");
+    }
+
     public static void cannotSetPixelGrid() {
         actionNotPermitted(
                 "turn pixel grid on or off",
@@ -83,15 +93,16 @@ public class StatusUpdates {
     }
 
     public static void cannotShiftColorPalette(
-            final boolean left, final Palette p, final Color c
+            final Palette p, final Color c, final boolean isLeft
     ) {
         final boolean colorInPalette = p.canRemove(c);
 
+        final String dir = isLeft ? "left" : "right";
+
         actionNotPermitted("shift the selected color " + processColor(c) +
-                        " to the " + (left ? "left" : "right") + " in \"" +
-                        p.getName() + "\"",
+                        " to the " + dir + " in \"" + p.getName() + "\"",
                 p.isMutable() ? (colorInPalette
-                        ? ("it is already the " + (left ? "left" : "right") + "most color")
+                        ? ("it is already the " + dir + "most color")
                         : "it is not in the palette")
                         : "\"" + p.getName() + "\" is immutable");
     }
@@ -104,6 +115,17 @@ public class StatusUpdates {
                         "\"" + p.getName() + "\"",
                 processColor(c) + (add ? " is already" : " is not") +
                         " in the palette");
+    }
+
+    public static void cannotSelectColorPalette(
+            final Palette p, final Color c, final boolean isLeft
+    ) {
+        final String dir = isLeft ? "left" : "right";
+
+        actionNotPermitted("select the next included color to the " + dir +
+                        " in the palette \"" + p.getName() + "\"",
+                "the current selected color " + processColor(c) +
+                        " is not included in the palette");
     }
 
     private static void actionNotPermitted(
@@ -154,6 +176,18 @@ public class StatusUpdates {
     public static void moveRightInPalette(final Palette p, final Color c) {
         StippleEffect.get().sendStatusUpdate("Shifted " + processColor(c) +
                 " to the right in \"" + p.getName() + "\"");
+    }
+
+    public static void selectNextPaletteColor(
+            final Palette p, final Color c, final boolean isLeft
+    ) {
+        final Color next = isLeft ? p.nextLeft(c) : p.nextRight(c);
+
+        StippleEffect.get().sendStatusUpdate(
+                "Selected next included color to the " +
+                        (isLeft ? "left" : "right") + " of " +
+                        processColor(c) + " in \"" + p.getName() +
+                        "\": " + processColor(next));
     }
 
     private static String processColor(final Color c) {
@@ -274,6 +308,24 @@ public class StatusUpdates {
         );
     }
 
+    public static void dumpedStates(
+            final int dumped, final long kbsFreed
+    ) {
+        StippleEffect.get().sendStatusUpdate("Dumped " + dumped + " state" +
+                (dumped > 1 ? "s" : "") + " due to low memory; freed " +
+                kbsFreed + " KBs of memory");
+    }
+
+    public static void setCheckAndGridToBounds(
+            final int width, final int height, final boolean fromSelection
+    ) {
+        StippleEffect.get().sendStatusUpdate(
+                "Set the dimensions of the checkerboard and pixel grid" +
+                        " cells to the bounds of the " +
+                        (fromSelection ? "selection" : "project canvas") +
+                        ": " + width + "x" + height);
+    }
+
     public static void sendToClipboard(
             final boolean copied, final Set<Coord2D> selection
     ) {
@@ -296,16 +348,15 @@ public class StatusUpdates {
                 StippleEffect.PROGRAM_NAME + " clipboard is empty");
     }
 
-    public static void invalidFontCode(final String attempt) {
-        StippleEffect.get().sendStatusUpdate("The font code \"" + attempt +
-                "\" is invalid; assigned to \"" + SEFonts.Code.CLASSIC.forButtonText() +
-                "\" instead");
-    }
-
     public static void saving() {
         StippleEffect.get().sendStatusUpdate(
                 "Saving... do not close " + StippleEffect.PROGRAM_NAME +
                         " until the project has been saved");
+    }
+
+    public static void saveFailed() {
+        StippleEffect.get().sendStatusUpdate("Failed to save file(s);" +
+                " the project's save settings are invalid.");
     }
 
     public static void saved(final Path filepath) {

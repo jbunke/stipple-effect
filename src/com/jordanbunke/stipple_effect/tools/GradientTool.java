@@ -2,25 +2,50 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.image.ImageProcessing;
+import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.ColorMath;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.Geometry;
+import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.Geometry;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.DropdownMenu;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 
 public final class GradientTool extends ToolWithBreadth
         implements SnappableTool, ToggleModeTool {
     private static final GradientTool INSTANCE;
 
-    private boolean drawing, linear, snap, backwards;
+    private boolean drawing, global, snap, backwards, dithered,
+            masked, bounded, contiguous;
     private GameImage toolContentPreview;
     private Coord2D anchor;
     private List<Set<Coord2D>> gradientStages;
+    private Shape shape;
+    private Set<Coord2D> accessible;
+
+    public enum Shape {
+        LINEAR, RADIAL, SPIRAL;
+
+        public BiFunction<Coord2D, Coord2D, Double> cGetter() {
+            return switch (this) {
+                case LINEAR -> INSTANCE::getLinearC;
+                case RADIAL -> INSTANCE::getRadialC;
+                case SPIRAL -> INSTANCE::getSpiralC;
+            };
+        }
+    }
 
     static {
         INSTANCE = new GradientTool();
@@ -28,9 +53,17 @@ public final class GradientTool extends ToolWithBreadth
 
     private GradientTool() {
         drawing = false;
-        linear = false;
+        global = false;
         snap = false;
         backwards = false;
+        dithered = false;
+        masked = false;
+        bounded = false;
+        contiguous = true;
+
+        shape = Shape.LINEAR;
+
+        accessible = new HashSet<>();
 
         toolContentPreview = GameImage.dummy();
 
@@ -58,7 +91,21 @@ public final class GradientTool extends ToolWithBreadth
             reset();
             anchor = tp;
             gradientStages = new ArrayList<>();
+
+            initializeMask(context);
         }
+    }
+
+    private void initializeMask(final SEContext context) {
+        final int w = context.getState().getImageWidth(),
+                h = context.getState().getImageHeight();
+
+        final GameImage frame = context.getState().getActiveLayerFrame();
+
+        final Color maskColor = masked && anchorInBounds(w, h)
+                ? ImageProcessing.colorAtPixel(frame, anchor.x, anchor.y)
+                : null;
+        accessible = maskColor != null ? search(frame, maskColor) : new HashSet<>();
     }
 
     @Override
@@ -68,27 +115,28 @@ public final class GradientTool extends ToolWithBreadth
         if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
-            final Set<Coord2D> selection = context.getState().getSelection();
 
             if (tp.equals(getLastTP()))
                 return;
 
             toolContentPreview = new GameImage(w, h);
 
-            if (linear)
-                updateLinearMode(selection, tp, w, h);
+            if (global)
+                updateGlobalMode(context, tp, w, h);
             else
-                updateBrushMode(selection, tp, w, h);
+                updateBrushMode(context, tp, w, h);
 
             updateLast(context);
         }
     }
 
     private void updateBrushMode(
-            final Set<Coord2D> selection, final Coord2D tp,
+            final SEContext context, final Coord2D tp,
             final int w, final int h
     ) {
-        final Set<Coord2D> gradientStage = new HashSet<>();
+        final Set<Coord2D>
+                selection = context.getState().getSelection(),
+                gradientStage = new HashSet<>();
 
         populateAround(gradientStage, tp, selection);
         fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
@@ -99,8 +147,8 @@ public final class GradientTool extends ToolWithBreadth
         drawGradientStages(w, h);
     }
 
-    private void updateLinearMode(
-            final Set<Coord2D> selection, final Coord2D tp,
+    private void updateGlobalMode(
+            final SEContext context, final Coord2D tp,
             final int w, final int h
     ) {
         final Coord2D endpoint;
@@ -114,7 +162,7 @@ public final class GradientTool extends ToolWithBreadth
         } else
             endpoint = tp;
 
-        drawLinearGradient(endpoint, selection, w, h);
+        drawGlobalGradient(endpoint, context, w, h);
     }
 
     private void populateAround(
@@ -137,10 +185,11 @@ public final class GradientTool extends ToolWithBreadth
             }
     }
 
-    private void drawLinearGradient(
-            final Coord2D endpoint, final Set<Coord2D> selection,
+    private void drawGlobalGradient(
+            final Coord2D endpoint, final SEContext context,
             final int w, final int h
     ) {
+        final Set<Coord2D> selection = context.getState().getSelection();
         final boolean hasSelection = !selection.isEmpty();
 
         for (int x = 0; x < w; x++) {
@@ -149,13 +198,41 @@ public final class GradientTool extends ToolWithBreadth
                 if (hasSelection && !selection.contains(pos))
                     continue;
 
-                final double c = getC(pos, endpoint);
-                toolContentPreview.setRGB(x, y, getColor(c).getRGB());
+                final double c = shape.cGetter().apply(pos, endpoint);
+
+                final boolean satisfiesMask = !masked ||
+                        (anchorInBounds(w, h) &&
+                                accessible.contains(new Coord2D(x, y))),
+                        satisfiesScope = isCValid(c),
+                        replacePixel = satisfiesMask && satisfiesScope;
+
+                if (replacePixel)
+                    toolContentPreview.setRGB(x, y, (dithered
+                            ? getDitherColor(x, y, DitherStage.get(c))
+                            : getColor(c)).getRGB());
             }
         }
     }
 
-    private double getC(final Coord2D pos, final Coord2D endpoint) {
+    private double getRadialC(final Coord2D pos, final Coord2D endpoint) {
+        final double
+                totalDistance = Coord2D.unitDistanceBetween(anchor, endpoint),
+                distance = Coord2D.unitDistanceBetween(anchor, pos);
+
+        return totalDistance == 0d ? 0d
+                : distance / totalDistance;
+    }
+
+    private double getSpiralC(final Coord2D pos, final Coord2D endpoint) {
+        final double
+                initialAngle = Geometry.calculateAngleInRad(endpoint, anchor),
+                angle = Geometry.calculateAngleInRad(pos, anchor),
+                normalized = Geometry.normalizeAngle(angle - initialAngle);
+
+        return normalized / Constants.CIRCLE;
+    }
+
+    private double getLinearC(final Coord2D pos, final Coord2D endpoint) {
         final int diffY = endpoint.y - anchor.y,
                 diffX = endpoint.x - anchor.x,
                 deltaY = pos.y - anchor.y,
@@ -181,17 +258,46 @@ public final class GradientTool extends ToolWithBreadth
         }
     }
 
+    private boolean isCValid(final double c) {
+        return !bounded || (c >= 0d && c <= 1d);
+    }
+
+    private boolean anchorInBounds(
+            final int w, final int h
+    ) {
+        return anchor.x >= 0 && anchor.x < w &&
+                anchor.y >= 0 && anchor.y < h;
+    }
+
+    private Set<Coord2D> search(
+            final GameImage frame, final Color maskColor
+    ) {
+        return contiguous
+                ? ToolThatSearches.contiguousSearch(frame, maskColor, anchor)
+                : ToolThatSearches.globalSearch(frame, maskColor);
+    }
+
     private void drawGradientStages(final int w, final int h) {
         final int size = gradientStages.size();
 
         for (int g = 0; g < size; g++) {
             final double c = size == 1 ? 0d : g / (double) (size - 1);
-            final Color stageColor = getColor(c);
 
-            gradientStages.get(g).stream().filter(
-                    p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
-                    .forEach(p -> toolContentPreview.setRGB(
-                            p.x, p.y, stageColor.getRGB()));
+            if (dithered) {
+                final DitherStage ds = DitherStage.get(c);
+
+                gradientStages.get(g).stream().filter(
+                                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
+                        .forEach(p -> toolContentPreview.setRGB(
+                                p.x, p.y, getDitherColor(p.x, p.y, ds).getRGB()));
+            } else {
+                final Color stageColor = getColor(c);
+
+                gradientStages.get(g).stream().filter(
+                                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h)
+                        .forEach(p -> toolContentPreview.setRGB(
+                                p.x, p.y, stageColor.getRGB()));
+            }
         }
     }
 
@@ -200,6 +306,17 @@ public final class GradientTool extends ToolWithBreadth
                 s = StippleEffect.get().getSecondary();
 
         return ColorMath.betweenColor(backwards ? 1 - c : c, p, s);
+    }
+
+    private Color getDitherColor(
+            final int x, final int y, final DitherStage ds
+    ) {
+        final Color p = StippleEffect.get().getPrimary(),
+                s = StippleEffect.get().getSecondary();
+
+        return ds.condition(x, y)
+                ? (backwards ? p : s)
+                : (backwards ? s : p);
     }
 
     @Override
@@ -225,14 +342,34 @@ public final class GradientTool extends ToolWithBreadth
     }
 
     @Override
-    public void setMode(final boolean linear) {
+    public void setMode(final boolean global) {
         if (!drawing)
-            this.linear = linear;
+            this.global = global;
+    }
+
+    public void setDithered(final boolean dithered) {
+        this.dithered = dithered;
+    }
+
+    public void setMasked(final boolean masked) {
+        this.masked = masked;
+    }
+
+    public void setBounded(final boolean bounded) {
+        this.bounded = bounded;
+    }
+
+    public void setContiguous(final boolean contiguous) {
+        this.contiguous = contiguous;
+    }
+
+    public void setShape(final Shape shape) {
+        this.shape = shape;
     }
 
     @Override
     public void setSnap(final boolean snap) {
-        this.snap = linear && snap;
+        this.snap = global && snap;
     }
 
     @Override
@@ -247,13 +384,110 @@ public final class GradientTool extends ToolWithBreadth
 
     @Override
     public GameImage getOverlay() {
-        return linear ? GameImage.dummy() : super.getOverlay();
+        return global ? GameImage.dummy() : super.getOverlay();
     }
 
     @Override
     public String getBottomBarText() {
-        return linear
-                ? "Linear Gradient"
+        return global
+                ? EnumUtils.formattedName(shape) + " Gradient"
                 : super.getBottomBarText().replace("Tool", "Brush");
+    }
+
+    @Override
+    public MenuElementGrouping buildToolOptionsBar() {
+        // inherited content called first to trigger correct ditherTextX assignment
+        final MenuElementGrouping inherited = super.buildToolOptionsBar();
+
+        // dithered label
+        final TextLabel ditheredLabel = TextLabel.make(
+                new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
+                "Dithered", Constants.WHITE);
+
+        // dithered checkbox
+        final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(ditheredLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> dithered, this::setDithered);
+
+        // shape label
+        final TextLabel shapeLabel = TextLabel.make(new Coord2D(
+                        Layout.optionsBarNextElementX(ditheredCheckbox, true),
+                        Layout.optionsBarTextY()), "Shape", Constants.WHITE);
+
+        // shape dropdown
+        final DropdownMenu shapeDropdown = DropdownMenu.forToolOptionsBar(
+                Layout.optionsBarNextElementX(shapeLabel, false),
+                EnumUtils.stream(Shape.class).map(EnumUtils::formattedName)
+                        .toArray(String[]::new),
+                EnumUtils.stream(Shape.class).map(s -> (Runnable) () ->
+                        setShape(s)).toArray(Runnable[]::new),
+                shape::ordinal);
+
+        // bounded label
+        final TextLabel boundedLabel = TextLabel.make(new Coord2D(
+                Layout.optionsBarNextElementX(shapeDropdown, true),
+                Layout.optionsBarTextY()), "Bounded", Constants.WHITE);
+
+        // bounded checkbox
+        final Checkbox boundedCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(boundedLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> bounded, this::setBounded);
+
+        // masked label
+        final TextLabel maskedLabel = TextLabel.make(new Coord2D(
+                Layout.optionsBarNextElementX(boundedCheckbox, true),
+                Layout.optionsBarTextY()), "Mask", Constants.WHITE);
+
+        // masked checkbox
+        final Checkbox maskedCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(maskedLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> masked, this::setMasked);
+
+        // contiguous label
+        final TextLabel contiguousLabel = TextLabel.make(new Coord2D(
+                Layout.optionsBarNextElementX(maskedCheckbox, true),
+                Layout.optionsBarTextY()), "Contiguous", Constants.WHITE);
+
+        // contiguous checkbox
+        final Checkbox contiguousCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(contiguousLabel, false),
+                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
+                () -> contiguous, this::setContiguous);
+
+        // tolerance
+        final TextLabel toleranceLabel = Layout.optionsBarNextSectionLabel(
+                contiguousCheckbox, "Tol.");
+
+        final int PERCENT = 100;
+        final IncrementalRangeElements<Double> tolerance =
+                IncrementalRangeElements.makeForDouble(toleranceLabel,
+                        Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
+                        ToolThatSearches::decreaseTolerance,
+                        ToolThatSearches::increaseTolerance,
+                        Constants.EXACT_COLOR_MATCH, Constants.MAX_TOLERANCE,
+                        ToolThatSearches::setTolerance,
+                        ToolThatSearches::getTolerance,
+                        t -> (int) (PERCENT * t),
+                        sv -> sv / (double) PERCENT,
+                        t -> ((int) (PERCENT * t)) + "%",
+                        MathPlus.findBest(ToolThatSearches.NO_TOLERANCE,
+                                0, String::length, (a, b) -> a < b,
+                                ToolThatSearches.NO_TOLERANCE,
+                                ToolThatSearches.MAX_TOLERANCE));
+
+        final GatewayMenuElement maskUnlocks = new GatewayMenuElement(
+                new MenuElementGrouping(
+                        contiguousLabel, contiguousCheckbox,
+                        toleranceLabel, tolerance.decButton,
+                        tolerance.incButton, tolerance.slider,
+                        tolerance.value), () -> masked);
+
+        return new MenuElementGrouping(inherited,
+                ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
+                boundedLabel, boundedCheckbox,
+                maskedLabel, maskedCheckbox, maskUnlocks);
     }
 }

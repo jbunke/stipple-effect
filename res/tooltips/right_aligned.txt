@@ -1,0 +1,2 @@
+Right-aligned
+Toggle: {Ctrl + K}

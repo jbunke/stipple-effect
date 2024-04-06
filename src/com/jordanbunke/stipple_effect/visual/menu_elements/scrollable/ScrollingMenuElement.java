@@ -4,10 +4,11 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-public abstract class ScrollingMenuElement extends MenuElement {
+public abstract class ScrollingMenuElement extends MenuElementContainer {
     final ScrollableMenuElement[] menuElements;
 
     // cosmetic
@@ -19,7 +20,8 @@ public abstract class ScrollingMenuElement extends MenuElement {
     ) {
         super(position, dimensions, Anchor.LEFT_TOP, true);
 
-        this.menuElements = menuElements;
+        this.menuElements = MenuElement
+                .sortForRender(menuElements, ScrollableMenuElement[]::new);
 
         this.background = drawBackground();
     }
@@ -47,8 +49,12 @@ public abstract class ScrollingMenuElement extends MenuElement {
         // background
         draw(background, canvas);
 
+        final ScrollableMenuElement[] renderOrder =
+                MenuElement.sortForRender(menuElements,
+                        ScrollableMenuElement[]::new);
+
         // contents
-        for (ScrollableMenuElement sme : menuElements)
+        for (ScrollableMenuElement sme : renderOrder)
             if (renderAndProcessChild(sme))
                 sme.render(canvas);
     }
@@ -65,6 +71,16 @@ public abstract class ScrollingMenuElement extends MenuElement {
         for (ScrollableMenuElement sme : menuElements)
             if (renderAndProcessChild(sme))
                 sme.process(eventLogger);
+    }
+
+    @Override
+    public ScrollableMenuElement[] getMenuElements() {
+        return menuElements;
+    }
+
+    @Override
+    public boolean hasNonTrivialBehaviour() {
+        return true;
     }
 
     abstract Coord2D calculateOffset();

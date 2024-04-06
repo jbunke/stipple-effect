@@ -6,25 +6,28 @@ import com.jordanbunke.anim.MP4Writer;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
+import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.utility.*;
 
 import java.nio.file.Path;
+import java.util.function.BinaryOperator;
 
 public class ProjectInfo {
-    private static final int X = 0, Y = 1;
+    private static final int INVALID_BOUND = -1;
 
     private Path folder;
     private String name, indexPrefix, indexSuffix;
     private SaveType saveType;
 
-    private boolean editedSinceLastSave;
+    private boolean editedSinceLastSave, saveRangeOfFrames;
 
-    private final int[] frameDims;
-    private int fps, scaleUp, countFrom;
+    private int framesPerDim, fps, scaleUp, countFrom, lowerBound, upperBound;
 
     public enum SaveType {
         NATIVE, PNG_STITCHED, PNG_SEPARATE, GIF, MP4;
@@ -38,21 +41,17 @@ public class ProjectInfo {
             };
         }
 
-        public String getButtonText() {
+        public String getButtonText(final ProjectInfo projectInfo) {
             return switch (this) {
-                case PNG_STITCHED -> "Single PNG";
+                case PNG_STITCHED -> "Single PNG" +
+                        (projectInfo.isAnimation()
+                                ? " (spritesheet)" : "");
                 case PNG_SEPARATE -> "Separate PNGs per frame";
                 case GIF -> "Animated GIF";
                 case MP4 -> "MP4 Video";
-                case NATIVE -> StippleEffect.PROGRAM_NAME + " file (." + getFileSuffix() + ")";
+                case NATIVE -> StippleEffect.PROGRAM_NAME +
+                        " file (." + getFileSuffix() + ")";
             };
-        }
-
-        public static SaveType[] validOptions() {
-            if (StippleEffect.get().getContext().getState().getFrameCount() == 1)
-                return new SaveType[] { NATIVE, PNG_STITCHED };
-
-            return SaveType.values();
         }
     }
 
@@ -76,16 +75,17 @@ public class ProjectInfo {
         saveType = filepath != null && filepath.getFileName()
                 .toString().endsWith(SaveType.NATIVE.getFileSuffix())
                 ? SaveType.NATIVE : SaveType.PNG_STITCHED;
-        frameDims = new int[] {
-                DialogVals.getNewProjectXDivs(),
-                DialogVals.getNewProjectYDivs()
-        };
+        framesPerDim = Constants.MAX_NUM_FRAMES;
         fps = Constants.DEFAULT_PLAYBACK_FPS;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
 
         countFrom = 1;
         indexPrefix = Settings.getDefaultIndexPrefix();
         indexSuffix = Settings.getDefaultIndexSuffix();
+
+        saveRangeOfFrames = false;
+        lowerBound = INVALID_BOUND;
+        upperBound = INVALID_BOUND;
     }
 
     public void save() {
@@ -104,85 +104,91 @@ public class ProjectInfo {
 
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight(),
-                frameCount = c.getState().getFrameCount();
+                framesToSave = calculateNumFrames(),
+                f0 = saveRangeOfFrames ? lowerBound : 0;
 
-        switch (saveType) {
-            case NATIVE -> {
-                final Thread stipSaverThread = new Thread(() -> {
-                    final Path filepath = buildFilepath();
+        if (saveType == SaveType.NATIVE) {
+            final Thread stipSaverThread = new Thread(() -> {
+                final Path filepath = buildFilepath();
 
-                    ParserSerializer.save(c, filepath);
-                    StatusUpdates.saved(filepath);
-                });
+                ParserSerializer.save(c, filepath);
+                StatusUpdates.saved(filepath);
+            });
 
-                stipSaverThread.start();
+            stipSaverThread.start();
+        } else {
+            final int frameCount = c.getState().getFrameCount();
+
+            if (f0 + framesToSave > frameCount) {
+                StatusUpdates.saveFailed();
+                return;
             }
-            case GIF, MP4 -> {
-                final GameImage[] images = new GameImage[frameCount];
 
-                for (int i = 0; i < frameCount; i++) {
-                    images[i] = c.getState().draw(false, false, i);
+            switch (saveType) {
+                case GIF, MP4 -> {
+                    final GameImage[] images = new GameImage[framesToSave];
 
-                    if (scaleUp > 1)
-                        images[i] = ImageProcessing.scale(images[i], scaleUp);
-                }
+                    for (int i = 0; i < framesToSave; i++) {
+                        images[i] = c.getState().draw(
+                                false, false, f0 + i);
 
-                final AnimWriter writer = saveType == SaveType.GIF
-                        ? GIFWriter.get() : MP4Writer.get();
-
-                final Thread animSaverThread = new Thread(() -> {
-                    final Path filepath = buildFilepath();
-
-                    writer.write(filepath, images,
-                            Constants.MILLIS_IN_SECOND / fps);
-                    StatusUpdates.saved(filepath);
-                });
-
-                animSaverThread.start();
-            }
-            case PNG_SEPARATE -> {
-                for (int i = 0; i < frameCount; i++) {
-                    final GameImage image = c.getState().draw(false, false, i);
-                    final String suffix = indexPrefix +
-                            (countFrom + i) + indexSuffix;
-
-                    GameImageIO.writeImage(buildFilepath(suffix), scaleUp > 1
-                            ? ImageProcessing.scale(image, scaleUp) : image);
-                }
-
-                StatusUpdates.savedAllFrames(folder);
-            }
-            case PNG_STITCHED -> {
-                final boolean validDimensions = frameCount == frameDims[X] * frameDims[Y];
-
-                if (!validDimensions) {
-                    if (frameDims[X] == 1) {
-                        frameDims[X] = frameCount;
-                        frameDims[Y] = 1;
-                    } else {
-                        if (frameDims[X] > frameCount)
-                            frameDims[X] = frameCount;
-
-                        frameDims[Y] = (int) Math.ceil(frameCount / (double) frameDims[X]);
+                        if (scaleUp > 1)
+                            images[i] = ImageProcessing.scale(images[i], scaleUp);
                     }
+
+                    final AnimWriter writer = saveType == SaveType.GIF
+                            ? GIFWriter.get() : MP4Writer.get();
+
+                    final Thread animSaverThread = new Thread(() -> {
+                        final Path filepath = buildFilepath();
+
+                        writer.write(filepath, images,
+                                Constants.MILLIS_IN_SECOND / fps);
+                        StatusUpdates.saved(filepath);
+                    });
+
+                    animSaverThread.start();
                 }
+                case PNG_SEPARATE -> {
+                    for (int i = 0; i < framesToSave; i++) {
+                        final GameImage image = c.getState().draw(
+                                false, false, f0 + i);
+                        GameImageIO.writeImage(buildFilepath(countFrom + i),
+                                scaleUp > 1
+                                        ? ImageProcessing.scale(image, scaleUp)
+                                        : image);
+                    }
 
-                final GameImage stitched = new GameImage(
-                        w * frameDims[X],
-                        h * frameDims[Y]);
-
-                for (int i = 0; i < frameCount; i++) {
-                    final int x = i % frameDims[X],
-                            y = i / frameDims[X];
-
-                    stitched.draw(c.getState().draw(
-                            false, false, i), w * x, h * y);
+                    StatusUpdates.savedAllFrames(folder);
                 }
+                case PNG_STITCHED -> {
+                    final int fpd = getFramesPerDim(),
+                            fpcd = getFramesPerCompDim(),
+                            sw = w * (StitchSplitMath.isHorizontal() ? fpd : fpcd),
+                            sh = h * (StitchSplitMath.isHorizontal() ? fpcd : fpd);
 
-                GameImageIO.writeImage(buildFilepath(), scaleUp > 1
-                        ? ImageProcessing.scale(stitched.submit(), scaleUp)
-                        : stitched.submit());
-                StatusUpdates.saved(buildFilepath());
+                    final boolean isHorizontal = StitchSplitMath.isHorizontal();
+                    final BinaryOperator<Integer>
+                            horz = (a, b) -> a % b,
+                            vert = (a, b) -> a / b,
+                            xOp = isHorizontal ? horz : vert,
+                            yOp = isHorizontal ? vert : horz;
+
+                    final GameImage stitched = new GameImage(sw, sh);
+
+                    for (int i = 0; i < framesToSave; i++) {
+                        final int x = xOp.apply(i, fpd) * w,
+                                y = yOp.apply(i, fpd) * h;
+
+                        stitched.draw(c.getState().draw(
+                                false, false, f0 + i), x, y);
+                    }
+
+                    GameImageIO.writeImage(buildFilepath(), scaleUp > 1
+                            ? ImageProcessing.scale(stitched.submit(), scaleUp)
+                            : stitched.submit());
+                    StatusUpdates.saved(buildFilepath());
+                }
             }
         }
 
@@ -198,8 +204,30 @@ public class ProjectInfo {
         return folder.resolve(name + nameSuffix + "." + saveType.getFileSuffix());
     }
 
-    private Path buildFilepath() {
+    public Path buildFilepath(final int frameIndex) {
+        return buildFilepath(indexPrefix + frameIndex + indexSuffix);
+    }
+
+    public Path buildFilepath() {
         return buildFilepath("");
+    }
+
+    public boolean isAnimation() {
+        return StippleEffect.get().getContext().getState().getFrameCount() > 1;
+    }
+
+    public SaveType[] getSaveOptions() {
+        if (isAnimation())
+            return SaveType.values();
+
+        return new SaveType[] { SaveType.NATIVE, SaveType.PNG_STITCHED };
+    }
+
+    public int calculateNumFrames() {
+        if (!saveRangeOfFrames)
+            return StippleEffect.get().getContext().getState().getFrameCount();
+
+        return (upperBound - lowerBound) + 1;
     }
 
     public boolean hasSaveAssociation() {
@@ -246,12 +274,13 @@ public class ProjectInfo {
         return scaleUp;
     }
 
-    public int getFrameDimsX() {
-        return frameDims[X];
+    public int getFramesPerDim() {
+        return framesPerDim;
     }
 
-    public int getFrameDimsY() {
-        return frameDims[Y];
+    public int getFramesPerCompDim() {
+        return DialogVals.calculateFramesPerComplementaryDim(
+                calculateNumFrames(), framesPerDim);
     }
 
     public SaveType getSaveType() {
@@ -270,27 +299,55 @@ public class ProjectInfo {
         return countFrom;
     }
 
+    public boolean isSaveRangeOfFrames() {
+        return saveRangeOfFrames;
+    }
+
+    public int getLowerBound() {
+        return lowerBound;
+    }
+
+    public int getUpperBound() {
+        return upperBound;
+    }
+
+    public void setSaveRangeOfFrames(final boolean saveRangeOfFrames) {
+        this.saveRangeOfFrames = saveRangeOfFrames;
+    }
+
+    public void setLowerBound(final int lowerBound) {
+        this.lowerBound = clampFrameBounds(lowerBound);
+    }
+
+    public void setUpperBound(final int upperBound) {
+        this.upperBound = clampFrameBounds(upperBound);
+    }
+
+    private int clampFrameBounds(final int candidate) {
+        return MathPlus.bounded(0, candidate, StippleEffect.get()
+                .getContext().getState().getFrameCount() - 1);
+    }
+
     public void setCountFrom(final int countFrom) {
         this.countFrom = countFrom;
     }
 
-    public void setFrameDimsX(final int v) {
-        this.frameDims[X] = v;
+    public void setFramesPerDim(final int framesPerDim) {
+        this.framesPerDim = framesPerDim;
     }
 
-    public void setFrameDimsY(final int v) {
-        this.frameDims[Y] = v;
-    }
     public void setSaveType(final SaveType saveType) {
         this.saveType = saveType;
     }
 
     public void setFps(final int fps) {
-        this.fps = fps;
+        this.fps = MathPlus.bounded(Constants.MIN_PLAYBACK_FPS,
+                fps, Constants.MAX_PLAYBACK_FPS);
     }
 
     public void setScaleUp(final int scaleUp) {
-        this.scaleUp = scaleUp;
+        this.scaleUp = MathPlus.bounded(Constants.MIN_SCALE_UP,
+                scaleUp, Constants.MAX_SCALE_UP);
     }
 
     public void setName(final String name) {

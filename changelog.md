@@ -1,16 +1,43 @@
 # Changelog
 
-## Upcoming
+## **0.3.0** - The Settings and Options Update - 2024-04-07
 
-### Add:
-* Scripting system
-    * Language
-    * Interpreter
-    * Preview scripts and transformation scripts
-* Symmetry tools
-### Fix:
-* Performance optimizations
-* Memory issues and related crashes
+### Added:
+* Added text tool
+* Added system timer
+* Added tool options bar
+* Added dither option to gradient tool
+* Added second snap mode to pick up selection and move selection tools for pixel grid snapping
+* Added stitching and splitting
+* Added hotkeys and shortcuts:
+  * *1* - *9* to quickly select one of the first 9 projects loaded into the program
+  * Iterate through included palette colors (*Ctrl + ,* and *Ctrl + .*)
+  * Set the checkerboard and grid cell size to the bounds of the selection/project (*Ctrl + B*)
+* Added settings for:
+  * Enabling/disabling state dumping
+  * Direction inversion:
+    * Zoom
+    * Tool breadth incrementation (brush, eraser, shade brush, etc.)
+    * Search tool tolerance incrementation (fill, wand)
+    * Font size incrementation
+
+### Changed:
+* Redrew frame icons to feature purple film reels instead of orange motion blobs
+* Changed box select tool's overlay to a tool content preview
+* Modified box select tool snapping behaviour
+* Modified polygon select behaviour: middle vertices can be placed off the canvas
+* Changed brush select hotkey from {T} to {V}
+* Changed pixel grid validation so that # of grid lines is checked instead of image bounds
+* State stack is now dynamically sized; states are dumped based on insufficient available memory
+* Redesigned and extended dialog menus
+* Overhauled preview window
+* Moved upcoming features from the top of the changelog to a dedicated "roadmap" tab
+* Moved default frame prefix and suffix to "default" settings page and delete "format" page
+
+### Fixed:
+* Bug: Palettes were saved with the palette name instead of the filename
+* Bug: Onion skin mode and layer settings buttons do not scroll with other layer menu elements
+* Bug: Program sometimes crashes when launched with an image file or STIP project
 
 ## **0.2.0.1** - 2024-02-26
 

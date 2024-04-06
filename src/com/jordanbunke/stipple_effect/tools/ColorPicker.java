@@ -37,20 +37,9 @@ public final class ColorPicker extends Tool {
                     ? StippleEffect.PRIMARY : StippleEffect.SECONDARY;
 
             final Color c = ImageProcessing.colorAtPixel(
-                    context.getState().getEditingLayer().getFrame(
-                            context.getState().getFrameIndex()), tp.x, tp.y);
+                    context.getState().getActiveLayerFrame(), tp.x, tp.y);
 
             StippleEffect.get().setColorIndexAndColor(index, c);
         }
-    }
-
-    @Override
-    public void update(final SEContext context, final Coord2D mousePosition) {
-
-    }
-
-    @Override
-    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-
     }
 }

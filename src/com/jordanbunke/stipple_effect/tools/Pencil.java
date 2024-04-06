@@ -84,4 +84,14 @@ public final class Pencil extends ToolThatDraws {
             me.markAsProcessed();
         }
     }
+
+    @Override
+    public boolean hasToolOptionsBar() {
+        return true;
+    }
+
+    @Override
+    int getDitherTextX() {
+        return getFirstOptionLabelPosition().x;
+    }
 }

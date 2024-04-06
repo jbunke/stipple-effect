@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.OnStartup;
 import com.jordanbunke.delta_time.contexts.ProgramContext;
 import com.jordanbunke.delta_time.debug.DebugChannel;
 import com.jordanbunke.delta_time.debug.GameDebugger;
+import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.game.Game;
@@ -19,6 +20,7 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.utility.Version;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
@@ -31,25 +33,26 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
-import com.jordanbunke.stipple_effect.visual.DialogAssembly;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.MenuAssembly;
-import com.jordanbunke.stipple_effect.visual.SECursor;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.*;
 
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 public class StippleEffect implements ProgramContext {
     public static String
-            PROGRAM_NAME = "Stipple Effect", VERSION = "dev_build",
+            PROGRAM_NAME = "Stipple Effect",
             NATIVE_STANDARD = "1.0", PALETTE_STANDARD = "1.0";
+    private static Version VERSION = new Version(1, 0, 0);
+    private static boolean IS_DEVBUILD = false;
 
     public static final int PRIMARY = 0, SECONDARY = 1;
 
@@ -103,6 +106,16 @@ public class StippleEffect implements ProgramContext {
     private String toolTipCode, provisionalToolTipCode;
     private GameImage toolTip;
 
+    // timer
+    private int timerCounter, timerMillis;
+    private boolean timerToggle;
+
+    /**
+     * This exists to ensure that the standard execution thread executes
+     * the jobs that are scheduled, thus avoiding race conditions etc.
+     * */
+    private final Queue<Runnable> jobScheduler;
+
     static {
         OnStartup.run();
         Settings.read();
@@ -134,20 +147,65 @@ public class StippleEffect implements ProgramContext {
 
             switch (code) {
                 case Constants.NAME_CODE -> PROGRAM_NAME = value;
-                case Constants.VERSION_CODE -> VERSION = value;
+                case Constants.VERSION_CODE -> {
+                    try {
+                        final Integer[] components = Arrays
+                                .stream(value.split("\\."))
+                                .map(Integer::parseInt).toArray(Integer[]::new);
+
+                        final int MAJOR = 0, MINOR = 1, PATCH = 2,
+                                BUILD = 3, HAS_BUILD_LENGTH = 4;
+
+                        if (components.length == HAS_BUILD_LENGTH)
+                            VERSION = new Version(components[MAJOR],
+                                    components[MINOR], components[PATCH],
+                                    components[BUILD]);
+                        else if (components.length > PATCH)
+                            VERSION = new Version(components[MAJOR],
+                                    components[MINOR], components[PATCH]);
+                    } catch (NumberFormatException e) {
+                        GameError.send("Could not read program version from data file.");
+                    }
+                }
+                case Constants.IS_DEVBUILD_CODE ->
+                        IS_DEVBUILD = Boolean.parseBoolean(value);
                 case Constants.NATIVE_STANDARD_CODE ->
                         NATIVE_STANDARD = value;
                 case Constants.PALETTE_STANDARD_CODE ->
                         PALETTE_STANDARD = value;
             }
         }
+
+        if (IS_DEVBUILD) {
+            VERSION.incrementBuild();
+
+            final Path toSave = Path.of("res").resolve(Constants.PROGRAM_FILE);
+
+            final String write = ParserUtils.encloseSetting(
+                    Constants.NAME_CODE, PROGRAM_NAME) +
+                    ParserUtils.encloseSetting(Constants.VERSION_CODE,
+                            VERSION.toString()) +
+                    ParserUtils.encloseSetting(Constants.IS_DEVBUILD_CODE,
+                            String.valueOf(IS_DEVBUILD)) +
+                    ParserUtils.encloseSetting(
+                            Constants.NATIVE_STANDARD_CODE, NATIVE_STANDARD) +
+                    ParserUtils.encloseSetting(
+                            Constants.PALETTE_STANDARD_CODE, PALETTE_STANDARD);
+
+            FileIO.writeFile(toSave, write);
+        }
+    }
+
+    public static String getVersion() {
+        return "v" + VERSION + (IS_DEVBUILD ? " (devbuild)" : "");
     }
 
     public StippleEffect() {
         mousePos = new Coord2D();
 
         contexts = new ArrayList<>(List.of(new SEContext(
-                DialogVals.getNewProjectWidth(), DialogVals.getNewProjectHeight())));
+                Settings.getDefaultCanvasWPixels(),
+                Settings.getDefaultCanvasHPixels())));
         contextIndex = 0;
         toImport = new ArrayList<>();
 
@@ -190,6 +248,12 @@ public class StippleEffect implements ProgramContext {
         toolTipCode = Constants.ICON_ID_GAP_CODE;
         toolTip = GameImage.dummy();
 
+        timerCounter = 0;
+        timerToggle = false;
+        timerMillis = 0;
+
+        jobScheduler = new LinkedList<>();
+
         configureDebugger();
     }
 
@@ -199,12 +263,12 @@ public class StippleEffect implements ProgramContext {
 
     public static void main(final String[] args) {
         if (args.length > 0)
-            launchWithFile(Path.of(Arrays.stream(args)
-                    .reduce("", (a, b) -> a + b)));
+            get().launchWithFile(Path.of(Arrays.stream(args)
+                    .reduce("", (a, b) -> a + " " + b).trim()));
     }
 
-    private static void launchWithFile(final Path filepath) {
-        get().verifyFilepath(filepath);
+    private void launchWithFile(final Path filepath) {
+        jobScheduler.add(() -> verifyFilepath(filepath));
     }
 
     private void configureDebugger() {
@@ -242,7 +306,7 @@ public class StippleEffect implements ProgramContext {
     private GameWindow makeWindow() {
         final Coord2D size = determineWindowSize();
         Layout.setSize(size.x, size.y);
-        final GameWindow window = new GameWindow(PROGRAM_NAME + " v" + VERSION,
+        final GameWindow window = new GameWindow(PROGRAM_NAME + " " + getVersion(),
                 size.x, size.y, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
@@ -324,7 +388,7 @@ public class StippleEffect implements ProgramContext {
             projectsMenu.process(eventLogger);
 
             // workspace
-            getContext().process(eventLogger, tool);
+            getContext().process(eventLogger);
         } else {
             dialog.process(eventLogger);
         }
@@ -332,6 +396,7 @@ public class StippleEffect implements ProgramContext {
 
     private void processNonStateKeyPresses(final InputEventLogger eventLogger) {
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+            // Ctrl + Shift + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToSave);
@@ -344,7 +409,11 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::toggleColorMenuMode);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
+                    this::stitchOrSplit);
         } else if (eventLogger.isPressed(Key.CTRL)) {
+            // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToInfo);
@@ -367,7 +436,20 @@ public class StippleEffect implements ProgramContext {
                                 getSelectedPalette().isMutable())
                             DialogAssembly.setDialogToSavePalette(getSelectedPalette());
                     });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.K, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (tool.equals(TextTool.get()))
+                            TextTool.get().toggleAlignment();
+                    });
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
+                    this::selectPaletteColorToTheLeft);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
+                    this::selectPaletteColorToTheRight);
         } else if (eventLogger.isPressed(Key.SHIFT)) {
+            // Shift + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::swapColors);
@@ -417,15 +499,51 @@ public class StippleEffect implements ProgramContext {
                                     getSelectedPalette());
                     });
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> {
+                        if (tool.equals(TextTool.get()))
+                            DialogAssembly.setDialogToNewFont();
+                    });
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
                     this::moveColorLeftInPalette);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
                     this::moveColorRightInPalette);
         } else {
+            // single key presses
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     this::toggleFullscreen);
+
+            // quick context select
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(0));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(1));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(2));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(3));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(4));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._6, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(5));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._7, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(6));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._8, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(7));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
+                    () -> setContextIndex(8));
 
             // set tools
             eventLogger.checkForMatchingKeyStroke(
@@ -462,10 +580,13 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     () -> setTool(LineTool.get()));
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
+                    () -> setTool(TextTool.get()));
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
                     () -> setTool(Wand.get()));
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
+                    GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
                     () -> setTool(BrushSelect.get()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
@@ -486,12 +607,31 @@ public class StippleEffect implements ProgramContext {
     public void update(final double deltaTime) {
         provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
 
+        while (!jobScheduler.isEmpty())
+            jobScheduler.poll().run();
+
         if (dialog == null) {
             getContext().animate(deltaTime);
 
+            final int millisThisTick = (int)
+                    (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
+
+            // system timer
+            timerMillis += millisThisTick;
+
+            if (timerMillis >= Constants.MILLIS_PER_TIMER_INC) {
+                timerMillis -= Constants.MILLIS_PER_TIMER_INC;
+
+                timerCounter++;
+
+                if (timerCounter >= Constants.TIMER_MAX_OUT) {
+                    timerCounter = 0;
+                    timerToggle = !timerToggle;
+                }
+            }
+
             // status update
-            millisSinceStatusUpdate +=
-                    (int) (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
+            millisSinceStatusUpdate += millisThisTick;
 
             // bottom bar
             bottomBarMenu.update(deltaTime);
@@ -562,6 +702,7 @@ public class StippleEffect implements ProgramContext {
     public void render(final GameImage canvas) {
         final Coord2D wp = Layout.getWorkspacePosition(),
                 tp = Layout.getToolsPosition(),
+                tobp = Layout.getToolOptionsBarPosition(),
                 lp = Layout.getLayersPosition(),
                 cp = Layout.getColorsPosition(),
                 pp = Layout.getProjectsPosition(),
@@ -575,49 +716,64 @@ public class StippleEffect implements ProgramContext {
         if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
             canvas.draw(statusUpdate, wp.x, wp.y);
 
+        // segment backgrounds
+
         // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
         canvas.draw(bottomBar, bbp.x, bbp.y);
-        bottomBarMenu.render(canvas);
+
         // tools
         if (Layout.isToolbarShowing()) {
             final GameImage tools = drawTools();
             canvas.draw(tools, tp.x, tp.y);
+
+            if (tool.hasToolOptionsBar()) {
+                final GameImage toolOptionsBar = drawToolOptionsBar();
+                canvas.draw(toolOptionsBar, tobp.x, tobp.y);
+            }
         }
-        toolButtonMenu.render(canvas);
+
         // layers
         if (Layout.isLayersPanelShowing()) {
             final GameImage layers = drawLayers();
             canvas.draw(layers, lp.x, lp.y);
         }
-        layersMenu.render(canvas);
+
         // colors
         if (Layout.isColorsPanelShowing()) {
             final GameImage colors = drawColorsSegment();
             canvas.draw(colors, cp.x, cp.y);
         }
-        colorsMenu.render(canvas);
+
         // projects / contexts
         final GameImage projects = drawProjects();
         canvas.draw(projects, pp.x, pp.y);
-        projectsMenu.render(canvas);
+
         // frames
         if (Layout.isFramesPanelShowing()) {
             final GameImage frames = drawFrames();
             canvas.draw(frames, fp.x, fp.y);
         }
-        framesMenu.render(canvas);
 
         // borders
         final float strokeWidth = 2f;
 
         canvas.setColor(Constants.DARK);
-        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, wp.y); // projects and frame separation
-        canvas.drawLine(strokeWidth, pp.x, tp.y, Layout.width(), tp.y); // top segments and middle separation
+        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation
+        canvas.drawLine(strokeWidth, pp.x, tobp.y, Layout.width(), tobp.y); // top segments and middle separation
+        canvas.drawLine(strokeWidth, tp.x, wp.y, lp.x, wp.y); // tool options bar and tools/workspace separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
         canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
-        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace and right segments separation
+        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace/option bar and right segments separation
+
+        // menu elements
+        bottomBarMenu.render(canvas);
+        toolButtonMenu.render(canvas);
+        layersMenu.render(canvas);
+        colorsMenu.render(canvas);
+        projectsMenu.render(canvas);
+        framesMenu.render(canvas);
 
         if (dialog != null) {
             canvas.fillRectangle(Constants.VEIL, 0, 0,
@@ -661,11 +817,21 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawTools() {
         final GameImage tools = new GameImage(Layout.getToolsWidth(),
-                Layout.getWorkspaceHeight());
+                Layout.getToolsHeight());
         tools.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
-                Layout.getToolsWidth(), Layout.getWorkspaceHeight());
+                Layout.getToolsWidth(), Layout.getToolsHeight());
 
         return tools.submit();
+    }
+
+    private GameImage drawToolOptionsBar() {
+        final GameImage toolOptionsBar = new GameImage(
+                Layout.getToolOptionsBarWidth(),
+                Layout.TOOL_OPTIONS_BAR_H);
+        toolOptionsBar.fillRectangle(Constants.ACCENT_BACKGROUND_DARK, 0, 0,
+                Layout.getToolOptionsBarWidth(), Layout.TOOL_OPTIONS_BAR_H);
+
+        return toolOptionsBar.submit();
     }
 
     private GameImage drawLayers() {
@@ -701,6 +867,13 @@ public class StippleEffect implements ProgramContext {
                 Layout.width(), Layout.BOTTOM_BAR_H);
 
         return bottomBar.submit();
+    }
+
+    public void stitchOrSplit() {
+        if (getContext().getState().getFrameCount() > 1)
+            DialogAssembly.setDialogToStitchFramesTogether();
+        else
+            DialogAssembly.setDialogToSplitCanvasIntoFrames();
     }
 
     public SEContext getContext() {
@@ -751,6 +924,14 @@ public class StippleEffect implements ProgramContext {
         return tool;
     }
 
+    public int getTimerCounter() {
+        return timerCounter;
+    }
+
+    public boolean isTimerToggle() {
+        return timerToggle;
+    }
+
     public void newProject() {
         addContext(new SEContext(DialogVals.getNewProjectWidth(),
                 DialogVals.getNewProjectHeight()), true);
@@ -789,6 +970,24 @@ public class StippleEffect implements ProgramContext {
         }
     }
 
+    public void openFontTemplateProjects() {
+        final String suffix = "." + Constants.NATIVE_FILE_SUFFIX;
+        final Path folder = SEFonts.FONT_FOLDER.resolve("templates"),
+                asciiPath = folder.resolve(Constants.ASCII_TEMPLATE + suffix),
+                latinExtendedPath = folder.resolve(Constants.LATIN_EXTENDED_TEMPLATE + suffix);
+
+        final String ascii = FileIO.readResource(
+                ResourceLoader.loadResource(asciiPath), "ASCII Template"),
+                latinExtended = FileIO.readResource(
+                        ResourceLoader.loadResource(latinExtendedPath),
+                        "Latin Extended Template");
+
+        openNativeProject(ascii, asciiPath);
+        openNativeProject(latinExtended, latinExtendedPath);
+
+        clearDialog();
+    }
+
     public void openPalette() {
         FileIO.setDialogToFilesOnly();
         final Optional<File> opened = FileIO.openFileFromSystem(
@@ -809,9 +1008,12 @@ public class StippleEffect implements ProgramContext {
     private void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix()))
-            openNativeProject(filepath);
-        else if (isAcceptedRasterFormat(fileName)) {
+        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix())) {
+            final String contents = FileIO.readFile(filepath);
+            openNativeProject(contents, filepath);
+
+            processNextImport();
+        } else if (isAcceptedRasterFormat(fileName)) {
             final GameImage image = GameImageIO.readImage(filepath);
 
             DialogAssembly.setDialogToOpenPNG(image, filepath);
@@ -826,16 +1028,12 @@ public class StippleEffect implements ProgramContext {
         // extend with else-ifs for additional file types classes (scripts, palettes)
     }
 
-    public void openNativeProject(final Path filepath) {
-        final String contents = FileIO.readFile(filepath);
-
+    public void openNativeProject(final String contents, final Path filepath) {
         if (contents != null) {
             final SEContext project = ParserSerializer.load(contents, filepath);
             addContext(project, true);
         } else
             StatusUpdates.openFailed(filepath);
-
-        processNextImport();
     }
 
     private static boolean isAcceptedRasterFormat(final String toCheck) {
@@ -849,21 +1047,34 @@ public class StippleEffect implements ProgramContext {
     public void newProjectFromFile(
             final GameImage image, final Path filepath
     ) {
-        final int w = DialogVals.getResizeWidth(),
-                h = DialogVals.getResizeHeight(),
-                xDivs = DialogVals.getNewProjectXDivs(),
-                yDivs = DialogVals.getNewProjectYDivs(),
-                fw = w / xDivs, fh = h /  yDivs,
-                frameCount = Math.min(Constants.MAX_NUM_FRAMES, xDivs * yDivs);
+        final int iw = DialogVals.getImportWidth(),
+                ih = DialogVals.getImportHeight(),
+                fw = DialogVals.getImportFrameWidth(),
+                fh = DialogVals.getImportFrameHeight(),
+                columns = StitchSplitMath.importColumns(iw),
+                rows = StitchSplitMath.importRows(ih),
+                frameCount = columns * rows;
 
-        final GameImage resized = ImageProcessing.scale(image, w, h);
+        final GameImage resized = ImageProcessing.scale(image, iw, ih);
         final List<GameImage> frames = new ArrayList<>();
 
-        for (int y = 0; y < yDivs; y++)
-            for (int x = 0; x < xDivs; x++)
-                if (frames.size() < frameCount)
-                    frames.add(new GameImage(resized.getSubimage(
-                            x * fw, y * fh, fw, fh)));
+        final boolean isHorizontal = StitchSplitMath.isHorizontal();
+        final BinaryOperator<Integer>
+                horz = (a, b) -> a % b,
+                vert = (a, b) -> a / b,
+                xOp = isHorizontal ? horz : vert,
+                yOp = isHorizontal ? vert : horz;
+        final int fpd = isHorizontal ? columns : rows;
+
+        for (int i = 0; i < frameCount; i++) {
+            final GameImage frame = new GameImage(fw, fh);
+
+            final int x = xOp.apply(i, fpd) * fw,
+                    y = yOp.apply(i, fpd) * fh;
+
+            frame.draw(resized, -1 * x, -1 * y);
+            frames.add(frame.submit());
+        }
 
         final SELayer firstLayer = new SELayer(frames,
                 new GameImage(fw, fh), Constants.OPAQUE, true, false,
@@ -889,8 +1100,10 @@ public class StippleEffect implements ProgramContext {
         // close unmodified untitled project
         if (contexts.size() == 1 && !contexts.get(0).projectInfo
                 .hasUnsavedChanges() &&
-                !contexts.get(0).projectInfo.hasSaveAssociation())
+                !contexts.get(0).projectInfo.hasSaveAssociation()) {
+            contexts.get(0).releasePixelGrid();
             contexts.remove(0);
+        }
 
         contexts.add(context);
 
@@ -902,6 +1115,7 @@ public class StippleEffect implements ProgramContext {
 
     public void removeContext(final int index) {
         if (index >= 0 && index < contexts.size()) {
+            contexts.get(index).releasePixelGrid();
             contexts.remove(index);
 
             if (contextIndex >= contexts.size())
@@ -965,13 +1179,29 @@ public class StippleEffect implements ProgramContext {
     public void moveColorLeftInPalette() {
         paletteSelectedColorAction(Palette::moveLeft,
                 Palette::canMoveLeft, StatusUpdates::moveLeftInPalette,
-                (p, c) -> StatusUpdates.cannotShiftColorPalette(true, p, c));
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(p, c, true));
     }
 
     public void moveColorRightInPalette() {
         paletteSelectedColorAction(Palette::moveRight,
                 Palette::canMoveRight, StatusUpdates::moveRightInPalette,
-                (p, c) -> StatusUpdates.cannotShiftColorPalette(false, p, c));
+                (p, c) -> StatusUpdates.cannotShiftColorPalette(p, c, false));
+    }
+
+    public void selectPaletteColorToTheLeft() {
+        paletteSelectedColorAction(
+                (p, c) -> setSelectedColor(p.nextLeft(c),
+                        ColorMath.LastHSVEdit.NONE), Palette::isIncluded,
+                (p, c) -> StatusUpdates.selectNextPaletteColor(p, c, true),
+                (p, c) -> StatusUpdates.cannotSelectColorPalette(p, c, true));
+    }
+
+    public void selectPaletteColorToTheRight() {
+        paletteSelectedColorAction(
+                (p, c) -> setSelectedColor(p.nextRight(c),
+                        ColorMath.LastHSVEdit.NONE), Palette::isIncluded,
+                (p, c) -> StatusUpdates.selectNextPaletteColor(p, c, false),
+                (p, c) -> StatusUpdates.cannotSelectColorPalette(p, c, false));
     }
 
     private void paletteSelectedColorAction(
@@ -1000,9 +1230,17 @@ public class StippleEffect implements ProgramContext {
 
     public void setContextIndex(final int contextIndex) {
         if (contextIndex >= 0 && contextIndex < contexts.size()) {
+            // release resources
+            if (this.contextIndex < contexts.size())
+                getContext().releasePixelGrid();
+
+            // assign
             this.contextIndex = contextIndex;
+
+            // auxiliaries
             rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
+            getContext().redrawCanvasAuxiliaries();
         }
     }
 
@@ -1153,6 +1391,9 @@ public class StippleEffect implements ProgramContext {
         if (was.equals(PickUpSelection.get()) &&
                 !tool.equals(PickUpSelection.get()))
             PickUpSelection.get().disengage(getContext());
+        else if (was.equals(TextTool.get()) &&
+                !tool.equals(TextTool.get()) && TextTool.get().isTyping())
+            TextTool.get().setTyping(false);
 
         this.tool = tool;
 

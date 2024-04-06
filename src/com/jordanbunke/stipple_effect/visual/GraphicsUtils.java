@@ -14,7 +14,7 @@ import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.Settings;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
 
@@ -31,7 +31,9 @@ public class GraphicsUtils {
             HIGHLIGHT_OVERLAY = loadIcon("highlighted"),
             SELECT_OVERLAY = loadIcon("selected"),
             TRANSFORM_NODE = ResourceLoader.loadImageResource(
-                    Constants.MISC_FOLDER.resolve("transform_node.png"));
+                    Constants.MISC_FOLDER.resolve("transform_node.png")),
+            CHECKMARK = ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve("checkmark.png"));
 
     public static TextBuilder uiText() {
         return uiText(Constants.WHITE);
@@ -52,6 +54,26 @@ public class GraphicsUtils {
 
     public static Color buttonBorderColorAlt(final boolean selected) {
         return selected ? Constants.HIGHLIGHT_1 : Constants.WHITE;
+    }
+
+    public static GameImage drawCheckbox(
+            final boolean isHighlighted, final boolean isChecked
+    ) {
+        final Coord2D dims = Layout.ICON_DIMS;
+        final int w = dims.x, h = dims.y;
+
+        final GameImage checkbox = new GameImage(w, h);
+        checkbox.fillRectangle(Constants.GREY, 0, 0, w, h);
+
+        if (isChecked)
+            checkbox.draw(CHECKMARK);
+
+        final Color frame = GraphicsUtils.buttonBorderColor(false);
+        checkbox.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX,
+                0, 0, w, h);
+
+        return isHighlighted ? drawHighlightedButton(checkbox.submit())
+                : checkbox.submit();
     }
 
     public static GameImage drawTextBox(
@@ -143,7 +165,7 @@ public class GraphicsUtils {
             final boolean isSelected, final Color backgroundColor
     ) {
         final GameImage base = drawTextButton(width, text, isSelected,
-                backgroundColor, true);
+                backgroundColor, true, true);
 
         final GameImage icon = GraphicsUtils.loadIcon(isSelected
                 ? IconCodes.COLLAPSE : IconCodes.EXPAND);
@@ -156,7 +178,7 @@ public class GraphicsUtils {
     public static GameImage drawTextButton(
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor,
-            final boolean leftAligned
+            final boolean leftAligned, final boolean drawBorder
     ) {
         final Color textColor = textButtonColorFromBackgroundColor(
                 backgroundColor, true);
@@ -175,8 +197,11 @@ public class GraphicsUtils {
                 : (w - textImage.getWidth()) / 2;
 
         nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
-        final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
-        nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+
+        if (drawBorder) {
+            final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
+            nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+        }
 
         return nhi.submit();
     }
@@ -185,7 +210,7 @@ public class GraphicsUtils {
             final int width, final String text,
             final boolean isSelected, final Color backgroundColor
     ) {
-        return drawTextButton(width, text, isSelected, backgroundColor, false);
+        return drawTextButton(width, text, isSelected, backgroundColor, false, true);
     }
 
     public static SimpleMenuButton makeStandardTextButton(
@@ -194,6 +219,20 @@ public class GraphicsUtils {
         final GameImage base = drawTextButton(Layout.STD_TEXT_BUTTON_W,
                 text, false, Constants.GREY);
         return new SimpleMenuButton(pos, new Coord2D(Layout.STD_TEXT_BUTTON_W,
+                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
+                true, onClick, base, drawHighlightedButton(base));
+    }
+
+    public static SimpleMenuButton makeBespokeTextButton(
+            final String text, final Coord2D pos, final Runnable onClick
+    ) {
+        final int w = GraphicsUtils.uiText(Constants.BLACK)
+                .addText(text).build().draw()
+                .getWidth() + Layout.CONTENT_BUFFER_PX;
+
+        final GameImage base = drawTextButton(w,
+                text, false, Constants.GREY);
+        return new SimpleMenuButton(pos, new Coord2D(w,
                 Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
                 true, onClick, base, drawHighlightedButton(base));
     }

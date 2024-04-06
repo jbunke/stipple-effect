@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.LayerMerger;
+import com.jordanbunke.stipple_effect.layer.LayerHelper;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
@@ -17,6 +17,8 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
@@ -146,10 +148,12 @@ public class SEContext {
                 final GameImage pixelGrid = pixelGridMap
                         .getOrDefault(zoomFactor, GameImage.dummy());
                 final int z = (int) zoomFactor;
-                workspace.draw(pixelGrid.section(
-                                bounds[TL].x * z, bounds[TL].y * z,
-                                bounds[BR].x * z, bounds[BR].y * z),
-                        bounds[TRP].x, bounds[TRP].y);
+
+                if (pixelGrid.getWidth() > GameImage.dummy().getWidth())
+                    workspace.draw(pixelGrid.section(
+                                    bounds[TL].x * z, bounds[TL].y * z,
+                                    bounds[BR].x * z, bounds[BR].y * z),
+                            bounds[TRP].x, bounds[TRP].y);
             }
         }
 
@@ -206,10 +210,10 @@ public class SEContext {
         }
     }
 
-    public void process(final InputEventLogger eventLogger, final Tool tool) {
+    public void process(final InputEventLogger eventLogger) {
         setInWorkspaceBounds(eventLogger);
         setTargetPixel(eventLogger);
-        processTools(eventLogger, tool);
+        processTools(eventLogger);
         processAdditionalMouseEvents(eventLogger);
 
         if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
@@ -219,9 +223,9 @@ public class SEContext {
         }
     }
 
-    private void processTools(
-            final InputEventLogger eventLogger, final Tool tool
-    ) {
+    private void processTools(final InputEventLogger eventLogger) {
+        final Tool tool = StippleEffect.get().getTool();
+
         if (tool instanceof ToolWithMode || tool.equals(BrushSelect.get())) {
             ToolWithMode.setGlobal(eventLogger.isPressed(Key.SHIFT));
 
@@ -251,11 +255,18 @@ public class SEContext {
         if (tool instanceof SnappableTool st)
             st.setSnap(eventLogger.isPressed(Key.SHIFT));
 
+        if (tool instanceof MoverTool mt)
+            mt.setSnapToggled(eventLogger.isPressed(Key.CTRL));
+
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
             if (e instanceof GameMouseEvent me) {
                 if (me.matchesAction(GameMouseEvent.Action.DOWN) &&
                         inWorkspaceBounds) {
                     tool.onMouseDown(this, me);
+                    me.markAsProcessed();
+                } else if (me.matchesAction(GameMouseEvent.Action.CLICK) &&
+                        inWorkspaceBounds) {
+                    tool.onClick(this, me);
                     me.markAsProcessed();
                 } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
                     tool.onMouseUp(this, me);
@@ -263,10 +274,17 @@ public class SEContext {
             }
         }
 
+        if (tool.equals(TextTool.get()))
+            TextTool.get().process(this, eventLogger);
+
         tool.update(this, eventLogger.getAdjustedMousePosition());
     }
 
     public void processAdditionalMouseEvents(final InputEventLogger eventLogger) {
+        final boolean typingNotBlocked = DeltaTimeGlobal
+                .getStatusOf(Constants.TYPING_CODE)
+                .orElse(Boolean.FALSE) instanceof Boolean b && !b;
+
         final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
 
         for (GameEvent e : unprocessed)
@@ -279,55 +297,79 @@ public class SEContext {
                     else
                         getState().nextFrame();
                 } else if (eventLogger.isPressed(Key.SHIFT)) {
-                    if (eventLogger.isPressed(Key.R)) {
+                    if (typingNotBlocked) {
+                        if (eventLogger.isPressed(Key.R)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0, 0);
+                        } else if (eventLogger.isPressed(Key.G)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0);
+                        } else if (eventLogger.isPressed(Key.B)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0);
+                        } else if (eventLogger.isPressed(Key.H)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorHue(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        } else if (eventLogger.isPressed(Key.S)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorSaturation(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        } else if (eventLogger.isPressed(Key.V)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorValue(
+                                    mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        } else if (eventLogger.isPressed(Key.A)) {
+                            mse.markAsProcessed();
+
+                            StippleEffect.get().incrementSelectedColorRGBA(
+                                    0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
+                        }
+                    }
+
+                    // preceding block does not guarantee whether mse has been processed
+                    if (mse.isProcessed())
+                        continue;
+
+                    if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
                         mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0, 0);
-                    } else if (eventLogger.isPressed(Key.G)) {
+                        final int cs = Settings.getScrollClicks(
+                                mse.clicksScrolled,
+                                Settings.Code.INVERT_BREADTH_DIRECTION);
+
+                        bt.setBreadth(bt.getBreadth() + cs);
+                    } else if (StippleEffect.get().getTool() instanceof ToolThatSearches) {
                         mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0, 0);
-                    } else if (eventLogger.isPressed(Key.B)) {
+                        final int cs = Settings.getScrollClicks(mse.clicksScrolled,
+                                Settings.Code.INVERT_TOLERANCE_DIRECTION);
+
+                        ToolThatSearches.setTolerance(
+                                ToolThatSearches.getTolerance() +
+                                        (cs * Constants.SMALL_TOLERANCE_INC));
+                    } else if (StippleEffect.get().getTool() instanceof TextTool tt) {
                         mse.markAsProcessed();
 
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC, 0);
-                    } else if (eventLogger.isPressed(Key.H)) {
-                        mse.markAsProcessed();
+                        final int cs = Settings.getScrollClicks(mse.clicksScrolled,
+                                Settings.Code.INVERT_FONT_SIZE_DIRECTION);
 
-                        StippleEffect.get().incrementSelectedColorHue(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (eventLogger.isPressed(Key.S)) {
-                        mse.markAsProcessed();
-
-                        StippleEffect.get().incrementSelectedColorSaturation(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (eventLogger.isPressed(Key.V)) {
-                        mse.markAsProcessed();
-
-                        StippleEffect.get().incrementSelectedColorValue(
-                                mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (eventLogger.isPressed(Key.A)) {
-                        mse.markAsProcessed();
-
-                        StippleEffect.get().incrementSelectedColorRGBA(
-                                0, 0, 0, mse.clicksScrolled * Constants.COLOR_SET_RGBA_INC);
-                    } else if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
-                        mse.markAsProcessed();
-
-                        bt.setBreadth(bt.getBreadth() + mse.clicksScrolled);
-                    } else if (StippleEffect.get().getTool() instanceof ToolThatSearches tts) {
-                        mse.markAsProcessed();
-
-                        tts.setTolerance(tts.getTolerance() + (mse.clicksScrolled *
-                                Constants.SMALL_TOLERANCE_INC));
+                        tt.setFontScale(tt.getFontScale() + cs);
                     }
                 } else if (inWorkspaceBounds) {
                     mse.markAsProcessed();
 
-                    if (mse.clicksScrolled < 0)
+                    if (Settings.getScrollClicks(mse.clicksScrolled,
+                            Settings.Code.INVERT_ZOOM_DIRECTION) < 0)
                         renderInfo.zoomIn(targetPixel);
                     else
                         renderInfo.zoomOut();
@@ -423,6 +465,9 @@ public class SEContext {
                             StatusUpdates.cannotSetPixelGrid();
                     });
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
+                    this::setPixelGridAndCheckerboard);
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
                     this::addFrame);
             eventLogger.checkForMatchingKeyStroke(
@@ -434,7 +479,7 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
                     () -> getState().getEditingLayer().setOnionSkinMode(
-                            getState().getEditingLayer().getOnionSkinMode().next()));
+                            EnumUtils.next(getState().getEditingLayer().getOnionSkinMode())));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
                     this::removeFrame);
@@ -667,19 +712,38 @@ public class SEContext {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
                         () -> bt.setBreadth(bt.getBreadth() - Constants.BREADTH_INC));
-            } else if (tool instanceof ToolThatSearches tts) {
+            } else if (tool instanceof ToolThatSearches) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::decreaseTolerance);
+                        ToolThatSearches::decreaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        tts::increaseTolerance);
+                        ToolThatSearches::increaseTolerance);
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() + Constants.BIG_TOLERANCE_INC));
+                        () -> ToolThatSearches.setTolerance(
+                                ToolThatSearches.getTolerance() +
+                                        Constants.BIG_TOLERANCE_INC));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> tts.setTolerance(tts.getTolerance() - Constants.BIG_TOLERANCE_INC));
+                        () -> ToolThatSearches.setTolerance(
+                                ToolThatSearches.getTolerance() -
+                                        Constants.BIG_TOLERANCE_INC));
+            } else if (tool.equals(TextTool.get())) {
+                final TextTool tt = TextTool.get();
+
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontScale(tt.getFontScale() - 1));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontScale(tt.getFontScale() + 1));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontIndex(tt.getFontIndex() - 1));
+                eventLogger.checkForMatchingKeyStroke(
+                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
+                        () -> tt.setFontIndex(tt.getFontIndex() + 1));
             } else if (tool.equals(Hand.get())) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
@@ -799,8 +863,8 @@ public class SEContext {
 
         final GameImage image = new GameImage(w, h);
 
-        final int cbx = Settings.getCheckerboardXPixels(),
-                cby = Settings.getCheckerboardYPixels();
+        final int cbx = Settings.getCheckerboardWPixels(),
+                cby = Settings.getCheckerboardHPixels();
 
         for (int x = 0; x < w; x += cbx) {
             for (int y = 0; y < h; y += cby) {
@@ -815,16 +879,34 @@ public class SEContext {
     }
 
     public boolean couldRenderPixelGrid() {
+        final float z = renderInfo.getZoomFactor();
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        return renderInfo.getZoomFactor() >= Constants.ZOOM_FOR_GRID &&
-                w <= Layout.PIXEL_GRID_IMAGE_DIM_MAX &&
-                h <= Layout.PIXEL_GRID_IMAGE_DIM_MAX;
+        final int px = Settings.getPixelGridXPixels(),
+                py = Settings.getPixelGridYPixels(),
+                xLines = w / px, yLines = h / py,
+                narrowerLineGapPx = Math.min(px, py),
+                widerGridDim = (int) Math.max(w * z, h * z);
+
+        final boolean exceedsLineLimit =
+                xLines + yLines > Layout.MAX_PIXEL_GRID_LINES,
+                linesTooNarrowForZoomLevel =
+                        z * narrowerLineGapPx < Constants.ZOOM_FOR_GRID,
+                pixelGridImageTooLarge = widerGridDim > Layout.PIXEL_GRID_ZOOM_DIM_MAX;
+
+        return !(exceedsLineLimit || linesTooNarrowForZoomLevel || pixelGridImageTooLarge);
+    }
+
+    public void releasePixelGrid() {
+        if (pixelGridMap != null)
+            pixelGridMap.clear();
+
+        pixelGridMap = new HashMap<>();
     }
 
     public void redrawPixelGrid() {
-        pixelGridMap = new HashMap<>();
+        releasePixelGrid();
 
         if (!(renderInfo.isPixelGridOn() && couldRenderPixelGrid()))
             return;
@@ -835,34 +917,58 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final float minZ = Constants.ZOOM_FOR_GRID, maxZ = Constants.MAX_ZOOM;
-
-        for (float fZ = minZ; fZ <= maxZ; fZ *= 2f) {
+        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM; fZ *= 2f) {
             final int z = (int) fZ, altPx = Math.max(2,
                     z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
+
+            final boolean tooSmall = z == 0,
+                    tooLarge = Math.max(w, h) * z >
+                            Layout.PIXEL_GRID_ZOOM_DIM_MAX;
+
+            if (tooSmall || tooLarge)
+                continue;
 
             final GameImage image = new GameImage(w * z, h * z);
 
             final int pgx = Settings.getPixelGridXPixels(),
                     pgy = Settings.getPixelGridYPixels();
 
+            final GameImage vertGridLine = new GameImage(1, h * z),
+                    horzGridLine = new GameImage(w * z, 1),
+                    vertPixel = new GameImage(1, z),
+                    horzPixel = new GameImage(z, 1);
+
+            // populate lines
+            // pixel stretches
+            for (int zInc = 0; zInc < z; zInc += altPx) {
+                final Color c = (zInc / altPx) % 2 == 0 ? a : b;
+
+                vertPixel.fillRectangle(c, 0, zInc, 1, altPx);
+                horzPixel.fillRectangle(c, zInc, 0, altPx, 1);
+            }
+
+            vertPixel.free();
+            horzPixel.free();
+
+            // vertical
+            for (int y = 0; y < h; y++)
+                vertGridLine.draw(vertPixel, 0, y * z);
+
+            vertGridLine.free();
+
+            // horizontal
+            for (int x = 0; x < w; x++)
+                horzGridLine.draw(horzPixel, x * z, 0);
+
+            horzGridLine.free();
+
             // vertical grid
             for (int x = 0; x < w; x += pgx)
-                for (int y = 0; y < h; y++)
-                    for (int zInc = 0; zInc < z; zInc += altPx) {
-                        final Color c = (zInc / altPx) % 2 == 0
-                                ? a : b;
-                        image.fillRectangle(c, x * z, (y * z) + zInc, 1, altPx);
-                    }
+                image.draw(vertGridLine, x * z, 0);
 
             // horizontal grid
             for (int y = 0; y < h; y += pgy)
-                for (int x = 0; x < w; x++)
-                    for (int zInc = 0; zInc < z; zInc += altPx) {
-                        final Color c = (zInc / altPx) % 2 == 0
-                                ? a : b;
-                        image.fillRectangle(c, (x * z) + zInc, y * z, altPx, 1);
-                    }
+                image.draw(horzGridLine, 0, y * z);
 
             pixelGridMap.put(fZ, image.submit());
         }
@@ -885,14 +991,41 @@ public class SEContext {
             StatusUpdates.clipboardSendFailed(true);
     }
 
+    private void setPixelGridAndCheckerboard() {
+        final boolean fromSelection = getState().hasSelection();
+        final int w, h;
+
+        if (fromSelection) {
+            final Set<Coord2D> selection = getState().getSelection();
+
+            w = SelectionUtils.width(selection);
+            h = SelectionUtils.height(selection);
+        } else {
+            w = getState().getImageWidth();
+            h = getState().getImageHeight();
+        }
+
+        if (w <= Layout.PIXEL_GRID_MAX && h <= Layout.PIXEL_GRID_MAX &&
+                w >= Layout.PIXEL_GRID_MIN && h >= Layout.PIXEL_GRID_MIN) {
+            Settings.setCheckerboardWPixels(w);
+            Settings.setCheckerboardHPixels(h);
+            Settings.setPixelGridXPixels(w);
+            Settings.setPixelGridYPixels(h);
+
+            Settings.apply();
+
+            StatusUpdates.setCheckAndGridToBounds(w, h, fromSelection);
+        } else
+            StatusUpdates.cannotSetCheckAndGridToBounds(fromSelection);
+    }
+
     // contents to palette
     public void contentsToPalette(final Palette palette) {
-        final DialogVals.ContentType contentType = DialogVals
-                .getContentType(this);
+        final DialogVals.Scope scope = DialogVals.getScope();
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
-        switch (contentType) {
+        switch (scope) {
             case SELECTION -> extractColorsFromSelection(colors);
             case LAYER_FRAME -> extractColorsFromFrame(colors, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
@@ -943,9 +1076,7 @@ public class SEContext {
                     h = getState().getImageHeight();
 
             final Set<Coord2D> selection = getState().getSelection();
-            final SELayer layer = getState().getEditingLayer();
-            final int frameIndex = getState().getFrameIndex();
-            final GameImage canvas = layer.getFrame(frameIndex),
+            final GameImage canvas = getState().getActiveLayerFrame(),
                     source = switch (getState().getSelectionMode()) {
                         case CONTENTS -> getState().getSelectionContents()
                                 .getContentForCanvas(w, h);
@@ -964,10 +1095,10 @@ public class SEContext {
 
     // palettize
     public void palettize(final Palette palette) {
-        final DialogVals.ContentType contentType = DialogVals.getContentType(this);
+        final DialogVals.Scope scope = DialogVals.getScope();
         ProjectState state = getState();
 
-        switch (contentType) {
+        switch (scope) {
             case SELECTION -> palettizeSelection(palette);
             case LAYER_FRAME -> state = palettizeFrame(palette, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
@@ -1007,7 +1138,7 @@ public class SEContext {
             }
         }
 
-        if (contentType != DialogVals.ContentType.SELECTION) {
+        if (scope != DialogVals.Scope.SELECTION) {
             state.markAsCheckpoint(false);
             stateManager.performAction(state, Operation.PALETTIZE);
         }
@@ -1331,8 +1462,7 @@ public class SEContext {
                     selection.add(new Coord2D(x, y));
         }
 
-        final GameImage canvas = getState().getEditingLayer()
-                .getFrame(getState().getFrameIndex());
+        final GameImage canvas = getState().getActiveLayerFrame();
         final SelectionContents selectionContents =
                 new SelectionContents(canvas, selection);
 
@@ -1524,22 +1654,58 @@ public class SEContext {
                 .map(layer -> layer.returnPadded(left, top, w, h)).toList();
 
         final ProjectState result = getState().resize(w, h, layers)
-                .changeSelectionBounds(new HashSet<>()).changeIsCheckpoint(true);
+                .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, Operation.PAD);
 
         snapToCenterOfImage();
     }
 
     public void resize() {
-        final int w = DialogVals.getResizeWidth(),
-                h = DialogVals.getResizeHeight();
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight(),
+                rw = DialogVals.calculcateResizeWidth(w),
+                rh = DialogVals.calculateResizeHeight(h);
 
         final List<SELayer> layers = getState().getLayers().stream()
-                .map(layer -> layer.returnResized(w, h)).toList();
+                .map(layer -> layer.returnResized(rw, rh)).toList();
 
-        final ProjectState result = getState().resize(w, h, layers)
+        final ProjectState result = getState().resize(rw, rh, layers)
                 .changeSelectionBounds(new HashSet<>());
         stateManager.performAction(result, Operation.RESIZE);
+
+        snapToCenterOfImage();
+    }
+
+    public void stitch() {
+        final int frameWidth = getState().getImageWidth(),
+                frameHeight = getState().getImageHeight(),
+                frameCount = getState().getFrameCount(),
+                w = StitchSplitMath.stitchedWidth(frameWidth, frameCount),
+                h = StitchSplitMath.stitchedHeight(frameHeight, frameCount);
+
+        final List<SELayer> layers = getState().getLayers().stream()
+                .map(layer -> layer.returnStitched(frameWidth,
+                        frameHeight, frameCount)).toList();
+
+        final ProjectState result = getState().stitch(w, h,
+                layers).changeSelectionBounds(new HashSet<>());
+        stateManager.performAction(result, Operation.STITCH);
+
+        snapToCenterOfImage();
+    }
+
+    public void split() {
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight(),
+                frameCount = StitchSplitMath.splitFrameCount(w, h);
+
+        final List<SELayer> layers = getState().getLayers().stream()
+                .map(layer -> layer.returnSplit(w, h, frameCount)).toList();
+
+        final ProjectState result = getState().split(
+                DialogVals.getFrameWidth(), DialogVals.getFrameHeight(),
+                layers, frameCount).changeSelectionBounds(new HashSet<>());
+        stateManager.performAction(result, Operation.SPLIT);
 
         snapToCenterOfImage();
     }
@@ -1969,7 +2135,7 @@ public class SEContext {
 
             final SELayer above = layers.get(aboveIndex),
                     below = layers.get(belowIndex);
-            final SELayer merged = LayerMerger.merge(above, below,
+            final SELayer merged = LayerHelper.merge(above, below,
                     getState().getFrameIndex(), getState().getFrameCount());
             layers.remove(above);
             layers.remove(below);
@@ -2031,5 +2197,9 @@ public class SEContext {
 
     public StateManager getStateManager() {
         return stateManager;
+    }
+
+    public GameImage getCheckerboard() {
+        return checkerboard;
     }
 }

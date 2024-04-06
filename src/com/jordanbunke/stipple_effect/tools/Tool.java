@@ -2,9 +2,13 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 public abstract class Tool {
     private final GameImage icon, highlightedIcon, selectedIcon;
@@ -15,7 +19,7 @@ public abstract class Tool {
                 StipplePencil.get(), Pencil.get(),
                 Brush.get(), ShadeBrush.get(), Eraser.get(),
                 GradientTool.get(), LineTool.get(),
-                Fill.get(), ColorPicker.get(),
+                TextTool.get(), Fill.get(), ColorPicker.get(),
                 Wand.get(), BrushSelect.get(), BoxSelect.get(), PolygonSelect.get(),
                 MoveSelection.get(), PickUpSelection.get()
         };
@@ -43,9 +47,23 @@ public abstract class Tool {
     }
 
     public abstract String getName();
-    public abstract void onMouseDown(final SEContext context, final GameMouseEvent me);
-    public abstract void update(final SEContext context, final Coord2D mousePosition);
-    public abstract void onMouseUp(final SEContext context, final GameMouseEvent me);
+
+    // stubs that can be extended for custom behaviours
+    public void onMouseDown(final SEContext context, final GameMouseEvent me) {
+
+    }
+
+    public void onMouseUp(final SEContext context, final GameMouseEvent me) {
+
+    }
+
+    public void onClick(final SEContext context, final GameMouseEvent me) {
+
+    }
+
+    public void update(final SEContext context, final Coord2D mousePosition) {
+
+    }
 
     public String convertNameToFilename() {
         return getName().replace(" ", "_").toLowerCase();
@@ -85,5 +103,25 @@ public abstract class Tool {
 
     public GameImage getToolContentPreview() {
         return GameImage.dummy();
+    }
+
+    public boolean hasToolOptionsBar() {
+        return false;
+    }
+
+    public MenuElementGrouping buildToolOptionsBar() {
+        return new MenuElementGrouping(getOptionsLabel());
+    }
+
+    private TextLabel getOptionsLabel() {
+        return TextLabel.make(new Coord2D(
+                Layout.getToolOptionsBarPosition().x +
+                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarTextY()),
+                "Tool Options", Constants.WHITE);
+    }
+
+    Coord2D getFirstOptionLabelPosition() {
+        return new Coord2D(Layout.optionsBarNextElementX(
+                getOptionsLabel(), true), Layout.optionsBarTextY());
     }
 }

@@ -1,0 +1,3 @@
+The quick brown fox jumps over the lazy dog.
+THE FIVE BOXING WIZARDS JUMP QUICKLY.
+0123456789 - ? : ; ' " / () [] {}
