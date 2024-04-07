@@ -24,6 +24,7 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
 
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
@@ -46,15 +47,15 @@ public class SEContext {
     public SEContext(
             final int imageWidth, final int imageHeight
     ) {
-        this(new ProjectInfo(), ProjectState.makeNew(imageWidth, imageHeight),
+        this(null, ProjectState.makeNew(imageWidth, imageHeight),
                 imageWidth, imageHeight);
     }
 
     public SEContext(
-            final ProjectInfo projectInfo, final ProjectState projectState,
+            final Path filepath, final ProjectState projectState,
             final int imageWidth, final int imageHeight
     ) {
-        this.projectInfo = projectInfo;
+        this.projectInfo = new ProjectInfo(this, filepath);
         stateManager = new StateManager(projectState);
         renderInfo = new RenderInfo(imageWidth, imageHeight);
         playbackInfo = new PlaybackInfo();

@@ -1,6 +1,6 @@
 # Changelog
 
-## **0.3.0** - The Settings and Options Update - 2024-04-07
+## **0.3.0** - The Settings and Options Update - 2024-04-08
 
 ### Added:
 * Added text tool

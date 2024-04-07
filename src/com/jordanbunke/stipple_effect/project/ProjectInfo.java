@@ -21,6 +21,8 @@ import java.util.function.BinaryOperator;
 public class ProjectInfo {
     private static final int INVALID_BOUND = -1;
 
+    private final SEContext context;
+
     private Path folder;
     private String name, indexPrefix, indexSuffix;
     private SaveType saveType;
@@ -55,11 +57,9 @@ public class ProjectInfo {
         }
     }
 
-    public ProjectInfo() {
-        this(null);
-    }
+    public ProjectInfo(final SEContext context, final Path filepath) {
+        this.context = context;
 
-    public ProjectInfo(final Path filepath) {
         if (filepath == null) {
             folder = null;
             name = "";
@@ -75,7 +75,7 @@ public class ProjectInfo {
         saveType = filepath != null && filepath.getFileName()
                 .toString().endsWith(SaveType.NATIVE.getFileSuffix())
                 ? SaveType.NATIVE : SaveType.PNG_STITCHED;
-        framesPerDim = Constants.MAX_NUM_FRAMES;
+        framesPerDim = 1;
         fps = Constants.DEFAULT_PLAYBACK_FPS;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
 
@@ -96,28 +96,29 @@ public class ProjectInfo {
 
         StatusUpdates.saving();
 
-        final SEContext c = StippleEffect.get().getContext();
+        // drop picked up selection down to layer so its contents can be saved
+        if (context.getState().getSelectionMode() == SelectionMode.CONTENTS &&
+                context.getState().hasSelection())
+            context.dropContentsToLayer(true, false);
 
-        if (c.getState().getSelectionMode() == SelectionMode.CONTENTS &&
-                c.getState().hasSelection())
-            c.dropContentsToLayer(true, false);
-
-        final int w = c.getState().getImageWidth(),
-                h = c.getState().getImageHeight(),
+        final int w = context.getState().getImageWidth(),
+                h = context.getState().getImageHeight(),
                 framesToSave = calculateNumFrames(),
                 f0 = saveRangeOfFrames ? lowerBound : 0;
+
+        setFramesPerDim(Math.min(framesToSave, framesPerDim));
 
         if (saveType == SaveType.NATIVE) {
             final Thread stipSaverThread = new Thread(() -> {
                 final Path filepath = buildFilepath();
 
-                ParserSerializer.save(c, filepath);
+                ParserSerializer.save(context, filepath);
                 StatusUpdates.saved(filepath);
             });
 
             stipSaverThread.start();
         } else {
-            final int frameCount = c.getState().getFrameCount();
+            final int frameCount = context.getState().getFrameCount();
 
             if (f0 + framesToSave > frameCount) {
                 StatusUpdates.saveFailed();
@@ -129,7 +130,7 @@ public class ProjectInfo {
                     final GameImage[] images = new GameImage[framesToSave];
 
                     for (int i = 0; i < framesToSave; i++) {
-                        images[i] = c.getState().draw(
+                        images[i] = context.getState().draw(
                                 false, false, f0 + i);
 
                         if (scaleUp > 1)
@@ -151,7 +152,7 @@ public class ProjectInfo {
                 }
                 case PNG_SEPARATE -> {
                     for (int i = 0; i < framesToSave; i++) {
-                        final GameImage image = c.getState().draw(
+                        final GameImage image = context.getState().draw(
                                 false, false, f0 + i);
                         GameImageIO.writeImage(buildFilepath(countFrom + i),
                                 scaleUp > 1
@@ -162,12 +163,12 @@ public class ProjectInfo {
                     StatusUpdates.savedAllFrames(folder);
                 }
                 case PNG_STITCHED -> {
-                    final int fpd = getFramesPerDim(),
-                            fpcd = getFramesPerCompDim(),
-                            sw = w * (StitchSplitMath.isHorizontal() ? fpd : fpcd),
-                            sh = h * (StitchSplitMath.isHorizontal() ? fpcd : fpd);
-
                     final boolean isHorizontal = StitchSplitMath.isHorizontal();
+                    final int fpd = getFramesPerDim(),
+                            fpcd = calcFramesPerCompDim(),
+                            sw = w * (isHorizontal ? fpd : fpcd),
+                            sh = h * (isHorizontal ? fpcd : fpd);
+
                     final BinaryOperator<Integer>
                             horz = (a, b) -> a % b,
                             vert = (a, b) -> a / b,
@@ -180,7 +181,7 @@ public class ProjectInfo {
                         final int x = xOp.apply(i, fpd) * w,
                                 y = yOp.apply(i, fpd) * h;
 
-                        stitched.draw(c.getState().draw(
+                        stitched.draw(context.getState().draw(
                                 false, false, f0 + i), x, y);
                     }
 
@@ -194,6 +195,11 @@ public class ProjectInfo {
 
         editedSinceLastSave = false;
         StippleEffect.get().rebuildProjectsMenu();
+    }
+
+    private int calcFramesPerCompDim() {
+        return DialogVals.calculateFramesPerComplementaryDim(
+                calculateNumFrames(), framesPerDim);
     }
 
     public void markAsEdited() {
@@ -213,7 +219,7 @@ public class ProjectInfo {
     }
 
     public boolean isAnimation() {
-        return StippleEffect.get().getContext().getState().getFrameCount() > 1;
+        return context.getState().getFrameCount() > 1;
     }
 
     public SaveType[] getSaveOptions() {
@@ -225,7 +231,7 @@ public class ProjectInfo {
 
     public int calculateNumFrames() {
         if (!saveRangeOfFrames)
-            return StippleEffect.get().getContext().getState().getFrameCount();
+            return context.getState().getFrameCount();
 
         return (upperBound - lowerBound) + 1;
     }
@@ -278,11 +284,6 @@ public class ProjectInfo {
         return framesPerDim;
     }
 
-    public int getFramesPerCompDim() {
-        return DialogVals.calculateFramesPerComplementaryDim(
-                calculateNumFrames(), framesPerDim);
-    }
-
     public SaveType getSaveType() {
         return saveType;
     }
@@ -324,8 +325,7 @@ public class ProjectInfo {
     }
 
     private int clampFrameBounds(final int candidate) {
-        return MathPlus.bounded(0, candidate, StippleEffect.get()
-                .getContext().getState().getFrameCount() - 1);
+        return MathPlus.bounded(0, candidate, context.getState().getFrameCount() - 1);
     }
 
     public void setCountFrom(final int countFrom) {
