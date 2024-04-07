@@ -1,7 +1,8 @@
 # ![Stipple Effect](https://i.imgur.com/sDn5Bz5.gif)
 
-[![Download](https://i.imgur.com/X6ClI06.png)](https://flinkerflitzer.itch.io/stipple-effect)
-[![Changelog](https://i.imgur.com/IhJsonn.png)](https://github.com/jbunke/stipple-effect/blob/master/changelog.md)
+[![Download](https://i.imgur.com/Ry12ica.png)](https://flinkerflitzer.itch.io/stipple-effect)
+[![Changelog](https://i.imgur.com/83bOHrf.png)](https://github.com/jbunke/stipple-effect/blob/master/changelog.md)
+[![Roadmap](https://i.imgur.com/7CECQB6.png)](https://github.com/jbunke/stipple-effect/blob/master/roadmap.md)
 
 ## About
 **Stipple Effect** is an image editor designed for creating and animating pixel art. The program was first built to facilitate and improve my workflow for the pixel art that I produce as an [indie game developer](https://flinkerflitzer.itch.io/) and [freelancer](https://www.fiverr.com/jordanbunke).
