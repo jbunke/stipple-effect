@@ -198,8 +198,7 @@ public class DialogAssembly {
 
         final MenuBuilder stitchMB = new MenuBuilder();
 
-        makeStitchElements(stitchMB,
-                c.projectInfo::calculateNumFrames, lowerBoundsLabel);
+        makeStitchElementsForSaveSpriteSheet(stitchMB, c, lowerBoundsLabel);
 
         final MenuElementGrouping pngStitchedContents =
                 new MenuElementGrouping(stitchMB.build().getMenuElements());
@@ -1387,11 +1386,33 @@ public class DialogAssembly {
         mb.addAll(label, dropdown);
     }
 
-    private static void makeStitchElements(
-            final MenuBuilder mb,
-            final Supplier<Integer> fcGetter,
+    private static void makeStitchElementsForSaveSpriteSheet(
+            final MenuBuilder mb, final SEContext c,
             final TextLabel referenceLabel
     ) {
+        makeStitchElements(mb,
+                c.projectInfo::setFramesPerDim,
+                c.projectInfo::getFramesPerDim,
+                c.projectInfo::calculateNumFrames, referenceLabel);
+    }
+
+    private static void makeStitchElements(
+            final MenuBuilder mb, final Supplier<Integer> fcGetter,
+            final TextLabel referenceLabel
+    ) {
+        makeStitchElements(mb, DialogVals::setFramesPerDim,
+                DialogVals::getFramesPerDim, fcGetter, referenceLabel);
+    }
+
+    private static void makeStitchElements(
+            final MenuBuilder mb,
+            final Consumer<Integer> fpdSetter,
+            final Supplier<Integer> fpdGetter,
+            final Supplier<Integer> fcGetter, final TextLabel referenceLabel
+    ) {
+        // pre-processing
+        fpdSetter.accept(fcGetter.get());
+
         // sequence order
         makeSequenceOrderElements(mb, referenceLabel);
 
@@ -1406,7 +1427,7 @@ public class DialogAssembly {
                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                 "", fcGetter.get(), "",
                 tbv -> tbv >= 1 && tbv <= Constants.MAX_NUM_FRAMES,
-                DialogVals::setFramesPerDim, DialogVals::getFramesPerDim,
+                fpdSetter, fpdGetter,
                 String.valueOf(Constants.MAX_NUM_FRAMES).length());
         mb.addAll(framesPerDimLabel, framesPerDimTextbox);
 
@@ -1416,7 +1437,8 @@ public class DialogAssembly {
         final DynamicLabel framesPerCompDim = makeDynamicLabel(
                 textBelowPos(framesPerDimLabel), () -> {
                     final int comp = DialogVals
-                            .calculateFramesPerComplementaryDim(fcGetter.get());
+                            .calculateFramesPerComplementaryDim(
+                                    fcGetter.get(), fpdGetter.get());
 
                     return FPCD_PREFIX + comp + (
                             comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX

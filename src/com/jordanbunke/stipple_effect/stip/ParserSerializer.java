@@ -4,10 +4,9 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
@@ -128,8 +127,8 @@ public class ParserSerializer {
                 .replaceAll("\t", "");
         final ProjectState state = deserializeProjectState(contents);
 
-        return new SEContext(new ProjectInfo(filepath), state,
-                state.getImageWidth(), state.getImageHeight());
+        return new SEContext(filepath, state, state.getImageWidth(),
+                state.getImageHeight());
     }
 
     private static ProjectState deserializeProjectState(final String contents) {

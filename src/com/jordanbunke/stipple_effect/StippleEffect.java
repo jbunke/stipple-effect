@@ -1082,8 +1082,7 @@ public class StippleEffect implements ProgramContext {
         final ProjectState initialState = ProjectState.makeFromRasterFile(
                 fw, fh, firstLayer, frameCount);
 
-        final SEContext project = new SEContext(
-                new ProjectInfo(filepath), initialState, fw, fh);
+        final SEContext project = new SEContext(filepath, initialState, fw, fh);
         addContext(project, true);
 
         processNextImport();
