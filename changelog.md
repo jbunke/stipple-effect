@@ -26,7 +26,7 @@
 * Changed box select tool's overlay to a tool content preview
 * Modified box select tool snapping behaviour
 * Modified polygon select behaviour: middle vertices can be placed off the canvas
-* Changed brush select hotkey from {T} to {V}
+* Changed brush select hotkey from *T* to *V*
 * Changed pixel grid validation so that # of grid lines is checked instead of image bounds
 * State stack is now dynamically sized; states are dumped based on insufficient available memory
 * Redesigned and extended dialog menus
