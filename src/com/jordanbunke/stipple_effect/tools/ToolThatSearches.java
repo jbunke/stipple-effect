@@ -1,10 +1,10 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -207,9 +207,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         // diagonal checkbox
         final Checkbox diagonalCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(diagonalLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                ToolThatSearches::isSearchDiag,
-                ToolThatSearches::setSearchDiag);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                ToolThatSearches::isSearchDiag, ToolThatSearches::setSearchDiag
+        ));
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 toleranceLabel, tolerance.decButton, tolerance.incButton,

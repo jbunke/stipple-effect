@@ -2,11 +2,11 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -410,8 +410,8 @@ public final class GradientTool extends ToolWithBreadth
         // dithered checkbox
         final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(ditheredLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> dithered, this::setDithered);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                () -> dithered, this::setDithered));
 
         // shape label
         final TextLabel shapeLabel = TextLabel.make(new Coord2D(
@@ -435,8 +435,8 @@ public final class GradientTool extends ToolWithBreadth
         // bounded checkbox
         final Checkbox boundedCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(boundedLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> bounded, this::setBounded);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                        () -> bounded, this::setBounded));
 
         // masked label
         final TextLabel maskedLabel = TextLabel.make(new Coord2D(
@@ -446,8 +446,8 @@ public final class GradientTool extends ToolWithBreadth
         // masked checkbox
         final Checkbox maskedCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(maskedLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> masked, this::setMasked);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                () -> masked, this::setMasked));
 
         // contiguous label
         final TextLabel contiguousLabel = TextLabel.make(new Coord2D(
@@ -457,8 +457,8 @@ public final class GradientTool extends ToolWithBreadth
         // contiguous checkbox
         final Checkbox contiguousCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(contiguousLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> contiguous, this::setContiguous);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                () -> contiguous, this::setContiguous));
 
         // tolerance
         final TextLabel toleranceLabel = Layout.optionsBarNextSectionLabel(

@@ -399,8 +399,4 @@ public class Textbox extends MenuButtonStub {
 
         validate();
     }
-
-    public String getText() {
-        return text;
-    }
 }

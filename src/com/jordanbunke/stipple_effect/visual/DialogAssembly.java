@@ -17,6 +17,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.invisible.TimedMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.AnimationMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
@@ -149,9 +150,9 @@ public class DialogAssembly {
                                 .equals(ProjectInfo.SaveType.NATIVE);
         final Checkbox frameBoundsCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(frameBoundsLabel),
-                MenuElement.Anchor.LEFT_TOP,
-                c.projectInfo::isSaveRangeOfFrames,
-                c.projectInfo::setSaveRangeOfFrames);
+                new ConcreteProperty<>(
+                        c.projectInfo::isSaveRangeOfFrames,
+                        c.projectInfo::setSaveRangeOfFrames));
         final String FRAME_NUM_PREFIX = "Frm. ";
         final DynamicTextbox lowerBoundTextbox =
                 makeDialogNumericalDynamicTextbox(lowerBoundsLabel,
@@ -311,9 +312,9 @@ public class DialogAssembly {
                         "Preserve aspect ratio?", Constants.WHITE);
         final Checkbox preserveAspectRatioCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(preserveAspectRatioLabel),
-                MenuElement.Anchor.LEFT_TOP,
-                DialogVals::isResizePreserveAspectRatio,
-                DialogVals::setResizePreserveAspectRatio);
+                new ConcreteProperty<>(
+                        DialogVals::isResizePreserveAspectRatio,
+                        DialogVals::setResizePreserveAspectRatio));
         mb.addAll(preserveAspectRatioLabel, preserveAspectRatioCheckbox);
 
         final TextLabel resizeTypeLabel =
@@ -624,9 +625,9 @@ public class DialogAssembly {
                 heightLabel = makeDialogRightLabel(widthLabel, "Height:");
         final Checkbox preserveAspectRatioCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(preserveAspectRatioLabel),
-                MenuElement.Anchor.LEFT_TOP,
-                DialogVals::isResizePreserveAspectRatio,
-                DialogVals::setResizePreserveAspectRatio);
+                new ConcreteProperty<>(
+                        DialogVals::isResizePreserveAspectRatio,
+                        DialogVals::setResizePreserveAspectRatio));
         final DynamicTextbox widthTextbox =
                 makeDialogPixelDynamicTextbox(widthLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
@@ -811,9 +812,9 @@ public class DialogAssembly {
                 makeDialogRightLabel(spacingLabel, "Character-specific spacing");
         final Checkbox charSpecificCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(charSpecificLabel),
-                MenuElement.Anchor.LEFT_TOP,
-                DialogVals::isCharSpecificSpacing,
-                DialogVals::setCharSpecificSpacing);
+                new ConcreteProperty<>(
+                        DialogVals::isCharSpecificSpacing,
+                        DialogVals::setCharSpecificSpacing));
         mb.add(charSpecificLabel);
         mb.add(charSpecificCheckbox);
         lines += 1 + LINE_BREAK;
@@ -840,8 +841,8 @@ public class DialogAssembly {
                 "Does this font support Latin Extended characters?");
         final Checkbox latinExCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(latinExQuestion),
-                MenuElement.Anchor.LEFT_TOP,
-                DialogVals::hasLatinEx, DialogVals::setHasLatinEx);
+                new ConcreteProperty<>(
+                        DialogVals::hasLatinEx, DialogVals::setHasLatinEx));
         final TextLabel latinExLabel = makeDialogLeftLabel(
                 lines + 1, "Latin Extended source file:");
         final SimpleMenuButton latinExButton =
@@ -1061,7 +1062,7 @@ public class DialogAssembly {
             } else {
                 final Checkbox panelCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(label),
-                        MenuElement.Anchor.LEFT_TOP, ret, adj);
+                        new ConcreteProperty<>(ret, adj));
                 mb.addAll(label, panelCheckbox);
             }
         }
@@ -1131,9 +1132,9 @@ public class DialogAssembly {
                 () -> DialogVals.getPaletteSorter().ordinal());
         final Checkbox backwardsCheckbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(backwardsLabel),
-                MenuElement.Anchor.LEFT_TOP,
-                DialogVals::isSortPaletteBackwards,
-                DialogVals::setSortPaletteBackwards);
+                new ConcreteProperty<>(
+                        DialogVals::isSortPaletteBackwards,
+                        DialogVals::setSortPaletteBackwards));
         mb.addAll(sortLabel, sortDropdown, backwardsLabel, backwardsCheckbox);
 
         final MenuElementGrouping contents =
@@ -1884,15 +1885,15 @@ public class DialogAssembly {
 
                 final Checkbox fullscreenCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(fullscreenLabel),
-                        MenuElement.Anchor.LEFT_TOP,
-                        Settings::checkIsFullscreenOnStartup,
-                        Settings::setFullscreenOnStartup),
+                        new ConcreteProperty<>(
+                                Settings::checkIsFullscreenOnStartup,
+                                Settings::setFullscreenOnStartup)),
                         pixelGridCheckbox = new Checkbox(
                                 getDialogContentOffsetFollowingLabel(
                                         pixelGridDefaultLabel),
-                                MenuElement.Anchor.LEFT_TOP,
-                                Settings::checkIsPixelGridOnByDefault,
-                                Settings::setPixelGridOnByDefault);
+                                new ConcreteProperty<>(
+                                        Settings::checkIsPixelGridOnByDefault,
+                                        Settings::setPixelGridOnByDefault));
 
                 final DynamicTextbox widthTextbox = makeDialogPixelDynamicTextbox(
                         newProjectWidthLabel,
@@ -1954,27 +1955,27 @@ public class DialogAssembly {
 
                 final Checkbox invertZoomCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(invertZoomLabel),
-                        MenuElement.Anchor.LEFT_TOP,
-                        Settings::checkIsInvertZoomDirection,
-                        Settings::setInvertZoomDirection),
+                        new ConcreteProperty<>(
+                                Settings::checkIsInvertZoomDirection,
+                                Settings::setInvertZoomDirection)),
                         invertBreadthCheckbox = new Checkbox(
                                 getDialogContentOffsetFollowingLabel(
                                         invertBreadthLabel),
-                                MenuElement.Anchor.LEFT_TOP,
-                                Settings::checkIsInvertBreadthDirection,
-                                Settings::setInvertBreadthDirection),
+                                new ConcreteProperty<>(
+                                        Settings::checkIsInvertBreadthDirection,
+                                        Settings::setInvertBreadthDirection)),
                         invertToleranceCheckbox = new Checkbox(
                                 getDialogContentOffsetFollowingLabel(
                                         invertToleranceLabel),
-                                MenuElement.Anchor.LEFT_TOP,
-                                Settings::checkIsInvertToleranceDirection,
-                                Settings::setInvertToleranceDirection),
+                                new ConcreteProperty<>(
+                                        Settings::checkIsInvertToleranceDirection,
+                                        Settings::setInvertToleranceDirection)),
                         invertFontSizeCheckbox = new Checkbox(
                                 getDialogContentOffsetFollowingLabel(
                                         invertFontSizeLabel),
-                                MenuElement.Anchor.LEFT_TOP,
-                                Settings::checkIsInvertFontSizeDirection,
-                                Settings::setInvertFontSizeDirection);
+                                new ConcreteProperty<>(
+                                        Settings::checkIsInvertFontSizeDirection,
+                                        Settings::setInvertFontSizeDirection));
 
                 mb.addAll(scrollDirectionLabel,
                         invertZoomLabel, invertZoomCheckbox,
@@ -2098,8 +2099,9 @@ public class DialogAssembly {
 
                 final Checkbox dumpStatesCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(dumpStatesLabel),
-                        MenuElement.Anchor.LEFT_TOP,
-                        Settings::checkIsDumpStates, Settings::setDumpStates);
+                        new ConcreteProperty<>(
+                                Settings::checkIsDumpStates,
+                                Settings::setDumpStates));
 
                 mb.addAll(dumpStatesLabel, dumpStatesCheckbox,
                         dsContext1, dsContext2, dsContext3, dsContext4);

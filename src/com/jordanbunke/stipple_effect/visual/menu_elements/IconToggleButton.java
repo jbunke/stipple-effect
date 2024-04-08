@@ -15,10 +15,13 @@ public class IconToggleButton extends SimpleToggleMenuButton {
     private final Function<Integer, String> iconCodeFunction;
 
     public IconToggleButton(
-            Coord2D position, GameImage[] nonHighlightedImages,
-            GameImage[] highlightedImages, Runnable[] chosenBehaviours,
-            Supplier<Integer> updateIndexLogic, Runnable globalBehaviour,
-            Function<Integer, String> iconCodeFunction
+            final Coord2D position,
+            final GameImage[] nonHighlightedImages,
+            final GameImage[] highlightedImages,
+            final Runnable[] chosenBehaviours,
+            final Supplier<Integer> updateIndexLogic,
+            final Runnable globalBehaviour,
+            final Function<Integer, String> iconCodeFunction
     ) {
         super(position, Layout.ICON_DIMS, Anchor.LEFT_TOP, true,
                 nonHighlightedImages, highlightedImages, chosenBehaviours,
