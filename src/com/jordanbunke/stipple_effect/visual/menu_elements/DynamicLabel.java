@@ -1,9 +1,7 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements;
 
-import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.AbstractDynamicLabel;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -11,67 +9,26 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import java.awt.*;
 import java.util.function.Supplier;
 
-public class DynamicLabel extends MenuElement {
-    private final Supplier<String> getter;
-
-    private final Color textColor;
-
-    private String label;
-    private GameImage labelImage;
+public class DynamicLabel extends AbstractDynamicLabel {
+    public DynamicLabel(
+            final Coord2D position, final Anchor anchor,
+            final Color textColor, final Supplier<String> getter,
+            final String widestCase
+    ) {
+        super(position, widestCase, Layout.DYNAMIC_LABEL_H,
+                anchor, textColor, getter, DynamicLabel::draw);
+    }
 
     public DynamicLabel(
-            final Coord2D position, Anchor anchor, final Color textColor,
-            final Supplier<String> getter, final int widthAllowance
+            final Coord2D position, final Anchor anchor,
+            final Color textColor, final Supplier<String> getter,
+            final int widthAllowance
     ) {
-        super(position, new Coord2D(widthAllowance, Layout.DYNAMIC_LABEL_H), anchor, true);
-
-        this.textColor = textColor;
-
-        this.getter = getter;
-        label = getter.get();
-
-        updateAssets();
+        super(position, new Coord2D(widthAllowance, Layout.DYNAMIC_LABEL_H),
+                anchor, textColor, getter, DynamicLabel::draw);
     }
 
-    private void updateAssets() {
-        final GameImage l = GraphicsUtils.uiText(textColor).addText(label).build().draw();
-        labelImage = new GameImage(getWidth(), getHeight());
-
-        final Coord2D offset = switch (getAnchor()) {
-            case RIGHT_TOP, RIGHT_CENTRAL, RIGHT_BOTTOM ->
-                    new Coord2D((labelImage.getWidth() - l.getWidth()), 0);
-            case CENTRAL, CENTRAL_BOTTOM, CENTRAL_TOP ->
-                    new Coord2D((labelImage.getWidth() - l.getWidth()) / 2, 0);
-            default -> new Coord2D();
-        };
-
-        labelImage.draw(l, offset.x, offset.y);
-
-        labelImage.free();
-    }
-
-    @Override
-    public void process(final InputEventLogger eventLogger) {
-
-    }
-
-    @Override
-    public void update(final double deltaTime) {
-        final String fetched = getter.get();
-
-        if (!label.equals(fetched)) {
-            label = fetched;
-            updateAssets();
-        }
-    }
-
-    @Override
-    public void render(final GameImage canvas) {
-        draw(labelImage, canvas);
-    }
-
-    @Override
-    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
-
+    private static GameImage draw(final String text, final Color textColor) {
+        return GraphicsUtils.uiText(textColor).addText(text).build().draw();
     }
 }

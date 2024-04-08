@@ -85,8 +85,7 @@ public class IncrementalRangeElements<R extends Number> {
         return new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(slider, false),
                 textY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
-                () -> valueFormatter.apply(getter.get()),
-                Layout.estimateDynamicLabelMaxWidth(widestTextCase));
+                () -> valueFormatter.apply(getter.get()), widestTextCase);
     }
 
     public static IncrementalRangeElements<Integer> makeForInt(

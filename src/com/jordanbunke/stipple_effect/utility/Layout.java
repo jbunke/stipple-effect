@@ -237,14 +237,6 @@ public class Layout {
                 optionsBarTextY()), text, Constants.WHITE);
     }
 
-    public static int estimateDynamicLabelMaxWidth(
-            final String widestTextCase
-    ) {
-        return TextLabel
-                .make(new Coord2D(), widestTextCase, Constants.WHITE)
-                .getWidth();
-    }
-
     // segments layout
     public static int getProjectsWidth() {
         final int w = width();

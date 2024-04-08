@@ -171,14 +171,14 @@ public class PreviewWindow implements ProgramContext {
 
     private static DynamicLabel labelAfterLastButton(
             final MenuElement lastButton, final Supplier<String> getter,
-            final String maxWidthCase
+            final String widestCase
     ) {
         return new DynamicLabel(
                 lastButton.getRenderPosition().displace(
                         Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
                         -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE, getter,
-                Layout.estimateDynamicLabelMaxWidth(maxWidthCase));
+                widestCase);
     }
 
     private void setZoom(final float zoom) {

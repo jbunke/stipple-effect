@@ -1755,8 +1755,8 @@ public class DialogAssembly {
             final String widestTextCase
     ) {
         return new DynamicLabel(position,
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE, getter,
-                Layout.estimateDynamicLabelMaxWidth(widestTextCase));
+                MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                getter, widestTextCase);
     }
 
     private static TextLabel makeValidDimensionsBottomLabel() {
