@@ -1,26 +1,26 @@
 package com.jordanbunke.stipple_effect;
 
 import com.jordanbunke.delta_time.OnStartup;
-import com.jordanbunke.delta_time.contexts.ProgramContext;
+import com.jordanbunke.delta_time._core.GameManager;
+import com.jordanbunke.delta_time._core.Program;
+import com.jordanbunke.delta_time._core.ProgramContext;
 import com.jordanbunke.delta_time.debug.DebugChannel;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.events.GameKeyEvent;
 import com.jordanbunke.delta_time.events.Key;
-import com.jordanbunke.delta_time.game.Game;
-import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.delta_time.menus.Menu;
+import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
-import com.jordanbunke.delta_time.utility.MathPlus;
 import com.jordanbunke.delta_time.utility.Version;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
@@ -41,8 +41,9 @@ import com.jordanbunke.stipple_effect.visual.*;
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -60,7 +61,7 @@ public class StippleEffect implements ProgramContext {
 
     private static final StippleEffect INSTANCE;
 
-    public final Game game;
+    public final Program program;
     public GameWindow window;
     private boolean windowed;
 
@@ -236,9 +237,9 @@ public class StippleEffect implements ProgramContext {
         window = makeWindow();
         final GameManager manager = new GameManager(0, this);
 
-        game = new Game(window, manager, Constants.TICK_HZ, Constants.FPS);
-        game.setCanvasSize(Layout.width(), Layout.height());
-        game.setScheduleUpdates(false);
+        program = new Program(window, manager, Constants.TICK_HZ, Constants.FPS);
+        program.setCanvasSize(Layout.width(), Layout.height());
+        program.setScheduleUpdates(false);
 
         millisSinceStatusUpdate = 0;
         statusUpdate = GameImage.dummy();
@@ -272,7 +273,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     private void configureDebugger() {
-        final GameDebugger debugger = game.getDebugger();
+        final GameDebugger debugger = program.getDebugger();
 
         debugger.muteChannel(GameDebugger.FRAME_RATE);
         debugger.addChannel(new DebugChannel(STATUS_UPDATE_CHANNEL,
@@ -280,7 +281,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void sendStatusUpdate(final String message) {
-        game.getDebugger().getChannel(STATUS_UPDATE_CHANNEL)
+        program.getDebugger().getChannel(STATUS_UPDATE_CHANNEL)
                 .printMessage(message);
     }
 
@@ -1371,8 +1372,8 @@ public class StippleEffect implements ProgramContext {
         windowed = !windowed;
 
         window = makeWindow();
-        game.setCanvasSize(Layout.width(), Layout.height());
-        game.replaceWindow(window);
+        program.setCanvasSize(Layout.width(), Layout.height());
+        program.replaceWindow(window);
 
         // redraw everything
         rebuildAllMenus();

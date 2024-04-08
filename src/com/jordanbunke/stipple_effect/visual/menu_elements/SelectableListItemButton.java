@@ -2,8 +2,8 @@ package com.jordanbunke.stipple_effect.visual.menu_elements;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButton;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.menu.menu_elements.button.MenuButton;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

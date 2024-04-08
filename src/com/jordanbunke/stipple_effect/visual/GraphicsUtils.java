@@ -1,15 +1,14 @@
 package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
-import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
@@ -433,7 +432,7 @@ public class GraphicsUtils {
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                final Color cWas = ImageProcessing.colorAtPixel(image, x, y);
+                final Color cWas = image.getColorAt(x, y);
                 final int rgbAvg = (cWas.getRed() + cWas.getGreen() + cWas.getBlue()) / 3;
                 final Color cIs = new Color(rgbAvg, rgbAvg, rgbAvg, cWas.getAlpha());
 

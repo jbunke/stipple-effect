@@ -2,8 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
 import java.awt.*;
@@ -35,7 +34,7 @@ public final class Wand extends ToolThatSearches {
             final Coord2D tp = context.getTargetPixel();
 
             final GameImage image = context.getState().getActiveLayerFrame();
-            final Color initial = ImageProcessing.colorAtPixel(image, tp.x, tp.y);
+            final Color initial = image.getColorAt(tp.x, tp.y);
 
             // search
             final Set<Coord2D> matched = search(image, initial, tp);
