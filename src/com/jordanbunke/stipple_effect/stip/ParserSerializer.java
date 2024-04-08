@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.stip;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
@@ -459,8 +458,7 @@ public class ParserSerializer {
             indent(sb, indentLevel + 2);
 
             for (int x = 0; x < w; x++) {
-                sb.append(serializeColor(ImageProcessing
-                        .colorAtPixel(image, x, y), false));
+                sb.append(serializeColor(image.getColorAt(x, y), false));
 
                 if (x + 1 < w || y + 1 < h)
                     sb.append(CONTENT_SEPARATOR);

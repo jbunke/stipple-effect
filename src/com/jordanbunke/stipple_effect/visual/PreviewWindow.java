@@ -1,20 +1,20 @@
 package com.jordanbunke.stipple_effect.visual;
 
-import com.jordanbunke.delta_time.contexts.ProgramContext;
+import com.jordanbunke.delta_time._core.GameManager;
+import com.jordanbunke.delta_time._core.Program;
+import com.jordanbunke.delta_time._core.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
 import com.jordanbunke.delta_time.events.GameWindowEvent;
-import com.jordanbunke.delta_time.game.Game;
-import com.jordanbunke.delta_time.game.GameManager;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menus.Menu;
-import com.jordanbunke.delta_time.menus.MenuBuilder;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.menu.Menu;
+import com.jordanbunke.delta_time.menu.MenuBuilder;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
@@ -42,7 +42,7 @@ public class PreviewWindow implements ProgramContext {
 
     private GameWindow window;
     private final SEContext context;
-    private final Game preview;
+    private final Program preview;
     private final Menu menu;
     private final PlaybackInfo playbackInfo;
 
@@ -72,7 +72,7 @@ public class PreviewWindow implements ProgramContext {
 
         menu = makeMenu();
         window = makeWindow();
-        preview = new Game(window, new GameManager(0, this));
+        preview = new Program(window, new GameManager(0, this));
         preview.getDebugger().getChannel(GameDebugger.FRAME_RATE).mute();
         preview.setScheduleUpdates(false);
         window.setOnCloseBehaviour(preview::terminateExecution);

@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.project;
 
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;

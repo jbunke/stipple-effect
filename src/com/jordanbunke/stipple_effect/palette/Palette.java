@@ -1,12 +1,11 @@
 package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
-import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
 import java.util.List;
@@ -126,7 +125,7 @@ public class Palette {
 
         for (int x = 0; x < source.getWidth(); x++) {
             for (int y = 0; y < source.getHeight(); y++) {
-                final Color c = ImageProcessing.colorAtPixel(source, x, y);
+                final Color c = source.getColorAt(x, y);
 
                 if (c.getAlpha() == 0)
                     continue;

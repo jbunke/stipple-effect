@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 

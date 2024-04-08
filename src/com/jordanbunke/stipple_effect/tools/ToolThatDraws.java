@@ -1,17 +1,17 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
-import com.jordanbunke.delta_time.utility.RNG;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.delta_time.utility.math.RNG;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 import java.util.function.BiConsumer;

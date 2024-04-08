@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.dialog;
 
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

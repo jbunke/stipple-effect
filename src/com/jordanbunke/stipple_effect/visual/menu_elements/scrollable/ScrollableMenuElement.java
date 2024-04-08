@@ -2,9 +2,9 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.invisible.InvisibleMenuElement;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.InvisibleMenuElement;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 
 public class ScrollableMenuElement extends InvisibleMenuElement {
 

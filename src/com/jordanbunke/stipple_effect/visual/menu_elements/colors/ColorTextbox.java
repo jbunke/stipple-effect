@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 
 import com.jordanbunke.delta_time.error.GameError;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;

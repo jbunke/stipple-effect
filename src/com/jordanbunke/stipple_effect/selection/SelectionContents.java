@@ -1,8 +1,7 @@
 package com.jordanbunke.stipple_effect.selection;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
@@ -65,7 +64,7 @@ public class SelectionContents {
                 if (!pixels.contains(new Coord2D(tl.x + x, tl.y + y)))
                     continue;
 
-                final Color c = ImageProcessing.colorAtPixel(canvas, tl.x + x, tl.y + y);
+                final Color c = canvas.getColorAt(tl.x + x, tl.y + y);
                 content.dot(c, x, y);
             }
         }
@@ -107,8 +106,7 @@ public class SelectionContents {
                     final int sampleX = (int)((x / (double) w) * sampleFrom.getWidth()),
                             sampleY = (int)((y / (double) h) * sampleFrom.getHeight());
 
-                    content.dot(ImageProcessing.colorAtPixel(
-                            sampleFrom, sampleX, sampleY), x, y);
+                    content.dot(sampleFrom.getColorAt(sampleX, sampleY), x, y);
                 }
 
         return new SelectionContents(content.submit(), tl, pixels,
@@ -165,8 +163,7 @@ public class SelectionContents {
                     if (sampleX >= 0 && sampleY >= 0 &&
                             sampleX < sampleFrom.getWidth() &&
                             sampleY < sampleFrom.getHeight())
-                        content.dot(ImageProcessing.colorAtPixel(
-                                sampleFrom, sampleX, sampleY), x, y);
+                        content.dot(sampleFrom.getColorAt(sampleX, sampleY), x, y);
                 }
 
         return new SelectionContents(content.submit(), tl, pixels,
@@ -212,8 +209,7 @@ public class SelectionContents {
                     if (sampleX >= 0 && sampleY >= 0 &&
                             sampleX < this.content.getWidth() &&
                             sampleY < this.content.getHeight())
-                        content.dot(ImageProcessing.colorAtPixel(
-                                this.content, sampleX, sampleY), x, y);
+                        content.dot(this.content.getColorAt(sampleX, sampleY), x, y);
                 }
 
         return new SelectionContents(content.submit(), tl, pixels);

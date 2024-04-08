@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 
 import java.util.List;
