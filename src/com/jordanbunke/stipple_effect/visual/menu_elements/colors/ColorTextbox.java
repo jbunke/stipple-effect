@@ -4,9 +4,10 @@ import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.drawing_functions.TextboxDrawingFunction;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.color.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 
 import java.awt.*;
@@ -48,7 +49,8 @@ public class ColorTextbox extends Textbox {
                 selectionIndex, valid, highlighted, typing) -> {
             final int width = dimensions.x;
             final Color accent = typing
-                    ? Constants.HIGHLIGHT_1 : Constants.BLACK,
+                    ? Settings.getTheme().getHighlightOutline()
+                    : Settings.getTheme().getButtonOutline(),
                     background = ColorTextbox.getColorFromHexCode(text);
 
             return GraphicsUtils.drawTextbox(
@@ -60,7 +62,7 @@ public class ColorTextbox extends Textbox {
 
     private static Color getColorFromHexCode(final String hexCode) {
         if (!validateAsHexCode(hexCode))
-            return Constants.TRANSPARENT;
+            return SEColors.transparent();
 
         final int LENGTH_OF_SECTION = 2, R = 0, G = 2, B = 4;
 

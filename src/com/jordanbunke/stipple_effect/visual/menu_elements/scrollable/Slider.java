@@ -7,8 +7,8 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
@@ -121,35 +121,45 @@ public abstract class Slider extends MenuElement {
     }
 
     // graphical
-    public GameImage[] drawSliderBallShells() {
+    public GameImage[] drawSliderBalls() {
+        final int BASE = 0, HIGHLIGHTED = 1, SELECTED = 2;
         final int sbd = Layout.SLIDER_BALL_DIM;
 
-        final GameImage baseSliderBall = new GameImage(sbd, sbd),
-                highlightedSliderBall = new GameImage(sbd, sbd),
-                selectedSliderBall = new GameImage(sbd, sbd);
+        final int sbcd = sbd - (2 * Layout.BUTTON_BORDER_PX);
 
-        baseSliderBall.fillRectangle(
+        final GameImage[] sliderBalls = new GameImage[] {
+                new GameImage(sbd, sbd),
+                GameImage.dummy(),
+                new GameImage(sbd, sbd)
+        };
+
+        sliderBalls[BASE].fillRectangle(
                 GraphicsUtils.buttonBorderColor(false), 0, 0, sbd, sbd);
-        highlightedSliderBall.fillRectangle(
-                GraphicsUtils.buttonBorderColorAlt(false), 0, 0, sbd, sbd);
-        selectedSliderBall.fillRectangle(
+        sliderBalls[SELECTED].fillRectangle(
                 GraphicsUtils.buttonBorderColor(true), 0, 0, sbd, sbd);
 
-        return new GameImage[] {
-                baseSliderBall, highlightedSliderBall, selectedSliderBall
-        };
+        sliderBalls[BASE].fillRectangle(getSliderBallCoreColor(),
+                Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX, sbcd, sbcd);
+        sliderBalls[SELECTED].fillRectangle(getSliderBallCoreColor(),
+                Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX, sbcd, sbcd);
+
+        sliderBalls[HIGHLIGHTED] =
+                GraphicsUtils.drawHighlightedButton(sliderBalls[BASE]);
+
+        return sliderBalls;
     }
 
     public GameImage drawSliderCore(final int w, final int h) {
         final GameImage sliderCore = new GameImage(w, h);
 
-        sliderCore.fillRectangle(Constants.WHITE, 0, 0, w, h);
+        sliderCore.fillRectangle(
+                Settings.getTheme().getDefaultSliderCore(), 0, 0, w, h);
 
         return sliderCore.submit();
     }
 
     public Color getSliderBallCoreColor() {
-        return Constants.GREY;
+        return Settings.getTheme().getDefaultSliderBall();
     }
 
     // helper
@@ -202,19 +212,12 @@ public abstract class Slider extends MenuElement {
         final GameImage b = new GameImage(slider), h = new GameImage(slider),
                 s = new GameImage(slider);
 
-        // slider ball shell
-        final GameImage[] sliderBalls = drawSliderBallShells();
-
-        // slider ball core
-        final int sbcd = sbd - (2 * Layout.BUTTON_BORDER_PX);
-
-        for (GameImage sliderBall : sliderBalls)
-            sliderBall.fillRectangle(getSliderBallCoreColor(),
-                    Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX,
-                    sbcd, sbcd);
+        // slider balls
+        final GameImage[] sliderBalls = drawSliderBalls();
 
         final int sliderBallRenderDim = (int)(getSliderFraction() * sd);
-        final Coord2D sliderBallRenderPos = getSliderBallRenderPos(sliderBallRenderDim);
+        final Coord2D sliderBallRenderPos =
+                getSliderBallRenderPos(sliderBallRenderDim);
 
         b.draw(sliderBalls[0].submit(), sliderBallRenderPos.x, sliderBallRenderPos.y);
         h.draw(sliderBalls[1].submit(), sliderBallRenderPos.x, sliderBallRenderPos.y);

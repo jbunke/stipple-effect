@@ -234,7 +234,7 @@ public class Layout {
     ) {
         return TextLabel.make(new Coord2D(
                 optionsBarNextElementX(preceding, true),
-                optionsBarTextY()), text, Constants.WHITE);
+                optionsBarTextY()), text);
     }
 
     // segments layout

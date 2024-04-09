@@ -7,9 +7,9 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -54,12 +54,12 @@ public class ColorComponent extends MenuElementContainer {
         // label
         elements.add(TextLabel.make(
                 startingPos.displace(indent, Layout.COLOR_LABEL_OFFSET_Y),
-                label, Constants.WHITE));
+                label, Settings.getTheme().getTextLight()));
 
         // value
         elements.add(new DynamicLabel(startingPos.displace(
                 width - indent, Layout.COLOR_LABEL_OFFSET_Y),
-                Anchor.RIGHT_TOP, Constants.WHITE,
+                Anchor.RIGHT_TOP, Settings.getTheme().getTextLight(),
                 () -> String.valueOf(getter.get()),
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 

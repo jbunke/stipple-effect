@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.utility;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 
-import java.awt.*;
 import java.nio.file.Path;
 
 public class Constants {
@@ -44,22 +43,6 @@ public class Constants {
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
             ICON_ID_GAP_CODE = "", TYPING_CODE = "typing",
             GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";
-
-    public static final Color BACKGROUND = new Color(80, 80, 80),
-            BLACK = new Color(0, 0, 0),
-            WHITE = new Color(255, 255, 255),
-            ACCENT_BACKGROUND_LIGHT = new Color(192, 192, 192),
-            ACCENT_BACKGROUND_DARK = new Color(40, 40, 60),
-            GREY = new Color(127, 127, 127),
-            DARK = new Color(55, 55, 55),
-            INVALID = new Color(100, 20, 20),
-            VEIL = new Color(ACCENT_BACKGROUND_LIGHT.getRed(),
-                    ACCENT_BACKGROUND_LIGHT.getGreen(),
-                    ACCENT_BACKGROUND_LIGHT.getBlue(), 200),
-            HIGHLIGHT_1 = new Color(100, 100, 255),
-            HIGHLIGHT_2 = new Color(50, 80, 255, 100),
-            OVERLAY_FILL_C = new Color(50, 80, 255, 50),
-            TRANSPARENT = new Color(0, 0, 0, 0);
 
     public static final int DEFAULT_CANVAS_W = 32, DEFAULT_CANVAS_H = 32,
             MIN_CANVAS_W = 1, MIN_CANVAS_H = 1, MAX_CANVAS_W = 800, MAX_CANVAS_H = 800,

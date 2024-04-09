@@ -11,6 +11,7 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -124,8 +125,8 @@ public class SEFonts {
 
         final String[] previewText = ParserUtils.getBlurb(
                 IconCodes.FONT_EXAMPLE_TEXT);
-        final TextBuilder tb = new TextBuilder(1d,
-                Text.Orientation.LEFT, Constants.WHITE, buildNewFont());
+        final TextBuilder tb = new TextBuilder(1d, Text.Orientation.LEFT,
+                Settings.getTheme().getTextLight(), buildNewFont());
         Arrays.stream(previewText).forEach(line -> {
             tb.addText(line);
             tb.addLineBreak();

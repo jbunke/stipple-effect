@@ -7,8 +7,8 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
@@ -99,7 +99,7 @@ public class DropdownMenu extends MenuElement {
 
             final GameImage nhi = GraphicsUtils.drawTextButton(
                     buttonWidth, labels[i], false,
-                    Constants.BLACK, true, false);
+                    Settings.getTheme().getDropdownOptionBody(), true, false);
 
             scrollables[i] = new SimpleMenuButton(
                     position.displace(0, index * Layout.STD_TEXT_BUTTON_H),
@@ -128,10 +128,8 @@ public class DropdownMenu extends MenuElement {
         final String text = labels[index];
 
         final GameImage[] bases = new GameImage[] {
-                GraphicsUtils.drawDropDownButton(getWidth(), text,
-                        false, Constants.GREY),
-                GraphicsUtils.drawDropDownButton(getWidth(), text,
-                        true, Constants.GREY)
+                GraphicsUtils.drawDropDownButton(getWidth(), text, false),
+                GraphicsUtils.drawDropDownButton(getWidth(), text, true)
         };
 
         final GameImage[] highlighted = Arrays.stream(bases)

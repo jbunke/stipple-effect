@@ -1,3 +1,16 @@
+TODO:
+
+> Add:
+    > Scripting system
+
+{0.4.0} - The Scripting Update - 2024-05-01
+
+Added:
+> Added themes
+    > Added "Minimalist" theme
+    > Added "Bunkering" theme
+> Added transparency checkerboard to the color slider core
+
 {0.3.0} - The Settings and Options Update - 2024-04-08
 
 Added:

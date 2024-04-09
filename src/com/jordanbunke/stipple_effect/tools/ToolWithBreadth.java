@@ -8,6 +8,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
+import com.jordanbunke.stipple_effect.visual.color.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
@@ -37,8 +38,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
 
     public void drawOverlay() {
         final boolean[][] mask = breadthMask();
-        final Color outside = Constants.WHITE,
-                inside = Constants.ACCENT_BACKGROUND_DARK;
+        final Color outside = SEColors.white(), inside = SEColors.black();
 
         this.overlay = GraphicsUtils.drawOverlay(mask.length, mask[0].length,
                 StippleEffect.get().getContext().renderInfo.getZoomFactor(),
@@ -81,8 +81,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     public MenuElementGrouping buildToolOptionsBar() {
         // breadth label
         final TextLabel breadthLabel = TextLabel.make(
-                getFirstOptionLabelPosition(),
-                "Breadth", Constants.WHITE);
+                getFirstOptionLabelPosition(), "Breadth");
 
         // breadth content
         final int ARTICULATIONS = 40,

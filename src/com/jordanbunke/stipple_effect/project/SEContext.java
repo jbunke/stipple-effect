@@ -22,6 +22,7 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.PreviewWindow;
+import com.jordanbunke.stipple_effect.visual.color.Theme;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -119,7 +120,8 @@ public class SEContext {
         final GameImage workspace = new GameImage(ww, wh);
 
         // background
-        workspace.fillRectangle(Constants.BACKGROUND, 0, 0, ww, wh);
+        workspace.fillRectangle(
+                Settings.getTheme().getWorkspaceBackground(), 0, 0, ww, wh);
 
         // math
         final float zoomFactor = renderInfo.getZoomFactor();
@@ -859,6 +861,7 @@ public class SEContext {
     }
 
     public void redrawCheckerboard() {
+        final Theme t = Settings.getTheme();
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
@@ -870,7 +873,7 @@ public class SEContext {
         for (int x = 0; x < w; x += cbx) {
             for (int y = 0; y < h; y += cby) {
                 final Color c = ((x / cbx) + (y / cby)) % 2 == 0
-                        ? Constants.WHITE : Constants.ACCENT_BACKGROUND_LIGHT;
+                        ? t.getCheckerboard1() : t.getCheckerboard2();
 
                 image.fillRectangle(c, x, y, cbx, cby);
             }

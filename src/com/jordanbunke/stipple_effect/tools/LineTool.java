@@ -7,6 +7,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
+import com.jordanbunke.stipple_effect.visual.color.SEColors;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public final class LineTool extends ToolWithBreadth implements SnappableTool {
     private LineTool() {
         drawing = false;
         snap = false;
-        c = Constants.BLACK;
+        c = SEColors.def();
         toolContentPreview = GameImage.dummy();
 
         anchor = Constants.NO_VALID_TARGET;

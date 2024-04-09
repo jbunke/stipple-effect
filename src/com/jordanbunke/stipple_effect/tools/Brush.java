@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.color.SEColors;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ public final class Brush extends ToolWithBreadth {
 
     private Brush() {
         painting = false;
-        c = (x, y) -> Constants.BLACK;
+        c = (x, y) -> SEColors.def();
         painted = new HashSet<>();
     }
 

@@ -9,6 +9,8 @@ import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.LineMath;
 import com.jordanbunke.stipple_effect.utility.math.LineSegment;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.color.Theme;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -209,13 +211,15 @@ public final class PolygonSelect extends ToolWithMode {
     }
 
     private void updateToolContentPreview(final SEContext context) {
+        final Theme t = Settings.getTheme();
+
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
         final Coord2D tp = context.getTargetPixel(), first = vertices.get(0);
 
         final Color border = tp.equals(first)
-                ? Constants.HIGHLIGHT_1
-                : Constants.HIGHLIGHT_2;
+                ? t.getHighlightOutline()
+                : t.getHighlightOverlay();
 
         toolContentPreview = new GameImage(w, h);
 
@@ -225,8 +229,7 @@ public final class PolygonSelect extends ToolWithMode {
                     continue;
 
                 final Color c = (x + y) % 2 == 0
-                        ? Constants.WHITE
-                        : Constants.BLACK;
+                        ? t.getTextLight() : t.getTextDark();
 
                 toolContentPreview.dot(c, first.x + x, first.y + y);
             }
@@ -237,7 +240,7 @@ public final class PolygonSelect extends ToolWithMode {
         defineLine(getLastVertex(), tp).forEach(next ->
                 toolContentPreview.dot(border, next.x, next.y));
         vertices.forEach(v ->
-                toolContentPreview.dot(Constants.HIGHLIGHT_1, v.x, v.y));
+                toolContentPreview.dot(t.getHighlightOutline(), v.x, v.y));
     }
 
     private void addEdge(final Coord2D v1, final Coord2D v2) {

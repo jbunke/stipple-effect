@@ -229,7 +229,7 @@ public abstract class ToolThatDraws extends Tool {
         // bias label
         final TextLabel biasLabel = TextLabel.make(
                 new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
-                "Combination mode bias", Constants.WHITE);
+                "Combination mode bias");
 
         // bias content
         final int PERCENT = 100;

@@ -22,6 +22,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
@@ -48,7 +49,7 @@ public class MenuAssembly {
 
         mb.add(TextLabel.make(Layout.getProjectsPosition().displace(
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
-                "Projects", Constants.WHITE));
+                "Projects"));
 
         populateButtonsIntoBuilder(mb,
                 new String[] {
@@ -131,11 +132,12 @@ public class MenuAssembly {
                     .addText(text).build().draw().getWidth() +
                     Layout.PROJECT_NAME_BUTTON_PADDING_W;
 
-            final GameImage baseImage = GraphicsUtils.drawTextButton(paddedTextWidth,
-                    text, false, Constants.GREY),
-                    highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils.drawTextButton(paddedTextWidth,
-                            text, true, Constants.GREY);
+            final GameImage baseImage = GraphicsUtils
+                    .drawTextButton(paddedTextWidth, text, false),
+                    highlightedImage = GraphicsUtils
+                            .drawHighlightedButton(baseImage),
+                    selectedImage = GraphicsUtils
+                            .drawTextButton(paddedTextWidth, text, true);
 
             int offsetX = 0;
 
@@ -187,7 +189,7 @@ public class MenuAssembly {
 
         mb.add(TextLabel.make(Layout.getFramesPosition().displace(
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
-                "Frames", Constants.WHITE));
+                "Frames"));
 
         populateButtonsIntoBuilder(mb,
                 new String[] {
@@ -260,8 +262,7 @@ public class MenuAssembly {
                         (AFTER_PLAYBACK_MODE * Layout.BUTTON_INC),
                 Layout.TEXT_Y_OFFSET);
 
-        final TextLabel playbackLabel = TextLabel.make(
-                labelPos, "", Constants.WHITE);
+        final TextLabel playbackLabel = TextLabel.make(labelPos, "");
         final IncrementalRangeElements<Integer> playback =
                 IncrementalRangeElements.makeForInt(playbackLabel,
                         Layout.ICON_BUTTON_OFFSET_Y, Layout.TEXT_Y_OFFSET, 1,
@@ -286,11 +287,14 @@ public class MenuAssembly {
         int realRightX = firstPos.x;
 
         for (int i = 0; i < amount; i++) {
-            final GameImage baseImage = GraphicsUtils.drawTextButton(Layout.FRAME_BUTTON_W,
-                    String.valueOf(i + 1), false, Constants.GREY),
-                    highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils.drawTextButton(Layout.FRAME_BUTTON_W,
-                            String.valueOf(i + 1), true, Constants.GREY);
+            final GameImage baseImage = GraphicsUtils
+                    .drawTextButton(Layout.FRAME_BUTTON_W,
+                            String.valueOf(i + 1), false),
+                    highlightedImage = GraphicsUtils
+                            .drawHighlightedButton(baseImage),
+                    selectedImage = GraphicsUtils
+                            .drawTextButton(Layout.FRAME_BUTTON_W,
+                                    String.valueOf(i + 1), true);
 
             final Coord2D pos = firstPos.displace(
                     i * (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET), 0),
@@ -358,7 +362,7 @@ public class MenuAssembly {
 
         mb.add(TextLabel.make(Layout.getLayersPosition().displace(
                         Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
-                "Layers", Constants.WHITE));
+                "Layers"));
 
         populateButtonsIntoBuilder(mb,
                 new String[] {
@@ -408,11 +412,12 @@ public class MenuAssembly {
                             ? name.substring(0, Layout.LAYER_NAME_LENGTH_CUTOFF) + "..."
                             : name;
 
-            final GameImage baseImage = GraphicsUtils.drawTextButton(Layout.LAYER_BUTTON_W,
-                    text, false, Constants.GREY),
-                    highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils.drawTextButton(Layout.LAYER_BUTTON_W,
-                            text, true, Constants.GREY);
+            final GameImage baseImage = GraphicsUtils
+                    .drawTextButton(Layout.LAYER_BUTTON_W, text, false),
+                    highlightedImage = GraphicsUtils
+                            .drawHighlightedButton(baseImage),
+                    selectedImage = GraphicsUtils
+                            .drawTextButton(Layout.LAYER_BUTTON_W, text, true);
 
             final Coord2D pos = firstPos.displace(0,
                     (amount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC),
@@ -541,7 +546,7 @@ public class MenuAssembly {
 
         mb.add(TextLabel.make(Layout.getColorsPosition().displace(
                 Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
-                "Colors", Constants.WHITE));
+                "Colors"));
 
         populateButtonsIntoBuilder(
                 mb, new String[] {
@@ -578,7 +583,7 @@ public class MenuAssembly {
                 case 0 -> "Primary";
                 case 1 -> "Secondary";
                 default -> "Other";
-            }, Constants.WHITE));
+            }));
 
             final ColorTextbox colorTextBox = ColorTextbox.make(textBoxPos, i);
             mb.add(colorTextBox);
@@ -629,7 +634,7 @@ public class MenuAssembly {
         final boolean hasPaletteContents = s.hasPaletteContents();
 
         // palette label
-        mb.add(TextLabel.make(startingPos, "Palette", Constants.WHITE));
+        mb.add(TextLabel.make(startingPos, "Palette"));
 
         // palette options
         populateButtonsIntoBuilder(
@@ -714,7 +719,8 @@ public class MenuAssembly {
                 : new StaticMenuElement(dropdownPos,
                 new Coord2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
                 MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
-                contentWidth, "No palettes", false, Constants.DARK)));
+                contentWidth, "No palettes", false,
+                Settings.getTheme().getStubButtonBody())));
 
         // palette buttons
         if (hasPaletteContents) {
@@ -845,7 +851,8 @@ public class MenuAssembly {
                 IconCodes.IND_TOOL);
         final DynamicLabel toolLabel = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(toolIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
+                Settings.getTheme().getTextLight(),
                 () -> StippleEffect.get().getTool().getBottomBarText(),
                 Layout.getBottomBarToolWidth());
         mb.addAll(toolIndicator, toolLabel);
@@ -856,7 +863,8 @@ public class MenuAssembly {
                 IconCodes.IND_TARGET);
         final DynamicLabel targetLabel = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(targetIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
+                Settings.getTheme().getTextLight(),
                 c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth());
         mb.addAll(targetIndicator, targetLabel);
 
@@ -866,7 +874,8 @@ public class MenuAssembly {
                 IconCodes.IND_BOUNDS);
         final DynamicLabel boundsLabel = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(boundsIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
+                Settings.getTheme().getTextLight(),
                 c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth());
         mb.addAll(boundsIndicator, boundsLabel);
 
@@ -891,7 +900,7 @@ public class MenuAssembly {
         // selection
         mb.add(new DynamicLabel(new Coord2D(Layout.width() -
                 (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
-                MenuElement.Anchor.RIGHT_TOP, Constants.WHITE,
+                MenuElement.Anchor.RIGHT_TOP, Settings.getTheme().getTextLight(),
                 c::getSelectionText, Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
 

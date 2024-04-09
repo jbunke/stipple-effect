@@ -3,8 +3,8 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.awt.*;
@@ -48,8 +48,8 @@ public class ColorSlider extends HorizontalSlider {
     public GameImage drawSliderCore(final int w, final int h) {
         final GameImage sliderCore = new GameImage(w, h);
 
-        final Color light = Constants.WHITE,
-                dark = Constants.ACCENT_BACKGROUND_LIGHT;
+        final Color light = Settings.getTheme().getCheckerboard1(),
+                dark = Settings.getTheme().getCheckerboard2();
 
         final int sectionalW = Layout.SLIDER_OFF_DIM / 4;
         final int sections = (w / sectionalW) + 1;
@@ -74,7 +74,7 @@ public class ColorSlider extends HorizontalSlider {
     @Override
     public Color getSliderBallCoreColor() {
         final GameImage core = new GameImage(1, 1);
-        core.dot(Constants.GREY, 0, 0);
+        core.dot(Settings.getTheme().getButtonBody(), 0, 0);
         core.dot(spectralFunction.apply(getValue()), 0, 0);
         core.free();
 

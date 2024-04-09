@@ -9,6 +9,7 @@ import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.SECursor;
+import com.jordanbunke.stipple_effect.visual.color.SEColors;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -163,8 +164,8 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
         toolContentPreview = new GameImage(w, h);
 
         final boolean reverse = StippleEffect.get().isTimerToggle();
-        final Color a = reverse ? Constants.WHITE : Constants.BLACK,
-                b = reverse ? Constants.BLACK : Constants.WHITE;
+        final Color a = reverse ? SEColors.white() : SEColors.black(),
+                b = reverse ? SEColors.black() : SEColors.white();
         final int offset = StippleEffect.get().getTimerCounter(), altPx = 4,
                 distanceX = bottomRight.x - topLeft.x,
                 distanceY = bottomRight.y - topLeft.y,

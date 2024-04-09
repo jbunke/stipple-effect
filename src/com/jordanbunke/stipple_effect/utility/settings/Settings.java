@@ -12,6 +12,7 @@ import com.jordanbunke.stipple_effect.utility.settings.types.IntSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
+import com.jordanbunke.stipple_effect.visual.color.Theme;
 
 import java.nio.file.Path;
 
@@ -31,21 +32,31 @@ public class Settings {
         // int settings
         CHECKERBOARD_W_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
-                cbw -> StippleEffect.get().getContext().redrawCheckerboard())),
+                cbw -> {
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawCheckerboard);
+                })),
         CHECKERBOARD_H_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
-                cbh -> StippleEffect.get().getContext().redrawCheckerboard())),
+                cbh -> {
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawCheckerboard);
+                })),
         PIXEL_GRID_X_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgx -> {
                     final SEContext c = StippleEffect.get().getContext();
                     c.renderInfo.setPixelGrid(true);
-                    c.redrawPixelGrid();
+
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawPixelGrid);
                 })),
         PIXEL_GRID_Y_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgy -> {
                     final SEContext c = StippleEffect.get().getContext();
                     c.renderInfo.setPixelGrid(true);
-                    c.redrawPixelGrid();
+
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawPixelGrid);
                 })),
         DEFAULT_CANVAS_W_PX(new Setting<>(
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_W)),
@@ -69,6 +80,13 @@ public class Settings {
                 new EnumSettingType<>(SEFonts.Code.class),
                 SEFonts.DEFAULT_FONT, code -> {
                     DialogAssembly.setDialogToProgramSettings();
+                    StippleEffect.get().rebuildAllMenus();
+                })),
+        THEME(new Setting<>(
+                new EnumSettingType<>(Theme.class),
+                Theme.DEFAULT, theme -> {
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawCheckerboard);
                     StippleEffect.get().rebuildAllMenus();
                 }));
 
@@ -235,6 +253,10 @@ public class Settings {
         Code.PROGRAM_FONT.set(fontCode);
     }
 
+    public static void setTheme(final Theme theme) {
+        Code.THEME.set(theme);
+    }
+
     // checkers
     public static boolean checkIsFullscreenOnStartup() {
         return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.check();
@@ -300,6 +322,10 @@ public class Settings {
         return (SEFonts.Code) Code.PROGRAM_FONT.setting.check();
     }
 
+    public static Theme checkTheme() {
+        return (Theme) Code.THEME.setting.check();
+    }
+
     // getters
     public static boolean isFullscreenOnStartup() {
         return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.get();
@@ -347,6 +373,10 @@ public class Settings {
 
     public static SEFonts.Code getProgramFont() {
         return (SEFonts.Code) Code.PROGRAM_FONT.setting.get();
+    }
+
+    public static Theme getTheme() {
+        return (Theme) Code.THEME.setting.get();
     }
 
     public static int getScrollClicks(

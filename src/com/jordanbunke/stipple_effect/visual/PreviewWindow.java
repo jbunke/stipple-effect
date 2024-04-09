@@ -23,6 +23,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.color.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
@@ -177,8 +178,8 @@ public class PreviewWindow implements ProgramContext {
                 lastButton.getRenderPosition().displace(
                         Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
                         -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
-                MenuElement.Anchor.LEFT_TOP, Constants.WHITE, getter,
-                widestCase);
+                MenuElement.Anchor.LEFT_TOP, Settings.getTheme().getTextLight(),
+                getter, widestCase);
     }
 
     private void setZoom(final float zoom) {
@@ -307,7 +308,7 @@ public class PreviewWindow implements ProgramContext {
 
     @Override
     public void render(final GameImage canvas) {
-        canvas.fill(Constants.ACCENT_BACKGROUND_DARK);
+        canvas.fill(Settings.getTheme().getPanelBackground());
 
         renderProject(canvas);
         menu.render(canvas);
@@ -324,7 +325,7 @@ public class PreviewWindow implements ProgramContext {
         final GameImage canvasContents = new GameImage(w + (2 * BORDER),
                 h + (2 * BORDER));
 
-        canvasContents.drawRectangle(Constants.BLACK, 2f, BORDER, BORDER, w, h);
+        canvasContents.drawRectangle(SEColors.black(), 2f, BORDER, BORDER, w, h);
         canvasContents.draw(context.getCheckerboard(), BORDER, BORDER, w, h);
         canvasContents.draw(project, BORDER, BORDER, w, h);
 

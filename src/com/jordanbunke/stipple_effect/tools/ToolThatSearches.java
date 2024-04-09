@@ -182,7 +182,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
     public MenuElementGrouping buildToolOptionsBar() {
         // tolerance label
         final TextLabel toleranceLabel = TextLabel.make(
-                getFirstOptionLabelPosition(), "Tolerance", Constants.WHITE);
+                getFirstOptionLabelPosition(), "Tolerance");
 
         final int SLIDER_MULT = 100;
         final IncrementalRangeElements<Double> tolerance =

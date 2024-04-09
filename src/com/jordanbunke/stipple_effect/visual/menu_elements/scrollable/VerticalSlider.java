@@ -3,8 +3,8 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -29,7 +29,8 @@ public class VerticalSlider extends Slider {
         slider.draw(drawSliderCore(sw, sd), Layout.SLIDER_THINNING, Layout.SLIDER_BALL_DIM / 2);
 
         // slider outline
-        slider.drawRectangle(Constants.BLACK, Layout.BUTTON_BORDER_PX,
+        slider.drawRectangle(Settings.getTheme().getButtonOutline(),
+                Layout.BUTTON_BORDER_PX,
                 Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2),
                 Layout.SLIDER_BALL_DIM / 2,
                 getWidth() - (Layout.BUTTON_BORDER_PX + (2 * Layout.SLIDER_THINNING)), sd

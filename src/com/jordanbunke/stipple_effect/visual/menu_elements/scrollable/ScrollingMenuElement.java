@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 public abstract class ScrollingMenuElement extends MenuElementContainer {
     final ScrollableMenuElement[] menuElements;
@@ -30,7 +30,8 @@ public abstract class ScrollingMenuElement extends MenuElementContainer {
         final int w = getWidth(), h = getHeight();
 
         final GameImage background = new GameImage(w, h);
-        background.fillRectangle(Constants.DARK, 0, 0, w, h);
+        background.fillRectangle(
+                Settings.getTheme().getScrollBackground(), 0, 0, w, h);
         return background.submit();
     }
 

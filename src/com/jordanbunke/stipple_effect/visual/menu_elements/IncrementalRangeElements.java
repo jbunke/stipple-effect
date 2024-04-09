@@ -2,13 +2,13 @@ package com.jordanbunke.stipple_effect.visual.menu_elements;
 
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.setting_group.DoubleToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.FloatToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.IntToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.ToolSettingType;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.util.function.Consumer;
@@ -84,7 +84,8 @@ public class IncrementalRangeElements<R extends Number> {
     ) {
         return new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(slider, false),
-                textY), MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
+                textY), MenuElement.Anchor.LEFT_TOP,
+                Settings.getTheme().getTextLight(),
                 () -> valueFormatter.apply(getter.get()), widestTextCase);
     }
 

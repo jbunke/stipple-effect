@@ -405,7 +405,7 @@ public final class GradientTool extends ToolWithBreadth
         // dithered label
         final TextLabel ditheredLabel = TextLabel.make(
                 new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
-                "Dithered", Constants.WHITE);
+                "Dithered");
 
         // dithered checkbox
         final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
@@ -416,7 +416,7 @@ public final class GradientTool extends ToolWithBreadth
         // shape label
         final TextLabel shapeLabel = TextLabel.make(new Coord2D(
                         Layout.optionsBarNextElementX(ditheredCheckbox, true),
-                        Layout.optionsBarTextY()), "Shape", Constants.WHITE);
+                        Layout.optionsBarTextY()), "Shape");
 
         // shape dropdown
         final DropdownMenu shapeDropdown = DropdownMenu.forToolOptionsBar(
@@ -430,7 +430,7 @@ public final class GradientTool extends ToolWithBreadth
         // bounded label
         final TextLabel boundedLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(shapeDropdown, true),
-                Layout.optionsBarTextY()), "Bounded", Constants.WHITE);
+                Layout.optionsBarTextY()), "Bounded");
 
         // bounded checkbox
         final Checkbox boundedCheckbox = new Checkbox(new Coord2D(
@@ -441,7 +441,7 @@ public final class GradientTool extends ToolWithBreadth
         // masked label
         final TextLabel maskedLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(boundedCheckbox, true),
-                Layout.optionsBarTextY()), "Mask", Constants.WHITE);
+                Layout.optionsBarTextY()), "Mask");
 
         // masked checkbox
         final Checkbox maskedCheckbox = new Checkbox(new Coord2D(
@@ -452,7 +452,7 @@ public final class GradientTool extends ToolWithBreadth
         // contiguous label
         final TextLabel contiguousLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(maskedCheckbox, true),
-                Layout.optionsBarTextY()), "Contiguous", Constants.WHITE);
+                Layout.optionsBarTextY()), "Contiguous");
 
         // contiguous checkbox
         final Checkbox contiguousCheckbox = new Checkbox(new Coord2D(
