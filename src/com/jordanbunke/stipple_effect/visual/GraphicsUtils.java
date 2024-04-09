@@ -75,11 +75,24 @@ public class GraphicsUtils {
                 : checkbox.submit();
     }
 
-    public static GameImage drawTextBox(
+    public static GameImage drawTextbox(
+            final Coord2D dimensions,
+            final String prefix, final String text, final String suffix,
+            final int cursorIndex, final int selectionIndex,
+            final boolean valid, final boolean highlighted, final boolean typing
+    ) {
+        final Color accent = typing ? Constants.HIGHLIGHT_1 : Constants.BLACK,
+                background = valid ? Constants.GREY : Constants.INVALID;
+
+        return drawTextbox(dimensions.x, prefix, text, suffix,
+                cursorIndex, selectionIndex, highlighted, accent, background);
+    }
+
+    public static GameImage drawTextbox(
             final int width,
             final String prefix, final String text, final String suffix,
             final int cursorIndex, final int selectionIndex,
-            final boolean isHighlighted, final Color accentColor,
+            final boolean highlighted, final Color accentColor,
             final Color backgroundColor
     ) {
         final Color mainTextC = textButtonColorFromBackgroundColor(
@@ -153,7 +166,7 @@ public class GraphicsUtils {
                 0, 0, width, height);
 
         // highlighting
-        if (isHighlighted)
+        if (highlighted)
             return drawHighlightedButton(nhi.submit());
         else
             return nhi.submit();

@@ -58,7 +58,8 @@ public class Constants {
                     ACCENT_BACKGROUND_LIGHT.getBlue(), 200),
             HIGHLIGHT_1 = new Color(100, 100, 255),
             HIGHLIGHT_2 = new Color(50, 80, 255, 100),
-            OVERLAY_FILL_C = new Color(50, 80, 255, 50);
+            OVERLAY_FILL_C = new Color(50, 80, 255, 50),
+            TRANSPARENT = new Color(0, 0, 0, 0);
 
     public static final int DEFAULT_CANVAS_W = 32, DEFAULT_CANVAS_H = 32,
             MIN_CANVAS_W = 1, MIN_CANVAS_H = 1, MAX_CANVAS_W = 800, MAX_CANVAS_H = 800,

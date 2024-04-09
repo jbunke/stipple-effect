@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.awt.*;
@@ -46,6 +47,22 @@ public class ColorSlider extends HorizontalSlider {
     @Override
     public GameImage drawSliderCore(final int w, final int h) {
         final GameImage sliderCore = new GameImage(w, h);
+
+        final Color light = Constants.WHITE,
+                dark = Constants.ACCENT_BACKGROUND_LIGHT;
+
+        final int sectionalW = Layout.SLIDER_OFF_DIM / 4;
+        final int sections = (w / sectionalW) + 1;
+
+        for (int x = 0; x < sections; x++) {
+            final Color topC = (x % 2 == 0 ? light : dark),
+                    bottomC = (x % 2 == 0 ? dark : light);
+
+            sliderCore.fillRectangle(topC,
+                    x * sectionalW, 0, sectionalW, h / 2);
+            sliderCore.fillRectangle(bottomC,
+                    x * sectionalW, h / 2, sectionalW, h / 2);
+        }
 
         for (int x = 0; x < w; x++)
             sliderCore.fillRectangle(spectralFunction.apply(

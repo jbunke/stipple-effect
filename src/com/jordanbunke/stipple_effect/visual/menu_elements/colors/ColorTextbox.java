@@ -1,9 +1,12 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 
 import com.jordanbunke.delta_time.error.GameError;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.drawing_functions.TextboxDrawingFunction;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 
 import java.awt.*;
@@ -22,7 +25,7 @@ public class ColorTextbox extends Textbox {
     ) {
         super(position, Layout.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
                 initialText, () -> "", ColorTextbox::validateAsHexCode,
-                setter, getter, HEX_CODE_LENGTH);
+                setter, ColorTextbox.getFDraw(), HEX_CODE_LENGTH);
 
         this.index = index;
         this.getter = getter;
@@ -40,16 +43,41 @@ public class ColorTextbox extends Textbox {
         return new ColorTextbox(position, index, initialText, getter, setter);
     }
 
-    public static void setColorFromHexCode(final String hexCode, final int index) {
+    private static TextboxDrawingFunction getFDraw() {
+        return (dimensions, prefix, text, suffix, cursorIndex,
+                selectionIndex, valid, highlighted, typing) -> {
+            final int width = dimensions.x;
+            final Color accent = typing
+                    ? Constants.HIGHLIGHT_1 : Constants.BLACK,
+                    background = ColorTextbox.getColorFromHexCode(text);
+
+            return GraphicsUtils.drawTextbox(
+                    width, prefix, text, suffix,
+                    cursorIndex, selectionIndex, highlighted,
+                    accent, background);
+        };
+    }
+
+    private static Color getColorFromHexCode(final String hexCode) {
+        if (!validateAsHexCode(hexCode))
+            return Constants.TRANSPARENT;
+
         final int LENGTH_OF_SECTION = 2, R = 0, G = 2, B = 4;
 
         final int r = hexToInt(hexCode.substring(R, R + LENGTH_OF_SECTION)),
                 g = hexToInt(hexCode.substring(G, G + LENGTH_OF_SECTION)),
                 b = hexToInt(hexCode.substring(B, B + LENGTH_OF_SECTION));
 
+        return new Color(r, g, b);
+    }
+
+    public static void setColorFromHexCode(final String hexCode, final int index) {
+        final Color rgb = getColorFromHexCode(hexCode);
+
         final int alpha = StippleEffect.get().getColorAtIndex(index).getAlpha();
 
-        StippleEffect.get().setColorIndexAndColor(index, new Color(r, g, b, alpha));
+        StippleEffect.get().setColorIndexAndColor(index,
+                new Color(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), alpha));
     }
 
     public static int hexToInt(final String hexSequence) {

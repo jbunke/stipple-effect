@@ -782,8 +782,7 @@ public class DialogAssembly {
                 GraphicsUtils.makeStandardTextButton("Import",
                         getDialogContentOffsetFollowingLabel(importTemplatesLabel),
                         () -> StippleEffect.get().openFontTemplateProjects());
-        mb.add(importTemplatesLabel);
-        mb.add(importTemplatesButton);
+        mb.addAll(importTemplatesLabel, importTemplatesButton);
         lines += 1 + LINE_BREAK;
 
         // name
@@ -794,8 +793,7 @@ public class DialogAssembly {
                 () -> "", DialogVals.getFontName(), () -> "",
                 Textbox::validateAsFileName, DialogVals::setFontName,
                 Constants.MAX_NAME_LENGTH);
-        mb.add(nameLabel);
-        mb.add(nameTextbox);
+        mb.addAll(nameLabel, nameTextbox);
         lines++;
 
         // pixel spacing
@@ -805,8 +803,7 @@ public class DialogAssembly {
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
                 DialogVals::setNewFontPixelSpacing,
                 DialogVals::getNewFontPixelSpacing, 2);
-        mb.add(spacingLabel);
-        mb.add(spacingTextbox);
+        mb.addAll(spacingLabel, spacingTextbox);
         // character-specific
         final TextLabel charSpecificLabel =
                 makeDialogRightLabel(spacingLabel, "Character-specific spacing");
@@ -815,8 +812,7 @@ public class DialogAssembly {
                 new ConcreteProperty<>(
                         DialogVals::isCharSpecificSpacing,
                         DialogVals::setCharSpecificSpacing));
-        mb.add(charSpecificLabel);
-        mb.add(charSpecificCheckbox);
+        mb.addAll(charSpecificLabel, charSpecificCheckbox);
         lines += 1 + LINE_BREAK;
 
         // ASCII
@@ -831,9 +827,7 @@ public class DialogAssembly {
                 MenuElement.Anchor.LEFT_TOP, Constants.WHITE,
                 () -> DialogVals.getAsciiStatus().getMessage(),
                 Layout.getDialogWidth());
-        mb.add(asciiLabel);
-        mb.add(asciiButton);
-        mb.add(asciiConfirmation);
+        mb.addAll(asciiLabel, asciiButton, asciiConfirmation);
         lines++;
 
         // latin extended
@@ -858,9 +852,7 @@ public class DialogAssembly {
                 latinExLabel, latinExButton, latinExConfirmation);
         final GatewayMenuElement latinExGateway = new GatewayMenuElement(
                 latinExContent, DialogVals::hasLatinEx);
-        mb.add(latinExQuestion);
-        mb.add(latinExCheckbox);
-        mb.add(latinExGateway);
+        mb.addAll(latinExQuestion, latinExCheckbox, latinExGateway);
         lines += 2 + LINE_BREAK;
 
         // partial precondition
@@ -1737,7 +1729,7 @@ public class DialogAssembly {
     ) {
         return new Textbox(offsetFunction.apply(label), width,
                 MenuElement.Anchor.LEFT_TOP, prefixGetter, initial, suffixGetter,
-                textValidator, setter, () -> Constants.GREY, length);
+                textValidator, setter, length);
     }
 
     private static Textbox makeDialogNameTextBox(
