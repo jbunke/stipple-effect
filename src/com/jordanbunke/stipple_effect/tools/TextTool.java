@@ -414,7 +414,7 @@ public final class TextTool extends Tool {
                         Layout.optionsBarTextY()), "Font");
 
         // font dropdown
-        final DropdownMenu fontDropdown = DropdownMenu.forToolOptionsBar(
+        final Dropdown fontDropdown = Dropdown.forToolOptionsBar(
                 Layout.optionsBarNextElementX(fontLabel, false),
                 fonts.stream().map(TextToolFont::name).toArray(String[]::new),
                 fonts.stream().map(ttf -> (Runnable) () ->

@@ -15,7 +15,7 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.DropdownMenu;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
@@ -419,7 +419,7 @@ public final class GradientTool extends ToolWithBreadth
                         Layout.optionsBarTextY()), "Shape");
 
         // shape dropdown
-        final DropdownMenu shapeDropdown = DropdownMenu.forToolOptionsBar(
+        final Dropdown shapeDropdown = Dropdown.forToolOptionsBar(
                 Layout.optionsBarNextElementX(shapeLabel, false),
                 EnumUtils.stream(Shape.class).map(EnumUtils::formattedName)
                         .toArray(String[]::new),

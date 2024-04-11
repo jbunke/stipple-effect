@@ -106,7 +106,7 @@ public class DialogAssembly {
 
         // save as type dropdown
         final ProjectInfo.SaveType[] saveOptions = c.projectInfo.getSaveOptions();
-        final DropdownMenu saveAsTypeDropdown = DropdownMenu.forDialog(
+        final Dropdown saveAsTypeDropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(saveAsTypeLabel),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
                 Arrays.stream(saveOptions)
@@ -321,7 +321,7 @@ public class DialogAssembly {
         final TextLabel resizeTypeLabel =
                 TextLabel.make(textBelowPos(preserveAspectRatioLabel),
                         "Resize by:");
-        final DropdownMenu resizeByDropdown = DropdownMenu.forDialog(
+        final Dropdown resizeByDropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(resizeTypeLabel),
                 EnumUtils.stream(DialogVals.ResizeBy.class)
                         .map(DialogVals.ResizeBy::toString)
@@ -1114,7 +1114,7 @@ public class DialogAssembly {
         final TextLabel sortLabel = makeDialogLeftLabel(0, "Sort colors by:"),
                 backwardsLabel = TextLabel.make(textBelowPos(sortLabel),
                         "Backwards?");
-        final DropdownMenu sortDropdown = DropdownMenu.forDialog(
+        final Dropdown sortDropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(sortLabel),
                 Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
                 EnumUtils.stream(PaletteSorter.class)
@@ -1366,7 +1366,7 @@ public class DialogAssembly {
         DialogVals.setScope(vs[0]);
 
         final TextLabel label = makeDialogLeftLabel(0, "Scope:");
-        final DropdownMenu dropdown = DropdownMenu.forDialog(
+        final Dropdown dropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(label),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
                 Arrays.stream(vs)
@@ -1545,7 +1545,7 @@ public class DialogAssembly {
         // X-axis remainder
         final TextLabel xRemainderLabel = TextLabel.make(
                 textBelowPos(frameWidthLabel), "X-axis remainder:");
-        final DropdownMenu xRemainderDropdown = DropdownMenu.forDialog(
+        final Dropdown xRemainderDropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(xRemainderLabel),
                 remainderLabels, new Runnable[] {
                         () -> DialogVals.setTruncateSplitX(false),
@@ -1559,7 +1559,7 @@ public class DialogAssembly {
         // Y-axis remainder
         final TextLabel yRemainderLabel = makeDialogRightLabel(
                 xRemainderLabel, "Y-axis remainder:");
-        final DropdownMenu yRemainderDropdown = DropdownMenu.forDialog(
+        final Dropdown yRemainderDropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(yRemainderLabel),
                 remainderLabels, new Runnable[] {
                         () -> DialogVals.setTruncateSplitY(false),
@@ -1577,7 +1577,7 @@ public class DialogAssembly {
         final TextLabel sequenceLabel = TextLabel.make(
                 textBelowPos(referenceLabel, 1),
                 "Sequence order:");
-        final DropdownMenu sequenceDropdown = DropdownMenu.forDialog(
+        final Dropdown sequenceDropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(sequenceLabel),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
                         .map(EnumUtils::formattedName).toArray(String[]::new),
@@ -2012,7 +2012,7 @@ public class DialogAssembly {
                                 textBelowPos(pixelGridLimits1),
                                 "the canvas due to performance constraints.");
 
-                final DropdownMenu fontDropdown = DropdownMenu.forDialog(
+                final Dropdown fontDropdown = Dropdown.forDialog(
                         getDialogContentOffsetFollowingLabel(fontLabel),
                         EnumUtils.stream(SEFonts.Code.class)
                                 .map(SEFonts.Code::forButtonText)
@@ -2022,7 +2022,7 @@ public class DialogAssembly {
                                         .setProgramFont(code))
                                 .toArray(Runnable[]::new),
                         () -> Settings.checkProgramFont().ordinal()),
-                        themeDropdown = DropdownMenu.forDialog(
+                        themeDropdown = Dropdown.forDialog(
                                 getDialogContentOffsetFollowingLabel(themeLabel),
                                 EnumUtils.stream(Theme.class)
                                         .map(Theme::forButtonText)
