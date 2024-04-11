@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -18,8 +17,7 @@ public class HorizontalSlider extends Slider {
             final boolean canSetImplicitly
     ) {
         super(position, new Coord2D(width, Layout.SLIDER_OFF_DIM), anchor,
-                minValue, maxValue, getter, setter,
-                canSetImplicitly, c -> c.x, MenuElement::getWidth);
+                minValue, maxValue, getter, setter, canSetImplicitly);
     }
 
     public HorizontalSlider(
@@ -49,5 +47,15 @@ public class HorizontalSlider extends Slider {
     @Override
     public Coord2D getSliderBallRenderPos(final int sliderBallRenderDim) {
         return new Coord2D(sliderBallRenderDim, 0);
+    }
+
+    @Override
+    protected int getCoordDimension(final Coord2D position) {
+        return position.x;
+    }
+
+    @Override
+    protected int getSizeDimension() {
+        return getWidth();
     }
 }

@@ -89,6 +89,7 @@ public class IconCodes {
     public static final String NO_ICON_PREFIX = "__";
 
     public static final String
+            ABOUT = NO_ICON_PREFIX + "about",
             CHANGELOG = NO_ICON_PREFIX + "changelog",
             ROADMAP = NO_ICON_PREFIX + "roadmap",
             GENERAL = NO_ICON_PREFIX + "general",

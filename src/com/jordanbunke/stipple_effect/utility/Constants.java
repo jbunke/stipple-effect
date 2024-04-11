@@ -6,7 +6,7 @@ import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import java.nio.file.Path;
 
 public class Constants {
-    public static final String ABOUT = "about",
+    public static final String
             NAME_CODE = "name", VERSION_CODE = "version",
             IS_DEVBUILD_CODE = "devbuild",
             NATIVE_STANDARD_CODE = "native_standard",

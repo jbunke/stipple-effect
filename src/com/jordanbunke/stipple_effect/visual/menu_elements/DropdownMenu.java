@@ -6,12 +6,12 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -27,7 +27,7 @@ public class DropdownMenu extends MenuElement {
     private final String[] labels;
 
     private SimpleToggleMenuButton ddButton;
-    private final VerticalScrollingMenuElement ddContainer;
+    private final VerticalScrollBox ddContainer;
 
     public DropdownMenu(
             final Coord2D position, final int width, final Anchor anchor,
@@ -86,7 +86,7 @@ public class DropdownMenu extends MenuElement {
                 labels, behaviours, initialIndexFunction);
     }
 
-    private VerticalScrollingMenuElement makeContainer(
+    private VerticalScrollBox makeContainer(
             final Coord2D position, final Coord2D dimensions,
             final Runnable[] behaviours
     ) {
@@ -109,10 +109,10 @@ public class DropdownMenu extends MenuElement {
                     nhi, GraphicsUtils.drawHighlightedButton(nhi));
         }
 
-        return new VerticalScrollingMenuElement(position, dimensions,
+        return new VerticalScrollBox(position, dimensions,
                 Arrays.stream(scrollables)
-                        .map(ScrollableMenuElement::new)
-                        .toArray(ScrollableMenuElement[]::new),
+                        .map(Scrollable::new)
+                        .toArray(Scrollable[]::new),
                 position.y + (size * Layout.STD_TEXT_BUTTON_H), 0);
     }
 

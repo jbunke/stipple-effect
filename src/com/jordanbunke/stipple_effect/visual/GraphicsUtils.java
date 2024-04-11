@@ -53,6 +53,15 @@ public class GraphicsUtils {
                 : Settings.getTheme().getButtonOutline();
     }
 
+    public static GameImage drawScrollBoxBackground(
+            final int w, final int h
+    ) {
+        final GameImage background = new GameImage(w, h);
+        background.fillRectangle(
+                Settings.getTheme().getScrollBackground(), 0, 0, w, h);
+        return background.submit();
+    }
+
     public static GameImage drawCheckbox(
             final boolean isHighlighted, final boolean isChecked
     ) {

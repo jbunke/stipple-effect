@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -27,9 +28,8 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollingMenuElement;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -116,10 +116,10 @@ public class MenuAssembly {
 
         // project previews
 
-        final int amount = StippleEffect.get().getContexts().size(), elementsPerProject = 2,
+        final int amount = StippleEffect.get().getContexts().size(),
                 selectedIndex = StippleEffect.get().getContextIndex();
 
-        final ScrollableMenuElement[] projectElements = new ScrollableMenuElement[amount * elementsPerProject];
+        final MenuBuilder toScroll = new MenuBuilder();
 
         final Coord2D firstPos = Layout.getProjectsPosition()
                 .displace(Layout.getSegmentContentDisplacement());
@@ -146,7 +146,7 @@ public class MenuAssembly {
 
             offsetX += paddedTextWidth + Layout.BUTTON_OFFSET;
 
-            projectElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
+            toScroll.add(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
                     i, () -> StippleEffect.get().getContextIndex(),
                     s -> StippleEffect.get().setContextIndex(s)));
@@ -166,8 +166,7 @@ public class MenuAssembly {
                     StippleEffect.get().removeContext(index);
             };
 
-            projectElements[amount + i] = new ScrollableMenuElement(
-                    IconButton.make(IconCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
+            toScroll.add(IconButton.make(IconCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
 
             cumulativeWidth += offsetX;
             realRightX = cpPos.x + Layout.BUTTON_DIM;
@@ -176,9 +175,13 @@ public class MenuAssembly {
                 initialOffsetX = pos.x - firstPos.x;
         }
 
-        mb.add(new HorizontalScrollingMenuElement(firstPos, new Coord2D(
-                Layout.getProjectScrollWindowWidth(), Layout.TOP_PANEL_SCROLL_WINDOW_H),
-                projectElements, realRightX, initialOffsetX));
+        mb.add(new HorizontalScrollBox(
+                firstPos, new Coord2D(Layout.getProjectScrollWindowWidth(),
+                Layout.TOP_PANEL_SCROLL_WINDOW_H),
+                Arrays.stream(toScroll.build().getMenuElements())
+                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                realRightX, initialOffsetX)
+        );
 
         return mb.build();
     }
@@ -275,11 +278,9 @@ public class MenuAssembly {
 
         // frame content
 
-        final int amount = c.getState().getFrameCount(),
-                elementsPerFrame = 1;
+        final int amount = c.getState().getFrameCount();
 
-        final ScrollableMenuElement[] frameElements =
-                new ScrollableMenuElement[amount * elementsPerFrame];
+        final MenuBuilder frameElements = new MenuBuilder();
 
         final Coord2D firstPos = Layout.getFramesPosition()
                 .displace(Layout.getSegmentContentDisplacement());
@@ -300,18 +301,21 @@ public class MenuAssembly {
                     i * (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET), 0),
                     dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
 
-            frameElements[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
+            frameElements.add(new SelectableListItemButton(pos, dims,
+                    MenuElement.Anchor.LEFT_TOP,
+                    baseImage, highlightedImage, selectedImage,
                     i, () -> c.getState().getFrameIndex(),
-                    s -> c.getState().setFrameIndex(s)
-            ));
+                    s -> c.getState().setFrameIndex(s)));
 
             realRightX = pos.x + dims.x;
         }
 
-        mb.add(new HorizontalScrollingMenuElement(firstPos, new Coord2D(
-                Layout.getFrameScrollWindowWidth(), Layout.TOP_PANEL_SCROLL_WINDOW_H),
-                frameElements, realRightX, frameButtonXDisplacement()));
+        mb.add(new HorizontalScrollBox(
+                firstPos, new Coord2D(Layout.getFrameScrollWindowWidth(),
+                Layout.TOP_PANEL_SCROLL_WINDOW_H),
+                Arrays.stream(frameElements.build().getMenuElements())
+                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                realRightX, frameButtonXDisplacement()));
 
         return mb.build();
     }
@@ -396,9 +400,9 @@ public class MenuAssembly {
         // layer content
 
         final List<SELayer> layers = c.getState().getLayers();
-        final int amount = layers.size(), elementsPerLayer = 5;
+        final int amount = layers.size();
 
-        final ScrollableMenuElement[] layerButtons = new ScrollableMenuElement[amount * elementsPerLayer];
+        final MenuBuilder layerButtons = new MenuBuilder();
 
         final Coord2D firstPos = Layout.getLayersPosition()
                 .displace(Layout.getSegmentContentDisplacement());
@@ -423,11 +427,11 @@ public class MenuAssembly {
                     (amount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC),
                     dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
 
-            layerButtons[i] = new ScrollableMenuElement(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
+            layerButtons.add(new SelectableListItemButton(pos, dims,
+                    MenuElement.Anchor.LEFT_TOP,
+                    baseImage, highlightedImage, selectedImage,
                     i, () -> c.getState().getLayerEditIndex(),
-                    s -> c.getState().setLayerEditIndex(s)
-            ));
+                    s -> c.getState().setLayerEditIndex(s)));
 
             final int index = i;
 
@@ -435,33 +439,32 @@ public class MenuAssembly {
             final Coord2D vtPos = pos.displace(
                     Layout.LAYER_BUTTON_W + Layout.BUTTON_OFFSET,
                     (Layout.STD_TEXT_BUTTON_H / 2)  - (Layout.BUTTON_DIM / 2));
-            layerButtons[amount + i] = new ScrollableMenuElement(
-                    new LayerVisibilityButton(vtPos, index));
+            layerButtons.add(new LayerVisibilityButton(vtPos, index));
 
             // frames linked toggle
             final Coord2D flPos = vtPos.displace(Layout.BUTTON_INC, 0);
-            layerButtons[(2 * amount) + i] =
-                    new ScrollableMenuElement(generateFramesLinkedToggle(index, flPos));
+            layerButtons.add(generateFramesLinkedToggle(index, flPos));
 
             // onion skin toggle
             final Coord2D onionPos = vtPos.displace(Layout.BUTTON_INC * 2, 0);
-            layerButtons[(3 * amount) + i] =
-                    new ScrollableMenuElement(generateOnionSkinToggle(index, onionPos));
+            layerButtons.add(generateOnionSkinToggle(index, onionPos));
 
             // layer settings
             final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
-            layerButtons[(4 * amount) + i] = new ScrollableMenuElement(
-                    IconButton.make(IconCodes.LAYER_SETTINGS, lsPos, () ->
-                            DialogAssembly.setDialogToLayerSettings(index)));
+            layerButtons.add(IconButton.make(IconCodes.LAYER_SETTINGS, lsPos,
+                    () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + dims.y;
         }
 
         final int initialOffsetY = layerButtonYDisplacement(amount);
 
-        mb.add(new VerticalScrollingMenuElement(firstPos, new Coord2D(
-                Layout.VERT_SCROLL_WINDOW_W, Layout.getVertScrollWindowHeight()),
-                layerButtons, realBottomY, initialOffsetY));
+        mb.add(new VerticalScrollBox(
+                firstPos, new Coord2D(Layout.VERT_SCROLL_WINDOW_W,
+                Layout.getVertScrollWindowHeight()),
+                Arrays.stream(layerButtons.build().getMenuElements())
+                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                realBottomY, initialOffsetY));
 
         return mb.build();
     }
@@ -743,10 +746,10 @@ public class MenuAssembly {
                 buttons.add(new PaletteColorButton(pos, colors[i], s.getSelectedPalette()));
             }
 
-            mb.add(new VerticalScrollingMenuElement(
+            mb.add(new VerticalScrollBox(
                     container, new Coord2D(contentWidth, height),
-                    buttons.stream().map(ScrollableMenuElement::new)
-                            .toArray(ScrollableMenuElement[]::new),
+                    buttons.stream().map(Scrollable::new)
+                            .toArray(Scrollable[]::new),
                     container.displace(0, (colors.length / fitsOnLine) *
                             Layout.PALETTE_DIMS.y).y, 0));
         }

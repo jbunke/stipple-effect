@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.PlaceholderMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
@@ -38,8 +39,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.ScrollableMenuElement;
-import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollingMenuElement;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -1224,7 +1224,7 @@ public class DialogAssembly {
         });
 
         // decision logic
-        final Map<DialogVals.SettingScreen, VerticalScrollingMenuElement>
+        final Map<DialogVals.SettingScreen, VerticalScrollBox>
                 settingScreens = new HashMap<>();
 
         for (DialogVals.SettingScreen settingScreen : DialogVals.SettingScreen.values()) {
@@ -1832,7 +1832,7 @@ public class DialogAssembly {
                 .displace(preceding.getWidth() + Layout.CONTENT_BUFFER_PX, 0);
     }
 
-    private static VerticalScrollingMenuElement assembleScroller(
+    private static VerticalScrollBox assembleScroller(
             final DialogVals.SettingScreen settingScreen
     ) {
         final MenuBuilder mb = new MenuBuilder();
@@ -2115,13 +2115,13 @@ public class DialogAssembly {
         final int realBottomY = bottomLabel.getRenderPosition().y +
                 bottomLabel.getHeight() + Layout.STD_TEXT_BUTTON_H;
 
-        return new VerticalScrollingMenuElement(scrollerPos, scrollerDims,
-                Arrays.stream(mb.build().getMenuElements()).map(
-                        ScrollableMenuElement::new).toArray(
-                                ScrollableMenuElement[]::new), realBottomY, 0);
+        return new VerticalScrollBox(scrollerPos, scrollerDims,
+                Arrays.stream(mb.build().getMenuElements())
+                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                realBottomY, 0);
     }
 
-    private static VerticalScrollingMenuElement assembleScroller(
+    private static VerticalScrollBox assembleScroller(
             final DialogVals.InfoScreen infoScreen, final int scrollerEndY
     ) {
         final int dialogW = (int)(Layout.width() * 0.7),
@@ -2144,7 +2144,7 @@ public class DialogAssembly {
 
         final int deltaBottomY = switch (infoScreen) {
             case ABOUT -> assembleInfoScreenContents(
-                    new String[] { Constants.ABOUT }, new String[] { "" },
+                    new String[] { IconCodes.ABOUT }, new String[] { "" },
                     contentAssembler, contentStart, initialbottomY
             );
             case PROJECT -> assembleProjectInfoScreenContents(
@@ -2189,15 +2189,15 @@ public class DialogAssembly {
                     contentAssembler, contentStart, initialbottomY);
         };
 
-        final ScrollableMenuElement[] scrollingElements =
-                contentAssembler.stream().map(ScrollableMenuElement::new)
-                        .toArray(ScrollableMenuElement[]::new);
+        final Scrollable[] scrollingElements =
+                contentAssembler.stream()
+                        .map(Scrollable::new).toArray(Scrollable[]::new);
 
         final Coord2D wrapperDims = new Coord2D(dialogW - (2 * Layout.BUTTON_BORDER_PX),
                 scrollerEndY - (contentStart.y + Layout.TEXT_Y_OFFSET));
 
         // assemble contents into scrolling element
-        return new VerticalScrollingMenuElement(contentStart.displace(
+        return new VerticalScrollBox(contentStart.displace(
                 -Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET), wrapperDims,
                 scrollingElements, initialbottomY + deltaBottomY +
                 contentStart.y, 0);
@@ -2504,7 +2504,7 @@ public class DialogAssembly {
                 background.getHeight()) - ((2 * Layout.CONTENT_BUFFER_PX) +
                 baseImage.getHeight());
 
-        final Map<DialogVals.InfoScreen, VerticalScrollingMenuElement>
+        final Map<DialogVals.InfoScreen, VerticalScrollBox>
                 infoScreens = new HashMap<>();
 
         for (DialogVals.InfoScreen infoScreen : DialogVals.InfoScreen.values()) {
