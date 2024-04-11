@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.AbstractSlider;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -20,8 +21,8 @@ public abstract class Slider extends AbstractSlider {
             final int minValue, final int maxValue, final Supplier<Integer> getter,
             final Consumer<Integer> setter, final boolean canSetImplicitly
     ) {
-        super(position, dimensions, anchor,
-                minValue, maxValue, getter, setter, canSetImplicitly,
+        super(position, dimensions, anchor, minValue, maxValue,
+                new ConcreteProperty<>(getter, setter), canSetImplicitly,
                 Layout.SLIDER_BALL_DIM);
     }
 
