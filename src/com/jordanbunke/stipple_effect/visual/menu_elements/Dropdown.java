@@ -4,7 +4,9 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.AbstractDropdown;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractOneOfDropdown;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownBehaviour;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -15,18 +17,37 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalSc
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-public class Dropdown extends AbstractDropdown {
+public class Dropdown extends AbstractOneOfDropdown {
     public static final int DEFAULT_RENDER_ORDER = 1;
+
+    private final int dropdownAllowanceY;
 
     public Dropdown(
             final Coord2D position, final int width, final Anchor anchor,
-            final int dropDownHAllowance, final int renderOrder,
+            final int dropdownAllowanceY, final int renderOrder,
             final String[] labels, final Runnable[] behaviours,
             final Supplier<Integer> initialIndexFunction
     ) {
-        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H), anchor,
-                dropDownHAllowance, Layout.STD_TEXT_BUTTON_H,
-                renderOrder, labels, behaviours, initialIndexFunction);
+        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
+                anchor, renderOrder, composeItems(labels, behaviours),
+                initialIndexFunction);
+
+        this.dropdownAllowanceY = dropdownAllowanceY;
+
+        make();
+    }
+
+    private static DropdownItem[] composeItems(
+            final String[] labels, final Runnable[] behaviours
+    ) {
+        assert labels.length == behaviours.length;
+
+        final DropdownItem[] items = new DropdownItem[labels.length];
+
+        for (int i = 0; i < items.length; i++)
+            items[i] = new DropdownBehaviour(labels[i], behaviours[i]);
+
+        return items;
     }
 
     public static Dropdown forDialog(
@@ -42,9 +63,8 @@ public class Dropdown extends AbstractDropdown {
             final String[] labels, final Runnable[] behaviours,
             final Supplier<Integer> initialIndexFunction
     ) {
-        return new Dropdown(pos, width,
-                MenuElement.Anchor.LEFT_TOP, Layout.height() / 5,
-                DEFAULT_RENDER_ORDER,
+        return new Dropdown(pos, width, MenuElement.Anchor.LEFT_TOP,
+                Layout.height() / 5, DEFAULT_RENDER_ORDER,
                 labels, behaviours, initialIndexFunction);
     }
 
@@ -62,10 +82,7 @@ public class Dropdown extends AbstractDropdown {
     }
 
     @Override
-    protected VerticalScrollBox makeDDContainer(
-            final Coord2D position, final int dropdownAllowanceY,
-            final int heightPerOption, final Runnable[] behaviours
-    ) {
+    protected VerticalScrollBox makeDDContainer(final Coord2D position) {
         final int size = getSize();
         final MenuElement[] scrollables = new MenuElement[size];
 
@@ -81,13 +98,12 @@ public class Dropdown extends AbstractDropdown {
             scrollables[i] = new SimpleMenuButton(
                     position.displace(0, i * Layout.STD_TEXT_BUTTON_H),
                     new Coord2D(buttonWidth, Layout.STD_TEXT_BUTTON_H),
-                    Anchor.LEFT_TOP, true,
-                    () -> onSelection(index, behaviours[index]),
+                    Anchor.LEFT_TOP, true, () -> select(index),
                     nhi, GraphicsUtils.drawHighlightedButton(nhi));
         }
 
         final Coord2D dimensions = new Coord2D(getWidth(),
-                Math.min(dropdownAllowanceY, heightPerOption * size));
+                Math.min(dropdownAllowanceY, Layout.STD_TEXT_BUTTON_H * size));
 
         return new VerticalScrollBox(position, dimensions,
                 Arrays.stream(scrollables)
@@ -114,5 +130,10 @@ public class Dropdown extends AbstractDropdown {
                 getAnchor(), true, bases, highlighted,
                 new Runnable[] { () -> {}, () -> {} },
                 () -> isDroppedDown() ? 1 : 0, this::toggleDropDown);
+    }
+
+    @Override
+    protected Coord2D contentsDisplacement() {
+        return new Coord2D(0, getHeight());
     }
 }

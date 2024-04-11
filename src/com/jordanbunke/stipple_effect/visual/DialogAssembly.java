@@ -1921,7 +1921,7 @@ public class DialogAssembly {
                                 frameAffixExample, prefixTextbox, suffixTextbox);
 
                 // update as new settings are added to category
-                yield suffixLabel;
+                yield frameAffixExample;
             }
             case CONTROLS -> {
                 final TextLabel scrollDirectionLabel = makeDialogLeftLabel(
