@@ -4,9 +4,8 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractOneOfDropdown;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownBehaviour;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractDropdownList;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -17,7 +16,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalSc
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-public class Dropdown extends AbstractOneOfDropdown {
+public class Dropdown extends AbstractDropdownList {
     public static final int DEFAULT_RENDER_ORDER = 1;
 
     private final int dropdownAllowanceY;
@@ -37,15 +36,15 @@ public class Dropdown extends AbstractOneOfDropdown {
         make();
     }
 
-    private static DropdownItem[] composeItems(
+    private static SimpleItem[] composeItems(
             final String[] labels, final Runnable[] behaviours
     ) {
         assert labels.length == behaviours.length;
 
-        final DropdownItem[] items = new DropdownItem[labels.length];
+        final SimpleItem[] items = new SimpleItem[labels.length];
 
         for (int i = 0; i < items.length; i++)
-            items[i] = new DropdownBehaviour(labels[i], behaviours[i]);
+            items[i] = new SimpleItem(labels[i], behaviours[i]);
 
         return items;
     }
