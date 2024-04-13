@@ -17,7 +17,6 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.Version;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
@@ -374,8 +373,7 @@ public class StippleEffect implements ProgramContext {
         mousePos = eventLogger.getAdjustedMousePosition();
 
         if (dialog == null) {
-            if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
-                    .orElse(Boolean.FALSE) instanceof Boolean b && !b)
+            if (!Permissions.isTyping())
                 processNonStateKeyPresses(eventLogger);
 
             // bottom bar

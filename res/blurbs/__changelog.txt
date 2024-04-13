@@ -10,6 +10,7 @@ Added:
     > Added "Minimalist" theme
     > Added "Bunkering" theme
 > Added transparency checkerboard to the color slider core
+> Dialog menus can now be closed by pressing {Enter} if the precondition is passing
 
 Fixed:
 > Bug: The dynamic label showing an example file name for the prefix and suffix doesn't update
