@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuEleme
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -65,8 +66,7 @@ public class GraphicsUtils {
     public static GameImage drawCheckbox(
             final boolean isHighlighted, final boolean isChecked
     ) {
-        final Coord2D dims = Layout.ICON_DIMS;
-        final int w = dims.x, h = dims.y;
+        final int w = Layout.ICON_DIMS.width(), h = Layout.ICON_DIMS.height();
 
         final GameImage checkbox = new GameImage(w, h);
         checkbox.fillRectangle(Settings.getTheme().getButtonBody(), 0, 0, w, h);
@@ -247,7 +247,7 @@ public class GraphicsUtils {
     ) {
         final GameImage base =
                 drawTextButton(Layout.STD_TEXT_BUTTON_W, text, false);
-        return new SimpleMenuButton(pos, new Coord2D(Layout.STD_TEXT_BUTTON_W,
+        return new SimpleMenuButton(pos, new Bounds2D(Layout.STD_TEXT_BUTTON_W,
                 Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
                 true, onClick, base, drawHighlightedButton(base));
     }
@@ -260,7 +260,7 @@ public class GraphicsUtils {
                 .getWidth() + Layout.CONTENT_BUFFER_PX;
 
         final GameImage base = drawTextButton(w, text, false);
-        return new SimpleMenuButton(pos, new Coord2D(w,
+        return new SimpleMenuButton(pos, new Bounds2D(w,
                 Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
                 true, onClick, base, drawHighlightedButton(base));
     }
@@ -436,8 +436,7 @@ public class GraphicsUtils {
     ) {
         final IconButton icon = IconButton.make(iconID, position, behaviour);
         final StaticMenuElement stub = new StaticMenuElement(position,
-                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_TOP,
+                Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
                 greyscaleVersionOf(loadIcon(iconID)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
@@ -452,8 +451,7 @@ public class GraphicsUtils {
         final IconToggleButton icon = IconToggleButton.make(position,
                 codes, behaviours, updateIndexLogic, global);
         final StaticMenuElement stub = new StaticMenuElement(position,
-                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_TOP,
+                Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
                 greyscaleVersionOf(loadIcon(stubIconCode)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);

@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -14,7 +15,7 @@ public class VerticalSlider extends Slider {
             final int minValue, final int maxValue,
             final Supplier<Integer> getter, final Consumer<Integer> setter
     ) {
-        super(position, new Coord2D(Layout.SLIDER_OFF_DIM, height), anchor,
+        super(position, new Bounds2D(Layout.SLIDER_OFF_DIM, height), anchor,
                 minValue, maxValue, getter, setter, true);
     }
 

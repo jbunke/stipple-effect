@@ -10,6 +10,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButt
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
@@ -141,8 +142,9 @@ public class MenuAssembly {
 
             int offsetX = 0;
 
-            final Coord2D pos = firstPos.displace(cumulativeWidth, 0),
-                    dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
+            final Coord2D pos = firstPos.displace(cumulativeWidth, 0);
+            final Bounds2D dims = new Bounds2D(baseImage.getWidth(),
+                    baseImage.getHeight());
 
             offsetX += paddedTextWidth + Layout.BUTTON_OFFSET;
 
@@ -175,13 +177,13 @@ public class MenuAssembly {
                 initialOffsetX = pos.x - firstPos.x;
         }
 
-        mb.add(new HorizontalScrollBox(
-                firstPos, new Coord2D(Layout.getProjectScrollWindowWidth(),
-                Layout.TOP_PANEL_SCROLL_WINDOW_H),
+        mb.add(new HorizontalScrollBox(firstPos,
+                new Bounds2D(Layout.getProjectScrollWindowWidth(),
+                        Layout.TOP_PANEL_SCROLL_WINDOW_H),
                 Arrays.stream(toScroll.build().getMenuElements())
-                        .map(Scrollable::new).toArray(Scrollable[]::new),
-                realRightX, initialOffsetX)
-        );
+                        .map(Scrollable::new)
+                        .toArray(Scrollable[]::new),
+                realRightX, initialOffsetX));
 
         return mb.build();
     }
@@ -298,8 +300,8 @@ public class MenuAssembly {
                                     String.valueOf(i + 1), true);
 
             final Coord2D pos = firstPos.displace(
-                    i * (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET), 0),
-                    dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
+                    i * (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET), 0);
+            final Bounds2D dims = new Bounds2D(baseImage.getWidth(), baseImage.getHeight());
 
             frameElements.add(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP,
@@ -307,14 +309,15 @@ public class MenuAssembly {
                     i, () -> c.getState().getFrameIndex(),
                     s -> c.getState().setFrameIndex(s)));
 
-            realRightX = pos.x + dims.x;
+            realRightX = pos.x + dims.width();
         }
 
-        mb.add(new HorizontalScrollBox(
-                firstPos, new Coord2D(Layout.getFrameScrollWindowWidth(),
-                Layout.TOP_PANEL_SCROLL_WINDOW_H),
+        mb.add(new HorizontalScrollBox(firstPos,
+                new Bounds2D(Layout.getFrameScrollWindowWidth(),
+                        Layout.TOP_PANEL_SCROLL_WINDOW_H),
                 Arrays.stream(frameElements.build().getMenuElements())
-                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                        .map(Scrollable::new)
+                        .toArray(Scrollable[]::new),
                 realRightX, frameButtonXDisplacement()));
 
         return mb.build();
@@ -424,8 +427,8 @@ public class MenuAssembly {
                             .drawTextButton(Layout.LAYER_BUTTON_W, text, true);
 
             final Coord2D pos = firstPos.displace(0,
-                    (amount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC),
-                    dims = new Coord2D(baseImage.getWidth(), baseImage.getHeight());
+                    (amount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
+            final Bounds2D dims = new Bounds2D(baseImage.getWidth(), baseImage.getHeight());
 
             layerButtons.add(new SelectableListItemButton(pos, dims,
                     MenuElement.Anchor.LEFT_TOP,
@@ -454,14 +457,14 @@ public class MenuAssembly {
             layerButtons.add(IconButton.make(IconCodes.LAYER_SETTINGS, lsPos,
                     () -> DialogAssembly.setDialogToLayerSettings(index)));
 
-            realBottomY = pos.y + dims.y;
+            realBottomY = pos.y + dims.height();
         }
 
         final int initialOffsetY = layerButtonYDisplacement(amount);
 
-        mb.add(new VerticalScrollBox(
-                firstPos, new Coord2D(Layout.VERT_SCROLL_WINDOW_W,
-                Layout.getVertScrollWindowHeight()),
+        mb.add(new VerticalScrollBox(firstPos,
+                new Bounds2D(Layout.VERT_SCROLL_WINDOW_W,
+                        Layout.getVertScrollWindowHeight()),
                 Arrays.stream(layerButtons.build().getMenuElements())
                         .map(Scrollable::new).toArray(Scrollable[]::new),
                 realBottomY, initialOffsetY));
@@ -592,12 +595,12 @@ public class MenuAssembly {
             mb.add(colorTextBox);
 
             final int index = i;
-            final Coord2D dims = new Coord2D(colorTextBox.getWidth(),
+            final Bounds2D dims = new Bounds2D(colorTextBox.getWidth(),
                     colorTextBox.getHeight());
             final GatewayMenuElement highlight = new GatewayMenuElement(
                     new StaticMenuElement(textBoxPos, dims, MenuElement.Anchor.CENTRAL_TOP,
                             GraphicsUtils.drawSelectedTextBox(
-                                    new GameImage(dims.x, dims.y))),
+                                    new GameImage(dims.width(), dims.height()))),
                     () -> StippleEffect.get().getColorIndex() == index);
             mb.add(highlight);
         }
@@ -720,7 +723,7 @@ public class MenuAssembly {
                 palettes.stream().map(Palette::getName).toArray(String[]::new),
                 behaviours.toArray(Runnable[]::new), () -> index)
                 : new StaticMenuElement(dropdownPos,
-                new Coord2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
+                new Bounds2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
                 MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
                 contentWidth, "No palettes", false,
                 Settings.getTheme().getStubButtonBody())));
@@ -730,7 +733,7 @@ public class MenuAssembly {
             final Coord2D container = dropdownPos.displace(0,
                     Layout.STD_TEXT_BUTTON_INC);
             final int fitsOnLine = (contentWidth - Layout.SLIDER_OFF_DIM) /
-                    Layout.PALETTE_DIMS.x;
+                    Layout.PALETTE_DIMS.width();
             final int height = Layout.getColorsHeight() -
                     ((container.y - Layout.getColorsPosition().y) +
                             Layout.CONTENT_BUFFER_PX);
@@ -741,17 +744,18 @@ public class MenuAssembly {
             for (int i = 0; i < colors.length; i++) {
                 final int x = i % fitsOnLine, y = i / fitsOnLine;
                 final Coord2D pos = container.displace(
-                        x * Layout.PALETTE_DIMS.x, y * Layout.PALETTE_DIMS.y);
+                        x * Layout.PALETTE_DIMS.width(),
+                        y * Layout.PALETTE_DIMS.height());
 
                 buttons.add(new PaletteColorButton(pos, colors[i], s.getSelectedPalette()));
             }
 
             mb.add(new VerticalScrollBox(
-                    container, new Coord2D(contentWidth, height),
+                    container, new Bounds2D(contentWidth, height),
                     buttons.stream().map(Scrollable::new)
                             .toArray(Scrollable[]::new),
                     container.displace(0, (colors.length / fitsOnLine) *
-                            Layout.PALETTE_DIMS.y).y, 0));
+                            Layout.PALETTE_DIMS.height()).y, 0));
         }
     }
 
