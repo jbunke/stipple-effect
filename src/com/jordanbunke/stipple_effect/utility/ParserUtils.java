@@ -18,16 +18,16 @@ public class ParserUtils {
 
     public static GameImage generateStatusEffectText(final String message) {
         final Theme t = Settings.getTheme();
-        final TextBuilder tb = GraphicsUtils.uiText(t.getTextLight());
+        final TextBuilder tb = GraphicsUtils.uiText(t.textLight.get());
 
         final String[] segments = extractHighlight(message,
                 Constants.OPEN_COLOR, Constants.CLOSE_COLOR);
 
         for (int i = 0; i < segments.length; i++) {
             if (i % 2 == 0)
-                tb.setColor(t.getTextLight());
+                tb.setColor(t.textLight.get());
             else {
-                tb.setColor(t.getAffixTextLight());
+                tb.setColor(t.affixTextLight.get());
                 tb.addText("#");
                 tb.setColor(ParserSerializer.deserializeColor(segments[i]));
             }

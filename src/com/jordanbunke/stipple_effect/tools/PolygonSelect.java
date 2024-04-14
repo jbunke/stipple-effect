@@ -218,8 +218,7 @@ public final class PolygonSelect extends ToolWithMode {
         final Coord2D tp = context.getTargetPixel(), first = vertices.get(0);
 
         final Color border = tp.equals(first)
-                ? t.getHighlightOutline()
-                : t.getHighlightOverlay();
+                ? t.highlightOutline.get() : t.highlightOverlay.get();
 
         toolContentPreview = new GameImage(w, h);
 
@@ -229,7 +228,7 @@ public final class PolygonSelect extends ToolWithMode {
                     continue;
 
                 final Color c = (x + y) % 2 == 0
-                        ? t.getTextLight() : t.getTextDark();
+                        ? t.textLight.get() : t.textDark.get();
 
                 toolContentPreview.dot(c, first.x + x, first.y + y);
             }
@@ -240,7 +239,7 @@ public final class PolygonSelect extends ToolWithMode {
         defineLine(getLastVertex(), tp).forEach(next ->
                 toolContentPreview.dot(border, next.x, next.y));
         vertices.forEach(v ->
-                toolContentPreview.dot(t.getHighlightOutline(), v.x, v.y));
+                toolContentPreview.dot(t.highlightOutline.get(), v.x, v.y));
     }
 
     private void addEdge(final Coord2D v1, final Coord2D v2) {

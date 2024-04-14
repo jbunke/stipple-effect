@@ -827,7 +827,7 @@ public class DialogAssembly {
         final DynamicLabel asciiConfirmation = new DynamicLabel(
                 getDialogRightContentPositionForRow(lines),
                 MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().getTextLight(),
+                Settings.getTheme().textLight.get(),
                 () -> DialogVals.getAsciiStatus().getMessage(),
                 Layout.getDialogWidth());
         mb.addAll(asciiLabel, asciiButton, asciiConfirmation);
@@ -849,7 +849,7 @@ public class DialogAssembly {
         final DynamicLabel latinExConfirmation = new DynamicLabel(
                 getDialogRightContentPositionForRow(lines + 1),
                 MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().getTextLight(),
+                Settings.getTheme().textLight.get(),
                 () -> DialogVals.getLatinExStatus().getMessage(),
                 Layout.getDialogWidth());
         final MenuElementGrouping latinExContent = new MenuElementGrouping(
@@ -1310,13 +1310,13 @@ public class DialogAssembly {
         final GameImage background = new GameImage(w, h);
         background.free();
 
-        background.fillRectangle(t.getSplashBackground(), 0, 0, w, h);
+        background.fillRectangle(t.splashBackground.get(), 0, 0, w, h);
         mb.add(new SimpleMenuButton(new Coord2D(), new Bounds2D(w, h),
                 MenuElement.Anchor.LEFT_TOP, true,
                 () -> StippleEffect.get().clearDialog(), background, background));
 
         // version
-        final GameImage version = GraphicsUtils.uiText(t.getSplashText())
+        final GameImage version = GraphicsUtils.uiText(t.splashText.get())
                 .addText(StippleEffect.getVersion()).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
@@ -1324,7 +1324,7 @@ public class DialogAssembly {
                 MenuElement.Anchor.CENTRAL_BOTTOM, version));
 
         // gateway
-        final GameImage ctc = GraphicsUtils.uiText(t.getSplashFlashingText())
+        final GameImage ctc = GraphicsUtils.uiText(t.splashFlashingText.get())
                 .addText("Click anywhere to continue").build().draw();
 
         mb.add(new AnimationMenuElement(new Coord2D(w - Layout.CONTENT_BUFFER_PX, h),
@@ -1339,7 +1339,7 @@ public class DialogAssembly {
                 MenuElement.Anchor.CENTRAL, 5, frames));
 
         // subtitle
-        final GameImage subtitle = GraphicsUtils.uiText(t.getSplashText())
+        final GameImage subtitle = GraphicsUtils.uiText(t.splashText.get())
                 .addText("Pixel art editor and animator").addLineBreak()
                 .addText("Jordan Bunke, 2023-2024")
                 .build().draw();
@@ -1746,7 +1746,7 @@ public class DialogAssembly {
             final String widestTextCase
     ) {
         return new DynamicLabel(position, MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().getTextLight(), getter, widestTextCase);
+                Settings.getTheme().textLight.get(), getter, widestTextCase);
     }
 
     private static TextLabel makeValidDimensionsBottomLabel() {
@@ -1765,7 +1765,7 @@ public class DialogAssembly {
         return new DynamicLabel(
                 new Coord2D(Layout.getDialogContentInitial().x, y),
                 MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().getTextLight(),
+                Settings.getTheme().textLight.get(),
                 getter, Layout.getDialogWidth());
     }
 
@@ -1844,7 +1844,7 @@ public class DialogAssembly {
                 Layout.CONTENT_BUFFER_PX + Layout.BUTTON_BORDER_PX,
                 (int)(3.5 * Layout.STD_TEXT_BUTTON_INC));
         mb.add(TextLabel.make(titlePosition, settingScreen.getTitle(),
-                t.getTextMenuHeading(), 2d));
+                t.textMenuHeading.get(), 2d));
         final int initialYIndex = 4;
 
         // initialize in every execution path
@@ -2138,7 +2138,7 @@ public class DialogAssembly {
         final double titleSize = 2d;
         final TextLabel headingLabel = TextLabel.make(contentStart.displace(
                 0, initialbottomY), infoScreen.getTitle(),
-                Settings.getTheme().getTextMenuHeading(), titleSize);
+                Settings.getTheme().textMenuHeading.get(), titleSize);
         initialbottomY += (int)(incY * titleSize) + Layout.BUTTON_INC;
 
         contentAssembler.add(headingLabel);
@@ -2236,7 +2236,7 @@ public class DialogAssembly {
             final TextLabel name = TextLabel.make(contentStart.displace(
                             (hasIcon ? Layout.BUTTON_INC : 0) + Layout.CONTENT_BUFFER_PX,
                             bottomY + Layout.TEXT_Y_OFFSET - Layout.BUTTON_BORDER_PX),
-                    headings[i], hasIcon ? t.getTextShortcut() : t.getAffixTextLight());
+                    headings[i], hasIcon ? t.textShortcut.get() : t.affixTextLight.get());
             contentAssembler.add(name);
 
             bottomY += incY;
@@ -2253,7 +2253,7 @@ public class DialogAssembly {
                             contentStart.displace(indent + offsetX,
                                     bottomY + Layout.TEXT_Y_OFFSET),
                             lineSegments[j], j % 2 == 1
-                                    ? t.getTextShortcut() : t.getTextLight());
+                                    ? t.textShortcut.get() : t.textLight.get());
 
                     contentAssembler.add(segmentText);
                     offsetX += segmentText.getWidth() + Layout.BUTTON_BORDER_PX;
@@ -2450,9 +2450,9 @@ public class DialogAssembly {
         // background
         final GameImage backgroundImage = new GameImage(dialogW,
                 Layout.height() - (2 * Layout.BUTTON_DIM));
-        backgroundImage.fillRectangle(Settings.getTheme().getPanelBackground(),
+        backgroundImage.fillRectangle(Settings.getTheme().panelBackground.get(),
                 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
-        backgroundImage.drawRectangle(Settings.getTheme().getButtonOutline(),
+        backgroundImage.drawRectangle(Settings.getTheme().buttonOutline.get(),
                 2f * Layout.BUTTON_BORDER_PX, 0, 0,
                 backgroundImage.getWidth(), backgroundImage.getHeight());
 
@@ -2530,7 +2530,7 @@ public class DialogAssembly {
         // background
         final GameImage backgroundImage = new GameImage(
                 Layout.getDialogWidth(), Layout.getDialogHeight());
-        backgroundImage.fillRectangle(Settings.getTheme().getPanelBackground(),
+        backgroundImage.fillRectangle(Settings.getTheme().panelBackground.get(),
                 0, 0, Layout.getDialogWidth(), Layout.getDialogHeight());
 
         final StaticMenuElement background =
@@ -2579,7 +2579,7 @@ public class DialogAssembly {
         // border
         final GameImage borderImage = new GameImage(
                 Layout.getDialogWidth(), Layout.getDialogHeight());
-        borderImage.drawRectangle(Settings.getTheme().getButtonOutline(),
+        borderImage.drawRectangle(Settings.getTheme().buttonOutline.get(),
                 2f * Layout.BUTTON_BORDER_PX, 0, 0,
                 Layout.getDialogWidth(), Layout.getDialogHeight());
 

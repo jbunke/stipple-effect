@@ -49,8 +49,8 @@ public class ColorTextbox extends Textbox {
                 selectionIndex, valid, highlighted, typing) -> {
             final int width = dimensions.x;
             final Color accent = typing
-                    ? Settings.getTheme().getHighlightOutline()
-                    : Settings.getTheme().getButtonOutline(),
+                    ? Settings.getTheme().highlightOutline.get()
+                    : Settings.getTheme().buttonOutline.get(),
                     background = ColorTextbox.getColorFromHexCode(text);
 
             return GraphicsUtils.drawTextbox(

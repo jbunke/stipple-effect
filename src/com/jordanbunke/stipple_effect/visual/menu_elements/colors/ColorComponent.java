@@ -56,12 +56,12 @@ public class ColorComponent extends MenuElementContainer {
         // label
         elements.add(TextLabel.make(
                 startingPos.displace(indent, Layout.COLOR_LABEL_OFFSET_Y),
-                label, Settings.getTheme().getTextLight()));
+                label, Settings.getTheme().textLight.get()));
 
         // value
         elements.add(new DynamicLabel(startingPos.displace(
                 width - indent, Layout.COLOR_LABEL_OFFSET_Y),
-                Anchor.RIGHT_TOP, Settings.getTheme().getTextLight(),
+                Anchor.RIGHT_TOP, Settings.getTheme().textLight.get(),
                 () -> String.valueOf(getter.get()),
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 

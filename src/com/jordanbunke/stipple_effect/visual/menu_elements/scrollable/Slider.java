@@ -65,13 +65,13 @@ public abstract class Slider extends AbstractSlider {
         final GameImage sliderCore = new GameImage(w, h);
 
         sliderCore.fillRectangle(
-                Settings.getTheme().getDefaultSliderCore(), 0, 0, w, h);
+                Settings.getTheme().defaultSliderCore.get(), 0, 0, w, h);
 
         return sliderCore.submit();
     }
 
     public Color getSliderBallCoreColor() {
-        return Settings.getTheme().getDefaultSliderBall();
+        return Settings.getTheme().defaultSliderBall.get();
     }
 
     public abstract void drawSlider(final GameImage slider);

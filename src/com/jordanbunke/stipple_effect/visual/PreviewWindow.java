@@ -178,7 +178,7 @@ public class PreviewWindow implements ProgramContext {
                 lastButton.getRenderPosition().displace(
                         Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
                         -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
-                MenuElement.Anchor.LEFT_TOP, Settings.getTheme().getTextLight(),
+                MenuElement.Anchor.LEFT_TOP, Settings.getTheme().textLight.get(),
                 getter, widestCase);
     }
 
@@ -308,7 +308,7 @@ public class PreviewWindow implements ProgramContext {
 
     @Override
     public void render(final GameImage canvas) {
-        canvas.fill(Settings.getTheme().getPanelBackground());
+        canvas.fill(Settings.getTheme().panelBackground.get());
 
         renderProject(canvas);
         menu.render(canvas);

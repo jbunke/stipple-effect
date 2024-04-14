@@ -93,7 +93,7 @@ public class Dropdown extends AbstractDropdownList {
 
             final GameImage nhi = GraphicsUtils.drawTextButton(
                     buttonWidth, getLabelTextFor(i), false,
-                    Settings.getTheme().getDropdownOptionBody(), true, false);
+                    Settings.getTheme().dropdownOptionBody.get(), true, false);
 
             scrollables[i] = new SimpleMenuButton(
                     position.displace(0, i * Layout.STD_TEXT_BUTTON_H),

@@ -18,7 +18,7 @@ public class TextLabel extends StaticMenuElement {
     public static TextLabel make(
             final Coord2D position, final String text
     ) {
-        return make(position, text, Settings.getTheme().getTextLight());
+        return make(position, text, Settings.getTheme().textLight.get());
     }
 
     public static TextLabel make(

@@ -295,7 +295,7 @@ public class StippleEffect implements ProgramContext {
 
         final GameImage statusUpdate = new GameImage(w, h);
         statusUpdate.fillRectangle(
-                Settings.getTheme().getPanelBackground(), 0, 0, w, h);
+                Settings.getTheme().panelBackground.get(), 0, 0, w, h);
         statusUpdate.draw(text, 2 * Layout.BUTTON_BORDER_PX,
                 Layout.TEXT_Y_OFFSET);
 
@@ -673,16 +673,16 @@ public class StippleEffect implements ProgramContext {
         final Theme t = Settings.getTheme();
 
         final String[] lines = ParserUtils.getToolTip(toolTipCode);
-        final TextBuilder tb = GraphicsUtils.uiText(t.getTextLight());
+        final TextBuilder tb = GraphicsUtils.uiText(t.textLight.get());
 
         for (int l = 0; l < lines.length; l++) {
             final String[] segments = ParserUtils.extractHighlight(lines[l]);
 
             for (int i = 0; i < segments.length; i++) {
                 if (i % 2 == 0)
-                    tb.setColor(t.getTextLight());
+                    tb.setColor(t.textLight.get());
                 else
-                    tb.setColor(t.getTextShortcut());
+                    tb.setColor(t.textShortcut.get());
 
                 tb.addText(segments[i]);
             }
@@ -696,7 +696,7 @@ public class StippleEffect implements ProgramContext {
                 h = text.getHeight() - (4 * Layout.BUTTON_BORDER_PX);
 
         final GameImage tt = new GameImage(w, h);
-        tt.fillRectangle(t.getPanelBackground(), 0, 0, w, h);
+        tt.fillRectangle(t.panelBackground.get(), 0, 0, w, h);
         tt.draw(text, 2 * Layout.BUTTON_BORDER_PX, Layout.TEXT_Y_OFFSET);
 
         return tt.submit();
@@ -762,7 +762,7 @@ public class StippleEffect implements ProgramContext {
         // borders
         final float strokeWidth = 2f;
 
-        canvas.setColor(Settings.getTheme().getPanelDivisions());
+        canvas.setColor(Settings.getTheme().panelDivisions.get());
         canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation
         canvas.drawLine(strokeWidth, pp.x, tobp.y, Layout.width(), tobp.y); // top segments and middle separation
         canvas.drawLine(strokeWidth, tp.x, wp.y, lp.x, wp.y); // tool options bar and tools/workspace separation
@@ -780,7 +780,7 @@ public class StippleEffect implements ProgramContext {
         framesMenu.render(canvas);
 
         if (dialog != null) {
-            canvas.fillRectangle(Settings.getTheme().getDialogVeil(),
+            canvas.fillRectangle(Settings.getTheme().dialogVeil.get(),
                     0, 0, Layout.width(), Layout.height());
             dialog.render(canvas);
         }
@@ -813,7 +813,7 @@ public class StippleEffect implements ProgramContext {
     private GameImage drawColorsSegment() {
         final GameImage colors = new GameImage(Layout.getColorsWidth(),
                 Layout.getColorsHeight());
-        colors.fillRectangle(Settings.getTheme().getPanelBackground(), 0, 0,
+        colors.fillRectangle(Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.getColorsWidth(), Layout.getColorsHeight());
 
         return colors.submit();
@@ -822,7 +822,7 @@ public class StippleEffect implements ProgramContext {
     private GameImage drawTools() {
         final GameImage tools = new GameImage(Layout.getToolsWidth(),
                 Layout.getToolsHeight());
-        tools.fillRectangle(Settings.getTheme().getPanelBackground(), 0, 0,
+        tools.fillRectangle(Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.getToolsWidth(), Layout.getToolsHeight());
 
         return tools.submit();
@@ -833,7 +833,7 @@ public class StippleEffect implements ProgramContext {
                 Layout.getToolOptionsBarWidth(),
                 Layout.TOOL_OPTIONS_BAR_H);
         toolOptionsBar.fillRectangle(
-                Settings.getTheme().getPanelBackground(), 0, 0,
+                Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.getToolOptionsBarWidth(), Layout.TOOL_OPTIONS_BAR_H);
 
         return toolOptionsBar.submit();
@@ -843,7 +843,7 @@ public class StippleEffect implements ProgramContext {
         final GameImage layers = new GameImage(Layout.getLayersWidth(),
                 Layout.getLayersHeight());
         layers.fillRectangle(
-                Settings.getTheme().getPanelBackground(), 0, 0,
+                Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.getLayersWidth(), Layout.getLayersHeight());
 
         return layers.submit();
@@ -853,7 +853,7 @@ public class StippleEffect implements ProgramContext {
         final GameImage projects = new GameImage(Layout.getProjectsWidth(),
                 Layout.getTopPanelHeight());
         projects.fillRectangle(
-                Settings.getTheme().getPanelBackground(), 0, 0,
+                Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.getProjectsWidth(), Layout.getTopPanelHeight());
 
         return projects.submit();
@@ -863,7 +863,7 @@ public class StippleEffect implements ProgramContext {
         final GameImage frames = new GameImage(Layout.getFramesWidth(),
                 Layout.getTopPanelHeight());
         frames.fillRectangle(
-                Settings.getTheme().getPanelBackground(), 0, 0,
+                Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.getFramesWidth(), Layout.getTopPanelHeight());
 
         return frames.submit();
@@ -873,7 +873,7 @@ public class StippleEffect implements ProgramContext {
         final GameImage bottomBar =
                 new GameImage(Layout.width(), Layout.BOTTOM_BAR_H);
         bottomBar.fillRectangle(
-                Settings.getTheme().getPanelBackground(), 0, 0,
+                Settings.getTheme().panelBackground.get(), 0, 0,
                 Layout.width(), Layout.BOTTOM_BAR_H);
 
         return bottomBar.submit();

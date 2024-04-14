@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.visual.color;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 
 import java.awt.*;
+import java.util.function.Supplier;
 
 public enum Theme {
     DEFAULT(
@@ -73,7 +74,7 @@ public enum Theme {
             SEColors.GREY, SEColors.MID_DARK_GREY)
     ;
 
-    private final Color
+    public final Supplier<Color>
             textLight, textDark,
             affixTextLight, affixTextDark,
             textMenuHeading, textShortcut,
@@ -111,144 +112,40 @@ public enum Theme {
             final Color checkerboard1,
             final Color checkerboard2
     ) {
-        this.textLight = textLight;
-        this.textDark = textDark;
-        this.affixTextLight = affixTextLight;
-        this.affixTextDark = affixTextDark;
-        this.textMenuHeading = textMenuHeading;
-        this.textShortcut = textShortcut;
+        this.textLight = () -> textLight;
+        this.textDark = () -> textDark;
+        this.affixTextLight = () -> affixTextLight;
+        this.affixTextDark = () -> affixTextDark;
+        this.textMenuHeading = () -> textMenuHeading;
+        this.textShortcut = () -> textShortcut;
 
-        this.workspaceBackground = workspaceBackground;
-        this.panelBackground = panelBackground;
-        this.panelDivisions = panelDivisions;
+        this.workspaceBackground = () -> workspaceBackground;
+        this.panelBackground = () -> panelBackground;
+        this.panelDivisions = () -> panelDivisions;
 
-        this.scrollBackground = scrollBackground;
-        this.dialogVeil = dialogVeil;
-        this.selectionFill = selectionFill;
-        this.buttonBody = buttonBody;
-        this.stubButtonBody = stubButtonBody;
-        this.dropdownOptionBody = dropdownOptionBody;
-        this.defaultSliderCore = defaultSliderCore;
-        this.defaultSliderBall = defaultSliderBall;
-        this.buttonOutline = buttonOutline;
+        this.scrollBackground = () -> scrollBackground;
+        this.dialogVeil = () -> dialogVeil;
+        this.selectionFill = () -> selectionFill;
+        this.buttonBody = () -> buttonBody;
+        this.stubButtonBody = () -> stubButtonBody;
+        this.dropdownOptionBody = () -> dropdownOptionBody;
+        this.defaultSliderCore = () -> defaultSliderCore;
+        this.defaultSliderBall = () -> defaultSliderBall;
+        this.buttonOutline = () -> buttonOutline;
 
-        this.highlightOutline = highlightOutline;
-        this.highlightOverlay = highlightOverlay;
-        this.invalid = invalid;
+        this.highlightOutline = () -> highlightOutline;
+        this.highlightOverlay = () -> highlightOverlay;
+        this.invalid = () -> invalid;
 
-        this.splashText = splashText;
-        this.splashFlashingText = splashFlashingText;
-        this.splashBackground = splashBackground;
+        this.splashText = () -> splashText;
+        this.splashFlashingText = () -> splashFlashingText;
+        this.splashBackground = () -> splashBackground;
 
-        this.checkerboard1 = checkerboard1;
-        this.checkerboard2 = checkerboard2;
+        this.checkerboard1 = () -> checkerboard1;
+        this.checkerboard2 = () -> checkerboard2;
     }
 
     public String forButtonText() {
         return EnumUtils.formattedName(this);
-    }
-
-    public Color getTextLight() {
-        return textLight;
-    }
-
-    public Color getTextDark() {
-        return textDark;
-    }
-
-    public Color getAffixTextLight() {
-        return affixTextLight;
-    }
-
-    public Color getAffixTextDark() {
-        return affixTextDark;
-    }
-
-    public Color getTextMenuHeading() {
-        return textMenuHeading;
-    }
-
-    public Color getTextShortcut() {
-        return textShortcut;
-    }
-
-    public Color getWorkspaceBackground() {
-        return workspaceBackground;
-    }
-
-    public Color getPanelBackground() {
-        return panelBackground;
-    }
-
-    public Color getPanelDivisions() {
-        return panelDivisions;
-    }
-
-    public Color getScrollBackground() {
-        return scrollBackground;
-    }
-
-    public Color getDialogVeil() {
-        return dialogVeil;
-    }
-
-    public Color getSelectionFill() {
-        return selectionFill;
-    }
-
-    public Color getButtonBody() {
-        return buttonBody;
-    }
-
-    public Color getStubButtonBody() {
-        return stubButtonBody;
-    }
-
-    public Color getDropdownOptionBody() {
-        return dropdownOptionBody;
-    }
-
-    public Color getDefaultSliderCore() {
-        return defaultSliderCore;
-    }
-
-    public Color getDefaultSliderBall() {
-        return defaultSliderBall;
-    }
-
-    public Color getButtonOutline() {
-        return buttonOutline;
-    }
-
-    public Color getHighlightOutline() {
-        return highlightOutline;
-    }
-
-    public Color getHighlightOverlay() {
-        return highlightOverlay;
-    }
-
-    public Color getInvalid() {
-        return invalid;
-    }
-
-    public Color getSplashText() {
-        return splashText;
-    }
-
-    public Color getSplashFlashingText() {
-        return splashFlashingText;
-    }
-
-    public Color getSplashBackground() {
-        return splashBackground;
-    }
-
-    public Color getCheckerboard1() {
-        return checkerboard1;
-    }
-
-    public Color getCheckerboard2() {
-        return checkerboard2;
     }
 }
