@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -49,13 +50,13 @@ public class Layout {
             HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
             COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100;
 
-    public static final Coord2D ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM),
-            PALETTE_DIMS = new Coord2D(24, 24);
+    public static final Bounds2D ICON_DIMS = new Bounds2D(BUTTON_DIM, BUTTON_DIM),
+            PALETTE_DIMS = new Bounds2D(24, 24);
 
-    private static Coord2D size;
+    private static Bounds2D size;
 
     static {
-        size = new Coord2D(Toolkit.getDefaultToolkit().getScreenSize().width,
+        size = new Bounds2D(Toolkit.getDefaultToolkit().getScreenSize().width,
                 Toolkit.getDefaultToolkit().getScreenSize().height);
 
         projectsExpanded = true;
@@ -148,15 +149,15 @@ public class Layout {
 
     // program canvas size
     public static int width() {
-        return size.x;
+        return size.width();
     }
 
     public static int height() {
-        return size.y;
+        return size.height();
     }
 
     public static void setSize(final int w, final int h) {
-        Layout.size = new Coord2D(w, h);
+        size = new Bounds2D(w, h);
     }
 
     // bottom bar layout

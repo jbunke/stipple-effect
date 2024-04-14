@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.dialog;
 
 import com.jordanbunke.delta_time.menu.menu_elements.ext.AbstractTextbox;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.drawing_functions.TextboxDrawingFunction;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -46,7 +47,7 @@ public class Textbox extends AbstractTextbox {
             final Function<String, Boolean> textValidator,
             final Consumer<String> setter, final int maxLength
     ) {
-        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
+        super(position, new Bounds2D(width, Layout.STD_TEXT_BUTTON_H),
                 anchor, prefixGetter, initialText, suffixGetter,
                 textValidator, setter, GraphicsUtils::drawTextbox, maxLength);
     }
@@ -59,7 +60,7 @@ public class Textbox extends AbstractTextbox {
             final Consumer<String> setter,
             final TextboxDrawingFunction fDraw, final int maxLength
     ) {
-        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
+        super(position, new Bounds2D(width, Layout.STD_TEXT_BUTTON_H),
                 anchor, prefixGetter, initialText, suffixGetter,
                 textValidator, setter, fDraw, maxLength);
     }

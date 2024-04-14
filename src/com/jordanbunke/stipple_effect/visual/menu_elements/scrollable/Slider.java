@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.AbstractSlider;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -17,7 +18,7 @@ public abstract class Slider extends AbstractSlider {
     private GameImage baseImage, highlightedImage, slidingImage;
 
     public Slider(
-            final Coord2D position, final Coord2D dimensions, final Anchor anchor,
+            final Coord2D position, final Bounds2D dimensions, final Anchor anchor,
             final int minValue, final int maxValue, final Supplier<Integer> getter,
             final Consumer<Integer> setter, final boolean canSetImplicitly
     ) {

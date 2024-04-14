@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementContainer;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -34,7 +35,7 @@ public class ColorComponent extends MenuElementContainer {
             final Function<Integer, Color> spectralFunction,
             final Consumer<Color> setter, final Supplier<Integer> getter
     ) {
-        super(new Coord2D(), new Coord2D(), Anchor.LEFT_TOP, false);
+        super(new Coord2D(), new Bounds2D(1, 1), Anchor.LEFT_TOP, false);
 
         final boolean isFull = alignment == Alignment.FULL;
 
@@ -45,9 +46,10 @@ public class ColorComponent extends MenuElementContainer {
                 width = isFull
                         ? Layout.getColorsWidth() : Layout.getColorsWidth() / 2,
                 indent = Layout.CONTENT_BUFFER_PX;
-        final Coord2D startingPos = Layout.getColorsPosition().displace(
-                globalOffsetX, globalOffsetY),
-                buttonDims = new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM);
+        final Coord2D startingPos = Layout.getColorsPosition()
+                .displace(globalOffsetX, globalOffsetY);
+        final Bounds2D buttonDims = new Bounds2D(
+                Layout.BUTTON_DIM, Layout.BUTTON_DIM);
 
         final List<MenuElement> elements = new ArrayList<>();
 

@@ -96,7 +96,8 @@ public class PaletteColorButton extends SelectableMenuElement {
                 IconCodes.PALETTE_BUTTON_BACKGROUND);
 
         base.fillRectangle(color, 0, 0,
-                Layout.PALETTE_DIMS.x, Layout.PALETTE_DIMS.y);
+                Layout.PALETTE_DIMS.width(),
+                Layout.PALETTE_DIMS.height());
         base.draw(selection.getOverlay());
 
         if (!included)

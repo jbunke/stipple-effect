@@ -17,6 +17,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuEleme
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.TimedMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.AnimationMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -909,7 +910,7 @@ public class DialogAssembly {
         final GameImage warningText = GraphicsUtils.uiText()
                 .addText(consequence).build().draw();
         final StaticMenuElement warning = new StaticMenuElement(
-                Layout.getCanvasMiddle(), new Coord2D(warningText.getWidth(),
+                Layout.getCanvasMiddle(), new Bounds2D(warningText.getWidth(),
                 warningText.getHeight()), MenuElement.Anchor.CENTRAL, warningText);
 
         final MenuElementGrouping contents = new MenuElementGrouping(warning);
@@ -1040,7 +1041,7 @@ public class DialogAssembly {
 
                 final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
                         getDialogContentOffsetFollowingLabel(label),
-                        new Coord2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
+                        new Bounds2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
                                 Layout.STD_TEXT_BUTTON_H),
                         MenuElement.Anchor.LEFT_TOP, true, bases,
                         Arrays.stream(bases)
@@ -1217,7 +1218,7 @@ public class DialogAssembly {
                             (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
             mb.add(new SimpleMenuButton(ssPos,
-                    new Coord2D(baseSS.getWidth(), baseSS.getHeight()),
+                    new Bounds2D(baseSS.getWidth(), baseSS.getHeight()),
                     MenuElement.Anchor.LEFT_TOP, true,
                     () -> DialogVals.setSettingScreen(ss),
                     baseSS, highlighedSS));
@@ -1310,7 +1311,7 @@ public class DialogAssembly {
         background.free();
 
         background.fillRectangle(t.getSplashBackground(), 0, 0, w, h);
-        mb.add(new SimpleMenuButton(new Coord2D(), new Coord2D(w, h),
+        mb.add(new SimpleMenuButton(new Coord2D(), new Bounds2D(w, h),
                 MenuElement.Anchor.LEFT_TOP, true,
                 () -> StippleEffect.get().clearDialog(), background, background));
 
@@ -1319,7 +1320,7 @@ public class DialogAssembly {
                 .addText(StippleEffect.getVersion()).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
-                new Coord2D(version.getWidth(), version.getHeight()),
+                new Bounds2D(version.getWidth(), version.getHeight()),
                 MenuElement.Anchor.CENTRAL_BOTTOM, version));
 
         // gateway
@@ -1327,14 +1328,14 @@ public class DialogAssembly {
                 .addText("Click anywhere to continue").build().draw();
 
         mb.add(new AnimationMenuElement(new Coord2D(w - Layout.CONTENT_BUFFER_PX, h),
-                new Coord2D(ctc.getWidth(), ctc.getHeight()),
+                new Bounds2D(ctc.getWidth(), ctc.getHeight()),
                 MenuElement.Anchor.RIGHT_BOTTOM, (int)(Constants.TICK_HZ / 2),
                 ctc, GameImage.dummy()));
 
         // animation frames
         final GameImage[] frames = SplashLoader.loadAnimationFrames();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
-                new Coord2D(frames[0].getWidth(), frames[0].getHeight()),
+                new Bounds2D(frames[0].getWidth(), frames[0].getHeight()),
                 MenuElement.Anchor.CENTRAL, 5, frames));
 
         // subtitle
@@ -1344,7 +1345,7 @@ public class DialogAssembly {
                 .build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h - (version.getHeight() * 2)),
-                new Coord2D(subtitle.getWidth(), subtitle.getHeight()),
+                new Bounds2D(subtitle.getWidth(), subtitle.getHeight()),
                 MenuElement.Anchor.CENTRAL_BOTTOM, subtitle));
 
         setDialog(mb.build());
@@ -2108,8 +2109,8 @@ public class DialogAssembly {
 
         final Coord2D scrollerPos = Layout.getDialogPosition().displace(0,
                 (4 * Layout.STD_TEXT_BUTTON_INC) +
-                        Layout.TEXT_Y_OFFSET - Layout.BUTTON_DIM),
-                scrollerDims = new Coord2D(Layout.getDialogWidth(),
+                        Layout.TEXT_Y_OFFSET - Layout.BUTTON_DIM);
+        final Bounds2D scrollerDims = new Bounds2D(Layout.getDialogWidth(),
                         scrollerEndY - scrollerPos.y);
 
         final int realBottomY = bottomLabel.getRenderPosition().y +
@@ -2193,7 +2194,8 @@ public class DialogAssembly {
                 contentAssembler.stream()
                         .map(Scrollable::new).toArray(Scrollable[]::new);
 
-        final Coord2D wrapperDims = new Coord2D(dialogW - (2 * Layout.BUTTON_BORDER_PX),
+        final Bounds2D wrapperDims = new Bounds2D(
+                dialogW - (2 * Layout.BUTTON_BORDER_PX),
                 scrollerEndY - (contentStart.y + Layout.TEXT_Y_OFFSET));
 
         // assemble contents into scrolling element
@@ -2476,7 +2478,7 @@ public class DialogAssembly {
                 .displace(-Layout.CONTENT_BUFFER_PX, -Layout.CONTENT_BUFFER_PX);
 
         mb.add(new SimpleMenuButton(cancelPos,
-                new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
+                new Bounds2D(baseImage.getWidth(), baseImage.getHeight()),
                 MenuElement.Anchor.RIGHT_BOTTOM, true,
                 () -> StippleEffect.get().clearDialog(),
                 baseImage, highlightedImage));
@@ -2494,7 +2496,7 @@ public class DialogAssembly {
                                             (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
                     mb.add(new SimpleMenuButton(isPos,
-                            new Coord2D(baseIS.getWidth(), baseIS.getHeight()),
+                            new Bounds2D(baseIS.getWidth(), baseIS.getHeight()),
                             MenuElement.Anchor.LEFT_TOP, true,
                             () -> DialogVals.setInfoScreen(is),
                             baseIS, highlighedIS));
@@ -2532,7 +2534,7 @@ public class DialogAssembly {
                 0, 0, Layout.getDialogWidth(), Layout.getDialogHeight());
 
         final StaticMenuElement background =
-                new StaticMenuElement(Layout.getCanvasMiddle(), new Coord2D(
+                new StaticMenuElement(Layout.getCanvasMiddle(), new Bounds2D(
                         Layout.getDialogWidth(), Layout.getDialogHeight()),
                         MenuElement.Anchor.CENTRAL, backgroundImage.submit());
         mb.add(background);
@@ -2555,7 +2557,7 @@ public class DialogAssembly {
                 .displace(-Layout.CONTENT_BUFFER_PX, -Layout.CONTENT_BUFFER_PX);
 
         mb.add(new SimpleMenuButton(cancelPos,
-                new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
+                new Bounds2D(baseImage.getWidth(), baseImage.getHeight()),
                 MenuElement.Anchor.RIGHT_BOTTOM, true,
                 () -> StippleEffect.get().clearDialog(),
                 baseImage, highlightedImage));
@@ -2566,7 +2568,7 @@ public class DialogAssembly {
                     Layout.BUTTON_OFFSET), 0);
 
             mb.add(new ApproveDialogButton(approvePos,
-                    new Coord2D(baseImage.getWidth(), baseImage.getHeight()),
+                    new Bounds2D(baseImage.getWidth(), baseImage.getHeight()),
                     MenuElement.Anchor.RIGHT_BOTTOM, onApproval, clearDialog,
                     precondition, approveText));
         }
@@ -2582,7 +2584,7 @@ public class DialogAssembly {
                 Layout.getDialogWidth(), Layout.getDialogHeight());
 
         final StaticMenuElement border =
-                new StaticMenuElement(Layout.getCanvasMiddle(), new Coord2D(
+                new StaticMenuElement(Layout.getCanvasMiddle(), new Bounds2D(
                         Layout.getDialogWidth(), Layout.getDialogHeight()),
                         MenuElement.Anchor.CENTRAL, borderImage.submit());
         mb.add(border);

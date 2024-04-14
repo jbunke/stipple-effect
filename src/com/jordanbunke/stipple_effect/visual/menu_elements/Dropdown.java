@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButt
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractDropdownList;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -27,7 +28,7 @@ public class Dropdown extends AbstractDropdownList {
             final String[] labels, final Runnable[] behaviours,
             final Supplier<Integer> initialIndexFunction
     ) {
-        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
+        super(position, new Bounds2D(width, Layout.STD_TEXT_BUTTON_H),
                 anchor, renderOrder, composeItems(labels, behaviours),
                 initialIndexFunction);
 
@@ -96,12 +97,12 @@ public class Dropdown extends AbstractDropdownList {
 
             scrollables[i] = new SimpleMenuButton(
                     position.displace(0, i * Layout.STD_TEXT_BUTTON_H),
-                    new Coord2D(buttonWidth, Layout.STD_TEXT_BUTTON_H),
+                    new Bounds2D(buttonWidth, Layout.STD_TEXT_BUTTON_H),
                     Anchor.LEFT_TOP, true, () -> select(index),
                     nhi, GraphicsUtils.drawHighlightedButton(nhi));
         }
 
-        final Coord2D dimensions = new Coord2D(getWidth(),
+        final Bounds2D dimensions = new Bounds2D(getWidth(),
                 Math.min(dropdownAllowanceY, Layout.STD_TEXT_BUTTON_H * size));
 
         return new VerticalScrollBox(position, dimensions,
@@ -125,7 +126,7 @@ public class Dropdown extends AbstractDropdownList {
                 .toArray(GameImage[]::new);
 
         return new SimpleToggleMenuButton(new Coord2D(getX(), getY()),
-                new Coord2D(getWidth(), Layout.STD_TEXT_BUTTON_H),
+                new Bounds2D(getWidth(), Layout.STD_TEXT_BUTTON_H),
                 getAnchor(), true, bases, highlighted,
                 new Runnable[] { () -> {}, () -> {} },
                 () -> isDroppedDown() ? 1 : 0, this::toggleDropDown);
