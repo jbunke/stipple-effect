@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.visual;
+package com.jordanbunke.stipple_effect.preview;
 
 import com.jordanbunke.delta_time._core.GameManager;
 import com.jordanbunke.delta_time._core.Program;
@@ -23,18 +23,20 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.color.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
+import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.PreviewHousingBox;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class PreviewWindow implements ProgramContext {
-    private static final int BORDER = 1,
+    public static final int BORDER = 1,
             MENU_X_ALLOTMENT_PX = Layout.BUTTON_INC * 10,
             MENU_Y_ALLOTMENT_PX = (Layout.BUTTON_INC * 3) +
                     (Layout.CONTENT_BUFFER_PX - Layout.BUTTON_OFFSET);
@@ -51,6 +53,9 @@ public class PreviewWindow implements ProgramContext {
     private float zoom;
     private Coord2D mousePos;
     private GameImage project;
+
+    private PreviewImage previewImage;
+    private PreviewHousingBox housingBox;
 
     public static void set(final SEContext context) {
         if (INSTANCE != null)
@@ -73,6 +78,8 @@ public class PreviewWindow implements ProgramContext {
 
         menu = makeMenu();
         window = makeWindow();
+        previewImage = new PreviewImage();
+        housingBox = makeHousingBox();
         preview = new Program(window, new GameManager(0, this));
         preview.getDebugger().getChannel(GameDebugger.FRAME_RATE).mute();
         preview.setScheduleUpdates(false);
@@ -202,6 +209,7 @@ public class PreviewWindow implements ProgramContext {
     @Override
     public void process(final InputEventLogger eventLogger) {
         menu.process(eventLogger);
+        housingBox.process(eventLogger);
 
         mousePos = eventLogger.getAdjustedMousePosition();
 
@@ -237,6 +245,7 @@ public class PreviewWindow implements ProgramContext {
         }
 
         menu.update(deltaTime);
+        housingBox.update(deltaTime);
 
         animate(deltaTime);
         windowUpdateCheck();
@@ -275,6 +284,8 @@ public class PreviewWindow implements ProgramContext {
 
     private void updateWindow() {
         window = makeWindow();
+        previewImage = new PreviewImage();
+        housingBox = makeHousingBox();
         preview.replaceWindow(window);
         preview.setCanvasSize(window.getWidth(), window.getHeight());
         window.setOnCloseBehaviour(preview::terminateExecution);
@@ -286,17 +297,20 @@ public class PreviewWindow implements ProgramContext {
         canvasW = context.getState().getImageWidth();
         canvasH = context.getState().getImageHeight();
 
+        final int zoomW = (int) (zoom * canvasW),
+                zoomH = (int) (zoom * canvasH);
+
         final int buffer = 2 * Layout.PREVIEW_WINDOW_BUFFER_PX,
                 addOn = buffer + (2 * BORDER),
-                xBase = addOn + MENU_X_ALLOTMENT_PX,
-                yBase = addOn + MENU_Y_ALLOTMENT_PX;
+                yBase = addOn + MENU_Y_ALLOTMENT_PX,
+                extraW = zoomW > Constants.MAX_CANVAS_W
+                        ? Layout.PREVIEW_WINDOW_BUFFER_PX : 0,
+                extraH = zoomH > Constants.MAX_CANVAS_H
+                        ? Layout.PREVIEW_WINDOW_BUFFER_PX : 0;
 
-        final int width = MathPlus.bounded(xBase,
-                addOn + (int) (canvasW * zoom),
-                Toolkit.getDefaultToolkit().getScreenSize().width),
-                height = MathPlus.bounded(yBase,
-                        yBase + (int) (canvasH * zoom),
-                        Toolkit.getDefaultToolkit().getScreenSize().height);
+        final int width = addOn + MathPlus.bounded(
+                MENU_X_ALLOTMENT_PX, zoomW, Constants.MAX_CANVAS_W) + extraH,
+                height = yBase + Math.min(zoomH, Constants.MAX_CANVAS_H) + extraW;
 
         final GameWindow window = new GameWindow("Preview: " +
                 context.projectInfo.getFormattedName(false, false),
@@ -306,19 +320,23 @@ public class PreviewWindow implements ProgramContext {
         return window;
     }
 
+    private PreviewHousingBox makeHousingBox() {
+        return PreviewHousingBox.make(previewImage,
+                (int) (canvasW * zoom), (int) (canvasH * zoom));
+    }
+
     @Override
     public void render(final GameImage canvas) {
         canvas.fill(Settings.getTheme().panelBackground.get());
 
-        renderProject(canvas);
+        refreshPreviewImage();
+
         menu.render(canvas);
+        housingBox.render(canvas);
         renderCursor(canvas);
     }
 
-    private void renderProject(final GameImage canvas) {
-        final int renderX = Layout.PREVIEW_WINDOW_BUFFER_PX,
-                renderY = Layout.PREVIEW_WINDOW_BUFFER_PX + MENU_Y_ALLOTMENT_PX;
-
+    private void refreshPreviewImage() {
         final int w = (int) Math.max(1, canvasW * zoom),
                 h = (int) Math.max(1, canvasH * zoom);
 
@@ -329,7 +347,7 @@ public class PreviewWindow implements ProgramContext {
         canvasContents.draw(context.getCheckerboard(), BORDER, BORDER, w, h);
         canvasContents.draw(project, BORDER, BORDER, w, h);
 
-        canvas.draw(canvasContents.submit(), renderX, renderY);
+        previewImage.refresh(canvasContents.submit());
     }
 
     private void renderCursor(final GameImage canvas) {
