@@ -18,6 +18,7 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Version;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
@@ -307,24 +308,24 @@ public class StippleEffect implements ProgramContext {
     }
 
     private GameWindow makeWindow() {
-        final Coord2D size = determineWindowSize();
-        Layout.setSize(size.x, size.y);
-        final GameWindow window = new GameWindow(PROGRAM_NAME + " " + getVersion(),
-                size.x, size.y, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
+        final Bounds2D size = determineWindowSize();
+        Layout.setSize(size.width(), size.height());
+        final GameWindow window = new GameWindow(
+                PROGRAM_NAME + " " + getVersion(),
+                size.width(), size.height(),
+                GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
         return window;
     }
 
-    private Coord2D determineWindowSize() {
+    private Bounds2D determineWindowSize() {
         final int screenW = Toolkit.getDefaultToolkit().getScreenSize().width,
                 screenH = Toolkit.getDefaultToolkit().getScreenSize().height;
 
-        final int h = Math.max(screenH - Layout.SCREEN_H_BUFFER, Layout.MIN_WINDOW_H);
-
-        return windowed
-                ? new Coord2D((int)(h * (16 / 9.)), h)
-                : new Coord2D(screenW, screenH);
+        return windowed ? new Bounds2D(
+                Settings.getWindowedWidth(), Settings.getWindowedHeight())
+                : new Bounds2D(screenW, screenH);
     }
 
     public void rebuildAllMenus() {
@@ -1380,6 +1381,10 @@ public class StippleEffect implements ProgramContext {
     private void toggleFullscreen() {
         windowed = !windowed;
 
+        remakeWindow();
+    }
+
+    public void remakeWindow() {
         window = makeWindow();
         program.setCanvasSize(Layout.width(), Layout.height());
         program.replaceWindow(window);

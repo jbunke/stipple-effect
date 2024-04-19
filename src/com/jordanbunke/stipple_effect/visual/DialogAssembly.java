@@ -1978,8 +1978,25 @@ public class DialogAssembly {
                         initialYIndex, "Program font:"),
                         themeLabel = makeDialogRightLabel(fontLabel,
                                 "Theme:"),
-                        checkerboardLabel = TextLabel.make(
+                        windowedSizeLabel = TextLabel.make(
                                 textBelowPos(fontLabel, 1),
+                                "Program size when windowed"),
+                        windowedWidthLabel = TextLabel.make(
+                                textBelowPos(windowedSizeLabel),
+                                "Window width:"),
+                        windowedHeightLabel = makeDialogRightLabel(
+                                windowedWidthLabel, "Window height:"),
+                        windowedContext = TextLabel.make(
+                                textBelowPos(windowedWidthLabel),
+                                "On this device, the windowed program can range from "),
+                        windowedContext2 = TextLabel.make(
+                                textBelowPos(windowedContext),
+                                Layout.MIN_WINDOW_W + "x" +
+                                        Layout.MIN_WINDOW_H + " to " +
+                                        Layout.MAX_WINDOW_W + "x" +
+                                        Layout.MAX_WINDOW_H + " pixels."),
+                        checkerboardLabel = TextLabel.make(
+                                textBelowPos(windowedContext2, 1),
                                 "Checkerboard size"),
                         checkerboardWidthLabel = TextLabel.make(
                                 textBelowPos(checkerboardLabel),
@@ -2035,6 +2052,18 @@ public class DialogAssembly {
                                 () -> Settings.checkTheme().ordinal());
 
                 // textboxes
+                final DynamicTextbox windowedWidthTextbox =
+                        makeDialogPixelDynamicTextbox(windowedWidthLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Layout.MIN_WINDOW_W, Layout.MAX_WINDOW_W,
+                                Settings::setWindowedWidth,
+                                Settings::checkWindowedWidth, 4);
+                final DynamicTextbox windowedHeightTextbox =
+                        makeDialogPixelDynamicTextbox(windowedHeightLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Layout.MIN_WINDOW_H, Layout.MAX_WINDOW_H,
+                                Settings::setWindowedHeight,
+                                Settings::checkWindowedHeight, 4);
                 final DynamicTextbox checkerboardXTextbox =
                         makeDialogPixelDynamicTextbox(checkerboardWidthLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
@@ -2065,6 +2094,10 @@ public class DialogAssembly {
                                 Settings::checkPixelGridYPixels, 3);
 
                 mb.addAll(fontLabel, fontDropdown, themeLabel, themeDropdown,
+                        windowedSizeLabel,
+                        windowedWidthLabel, windowedWidthTextbox,
+                        windowedHeightLabel, windowedHeightTextbox,
+                        windowedContext, windowedContext2,
                         checkerboardLabel,
                         checkerboardWidthLabel, checkerboardXTextbox,
                         checkerboardHeightLabel, checkerboardYTextbox,

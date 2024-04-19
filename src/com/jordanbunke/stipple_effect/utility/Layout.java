@@ -20,7 +20,11 @@ public class Layout {
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
-            MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
+            MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
+            MIN_WINDOW_H = 666,
+            MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),
+            MIN_WINDOW_W = (int)(MIN_WINDOW_H * (16 / 9.)),
+            TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
             TEXT_CARET_W = 1, TEXT_CARET_H = 23,
             TEXT_CARET_Y_OFFSET = -11, TEXT_LINE_PX_H = TEXT_CARET_H + 2,
             CONTENT_BUFFER_PX = 8, PREVIEW_WINDOW_BUFFER_PX = 20,

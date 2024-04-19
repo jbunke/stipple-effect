@@ -30,6 +30,16 @@ public class Settings {
         DUMP_STATES(new Setting<>(BooleanSettingType.get(), true)),
 
         // int settings
+        WINDOWED_W(new Setting<>(
+                IntSettingType.get(), Layout.MAX_WINDOW_W,
+                ww -> {
+                    StippleEffect.get().remakeWindow();
+                })),
+        WINDOWED_H(new Setting<>(
+                IntSettingType.get(), Layout.MAX_WINDOW_H,
+                wh -> {
+                    StippleEffect.get().remakeWindow();
+                })),
         CHECKERBOARD_W_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
                 cbw -> {
@@ -201,6 +211,18 @@ public class Settings {
         Code.DUMP_STATES.set(dumpStates);
     }
 
+    public static void setWindowedWidth(
+            final int windowedWidth
+    ) {
+        Code.WINDOWED_W.set(windowedWidth);
+    }
+
+    public static void setWindowedHeight(
+            final int windowedHeight
+    ) {
+        Code.WINDOWED_H.set(windowedHeight);
+    }
+
     public static void setCheckerboardWPixels(
             final int checkerboardWPixels
     ) {
@@ -286,6 +308,14 @@ public class Settings {
         return (boolean) Code.DUMP_STATES.setting.check();
     }
 
+    public static int checkWindowedWidth() {
+        return (int) Code.WINDOWED_W.setting.check();
+    }
+
+    public static int checkWindowedHeight() {
+        return (int) Code.WINDOWED_H.setting.check();
+    }
+
     public static int checkCheckerboardWPixels() {
         return (int) Code.CHECKERBOARD_W_PX.setting.check();
     }
@@ -337,6 +367,14 @@ public class Settings {
 
     public static boolean isDumpStates() {
         return (boolean) Code.DUMP_STATES.setting.get();
+    }
+
+    public static int getWindowedWidth() {
+        return (int) Code.WINDOWED_W.setting.get();
+    }
+
+    public static int getWindowedHeight() {
+        return (int) Code.WINDOWED_H.setting.get();
     }
 
     public static int getCheckerboardWPixels() {
