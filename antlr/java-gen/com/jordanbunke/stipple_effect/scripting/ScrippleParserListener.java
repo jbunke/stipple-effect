@@ -425,18 +425,6 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitIf_stat(ScrippleParser.If_statContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code TernaryExpression}
-	 * labeled alternative in {@link ScrippleParser#expr()}.
-	 * @param ctx the parse tree
-	 */
-	void enterTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code TernaryExpression}
-	 * labeled alternative in {@link ScrippleParser#expr()}.
-	 * @param ctx the parse tree
-	 */
-	void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code LogicBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -448,6 +436,18 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void enterTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code MultBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.

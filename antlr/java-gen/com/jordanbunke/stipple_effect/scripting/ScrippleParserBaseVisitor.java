@@ -271,14 +271,14 @@ public class ScrippleParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> im
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

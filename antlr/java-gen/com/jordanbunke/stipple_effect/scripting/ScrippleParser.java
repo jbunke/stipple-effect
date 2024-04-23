@@ -1,14 +1,17 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
 
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ParserATNSimulator;
+import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.tree.ParseTreeListener;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class ScrippleParser extends Parser {
@@ -1902,31 +1905,6 @@ public class ScrippleParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class TernaryExpressionContext extends ExprContext {
-		public List<ExprContext> expr() {
-			return getRuleContexts(ExprContext.class);
-		}
-		public ExprContext expr(int i) {
-			return getRuleContext(ExprContext.class,i);
-		}
-		public TerminalNode QUESTION() { return getToken(ScrippleParser.QUESTION, 0); }
-		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
-		public TernaryExpressionContext(ExprContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterTernaryExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitTernaryExpression(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitTernaryExpression(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
 	public static class LogicBinExpressionContext extends ExprContext {
 		public Token op;
 		public List<ExprContext> expr() {
@@ -1949,6 +1927,31 @@ public class ScrippleParser extends Parser {
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
 			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitLogicBinExpression(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class TernaryExpressionContext extends ExprContext {
+		public List<ExprContext> expr() {
+			return getRuleContexts(ExprContext.class);
+		}
+		public ExprContext expr(int i) {
+			return getRuleContext(ExprContext.class,i);
+		}
+		public TerminalNode QUESTION() { return getToken(ScrippleParser.QUESTION, 0); }
+		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
+		public TernaryExpressionContext(ExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterTernaryExpression(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitTernaryExpression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitTernaryExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2570,7 +2573,7 @@ public class ScrippleParser extends Parser {
 					consume();
 				}
 				setState(237);
-				expr(18);
+				expr(24);
 				}
 				break;
 			case 3:
@@ -2777,27 +2780,11 @@ public class ScrippleParser extends Parser {
 					switch ( getInterpreter().adaptivePredict(_input,19,_ctx) ) {
 					case 1:
 						{
-						_localctx = new TernaryExpressionContext(new ExprContext(_parentctx, _parentState));
-						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(301);
-						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
-						setState(302);
-						match(QUESTION);
-						setState(303);
-						expr(0);
-						setState(304);
-						match(COLON);
-						setState(305);
-						expr(25);
-						}
-						break;
-					case 2:
-						{
 						_localctx = new ArithmeticBinExpressionContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(307);
+						setState(301);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
-						setState(308);
+						setState(302);
 						((ArithmeticBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==PLUS || _la==MINUS) ) {
@@ -2808,17 +2795,17 @@ public class ScrippleParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(309);
+						setState(303);
 						expr(24);
 						}
 						break;
-					case 3:
+					case 2:
 						{
 						_localctx = new MultBinExpressionContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(310);
+						setState(304);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
-						setState(311);
+						setState(305);
 						((MultBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 481036337152L) != 0)) ) {
@@ -2829,29 +2816,29 @@ public class ScrippleParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(312);
+						setState(306);
 						expr(23);
+						}
+						break;
+					case 3:
+						{
+						_localctx = new PowerBinExpressionContext(new ExprContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_expr);
+						setState(307);
+						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
+						setState(308);
+						match(RAISE);
+						setState(309);
+						expr(22);
 						}
 						break;
 					case 4:
 						{
-						_localctx = new PowerBinExpressionContext(new ExprContext(_parentctx, _parentState));
-						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(313);
-						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
-						setState(314);
-						match(RAISE);
-						setState(315);
-						expr(22);
-						}
-						break;
-					case 5:
-						{
 						_localctx = new ComparisonBinExpressionContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(316);
+						setState(310);
 						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
-						setState(317);
+						setState(311);
 						((ComparisonBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 8455716864L) != 0)) ) {
@@ -2862,17 +2849,17 @@ public class ScrippleParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(318);
+						setState(312);
 						expr(21);
 						}
 						break;
-					case 6:
+					case 5:
 						{
 						_localctx = new LogicBinExpressionContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(319);
+						setState(313);
 						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
-						setState(320);
+						setState(314);
 						((LogicBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==AND || _la==OR) ) {
@@ -2883,8 +2870,24 @@ public class ScrippleParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(321);
+						setState(315);
 						expr(20);
+						}
+						break;
+					case 6:
+						{
+						_localctx = new TernaryExpressionContext(new ExprContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_expr);
+						setState(316);
+						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
+						setState(317);
+						match(QUESTION);
+						setState(318);
+						expr(0);
+						setState(319);
+						match(COLON);
+						setState(320);
+						expr(19);
 						}
 						break;
 					case 7:
@@ -3996,17 +3999,17 @@ public class ScrippleParser extends Parser {
 	private boolean expr_sempred(ExprContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 3:
-			return precpred(_ctx, 24);
-		case 4:
 			return precpred(_ctx, 23);
-		case 5:
+		case 4:
 			return precpred(_ctx, 22);
-		case 6:
+		case 5:
 			return precpred(_ctx, 21);
-		case 7:
+		case 6:
 			return precpred(_ctx, 20);
-		case 8:
+		case 7:
 			return precpred(_ctx, 19);
+		case 8:
+			return precpred(_ctx, 18);
 		case 9:
 			return precpred(_ctx, 17);
 		case 10:
@@ -4193,7 +4196,7 @@ public class ScrippleParser extends Parser {
 		"\u00e6\u0019\u0001\u0000\u0000\u0000\u00e7\u00e8\u0006\r\uffff\uffff\u0000"+
 		"\u00e8\u00e9\u0005\u0004\u0000\u0000\u00e9\u00ea\u0003\u001a\r\u0000\u00ea"+
 		"\u00eb\u0005\u0005\u0000\u0000\u00eb\u012c\u0001\u0000\u0000\u0000\u00ec"+
-		"\u00ed\u0007\u0000\u0000\u0000\u00ed\u012c\u0003\u001a\r\u0012\u00ee\u00ef"+
+		"\u00ed\u0007\u0000\u0000\u0000\u00ed\u012c\u0003\u001a\r\u0018\u00ee\u00ef"+
 		"\u0005@\u0000\u0000\u00ef\u00f0\u0005\u0004\u0000\u0000\u00f0\u00f1\u0003"+
 		"\u001a\r\u0000\u00f1\u00f2\u0005\u0005\u0000\u0000\u00f2\u012c\u0001\u0000"+
 		"\u0000\u0000\u00f3\u00f4\u0005C\u0000\u0000\u00f4\u00f5\u0005\u0004\u0000"+
@@ -4229,17 +4232,17 @@ public class ScrippleParser extends Parser {
 		"\u0000\u012b\u011a\u0001\u0000\u0000\u0000\u012b\u011f\u0001\u0000\u0000"+
 		"\u0000\u012b\u0122\u0001\u0000\u0000\u0000\u012b\u0125\u0001\u0000\u0000"+
 		"\u0000\u012b\u0129\u0001\u0000\u0000\u0000\u012b\u012a\u0001\u0000\u0000"+
-		"\u0000\u012c\u0160\u0001\u0000\u0000\u0000\u012d\u012e\n\u0018\u0000\u0000"+
-		"\u012e\u012f\u0005\u000f\u0000\u0000\u012f\u0130\u0003\u001a\r\u0000\u0130"+
-		"\u0131\u0005\u000b\u0000\u0000\u0131\u0132\u0003\u001a\r\u0019\u0132\u015f"+
-		"\u0001\u0000\u0000\u0000\u0133\u0134\n\u0017\u0000\u0000\u0134\u0135\u0007"+
-		"\u0001\u0000\u0000\u0135\u015f\u0003\u001a\r\u0018\u0136\u0137\n\u0016"+
-		"\u0000\u0000\u0137\u0138\u0007\u0002\u0000\u0000\u0138\u015f\u0003\u001a"+
-		"\r\u0017\u0139\u013a\n\u0015\u0000\u0000\u013a\u013b\u0005!\u0000\u0000"+
-		"\u013b\u015f\u0003\u001a\r\u0016\u013c\u013d\n\u0014\u0000\u0000\u013d"+
-		"\u013e\u0007\u0003\u0000\u0000\u013e\u015f\u0003\u001a\r\u0015\u013f\u0140"+
-		"\n\u0013\u0000\u0000\u0140\u0141\u0007\u0004\u0000\u0000\u0141\u015f\u0003"+
-		"\u001a\r\u0014\u0142\u0143\n\u0011\u0000\u0000\u0143\u0144\u0005J\u0000"+
+		"\u0000\u012c\u0160\u0001\u0000\u0000\u0000\u012d\u012e\n\u0017\u0000\u0000"+
+		"\u012e\u012f\u0007\u0001\u0000\u0000\u012f\u015f\u0003\u001a\r\u0018\u0130"+
+		"\u0131\n\u0016\u0000\u0000\u0131\u0132\u0007\u0002\u0000\u0000\u0132\u015f"+
+		"\u0003\u001a\r\u0017\u0133\u0134\n\u0015\u0000\u0000\u0134\u0135\u0005"+
+		"!\u0000\u0000\u0135\u015f\u0003\u001a\r\u0016\u0136\u0137\n\u0014\u0000"+
+		"\u0000\u0137\u0138\u0007\u0003\u0000\u0000\u0138\u015f\u0003\u001a\r\u0015"+
+		"\u0139\u013a\n\u0013\u0000\u0000\u013a\u013b\u0007\u0004\u0000\u0000\u013b"+
+		"\u015f\u0003\u001a\r\u0014\u013c\u013d\n\u0012\u0000\u0000\u013d\u013e"+
+		"\u0005\u000f\u0000\u0000\u013e\u013f\u0003\u001a\r\u0000\u013f\u0140\u0005"+
+		"\u000b\u0000\u0000\u0140\u0141\u0003\u001a\r\u0013\u0141\u015f\u0001\u0000"+
+		"\u0000\u0000\u0142\u0143\n\u0011\u0000\u0000\u0143\u0144\u0005J\u0000"+
 		"\u0000\u0144\u0145\u0005\u0004\u0000\u0000\u0145\u0146\u0003\u001a\r\u0000"+
 		"\u0146\u0147\u0005\u0005\u0000\u0000\u0147\u015f\u0001\u0000\u0000\u0000"+
 		"\u0148\u0149\n\u0010\u0000\u0000\u0149\u014a\u0005K\u0000\u0000\u014a"+
@@ -4252,9 +4255,9 @@ public class ScrippleParser extends Parser {
 		"\u0157\u0158\u0003\u001a\r\u0000\u0158\u0159\u0005\f\u0000\u0000\u0159"+
 		"\u015a\u0003\u001a\r\u0000\u015a\u015b\u0005\u0005\u0000\u0000\u015b\u015f"+
 		"\u0001\u0000\u0000\u0000\u015c\u015d\n\n\u0000\u0000\u015d\u015f\u0007"+
-		"\u0006\u0000\u0000\u015e\u012d\u0001\u0000\u0000\u0000\u015e\u0133\u0001"+
-		"\u0000\u0000\u0000\u015e\u0136\u0001\u0000\u0000\u0000\u015e\u0139\u0001"+
-		"\u0000\u0000\u0000\u015e\u013c\u0001\u0000\u0000\u0000\u015e\u013f\u0001"+
+		"\u0006\u0000\u0000\u015e\u012d\u0001\u0000\u0000\u0000\u015e\u0130\u0001"+
+		"\u0000\u0000\u0000\u015e\u0133\u0001\u0000\u0000\u0000\u015e\u0136\u0001"+
+		"\u0000\u0000\u0000\u015e\u0139\u0001\u0000\u0000\u0000\u015e\u013c\u0001"+
 		"\u0000\u0000\u0000\u015e\u0142\u0001\u0000\u0000\u0000\u015e\u0148\u0001"+
 		"\u0000\u0000\u0000\u015e\u014e\u0001\u0000\u0000\u0000\u015e\u0152\u0001"+
 		"\u0000\u0000\u0000\u015e\u0154\u0001\u0000\u0000\u0000\u015e\u015c\u0001"+

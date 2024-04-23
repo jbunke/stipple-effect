@@ -256,19 +256,19 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIf_stat(ScrippleParser.If_statContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code TernaryExpression}
-	 * labeled alternative in {@link ScrippleParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code LogicBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code MultBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.

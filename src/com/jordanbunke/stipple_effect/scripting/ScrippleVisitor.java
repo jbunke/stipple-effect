@@ -5,8 +5,12 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionN
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.BodyStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.IteratorLoopNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.WhileLoopNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.AssignmentNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeAddCallNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeDefineCallNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeDrawCallNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeRemoveCallNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
@@ -212,6 +216,130 @@ public final class ScrippleVisitor
     }
 
     @Override
+    public ForLoopNode visitForLoop(
+            final ScrippleParser.ForLoopContext ctx
+    ) {
+        final InitializationNode initialization =
+                visitVar_init(ctx.for_def().var_init());
+        final ExpressionNode loopCondition =
+                (ExpressionNode) visit(ctx.for_def().expr());
+        final AssignmentNode incrementation =
+                (AssignmentNode) visit(ctx.for_def().assignment());
+        final StatementNode loopBody = (StatementNode) visit(ctx.body());
+
+        return new ForLoopNode(TextPosition.fromToken(ctx.start),
+                initialization, loopCondition, incrementation, loopBody);
+    }
+
+    @Override
+    public IfStatementNode visitIfStatement(
+            final ScrippleParser.IfStatementContext ctx
+    ) {
+        return visitIf_stat(ctx.if_stat());
+    }
+
+    @Override
+    public IfStatementNode visitIf_stat(
+            final ScrippleParser.If_statContext ctx
+    ) {
+        final ExpressionNode condition = (ExpressionNode) visit(ctx.expr());
+        final StatementNode ifBody = (StatementNode) visit(ctx.body(0));
+        final IfStatementNode[] elseIfs = ctx.if_stat().stream()
+                .map(this::visitIf_stat)
+                .toArray(IfStatementNode[]::new);
+        final StatementNode elseBody = ctx.body().size() > 1
+                ? (StatementNode) visit(ctx.body(1)) : null;
+
+        return new IfStatementNode(TextPosition.fromToken(ctx.start),
+                condition, ifBody, elseIfs, elseBody);
+    }
+
+    @Override
+    public DeclarationNode visitVarDefStatement(
+            final ScrippleParser.VarDefStatementContext ctx
+    ) {
+        return (DeclarationNode) visit(ctx.var_def());
+    }
+
+    @Override
+    public InitializationNode visitVar_init(
+            final ScrippleParser.Var_initContext ctx
+    ) {
+        return new InitializationNode(
+                TextPosition.fromToken(ctx.start),
+                ctx.declaration().FINAL() == null,
+                (ScrippleTypeNode) visit(ctx.declaration().type()),
+                visitIdent(ctx.declaration().ident()),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public AssignmentNode visitAssignmentStatement(
+            final ScrippleParser.AssignmentStatementContext ctx
+    ) {
+        return (AssignmentNode) visit(ctx.assignment());
+    }
+
+    @Override
+    public ReturnStatementNode visitReturnStatement(
+            final ScrippleParser.ReturnStatementContext ctx
+    ) {
+        final TextPosition position =
+                TextPosition.fromToken(ctx.return_stat().start);
+
+        if (ctx.return_stat().expr() == null)
+            return ReturnStatementNode.forVoid(position);
+
+        return ReturnStatementNode.forTyped(position,
+                (ExpressionNode) visit(ctx.return_stat().expr()));
+    }
+
+    @Override
+    public NativeAddCallNode visitAddToCollection(
+            final ScrippleParser.AddToCollectionContext ctx
+    ) {
+        return new NativeAddCallNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr(0)),
+                (ExpressionNode) visit(ctx.expr(1)),
+                ctx.expr().size() > 2
+                        ? (ExpressionNode) visit(ctx.expr(2)) : null);
+    }
+
+    @Override
+    public NativeRemoveCallNode visitRemoveFromCollection(
+            final ScrippleParser.RemoveFromCollectionContext ctx
+    ) {
+        return new NativeRemoveCallNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr(0)),
+                (ExpressionNode) visit(ctx.expr(1)));
+    }
+
+    @Override
+    public NativeDefineCallNode visitDefineMapEntryStatement(
+            final ScrippleParser.DefineMapEntryStatementContext ctx
+    ) {
+        return new NativeDefineCallNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr(0)),
+                (ExpressionNode) visit(ctx.expr(1)),
+                (ExpressionNode) visit(ctx.expr(2)));
+    }
+
+    @Override
+    public NativeDrawCallNode visitDrawOntoImageStatement(
+            final ScrippleParser.DrawOntoImageStatementContext ctx
+    ) {
+        return new NativeDrawCallNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr(0)),
+                (ExpressionNode) visit(ctx.expr(1)),
+                (ExpressionNode) visit(ctx.expr(2)),
+                (ExpressionNode) visit(ctx.expr(3)));
+    }
+
+    @Override
     public StatementNode visitSingleStatBody(
             final ScrippleParser.SingleStatBodyContext ctx
     ) {
@@ -229,5 +357,5 @@ public final class ScrippleVisitor
                         .toArray(StatementNode[]::new));
     }
 
-    // TODO: statements
+    // TODO: assignments, expressions
 }

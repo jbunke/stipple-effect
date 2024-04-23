@@ -449,18 +449,6 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -468,6 +456,18 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

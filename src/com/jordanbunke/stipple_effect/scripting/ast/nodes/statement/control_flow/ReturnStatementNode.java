@@ -5,23 +5,28 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionN
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public final class IfStatementNode extends StatementNode {
-    private final ExpressionNode condition;
-    private final StatementNode ifBody;
-    private final IfStatementNode[] elseIfs;
-    private final StatementNode elseBody;
+public final class ReturnStatementNode extends StatementNode {
+    private final ExpressionNode expression;
 
-    public IfStatementNode(
+    private ReturnStatementNode(
             final TextPosition position,
-            final ExpressionNode condition, final StatementNode ifBody,
-            final IfStatementNode[] elseIfs, final StatementNode elseBody
+            final ExpressionNode expression
     ) {
         super(position);
 
-        this.condition = condition;
-        this.ifBody = ifBody;
-        this.elseIfs = elseIfs;
-        this.elseBody = elseBody;
+        this.expression = expression;
+    }
+
+    public static ReturnStatementNode forVoid(
+            final TextPosition position
+    ) {
+        return new ReturnStatementNode(position, null);
+    }
+
+    public static ReturnStatementNode forTyped(
+            final TextPosition position, final ExpressionNode expression
+    ) {
+        return new ReturnStatementNode(position, expression);
     }
 
     @Override
