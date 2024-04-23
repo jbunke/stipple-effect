@@ -7,14 +7,8 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.BodyStatemen
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.AssignmentNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeAddCallNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeDefineCallNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeDrawCallNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.NativeRemoveCallNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
 
 public final class ScrippleVisitor
         extends ScrippleParserBaseVisitor<ScrippleASTNode> {
@@ -176,8 +170,8 @@ public final class ScrippleVisitor
             final ScrippleParser.MapTypeContext ctx
     ) {
         return new MapTypeNode(
-                (ScrippleTypeNode) visit(ctx.type(0)),
-                (ScrippleTypeNode) visit(ctx.type(1)));
+                (ScrippleTypeNode) visit(ctx.key),
+                (ScrippleTypeNode) visit(ctx.val));
     }
 
     @Override
@@ -243,12 +237,12 @@ public final class ScrippleVisitor
             final ScrippleParser.If_statContext ctx
     ) {
         final ExpressionNode condition = (ExpressionNode) visit(ctx.expr());
-        final StatementNode ifBody = (StatementNode) visit(ctx.body(0));
+        final StatementNode ifBody = (StatementNode) visit(ctx.ifBody);
         final IfStatementNode[] elseIfs = ctx.if_stat().stream()
                 .map(this::visitIf_stat)
                 .toArray(IfStatementNode[]::new);
-        final StatementNode elseBody = ctx.body().size() > 1
-                ? (StatementNode) visit(ctx.body(1)) : null;
+        final StatementNode elseBody = ctx.elseBody != null
+                ? (StatementNode) visit(ctx.elseBody) : null;
 
         return new IfStatementNode(TextPosition.fromToken(ctx.start),
                 condition, ifBody, elseIfs, elseBody);
@@ -300,10 +294,10 @@ public final class ScrippleVisitor
     ) {
         return new NativeAddCallNode(
                 TextPosition.fromToken(ctx.start),
-                (ExpressionNode) visit(ctx.expr(0)),
-                (ExpressionNode) visit(ctx.expr(1)),
-                ctx.expr().size() > 2
-                        ? (ExpressionNode) visit(ctx.expr(2)) : null);
+                (ExpressionNode) visit(ctx.col),
+                (ExpressionNode) visit(ctx.elem),
+                ctx.index != null
+                        ? (ExpressionNode) visit(ctx.index) : null);
     }
 
     @Override
@@ -312,8 +306,8 @@ public final class ScrippleVisitor
     ) {
         return new NativeRemoveCallNode(
                 TextPosition.fromToken(ctx.start),
-                (ExpressionNode) visit(ctx.expr(0)),
-                (ExpressionNode) visit(ctx.expr(1)));
+                (ExpressionNode) visit(ctx.col),
+                (ExpressionNode) visit(ctx.arg));
     }
 
     @Override
@@ -322,9 +316,9 @@ public final class ScrippleVisitor
     ) {
         return new NativeDefineCallNode(
                 TextPosition.fromToken(ctx.start),
-                (ExpressionNode) visit(ctx.expr(0)),
-                (ExpressionNode) visit(ctx.expr(1)),
-                (ExpressionNode) visit(ctx.expr(2)));
+                (ExpressionNode) visit(ctx.map),
+                (ExpressionNode) visit(ctx.key),
+                (ExpressionNode) visit(ctx.val));
     }
 
     @Override
@@ -333,10 +327,10 @@ public final class ScrippleVisitor
     ) {
         return new NativeDrawCallNode(
                 TextPosition.fromToken(ctx.start),
-                (ExpressionNode) visit(ctx.expr(0)),
-                (ExpressionNode) visit(ctx.expr(1)),
-                (ExpressionNode) visit(ctx.expr(2)),
-                (ExpressionNode) visit(ctx.expr(3)));
+                (ExpressionNode) visit(ctx.canvas),
+                (ExpressionNode) visit(ctx.img),
+                (ExpressionNode) visit(ctx.x),
+                (ExpressionNode) visit(ctx.y));
     }
 
     @Override

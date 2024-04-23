@@ -26,7 +26,7 @@ type
 | type LBRACKET RBRACKET                    #ArrayType
 | type LT GT                                #SetType
 | type LCURLY RCURLY                        #ListType
-| LCURLY type COLON type RCURLY             #MapType
+| LCURLY key=type COLON val=type RCURLY     #MapType
 ;
 
 body
@@ -41,13 +41,14 @@ stat
 | var_def SEMICOLON                         #VarDefStatement
 | assignment SEMICOLON                      #AssignmentStatement
 | return_stat                               #ReturnStatement
-| expr ADD LPAREN expr (COMMA expr)?
-  RPAREN SEMICOLON                          #AddToCollection
-| expr REMOVE LPAREN expr RPAREN SEMICOLON  #RemoveFromCollection
-| expr DEFINE LPAREN expr COMMA expr
-  RPAREN SEMICOLON                          #DefineMapEntryStatement
-| expr DRAW LPAREN expr COMMA expr
-  COMMA expr RPAREN SEMICOLON               #DrawOntoImageStatement
+| col=expr ADD LPAREN elem=expr
+  (COMMA index=expr)? RPAREN SEMICOLON      #AddToCollection
+| col=expr REMOVE LPAREN
+  arg=expr RPAREN SEMICOLON                 #RemoveFromCollection
+| map=expr DEFINE LPAREN key=expr
+  COMMA val=expr RPAREN SEMICOLON           #DefineMapEntryStatement
+| canvas=expr DRAW LPAREN img=expr COMMA
+  x=expr COMMA y=expr RPAREN SEMICOLON      #DrawOntoImageStatement
 ;
 
 return_stat: RETURN expr? SEMICOLON;
@@ -67,31 +68,33 @@ while_def: WHILE LPAREN expr RPAREN;
 for_def: FOR LPAREN var_init SEMICOLON
 expr SEMICOLON assignment RPAREN;
 
-if_stat: IF LPAREN expr RPAREN body
-(ELSE if_stat)* (ELSE body)?;
+if_stat: IF LPAREN expr RPAREN ifBody=body
+(ELSE if_stat)* (ELSE elseBody=body)?;
 
 expr
 : LPAREN expr RPAREN                        #NestedExpression
 | op=(MINUS | NOT | SIZE) expr              #UnaryExpression
-| expr op=(PLUS | MINUS) expr               #ArithmeticBinExpression
-| expr op=(TIMES | DIVIDE | MOD) expr       #MultBinExpression
-| expr RAISE expr                           #PowerBinExpression
-| expr op=(EQUAL | NOT_EQUAL |
-  GT | LT | GEQ | LEQ) expr                 #ComparisonBinExpression
-| expr op=(OR | AND) expr                   #LogicBinExpression
-| expr QUESTION expr COLON expr             #TernaryExpression
-| expr HAS LPAREN expr RPAREN               #ContainsExpression
-| expr LOOKUP LPAREN expr RPAREN            #MapLookupExpression
-| expr KEYS LPAREN RPAREN                   #MapKeysetExpression
-| expr op=(RED | GREEN | BLUE | ALPHA)      #ColorChannelExpression
+| a=expr op=(PLUS | MINUS) b=expr           #ArithmeticBinExpression
+| a=expr op=(TIMES | DIVIDE | MOD) b=expr   #MultBinExpression
+| a=expr RAISE b=expr                       #PowerBinExpression
+| a=expr op=(EQUAL | NOT_EQUAL |
+  GT | LT | GEQ | LEQ) b=expr               #ComparisonBinExpression
+| a=expr op=(OR | AND) b=expr               #LogicBinExpression
+| cond=expr QUESTION if=expr
+  COLON else=expr                           #TernaryExpression
+| col=expr HAS LPAREN expr RPAREN           #ContainsExpression
+| map=expr LOOKUP LPAREN expr RPAREN        #MapLookupExpression
+| map=expr KEYS LPAREN RPAREN               #MapKeysetExpression
+| c=expr op=(RED | GREEN | BLUE | ALPHA)    #ColorChannelExpression
 | FROM LPAREN expr RPAREN                   #ImageFromPathExpression
-| BLANK LPAREN expr COMMA expr RPAREN       #ImageOfBoundsExpression
-| expr PIXEL LPAREN expr COMMA expr RPAREN  #ColorAtPixelExpression
+| BLANK LPAREN x=expr COMMA y=expr RPAREN   #ImageOfBoundsExpression
+| img=expr PIXEL LPAREN x=expr
+  COMMA y=expr RPAREN                       #ColorAtPixelExpression
 | expr op=(WIDTH | HEIGHT)                  #ImageBoundExpression
-| RGB LPAREN expr COMMA expr
-  COMMA expr RPAREN                         #RGBColorExpression
-| RGBA LPAREN expr COMMA expr
-  COMMA expr COMMA expr RPAREN              #RGBAColorExpression
+| RGB LPAREN r=expr COMMA g=expr
+  COMMA b=expr RPAREN                       #RGBColorExpression
+| RGBA LPAREN r=expr COMMA g=expr
+  COMMA b=expr COMMA a=expr RPAREN          #RGBAColorExpression
 | OF LPAREN expr (COMMA expr)* RPAREN       #ExplicitCollectionExpression
 | NEW LBRACKET expr RBRACKET                #NewArrayExpression
 | NEW LT GT                                 #NewListExpression

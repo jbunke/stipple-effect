@@ -1,17 +1,14 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class ScrippleParser extends Parser {
@@ -618,15 +615,17 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MapTypeContext extends TypeContext {
+		public TypeContext key;
+		public TypeContext val;
 		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
+		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
+		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
 		public List<TypeContext> type() {
 			return getRuleContexts(TypeContext.class);
 		}
 		public TypeContext type(int i) {
 			return getRuleContext(TypeContext.class,i);
 		}
-		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
 		public MapTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -787,11 +786,11 @@ public class ScrippleParser extends Parser {
 				setState(90);
 				match(LCURLY);
 				setState(91);
-				type(0);
+				((MapTypeContext)_localctx).key = type(0);
 				setState(92);
 				match(COLON);
 				setState(93);
-				type(0);
+				((MapTypeContext)_localctx).val = type(0);
 				setState(94);
 				match(RCURLY);
 				}
@@ -1012,16 +1011,18 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class RemoveFromCollectionContext extends StatContext {
+		public ExprContext col;
+		public ExprContext arg;
+		public TerminalNode REMOVE() { return getToken(ScrippleParser.REMOVE, 0); }
+		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode REMOVE() { return getToken(ScrippleParser.REMOVE, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
 		public RemoveFromCollectionContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1039,17 +1040,20 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DefineMapEntryStatementContext extends StatContext {
+		public ExprContext map;
+		public ExprContext key;
+		public ExprContext val;
+		public TerminalNode DEFINE() { return getToken(ScrippleParser.DEFINE, 0); }
+		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode DEFINE() { return getToken(ScrippleParser.DEFINE, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
 		public DefineMapEntryStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1088,12 +1092,10 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DrawOntoImageStatementContext extends StatContext {
-		public List<ExprContext> expr() {
-			return getRuleContexts(ExprContext.class);
-		}
-		public ExprContext expr(int i) {
-			return getRuleContext(ExprContext.class,i);
-		}
+		public ExprContext canvas;
+		public ExprContext img;
+		public ExprContext x;
+		public ExprContext y;
 		public TerminalNode DRAW() { return getToken(ScrippleParser.DRAW, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
@@ -1102,6 +1104,12 @@ public class ScrippleParser extends Parser {
 		}
 		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public List<ExprContext> expr() {
+			return getRuleContexts(ExprContext.class);
+		}
+		public ExprContext expr(int i) {
+			return getRuleContext(ExprContext.class,i);
+		}
 		public DrawOntoImageStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1139,16 +1147,19 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AddToCollectionContext extends StatContext {
+		public ExprContext col;
+		public ExprContext elem;
+		public ExprContext index;
+		public TerminalNode ADD() { return getToken(ScrippleParser.ADD, 0); }
+		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode ADD() { return getToken(ScrippleParser.ADD, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
 		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
 		public AddToCollectionContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
@@ -1264,13 +1275,13 @@ public class ScrippleParser extends Parser {
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(132);
-				expr(0);
+				((AddToCollectionContext)_localctx).col = expr(0);
 				setState(133);
 				match(ADD);
 				setState(134);
 				match(LPAREN);
 				setState(135);
-				expr(0);
+				((AddToCollectionContext)_localctx).elem = expr(0);
 				setState(138);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -1279,7 +1290,7 @@ public class ScrippleParser extends Parser {
 					setState(136);
 					match(COMMA);
 					setState(137);
-					expr(0);
+					((AddToCollectionContext)_localctx).index = expr(0);
 					}
 				}
 
@@ -1294,13 +1305,13 @@ public class ScrippleParser extends Parser {
 				enterOuterAlt(_localctx, 7);
 				{
 				setState(143);
-				expr(0);
+				((RemoveFromCollectionContext)_localctx).col = expr(0);
 				setState(144);
 				match(REMOVE);
 				setState(145);
 				match(LPAREN);
 				setState(146);
-				expr(0);
+				((RemoveFromCollectionContext)_localctx).arg = expr(0);
 				setState(147);
 				match(RPAREN);
 				setState(148);
@@ -1312,17 +1323,17 @@ public class ScrippleParser extends Parser {
 				enterOuterAlt(_localctx, 8);
 				{
 				setState(150);
-				expr(0);
+				((DefineMapEntryStatementContext)_localctx).map = expr(0);
 				setState(151);
 				match(DEFINE);
 				setState(152);
 				match(LPAREN);
 				setState(153);
-				expr(0);
+				((DefineMapEntryStatementContext)_localctx).key = expr(0);
 				setState(154);
 				match(COMMA);
 				setState(155);
-				expr(0);
+				((DefineMapEntryStatementContext)_localctx).val = expr(0);
 				setState(156);
 				match(RPAREN);
 				setState(157);
@@ -1334,21 +1345,21 @@ public class ScrippleParser extends Parser {
 				enterOuterAlt(_localctx, 9);
 				{
 				setState(159);
-				expr(0);
+				((DrawOntoImageStatementContext)_localctx).canvas = expr(0);
 				setState(160);
 				match(DRAW);
 				setState(161);
 				match(LPAREN);
 				setState(162);
-				expr(0);
+				((DrawOntoImageStatementContext)_localctx).img = expr(0);
 				setState(163);
 				match(COMMA);
 				setState(164);
-				expr(0);
+				((DrawOntoImageStatementContext)_localctx).x = expr(0);
 				setState(165);
 				match(COMMA);
 				setState(166);
-				expr(0);
+				((DrawOntoImageStatementContext)_localctx).y = expr(0);
 				setState(167);
 				match(RPAREN);
 				setState(168);
@@ -1791,6 +1802,8 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class If_statContext extends ParserRuleContext {
+		public BodyContext ifBody;
+		public BodyContext elseBody;
 		public TerminalNode IF() { return getToken(ScrippleParser.IF, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public ExprContext expr() {
@@ -1848,7 +1861,7 @@ public class ScrippleParser extends Parser {
 			setState(218);
 			match(RPAREN);
 			setState(219);
-			body();
+			((If_statContext)_localctx).ifBody = body();
 			setState(224);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,15,_ctx);
@@ -1875,7 +1888,7 @@ public class ScrippleParser extends Parser {
 				setState(227);
 				match(ELSE);
 				setState(228);
-				body();
+				((If_statContext)_localctx).elseBody = body();
 				}
 				break;
 			}
@@ -1906,7 +1919,9 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class LogicBinExpressionContext extends ExprContext {
+		public ExprContext a;
 		public Token op;
+		public ExprContext b;
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -1932,14 +1947,17 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class TernaryExpressionContext extends ExprContext {
+		public ExprContext cond;
+		public ExprContext if_;
+		public ExprContext else_;
+		public TerminalNode QUESTION() { return getToken(ScrippleParser.QUESTION, 0); }
+		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode QUESTION() { return getToken(ScrippleParser.QUESTION, 0); }
-		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
 		public TernaryExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -1957,7 +1975,9 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MultBinExpressionContext extends ExprContext {
+		public ExprContext a;
 		public Token op;
+		public ExprContext b;
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2031,14 +2051,15 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MapLookupExpressionContext extends ExprContext {
+		public ExprContext map;
+		public TerminalNode LOOKUP() { return getToken(ScrippleParser.LOOKUP, 0); }
+		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode LOOKUP() { return getToken(ScrippleParser.LOOKUP, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public MapLookupExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
@@ -2057,13 +2078,15 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PowerBinExpressionContext extends ExprContext {
+		public ExprContext a;
+		public ExprContext b;
+		public TerminalNode RAISE() { return getToken(ScrippleParser.RAISE, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode RAISE() { return getToken(ScrippleParser.RAISE, 0); }
 		public PowerBinExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -2081,7 +2104,9 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ComparisonBinExpressionContext extends ExprContext {
+		public ExprContext a;
 		public Token op;
+		public ExprContext b;
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2111,19 +2136,22 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class RGBColorExpressionContext extends ExprContext {
+		public ExprContext r;
+		public ExprContext g;
+		public ExprContext b;
 		public TerminalNode RGB() { return getToken(ScrippleParser.RGB, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(ScrippleParser.COMMA, i);
+		}
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
-		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public RGBColorExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -2141,16 +2169,18 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ImageOfBoundsExpressionContext extends ExprContext {
+		public ExprContext x;
+		public ExprContext y;
 		public TerminalNode BLANK() { return getToken(ScrippleParser.BLANK, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public ImageOfBoundsExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -2209,19 +2239,23 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class RGBAColorExpressionContext extends ExprContext {
+		public ExprContext r;
+		public ExprContext g;
+		public ExprContext b;
+		public ExprContext a;
 		public TerminalNode RGBA() { return getToken(ScrippleParser.RGBA, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(ScrippleParser.COMMA, i);
+		}
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
-		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public RGBAColorExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -2259,14 +2293,15 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ContainsExpressionContext extends ExprContext {
+		public ExprContext col;
+		public TerminalNode HAS() { return getToken(ScrippleParser.HAS, 0); }
+		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode HAS() { return getToken(ScrippleParser.HAS, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public ContainsExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
@@ -2325,12 +2360,13 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MapKeysetExpressionContext extends ExprContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
-		}
+		public ExprContext map;
 		public TerminalNode KEYS() { return getToken(ScrippleParser.KEYS, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
+		}
 		public MapKeysetExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -2370,16 +2406,19 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ColorAtPixelExpressionContext extends ExprContext {
+		public ExprContext img;
+		public ExprContext x;
+		public ExprContext y;
+		public TerminalNode PIXEL() { return getToken(ScrippleParser.PIXEL, 0); }
+		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
+		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode PIXEL() { return getToken(ScrippleParser.PIXEL, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
 		public ColorAtPixelExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -2397,7 +2436,9 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArithmeticBinExpressionContext extends ExprContext {
+		public ExprContext a;
 		public Token op;
+		public ExprContext b;
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2453,6 +2494,7 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ColorChannelExpressionContext extends ExprContext {
+		public ExprContext c;
 		public Token op;
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
@@ -2601,11 +2643,11 @@ public class ScrippleParser extends Parser {
 				setState(244);
 				match(LPAREN);
 				setState(245);
-				expr(0);
+				((ImageOfBoundsExpressionContext)_localctx).x = expr(0);
 				setState(246);
 				match(COMMA);
 				setState(247);
-				expr(0);
+				((ImageOfBoundsExpressionContext)_localctx).y = expr(0);
 				setState(248);
 				match(RPAREN);
 				}
@@ -2620,15 +2662,15 @@ public class ScrippleParser extends Parser {
 				setState(251);
 				match(LPAREN);
 				setState(252);
-				expr(0);
+				((RGBColorExpressionContext)_localctx).r = expr(0);
 				setState(253);
 				match(COMMA);
 				setState(254);
-				expr(0);
+				((RGBColorExpressionContext)_localctx).g = expr(0);
 				setState(255);
 				match(COMMA);
 				setState(256);
-				expr(0);
+				((RGBColorExpressionContext)_localctx).b = expr(0);
 				setState(257);
 				match(RPAREN);
 				}
@@ -2643,19 +2685,19 @@ public class ScrippleParser extends Parser {
 				setState(260);
 				match(LPAREN);
 				setState(261);
-				expr(0);
+				((RGBAColorExpressionContext)_localctx).r = expr(0);
 				setState(262);
 				match(COMMA);
 				setState(263);
-				expr(0);
+				((RGBAColorExpressionContext)_localctx).g = expr(0);
 				setState(264);
 				match(COMMA);
 				setState(265);
-				expr(0);
+				((RGBAColorExpressionContext)_localctx).b = expr(0);
 				setState(266);
 				match(COMMA);
 				setState(267);
-				expr(0);
+				((RGBAColorExpressionContext)_localctx).a = expr(0);
 				setState(268);
 				match(RPAREN);
 				}
@@ -2781,6 +2823,7 @@ public class ScrippleParser extends Parser {
 					case 1:
 						{
 						_localctx = new ArithmeticBinExpressionContext(new ExprContext(_parentctx, _parentState));
+						((ArithmeticBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(301);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
@@ -2796,12 +2839,13 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(303);
-						expr(24);
+						((ArithmeticBinExpressionContext)_localctx).b = expr(24);
 						}
 						break;
 					case 2:
 						{
 						_localctx = new MultBinExpressionContext(new ExprContext(_parentctx, _parentState));
+						((MultBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(304);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
@@ -2817,24 +2861,26 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(306);
-						expr(23);
+						((MultBinExpressionContext)_localctx).b = expr(23);
 						}
 						break;
 					case 3:
 						{
 						_localctx = new PowerBinExpressionContext(new ExprContext(_parentctx, _parentState));
+						((PowerBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(307);
 						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
 						setState(308);
 						match(RAISE);
 						setState(309);
-						expr(22);
+						((PowerBinExpressionContext)_localctx).b = expr(22);
 						}
 						break;
 					case 4:
 						{
 						_localctx = new ComparisonBinExpressionContext(new ExprContext(_parentctx, _parentState));
+						((ComparisonBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(310);
 						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
@@ -2850,12 +2896,13 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(312);
-						expr(21);
+						((ComparisonBinExpressionContext)_localctx).b = expr(21);
 						}
 						break;
 					case 5:
 						{
 						_localctx = new LogicBinExpressionContext(new ExprContext(_parentctx, _parentState));
+						((LogicBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(313);
 						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
@@ -2871,28 +2918,30 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(315);
-						expr(20);
+						((LogicBinExpressionContext)_localctx).b = expr(20);
 						}
 						break;
 					case 6:
 						{
 						_localctx = new TernaryExpressionContext(new ExprContext(_parentctx, _parentState));
+						((TernaryExpressionContext)_localctx).cond = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(316);
 						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
 						setState(317);
 						match(QUESTION);
 						setState(318);
-						expr(0);
+						((TernaryExpressionContext)_localctx).if_ = expr(0);
 						setState(319);
 						match(COLON);
 						setState(320);
-						expr(19);
+						((TernaryExpressionContext)_localctx).else_ = expr(19);
 						}
 						break;
 					case 7:
 						{
 						_localctx = new ContainsExpressionContext(new ExprContext(_parentctx, _parentState));
+						((ContainsExpressionContext)_localctx).col = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(322);
 						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
@@ -2909,6 +2958,7 @@ public class ScrippleParser extends Parser {
 					case 8:
 						{
 						_localctx = new MapLookupExpressionContext(new ExprContext(_parentctx, _parentState));
+						((MapLookupExpressionContext)_localctx).map = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(328);
 						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
@@ -2925,6 +2975,7 @@ public class ScrippleParser extends Parser {
 					case 9:
 						{
 						_localctx = new MapKeysetExpressionContext(new ExprContext(_parentctx, _parentState));
+						((MapKeysetExpressionContext)_localctx).map = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(334);
 						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
@@ -2939,6 +2990,7 @@ public class ScrippleParser extends Parser {
 					case 10:
 						{
 						_localctx = new ColorChannelExpressionContext(new ExprContext(_parentctx, _parentState));
+						((ColorChannelExpressionContext)_localctx).c = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(338);
 						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
@@ -2958,6 +3010,7 @@ public class ScrippleParser extends Parser {
 					case 11:
 						{
 						_localctx = new ColorAtPixelExpressionContext(new ExprContext(_parentctx, _parentState));
+						((ColorAtPixelExpressionContext)_localctx).img = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(340);
 						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
@@ -2966,11 +3019,11 @@ public class ScrippleParser extends Parser {
 						setState(342);
 						match(LPAREN);
 						setState(343);
-						expr(0);
+						((ColorAtPixelExpressionContext)_localctx).x = expr(0);
 						setState(344);
 						match(COMMA);
 						setState(345);
-						expr(0);
+						((ColorAtPixelExpressionContext)_localctx).y = expr(0);
 						setState(346);
 						match(RPAREN);
 						}
