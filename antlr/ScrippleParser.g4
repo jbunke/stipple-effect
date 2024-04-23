@@ -9,53 +9,54 @@ head_rule: FUNC signature LCURLY stat* RCURLY;
 declaration: FINAL? type ident;
 
 signature
-: LPAREN param_list? RPAREN                 #VOID_RETURN
-| LPAREN param_list? ARROW type RPAREN      #TYPE_RETURN
+: LPAREN param_list? RPAREN                 #VoidReturnSignature
+| LPAREN param_list? ARROW type RPAREN      #TypeReturnSignature
 ;
 
 param_list: declaration (COMMA declaration)*;
 
 type
-: BOOL                                      #BOOL_TYPE
-| INT                                       #INT_TYPE
-| FLOAT                                     #FLOAT_TYPE
-| CHAR                                      #CHAR_TYPE
-| STRING                                    #STRING_TYPE
-| IMAGE                                     #IMAGE_TYPE
-| COLOR                                     #COLOR_TYPE
-| type LBRACKET RBRACKET                    #ARRAY_TYPE
-| type LT GT                                #SET_TYPE
-| type LCURLY RCURLY                        #LIST_TYPE
-| LCURLY type COLON type RCURLY             #MAP_TYPE
+: BOOL                                      #BoolType
+| INT                                       #IntType
+| FLOAT                                     #FloatType
+| CHAR                                      #CharType
+| STRING                                    #StringType
+| IMAGE                                     #ImageType
+| COLOR                                     #ColorType
+| type LBRACKET RBRACKET                    #ArrayType
+| type LT GT                                #SetType
+| type LCURLY RCURLY                        #ListType
+| LCURLY type COLON type RCURLY             #MapType
 ;
 
 body
-: stat                                      #SINGLE_STAT_BODY
-| LCURLY stat* RCURLY                       #COMPLEX_BODY
+: stat                                      #SingleStatBody
+| LCURLY stat* RCURLY                       #ComplexBody
 ;
 
 stat
-: loop_stat                                 #LOOP_STAT
-| if_stat                                   #IF_STAT
+: loop_stat                                 #LoopStatement
+| if_stat                                   #IfStatement
 // match_stat
-| var_def SEMICOLON                         #VAR_DEF_STAT
-| assignment SEMICOLON                      #ASSIGNMENT_STAT
-| return_stat                               #RETURN_STAT
+| var_def SEMICOLON                         #VarDefStatement
+| assignment SEMICOLON                      #AssignmentStatement
+| return_stat                               #ReturnStatement
 | expr ADD LPAREN expr (COMMA expr)?
-  RPAREN SEMICOLON                          #ADD_TO_COLLECTION
-| expr REMOVE LPAREN expr RPAREN SEMICOLON  #REMOVE_FROM_COLLECTION
+  RPAREN SEMICOLON                          #AddToCollection
+| expr REMOVE LPAREN expr RPAREN SEMICOLON  #RemoveFromCollection
 | expr DEFINE LPAREN expr COMMA expr
-  RPAREN SEMICOLON                          #DEFINE_MAP_ENTRY
+  RPAREN SEMICOLON                          #DefineMapEntryStatement
 | expr DRAW LPAREN expr COMMA expr
-  COMMA expr RPAREN SEMICOLON               #DRAW_ONTO_IMAGE
+  COMMA expr RPAREN SEMICOLON               #DrawOntoImageStatement
 ;
 
 return_stat: RETURN expr? SEMICOLON;
 
 loop_stat
-: (while_def | iteration_def | for_def)
-  body                                      #COND_FIRST_LOOP
-| DO body while_def SEMICOLON               #COND_LAST_LOOP
+: while_def body                            #WhileLoop
+| iteration_def body                        #IteratorLoop
+| for_def body                              #ForLoop
+| DO body while_def SEMICOLON               #DoWhileLoop
 ;
 
 iteration_def: FOREACH LPAREN
@@ -70,72 +71,72 @@ if_stat: IF LPAREN expr RPAREN body
 (ELSE if_stat)* (ELSE body)?;
 
 expr
-: LPAREN expr RPAREN                        #NESTED_EXPR
-| expr QUESTION expr COLON expr             #TERNARY_EXPR
-| expr op=(PLUS | MINUS) expr               #ARITHMETIC_BIN_EXPR
-| expr op=(TIMES | DIVIDE | MOD) expr       #MULT_BIN_EXPR
-| expr RAISE expr                           #POWER_BIN_EXPR
+: LPAREN expr RPAREN                        #NestedExpression
+| op=(MINUS | NOT | SIZE) expr              #UnaryExpression
+| expr op=(PLUS | MINUS) expr               #ArithmeticBinExpression
+| expr op=(TIMES | DIVIDE | MOD) expr       #MultBinExpression
+| expr RAISE expr                           #PowerBinExpression
 | expr op=(EQUAL | NOT_EQUAL |
-  GT | LT | GEQ | LEQ) expr                 #COMPARISON_BIN_EXPR
-| expr op=(OR | AND) expr                   #LOGIC_BIN_EXPR
-| op=(MINUS | NOT | SIZE) expr              #UNARY_EXPR
-| expr HAS LPAREN expr RPAREN               #CONTAINS_EXPR
-| expr LOOKUP LPAREN expr RPAREN            #MAP_GET_EXPR
-| expr KEYS LPAREN RPAREN                   #MAP_KEYSET_EXPR
-| expr op=(RED | GREEN | BLUE | ALPHA)      #GET_COLOR_CHANNEL
-| FROM LPAREN expr RPAREN                   #IMAGE_FROM_PATH_EXPR
-| BLANK LPAREN expr COMMA expr RPAREN       #IMAGE_OF_BOUNDS_EXPR
-| expr PIXEL LPAREN expr COMMA expr RPAREN  #COLOR_AT_PIXEL_EXPR
-| expr op=(WIDTH | HEIGHT)                  #IMAGE_BOUND_EXPR
+  GT | LT | GEQ | LEQ) expr                 #ComparisonBinExpression
+| expr op=(OR | AND) expr                   #LogicBinExpression
+| expr QUESTION expr COLON expr             #TernaryExpression
+| expr HAS LPAREN expr RPAREN               #ContainsExpression
+| expr LOOKUP LPAREN expr RPAREN            #MapLookupExpression
+| expr KEYS LPAREN RPAREN                   #MapKeysetExpression
+| expr op=(RED | GREEN | BLUE | ALPHA)      #ColorChannelExpression
+| FROM LPAREN expr RPAREN                   #ImageFromPathExpression
+| BLANK LPAREN expr COMMA expr RPAREN       #ImageOfBoundsExpression
+| expr PIXEL LPAREN expr COMMA expr RPAREN  #ColorAtPixelExpression
+| expr op=(WIDTH | HEIGHT)                  #ImageBoundExpression
 | RGB LPAREN expr COMMA expr
-  COMMA expr RPAREN                         #RGB_COLOR_EXPR
+  COMMA expr RPAREN                         #RGBColorExpression
 | RGBA LPAREN expr COMMA expr
-  COMMA expr COMMA expr RPAREN              #RGBA_COLOR_EXPR
-| OF LPAREN expr (COMMA expr)* RPAREN       #EXPLICIT_COLLECTION
-| NEW LBRACKET expr RBRACKET                #NEW_ARRAY_EXPR
-| NEW LT GT                                 #NEW_LIST_EXPR
-| NEW LCURLY RCURLY                         #NEW_SET_EXPR
-| NEW LCURLY COLON RCURLY                   #NEW_MAP_EXPR
-| assignable                                #ASSIGNABLE_EXPR
-| literal                                   #LIT_EXPR
+  COMMA expr COMMA expr RPAREN              #RGBAColorExpression
+| OF LPAREN expr (COMMA expr)* RPAREN       #ExplicitCollectionExpression
+| NEW LBRACKET expr RBRACKET                #NewArrayExpression
+| NEW LT GT                                 #NewListExpression
+| NEW LCURLY RCURLY                         #NewSetExpression
+| NEW LCURLY COLON RCURLY                   #NewMapExpression
+| assignable                                #AssignableExpression
+| literal                                   #LiteralExpression
 ;
 
 assignment
-: assignable ASSIGN expr                    #STANDARD_ASSIGNMENT
-| assignable INCREMENT                      #INC_ASSIGNMENT
-| assignable DECREMENT                      #DEC_ASSIGNMENT
-| assignable ADD_ASSIGN expr                #ADD_ASSIGNMENT
-| assignable SUB_ASSIGN expr                #SUB_ASSIGNMENT
-| assignable MUL_ASSIGN expr                #MUL_ASSIGNMENT
-| assignable DIV_ASSIGN expr                #DIV_ASSIGNMENT
-| assignable MOD_ASSIGN expr                #MOD_ASSIGNMENT
-| assignable AND_ASSIGN expr                #AND_ASSIGNMENT
-| assignable OR_ASSIGN expr                 #OR_ASSIGNMENT
+: assignable ASSIGN expr                    #StandardAssignment
+| assignable INCREMENT                      #IncrementAssignment
+| assignable DECREMENT                      #DecrementAssignment
+| assignable ADD_ASSIGN expr                #AddAssignment
+| assignable SUB_ASSIGN expr                #SubAssignment
+| assignable MUL_ASSIGN expr                #MultAssignment
+| assignable DIV_ASSIGN expr                #DivAssignmnet
+| assignable MOD_ASSIGN expr                #ModAssignment
+| assignable AND_ASSIGN expr                #AndAssignment
+| assignable OR_ASSIGN expr                 #OrAssignment
 ;
 
 var_init: declaration ASSIGN expr;
 
 var_def
-: declaration                               #IMPLICIT_DEF
-| var_init                                  #EXPLICIT_DEF
+: declaration                               #ImplicitVarDef
+| var_init                                  #ExplicitVarDef
 ;
 
 assignable
-: ident                                     #ASSIGNABLE_VAR
-| ident LT expr GT                          #ASSIGNABLE_LIST_ELEM
-| ident LBRACKET expr RBRACKET              #ASSIGNABLE_ARR_ELEM
+: ident                                     #SimpleAssignable
+| ident LT expr GT                          #ListAssignable
+| ident LBRACKET expr RBRACKET              #ArrayAssignable
 ;
 
 ident: IDENTIFIER;
 
 literal
-: STRING_LIT                                #STRING_LITERAL
-| CHAR_LIT                                  #CHAR_LITERAL
-| int_lit                                   #INT_LITERAL
-| FLOAT_LIT                                 #FLOAT_LITERAL
-| BOOL_LIT                                  #BOOL_LITERAL
+: STRING_LIT                                #StringLiteral
+| CHAR_LIT                                  #CharLiteral
+| int_lit                                   #IntLiteral
+| FLOAT_LIT                                 #FloatLiteral
+| BOOL_LIT                                  #BoolLiteral
 ;
 
-int_lit: HEX_LIT                            #HEXADECIMAL
-| DEC_LIT                                   #DECIMAL
+int_lit: HEX_LIT                            #Hexadecimal
+| DEC_LIT                                   #Decimal
 ;

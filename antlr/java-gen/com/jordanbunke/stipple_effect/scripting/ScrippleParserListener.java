@@ -1,5 +1,6 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
+
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -28,29 +29,29 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitDeclaration(ScrippleParser.DeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code VOID_RETURN}
+	 * Enter a parse tree produced by the {@code VoidReturnSignature}
 	 * labeled alternative in {@link ScrippleParser#signature}.
 	 * @param ctx the parse tree
 	 */
-	void enterVOID_RETURN(ScrippleParser.VOID_RETURNContext ctx);
+	void enterVoidReturnSignature(ScrippleParser.VoidReturnSignatureContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code VOID_RETURN}
+	 * Exit a parse tree produced by the {@code VoidReturnSignature}
 	 * labeled alternative in {@link ScrippleParser#signature}.
 	 * @param ctx the parse tree
 	 */
-	void exitVOID_RETURN(ScrippleParser.VOID_RETURNContext ctx);
+	void exitVoidReturnSignature(ScrippleParser.VoidReturnSignatureContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code TYPE_RETURN}
+	 * Enter a parse tree produced by the {@code TypeReturnSignature}
 	 * labeled alternative in {@link ScrippleParser#signature}.
 	 * @param ctx the parse tree
 	 */
-	void enterTYPE_RETURN(ScrippleParser.TYPE_RETURNContext ctx);
+	void enterTypeReturnSignature(ScrippleParser.TypeReturnSignatureContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code TYPE_RETURN}
+	 * Exit a parse tree produced by the {@code TypeReturnSignature}
 	 * labeled alternative in {@link ScrippleParser#signature}.
 	 * @param ctx the parse tree
 	 */
-	void exitTYPE_RETURN(ScrippleParser.TYPE_RETURNContext ctx);
+	void exitTypeReturnSignature(ScrippleParser.TypeReturnSignatureContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScrippleParser#param_list}.
 	 * @param ctx the parse tree
@@ -62,269 +63,269 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitParam_list(ScrippleParser.Param_listContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code IMAGE_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code ArrayType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterIMAGE_TYPE(ScrippleParser.IMAGE_TYPEContext ctx);
+	void enterArrayType(ScrippleParser.ArrayTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code IMAGE_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code ArrayType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitIMAGE_TYPE(ScrippleParser.IMAGE_TYPEContext ctx);
+	void exitArrayType(ScrippleParser.ArrayTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code CHAR_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code BoolType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterCHAR_TYPE(ScrippleParser.CHAR_TYPEContext ctx);
+	void enterBoolType(ScrippleParser.BoolTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code CHAR_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code BoolType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitCHAR_TYPE(ScrippleParser.CHAR_TYPEContext ctx);
+	void exitBoolType(ScrippleParser.BoolTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code STRING_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code StringType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterSTRING_TYPE(ScrippleParser.STRING_TYPEContext ctx);
+	void enterStringType(ScrippleParser.StringTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code STRING_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code StringType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitSTRING_TYPE(ScrippleParser.STRING_TYPEContext ctx);
+	void exitStringType(ScrippleParser.StringTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MAP_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code SetType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterMAP_TYPE(ScrippleParser.MAP_TYPEContext ctx);
+	void enterSetType(ScrippleParser.SetTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MAP_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code SetType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitMAP_TYPE(ScrippleParser.MAP_TYPEContext ctx);
+	void exitSetType(ScrippleParser.SetTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ARRAY_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code ListType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterARRAY_TYPE(ScrippleParser.ARRAY_TYPEContext ctx);
+	void enterListType(ScrippleParser.ListTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ARRAY_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code ListType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitARRAY_TYPE(ScrippleParser.ARRAY_TYPEContext ctx);
+	void exitListType(ScrippleParser.ListTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code COLOR_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code ColorType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterCOLOR_TYPE(ScrippleParser.COLOR_TYPEContext ctx);
+	void enterColorType(ScrippleParser.ColorTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code COLOR_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code ColorType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitCOLOR_TYPE(ScrippleParser.COLOR_TYPEContext ctx);
+	void exitColorType(ScrippleParser.ColorTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code FLOAT_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code CharType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterFLOAT_TYPE(ScrippleParser.FLOAT_TYPEContext ctx);
+	void enterCharType(ScrippleParser.CharTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code FLOAT_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code CharType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitFLOAT_TYPE(ScrippleParser.FLOAT_TYPEContext ctx);
+	void exitCharType(ScrippleParser.CharTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code LIST_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code MapType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterLIST_TYPE(ScrippleParser.LIST_TYPEContext ctx);
+	void enterMapType(ScrippleParser.MapTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code LIST_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code MapType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitLIST_TYPE(ScrippleParser.LIST_TYPEContext ctx);
+	void exitMapType(ScrippleParser.MapTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code BOOL_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code IntType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterBOOL_TYPE(ScrippleParser.BOOL_TYPEContext ctx);
+	void enterIntType(ScrippleParser.IntTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code BOOL_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code IntType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitBOOL_TYPE(ScrippleParser.BOOL_TYPEContext ctx);
+	void exitIntType(ScrippleParser.IntTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code INT_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code FloatType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterINT_TYPE(ScrippleParser.INT_TYPEContext ctx);
+	void enterFloatType(ScrippleParser.FloatTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code INT_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code FloatType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitINT_TYPE(ScrippleParser.INT_TYPEContext ctx);
+	void exitFloatType(ScrippleParser.FloatTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SET_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Enter a parse tree produced by the {@code ImageType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void enterSET_TYPE(ScrippleParser.SET_TYPEContext ctx);
+	void enterImageType(ScrippleParser.ImageTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code SET_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Exit a parse tree produced by the {@code ImageType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 */
-	void exitSET_TYPE(ScrippleParser.SET_TYPEContext ctx);
+	void exitImageType(ScrippleParser.ImageTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SINGLE_STAT_BODY}
+	 * Enter a parse tree produced by the {@code SingleStatBody}
 	 * labeled alternative in {@link ScrippleParser#body}.
 	 * @param ctx the parse tree
 	 */
-	void enterSINGLE_STAT_BODY(ScrippleParser.SINGLE_STAT_BODYContext ctx);
+	void enterSingleStatBody(ScrippleParser.SingleStatBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code SINGLE_STAT_BODY}
+	 * Exit a parse tree produced by the {@code SingleStatBody}
 	 * labeled alternative in {@link ScrippleParser#body}.
 	 * @param ctx the parse tree
 	 */
-	void exitSINGLE_STAT_BODY(ScrippleParser.SINGLE_STAT_BODYContext ctx);
+	void exitSingleStatBody(ScrippleParser.SingleStatBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code COMPLEX_BODY}
+	 * Enter a parse tree produced by the {@code ComplexBody}
 	 * labeled alternative in {@link ScrippleParser#body}.
 	 * @param ctx the parse tree
 	 */
-	void enterCOMPLEX_BODY(ScrippleParser.COMPLEX_BODYContext ctx);
+	void enterComplexBody(ScrippleParser.ComplexBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code COMPLEX_BODY}
+	 * Exit a parse tree produced by the {@code ComplexBody}
 	 * labeled alternative in {@link ScrippleParser#body}.
 	 * @param ctx the parse tree
 	 */
-	void exitCOMPLEX_BODY(ScrippleParser.COMPLEX_BODYContext ctx);
+	void exitComplexBody(ScrippleParser.ComplexBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code LOOP_STAT}
+	 * Enter a parse tree produced by the {@code LoopStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterLOOP_STAT(ScrippleParser.LOOP_STATContext ctx);
+	void enterLoopStatement(ScrippleParser.LoopStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code LOOP_STAT}
+	 * Exit a parse tree produced by the {@code LoopStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitLOOP_STAT(ScrippleParser.LOOP_STATContext ctx);
+	void exitLoopStatement(ScrippleParser.LoopStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code IF_STAT}
+	 * Enter a parse tree produced by the {@code IfStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterIF_STAT(ScrippleParser.IF_STATContext ctx);
+	void enterIfStatement(ScrippleParser.IfStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code IF_STAT}
+	 * Exit a parse tree produced by the {@code IfStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitIF_STAT(ScrippleParser.IF_STATContext ctx);
+	void exitIfStatement(ScrippleParser.IfStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code VAR_DEF_STAT}
+	 * Enter a parse tree produced by the {@code VarDefStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterVAR_DEF_STAT(ScrippleParser.VAR_DEF_STATContext ctx);
+	void enterVarDefStatement(ScrippleParser.VarDefStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code VAR_DEF_STAT}
+	 * Exit a parse tree produced by the {@code VarDefStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitVAR_DEF_STAT(ScrippleParser.VAR_DEF_STATContext ctx);
+	void exitVarDefStatement(ScrippleParser.VarDefStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ASSIGNMENT_STAT}
+	 * Enter a parse tree produced by the {@code AssignmentStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterASSIGNMENT_STAT(ScrippleParser.ASSIGNMENT_STATContext ctx);
+	void enterAssignmentStatement(ScrippleParser.AssignmentStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ASSIGNMENT_STAT}
+	 * Exit a parse tree produced by the {@code AssignmentStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitASSIGNMENT_STAT(ScrippleParser.ASSIGNMENT_STATContext ctx);
+	void exitAssignmentStatement(ScrippleParser.AssignmentStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code RETURN_STAT}
+	 * Enter a parse tree produced by the {@code ReturnStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterRETURN_STAT(ScrippleParser.RETURN_STATContext ctx);
+	void enterReturnStatement(ScrippleParser.ReturnStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code RETURN_STAT}
+	 * Exit a parse tree produced by the {@code ReturnStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitRETURN_STAT(ScrippleParser.RETURN_STATContext ctx);
+	void exitReturnStatement(ScrippleParser.ReturnStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ADD_TO_COLLECTION}
+	 * Enter a parse tree produced by the {@code AddToCollection}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterADD_TO_COLLECTION(ScrippleParser.ADD_TO_COLLECTIONContext ctx);
+	void enterAddToCollection(ScrippleParser.AddToCollectionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ADD_TO_COLLECTION}
+	 * Exit a parse tree produced by the {@code AddToCollection}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitADD_TO_COLLECTION(ScrippleParser.ADD_TO_COLLECTIONContext ctx);
+	void exitAddToCollection(ScrippleParser.AddToCollectionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code REMOVE_FROM_COLLECTION}
+	 * Enter a parse tree produced by the {@code RemoveFromCollection}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterREMOVE_FROM_COLLECTION(ScrippleParser.REMOVE_FROM_COLLECTIONContext ctx);
+	void enterRemoveFromCollection(ScrippleParser.RemoveFromCollectionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code REMOVE_FROM_COLLECTION}
+	 * Exit a parse tree produced by the {@code RemoveFromCollection}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitREMOVE_FROM_COLLECTION(ScrippleParser.REMOVE_FROM_COLLECTIONContext ctx);
+	void exitRemoveFromCollection(ScrippleParser.RemoveFromCollectionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code DEFINE_MAP_ENTRY}
+	 * Enter a parse tree produced by the {@code DefineMapEntryStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterDEFINE_MAP_ENTRY(ScrippleParser.DEFINE_MAP_ENTRYContext ctx);
+	void enterDefineMapEntryStatement(ScrippleParser.DefineMapEntryStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code DEFINE_MAP_ENTRY}
+	 * Exit a parse tree produced by the {@code DefineMapEntryStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitDEFINE_MAP_ENTRY(ScrippleParser.DEFINE_MAP_ENTRYContext ctx);
+	void exitDefineMapEntryStatement(ScrippleParser.DefineMapEntryStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code DRAW_ONTO_IMAGE}
+	 * Enter a parse tree produced by the {@code DrawOntoImageStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterDRAW_ONTO_IMAGE(ScrippleParser.DRAW_ONTO_IMAGEContext ctx);
+	void enterDrawOntoImageStatement(ScrippleParser.DrawOntoImageStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code DRAW_ONTO_IMAGE}
+	 * Exit a parse tree produced by the {@code DrawOntoImageStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitDRAW_ONTO_IMAGE(ScrippleParser.DRAW_ONTO_IMAGEContext ctx);
+	void exitDrawOntoImageStatement(ScrippleParser.DrawOntoImageStatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScrippleParser#return_stat}.
 	 * @param ctx the parse tree
@@ -336,29 +337,53 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitReturn_stat(ScrippleParser.Return_statContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code COND_FIRST_LOOP}
+	 * Enter a parse tree produced by the {@code WhileLoop}
 	 * labeled alternative in {@link ScrippleParser#loop_stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterCOND_FIRST_LOOP(ScrippleParser.COND_FIRST_LOOPContext ctx);
+	void enterWhileLoop(ScrippleParser.WhileLoopContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code COND_FIRST_LOOP}
+	 * Exit a parse tree produced by the {@code WhileLoop}
 	 * labeled alternative in {@link ScrippleParser#loop_stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitCOND_FIRST_LOOP(ScrippleParser.COND_FIRST_LOOPContext ctx);
+	void exitWhileLoop(ScrippleParser.WhileLoopContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code COND_LAST_LOOP}
+	 * Enter a parse tree produced by the {@code IteratorLoop}
 	 * labeled alternative in {@link ScrippleParser#loop_stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterCOND_LAST_LOOP(ScrippleParser.COND_LAST_LOOPContext ctx);
+	void enterIteratorLoop(ScrippleParser.IteratorLoopContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code COND_LAST_LOOP}
+	 * Exit a parse tree produced by the {@code IteratorLoop}
 	 * labeled alternative in {@link ScrippleParser#loop_stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitCOND_LAST_LOOP(ScrippleParser.COND_LAST_LOOPContext ctx);
+	void exitIteratorLoop(ScrippleParser.IteratorLoopContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ForLoop}
+	 * labeled alternative in {@link ScrippleParser#loop_stat}.
+	 * @param ctx the parse tree
+	 */
+	void enterForLoop(ScrippleParser.ForLoopContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ForLoop}
+	 * labeled alternative in {@link ScrippleParser#loop_stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitForLoop(ScrippleParser.ForLoopContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code DoWhileLoop}
+	 * labeled alternative in {@link ScrippleParser#loop_stat}.
+	 * @param ctx the parse tree
+	 */
+	void enterDoWhileLoop(ScrippleParser.DoWhileLoopContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code DoWhileLoop}
+	 * labeled alternative in {@link ScrippleParser#loop_stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitDoWhileLoop(ScrippleParser.DoWhileLoopContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScrippleParser#iteration_def}.
 	 * @param ctx the parse tree
@@ -400,425 +425,425 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitIf_stat(ScrippleParser.If_statContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code COMPARISON_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterCOMPARISON_BIN_EXPR(ScrippleParser.COMPARISON_BIN_EXPRContext ctx);
+	void enterTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code COMPARISON_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitCOMPARISON_BIN_EXPR(ScrippleParser.COMPARISON_BIN_EXPRContext ctx);
+	void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NESTED_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code LogicBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterNESTED_EXPR(ScrippleParser.NESTED_EXPRContext ctx);
+	void enterLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code NESTED_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code LogicBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitNESTED_EXPR(ScrippleParser.NESTED_EXPRContext ctx);
+	void exitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code UNARY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code MultBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterUNARY_EXPR(ScrippleParser.UNARY_EXPRContext ctx);
+	void enterMultBinExpression(ScrippleParser.MultBinExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code UNARY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code MultBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitUNARY_EXPR(ScrippleParser.UNARY_EXPRContext ctx);
+	void exitMultBinExpression(ScrippleParser.MultBinExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MAP_KEYSET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ImageBoundExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterMAP_KEYSET_EXPR(ScrippleParser.MAP_KEYSET_EXPRContext ctx);
+	void enterImageBoundExpression(ScrippleParser.ImageBoundExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MAP_KEYSET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ImageBoundExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitMAP_KEYSET_EXPR(ScrippleParser.MAP_KEYSET_EXPRContext ctx);
+	void exitImageBoundExpression(ScrippleParser.ImageBoundExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code CONTAINS_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code UnaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterCONTAINS_EXPR(ScrippleParser.CONTAINS_EXPRContext ctx);
+	void enterUnaryExpression(ScrippleParser.UnaryExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code CONTAINS_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code UnaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitCONTAINS_EXPR(ScrippleParser.CONTAINS_EXPRContext ctx);
+	void exitUnaryExpression(ScrippleParser.UnaryExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code RGBA_COLOR_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code MapLookupExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterRGBA_COLOR_EXPR(ScrippleParser.RGBA_COLOR_EXPRContext ctx);
+	void enterMapLookupExpression(ScrippleParser.MapLookupExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code RGBA_COLOR_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code MapLookupExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitRGBA_COLOR_EXPR(ScrippleParser.RGBA_COLOR_EXPRContext ctx);
+	void exitMapLookupExpression(ScrippleParser.MapLookupExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code TERNARY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code PowerBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterTERNARY_EXPR(ScrippleParser.TERNARY_EXPRContext ctx);
+	void enterPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code TERNARY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code PowerBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitTERNARY_EXPR(ScrippleParser.TERNARY_EXPRContext ctx);
+	void exitPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ARITHMETIC_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ComparisonBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterARITHMETIC_BIN_EXPR(ScrippleParser.ARITHMETIC_BIN_EXPRContext ctx);
+	void enterComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ARITHMETIC_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ComparisonBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitARITHMETIC_BIN_EXPR(ScrippleParser.ARITHMETIC_BIN_EXPRContext ctx);
+	void exitComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MAP_GET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code RGBColorExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterMAP_GET_EXPR(ScrippleParser.MAP_GET_EXPRContext ctx);
+	void enterRGBColorExpression(ScrippleParser.RGBColorExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MAP_GET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code RGBColorExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitMAP_GET_EXPR(ScrippleParser.MAP_GET_EXPRContext ctx);
+	void exitRGBColorExpression(ScrippleParser.RGBColorExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code IMAGE_OF_BOUNDS_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ImageOfBoundsExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterIMAGE_OF_BOUNDS_EXPR(ScrippleParser.IMAGE_OF_BOUNDS_EXPRContext ctx);
+	void enterImageOfBoundsExpression(ScrippleParser.ImageOfBoundsExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code IMAGE_OF_BOUNDS_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ImageOfBoundsExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitIMAGE_OF_BOUNDS_EXPR(ScrippleParser.IMAGE_OF_BOUNDS_EXPRContext ctx);
+	void exitImageOfBoundsExpression(ScrippleParser.ImageOfBoundsExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MULT_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code AssignableExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterMULT_BIN_EXPR(ScrippleParser.MULT_BIN_EXPRContext ctx);
+	void enterAssignableExpression(ScrippleParser.AssignableExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MULT_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code AssignableExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitMULT_BIN_EXPR(ScrippleParser.MULT_BIN_EXPRContext ctx);
+	void exitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code LIT_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code NewMapExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterLIT_EXPR(ScrippleParser.LIT_EXPRContext ctx);
+	void enterNewMapExpression(ScrippleParser.NewMapExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code LIT_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code NewMapExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitLIT_EXPR(ScrippleParser.LIT_EXPRContext ctx);
+	void exitNewMapExpression(ScrippleParser.NewMapExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NEW_SET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code RGBAColorExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterNEW_SET_EXPR(ScrippleParser.NEW_SET_EXPRContext ctx);
+	void enterRGBAColorExpression(ScrippleParser.RGBAColorExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code NEW_SET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code RGBAColorExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitNEW_SET_EXPR(ScrippleParser.NEW_SET_EXPRContext ctx);
+	void exitRGBAColorExpression(ScrippleParser.RGBAColorExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code RGB_COLOR_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code NewSetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterRGB_COLOR_EXPR(ScrippleParser.RGB_COLOR_EXPRContext ctx);
+	void enterNewSetExpression(ScrippleParser.NewSetExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code RGB_COLOR_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code NewSetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitRGB_COLOR_EXPR(ScrippleParser.RGB_COLOR_EXPRContext ctx);
+	void exitNewSetExpression(ScrippleParser.NewSetExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NEW_LIST_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ContainsExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterNEW_LIST_EXPR(ScrippleParser.NEW_LIST_EXPRContext ctx);
+	void enterContainsExpression(ScrippleParser.ContainsExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code NEW_LIST_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ContainsExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitNEW_LIST_EXPR(ScrippleParser.NEW_LIST_EXPRContext ctx);
+	void exitContainsExpression(ScrippleParser.ContainsExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NEW_ARRAY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code LiteralExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterNEW_ARRAY_EXPR(ScrippleParser.NEW_ARRAY_EXPRContext ctx);
+	void enterLiteralExpression(ScrippleParser.LiteralExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code NEW_ARRAY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code LiteralExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitNEW_ARRAY_EXPR(ScrippleParser.NEW_ARRAY_EXPRContext ctx);
+	void exitLiteralExpression(ScrippleParser.LiteralExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code NEW_MAP_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code NewListExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterNEW_MAP_EXPR(ScrippleParser.NEW_MAP_EXPRContext ctx);
+	void enterNewListExpression(ScrippleParser.NewListExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code NEW_MAP_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code NewListExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitNEW_MAP_EXPR(ScrippleParser.NEW_MAP_EXPRContext ctx);
+	void exitNewListExpression(ScrippleParser.NewListExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ASSIGNABLE_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code MapKeysetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterASSIGNABLE_EXPR(ScrippleParser.ASSIGNABLE_EXPRContext ctx);
+	void enterMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ASSIGNABLE_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code MapKeysetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitASSIGNABLE_EXPR(ScrippleParser.ASSIGNABLE_EXPRContext ctx);
+	void exitMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code IMAGE_BOUND_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code NestedExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterIMAGE_BOUND_EXPR(ScrippleParser.IMAGE_BOUND_EXPRContext ctx);
+	void enterNestedExpression(ScrippleParser.NestedExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code IMAGE_BOUND_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code NestedExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitIMAGE_BOUND_EXPR(ScrippleParser.IMAGE_BOUND_EXPRContext ctx);
+	void exitNestedExpression(ScrippleParser.NestedExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code LOGIC_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ColorAtPixelExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterLOGIC_BIN_EXPR(ScrippleParser.LOGIC_BIN_EXPRContext ctx);
+	void enterColorAtPixelExpression(ScrippleParser.ColorAtPixelExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code LOGIC_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ColorAtPixelExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitLOGIC_BIN_EXPR(ScrippleParser.LOGIC_BIN_EXPRContext ctx);
+	void exitColorAtPixelExpression(ScrippleParser.ColorAtPixelExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code GET_COLOR_CHANNEL}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ArithmeticBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterGET_COLOR_CHANNEL(ScrippleParser.GET_COLOR_CHANNELContext ctx);
+	void enterArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code GET_COLOR_CHANNEL}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ArithmeticBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitGET_COLOR_CHANNEL(ScrippleParser.GET_COLOR_CHANNELContext ctx);
+	void exitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code IMAGE_FROM_PATH_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ExplicitCollectionExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterIMAGE_FROM_PATH_EXPR(ScrippleParser.IMAGE_FROM_PATH_EXPRContext ctx);
+	void enterExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code IMAGE_FROM_PATH_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ExplicitCollectionExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitIMAGE_FROM_PATH_EXPR(ScrippleParser.IMAGE_FROM_PATH_EXPRContext ctx);
+	void exitExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code POWER_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ColorChannelExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterPOWER_BIN_EXPR(ScrippleParser.POWER_BIN_EXPRContext ctx);
+	void enterColorChannelExpression(ScrippleParser.ColorChannelExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code POWER_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ColorChannelExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitPOWER_BIN_EXPR(ScrippleParser.POWER_BIN_EXPRContext ctx);
+	void exitColorChannelExpression(ScrippleParser.ColorChannelExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code COLOR_AT_PIXEL_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code NewArrayExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterCOLOR_AT_PIXEL_EXPR(ScrippleParser.COLOR_AT_PIXEL_EXPRContext ctx);
+	void enterNewArrayExpression(ScrippleParser.NewArrayExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code COLOR_AT_PIXEL_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code NewArrayExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitCOLOR_AT_PIXEL_EXPR(ScrippleParser.COLOR_AT_PIXEL_EXPRContext ctx);
+	void exitNewArrayExpression(ScrippleParser.NewArrayExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code EXPLICIT_COLLECTION}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Enter a parse tree produced by the {@code ImageFromPathExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void enterEXPLICIT_COLLECTION(ScrippleParser.EXPLICIT_COLLECTIONContext ctx);
+	void enterImageFromPathExpression(ScrippleParser.ImageFromPathExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code EXPLICIT_COLLECTION}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Exit a parse tree produced by the {@code ImageFromPathExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 */
-	void exitEXPLICIT_COLLECTION(ScrippleParser.EXPLICIT_COLLECTIONContext ctx);
+	void exitImageFromPathExpression(ScrippleParser.ImageFromPathExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code STANDARD_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code StandardAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterSTANDARD_ASSIGNMENT(ScrippleParser.STANDARD_ASSIGNMENTContext ctx);
+	void enterStandardAssignment(ScrippleParser.StandardAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code STANDARD_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code StandardAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitSTANDARD_ASSIGNMENT(ScrippleParser.STANDARD_ASSIGNMENTContext ctx);
+	void exitStandardAssignment(ScrippleParser.StandardAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code INC_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code IncrementAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterINC_ASSIGNMENT(ScrippleParser.INC_ASSIGNMENTContext ctx);
+	void enterIncrementAssignment(ScrippleParser.IncrementAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code INC_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code IncrementAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitINC_ASSIGNMENT(ScrippleParser.INC_ASSIGNMENTContext ctx);
+	void exitIncrementAssignment(ScrippleParser.IncrementAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code DEC_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code DecrementAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterDEC_ASSIGNMENT(ScrippleParser.DEC_ASSIGNMENTContext ctx);
+	void enterDecrementAssignment(ScrippleParser.DecrementAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code DEC_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code DecrementAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitDEC_ASSIGNMENT(ScrippleParser.DEC_ASSIGNMENTContext ctx);
+	void exitDecrementAssignment(ScrippleParser.DecrementAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ADD_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code AddAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterADD_ASSIGNMENT(ScrippleParser.ADD_ASSIGNMENTContext ctx);
+	void enterAddAssignment(ScrippleParser.AddAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ADD_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code AddAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitADD_ASSIGNMENT(ScrippleParser.ADD_ASSIGNMENTContext ctx);
+	void exitAddAssignment(ScrippleParser.AddAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code SUB_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code SubAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterSUB_ASSIGNMENT(ScrippleParser.SUB_ASSIGNMENTContext ctx);
+	void enterSubAssignment(ScrippleParser.SubAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code SUB_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code SubAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitSUB_ASSIGNMENT(ScrippleParser.SUB_ASSIGNMENTContext ctx);
+	void exitSubAssignment(ScrippleParser.SubAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MUL_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code MultAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterMUL_ASSIGNMENT(ScrippleParser.MUL_ASSIGNMENTContext ctx);
+	void enterMultAssignment(ScrippleParser.MultAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MUL_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code MultAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitMUL_ASSIGNMENT(ScrippleParser.MUL_ASSIGNMENTContext ctx);
+	void exitMultAssignment(ScrippleParser.MultAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code DIV_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code DivAssignmnet}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterDIV_ASSIGNMENT(ScrippleParser.DIV_ASSIGNMENTContext ctx);
+	void enterDivAssignmnet(ScrippleParser.DivAssignmnetContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code DIV_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code DivAssignmnet}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitDIV_ASSIGNMENT(ScrippleParser.DIV_ASSIGNMENTContext ctx);
+	void exitDivAssignmnet(ScrippleParser.DivAssignmnetContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code MOD_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code ModAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterMOD_ASSIGNMENT(ScrippleParser.MOD_ASSIGNMENTContext ctx);
+	void enterModAssignment(ScrippleParser.ModAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code MOD_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code ModAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitMOD_ASSIGNMENT(ScrippleParser.MOD_ASSIGNMENTContext ctx);
+	void exitModAssignment(ScrippleParser.ModAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code AND_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code AndAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterAND_ASSIGNMENT(ScrippleParser.AND_ASSIGNMENTContext ctx);
+	void enterAndAssignment(ScrippleParser.AndAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code AND_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code AndAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitAND_ASSIGNMENT(ScrippleParser.AND_ASSIGNMENTContext ctx);
+	void exitAndAssignment(ScrippleParser.AndAssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code OR_ASSIGNMENT}
+	 * Enter a parse tree produced by the {@code OrAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void enterOR_ASSIGNMENT(ScrippleParser.OR_ASSIGNMENTContext ctx);
+	void enterOrAssignment(ScrippleParser.OrAssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code OR_ASSIGNMENT}
+	 * Exit a parse tree produced by the {@code OrAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 */
-	void exitOR_ASSIGNMENT(ScrippleParser.OR_ASSIGNMENTContext ctx);
+	void exitOrAssignment(ScrippleParser.OrAssignmentContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScrippleParser#var_init}.
 	 * @param ctx the parse tree
@@ -830,65 +855,65 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitVar_init(ScrippleParser.Var_initContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code IMPLICIT_DEF}
+	 * Enter a parse tree produced by the {@code ImplicitVarDef}
 	 * labeled alternative in {@link ScrippleParser#var_def}.
 	 * @param ctx the parse tree
 	 */
-	void enterIMPLICIT_DEF(ScrippleParser.IMPLICIT_DEFContext ctx);
+	void enterImplicitVarDef(ScrippleParser.ImplicitVarDefContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code IMPLICIT_DEF}
+	 * Exit a parse tree produced by the {@code ImplicitVarDef}
 	 * labeled alternative in {@link ScrippleParser#var_def}.
 	 * @param ctx the parse tree
 	 */
-	void exitIMPLICIT_DEF(ScrippleParser.IMPLICIT_DEFContext ctx);
+	void exitImplicitVarDef(ScrippleParser.ImplicitVarDefContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code EXPLICIT_DEF}
+	 * Enter a parse tree produced by the {@code ExplicitVarDef}
 	 * labeled alternative in {@link ScrippleParser#var_def}.
 	 * @param ctx the parse tree
 	 */
-	void enterEXPLICIT_DEF(ScrippleParser.EXPLICIT_DEFContext ctx);
+	void enterExplicitVarDef(ScrippleParser.ExplicitVarDefContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code EXPLICIT_DEF}
+	 * Exit a parse tree produced by the {@code ExplicitVarDef}
 	 * labeled alternative in {@link ScrippleParser#var_def}.
 	 * @param ctx the parse tree
 	 */
-	void exitEXPLICIT_DEF(ScrippleParser.EXPLICIT_DEFContext ctx);
+	void exitExplicitVarDef(ScrippleParser.ExplicitVarDefContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ASSIGNABLE_VAR}
+	 * Enter a parse tree produced by the {@code SimpleAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 */
-	void enterASSIGNABLE_VAR(ScrippleParser.ASSIGNABLE_VARContext ctx);
+	void enterSimpleAssignable(ScrippleParser.SimpleAssignableContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ASSIGNABLE_VAR}
+	 * Exit a parse tree produced by the {@code SimpleAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 */
-	void exitASSIGNABLE_VAR(ScrippleParser.ASSIGNABLE_VARContext ctx);
+	void exitSimpleAssignable(ScrippleParser.SimpleAssignableContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ASSIGNABLE_LIST_ELEM}
+	 * Enter a parse tree produced by the {@code ListAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 */
-	void enterASSIGNABLE_LIST_ELEM(ScrippleParser.ASSIGNABLE_LIST_ELEMContext ctx);
+	void enterListAssignable(ScrippleParser.ListAssignableContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ASSIGNABLE_LIST_ELEM}
+	 * Exit a parse tree produced by the {@code ListAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 */
-	void exitASSIGNABLE_LIST_ELEM(ScrippleParser.ASSIGNABLE_LIST_ELEMContext ctx);
+	void exitListAssignable(ScrippleParser.ListAssignableContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code ASSIGNABLE_ARR_ELEM}
+	 * Enter a parse tree produced by the {@code ArrayAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 */
-	void enterASSIGNABLE_ARR_ELEM(ScrippleParser.ASSIGNABLE_ARR_ELEMContext ctx);
+	void enterArrayAssignable(ScrippleParser.ArrayAssignableContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code ASSIGNABLE_ARR_ELEM}
+	 * Exit a parse tree produced by the {@code ArrayAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 */
-	void exitASSIGNABLE_ARR_ELEM(ScrippleParser.ASSIGNABLE_ARR_ELEMContext ctx);
+	void exitArrayAssignable(ScrippleParser.ArrayAssignableContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScrippleParser#ident}.
 	 * @param ctx the parse tree
@@ -900,87 +925,87 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitIdent(ScrippleParser.IdentContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code STRING_LITERAL}
+	 * Enter a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterSTRING_LITERAL(ScrippleParser.STRING_LITERALContext ctx);
+	void enterStringLiteral(ScrippleParser.StringLiteralContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code STRING_LITERAL}
+	 * Exit a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitSTRING_LITERAL(ScrippleParser.STRING_LITERALContext ctx);
+	void exitStringLiteral(ScrippleParser.StringLiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code CHAR_LITERAL}
+	 * Enter a parse tree produced by the {@code CharLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterCHAR_LITERAL(ScrippleParser.CHAR_LITERALContext ctx);
+	void enterCharLiteral(ScrippleParser.CharLiteralContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code CHAR_LITERAL}
+	 * Exit a parse tree produced by the {@code CharLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitCHAR_LITERAL(ScrippleParser.CHAR_LITERALContext ctx);
+	void exitCharLiteral(ScrippleParser.CharLiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code INT_LITERAL}
+	 * Enter a parse tree produced by the {@code IntLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterINT_LITERAL(ScrippleParser.INT_LITERALContext ctx);
+	void enterIntLiteral(ScrippleParser.IntLiteralContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code INT_LITERAL}
+	 * Exit a parse tree produced by the {@code IntLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitINT_LITERAL(ScrippleParser.INT_LITERALContext ctx);
+	void exitIntLiteral(ScrippleParser.IntLiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code FLOAT_LITERAL}
+	 * Enter a parse tree produced by the {@code FloatLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterFLOAT_LITERAL(ScrippleParser.FLOAT_LITERALContext ctx);
+	void enterFloatLiteral(ScrippleParser.FloatLiteralContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code FLOAT_LITERAL}
+	 * Exit a parse tree produced by the {@code FloatLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitFLOAT_LITERAL(ScrippleParser.FLOAT_LITERALContext ctx);
+	void exitFloatLiteral(ScrippleParser.FloatLiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code BOOL_LITERAL}
+	 * Enter a parse tree produced by the {@code BoolLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterBOOL_LITERAL(ScrippleParser.BOOL_LITERALContext ctx);
+	void enterBoolLiteral(ScrippleParser.BoolLiteralContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code BOOL_LITERAL}
+	 * Exit a parse tree produced by the {@code BoolLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitBOOL_LITERAL(ScrippleParser.BOOL_LITERALContext ctx);
+	void exitBoolLiteral(ScrippleParser.BoolLiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code HEXADECIMAL}
+	 * Enter a parse tree produced by the {@code Hexadecimal}
 	 * labeled alternative in {@link ScrippleParser#int_lit}.
 	 * @param ctx the parse tree
 	 */
-	void enterHEXADECIMAL(ScrippleParser.HEXADECIMALContext ctx);
+	void enterHexadecimal(ScrippleParser.HexadecimalContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code HEXADECIMAL}
+	 * Exit a parse tree produced by the {@code Hexadecimal}
 	 * labeled alternative in {@link ScrippleParser#int_lit}.
 	 * @param ctx the parse tree
 	 */
-	void exitHEXADECIMAL(ScrippleParser.HEXADECIMALContext ctx);
+	void exitHexadecimal(ScrippleParser.HexadecimalContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code DECIMAL}
+	 * Enter a parse tree produced by the {@code Decimal}
 	 * labeled alternative in {@link ScrippleParser#int_lit}.
 	 * @param ctx the parse tree
 	 */
-	void enterDECIMAL(ScrippleParser.DECIMALContext ctx);
+	void enterDecimal(ScrippleParser.DecimalContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code DECIMAL}
+	 * Exit a parse tree produced by the {@code Decimal}
 	 * labeled alternative in {@link ScrippleParser#int_lit}.
 	 * @param ctx the parse tree
 	 */
-	void exitDECIMAL(ScrippleParser.DECIMALContext ctx);
+	void exitDecimal(ScrippleParser.DecimalContext ctx);
 }

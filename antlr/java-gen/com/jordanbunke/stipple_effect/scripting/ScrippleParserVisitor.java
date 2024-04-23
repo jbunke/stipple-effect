@@ -1,5 +1,6 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
+
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -23,19 +24,19 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDeclaration(ScrippleParser.DeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code VOID_RETURN}
+	 * Visit a parse tree produced by the {@code VoidReturnSignature}
 	 * labeled alternative in {@link ScrippleParser#signature}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitVOID_RETURN(ScrippleParser.VOID_RETURNContext ctx);
+	T visitVoidReturnSignature(ScrippleParser.VoidReturnSignatureContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code TYPE_RETURN}
+	 * Visit a parse tree produced by the {@code TypeReturnSignature}
 	 * labeled alternative in {@link ScrippleParser#signature}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTYPE_RETURN(ScrippleParser.TYPE_RETURNContext ctx);
+	T visitTypeReturnSignature(ScrippleParser.TypeReturnSignatureContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ScrippleParser#param_list}.
 	 * @param ctx the parse tree
@@ -43,159 +44,159 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParam_list(ScrippleParser.Param_listContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IMAGE_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code ArrayType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIMAGE_TYPE(ScrippleParser.IMAGE_TYPEContext ctx);
+	T visitArrayType(ScrippleParser.ArrayTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CHAR_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code BoolType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCHAR_TYPE(ScrippleParser.CHAR_TYPEContext ctx);
+	T visitBoolType(ScrippleParser.BoolTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code STRING_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code StringType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSTRING_TYPE(ScrippleParser.STRING_TYPEContext ctx);
+	T visitStringType(ScrippleParser.StringTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MAP_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code SetType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMAP_TYPE(ScrippleParser.MAP_TYPEContext ctx);
+	T visitSetType(ScrippleParser.SetTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ARRAY_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code ListType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitARRAY_TYPE(ScrippleParser.ARRAY_TYPEContext ctx);
+	T visitListType(ScrippleParser.ListTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code COLOR_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code ColorType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCOLOR_TYPE(ScrippleParser.COLOR_TYPEContext ctx);
+	T visitColorType(ScrippleParser.ColorTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code FLOAT_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code CharType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFLOAT_TYPE(ScrippleParser.FLOAT_TYPEContext ctx);
+	T visitCharType(ScrippleParser.CharTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LIST_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code MapType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLIST_TYPE(ScrippleParser.LIST_TYPEContext ctx);
+	T visitMapType(ScrippleParser.MapTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code BOOL_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code IntType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitBOOL_TYPE(ScrippleParser.BOOL_TYPEContext ctx);
+	T visitIntType(ScrippleParser.IntTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code INT_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code FloatType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitINT_TYPE(ScrippleParser.INT_TYPEContext ctx);
+	T visitFloatType(ScrippleParser.FloatTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SET_TYPE}
-	 * labeled alternative in {@link ScrippleParser#type}.
+	 * Visit a parse tree produced by the {@code ImageType}
+	 * labeled alternative in {@link ScrippleParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSET_TYPE(ScrippleParser.SET_TYPEContext ctx);
+	T visitImageType(ScrippleParser.ImageTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SINGLE_STAT_BODY}
+	 * Visit a parse tree produced by the {@code SingleStatBody}
 	 * labeled alternative in {@link ScrippleParser#body}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSINGLE_STAT_BODY(ScrippleParser.SINGLE_STAT_BODYContext ctx);
+	T visitSingleStatBody(ScrippleParser.SingleStatBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code COMPLEX_BODY}
+	 * Visit a parse tree produced by the {@code ComplexBody}
 	 * labeled alternative in {@link ScrippleParser#body}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCOMPLEX_BODY(ScrippleParser.COMPLEX_BODYContext ctx);
+	T visitComplexBody(ScrippleParser.ComplexBodyContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LOOP_STAT}
+	 * Visit a parse tree produced by the {@code LoopStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLOOP_STAT(ScrippleParser.LOOP_STATContext ctx);
+	T visitLoopStatement(ScrippleParser.LoopStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IF_STAT}
+	 * Visit a parse tree produced by the {@code IfStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIF_STAT(ScrippleParser.IF_STATContext ctx);
+	T visitIfStatement(ScrippleParser.IfStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code VAR_DEF_STAT}
+	 * Visit a parse tree produced by the {@code VarDefStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitVAR_DEF_STAT(ScrippleParser.VAR_DEF_STATContext ctx);
+	T visitVarDefStatement(ScrippleParser.VarDefStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ASSIGNMENT_STAT}
+	 * Visit a parse tree produced by the {@code AssignmentStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitASSIGNMENT_STAT(ScrippleParser.ASSIGNMENT_STATContext ctx);
+	T visitAssignmentStatement(ScrippleParser.AssignmentStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RETURN_STAT}
+	 * Visit a parse tree produced by the {@code ReturnStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRETURN_STAT(ScrippleParser.RETURN_STATContext ctx);
+	T visitReturnStatement(ScrippleParser.ReturnStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ADD_TO_COLLECTION}
+	 * Visit a parse tree produced by the {@code AddToCollection}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitADD_TO_COLLECTION(ScrippleParser.ADD_TO_COLLECTIONContext ctx);
+	T visitAddToCollection(ScrippleParser.AddToCollectionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code REMOVE_FROM_COLLECTION}
+	 * Visit a parse tree produced by the {@code RemoveFromCollection}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitREMOVE_FROM_COLLECTION(ScrippleParser.REMOVE_FROM_COLLECTIONContext ctx);
+	T visitRemoveFromCollection(ScrippleParser.RemoveFromCollectionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DEFINE_MAP_ENTRY}
+	 * Visit a parse tree produced by the {@code DefineMapEntryStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDEFINE_MAP_ENTRY(ScrippleParser.DEFINE_MAP_ENTRYContext ctx);
+	T visitDefineMapEntryStatement(ScrippleParser.DefineMapEntryStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DRAW_ONTO_IMAGE}
+	 * Visit a parse tree produced by the {@code DrawOntoImageStatement}
 	 * labeled alternative in {@link ScrippleParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDRAW_ONTO_IMAGE(ScrippleParser.DRAW_ONTO_IMAGEContext ctx);
+	T visitDrawOntoImageStatement(ScrippleParser.DrawOntoImageStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ScrippleParser#return_stat}.
 	 * @param ctx the parse tree
@@ -203,19 +204,33 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturn_stat(ScrippleParser.Return_statContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code COND_FIRST_LOOP}
+	 * Visit a parse tree produced by the {@code WhileLoop}
 	 * labeled alternative in {@link ScrippleParser#loop_stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCOND_FIRST_LOOP(ScrippleParser.COND_FIRST_LOOPContext ctx);
+	T visitWhileLoop(ScrippleParser.WhileLoopContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code COND_LAST_LOOP}
+	 * Visit a parse tree produced by the {@code IteratorLoop}
 	 * labeled alternative in {@link ScrippleParser#loop_stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCOND_LAST_LOOP(ScrippleParser.COND_LAST_LOOPContext ctx);
+	T visitIteratorLoop(ScrippleParser.IteratorLoopContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ForLoop}
+	 * labeled alternative in {@link ScrippleParser#loop_stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForLoop(ScrippleParser.ForLoopContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DoWhileLoop}
+	 * labeled alternative in {@link ScrippleParser#loop_stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDoWhileLoop(ScrippleParser.DoWhileLoopContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ScrippleParser#iteration_def}.
 	 * @param ctx the parse tree
@@ -241,250 +256,250 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIf_stat(ScrippleParser.If_statContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code COMPARISON_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCOMPARISON_BIN_EXPR(ScrippleParser.COMPARISON_BIN_EXPRContext ctx);
+	T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code NESTED_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code LogicBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNESTED_EXPR(ScrippleParser.NESTED_EXPRContext ctx);
+	T visitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code UNARY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code MultBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitUNARY_EXPR(ScrippleParser.UNARY_EXPRContext ctx);
+	T visitMultBinExpression(ScrippleParser.MultBinExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MAP_KEYSET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ImageBoundExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMAP_KEYSET_EXPR(ScrippleParser.MAP_KEYSET_EXPRContext ctx);
+	T visitImageBoundExpression(ScrippleParser.ImageBoundExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CONTAINS_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code UnaryExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCONTAINS_EXPR(ScrippleParser.CONTAINS_EXPRContext ctx);
+	T visitUnaryExpression(ScrippleParser.UnaryExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RGBA_COLOR_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code MapLookupExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRGBA_COLOR_EXPR(ScrippleParser.RGBA_COLOR_EXPRContext ctx);
+	T visitMapLookupExpression(ScrippleParser.MapLookupExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code TERNARY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code PowerBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTERNARY_EXPR(ScrippleParser.TERNARY_EXPRContext ctx);
+	T visitPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ARITHMETIC_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ComparisonBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitARITHMETIC_BIN_EXPR(ScrippleParser.ARITHMETIC_BIN_EXPRContext ctx);
+	T visitComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MAP_GET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code RGBColorExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMAP_GET_EXPR(ScrippleParser.MAP_GET_EXPRContext ctx);
+	T visitRGBColorExpression(ScrippleParser.RGBColorExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IMAGE_OF_BOUNDS_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ImageOfBoundsExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIMAGE_OF_BOUNDS_EXPR(ScrippleParser.IMAGE_OF_BOUNDS_EXPRContext ctx);
+	T visitImageOfBoundsExpression(ScrippleParser.ImageOfBoundsExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MULT_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code AssignableExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMULT_BIN_EXPR(ScrippleParser.MULT_BIN_EXPRContext ctx);
+	T visitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LIT_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code NewMapExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLIT_EXPR(ScrippleParser.LIT_EXPRContext ctx);
+	T visitNewMapExpression(ScrippleParser.NewMapExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code NEW_SET_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code RGBAColorExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNEW_SET_EXPR(ScrippleParser.NEW_SET_EXPRContext ctx);
+	T visitRGBAColorExpression(ScrippleParser.RGBAColorExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RGB_COLOR_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code NewSetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRGB_COLOR_EXPR(ScrippleParser.RGB_COLOR_EXPRContext ctx);
+	T visitNewSetExpression(ScrippleParser.NewSetExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code NEW_LIST_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ContainsExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNEW_LIST_EXPR(ScrippleParser.NEW_LIST_EXPRContext ctx);
+	T visitContainsExpression(ScrippleParser.ContainsExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code NEW_ARRAY_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code LiteralExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNEW_ARRAY_EXPR(ScrippleParser.NEW_ARRAY_EXPRContext ctx);
+	T visitLiteralExpression(ScrippleParser.LiteralExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code NEW_MAP_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code NewListExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNEW_MAP_EXPR(ScrippleParser.NEW_MAP_EXPRContext ctx);
+	T visitNewListExpression(ScrippleParser.NewListExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ASSIGNABLE_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code MapKeysetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitASSIGNABLE_EXPR(ScrippleParser.ASSIGNABLE_EXPRContext ctx);
+	T visitMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IMAGE_BOUND_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code NestedExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIMAGE_BOUND_EXPR(ScrippleParser.IMAGE_BOUND_EXPRContext ctx);
+	T visitNestedExpression(ScrippleParser.NestedExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LOGIC_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ColorAtPixelExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLOGIC_BIN_EXPR(ScrippleParser.LOGIC_BIN_EXPRContext ctx);
+	T visitColorAtPixelExpression(ScrippleParser.ColorAtPixelExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code GET_COLOR_CHANNEL}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ArithmeticBinExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitGET_COLOR_CHANNEL(ScrippleParser.GET_COLOR_CHANNELContext ctx);
+	T visitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IMAGE_FROM_PATH_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ExplicitCollectionExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIMAGE_FROM_PATH_EXPR(ScrippleParser.IMAGE_FROM_PATH_EXPRContext ctx);
+	T visitExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code POWER_BIN_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ColorChannelExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitPOWER_BIN_EXPR(ScrippleParser.POWER_BIN_EXPRContext ctx);
+	T visitColorChannelExpression(ScrippleParser.ColorChannelExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code COLOR_AT_PIXEL_EXPR}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code NewArrayExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCOLOR_AT_PIXEL_EXPR(ScrippleParser.COLOR_AT_PIXEL_EXPRContext ctx);
+	T visitNewArrayExpression(ScrippleParser.NewArrayExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code EXPLICIT_COLLECTION}
-	 * labeled alternative in {@link ScrippleParser#expr}.
+	 * Visit a parse tree produced by the {@code ImageFromPathExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEXPLICIT_COLLECTION(ScrippleParser.EXPLICIT_COLLECTIONContext ctx);
+	T visitImageFromPathExpression(ScrippleParser.ImageFromPathExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code STANDARD_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code StandardAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSTANDARD_ASSIGNMENT(ScrippleParser.STANDARD_ASSIGNMENTContext ctx);
+	T visitStandardAssignment(ScrippleParser.StandardAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code INC_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code IncrementAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitINC_ASSIGNMENT(ScrippleParser.INC_ASSIGNMENTContext ctx);
+	T visitIncrementAssignment(ScrippleParser.IncrementAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DEC_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code DecrementAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDEC_ASSIGNMENT(ScrippleParser.DEC_ASSIGNMENTContext ctx);
+	T visitDecrementAssignment(ScrippleParser.DecrementAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ADD_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code AddAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitADD_ASSIGNMENT(ScrippleParser.ADD_ASSIGNMENTContext ctx);
+	T visitAddAssignment(ScrippleParser.AddAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SUB_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code SubAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSUB_ASSIGNMENT(ScrippleParser.SUB_ASSIGNMENTContext ctx);
+	T visitSubAssignment(ScrippleParser.SubAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MUL_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code MultAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMUL_ASSIGNMENT(ScrippleParser.MUL_ASSIGNMENTContext ctx);
+	T visitMultAssignment(ScrippleParser.MultAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DIV_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code DivAssignmnet}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDIV_ASSIGNMENT(ScrippleParser.DIV_ASSIGNMENTContext ctx);
+	T visitDivAssignmnet(ScrippleParser.DivAssignmnetContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MOD_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code ModAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMOD_ASSIGNMENT(ScrippleParser.MOD_ASSIGNMENTContext ctx);
+	T visitModAssignment(ScrippleParser.ModAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code AND_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code AndAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAND_ASSIGNMENT(ScrippleParser.AND_ASSIGNMENTContext ctx);
+	T visitAndAssignment(ScrippleParser.AndAssignmentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code OR_ASSIGNMENT}
+	 * Visit a parse tree produced by the {@code OrAssignment}
 	 * labeled alternative in {@link ScrippleParser#assignment}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOR_ASSIGNMENT(ScrippleParser.OR_ASSIGNMENTContext ctx);
+	T visitOrAssignment(ScrippleParser.OrAssignmentContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ScrippleParser#var_init}.
 	 * @param ctx the parse tree
@@ -492,40 +507,40 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVar_init(ScrippleParser.Var_initContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code IMPLICIT_DEF}
+	 * Visit a parse tree produced by the {@code ImplicitVarDef}
 	 * labeled alternative in {@link ScrippleParser#var_def}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIMPLICIT_DEF(ScrippleParser.IMPLICIT_DEFContext ctx);
+	T visitImplicitVarDef(ScrippleParser.ImplicitVarDefContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code EXPLICIT_DEF}
+	 * Visit a parse tree produced by the {@code ExplicitVarDef}
 	 * labeled alternative in {@link ScrippleParser#var_def}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEXPLICIT_DEF(ScrippleParser.EXPLICIT_DEFContext ctx);
+	T visitExplicitVarDef(ScrippleParser.ExplicitVarDefContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ASSIGNABLE_VAR}
+	 * Visit a parse tree produced by the {@code SimpleAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitASSIGNABLE_VAR(ScrippleParser.ASSIGNABLE_VARContext ctx);
+	T visitSimpleAssignable(ScrippleParser.SimpleAssignableContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ASSIGNABLE_LIST_ELEM}
+	 * Visit a parse tree produced by the {@code ListAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitASSIGNABLE_LIST_ELEM(ScrippleParser.ASSIGNABLE_LIST_ELEMContext ctx);
+	T visitListAssignable(ScrippleParser.ListAssignableContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ASSIGNABLE_ARR_ELEM}
+	 * Visit a parse tree produced by the {@code ArrayAssignable}
 	 * labeled alternative in {@link ScrippleParser#assignable}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitASSIGNABLE_ARR_ELEM(ScrippleParser.ASSIGNABLE_ARR_ELEMContext ctx);
+	T visitArrayAssignable(ScrippleParser.ArrayAssignableContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ScrippleParser#ident}.
 	 * @param ctx the parse tree
@@ -533,52 +548,52 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIdent(ScrippleParser.IdentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code STRING_LITERAL}
+	 * Visit a parse tree produced by the {@code StringLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSTRING_LITERAL(ScrippleParser.STRING_LITERALContext ctx);
+	T visitStringLiteral(ScrippleParser.StringLiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CHAR_LITERAL}
+	 * Visit a parse tree produced by the {@code CharLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCHAR_LITERAL(ScrippleParser.CHAR_LITERALContext ctx);
+	T visitCharLiteral(ScrippleParser.CharLiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code INT_LITERAL}
+	 * Visit a parse tree produced by the {@code IntLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitINT_LITERAL(ScrippleParser.INT_LITERALContext ctx);
+	T visitIntLiteral(ScrippleParser.IntLiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code FLOAT_LITERAL}
+	 * Visit a parse tree produced by the {@code FloatLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFLOAT_LITERAL(ScrippleParser.FLOAT_LITERALContext ctx);
+	T visitFloatLiteral(ScrippleParser.FloatLiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code BOOL_LITERAL}
+	 * Visit a parse tree produced by the {@code BoolLiteral}
 	 * labeled alternative in {@link ScrippleParser#literal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitBOOL_LITERAL(ScrippleParser.BOOL_LITERALContext ctx);
+	T visitBoolLiteral(ScrippleParser.BoolLiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code HEXADECIMAL}
+	 * Visit a parse tree produced by the {@code Hexadecimal}
 	 * labeled alternative in {@link ScrippleParser#int_lit}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitHEXADECIMAL(ScrippleParser.HEXADECIMALContext ctx);
+	T visitHexadecimal(ScrippleParser.HexadecimalContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DECIMAL}
+	 * Visit a parse tree produced by the {@code Decimal}
 	 * labeled alternative in {@link ScrippleParser#int_lit}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDECIMAL(ScrippleParser.DECIMALContext ctx);
+	T visitDecimal(ScrippleParser.DecimalContext ctx);
 }

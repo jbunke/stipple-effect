@@ -41,25 +41,25 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVOID_RETURN(ScrippleParser.VOID_RETURNContext ctx) { }
+	@Override public void enterVoidReturnSignature(ScrippleParser.VoidReturnSignatureContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitVOID_RETURN(ScrippleParser.VOID_RETURNContext ctx) { }
+	@Override public void exitVoidReturnSignature(ScrippleParser.VoidReturnSignatureContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTYPE_RETURN(ScrippleParser.TYPE_RETURNContext ctx) { }
+	@Override public void enterTypeReturnSignature(ScrippleParser.TypeReturnSignatureContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTYPE_RETURN(ScrippleParser.TYPE_RETURNContext ctx) { }
+	@Override public void exitTypeReturnSignature(ScrippleParser.TypeReturnSignatureContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -77,265 +77,265 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIMAGE_TYPE(ScrippleParser.IMAGE_TYPEContext ctx) { }
+	@Override public void enterArrayType(ScrippleParser.ArrayTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIMAGE_TYPE(ScrippleParser.IMAGE_TYPEContext ctx) { }
+	@Override public void exitArrayType(ScrippleParser.ArrayTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCHAR_TYPE(ScrippleParser.CHAR_TYPEContext ctx) { }
+	@Override public void enterBoolType(ScrippleParser.BoolTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCHAR_TYPE(ScrippleParser.CHAR_TYPEContext ctx) { }
+	@Override public void exitBoolType(ScrippleParser.BoolTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSTRING_TYPE(ScrippleParser.STRING_TYPEContext ctx) { }
+	@Override public void enterStringType(ScrippleParser.StringTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSTRING_TYPE(ScrippleParser.STRING_TYPEContext ctx) { }
+	@Override public void exitStringType(ScrippleParser.StringTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMAP_TYPE(ScrippleParser.MAP_TYPEContext ctx) { }
+	@Override public void enterSetType(ScrippleParser.SetTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMAP_TYPE(ScrippleParser.MAP_TYPEContext ctx) { }
+	@Override public void exitSetType(ScrippleParser.SetTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterARRAY_TYPE(ScrippleParser.ARRAY_TYPEContext ctx) { }
+	@Override public void enterListType(ScrippleParser.ListTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitARRAY_TYPE(ScrippleParser.ARRAY_TYPEContext ctx) { }
+	@Override public void exitListType(ScrippleParser.ListTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCOLOR_TYPE(ScrippleParser.COLOR_TYPEContext ctx) { }
+	@Override public void enterColorType(ScrippleParser.ColorTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCOLOR_TYPE(ScrippleParser.COLOR_TYPEContext ctx) { }
+	@Override public void exitColorType(ScrippleParser.ColorTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFLOAT_TYPE(ScrippleParser.FLOAT_TYPEContext ctx) { }
+	@Override public void enterCharType(ScrippleParser.CharTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFLOAT_TYPE(ScrippleParser.FLOAT_TYPEContext ctx) { }
+	@Override public void exitCharType(ScrippleParser.CharTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLIST_TYPE(ScrippleParser.LIST_TYPEContext ctx) { }
+	@Override public void enterMapType(ScrippleParser.MapTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLIST_TYPE(ScrippleParser.LIST_TYPEContext ctx) { }
+	@Override public void exitMapType(ScrippleParser.MapTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBOOL_TYPE(ScrippleParser.BOOL_TYPEContext ctx) { }
+	@Override public void enterIntType(ScrippleParser.IntTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBOOL_TYPE(ScrippleParser.BOOL_TYPEContext ctx) { }
+	@Override public void exitIntType(ScrippleParser.IntTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterINT_TYPE(ScrippleParser.INT_TYPEContext ctx) { }
+	@Override public void enterFloatType(ScrippleParser.FloatTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitINT_TYPE(ScrippleParser.INT_TYPEContext ctx) { }
+	@Override public void exitFloatType(ScrippleParser.FloatTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSET_TYPE(ScrippleParser.SET_TYPEContext ctx) { }
+	@Override public void enterImageType(ScrippleParser.ImageTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSET_TYPE(ScrippleParser.SET_TYPEContext ctx) { }
+	@Override public void exitImageType(ScrippleParser.ImageTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSINGLE_STAT_BODY(ScrippleParser.SINGLE_STAT_BODYContext ctx) { }
+	@Override public void enterSingleStatBody(ScrippleParser.SingleStatBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSINGLE_STAT_BODY(ScrippleParser.SINGLE_STAT_BODYContext ctx) { }
+	@Override public void exitSingleStatBody(ScrippleParser.SingleStatBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCOMPLEX_BODY(ScrippleParser.COMPLEX_BODYContext ctx) { }
+	@Override public void enterComplexBody(ScrippleParser.ComplexBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCOMPLEX_BODY(ScrippleParser.COMPLEX_BODYContext ctx) { }
+	@Override public void exitComplexBody(ScrippleParser.ComplexBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLOOP_STAT(ScrippleParser.LOOP_STATContext ctx) { }
+	@Override public void enterLoopStatement(ScrippleParser.LoopStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLOOP_STAT(ScrippleParser.LOOP_STATContext ctx) { }
+	@Override public void exitLoopStatement(ScrippleParser.LoopStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIF_STAT(ScrippleParser.IF_STATContext ctx) { }
+	@Override public void enterIfStatement(ScrippleParser.IfStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIF_STAT(ScrippleParser.IF_STATContext ctx) { }
+	@Override public void exitIfStatement(ScrippleParser.IfStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVAR_DEF_STAT(ScrippleParser.VAR_DEF_STATContext ctx) { }
+	@Override public void enterVarDefStatement(ScrippleParser.VarDefStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitVAR_DEF_STAT(ScrippleParser.VAR_DEF_STATContext ctx) { }
+	@Override public void exitVarDefStatement(ScrippleParser.VarDefStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterASSIGNMENT_STAT(ScrippleParser.ASSIGNMENT_STATContext ctx) { }
+	@Override public void enterAssignmentStatement(ScrippleParser.AssignmentStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitASSIGNMENT_STAT(ScrippleParser.ASSIGNMENT_STATContext ctx) { }
+	@Override public void exitAssignmentStatement(ScrippleParser.AssignmentStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRETURN_STAT(ScrippleParser.RETURN_STATContext ctx) { }
+	@Override public void enterReturnStatement(ScrippleParser.ReturnStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRETURN_STAT(ScrippleParser.RETURN_STATContext ctx) { }
+	@Override public void exitReturnStatement(ScrippleParser.ReturnStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterADD_TO_COLLECTION(ScrippleParser.ADD_TO_COLLECTIONContext ctx) { }
+	@Override public void enterAddToCollection(ScrippleParser.AddToCollectionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitADD_TO_COLLECTION(ScrippleParser.ADD_TO_COLLECTIONContext ctx) { }
+	@Override public void exitAddToCollection(ScrippleParser.AddToCollectionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterREMOVE_FROM_COLLECTION(ScrippleParser.REMOVE_FROM_COLLECTIONContext ctx) { }
+	@Override public void enterRemoveFromCollection(ScrippleParser.RemoveFromCollectionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitREMOVE_FROM_COLLECTION(ScrippleParser.REMOVE_FROM_COLLECTIONContext ctx) { }
+	@Override public void exitRemoveFromCollection(ScrippleParser.RemoveFromCollectionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDEFINE_MAP_ENTRY(ScrippleParser.DEFINE_MAP_ENTRYContext ctx) { }
+	@Override public void enterDefineMapEntryStatement(ScrippleParser.DefineMapEntryStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDEFINE_MAP_ENTRY(ScrippleParser.DEFINE_MAP_ENTRYContext ctx) { }
+	@Override public void exitDefineMapEntryStatement(ScrippleParser.DefineMapEntryStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDRAW_ONTO_IMAGE(ScrippleParser.DRAW_ONTO_IMAGEContext ctx) { }
+	@Override public void enterDrawOntoImageStatement(ScrippleParser.DrawOntoImageStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDRAW_ONTO_IMAGE(ScrippleParser.DRAW_ONTO_IMAGEContext ctx) { }
+	@Override public void exitDrawOntoImageStatement(ScrippleParser.DrawOntoImageStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -353,25 +353,49 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCOND_FIRST_LOOP(ScrippleParser.COND_FIRST_LOOPContext ctx) { }
+	@Override public void enterWhileLoop(ScrippleParser.WhileLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCOND_FIRST_LOOP(ScrippleParser.COND_FIRST_LOOPContext ctx) { }
+	@Override public void exitWhileLoop(ScrippleParser.WhileLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCOND_LAST_LOOP(ScrippleParser.COND_LAST_LOOPContext ctx) { }
+	@Override public void enterIteratorLoop(ScrippleParser.IteratorLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCOND_LAST_LOOP(ScrippleParser.COND_LAST_LOOPContext ctx) { }
+	@Override public void exitIteratorLoop(ScrippleParser.IteratorLoopContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForLoop(ScrippleParser.ForLoopContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForLoop(ScrippleParser.ForLoopContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDoWhileLoop(ScrippleParser.DoWhileLoopContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDoWhileLoop(ScrippleParser.DoWhileLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -425,421 +449,421 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCOMPARISON_BIN_EXPR(ScrippleParser.COMPARISON_BIN_EXPRContext ctx) { }
+	@Override public void enterTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCOMPARISON_BIN_EXPR(ScrippleParser.COMPARISON_BIN_EXPRContext ctx) { }
+	@Override public void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNESTED_EXPR(ScrippleParser.NESTED_EXPRContext ctx) { }
+	@Override public void enterLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNESTED_EXPR(ScrippleParser.NESTED_EXPRContext ctx) { }
+	@Override public void exitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUNARY_EXPR(ScrippleParser.UNARY_EXPRContext ctx) { }
+	@Override public void enterMultBinExpression(ScrippleParser.MultBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitUNARY_EXPR(ScrippleParser.UNARY_EXPRContext ctx) { }
+	@Override public void exitMultBinExpression(ScrippleParser.MultBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMAP_KEYSET_EXPR(ScrippleParser.MAP_KEYSET_EXPRContext ctx) { }
+	@Override public void enterImageBoundExpression(ScrippleParser.ImageBoundExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMAP_KEYSET_EXPR(ScrippleParser.MAP_KEYSET_EXPRContext ctx) { }
+	@Override public void exitImageBoundExpression(ScrippleParser.ImageBoundExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCONTAINS_EXPR(ScrippleParser.CONTAINS_EXPRContext ctx) { }
+	@Override public void enterUnaryExpression(ScrippleParser.UnaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCONTAINS_EXPR(ScrippleParser.CONTAINS_EXPRContext ctx) { }
+	@Override public void exitUnaryExpression(ScrippleParser.UnaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRGBA_COLOR_EXPR(ScrippleParser.RGBA_COLOR_EXPRContext ctx) { }
+	@Override public void enterMapLookupExpression(ScrippleParser.MapLookupExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRGBA_COLOR_EXPR(ScrippleParser.RGBA_COLOR_EXPRContext ctx) { }
+	@Override public void exitMapLookupExpression(ScrippleParser.MapLookupExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTERNARY_EXPR(ScrippleParser.TERNARY_EXPRContext ctx) { }
+	@Override public void enterPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTERNARY_EXPR(ScrippleParser.TERNARY_EXPRContext ctx) { }
+	@Override public void exitPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterARITHMETIC_BIN_EXPR(ScrippleParser.ARITHMETIC_BIN_EXPRContext ctx) { }
+	@Override public void enterComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitARITHMETIC_BIN_EXPR(ScrippleParser.ARITHMETIC_BIN_EXPRContext ctx) { }
+	@Override public void exitComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMAP_GET_EXPR(ScrippleParser.MAP_GET_EXPRContext ctx) { }
+	@Override public void enterRGBColorExpression(ScrippleParser.RGBColorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMAP_GET_EXPR(ScrippleParser.MAP_GET_EXPRContext ctx) { }
+	@Override public void exitRGBColorExpression(ScrippleParser.RGBColorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIMAGE_OF_BOUNDS_EXPR(ScrippleParser.IMAGE_OF_BOUNDS_EXPRContext ctx) { }
+	@Override public void enterImageOfBoundsExpression(ScrippleParser.ImageOfBoundsExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIMAGE_OF_BOUNDS_EXPR(ScrippleParser.IMAGE_OF_BOUNDS_EXPRContext ctx) { }
+	@Override public void exitImageOfBoundsExpression(ScrippleParser.ImageOfBoundsExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMULT_BIN_EXPR(ScrippleParser.MULT_BIN_EXPRContext ctx) { }
+	@Override public void enterAssignableExpression(ScrippleParser.AssignableExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMULT_BIN_EXPR(ScrippleParser.MULT_BIN_EXPRContext ctx) { }
+	@Override public void exitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLIT_EXPR(ScrippleParser.LIT_EXPRContext ctx) { }
+	@Override public void enterNewMapExpression(ScrippleParser.NewMapExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLIT_EXPR(ScrippleParser.LIT_EXPRContext ctx) { }
+	@Override public void exitNewMapExpression(ScrippleParser.NewMapExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNEW_SET_EXPR(ScrippleParser.NEW_SET_EXPRContext ctx) { }
+	@Override public void enterRGBAColorExpression(ScrippleParser.RGBAColorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNEW_SET_EXPR(ScrippleParser.NEW_SET_EXPRContext ctx) { }
+	@Override public void exitRGBAColorExpression(ScrippleParser.RGBAColorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRGB_COLOR_EXPR(ScrippleParser.RGB_COLOR_EXPRContext ctx) { }
+	@Override public void enterNewSetExpression(ScrippleParser.NewSetExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRGB_COLOR_EXPR(ScrippleParser.RGB_COLOR_EXPRContext ctx) { }
+	@Override public void exitNewSetExpression(ScrippleParser.NewSetExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNEW_LIST_EXPR(ScrippleParser.NEW_LIST_EXPRContext ctx) { }
+	@Override public void enterContainsExpression(ScrippleParser.ContainsExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNEW_LIST_EXPR(ScrippleParser.NEW_LIST_EXPRContext ctx) { }
+	@Override public void exitContainsExpression(ScrippleParser.ContainsExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNEW_ARRAY_EXPR(ScrippleParser.NEW_ARRAY_EXPRContext ctx) { }
+	@Override public void enterLiteralExpression(ScrippleParser.LiteralExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNEW_ARRAY_EXPR(ScrippleParser.NEW_ARRAY_EXPRContext ctx) { }
+	@Override public void exitLiteralExpression(ScrippleParser.LiteralExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNEW_MAP_EXPR(ScrippleParser.NEW_MAP_EXPRContext ctx) { }
+	@Override public void enterNewListExpression(ScrippleParser.NewListExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNEW_MAP_EXPR(ScrippleParser.NEW_MAP_EXPRContext ctx) { }
+	@Override public void exitNewListExpression(ScrippleParser.NewListExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterASSIGNABLE_EXPR(ScrippleParser.ASSIGNABLE_EXPRContext ctx) { }
+	@Override public void enterMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitASSIGNABLE_EXPR(ScrippleParser.ASSIGNABLE_EXPRContext ctx) { }
+	@Override public void exitMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIMAGE_BOUND_EXPR(ScrippleParser.IMAGE_BOUND_EXPRContext ctx) { }
+	@Override public void enterNestedExpression(ScrippleParser.NestedExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIMAGE_BOUND_EXPR(ScrippleParser.IMAGE_BOUND_EXPRContext ctx) { }
+	@Override public void exitNestedExpression(ScrippleParser.NestedExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLOGIC_BIN_EXPR(ScrippleParser.LOGIC_BIN_EXPRContext ctx) { }
+	@Override public void enterColorAtPixelExpression(ScrippleParser.ColorAtPixelExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLOGIC_BIN_EXPR(ScrippleParser.LOGIC_BIN_EXPRContext ctx) { }
+	@Override public void exitColorAtPixelExpression(ScrippleParser.ColorAtPixelExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterGET_COLOR_CHANNEL(ScrippleParser.GET_COLOR_CHANNELContext ctx) { }
+	@Override public void enterArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitGET_COLOR_CHANNEL(ScrippleParser.GET_COLOR_CHANNELContext ctx) { }
+	@Override public void exitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIMAGE_FROM_PATH_EXPR(ScrippleParser.IMAGE_FROM_PATH_EXPRContext ctx) { }
+	@Override public void enterExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIMAGE_FROM_PATH_EXPR(ScrippleParser.IMAGE_FROM_PATH_EXPRContext ctx) { }
+	@Override public void exitExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPOWER_BIN_EXPR(ScrippleParser.POWER_BIN_EXPRContext ctx) { }
+	@Override public void enterColorChannelExpression(ScrippleParser.ColorChannelExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPOWER_BIN_EXPR(ScrippleParser.POWER_BIN_EXPRContext ctx) { }
+	@Override public void exitColorChannelExpression(ScrippleParser.ColorChannelExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCOLOR_AT_PIXEL_EXPR(ScrippleParser.COLOR_AT_PIXEL_EXPRContext ctx) { }
+	@Override public void enterNewArrayExpression(ScrippleParser.NewArrayExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCOLOR_AT_PIXEL_EXPR(ScrippleParser.COLOR_AT_PIXEL_EXPRContext ctx) { }
+	@Override public void exitNewArrayExpression(ScrippleParser.NewArrayExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEXPLICIT_COLLECTION(ScrippleParser.EXPLICIT_COLLECTIONContext ctx) { }
+	@Override public void enterImageFromPathExpression(ScrippleParser.ImageFromPathExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEXPLICIT_COLLECTION(ScrippleParser.EXPLICIT_COLLECTIONContext ctx) { }
+	@Override public void exitImageFromPathExpression(ScrippleParser.ImageFromPathExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSTANDARD_ASSIGNMENT(ScrippleParser.STANDARD_ASSIGNMENTContext ctx) { }
+	@Override public void enterStandardAssignment(ScrippleParser.StandardAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSTANDARD_ASSIGNMENT(ScrippleParser.STANDARD_ASSIGNMENTContext ctx) { }
+	@Override public void exitStandardAssignment(ScrippleParser.StandardAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterINC_ASSIGNMENT(ScrippleParser.INC_ASSIGNMENTContext ctx) { }
+	@Override public void enterIncrementAssignment(ScrippleParser.IncrementAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitINC_ASSIGNMENT(ScrippleParser.INC_ASSIGNMENTContext ctx) { }
+	@Override public void exitIncrementAssignment(ScrippleParser.IncrementAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDEC_ASSIGNMENT(ScrippleParser.DEC_ASSIGNMENTContext ctx) { }
+	@Override public void enterDecrementAssignment(ScrippleParser.DecrementAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDEC_ASSIGNMENT(ScrippleParser.DEC_ASSIGNMENTContext ctx) { }
+	@Override public void exitDecrementAssignment(ScrippleParser.DecrementAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterADD_ASSIGNMENT(ScrippleParser.ADD_ASSIGNMENTContext ctx) { }
+	@Override public void enterAddAssignment(ScrippleParser.AddAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitADD_ASSIGNMENT(ScrippleParser.ADD_ASSIGNMENTContext ctx) { }
+	@Override public void exitAddAssignment(ScrippleParser.AddAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSUB_ASSIGNMENT(ScrippleParser.SUB_ASSIGNMENTContext ctx) { }
+	@Override public void enterSubAssignment(ScrippleParser.SubAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSUB_ASSIGNMENT(ScrippleParser.SUB_ASSIGNMENTContext ctx) { }
+	@Override public void exitSubAssignment(ScrippleParser.SubAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMUL_ASSIGNMENT(ScrippleParser.MUL_ASSIGNMENTContext ctx) { }
+	@Override public void enterMultAssignment(ScrippleParser.MultAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMUL_ASSIGNMENT(ScrippleParser.MUL_ASSIGNMENTContext ctx) { }
+	@Override public void exitMultAssignment(ScrippleParser.MultAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDIV_ASSIGNMENT(ScrippleParser.DIV_ASSIGNMENTContext ctx) { }
+	@Override public void enterDivAssignmnet(ScrippleParser.DivAssignmnetContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDIV_ASSIGNMENT(ScrippleParser.DIV_ASSIGNMENTContext ctx) { }
+	@Override public void exitDivAssignmnet(ScrippleParser.DivAssignmnetContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMOD_ASSIGNMENT(ScrippleParser.MOD_ASSIGNMENTContext ctx) { }
+	@Override public void enterModAssignment(ScrippleParser.ModAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMOD_ASSIGNMENT(ScrippleParser.MOD_ASSIGNMENTContext ctx) { }
+	@Override public void exitModAssignment(ScrippleParser.ModAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAND_ASSIGNMENT(ScrippleParser.AND_ASSIGNMENTContext ctx) { }
+	@Override public void enterAndAssignment(ScrippleParser.AndAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAND_ASSIGNMENT(ScrippleParser.AND_ASSIGNMENTContext ctx) { }
+	@Override public void exitAndAssignment(ScrippleParser.AndAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOR_ASSIGNMENT(ScrippleParser.OR_ASSIGNMENTContext ctx) { }
+	@Override public void enterOrAssignment(ScrippleParser.OrAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOR_ASSIGNMENT(ScrippleParser.OR_ASSIGNMENTContext ctx) { }
+	@Override public void exitOrAssignment(ScrippleParser.OrAssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -857,61 +881,61 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIMPLICIT_DEF(ScrippleParser.IMPLICIT_DEFContext ctx) { }
+	@Override public void enterImplicitVarDef(ScrippleParser.ImplicitVarDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIMPLICIT_DEF(ScrippleParser.IMPLICIT_DEFContext ctx) { }
+	@Override public void exitImplicitVarDef(ScrippleParser.ImplicitVarDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEXPLICIT_DEF(ScrippleParser.EXPLICIT_DEFContext ctx) { }
+	@Override public void enterExplicitVarDef(ScrippleParser.ExplicitVarDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEXPLICIT_DEF(ScrippleParser.EXPLICIT_DEFContext ctx) { }
+	@Override public void exitExplicitVarDef(ScrippleParser.ExplicitVarDefContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterASSIGNABLE_VAR(ScrippleParser.ASSIGNABLE_VARContext ctx) { }
+	@Override public void enterSimpleAssignable(ScrippleParser.SimpleAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitASSIGNABLE_VAR(ScrippleParser.ASSIGNABLE_VARContext ctx) { }
+	@Override public void exitSimpleAssignable(ScrippleParser.SimpleAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterASSIGNABLE_LIST_ELEM(ScrippleParser.ASSIGNABLE_LIST_ELEMContext ctx) { }
+	@Override public void enterListAssignable(ScrippleParser.ListAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitASSIGNABLE_LIST_ELEM(ScrippleParser.ASSIGNABLE_LIST_ELEMContext ctx) { }
+	@Override public void exitListAssignable(ScrippleParser.ListAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterASSIGNABLE_ARR_ELEM(ScrippleParser.ASSIGNABLE_ARR_ELEMContext ctx) { }
+	@Override public void enterArrayAssignable(ScrippleParser.ArrayAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitASSIGNABLE_ARR_ELEM(ScrippleParser.ASSIGNABLE_ARR_ELEMContext ctx) { }
+	@Override public void exitArrayAssignable(ScrippleParser.ArrayAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -929,85 +953,85 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSTRING_LITERAL(ScrippleParser.STRING_LITERALContext ctx) { }
+	@Override public void enterStringLiteral(ScrippleParser.StringLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSTRING_LITERAL(ScrippleParser.STRING_LITERALContext ctx) { }
+	@Override public void exitStringLiteral(ScrippleParser.StringLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCHAR_LITERAL(ScrippleParser.CHAR_LITERALContext ctx) { }
+	@Override public void enterCharLiteral(ScrippleParser.CharLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCHAR_LITERAL(ScrippleParser.CHAR_LITERALContext ctx) { }
+	@Override public void exitCharLiteral(ScrippleParser.CharLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterINT_LITERAL(ScrippleParser.INT_LITERALContext ctx) { }
+	@Override public void enterIntLiteral(ScrippleParser.IntLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitINT_LITERAL(ScrippleParser.INT_LITERALContext ctx) { }
+	@Override public void exitIntLiteral(ScrippleParser.IntLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFLOAT_LITERAL(ScrippleParser.FLOAT_LITERALContext ctx) { }
+	@Override public void enterFloatLiteral(ScrippleParser.FloatLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFLOAT_LITERAL(ScrippleParser.FLOAT_LITERALContext ctx) { }
+	@Override public void exitFloatLiteral(ScrippleParser.FloatLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBOOL_LITERAL(ScrippleParser.BOOL_LITERALContext ctx) { }
+	@Override public void enterBoolLiteral(ScrippleParser.BoolLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBOOL_LITERAL(ScrippleParser.BOOL_LITERALContext ctx) { }
+	@Override public void exitBoolLiteral(ScrippleParser.BoolLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterHEXADECIMAL(ScrippleParser.HEXADECIMALContext ctx) { }
+	@Override public void enterHexadecimal(ScrippleParser.HexadecimalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitHEXADECIMAL(ScrippleParser.HEXADECIMALContext ctx) { }
+	@Override public void exitHexadecimal(ScrippleParser.HexadecimalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDECIMAL(ScrippleParser.DECIMALContext ctx) { }
+	@Override public void enterDecimal(ScrippleParser.DecimalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDECIMAL(ScrippleParser.DECIMALContext ctx) { }
+	@Override public void exitDecimal(ScrippleParser.DecimalContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
