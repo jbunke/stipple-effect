@@ -2,10 +2,10 @@ package com.jordanbunke.stipple_effect.scripting;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.BodyStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.AssignmentNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
@@ -351,5 +351,119 @@ public final class ScrippleVisitor
                         .toArray(StatementNode[]::new));
     }
 
-    // TODO: assignments, expressions
+    @Override
+    public StandardAssignmentNode visitStandardAssignment(
+            final ScrippleParser.StandardAssignmentContext ctx
+    ) {
+        return new StandardAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public NoOperandAssignmentNode visitIncrementAssignment(
+            final ScrippleParser.IncrementAssignmentContext ctx
+    ) {
+        return new NoOperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                true);
+    }
+
+    @Override
+    public NoOperandAssignmentNode visitDecrementAssignment(
+            final ScrippleParser.DecrementAssignmentContext ctx
+    ) {
+        return new NoOperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                false);
+    }
+
+    @Override
+    public OperandAssignmentNode visitAddAssignment(
+            final ScrippleParser.AddAssignmentContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.ADD,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public OperandAssignmentNode visitSubAssignment(
+            final ScrippleParser.SubAssignmentContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.SUBTRACT,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public OperandAssignmentNode visitMultAssignment(
+            final ScrippleParser.MultAssignmentContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.MULTIPLY,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public OperandAssignmentNode visitDivAssignmnet(
+            final ScrippleParser.DivAssignmnetContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.DIVIDE,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public OperandAssignmentNode visitModAssignment(
+            final ScrippleParser.ModAssignmentContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.MODULO,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public OperandAssignmentNode visitAndAssignment(
+            final ScrippleParser.AndAssignmentContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.AND,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public OperandAssignmentNode visitOrAssignment(
+            final ScrippleParser.OrAssignmentContext ctx
+    ) {
+        return new OperandAssignmentNode(
+                TextPosition.fromToken(ctx.start),
+                (AssignableNode) visit(ctx.assignable()),
+                OperandAssignmentNode.Operator.OR,
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public ExpressionNode visitNestedExpression(
+            final ScrippleParser.NestedExpressionContext ctx
+    ) {
+        return (ExpressionNode) visit(ctx.expr());
+    }
+
+    // TODO: expressions, assignables, literals
 }
