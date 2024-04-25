@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScrippleASTNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public abstract class ExpressionNode extends ScrippleASTNode {
@@ -10,4 +11,6 @@ public abstract class ExpressionNode extends ScrippleASTNode {
     }
 
     public abstract Object evaluate(final SymbolTable symbolTable);
+
+    public abstract ScrippleTypeNode getType(final SymbolTable symbolTable);
 }

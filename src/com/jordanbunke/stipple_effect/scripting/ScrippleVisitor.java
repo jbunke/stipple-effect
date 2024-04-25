@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.scripting;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.BodyStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.*;
@@ -88,8 +89,8 @@ public final class ScrippleVisitor
             final ScrippleParser.IdentContext ctx
     ) {
         return new IdentifierNode(
-                TextPosition.fromToken(ctx.IDENTIFIER().getSymbol()),
-                ctx.IDENTIFIER().getText());
+                TextPosition.fromToken(ctx.start),
+                ctx.IDENTIFIER().getSymbol().getText());
     }
 
     @Override
@@ -459,11 +460,99 @@ public final class ScrippleVisitor
     }
 
     @Override
+    public BoolLiteralNode visitBoolLiteral(
+            final ScrippleParser.BoolLiteralContext ctx
+    ) {
+        return new BoolLiteralNode(
+                TextPosition.fromToken(ctx.BOOL_LIT().getSymbol()),
+                Boolean.parseBoolean(ctx.BOOL_LIT().getSymbol().getText()));
+    }
+
+    @Override
+    public FloatLiteralNode visitFloatLiteral(
+            final ScrippleParser.FloatLiteralContext ctx
+    ) {
+        return new FloatLiteralNode(
+                TextPosition.fromToken(ctx.FLOAT_LIT().getSymbol()),
+                Float.parseFloat(ctx.FLOAT_LIT().getSymbol().getText()));
+    }
+
+    @Override
+    public IntLiteralNode visitIntLiteral(
+            final ScrippleParser.IntLiteralContext ctx
+    ) {
+        return new IntLiteralNode(
+                TextPosition.fromToken(ctx.int_lit().start),
+                Integer.parseInt(ctx.int_lit().getText()));
+    }
+
+    @Override
+    public CharLiteralNode visitCharLiteral(
+            ScrippleParser.CharLiteralContext ctx
+    ) {
+        return new CharLiteralNode(
+                TextPosition.fromToken(ctx.CHAR_LIT().getSymbol()),
+                ctx.CHAR_LIT().getSymbol().getText().charAt(1));
+    }
+
+    @Override
+    public StringLiteralNode visitStringLiteral(
+            ScrippleParser.StringLiteralContext ctx
+    ) {
+        final String withQuotes = ctx.STRING_LIT().getSymbol().getText();
+
+        return new StringLiteralNode(
+                TextPosition.fromToken(ctx.STRING_LIT().getSymbol()),
+                withQuotes.substring(1, withQuotes.length() - 1));
+    }
+
+    @Override
     public ExpressionNode visitNestedExpression(
             final ScrippleParser.NestedExpressionContext ctx
     ) {
         return (ExpressionNode) visit(ctx.expr());
     }
 
-    // TODO: expressions, assignables, literals
+    @Override
+    public AssignableNode visitAssignableExpression(
+            final ScrippleParser.AssignableExpressionContext ctx
+    ) {
+        return (AssignableNode) visit(ctx.assignable());
+    }
+
+    @Override
+    public IdentifierNode visitSimpleAssignable(
+            ScrippleParser.SimpleAssignableContext ctx
+    ) {
+        return visitIdent(ctx.ident());
+    }
+
+    @Override
+    public ListAssignableNode visitListAssignable(
+            final ScrippleParser.ListAssignableContext ctx
+    ) {
+        return new ListAssignableNode(
+                TextPosition.fromToken(ctx.start),
+                ctx.ident().IDENTIFIER().getSymbol().getText(),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public ArrayAssignableNode visitArrayAssignable(
+            final ScrippleParser.ArrayAssignableContext ctx
+    ) {
+        return new ArrayAssignableNode(
+                TextPosition.fromToken(ctx.start),
+                ctx.ident().IDENTIFIER().getSymbol().getText(),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public LiteralNode visitLiteralExpression(
+            ScrippleParser.LiteralExpressionContext ctx
+    ) {
+        return (LiteralNode) visit(ctx.literal());
+    }
+
+    // TODO: expressions
 }
