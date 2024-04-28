@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment;
 
+import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
@@ -24,7 +25,10 @@ public final class StandardAssignmentNode extends AssignmentNode {
     }
 
     @Override
-    public void execute(final SymbolTable symbolTable) {
+    public FuncControlFlow execute(final SymbolTable symbolTable) {
         // TODO
+        getAssignable().update(symbolTable, expression.evaluate(symbolTable));
+
+        return FuncControlFlow.cont();
     }
 }

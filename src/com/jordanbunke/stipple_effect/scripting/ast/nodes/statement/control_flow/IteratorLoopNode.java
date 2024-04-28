@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
+import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.DeclarationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -30,7 +31,9 @@ public final class IteratorLoopNode extends StatementNode {
     }
 
     @Override
-    public void execute(final SymbolTable symbolTable) {
+    public FuncControlFlow execute(final SymbolTable symbolTable) {
         // TODO
+
+        return FuncControlFlow.cont();
     }
 }

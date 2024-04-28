@@ -45,8 +45,8 @@ public final class CollectionTypeNode extends ScrippleTypeNode  {
     @Override
     public Object[] createArray(final int length) {
         return switch (type) {
-            case SET -> new Set<>[length];
-            case LIST -> new List<>[length];
+            case SET -> new Set[length];
+            case LIST -> new List[length];
             case ARRAY -> (Object[])
                     Array.newInstance(elementType.valueClass(), length);
         };

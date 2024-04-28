@@ -11,7 +11,7 @@ public final class ScrippleErrorListener {
     }
 
     private enum ErrorClass {
-        SEMANTIC, RUNTIME;
+        COMPILE, RUNTIME;
 
         private String prefix() {
             return name() + " ERROR: ";
@@ -39,7 +39,10 @@ public final class ScrippleErrorListener {
         PIX_ARG_OUT_OF_BOUNDS,
         NON_POSITIVE_IMAGE_BOUND,
         MAP_DOES_NOT_CONTAIN_ELEMENT,
-        EXPECTED_SEARCHABLE_FOR_CALL
+        EXPECTED_SEARCHABLE_FOR_CALL,
+        ARGS_PARAMS_MISMATCH,
+        UNINITIALIZED_VAR,
+        UNDEFINED_VAR
         ;
 
         private String get(final String[] args) {
@@ -163,6 +166,26 @@ public final class ScrippleErrorListener {
                     yield dimension + " argument was evaluated as " + value +
                             ", which is invalid (" + dimension + " > 0)";
                 }
+                case ARGS_PARAMS_MISMATCH -> {
+                    final String expected = args[0], received = args[1];
+
+                    yield "The number of arguments passed into the script" +
+                            " is different to the number of parameters; " +
+                            "expected: " + expected +
+                            ", received: " + received;
+                }
+                case UNDEFINED_VAR -> {
+                    final String ident = args[0];
+
+                    yield "Attempted to reference variable \"" + ident +
+                            "\" that is not defined in the current scope";
+                }
+                case UNINITIALIZED_VAR -> {
+                    final String ident = args[0];
+
+                    yield "Variable \"" + ident +
+                            "\" has not been initialized";
+                }
             };
         }
 
@@ -189,8 +212,9 @@ public final class ScrippleErrorListener {
                         EXPECTED_MAP_FOR_CALL,
                         EXPECTED_SEARCHABLE_FOR_CALL,
                         IMG_ARG_NOT_INT,
-                        TEX_COL_REPL_ARG_NOT_IMG ->
-                        ErrorClass.SEMANTIC;
+                        TEX_COL_REPL_ARG_NOT_IMG,
+                        UNDEFINED_VAR ->
+                        ErrorClass.COMPILE;
                 case PATH_DOES_NOT_CONTAIN_IMAGE,
                         OPERAND_NAN_RT,
                         OPERAND_NOT_A_COLLECTION_RT,
@@ -199,7 +223,9 @@ public final class ScrippleErrorListener {
                         COLOR_CHANNEL_OUT_OF_BOUNDS,
                         PIX_ARG_OUT_OF_BOUNDS,
                         NON_POSITIVE_IMAGE_BOUND,
-                        MAP_DOES_NOT_CONTAIN_ELEMENT ->
+                        MAP_DOES_NOT_CONTAIN_ELEMENT,
+                        ARGS_PARAMS_MISMATCH,
+                        UNINITIALIZED_VAR ->
                         ErrorClass.RUNTIME;
             };
         }

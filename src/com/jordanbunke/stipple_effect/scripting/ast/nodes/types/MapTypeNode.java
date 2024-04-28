@@ -32,7 +32,7 @@ public final class MapTypeNode extends ScrippleTypeNode {
 
     @Override
     public Object[] createArray(final int length) {
-        return new Map<>[length];
+        return new Map[length];
     }
 
     @Override

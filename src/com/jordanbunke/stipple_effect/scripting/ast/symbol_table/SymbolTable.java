@@ -10,7 +10,7 @@ public final class SymbolTable {
     private final ScrippleASTNode scope;
     private final SymbolTable parent;
     private final Map<ScrippleASTNode, SymbolTable> children;
-    private final Map<String, Object> contents;
+    private final Map<String, Variable> contents;
 
     public SymbolTable(
             final ScrippleASTNode scope,
@@ -46,10 +46,25 @@ public final class SymbolTable {
         return children.getOrDefault(subScope, null);
     }
 
-    public Object get(final String ident) {
+    public Variable get(final String ident) {
         if (contents.containsKey(ident))
-            return ident;
+            return contents.get(ident);
 
         return parent != null ? parent.get(ident) : null;
+    }
+
+    public void put(final String ident, final Variable var) {
+        contents.put(ident, var);
+    }
+
+    public void update(final String ident, final Object value) {
+        if (!contents.containsKey(ident)) {
+            if (parent != null)
+                parent.update(ident, value);
+
+            return;
+        }
+
+        contents.get(ident).set(value);
     }
 }

@@ -14,4 +14,8 @@ public abstract class AssignmentNode extends StatementNode {
 
         this.assignable = assignable;
     }
+
+    public AssignableNode getAssignable() {
+        return assignable;
+    }
 }

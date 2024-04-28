@@ -24,8 +24,18 @@ public final class MethodSignatureNode extends ScrippleASTNode {
         this(position, parameters, null);
     }
 
+    public void execute(
+            final SymbolTable symbolTable,
+            final Object... args
+    ) {
+        parameters.populateArgs(symbolTable, args);
+    }
+
     @Override
-    public void semanticErrorCheck(SymbolTable symbolTable) {
-        // TODO
+    public void semanticErrorCheck(final SymbolTable symbolTable) {
+        parameters.semanticErrorCheck(symbolTable);
+
+        if (returnType != null)
+            returnType.semanticErrorCheck(symbolTable);
     }
 }

@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
+import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -28,7 +29,9 @@ public final class NativeDrawCallNode extends StatementNode {
     }
 
     @Override
-    public void execute(final SymbolTable symbolTable) {
+    public FuncControlFlow execute(final SymbolTable symbolTable) {
         // TODO
+
+        return FuncControlFlow.cont();
     }
 }
