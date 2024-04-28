@@ -449,6 +449,18 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code ExplicitArrayExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void enterExplicitArrayExpression(ScrippleParser.ExplicitArrayExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ExplicitArrayExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void exitExplicitArrayExpression(ScrippleParser.ExplicitArrayExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code MultBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -509,6 +521,18 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code ExplicitListExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void enterExplicitListExpression(ScrippleParser.ExplicitListExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ExplicitListExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void exitExplicitListExpression(ScrippleParser.ExplicitListExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ComparisonBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -556,6 +580,18 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code ExplicitSetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void enterExplicitSetExpression(ScrippleParser.ExplicitSetExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ExplicitSetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void exitExplicitSetExpression(ScrippleParser.ExplicitSetExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code NewMapExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
@@ -641,6 +677,18 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 */
 	void exitMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code TextureColorReplaceExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void enterTextureColorReplaceExpression(ScrippleParser.TextureColorReplaceExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code TextureColorReplaceExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 */
+	void exitTextureColorReplaceExpression(ScrippleParser.TextureColorReplaceExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code NestedExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -676,18 +724,6 @@ public interface ScrippleParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code ExplicitCollectionExpression}
-	 * labeled alternative in {@link ScrippleParser#expr()}.
-	 * @param ctx the parse tree
-	 */
-	void enterExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code ExplicitCollectionExpression}
-	 * labeled alternative in {@link ScrippleParser#expr()}.
-	 * @param ctx the parse tree
-	 */
-	void exitExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ColorChannelExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.

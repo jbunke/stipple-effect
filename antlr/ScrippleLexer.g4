@@ -76,11 +76,11 @@ FALSE: 'false';
 
 // Native call keywords
 NEW: 'new';
-OF: 'of';
 FROM: 'from';
 RGBA: 'rgba';
 RGB: 'rgb';
 BLANK: 'blank';
+TEX_COL_REPL: 'tex_col_repl';
 
 // Native field keywords
 RED: '.' ('red' | 'r');

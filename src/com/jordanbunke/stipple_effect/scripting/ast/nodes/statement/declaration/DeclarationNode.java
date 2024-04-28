@@ -1,11 +1,12 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public sealed class DeclarationNode extends ScrippleASTNode
+public sealed class DeclarationNode extends StatementNode
         permits InitializationNode {
     private final boolean mutable;
     private final ScrippleTypeNode type;
@@ -23,7 +24,16 @@ public sealed class DeclarationNode extends ScrippleASTNode
     }
 
     @Override
-    public void semanticErrorCheck(SymbolTable symbolTable) {
+    public void semanticErrorCheck(final SymbolTable symbolTable) {
         // TODO
+    }
+
+    @Override
+    public void execute(final SymbolTable symbolTable) {
+        // TODO
+    }
+
+    public ScrippleTypeNode getType() {
+        return type;
     }
 }

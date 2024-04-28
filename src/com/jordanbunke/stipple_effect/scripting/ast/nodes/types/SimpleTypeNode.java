@@ -1,7 +1,9 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+
+import java.awt.*;
 
 public final class SimpleTypeNode extends ScrippleTypeNode {
     private final Type type;
@@ -11,7 +13,12 @@ public final class SimpleTypeNode extends ScrippleTypeNode {
         /**
          * RAW is a special case for empty collection initializations
          * */
-        RAW
+        RAW;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 
     public SimpleTypeNode(final Type type) {
@@ -21,7 +28,37 @@ public final class SimpleTypeNode extends ScrippleTypeNode {
     }
 
     @Override
-    public void semanticErrorCheck(final SymbolTable symbolTable) {}
+    public Class<?> valueClass() {
+        return switch (type) {
+            case BOOL -> Boolean.class;
+            case INT -> Integer.class;
+            case FLOAT -> Float.class;
+            case CHAR -> Character.class;
+            case STRING -> String.class;
+            case COLOR -> Color.class;
+            case IMAGE -> Image.class;
+            case RAW -> Object.class;
+        };
+    }
+
+    @Override
+    public Object[] createArray(final int length) {
+        return switch (type) {
+            case BOOL -> new Boolean[length];
+            case INT -> new Integer[length];
+            case FLOAT -> new Float[length];
+            case CHAR -> new Character[length];
+            case STRING -> new String[length];
+            case COLOR -> new Color[length];
+            case IMAGE -> new GameImage[length];
+            case RAW -> new Object[length];
+        };
+    }
+
+    @Override
+    public String toString() {
+        return type.toString();
+    }
 
     @Override
     public boolean equals(final Object o) {

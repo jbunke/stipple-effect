@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -21,6 +21,17 @@ public final class InitializationNode extends DeclarationNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        // TODO
+
+        value.semanticErrorCheck(symbolTable);
+    }
+
+    @Override
+    public void execute(final SymbolTable symbolTable) {
+        super.execute(symbolTable);
+
+        final Object v = value.evaluate(symbolTable);
+
         // TODO
     }
 }

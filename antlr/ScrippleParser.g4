@@ -82,12 +82,15 @@ expr
 | a=expr op=(OR | AND) b=expr               #LogicBinExpression
 | cond=expr QUESTION if=expr
   COLON else=expr                           #TernaryExpression
-| col=expr HAS LPAREN expr RPAREN           #ContainsExpression
-| map=expr LOOKUP LPAREN expr RPAREN        #MapLookupExpression
+| col=expr HAS LPAREN elem=expr RPAREN      #ContainsExpression
+| map=expr LOOKUP LPAREN elem=expr RPAREN   #MapLookupExpression
 | map=expr KEYS LPAREN RPAREN               #MapKeysetExpression
 | c=expr op=(RED | GREEN | BLUE | ALPHA)    #ColorChannelExpression
 | FROM LPAREN expr RPAREN                   #ImageFromPathExpression
-| BLANK LPAREN x=expr COMMA y=expr RPAREN   #ImageOfBoundsExpression
+| BLANK LPAREN width=expr
+  COMMA height=expr RPAREN                  #ImageOfBoundsExpression
+| TEX_COL_REPL LPAREN texture=expr COMMA
+  lookup=expr COMMA replace=expr RPAREN     #TextureColorReplaceExpression
 | img=expr PIXEL LPAREN x=expr
   COMMA y=expr RPAREN                       #ColorAtPixelExpression
 | expr op=(WIDTH | HEIGHT)                  #ImageBoundExpression
@@ -95,8 +98,10 @@ expr
   COMMA b=expr RPAREN                       #RGBColorExpression
 | RGBA LPAREN r=expr COMMA g=expr
   COMMA b=expr COMMA a=expr RPAREN          #RGBAColorExpression
-| OF LPAREN expr (COMMA expr)* RPAREN       #ExplicitCollectionExpression
-| NEW LBRACKET expr RBRACKET                #NewArrayExpression
+| LBRACKET expr (COMMA expr)* RBRACKET      #ExplicitArrayExpression
+| LT expr (COMMA expr)* GT                  #ExplicitListExpression
+| LCURLY expr (COMMA expr)* RCURLY          #ExplicitSetExpression
+| NEW type LBRACKET expr RBRACKET           #NewArrayExpression
 | NEW LT GT                                 #NewListExpression
 | NEW LCURLY RCURLY                         #NewSetExpression
 | NEW LCURLY COLON RCURLY                   #NewMapExpression

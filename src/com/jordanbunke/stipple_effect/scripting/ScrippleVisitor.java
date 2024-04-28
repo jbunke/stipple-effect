@@ -2,12 +2,15 @@ package com.jordanbunke.stipple_effect.scripting;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.BodyStatementNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
 
@@ -184,7 +187,7 @@ public final class ScrippleVisitor
 
     @Override
     public WhileLoopNode visitWhileLoop(
-            ScrippleParser.WhileLoopContext ctx
+            final ScrippleParser.WhileLoopContext ctx
     ) {
         final ExpressionNode loopCondition =
                 (ExpressionNode) visit(ctx.while_def().expr());
@@ -488,7 +491,7 @@ public final class ScrippleVisitor
 
     @Override
     public CharLiteralNode visitCharLiteral(
-            ScrippleParser.CharLiteralContext ctx
+            final ScrippleParser.CharLiteralContext ctx
     ) {
         return new CharLiteralNode(
                 TextPosition.fromToken(ctx.CHAR_LIT().getSymbol()),
@@ -497,7 +500,7 @@ public final class ScrippleVisitor
 
     @Override
     public StringLiteralNode visitStringLiteral(
-            ScrippleParser.StringLiteralContext ctx
+            final ScrippleParser.StringLiteralContext ctx
     ) {
         final String withQuotes = ctx.STRING_LIT().getSymbol().getText();
 
@@ -522,7 +525,7 @@ public final class ScrippleVisitor
 
     @Override
     public IdentifierNode visitSimpleAssignable(
-            ScrippleParser.SimpleAssignableContext ctx
+            final ScrippleParser.SimpleAssignableContext ctx
     ) {
         return visitIdent(ctx.ident());
     }
@@ -549,10 +552,262 @@ public final class ScrippleVisitor
 
     @Override
     public LiteralNode visitLiteralExpression(
-            ScrippleParser.LiteralExpressionContext ctx
+            final ScrippleParser.LiteralExpressionContext ctx
     ) {
         return (LiteralNode) visit(ctx.literal());
     }
 
-    // TODO: expressions
+    @Override
+    public UnaryOperationNode visitUnaryExpression(
+            final ScrippleParser.UnaryExpressionContext ctx
+    ) {
+        return new UnaryOperationNode(TextPosition.fromToken(ctx.op),
+                ctx.op.getText(), (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public BinaryOperationNode visitArithmeticBinExpression(
+            final ScrippleParser.ArithmeticBinExpressionContext ctx
+    ) {
+        return new BinaryOperationNode(
+                TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
+                (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public BinaryOperationNode visitMultBinExpression(
+            final ScrippleParser.MultBinExpressionContext ctx
+    ) {
+        return new BinaryOperationNode(
+                TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
+                (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public BinaryOperationNode visitPowerBinExpression(
+            final ScrippleParser.PowerBinExpressionContext ctx
+    ) {
+        return new BinaryOperationNode(
+                TextPosition.fromToken(ctx.a.start),
+                ctx.RAISE().getSymbol().getText(),
+                (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public BinaryOperationNode visitComparisonBinExpression(
+            final ScrippleParser.ComparisonBinExpressionContext ctx
+    ) {
+        return new BinaryOperationNode(
+                TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
+                (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public BinaryOperationNode visitLogicBinExpression(
+            final ScrippleParser.LogicBinExpressionContext ctx
+    ) {
+        return new BinaryOperationNode(
+                TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
+                (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public TernaryOperationNode visitTernaryExpression(
+            final ScrippleParser.TernaryExpressionContext ctx
+    ) {
+        return new TernaryOperationNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.cond),
+                (ExpressionNode) visit(ctx.if_),
+                (ExpressionNode) visit(ctx.else_));
+    }
+
+    @Override
+    public ContainsNode visitContainsExpression(
+            final ScrippleParser.ContainsExpressionContext ctx
+    ) {
+        return new ContainsNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.col),
+                (ExpressionNode) visit(ctx.elem));
+    }
+
+    @Override
+    public MapLookupNode visitMapLookupExpression(
+            final ScrippleParser.MapLookupExpressionContext ctx
+    ) {
+        return new MapLookupNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.map),
+                (ExpressionNode) visit(ctx.elem));
+    }
+
+    @Override
+    public MapKeysetNode visitMapKeysetExpression(
+            final ScrippleParser.MapKeysetExpressionContext ctx
+    ) {
+        return new MapKeysetNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.map));
+    }
+
+    @Override
+    public ColorChannelNode visitColorChannelExpression(
+            final ScrippleParser.ColorChannelExpressionContext ctx
+    ) {
+        return new ColorChannelNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr()),
+                ctx.op.getText());
+    }
+
+    @Override
+    public ImageFromPathNode visitImageFromPathExpression(
+            final ScrippleParser.ImageFromPathExpressionContext ctx
+    ) {
+        return new ImageFromPathNode(
+                TextPosition.fromToken(ctx.expr().start),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public ImageOfBoundsNode visitImageOfBoundsExpression(
+            final ScrippleParser.ImageOfBoundsExpressionContext ctx
+    ) {
+        return new ImageOfBoundsNode(
+                TextPosition.fromToken(ctx.BLANK().getSymbol()),
+                (ExpressionNode) visit(ctx.width),
+                (ExpressionNode) visit(ctx.height));
+    }
+
+    @Override
+    public ColorAtPixelNode visitColorAtPixelExpression(
+            final ScrippleParser.ColorAtPixelExpressionContext ctx
+    ) {
+        return new ColorAtPixelNode(
+                TextPosition.fromToken(ctx.img.start),
+                (ExpressionNode) visit(ctx.img),
+                (ExpressionNode) visit(ctx.x),
+                (ExpressionNode) visit(ctx.y));
+    }
+
+    @Override
+    public ImageBoundNode visitImageBoundExpression(
+            final ScrippleParser.ImageBoundExpressionContext ctx
+    ) {
+        return new ImageBoundNode(TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr()),
+                ctx.op.getText().toLowerCase().startsWith("w"));
+    }
+
+    @Override
+    public TextureColorReplaceNode visitTextureColorReplaceExpression(
+            final ScrippleParser.TextureColorReplaceExpressionContext ctx
+    ) {
+        return new TextureColorReplaceNode(
+                TextPosition.fromToken(ctx.TEX_COL_REPL().getSymbol()),
+                (ExpressionNode) visit(ctx.texture),
+                (ExpressionNode) visit(ctx.lookup),
+                (ExpressionNode) visit(ctx.replace));
+    }
+
+    @Override
+    public RGBColorNode visitRGBColorExpression(
+            final ScrippleParser.RGBColorExpressionContext ctx
+    ) {
+        return new RGBColorNode(
+                TextPosition.fromToken(ctx.RGB().getSymbol()),
+                (ExpressionNode) visit(ctx.r),
+                (ExpressionNode) visit(ctx.g),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public RGBAColorNode visitRGBAColorExpression(
+            final ScrippleParser.RGBAColorExpressionContext ctx
+    ) {
+        return new RGBAColorNode(
+                TextPosition.fromToken(ctx.RGBA().getSymbol()),
+                (ExpressionNode) visit(ctx.r),
+                (ExpressionNode) visit(ctx.g),
+                (ExpressionNode) visit(ctx.b),
+                (ExpressionNode) visit(ctx.a));
+    }
+
+    @Override
+    public ExplicitCollectionInitNode visitExplicitArrayExpression(
+            final ScrippleParser.ExplicitArrayExpressionContext ctx
+    ) {
+        return new ExplicitCollectionInitNode(
+                TextPosition.fromToken(ctx.LBRACKET().getSymbol()),
+                CollectionTypeNode.Type.ARRAY,
+                ctx.expr().stream()
+                        .map(e -> (ExpressionNode) visit(e))
+                        .toArray(ExpressionNode[]::new));
+    }
+
+    @Override
+    public ExplicitCollectionInitNode visitExplicitListExpression(
+            final ScrippleParser.ExplicitListExpressionContext ctx
+    ) {
+        return new ExplicitCollectionInitNode(
+                TextPosition.fromToken(ctx.LT().getSymbol()),
+                CollectionTypeNode.Type.LIST,
+                ctx.expr().stream()
+                        .map(e -> (ExpressionNode) visit(e))
+                        .toArray(ExpressionNode[]::new));
+    }
+
+    @Override
+    public ExplicitCollectionInitNode visitExplicitSetExpression(
+            final ScrippleParser.ExplicitSetExpressionContext ctx
+    ) {
+        return new ExplicitCollectionInitNode(
+                TextPosition.fromToken(ctx.LCURLY().getSymbol()),
+                CollectionTypeNode.Type.SET,
+                ctx.expr().stream()
+                        .map(e -> (ExpressionNode) visit(e))
+                        .toArray(ExpressionNode[]::new));
+    }
+
+    @Override
+    public NewArrayNode visitNewArrayExpression(
+            final ScrippleParser.NewArrayExpressionContext ctx
+    ) {
+        return new NewArrayNode(
+                TextPosition.fromToken(ctx.NEW().getSymbol()),
+                (ScrippleTypeNode) visit(ctx.type()),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public NewCollectionNode visitNewListExpression(
+            final ScrippleParser.NewListExpressionContext ctx
+    ) {
+        return new NewCollectionNode(
+                TextPosition.fromToken(ctx.NEW().getSymbol()),
+                CollectionTypeNode.Type.LIST);
+    }
+
+    @Override
+    public NewCollectionNode visitNewSetExpression(
+            final ScrippleParser.NewSetExpressionContext ctx
+    ) {
+        return new NewCollectionNode(
+                TextPosition.fromToken(ctx.NEW().getSymbol()),
+                CollectionTypeNode.Type.SET);
+    }
+
+    @Override
+    public NewMapNode visitNewMapExpression(
+            final ScrippleParser.NewMapExpressionContext ctx
+    ) {
+        return new NewMapNode(
+                TextPosition.fromToken(ctx.NEW().getSymbol()));
+    }
 }

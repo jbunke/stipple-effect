@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.DeclarationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class ParametersNode extends ScrippleASTNode {

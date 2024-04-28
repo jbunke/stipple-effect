@@ -473,6 +473,18 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterExplicitArrayExpression(ScrippleParser.ExplicitArrayExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExplicitArrayExpression(ScrippleParser.ExplicitArrayExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterMultBinExpression(ScrippleParser.MultBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -533,6 +545,18 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterExplicitListExpression(ScrippleParser.ExplicitListExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExplicitListExpression(ScrippleParser.ExplicitListExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -576,6 +600,18 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExplicitSetExpression(ScrippleParser.ExplicitSetExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExplicitSetExpression(ScrippleParser.ExplicitSetExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -665,6 +701,18 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTextureColorReplaceExpression(ScrippleParser.TextureColorReplaceExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTextureColorReplaceExpression(ScrippleParser.TextureColorReplaceExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNestedExpression(ScrippleParser.NestedExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -696,18 +744,6 @@ public class ScrippleParserBaseListener implements ScrippleParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.InitializationNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.InitializationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.AssignmentNode;

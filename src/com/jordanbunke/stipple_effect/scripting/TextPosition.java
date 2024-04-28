@@ -9,4 +9,9 @@ public record TextPosition(int line, int column) {
         return new TextPosition(token.getLine(),
                 token.getCharPositionInLine());
     }
+
+    @Override
+    public String toString() {
+        return line + ":" + column;
+    }
 }

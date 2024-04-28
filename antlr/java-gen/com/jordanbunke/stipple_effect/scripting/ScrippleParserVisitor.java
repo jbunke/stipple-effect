@@ -270,6 +270,13 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ExplicitArrayExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExplicitArrayExpression(ScrippleParser.ExplicitArrayExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code MultBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -305,6 +312,13 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ExplicitListExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExplicitListExpression(ScrippleParser.ExplicitListExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ComparisonBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -332,6 +346,13 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExplicitSetExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExplicitSetExpression(ScrippleParser.ExplicitSetExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code NewMapExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
@@ -382,6 +403,13 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code TextureColorReplaceExpression}
+	 * labeled alternative in {@link ScrippleParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTextureColorReplaceExpression(ScrippleParser.TextureColorReplaceExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code NestedExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
 	 * @param ctx the parse tree
@@ -402,13 +430,6 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ExplicitCollectionExpression}
-	 * labeled alternative in {@link ScrippleParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExplicitCollectionExpression(ScrippleParser.ExplicitCollectionExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ColorChannelExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.
