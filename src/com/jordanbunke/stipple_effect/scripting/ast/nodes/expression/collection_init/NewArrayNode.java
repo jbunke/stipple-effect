@@ -4,17 +4,17 @@ import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class NewArrayNode extends ExpressionNode {
-    private final ScrippleTypeNode type;
+    private final TypeNode type;
     private final ExpressionNode length;
 
     public NewArrayNode(
             final TextPosition position,
-            final ScrippleTypeNode type,
+            final TypeNode type,
             final ExpressionNode length
     ) {
         super(position);
@@ -25,15 +25,15 @@ public final class NewArrayNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final ScrippleTypeNode lengthType = length.getType(symbolTable);
+        length.semanticErrorCheck(symbolTable);
+        type.semanticErrorCheck(symbolTable);
+
+        final TypeNode lengthType = length.getType(symbolTable);
 
         if (!lengthType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.ARR_LENGTH_NOT_INT,
                     getPosition(), lengthType.toString());
-
-        length.semanticErrorCheck(symbolTable);
-        type.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -49,7 +49,7 @@ public final class NewArrayNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
                 new SimpleTypeNode(SimpleTypeNode.Type.RAW));
     }

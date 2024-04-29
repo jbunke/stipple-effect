@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -27,10 +27,15 @@ public final class RGBAColorNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        r.semanticErrorCheck(symbolTable);
+        g.semanticErrorCheck(symbolTable);
+        b.semanticErrorCheck(symbolTable);
+        a.semanticErrorCheck(symbolTable);
+
         final SimpleTypeNode intType =
                 new SimpleTypeNode(SimpleTypeNode.Type.INT);
 
-        final ScrippleTypeNode
+        final TypeNode
                 rType = r.getType(symbolTable),
                 gType = g.getType(symbolTable),
                 bType = b.getType(symbolTable),
@@ -52,11 +57,6 @@ public final class RGBAColorNode extends ExpressionNode {
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.COLOR_CHANNEL_NOT_INT,
                     getPosition(), "Alpha", aType.toString());
-
-        r.semanticErrorCheck(symbolTable);
-        g.semanticErrorCheck(symbolTable);
-        b.semanticErrorCheck(symbolTable);
-        a.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class RGBAColorNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.COLOR);
     }
 }

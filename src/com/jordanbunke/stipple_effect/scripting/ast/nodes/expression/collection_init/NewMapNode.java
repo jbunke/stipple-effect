@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -25,7 +25,7 @@ public final class NewMapNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return new MapTypeNode(
                 new SimpleTypeNode(SimpleTypeNode.Type.RAW),
                 new SimpleTypeNode(SimpleTypeNode.Type.RAW));

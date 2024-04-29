@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -25,7 +25,11 @@ public final class TernaryOperationNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final ScrippleTypeNode
+        condition.semanticErrorCheck(symbolTable);
+        a.semanticErrorCheck(symbolTable);
+        b.semanticErrorCheck(symbolTable);
+
+        final TypeNode
                 cType = condition.getType(symbolTable),
                 aType = a.getType(symbolTable),
                 bType = b.getType(symbolTable);
@@ -39,10 +43,6 @@ public final class TernaryOperationNode extends ExpressionNode {
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.TERNARY_BRANCHES_OF_DIFFERENT_TYPES,
                     getPosition(), aType.toString(), bType.toString());
-
-        condition.semanticErrorCheck(symbolTable);
-        a.semanticErrorCheck(symbolTable);
-        b.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class TernaryOperationNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return a.getType(symbolTable);
     }
 }

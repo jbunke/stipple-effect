@@ -1,10 +1,11 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration;
 
 import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class InitializationNode extends DeclarationNode {
@@ -12,7 +13,7 @@ public final class InitializationNode extends DeclarationNode {
 
     public InitializationNode(
             final TextPosition position, final boolean mutable,
-            final ScrippleTypeNode type, final IdentifierNode ident,
+            final TypeNode type, final IdentifierNode ident,
             final ExpressionNode value
     ) {
         super(position, mutable, type, ident);
@@ -22,11 +23,17 @@ public final class InitializationNode extends DeclarationNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        value.semanticErrorCheck(symbolTable);
+
         super.semanticErrorCheck(symbolTable);
 
-        // TODO
+        final TypeNode initType = value.getType(symbolTable);
 
-        value.semanticErrorCheck(symbolTable);
+        if (!initType.equals(getType()))
+            ScrippleErrorListener.fireError(
+                    here,
+                    value.getPosition(), getType().toString(),
+                    initType.toString());
     }
 
     @Override

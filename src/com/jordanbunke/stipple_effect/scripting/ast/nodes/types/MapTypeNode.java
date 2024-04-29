@@ -4,12 +4,12 @@ import com.jordanbunke.stipple_effect.scripting.TextPosition;
 
 import java.util.Map;
 
-public final class MapTypeNode extends ScrippleTypeNode {
-    private final ScrippleTypeNode keyType;
-    private final ScrippleTypeNode valueType;
+public final class MapTypeNode extends TypeNode {
+    private final TypeNode keyType;
+    private final TypeNode valueType;
 
     public MapTypeNode(
-            final ScrippleTypeNode keyType, final ScrippleTypeNode valueType
+            final TypeNode keyType, final TypeNode valueType
     ) {
         super(TextPosition.N_A);
 
@@ -17,11 +17,11 @@ public final class MapTypeNode extends ScrippleTypeNode {
         this.valueType = valueType;
     }
 
-    public ScrippleTypeNode getKeyType() {
+    public TypeNode getKeyType() {
         return keyType;
     }
 
-    public ScrippleTypeNode getValueType() {
+    public TypeNode getValueType() {
         return valueType;
     }
 

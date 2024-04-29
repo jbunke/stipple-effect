@@ -6,7 +6,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
 
-public final class ParametersNode extends ScrippleASTNode {
+public final class ParametersNode extends ASTNode {
     private final DeclarationNode[] params;
 
     public ParametersNode(

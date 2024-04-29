@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -30,12 +30,15 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        x.semanticErrorCheck(symbolTable);
+        y.semanticErrorCheck(symbolTable);
+
         super.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode intType =
                 new SimpleTypeNode(SimpleTypeNode.Type.INT);
 
-        final ScrippleTypeNode
+        final TypeNode
                 xType = x.getType(symbolTable),
                 yType = y.getType(symbolTable);
 
@@ -47,9 +50,6 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
                     getPosition(), "Y", yType.toString());
-
-        x.semanticErrorCheck(symbolTable);
-        y.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -73,7 +73,7 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.COLOR);
     }
 }

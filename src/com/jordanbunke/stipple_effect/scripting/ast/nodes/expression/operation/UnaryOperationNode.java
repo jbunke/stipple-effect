@@ -4,7 +4,7 @@ import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -40,7 +40,9 @@ public final class UnaryOperationNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final ScrippleTypeNode operandType = operand.getType(symbolTable);
+        operand.semanticErrorCheck(symbolTable);
+
+        final TypeNode operandType = operand.getType(symbolTable);
 
         switch (operator) {
             case NOT -> {
@@ -51,7 +53,7 @@ public final class UnaryOperationNode extends ExpressionNode {
                             getPosition(), operandType.toString());
             }
             case NEGATE -> {
-                final Set<ScrippleTypeNode> acceptedTypes = Set.of(
+                final Set<TypeNode> acceptedTypes = Set.of(
                         new SimpleTypeNode(SimpleTypeNode.Type.INT),
                         new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
 
@@ -67,8 +69,6 @@ public final class UnaryOperationNode extends ExpressionNode {
                             getPosition(), operandType.toString());
             }
         }
-
-        operand.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -106,7 +106,7 @@ public final class UnaryOperationNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         if (operator == Operator.SIZE)
             return new SimpleTypeNode(SimpleTypeNode.Type.INT);
 

@@ -3,9 +3,10 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public final class ScriptFunctionNode extends ScrippleASTNode {
+public final class ScriptFunctionNode extends ASTNode {
 
     private final MethodSignatureNode signature;
     private final StatementNode[] statements;
@@ -24,7 +25,7 @@ public final class ScriptFunctionNode extends ScrippleASTNode {
             final SymbolTable symbolTable,
             final Object... args
     ) {
-        // TODO - populate arguments into symbol table for parameters
+        signature.execute(symbolTable, args);
 
         // program execution
         for (StatementNode statement : statements) {
@@ -37,9 +38,12 @@ public final class ScriptFunctionNode extends ScrippleASTNode {
         return null;
     }
 
+    public TypeNode getReturnType() {
+        return signature.getReturnType();
+    }
+
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        // TODO
         signature.semanticErrorCheck(symbolTable);
 
         for (StatementNode statement : statements)

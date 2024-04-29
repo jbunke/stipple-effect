@@ -1,9 +1,10 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
+import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -32,6 +33,18 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         Arrays.stream(initElements).forEach(
                 e -> e.semanticErrorCheck(symbolTable));
+
+        final TypeNode firstElemType = initElements[0].getType(symbolTable);
+
+        for (int i = 1; i < initElements.length; i++) {
+            final TypeNode type = initElements[i].getType(symbolTable);
+
+            if (!type.equals(firstElemType))
+                ScrippleErrorListener.fireError(
+                        here,
+                        initElements[i].getPosition(),
+                        String.valueOf(firstElemType), String.valueOf(type));
+        }
     }
 
     @Override
@@ -60,8 +73,8 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
-        final ScrippleTypeNode notRawType = Arrays.stream(initElements)
+    public TypeNode getType(final SymbolTable symbolTable) {
+        final TypeNode notRawType = Arrays.stream(initElements)
                 .map(e -> e.getType(symbolTable))
                 .reduce(initElements[0].getType(symbolTable),
                         (a, b) -> !a.equals(

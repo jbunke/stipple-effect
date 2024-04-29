@@ -18,14 +18,18 @@ public final class BodyStatementNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        final SymbolTable innerTable = new SymbolTable(this, symbolTable);
+
         for (StatementNode statement : statements)
-            statement.semanticErrorCheck(symbolTable);
+            statement.semanticErrorCheck(innerTable);
     }
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
+        final SymbolTable innerTable = symbolTable.getChild(this);
+
         for (StatementNode statement : statements) {
-            final FuncControlFlow potential = statement.execute(symbolTable);
+            final FuncControlFlow potential = statement.execute(innerTable);
 
             if (!potential.cont)
                 return potential;

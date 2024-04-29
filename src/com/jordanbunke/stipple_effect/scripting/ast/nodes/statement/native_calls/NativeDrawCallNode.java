@@ -1,9 +1,13 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class NativeDrawCallNode extends StatementNode {
@@ -25,12 +29,50 @@ public final class NativeDrawCallNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        // TODO
+        canvas.semanticErrorCheck(symbolTable);
+        superimposed.semanticErrorCheck(symbolTable);
+        x.semanticErrorCheck(symbolTable);
+        y.semanticErrorCheck(symbolTable);
+
+        final SimpleTypeNode
+                imgType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
+                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+
+        final TypeNode
+                cType = canvas.getType(symbolTable),
+                sType = superimposed.getType(symbolTable),
+                xType = x.getType(symbolTable),
+                yType = y.getType(symbolTable);
+
+        if (!cType.equals(imgType))
+            ScrippleErrorListener.fireError(
+                    here,
+                    canvas.getPosition(), cType.toString());
+        if (!sType.equals(imgType))
+            ScrippleErrorListener.fireError(
+                    here,
+                    superimposed.getPosition(), sType.toString());
+        if (!xType.equals(intType))
+            ScrippleErrorListener.fireError(
+                    here,
+                    x.getPosition(), xType.toString());
+        if (!yType.equals(intType))
+            ScrippleErrorListener.fireError(
+                    here,
+                    y.getPosition(), yType.toString());
     }
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        // TODO
+        final GameImage
+                c = (GameImage) canvas.evaluate(symbolTable),
+                s = (GameImage) superimposed.evaluate(symbolTable);
+
+        final int xCoord = (int) x.evaluate(symbolTable),
+                yCoord = (int) y.evaluate(symbolTable);
+
+        c.draw(s, xCoord, yCoord);
+        c.free();
 
         return FuncControlFlow.cont();
     }

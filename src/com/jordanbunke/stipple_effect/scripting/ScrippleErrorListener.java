@@ -42,7 +42,11 @@ public final class ScrippleErrorListener {
         EXPECTED_SEARCHABLE_FOR_CALL,
         ARGS_PARAMS_MISMATCH,
         UNINITIALIZED_VAR,
-        UNDEFINED_VAR
+        UNDEFINED_VAR,
+        INDEX_NOT_INT,
+        INDEX_OUT_OF_BOUNDS,
+        OWNER_NOT_COLLECTION,
+        ELEMENT_DOES_NOT_MATCH_COL
         ;
 
         private String get(final String[] args) {
@@ -186,6 +190,31 @@ public final class ScrippleErrorListener {
                     yield "Variable \"" + ident +
                             "\" has not been initialized";
                 }
+                case INDEX_NOT_INT -> {
+                    final String actualType = args[0];
+
+                    yield "Collection index should be of type \"int\"," +
+                            " instead is of type \"" + actualType + "\"";
+                }
+                case INDEX_OUT_OF_BOUNDS -> {
+                    final String index = args[0], size = args[1];
+                    final boolean include = args.length > 2 &&
+                            Boolean.parseBoolean(args[2]);
+
+                    yield "Collection index " + index + " is out of bounds" +
+                            " for collection of size " + size +
+                            "; (0 <= x <" + (include ? "= " : " ") +
+                            size + ")";
+                }
+                case OWNER_NOT_COLLECTION -> expectedTypeButGot(
+                        "list - <>\" or \"array - []", args[0]);
+                case ELEMENT_DOES_NOT_MATCH_COL -> {
+                    final String expectedType = args[0], actualType = args[1];
+
+                    yield "Element resolved to type \"" + expectedType +
+                            "\"; this collection takes elements of type \"" +
+                            actualType + "\"";
+                }
             };
         }
 
@@ -213,7 +242,10 @@ public final class ScrippleErrorListener {
                         EXPECTED_SEARCHABLE_FOR_CALL,
                         IMG_ARG_NOT_INT,
                         TEX_COL_REPL_ARG_NOT_IMG,
-                        UNDEFINED_VAR ->
+                        UNDEFINED_VAR,
+                        INDEX_NOT_INT,
+                        OWNER_NOT_COLLECTION,
+                        ELEMENT_DOES_NOT_MATCH_COL ->
                         ErrorClass.COMPILE;
                 case PATH_DOES_NOT_CONTAIN_IMAGE,
                         OPERAND_NAN_RT,
@@ -225,7 +257,8 @@ public final class ScrippleErrorListener {
                         NON_POSITIVE_IMAGE_BOUND,
                         MAP_DOES_NOT_CONTAIN_ELEMENT,
                         ARGS_PARAMS_MISMATCH,
-                        UNINITIALIZED_VAR ->
+                        UNINITIALIZED_VAR,
+                        INDEX_OUT_OF_BOUNDS ->
                         ErrorClass.RUNTIME;
             };
         }

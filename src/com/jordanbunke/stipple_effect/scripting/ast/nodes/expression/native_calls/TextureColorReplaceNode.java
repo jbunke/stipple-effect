@@ -5,7 +5,7 @@ import com.jordanbunke.delta_time.sprite.TextureColorReplace;
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -27,10 +27,14 @@ public final class TextureColorReplaceNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        texture.semanticErrorCheck(symbolTable);
+        lookup.semanticErrorCheck(symbolTable);
+        replacementColors.semanticErrorCheck(symbolTable);
+
         final SimpleTypeNode
                 imageType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
 
-        final ScrippleTypeNode
+        final TypeNode
                 textureType = texture.getType(symbolTable),
                 lookupType = lookup.getType(symbolTable),
                 replaceType = replacementColors.getType(symbolTable);
@@ -50,10 +54,6 @@ public final class TextureColorReplaceNode extends ExpressionNode {
                     ScrippleErrorListener.Message.TEX_COL_REPL_ARG_NOT_IMG,
                     replacementColors.getPosition(), "Replacement color",
                     replaceType.toString());
-
-        texture.semanticErrorCheck(symbolTable);
-        lookup.semanticErrorCheck(symbolTable);
-        replacementColors.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -67,7 +67,7 @@ public final class TextureColorReplaceNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
     }
 }

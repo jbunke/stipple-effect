@@ -15,6 +15,10 @@ public final class FuncControlFlow {
         return new FuncControlFlow(true, null);
     }
 
+    public static FuncControlFlow breakCF() {
+        return new FuncControlFlow(false, null);
+    }
+
     public static FuncControlFlow returnVoid() {
         return new FuncControlFlow(false, null);
     }

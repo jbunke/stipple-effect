@@ -15,7 +15,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
 
 public final class ScrippleVisitor
-        extends ScrippleParserBaseVisitor<ScrippleASTNode> {
+        extends ScrippleParserBaseVisitor<ASTNode> {
     @Override
     public ScriptFunctionNode visitHead_rule(
             final ScrippleParser.Head_ruleContext ctx
@@ -62,7 +62,7 @@ public final class ScrippleVisitor
 
         return new MethodSignatureNode(
                 TextPosition.fromToken(ctx.LPAREN().getSymbol()),
-                parameters, (ScrippleTypeNode) visit(ctx.type()));
+                parameters, (TypeNode) visit(ctx.type()));
     }
 
     @Override
@@ -83,7 +83,7 @@ public final class ScrippleVisitor
         return new DeclarationNode(
                 TextPosition.fromToken(ctx.start),
                 ctx.FINAL() == null,
-                (ScrippleTypeNode) visit(ctx.type()),
+                (TypeNode) visit(ctx.type()),
                 visitIdent(ctx.ident()));
     }
 
@@ -150,7 +150,7 @@ public final class ScrippleVisitor
             final ScrippleParser.ArrayTypeContext ctx
     ) {
         return new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
-                (ScrippleTypeNode) visit(ctx.type()));
+                (TypeNode) visit(ctx.type()));
     }
 
     @Override
@@ -158,7 +158,7 @@ public final class ScrippleVisitor
             final ScrippleParser.SetTypeContext ctx
     ) {
         return new CollectionTypeNode(CollectionTypeNode.Type.SET,
-                (ScrippleTypeNode) visit(ctx.type()));
+                (TypeNode) visit(ctx.type()));
     }
 
     @Override
@@ -166,7 +166,7 @@ public final class ScrippleVisitor
             final ScrippleParser.ListTypeContext ctx
     ) {
         return new CollectionTypeNode(CollectionTypeNode.Type.LIST,
-                (ScrippleTypeNode) visit(ctx.type()));
+                (TypeNode) visit(ctx.type()));
     }
 
     @Override
@@ -174,8 +174,8 @@ public final class ScrippleVisitor
             final ScrippleParser.MapTypeContext ctx
     ) {
         return new MapTypeNode(
-                (ScrippleTypeNode) visit(ctx.key),
-                (ScrippleTypeNode) visit(ctx.val));
+                (TypeNode) visit(ctx.key),
+                (TypeNode) visit(ctx.val));
     }
 
     @Override
@@ -266,7 +266,7 @@ public final class ScrippleVisitor
         return new InitializationNode(
                 TextPosition.fromToken(ctx.start),
                 ctx.declaration().FINAL() == null,
-                (ScrippleTypeNode) visit(ctx.declaration().type()),
+                (TypeNode) visit(ctx.declaration().type()),
                 visitIdent(ctx.declaration().ident()),
                 (ExpressionNode) visit(ctx.expr()));
     }
@@ -781,7 +781,7 @@ public final class ScrippleVisitor
     ) {
         return new NewArrayNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()),
-                (ScrippleTypeNode) visit(ctx.type()),
+                (TypeNode) visit(ctx.type()),
                 (ExpressionNode) visit(ctx.expr()));
     }
 

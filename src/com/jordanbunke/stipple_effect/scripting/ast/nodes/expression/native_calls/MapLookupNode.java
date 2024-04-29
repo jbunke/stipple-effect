@@ -4,7 +4,7 @@ import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -30,9 +30,22 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        element.semanticErrorCheck(symbolTable);
+
         super.semanticErrorCheck(symbolTable);
 
-        element.semanticErrorCheck(symbolTable);
+        final TypeNode
+                ownerType = getOwner().getType(symbolTable),
+                elemType = element.getType(symbolTable);
+
+        if (ownerType instanceof MapTypeNode mapType) {
+            final TypeNode keyType = mapType.getKeyType();
+
+            if (!keyType.equals(elemType))
+                ScrippleErrorListener.fireError(
+                        here,
+                        element.getPosition(), elemType.toString());
+        }
     }
 
     @Override
@@ -53,7 +66,7 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return ((MapTypeNode) getOwner().getType(symbolTable)).getValueType();
     }
 }

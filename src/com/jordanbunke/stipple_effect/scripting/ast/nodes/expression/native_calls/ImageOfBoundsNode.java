@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -24,10 +24,13 @@ public final class ImageOfBoundsNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        width.semanticErrorCheck(symbolTable);
+        height.semanticErrorCheck(symbolTable);
+
         final SimpleTypeNode intType =
                 new SimpleTypeNode(SimpleTypeNode.Type.INT);
 
-        final ScrippleTypeNode
+        final TypeNode
                 widthType = width.getType(symbolTable),
                 heightType = height.getType(symbolTable);
 
@@ -39,9 +42,6 @@ public final class ImageOfBoundsNode extends ExpressionNode {
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
                     height.getPosition(), "Height", heightType.toString());
-
-        width.semanticErrorCheck(symbolTable);
-        height.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class ImageOfBoundsNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
     }
 }

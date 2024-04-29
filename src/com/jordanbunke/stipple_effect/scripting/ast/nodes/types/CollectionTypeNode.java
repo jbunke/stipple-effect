@@ -6,9 +6,9 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 
-public final class CollectionTypeNode extends ScrippleTypeNode  {
+public final class CollectionTypeNode extends TypeNode {
     private final Type type;
-    private final ScrippleTypeNode elementType;
+    private final TypeNode elementType;
 
     public enum Type {
         ARRAY, SET, LIST;
@@ -24,12 +24,16 @@ public final class CollectionTypeNode extends ScrippleTypeNode  {
     }
 
     public CollectionTypeNode(
-            final Type type, final ScrippleTypeNode elementType
+            final Type type, final TypeNode elementType
     ) {
         super(TextPosition.N_A);
 
         this.type = type;
         this.elementType = elementType;
+    }
+
+    public TypeNode getElementType() {
+        return elementType;
     }
 
     @Override

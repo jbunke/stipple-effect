@@ -4,7 +4,7 @@ import com.jordanbunke.stipple_effect.scripting.ScrippleEquality;
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -60,7 +60,10 @@ public final class BinaryOperationNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final ScrippleTypeNode o1Type = o1.getType(symbolTable),
+        o1.semanticErrorCheck(symbolTable);
+        o2.semanticErrorCheck(symbolTable);
+
+        final TypeNode o1Type = o1.getType(symbolTable),
                 o2Type = o2.getType(symbolTable);
 
         switch (operator) {
@@ -79,7 +82,7 @@ public final class BinaryOperationNode extends ExpressionNode {
             }
             case ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
                     GT, LT, GEQ, LEQ -> {
-                final Set<ScrippleTypeNode> acceptedTypes = Set.of(
+                final Set<TypeNode> acceptedTypes = Set.of(
                         new SimpleTypeNode(SimpleTypeNode.Type.INT),
                         new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
 
@@ -93,9 +96,6 @@ public final class BinaryOperationNode extends ExpressionNode {
                             getPosition(), o2Type.toString());
             }
         }
-
-        o1.semanticErrorCheck(symbolTable);
-        o2.semanticErrorCheck(symbolTable);
     }
 
     @Override
@@ -148,11 +148,11 @@ public final class BinaryOperationNode extends ExpressionNode {
     }
 
     @Override
-    public ScrippleTypeNode getType(final SymbolTable symbolTable) {
+    public TypeNode getType(final SymbolTable symbolTable) {
         if (operator.isLogic())
             return new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
 
-        final ScrippleTypeNode o1Type = o1.getType(symbolTable),
+        final TypeNode o1Type = o1.getType(symbolTable),
                 o2Type = o2.getType(symbolTable);
 
         final SimpleTypeNode floatType =

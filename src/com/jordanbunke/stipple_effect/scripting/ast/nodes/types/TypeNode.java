@@ -1,11 +1,11 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScrippleASTNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public abstract class ScrippleTypeNode extends ScrippleASTNode {
-    public ScrippleTypeNode(final TextPosition position) {
+public abstract class TypeNode extends ASTNode {
+    public TypeNode(final TextPosition position) {
         super(position);
     }
 

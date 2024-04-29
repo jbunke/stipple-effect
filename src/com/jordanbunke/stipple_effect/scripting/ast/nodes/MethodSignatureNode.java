@@ -1,16 +1,16 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public final class MethodSignatureNode extends ScrippleASTNode {
-    private final ScrippleTypeNode returnType;
+public final class MethodSignatureNode extends ASTNode {
+    private final TypeNode returnType;
     private final ParametersNode parameters;
 
     public MethodSignatureNode(
             final TextPosition position, final ParametersNode parameters,
-            final ScrippleTypeNode returnType
+            final TypeNode returnType
     ) {
         super(position);
 
@@ -37,5 +37,9 @@ public final class MethodSignatureNode extends ScrippleASTNode {
 
         if (returnType != null)
             returnType.semanticErrorCheck(symbolTable);
+    }
+
+    public TypeNode getReturnType() {
+        return returnType;
     }
 }

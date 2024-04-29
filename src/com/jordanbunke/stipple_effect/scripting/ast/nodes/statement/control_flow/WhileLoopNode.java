@@ -1,9 +1,12 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
 import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class WhileLoopNode extends StatementNode {
@@ -23,13 +26,30 @@ public final class WhileLoopNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        // TODO
+        loopCondition.semanticErrorCheck(symbolTable);
+        loopBody.semanticErrorCheck(symbolTable);
+
+        final SimpleTypeNode
+                boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+        final TypeNode condType = loopCondition.getType(symbolTable);
+
+        if (!condType.equals(boolType))
+            ScrippleErrorListener.fireError(
+                    here, // TODO - conditional is not a boolean
+                    loopCondition.getPosition(), condType.toString());
+    }
+
+    private boolean evaluateCondition(final SymbolTable symbolTable) {
+        return (boolean) loopCondition.evaluate(symbolTable);
     }
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        // TODO
+        FuncControlFlow status = FuncControlFlow.cont();
 
-        return FuncControlFlow.cont();
+        while (evaluateCondition(symbolTable))
+            status = loopBody.execute(symbolTable);
+
+        return status;
     }
 }

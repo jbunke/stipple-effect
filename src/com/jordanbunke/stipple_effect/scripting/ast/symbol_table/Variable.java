@@ -1,15 +1,15 @@
 package com.jordanbunke.stipple_effect.scripting.ast.symbol_table;
 
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.ScrippleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 
 public final class Variable {
     private final boolean mutable;
-    private final ScrippleTypeNode type;
+    private final TypeNode type;
     private Object value;
 
     public Variable(
             final boolean mutable,
-            final ScrippleTypeNode type,
+            final TypeNode type,
             final Object value
     ) {
         this.mutable = mutable;
@@ -19,7 +19,7 @@ public final class Variable {
 
     public Variable(
             final boolean mutable,
-            final ScrippleTypeNode type
+            final TypeNode type
     ) {
         this(mutable, type, null);
     }
@@ -28,7 +28,7 @@ public final class Variable {
         return mutable;
     }
 
-    public ScrippleTypeNode getType() {
+    public TypeNode getType() {
         return type;
     }
 

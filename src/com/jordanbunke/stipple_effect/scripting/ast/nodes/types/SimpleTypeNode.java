@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.scripting.TextPosition;
 
 import java.awt.*;
 
-public final class SimpleTypeNode extends ScrippleTypeNode {
+public final class SimpleTypeNode extends TypeNode {
     private final Type type;
 
     public enum Type {
