@@ -56,23 +56,23 @@ public final class OperandAssignmentNode extends AssignmentNode {
         if (operator.isLogic()) {
             if (!assignableType.equals(boolType))
                 ScrippleErrorListener.fireError(
-                        here,
+                        here, // TODO - use of logic operator with non-bool variable
                         getAssignable().getPosition(),
                         assignableType.toString());
             if (!operandType.equals(boolType))
                 ScrippleErrorListener.fireError(
-                        here,
+                        here, // TODO - use of logic operator with non-bool operand
                         operand.getPosition(),
                         operandType.toString());
         } else {
             if (!numTypes.contains(assignableType))
                 ScrippleErrorListener.fireError(
-                        here,
+                        here, // TODO - use of numeric operator with arg that is NaN
                         getAssignable().getPosition(),
                         assignableType.toString());
             if (!numTypes.contains(operandType))
                 ScrippleErrorListener.fireError(
-                        here,
+                        here, // TODO - use of numeric operator with operand that is NaN
                         operand.getPosition(),
                         operandType.toString());
         }
@@ -100,7 +100,7 @@ public final class OperandAssignmentNode extends AssignmentNode {
 
                         if (op == 0d && operator.isDiv())
                             ScrippleErrorListener.fireError(
-                                    here,
+                                    ScrippleErrorListener.Message.DIV_BY_ZERO,
                                     operand.getPosition());
 
                         final Double res = switch (operator) {

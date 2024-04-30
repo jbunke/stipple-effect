@@ -1,14 +1,12 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public final class NewMapNode extends ExpressionNode {
     public NewMapNode(
@@ -20,8 +18,8 @@ public final class NewMapNode extends ExpressionNode {
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {}
 
-    public Map<?,?> evaluate(final SymbolTable symbolTable) {
-        return new HashMap<>();
+    public ScriptMap evaluate(final SymbolTable symbolTable) {
+        return new ScriptMap();
     }
 
     @Override

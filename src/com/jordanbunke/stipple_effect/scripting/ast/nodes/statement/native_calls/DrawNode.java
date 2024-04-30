@@ -10,10 +10,10 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public final class NativeDrawCallNode extends StatementNode {
+public final class DrawNode extends StatementNode {
     private final ExpressionNode canvas, superimposed, x, y;
 
-    public NativeDrawCallNode(
+    public DrawNode(
             final TextPosition position,
             final ExpressionNode canvas,
             final ExpressionNode superimposed,
@@ -46,20 +46,20 @@ public final class NativeDrawCallNode extends StatementNode {
 
         if (!cType.equals(imgType))
             ScrippleErrorListener.fireError(
-                    here,
+                    here, // TODO - canvas not image
                     canvas.getPosition(), cType.toString());
         if (!sType.equals(imgType))
             ScrippleErrorListener.fireError(
-                    here,
+                    here, // TODO - superimposed not image
                     superimposed.getPosition(), sType.toString());
         if (!xType.equals(intType))
             ScrippleErrorListener.fireError(
-                    here,
-                    x.getPosition(), xType.toString());
+                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+                    x.getPosition(), "X", xType.toString());
         if (!yType.equals(intType))
             ScrippleErrorListener.fireError(
-                    here,
-                    y.getPosition(), yType.toString());
+                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+                    y.getPosition(), "Y", yType.toString());
     }
 
     @Override

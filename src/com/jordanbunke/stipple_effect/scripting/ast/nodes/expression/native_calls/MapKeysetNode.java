@@ -2,14 +2,14 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-import java.util.Map;
 import java.util.Set;
 
 public final class MapKeysetNode extends NativeFuncWithOwnerNode {
@@ -25,8 +25,8 @@ public final class MapKeysetNode extends NativeFuncWithOwnerNode {
     }
 
     @Override
-    public Set<?> evaluate(final SymbolTable symbolTable) {
-        return ((Map<?,?>) getOwner().evaluate(symbolTable)).keySet();
+    public Set<Object> evaluate(final SymbolTable symbolTable) {
+        return ((ScriptMap) getOwner().evaluate(symbolTable)).keySet();
     }
 
     @Override

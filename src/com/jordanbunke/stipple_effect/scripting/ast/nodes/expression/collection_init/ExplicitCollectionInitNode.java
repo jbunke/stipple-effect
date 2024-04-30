@@ -2,17 +2,18 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection
 
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.stream.Stream;
 
 public final class ExplicitCollectionInitNode extends ExpressionNode {
     private final CollectionTypeNode.Type collectionType;
@@ -41,34 +42,21 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
 
             if (!type.equals(firstElemType))
                 ScrippleErrorListener.fireError(
-                        here,
+                        here, // TODO - inconsistent element types
                         initElements[i].getPosition(),
                         String.valueOf(firstElemType), String.valueOf(type));
         }
     }
 
     @Override
-    public Object evaluate(final SymbolTable symbolTable) {
+    public ScriptCollection evaluate(final SymbolTable symbolTable) {
+        final Stream<Object> elements =
+                Arrays.stream(initElements).map(e -> e.evaluate(symbolTable));
+
         return switch (collectionType) {
-            case ARRAY -> {
-                final Class<?> type = initElements[0].evaluate(symbolTable).getClass();
-
-                yield Arrays.stream(initElements)
-                        .map(e -> e.evaluate(symbolTable))
-                        .toArray(n -> (Object[]) Array.newInstance(type, n));
-            }
-            case SET, LIST -> {
-                final Collection<Object> c =
-                        collectionType == CollectionTypeNode.Type.SET
-                                ? new HashSet<>()
-                                : new ArrayList<>();
-
-                Arrays.stream(initElements)
-                        .map(e -> e.evaluate(symbolTable))
-                        .forEach(c::add);
-
-                yield c;
-            }
+            case ARRAY -> new ScriptArray(elements);
+            case LIST -> new ScriptList(elements);
+            case SET -> new ScriptSet(elements);
         };
     }
 

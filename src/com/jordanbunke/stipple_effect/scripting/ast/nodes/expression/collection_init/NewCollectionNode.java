@@ -1,14 +1,14 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 
 public final class NewCollectionNode extends ExpressionNode {
     private final CollectionTypeNode.Type collectionType;
@@ -26,11 +26,11 @@ public final class NewCollectionNode extends ExpressionNode {
     public void semanticErrorCheck(final SymbolTable symbolTable) {}
 
     @Override
-    public Object evaluate(final SymbolTable symbolTable) {
+    public ScriptCollection evaluate(final SymbolTable symbolTable) {
         if (collectionType == CollectionTypeNode.Type.SET)
-            return new HashSet<>();
+            return new ScriptSet();
 
-        return new ArrayList<>();
+        return new ScriptList();
     }
 
     @Override

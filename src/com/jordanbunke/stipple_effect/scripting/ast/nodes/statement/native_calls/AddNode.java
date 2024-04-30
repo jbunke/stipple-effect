@@ -3,6 +3,8 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_call
 import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
@@ -10,14 +12,12 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
-public final class NativeAddCallNode extends StatementNode {
+public final class AddNode extends StatementNode {
     private final ExpressionNode collection, toAdd, index;
 
-    public NativeAddCallNode(
+    public AddNode(
             final TextPosition position,
             final ExpressionNode collection,
             final ExpressionNode toAdd,
@@ -42,8 +42,11 @@ public final class NativeAddCallNode extends StatementNode {
                         ? ct.getElementType() : null,
                 addType = toAdd.getType(symbolTable),
                 iType = index.getType(symbolTable);
+        final CollectionTypeNode.Type typeOfCol =
+                (colType instanceof CollectionTypeNode ct)
+                        ? ct.getType() : null;
 
-        if (elemType == null)
+        if (elemType == null || typeOfCol == null)
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.OWNER_NOT_COLLECTION,
                     collection.getPosition(), colType.toString());
@@ -52,6 +55,10 @@ public final class NativeAddCallNode extends StatementNode {
                     ScrippleErrorListener.Message.ELEMENT_DOES_NOT_MATCH_COL,
                     toAdd.getPosition(),
                     elemType.toString(), addType.toString());
+        else if (typeOfCol == CollectionTypeNode.Type.ARRAY)
+            ScrippleErrorListener.fireError(
+                    here, // TODO - cannot add element to array
+                    collection.getPosition());
         if (!iType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.INDEX_NOT_INT,
@@ -60,15 +67,14 @@ public final class NativeAddCallNode extends StatementNode {
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        // TODO - resolve warning
-        final Collection<Object> c =
-                (Collection<Object>) collection.evaluate(symbolTable);
+        final ScriptCollection c =
+                (ScriptCollection) collection.evaluate(symbolTable);
         final Object element = toAdd.evaluate(symbolTable);
         final Optional<Integer> i = index != null
                 ? Optional.of((Integer) index.evaluate(symbolTable))
                 : Optional.empty();
 
-        if (i.isPresent() && c instanceof List<Object> l) {
+        if (i.isPresent() && c instanceof ScriptList l) {
             final int index = i.get();
 
             try {

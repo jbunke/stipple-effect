@@ -36,6 +36,10 @@ public final class CollectionTypeNode extends TypeNode {
         return elementType;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public Class<?> valueClass() {
         return switch (type) {
@@ -43,16 +47,6 @@ public final class CollectionTypeNode extends TypeNode {
             case SET -> Set.class;
             case ARRAY -> Array.newInstance(
                     elementType.valueClass(), 1).getClass();
-        };
-    }
-
-    @Override
-    public Object[] createArray(final int length) {
-        return switch (type) {
-            case SET -> new Set[length];
-            case LIST -> new List[length];
-            case ARRAY -> (Object[])
-                    Array.newInstance(elementType.valueClass(), length);
         };
     }
 

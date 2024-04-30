@@ -40,6 +40,10 @@ public final class BinaryOperationNode extends ExpressionNode {
         private boolean isLogic() {
             return ordinal() >= EQUAL.ordinal();
         }
+
+        private boolean isDiv() {
+            return this == DIVIDE || this == MODULO;
+        }
     }
 
     private final Operator operator;
@@ -132,6 +136,11 @@ public final class BinaryOperationNode extends ExpressionNode {
                         o1.getType(symbolTable).equals(intType) &&
                         o2.getType(symbolTable).equals(intType);
                 final double n1 = (Double) o1Value, n2 = (Double) o2Value;
+
+                if (n2 == 0d && operator.isDiv())
+                    ScrippleErrorListener.fireError(
+                            ScrippleErrorListener.Message.DIV_BY_ZERO,
+                            o2.getPosition());
 
                 final double result = switch (operator) {
                     case ADD -> n1 + n2;

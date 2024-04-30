@@ -293,10 +293,10 @@ public final class ScrippleVisitor
     }
 
     @Override
-    public NativeAddCallNode visitAddToCollection(
+    public AddNode visitAddToCollection(
             final ScrippleParser.AddToCollectionContext ctx
     ) {
-        return new NativeAddCallNode(
+        return new AddNode(
                 TextPosition.fromToken(ctx.start),
                 (ExpressionNode) visit(ctx.col),
                 (ExpressionNode) visit(ctx.elem),
@@ -305,20 +305,20 @@ public final class ScrippleVisitor
     }
 
     @Override
-    public NativeRemoveCallNode visitRemoveFromCollection(
+    public RemoveNode visitRemoveFromCollection(
             final ScrippleParser.RemoveFromCollectionContext ctx
     ) {
-        return new NativeRemoveCallNode(
+        return new RemoveNode(
                 TextPosition.fromToken(ctx.start),
                 (ExpressionNode) visit(ctx.col),
                 (ExpressionNode) visit(ctx.arg));
     }
 
     @Override
-    public NativeDefineCallNode visitDefineMapEntryStatement(
+    public MapDefineNode visitDefineMapEntryStatement(
             final ScrippleParser.DefineMapEntryStatementContext ctx
     ) {
-        return new NativeDefineCallNode(
+        return new MapDefineNode(
                 TextPosition.fromToken(ctx.start),
                 (ExpressionNode) visit(ctx.map),
                 (ExpressionNode) visit(ctx.key),
@@ -326,10 +326,10 @@ public final class ScrippleVisitor
     }
 
     @Override
-    public NativeDrawCallNode visitDrawOntoImageStatement(
+    public DrawNode visitDrawOntoImageStatement(
             final ScrippleParser.DrawOntoImageStatementContext ctx
     ) {
-        return new NativeDrawCallNode(
+        return new DrawNode(
                 TextPosition.fromToken(ctx.start),
                 (ExpressionNode) visit(ctx.canvas),
                 (ExpressionNode) visit(ctx.img),

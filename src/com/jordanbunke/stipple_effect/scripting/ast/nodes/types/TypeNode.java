@@ -12,7 +12,5 @@ public abstract class TypeNode extends ASTNode {
     @Override
     public final void semanticErrorCheck(final SymbolTable symbolTable) {}
 
-    public abstract Object[] createArray(final int length);
-
     public abstract Class<?> valueClass();
 }

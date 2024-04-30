@@ -31,7 +31,7 @@ public final class NoOperandAssignmentNode extends AssignmentNode {
 
         if (!assignableType.equals(intType))
             ScrippleErrorListener.fireError(
-                    here,
+                    here, // TODO - use of inc/dec operators with non-int variable
                     getPosition(), assignableType.toString());
     }
 

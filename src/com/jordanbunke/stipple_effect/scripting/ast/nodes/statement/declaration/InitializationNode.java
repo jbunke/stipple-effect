@@ -31,7 +31,7 @@ public final class InitializationNode extends DeclarationNode {
 
         if (!initType.equals(getType()))
             ScrippleErrorListener.fireError(
-                    here,
+                    here, // TODO - var type mismatch
                     value.getPosition(), getType().toString(),
                     initType.toString());
     }

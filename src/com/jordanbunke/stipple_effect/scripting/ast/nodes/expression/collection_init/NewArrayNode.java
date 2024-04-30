@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection
 
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -37,7 +38,7 @@ public final class NewArrayNode extends ExpressionNode {
     }
 
     @Override
-    public Object[] evaluate(final SymbolTable symbolTable) {
+    public ScriptArray evaluate(final SymbolTable symbolTable) {
         final int l = (int) length.evaluate(symbolTable);
 
         if (l < 0)
@@ -45,7 +46,7 @@ public final class NewArrayNode extends ExpressionNode {
                     ScrippleErrorListener.Message.ARR_LENGTH_NEGATIVE,
                     getPosition(), String.valueOf(l));
 
-        return type.createArray(l);
+        return new ScriptArray(l);
     }
 
     @Override

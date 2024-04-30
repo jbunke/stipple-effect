@@ -29,7 +29,7 @@ public final class StandardAssignmentNode extends AssignmentNode {
 
         if (!assignableType.equals(exprType))
             ScrippleErrorListener.fireError(
-                    here,
+                    here, // TODO - var type mismatch
                     getPosition(), assignableType.toString(),
                     exprType.toString());
     }

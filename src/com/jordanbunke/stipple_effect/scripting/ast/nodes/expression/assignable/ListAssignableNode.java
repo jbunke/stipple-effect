@@ -1,9 +1,10 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable;
 
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
 
 public final class ListAssignableNode extends CollectionAssignableNode {
     public ListAssignableNode(
@@ -15,14 +16,8 @@ public final class ListAssignableNode extends CollectionAssignableNode {
     }
 
     @Override
-    public Object evaluate(final SymbolTable symbolTable) {
-        // TODO
-        return null;
-    }
-
-    @Override
-    public TypeNode getType(final SymbolTable symbolTable) {
-        // TODO
-        return null;
+    public ScriptList evaluate(final SymbolTable symbolTable) {
+        final Variable var = symbolTable.get(getName());
+        return var != null ? (ScriptList) var.get() : null;
     }
 }

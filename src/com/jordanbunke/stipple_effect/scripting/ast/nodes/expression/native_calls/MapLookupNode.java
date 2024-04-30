@@ -2,13 +2,13 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 
 import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-import java.util.Map;
 import java.util.Set;
 
 public final class MapLookupNode extends NativeFuncWithOwnerNode {
@@ -43,7 +43,7 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
 
             if (!keyType.equals(elemType))
                 ScrippleErrorListener.fireError(
-                        here,
+                        here, // TODO - element type does not match map key type
                         element.getPosition(), elemType.toString());
         }
     }
@@ -53,7 +53,7 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
         final Object owner = getOwner().evaluate(symbolTable);
         final Object elemValue = element.evaluate(symbolTable);
 
-        if (owner instanceof Map<?,?> map) {
+        if (owner instanceof ScriptMap map) {
             if (map.containsKey(elemValue))
                 return map.get(elemValue);
             else

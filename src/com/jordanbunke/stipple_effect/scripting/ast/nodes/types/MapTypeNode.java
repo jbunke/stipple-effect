@@ -31,11 +31,6 @@ public final class MapTypeNode extends TypeNode {
     }
 
     @Override
-    public Object[] createArray(final int length) {
-        return new Map[length];
-    }
-
-    @Override
     public String toString() {
         return "{" + keyType + ":" + valueType + "}";
     }

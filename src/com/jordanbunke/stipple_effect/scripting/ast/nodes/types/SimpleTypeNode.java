@@ -1,6 +1,5 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
-import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.TextPosition;
 
 import java.awt.*;
@@ -38,20 +37,6 @@ public final class SimpleTypeNode extends TypeNode {
             case COLOR -> Color.class;
             case IMAGE -> Image.class;
             case RAW -> Object.class;
-        };
-    }
-
-    @Override
-    public Object[] createArray(final int length) {
-        return switch (type) {
-            case BOOL -> new Boolean[length];
-            case INT -> new Integer[length];
-            case FLOAT -> new Float[length];
-            case CHAR -> new Character[length];
-            case STRING -> new String[length];
-            case COLOR -> new Color[length];
-            case IMAGE -> new GameImage[length];
-            case RAW -> new Object[length];
         };
     }
 

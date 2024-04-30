@@ -35,7 +35,7 @@ public final class ScrippleErrorListener {
         EXPECTED_COLOR_FOR_CALL,
         EXPECTED_MAP_FOR_CALL,
         IMG_ARG_NOT_INT,
-        TEX_COL_REPL_ARG_NOT_IMG,
+        ARG_NOT_IMG,
         PIX_ARG_OUT_OF_BOUNDS,
         NON_POSITIVE_IMAGE_BOUND,
         MAP_DOES_NOT_CONTAIN_ELEMENT,
@@ -150,7 +150,7 @@ public final class ScrippleErrorListener {
                     yield dimension + " argument should be of type \"int\"," +
                             " instead is of type \"" + actualType + "\"";
                 }
-                case TEX_COL_REPL_ARG_NOT_IMG -> {
+                case ARG_NOT_IMG -> {
                     final String arg = args[0], actualType = args[1];
 
                     yield arg + " argument should be of type \"image\"," +
@@ -241,7 +241,7 @@ public final class ScrippleErrorListener {
                         EXPECTED_MAP_FOR_CALL,
                         EXPECTED_SEARCHABLE_FOR_CALL,
                         IMG_ARG_NOT_INT,
-                        TEX_COL_REPL_ARG_NOT_IMG,
+                        ARG_NOT_IMG,
                         UNDEFINED_VAR,
                         INDEX_NOT_INT,
                         OWNER_NOT_COLLECTION,
