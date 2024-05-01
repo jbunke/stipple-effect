@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
@@ -28,12 +28,23 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
     public final void update(
             final SymbolTable symbolTable, final Object value
     ) {
-        final ScriptCollection c = evaluate(symbolTable);
+        final ScriptCollection c = getCollection(symbolTable);
+
+        if (c == null)
+            return;
+
         c.set((int) index.evaluate(symbolTable), value);
     }
 
     @Override
-    public abstract ScriptCollection evaluate(final SymbolTable symbolTable);
+    public final Object evaluate(final SymbolTable symbolTable) {
+        final ScriptCollection c = getCollection(symbolTable);
+
+        if (c == null)
+            return null; // TODO - error
+
+        return c.get((Integer) index.evaluate(symbolTable));
+    }
 
     @Override
     public final void semanticErrorCheck(final SymbolTable symbolTable) {
@@ -64,5 +75,14 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
 
         final CollectionTypeNode colType = (CollectionTypeNode) var.getType();
         return colType.getElementType();
+    }
+
+    public ExpressionNode getIndex() {
+        return index;
+    }
+
+    private ScriptCollection getCollection(final SymbolTable symbolTable) {
+        final Variable var = symbolTable.get(getName());
+        return var != null ? (ScriptCollection) var.get(): null;
     }
 }

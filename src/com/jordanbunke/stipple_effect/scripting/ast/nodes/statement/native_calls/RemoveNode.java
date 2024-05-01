@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -41,11 +41,12 @@ public final class RemoveNode extends StatementNode {
 
         if (elemType == null || typeOfCol == null)
             ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.OWNER_NOT_COLLECTION,
-                    collection.getPosition(), colType.toString());
+                    ScrippleErrorListener.Message.EXPECTED_FOR_CALL,
+                    collection.getPosition(),
+                    "remove()", "list - <>", colType.toString());
         else if (typeOfCol != CollectionTypeNode.Type.LIST)
             ScrippleErrorListener.fireError(
-                    here, // TODO - cannot remove element from anything but list
+                    ScrippleErrorListener.Message.REMOVE_FROM_SET_OR_ARRAY,
                     collection.getPosition());
         if (!iType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
             ScrippleErrorListener.fireError(
@@ -69,5 +70,10 @@ public final class RemoveNode extends StatementNode {
         }
 
         return FuncControlFlow.cont();
+    }
+
+    @Override
+    public String toString() {
+        return collection + ".remove(" + index + ");";
     }
 }

@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -31,7 +31,7 @@ public final class InitializationNode extends DeclarationNode {
 
         if (!initType.equals(getType()))
             ScrippleErrorListener.fireError(
-                    here, // TODO - var type mismatch
+                    ScrippleErrorListener.Message.VAR_TYPE_MISMATCH,
                     value.getPosition(), getType().toString(),
                     initType.toString());
     }
@@ -45,5 +45,10 @@ public final class InitializationNode extends DeclarationNode {
         symbolTable.update(getIdent(), v);
 
         return FuncControlFlow.cont();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " = " + value + ";";
     }
 }

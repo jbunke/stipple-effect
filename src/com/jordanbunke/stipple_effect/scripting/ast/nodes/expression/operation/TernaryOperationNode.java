@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -36,7 +36,7 @@ public final class TernaryOperationNode extends ExpressionNode {
 
         if (!cType.equals(new SimpleTypeNode(SimpleTypeNode.Type.BOOL)))
             ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.TERNARY_CONDITION_NOT_BOOL,
+                    ScrippleErrorListener.Message.TERN_COND_NOT_BOOL,
                     getPosition(), cType.toString());
 
         if (!aType.equals(bType))
@@ -55,5 +55,10 @@ public final class TernaryOperationNode extends ExpressionNode {
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
         return a.getType(symbolTable);
+    }
+
+    @Override
+    public String toString() {
+        return condition + " ? " + a + " : " + b;
     }
 }

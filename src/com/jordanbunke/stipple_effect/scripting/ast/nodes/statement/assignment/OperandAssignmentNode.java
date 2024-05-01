@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -21,6 +21,18 @@ public final class OperandAssignmentNode extends AssignmentNode {
 
         private boolean isLogic() {
             return this == AND || this == OR;
+        }
+
+        public String toString() {
+            return " " + switch (this) {
+                case MODULO -> "%";
+                case DIVIDE -> "/";
+                case MULTIPLY -> "*";
+                case SUBTRACT -> "-";
+                case ADD -> "+";
+                case AND -> "&";
+                case OR -> "|";
+            } + "= ";
         }
     }
 
@@ -56,23 +68,23 @@ public final class OperandAssignmentNode extends AssignmentNode {
         if (operator.isLogic()) {
             if (!assignableType.equals(boolType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - use of logic operator with non-bool variable
+                        ScrippleErrorListener.Message.VAR_NOT_BOOL,
                         getAssignable().getPosition(),
                         assignableType.toString());
             if (!operandType.equals(boolType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - use of logic operator with non-bool operand
+                        ScrippleErrorListener.Message.VAR_NOT_BOOL,
                         operand.getPosition(),
                         operandType.toString());
         } else {
             if (!numTypes.contains(assignableType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - use of numeric operator with arg that is NaN
+                        ScrippleErrorListener.Message.VAR_NOT_NUM,
                         getAssignable().getPosition(),
                         assignableType.toString());
             if (!numTypes.contains(operandType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - use of numeric operator with operand that is NaN
+                        ScrippleErrorListener.Message.VAR_NOT_NUM,
                         operand.getPosition(),
                         operandType.toString());
         }
@@ -95,8 +107,9 @@ public final class OperandAssignmentNode extends AssignmentNode {
                                         .equals(intType);
 
                         final double
-                                bef = (double) before,
-                                op = (double) operand.evaluate(symbolTable);
+                                bef = ((Number) before).doubleValue(),
+                                op = ((Number) operand
+                                        .evaluate(symbolTable)).doubleValue();
 
                         if (op == 0d && operator.isDiv())
                             ScrippleErrorListener.fireError(
@@ -112,11 +125,19 @@ public final class OperandAssignmentNode extends AssignmentNode {
                             default -> bef;
                         };
 
-                        yield isInt ? Integer.valueOf(res.intValue()) : res;
+                        if (isInt)
+                            yield res.intValue();
+
+                        yield res;
                     }
                 };
         getAssignable().update(symbolTable, after);
 
         return FuncControlFlow.cont();
+    }
+
+    @Override
+    public String toString() {
+        return getAssignable() + operator.toString() + operand + ";";
     }
 }

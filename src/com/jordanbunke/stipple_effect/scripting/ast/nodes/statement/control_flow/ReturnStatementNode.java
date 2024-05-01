@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -53,7 +53,7 @@ public final class ReturnStatementNode extends StatementNode {
 
             if (!typeEquality)
                 ScrippleErrorListener.fireError(
-                        here, // TODO - function return type does not match expression in return statement
+                        ScrippleErrorListener.Message.RETURN_TYPE_MISMATCH,
                         pos, String.valueOf(returnType),
                         String.valueOf(exprType));
         }
@@ -64,5 +64,13 @@ public final class ReturnStatementNode extends StatementNode {
         return expression == null
                 ? FuncControlFlow.returnVoid()
                 : FuncControlFlow.returnVal(expression.evaluate(symbolTable));
+    }
+
+    @Override
+    public String toString() {
+        if (expression == null)
+            return "return;";
+
+        return "return " + expression + ";";
     }
 }

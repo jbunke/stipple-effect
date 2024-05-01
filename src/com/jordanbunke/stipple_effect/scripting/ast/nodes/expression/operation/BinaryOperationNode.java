@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleEquality;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleEquality;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -43,6 +43,26 @@ public final class BinaryOperationNode extends ExpressionNode {
 
         private boolean isDiv() {
             return this == DIVIDE || this == MODULO;
+        }
+
+        @Override
+        public String toString() {
+            return switch (this) {
+                case ADD -> "+";
+                case SUBTRACT -> "-";
+                case MULTIPLY -> "*";
+                case DIVIDE -> "/";
+                case MODULO -> "%";
+                case RAISE -> "^";
+                case EQUAL -> "==";
+                case NOT_EQUAL -> "!=";
+                case GT -> ">";
+                case LT -> "<";
+                case GEQ -> ">=";
+                case LEQ -> "<=";
+                case OR -> "||";
+                case AND -> "&&";
+            };
         }
     }
 
@@ -114,7 +134,9 @@ public final class BinaryOperationNode extends ExpressionNode {
                 yield operator == Operator.AND ? b1 && b2 : b1 || b2;
             }
             case GT, LT, GEQ, LEQ -> {
-                final double n1 = (Double) o1Value, n2 = (Double) o2Value;
+                final double
+                        n1 = ((Number) o1Value).doubleValue(),
+                        n2 = ((Number) o2Value).doubleValue();
 
                 yield switch (operator) {
                     case GT -> n1 > n2;
@@ -135,14 +157,16 @@ public final class BinaryOperationNode extends ExpressionNode {
                 final boolean bothInts =
                         o1.getType(symbolTable).equals(intType) &&
                         o2.getType(symbolTable).equals(intType);
-                final double n1 = (Double) o1Value, n2 = (Double) o2Value;
+                final double
+                        n1 = ((Number) o1Value).doubleValue(),
+                        n2 = ((Number) o2Value).doubleValue();
 
                 if (n2 == 0d && operator.isDiv())
                     ScrippleErrorListener.fireError(
                             ScrippleErrorListener.Message.DIV_BY_ZERO,
                             o2.getPosition());
 
-                final double result = switch (operator) {
+                final Double result = switch (operator) {
                     case ADD -> n1 + n2;
                     case SUBTRACT -> n1 - n2;
                     case MULTIPLY -> n1 * n2;
@@ -151,7 +175,10 @@ public final class BinaryOperationNode extends ExpressionNode {
                     default -> Math.pow(n1, n2);
                 };
 
-                yield bothInts ? (int) result : result;
+                if (bothInts)
+                    yield result.intValue();
+
+                yield result;
             }
         };
     }
@@ -171,5 +198,10 @@ public final class BinaryOperationNode extends ExpressionNode {
             return floatType;
 
         return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+    }
+
+    @Override
+    public String toString() {
+        return o1 + " " + operator.toString() + " " + o2;
     }
 }

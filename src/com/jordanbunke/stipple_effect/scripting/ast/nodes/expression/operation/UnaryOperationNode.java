@@ -1,14 +1,14 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
-import java.util.Collection;
 import java.util.Set;
 
 public final class UnaryOperationNode extends ExpressionNode {
@@ -20,6 +20,15 @@ public final class UnaryOperationNode extends ExpressionNode {
                 case "-" -> NEGATE;
                 case "!" -> NOT;
                 default -> SIZE;
+            };
+        }
+
+        @Override
+        public String toString() {
+            return switch (this) {
+                case SIZE -> "#";
+                case NEGATE -> "-";
+                case NOT -> "!";
             };
         }
     }
@@ -78,10 +87,8 @@ public final class UnaryOperationNode extends ExpressionNode {
         return switch (operator) {
             case NOT -> !((Boolean) operandValue);
             case SIZE -> {
-                if (operandValue instanceof Collection<?> c)
+                if (operandValue instanceof ScriptCollection c)
                     yield c.size();
-                else if (operandValue instanceof Object[] arr)
-                    yield arr.length;
 
                 ScrippleErrorListener.fireError(
                         ScrippleErrorListener.Message.OPERAND_NOT_A_COLLECTION_RT,
@@ -111,5 +118,10 @@ public final class UnaryOperationNode extends ExpressionNode {
             return new SimpleTypeNode(SimpleTypeNode.Type.INT);
 
         return operand.getType(symbolTable);
+    }
+
+    @Override
+    public String toString() {
+        return operator.toString() + operand;
     }
 }

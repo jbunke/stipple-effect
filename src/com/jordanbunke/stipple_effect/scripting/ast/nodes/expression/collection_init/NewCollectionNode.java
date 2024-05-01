@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptSet;
@@ -37,5 +37,11 @@ public final class NewCollectionNode extends ExpressionNode {
     public TypeNode getType(final SymbolTable symbolTable) {
         return new CollectionTypeNode(collectionType,
                 new SimpleTypeNode(SimpleTypeNode.Type.RAW));
+    }
+
+    @Override
+    public String toString() {
+        return "new" +
+                (collectionType == CollectionTypeNode.Type.SET ? "{}" : "<>");
     }
 }

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting;
+package com.jordanbunke.stipple_effect.scripting.util;
 
 import org.antlr.v4.runtime.Token;
 

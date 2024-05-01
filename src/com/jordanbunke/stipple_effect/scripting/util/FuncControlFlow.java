@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting;
+package com.jordanbunke.stipple_effect.scripting.util;
 
 public final class FuncControlFlow {
     public final boolean cont;
@@ -13,10 +13,6 @@ public final class FuncControlFlow {
 
     public static FuncControlFlow cont() {
         return new FuncControlFlow(true, null);
-    }
-
-    public static FuncControlFlow breakCF() {
-        return new FuncControlFlow(false, null);
     }
 
     public static FuncControlFlow returnVoid() {

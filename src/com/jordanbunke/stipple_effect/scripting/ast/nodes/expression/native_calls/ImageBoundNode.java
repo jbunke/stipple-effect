@@ -1,11 +1,10 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 import java.util.Set;
@@ -19,8 +18,7 @@ public final class ImageBoundNode extends NativeFuncWithOwnerNode {
             final boolean width
     ) {
         super(position, owner,
-                Set.of(new SimpleTypeNode(SimpleTypeNode.Type.IMAGE)),
-                ScrippleErrorListener.Message.EXPECTED_IMAGE_FOR_CALL);
+                Set.of(new SimpleTypeNode(SimpleTypeNode.Type.IMAGE)));
 
         this.width = width;
     }
@@ -35,5 +33,10 @@ public final class ImageBoundNode extends NativeFuncWithOwnerNode {
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+    }
+
+    @Override
+    String callName() {
+        return width ? "width" : "height";
     }
 }

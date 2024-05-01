@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.InitializationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -47,7 +47,7 @@ public final class ForLoopNode extends StatementNode {
 
         if (!condType.equals(boolType))
             ScrippleErrorListener.fireError(
-                    here, // TODO - conditional is not a boolean
+                    ScrippleErrorListener.Message.COND_NOT_BOOL,
                     loopCondition.getPosition(), condType.toString());
     }
 
@@ -69,5 +69,11 @@ public final class ForLoopNode extends StatementNode {
         }
 
         return status;
+    }
+
+    @Override
+    public String toString() {
+        return "for (" + initialization + " " + loopCondition + "; " +
+                incrementation + ")\n" + loopBody;
     }
 }

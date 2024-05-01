@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
@@ -51,5 +51,10 @@ public final class IdentifierNode extends AssignableNode {
         }
 
         return var.getType();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

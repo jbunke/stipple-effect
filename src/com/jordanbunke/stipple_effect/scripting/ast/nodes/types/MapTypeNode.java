@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Map;
 

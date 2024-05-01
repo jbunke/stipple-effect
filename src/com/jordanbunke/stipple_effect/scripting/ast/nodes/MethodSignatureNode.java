@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -31,12 +31,30 @@ public final class MethodSignatureNode extends ASTNode {
         parameters.populateArgs(symbolTable, args);
     }
 
+    public boolean paramsMatch(final TypeNode[] spec) {
+        final TypeNode[] actual = parameters.getTypes();
+
+        if (actual.length != spec.length)
+            return false;
+
+        for (int i = 0; i < actual.length; i++)
+            if (!actual[i].equals(spec[i]))
+                return false;
+
+        return true;
+    }
+
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         parameters.semanticErrorCheck(symbolTable);
 
         if (returnType != null)
             returnType.semanticErrorCheck(symbolTable);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + parameters + " -> " + returnType + ")";
     }
 
     public TypeNode getReturnType() {

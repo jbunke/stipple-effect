@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting;
+package com.jordanbunke.stipple_effect.scripting.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public final class ScrippleErrorListener {
     public enum Message {
         PATH_NOT_STRING,
         PATH_DOES_NOT_CONTAIN_IMAGE,
-        TERNARY_CONDITION_NOT_BOOL,
+        TERN_COND_NOT_BOOL,
         TERNARY_BRANCHES_OF_DIFFERENT_TYPES,
         OPERAND_NAN_RT, OPERAND_NAN_SEM,
         OPERAND_NOT_A_COLLECTION_RT, OPERAND_NOT_A_COLLECTION_SEM,
@@ -31,22 +31,31 @@ public final class ScrippleErrorListener {
         ARR_LENGTH_NEGATIVE,
         COLOR_CHANNEL_NOT_INT,
         COLOR_CHANNEL_OUT_OF_BOUNDS,
-        EXPECTED_IMAGE_FOR_CALL,
-        EXPECTED_COLOR_FOR_CALL,
-        EXPECTED_MAP_FOR_CALL,
+        EXPECTED_FOR_CALL,
         IMG_ARG_NOT_INT,
         ARG_NOT_IMG,
         PIX_ARG_OUT_OF_BOUNDS,
         NON_POSITIVE_IMAGE_BOUND,
         MAP_DOES_NOT_CONTAIN_ELEMENT,
-        EXPECTED_SEARCHABLE_FOR_CALL,
         ARGS_PARAMS_MISMATCH,
         UNINITIALIZED_VAR,
         UNDEFINED_VAR,
         INDEX_NOT_INT,
         INDEX_OUT_OF_BOUNDS,
-        OWNER_NOT_COLLECTION,
-        ELEMENT_DOES_NOT_MATCH_COL
+        ELEMENT_DOES_NOT_MATCH_COL,
+        MAP_KEY_TYPE_MISMATCH,
+        MAP_VALUE_TYPE_MISMATCH,
+        INCONSISTENT_COL_TYPES,
+        REASSIGN_FINAL,
+        VAR_NOT_INT,
+        VAR_NOT_BOOL,
+        VAR_NOT_NUM,
+        VAR_TYPE_MISMATCH,
+        COND_NOT_BOOL,
+        RETURN_TYPE_MISMATCH,
+        VAR_ALREADY_DEFINED,
+        ADD_TO_ARRAY,
+        REMOVE_FROM_SET_OR_ARRAY
         ;
 
         private String get(final String[] args) {
@@ -63,10 +72,12 @@ public final class ScrippleErrorListener {
                     yield "No image was found at the filepath \"" +
                             filepath + "\"";
                 }
-                case TERNARY_CONDITION_NOT_BOOL -> {
-                    final String actualType = args[0];
+                case TERN_COND_NOT_BOOL, COND_NOT_BOOL -> {
+                    final String actualType = args[0],
+                            prefix = this == TERN_COND_NOT_BOOL
+                                    ? "Ternary c" : "C";
 
-                    yield "Ternary condition should be of type \"bool\"," +
+                    yield prefix + "ondition should be of type \"bool\"," +
                             " instead is of type \"" + actualType + "\"";
                 }
                 case TERNARY_BRANCHES_OF_DIFFERENT_TYPES -> {
@@ -92,24 +103,21 @@ public final class ScrippleErrorListener {
                     final String actualType = args[0];
 
                     yield "Operand should be a numerical type (" +
-                            "\"int\", \"float\"" +
+                            "\"int\" or \"float\"" +
                             "), instead is of type \"" + actualType + "\"";
                 }
                 case OPERAND_NOT_A_COLLECTION_SEM -> {
                     final String actualType = args[0];
 
                     yield "Operand should be a collection type (" +
-                            "array - ?\"[]\", list - ?\"<>\", set - ?\"{}\"" +
+                            "array - ?\"[]\", list - ?\"<>\" or set - ?\"{}\"" +
                             "), instead is of type \"" + actualType + "\"";
                 }
                 case DIV_BY_ZERO ->
                     "Attempted to divide by 0";
-                case ARR_LENGTH_NOT_INT -> {
-                    final String actualType = args[0];
-
-                    yield "Array length should be of type \"int\"," +
-                            " instead is of type \"" + actualType + "\"";
-                }
+                case ARR_LENGTH_NOT_INT ->
+                        typeMismatch("initialized array length",
+                                "int", args[0]);
                 case ARR_LENGTH_NEGATIVE -> {
                     final String length = args[0];
 
@@ -128,16 +136,8 @@ public final class ScrippleErrorListener {
                     yield channel + "color channel should be of type \"int\"," +
                             " instead is of type \"" + actualType + "\"";
                 }
-                case EXPECTED_IMAGE_FOR_CALL ->
-                        expectedTypeButGot("image", args[0]);
-                case EXPECTED_COLOR_FOR_CALL ->
-                        expectedTypeButGot("color", args[0]);
-                case EXPECTED_MAP_FOR_CALL ->
-                        expectedTypeButGot("map - {?:?}", args[0]);
-                case EXPECTED_SEARCHABLE_FOR_CALL ->
-                    expectedTypeButGot(
-                            "map - {?:?}\", \"list - <>\", or \"set - {}",
-                            args[0]);
+                case EXPECTED_FOR_CALL ->
+                        callOwnerTypeMismatch(args[0], args[1], args[2]);
                 case MAP_DOES_NOT_CONTAIN_ELEMENT -> {
                     final String element = args[0];
 
@@ -178,24 +178,14 @@ public final class ScrippleErrorListener {
                             "expected: " + expected +
                             ", received: " + received;
                 }
-                case UNDEFINED_VAR -> {
-                    final String ident = args[0];
-
-                    yield "Attempted to reference variable \"" + ident +
-                            "\" that is not defined in the current scope";
-                }
-                case UNINITIALIZED_VAR -> {
-                    final String ident = args[0];
-
-                    yield "Variable \"" + ident +
-                            "\" has not been initialized";
-                }
-                case INDEX_NOT_INT -> {
-                    final String actualType = args[0];
-
-                    yield "Collection index should be of type \"int\"," +
-                            " instead is of type \"" + actualType + "\"";
-                }
+                case UNDEFINED_VAR ->
+                        "Attempted to reference variable \"" + args[0] +
+                                "\" that is not defined in the current scope";
+                case UNINITIALIZED_VAR ->
+                        "Variable \"" + args[0] +
+                                "\" has not been initialized";
+                case INDEX_NOT_INT -> typeMismatch("collection index",
+                        "int", args[0]);
                 case INDEX_OUT_OF_BOUNDS -> {
                     final String index = args[0], size = args[1];
                     final boolean include = args.length > 2 &&
@@ -206,47 +196,69 @@ public final class ScrippleErrorListener {
                             "; (0 <= x <" + (include ? "= " : " ") +
                             size + ")";
                 }
-                case OWNER_NOT_COLLECTION -> expectedTypeButGot(
-                        "list - <>\" or \"array - []", args[0]);
-                case ELEMENT_DOES_NOT_MATCH_COL -> {
-                    final String expectedType = args[0], actualType = args[1];
-
-                    yield "Element resolved to type \"" + expectedType +
-                            "\"; this collection takes elements of type \"" +
-                            actualType + "\"";
-                }
+                case ELEMENT_DOES_NOT_MATCH_COL ->
+                        typeMismatch("elements in this collection",
+                                args[0], args[1]);
+                case REASSIGN_FINAL ->
+                        "Attempting to reassign variable \"" + args[0] +
+                                "\", which was declared as immutable";
+                case VAR_NOT_INT ->
+                        assignableTypeMismatch("int", args[0]);
+                case VAR_NOT_NUM ->
+                        assignableTypeMismatch("int\" or \"float", args[0]);
+                case VAR_NOT_BOOL ->
+                        assignableTypeMismatch("bool", args[0]);
+                case VAR_TYPE_MISMATCH ->
+                        assignableTypeMismatch(args[0], args[1]);
+                case VAR_ALREADY_DEFINED ->
+                        "Attempting to declare a variable \"" + args[0] +
+                                "\", which already has a definition in this scope";
+                case RETURN_TYPE_MISMATCH ->
+                        typeMismatch("return expression does not match " +
+                                "method signature", args[0], args[1]);
+                case INCONSISTENT_COL_TYPES -> typeMismatch(
+                        "at index " + args[0] + " of explicit collection " +
+                                "initialization", args[1], args[2]);
+                case MAP_KEY_TYPE_MISMATCH ->
+                        typeMismatch("map key", args[0], args[1]);
+                case MAP_VALUE_TYPE_MISMATCH ->
+                        typeMismatch("map value", args[0], args[1]);
+                case ADD_TO_ARRAY ->
+                        "Arrays are of fixed length; elements " +
+                                "cannot be added";
+                case REMOVE_FROM_SET_OR_ARRAY ->
+                        "Cannot remove an element by index " +
+                                "from a set or an array, only from a list";
             };
         }
 
-        private static String expectedTypeButGot(
+        private static String assignableTypeMismatch(
                 final String expectedType, final String actualType
         ) {
-            return "Attempting to call a function for type \"" +
-                    expectedType + "\" on an expression of type \"" +
-                    actualType + "\"";
+            return typeMismatch(
+                    "variable being assigned",
+                    expectedType, actualType);
+        }
+
+        private static String callOwnerTypeMismatch(
+                final String call,
+                final String expectedType, final String actualType
+        ) {
+            return typeMismatch(
+                    "owner expression of native function call \"" +
+                            call + "\"", expectedType, actualType);
+        }
+
+        private static String typeMismatch(
+                final String prefix,
+                final String expectedType, final String actualType
+        ) {
+            return "Type mismatch... " + prefix + ": expected \"" +
+                    expectedType + "\" but got \"" + actualType + "\"";
         }
 
         private ErrorClass errorClass() {
             return switch (this) {
-                case PATH_NOT_STRING,
-                        TERNARY_CONDITION_NOT_BOOL,
-                        TERNARY_BRANCHES_OF_DIFFERENT_TYPES,
-                        OPERAND_NAN_SEM,
-                        OPERAND_NOT_A_COLLECTION_SEM,
-                        OPERAND_NOT_BOOL,
-                        ARR_LENGTH_NOT_INT,
-                        COLOR_CHANNEL_NOT_INT,
-                        EXPECTED_IMAGE_FOR_CALL,
-                        EXPECTED_COLOR_FOR_CALL,
-                        EXPECTED_MAP_FOR_CALL,
-                        EXPECTED_SEARCHABLE_FOR_CALL,
-                        IMG_ARG_NOT_INT,
-                        ARG_NOT_IMG,
-                        UNDEFINED_VAR,
-                        INDEX_NOT_INT,
-                        OWNER_NOT_COLLECTION,
-                        ELEMENT_DOES_NOT_MATCH_COL ->
-                        ErrorClass.COMPILE;
                 case PATH_DOES_NOT_CONTAIN_IMAGE,
                         OPERAND_NAN_RT,
                         OPERAND_NOT_A_COLLECTION_RT,
@@ -260,6 +272,7 @@ public final class ScrippleErrorListener {
                         UNINITIALIZED_VAR,
                         INDEX_OUT_OF_BOUNDS ->
                         ErrorClass.RUNTIME;
+                default -> ErrorClass.COMPILE;
             };
         }
     }
@@ -276,5 +289,17 @@ public final class ScrippleErrorListener {
             final String[] args
     ) {
         return message.get(args) + " [at " + position + "]";
+    }
+
+    public static boolean hasNoErrors() {
+        return errors.isEmpty();
+    }
+
+    public static List<String> getErrors() {
+        return errors;
+    }
+
+    public static void clearErrors() {
+        errors.clear();
     }
 }

@@ -39,4 +39,14 @@ public final class Variable {
     public void set(final Object value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        final String base = (mutable ? "" : "final ") + type;
+
+        if (value == null)
+            return base;
+
+        return base + ":" + value;
+    }
 }

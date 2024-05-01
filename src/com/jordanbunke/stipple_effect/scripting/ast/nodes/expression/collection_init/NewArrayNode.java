@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
@@ -53,5 +53,10 @@ public final class NewArrayNode extends ExpressionNode {
     public TypeNode getType(final SymbolTable symbolTable) {
         return new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
                 new SimpleTypeNode(SimpleTypeNode.Type.RAW));
+    }
+
+    @Override
+    public String toString() {
+        return "new " + type + "[" + length + "]";
     }
 }

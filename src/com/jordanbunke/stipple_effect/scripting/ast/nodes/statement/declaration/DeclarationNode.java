@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -41,7 +41,7 @@ public sealed class DeclarationNode extends StatementNode
 
         if (symbolTable.hasVarAtLevel(getIdent()))
             ScrippleErrorListener.fireError(
-                    here, // TODO - already contains variable of this name at this scope
+                    ScrippleErrorListener.Message.VAR_ALREADY_DEFINED,
                     ident.getPosition(), getIdent());
         else
             symbolTable.put(getIdent(), new Variable(mutable, type));
@@ -56,5 +56,10 @@ public sealed class DeclarationNode extends StatementNode
 
     public TypeNode getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        return (mutable ? "" : "final ") + type + " " + ident;
     }
 }

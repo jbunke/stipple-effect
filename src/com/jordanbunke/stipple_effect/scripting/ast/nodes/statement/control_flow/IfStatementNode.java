@@ -1,13 +1,15 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+
+import java.util.Arrays;
 
 public final class IfStatementNode extends StatementNode {
     private final ExpressionNode condition;
@@ -35,7 +37,8 @@ public final class IfStatementNode extends StatementNode {
 
         for (IfStatementNode elseIf : elseIfs)
             elseIf.semanticErrorCheck(symbolTable);
-        elseBody.semanticErrorCheck(symbolTable);
+        if (elseBody != null)
+            elseBody.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
                 boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
@@ -43,7 +46,7 @@ public final class IfStatementNode extends StatementNode {
 
         if (!condType.equals(boolType))
             ScrippleErrorListener.fireError(
-                    here, // TODO - conditional is not a boolean
+                    ScrippleErrorListener.Message.COND_NOT_BOOL,
                     condition.getPosition(), condType.toString());
     }
 
@@ -56,7 +59,22 @@ public final class IfStatementNode extends StatementNode {
                 if ((boolean) elseIf.condition.evaluate(symbolTable))
                     return elseIf.ifBody.execute(symbolTable);
 
-            return elseBody.execute(symbolTable);
+            return elseBody != null
+                    ? elseBody.execute(symbolTable)
+                    : FuncControlFlow.cont();
         }
+    }
+
+    @Override
+    public String toString() {
+        final String elseIfStrings = elseIfs.length == 1
+                ? elseIfs[0].toString()
+                : Arrays.stream(elseIfs)
+                .map(IfStatementNode::toString)
+                .reduce((a, b) -> a + b).orElse("");
+
+        return "if (" + condition + ")\n" + ifBody +
+                (elseIfs.length > 0 ? "\n" : "") + elseIfStrings +
+                (elseBody != null ? "\nelse\n" + elseBody : "");
     }
 }

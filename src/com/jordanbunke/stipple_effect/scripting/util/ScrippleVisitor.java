@@ -1,5 +1,7 @@
-package com.jordanbunke.stipple_effect.scripting;
+package com.jordanbunke.stipple_effect.scripting.util;
 
+import com.jordanbunke.stipple_effect.scripting.ScrippleParser;
+import com.jordanbunke.stipple_effect.scripting.ScrippleParserBaseVisitor;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;

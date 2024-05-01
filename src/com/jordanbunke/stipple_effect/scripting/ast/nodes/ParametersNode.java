@@ -1,10 +1,13 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.DeclarationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
+
+import java.util.Arrays;
 
 public final class ParametersNode extends ASTNode {
     private final DeclarationNode[] params;
@@ -38,9 +41,29 @@ public final class ParametersNode extends ASTNode {
         }
     }
 
+    public TypeNode[] getTypes() {
+        return Arrays.stream(params)
+                .map(DeclarationNode::getType)
+                .toArray(TypeNode[]::new);
+    }
+
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         for (DeclarationNode param : params)
             param.semanticErrorCheck(symbolTable);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < params.length; i++) {
+            sb.append(params[i]);
+
+            if (i + 1 < params.length)
+                sb.append(", ");
+        }
+
+        return sb.toString();
     }
 }

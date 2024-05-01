@@ -55,4 +55,15 @@ public final class ScriptList implements ScriptCollection {
     public String collectionName() {
         return "list - <>";
     }
+
+    @Override
+    public String toString() {
+        return switch (structure.size()) {
+            case 0 -> "<>";
+            case 1 -> "<" + structure.get(0) + ">";
+            default -> "<" + structure.stream()
+                    .map(Object::toString)
+                    .reduce((a, b) -> a + ", " + b).orElse("") + ">";
+        };
+    }
 }

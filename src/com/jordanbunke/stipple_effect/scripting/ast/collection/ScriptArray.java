@@ -1,7 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.collection;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleEquality;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleEquality;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public final class ScriptArray implements ScriptCollection {
@@ -13,6 +14,10 @@ public final class ScriptArray implements ScriptCollection {
 
     public ScriptArray(final int length) {
         structure = new Object[length];
+    }
+
+    public static ScriptArray of(final Object... elements) {
+        return new ScriptArray(Arrays.stream(elements));
     }
 
     @Override
@@ -51,5 +56,16 @@ public final class ScriptArray implements ScriptCollection {
     @Override
     public String collectionName() {
         return "array - []";
+    }
+
+    @Override
+    public String toString() {
+        return switch (structure.length) {
+            case 0 -> "[]";
+            case 1 -> "[" + structure[0] + "]";
+            default -> "[" + Arrays.stream(structure)
+                    .map(Object::toString)
+                    .reduce((a, b) -> a + ", " + b).orElse("") + "]";
+        };
     }
 }

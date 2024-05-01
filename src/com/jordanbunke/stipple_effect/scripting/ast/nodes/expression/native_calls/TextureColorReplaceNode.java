@@ -2,8 +2,8 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.sprite.TextureColorReplace;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -69,5 +69,11 @@ public final class TextureColorReplaceNode extends ExpressionNode {
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+    }
+
+    @Override
+    public String toString() {
+        return "tex_col_repl(" + texture + ", " + lookup + ", " +
+                replacementColors + ")";
     }
 }

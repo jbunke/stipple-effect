@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
@@ -20,8 +19,7 @@ public final class MapKeysetNode extends NativeFuncWithOwnerNode {
         super(position, owner,
                 Set.of(new MapTypeNode(
                         new SimpleTypeNode(SimpleTypeNode.Type.RAW),
-                        new SimpleTypeNode(SimpleTypeNode.Type.RAW))),
-                ScrippleErrorListener.Message.EXPECTED_MAP_FOR_CALL);
+                        new SimpleTypeNode(SimpleTypeNode.Type.RAW))));
     }
 
     @Override
@@ -35,5 +33,10 @@ public final class MapKeysetNode extends NativeFuncWithOwnerNode {
 
         return new CollectionTypeNode(CollectionTypeNode.Type.SET,
                 mtn.getKeyType());
+    }
+
+    @Override
+    String callName() {
+        return "keys()";
     }
 }

@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -29,8 +29,7 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
                         new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
                                 new SimpleTypeNode(SimpleTypeNode.Type.RAW)),
                         new CollectionTypeNode(CollectionTypeNode.Type.SET,
-                                new SimpleTypeNode(SimpleTypeNode.Type.RAW))),
-                ScrippleErrorListener.Message.EXPECTED_SEARCHABLE_FOR_CALL);
+                                new SimpleTypeNode(SimpleTypeNode.Type.RAW))));
 
         this.element = element;
     }
@@ -50,7 +49,7 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
 
             if (!keyType.equals(elemType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - arg type does not match map key type
+                        ScrippleErrorListener.Message.MAP_KEY_TYPE_MISMATCH,
                         element.getPosition(),
                         keyType.toString(), elemType.toString());
         } else if (ownerType instanceof CollectionTypeNode colType) {
@@ -58,7 +57,7 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
 
             if (!colElemType.equals(elemType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - arg type does not match collection element type
+                        ScrippleErrorListener.Message.ELEMENT_DOES_NOT_MATCH_COL,
                         element.getPosition(),
                         colElemType.toString(), elemType.toString());
         }
@@ -80,5 +79,17 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
         return new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+    }
+
+    @Override
+    String callName() {
+        return "has()";
+    }
+
+    @Override
+    public String toString() {
+        final String base = super.toString();
+
+        return base.substring(0, base.length() - 2) + "(" + element + ")";
     }
 }

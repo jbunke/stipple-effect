@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -35,7 +35,7 @@ public final class WhileLoopNode extends StatementNode {
 
         if (!condType.equals(boolType))
             ScrippleErrorListener.fireError(
-                    here, // TODO - conditional is not a boolean
+                    ScrippleErrorListener.Message.COND_NOT_BOOL,
                     loopCondition.getPosition(), condType.toString());
     }
 
@@ -51,5 +51,10 @@ public final class WhileLoopNode extends StatementNode {
             status = loopBody.execute(symbolTable);
 
         return status;
+    }
+
+    @Override
+    public String toString() {
+        return "while (" + loopCondition + ")\n" + loopBody;
     }
 }

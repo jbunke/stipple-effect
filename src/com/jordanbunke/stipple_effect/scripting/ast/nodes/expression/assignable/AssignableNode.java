@@ -1,10 +1,9 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
-import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
 
 public abstract class AssignableNode extends ExpressionNode {
     private final String name;

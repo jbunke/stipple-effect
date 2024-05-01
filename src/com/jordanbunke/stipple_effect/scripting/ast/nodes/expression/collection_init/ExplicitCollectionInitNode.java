@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
@@ -42,9 +42,11 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
 
             if (!type.equals(firstElemType))
                 ScrippleErrorListener.fireError(
-                        here, // TODO - inconsistent element types
+                        ScrippleErrorListener.Message.INCONSISTENT_COL_TYPES,
                         initElements[i].getPosition(),
-                        String.valueOf(firstElemType), String.valueOf(type));
+                        String.valueOf(i),
+                        String.valueOf(firstElemType),
+                        String.valueOf(type));
         }
     }
 
@@ -64,11 +66,32 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
     public TypeNode getType(final SymbolTable symbolTable) {
         final TypeNode notRawType = Arrays.stream(initElements)
                 .map(e -> e.getType(symbolTable))
-                .reduce(initElements[0].getType(symbolTable),
-                        (a, b) -> !a.equals(
+                .reduce((a, b) -> !a.equals(
                                 new SimpleTypeNode(SimpleTypeNode.Type.RAW))
-                                ? a : b);
+                                ? a : b).orElse(
+                                        initElements[0].getType(symbolTable));
 
         return new CollectionTypeNode(collectionType, notRawType);
+    }
+
+    @Override
+    public String toString() {
+        final String opener = switch (collectionType) {
+            case LIST -> "<";
+            case SET -> "{";
+            case ARRAY -> "[";
+        }, closer = switch (collectionType) {
+            case LIST -> ">";
+            case SET -> "}";
+            case ARRAY -> "]";
+        };
+
+        final String contents = initElements.length == 1
+                ? initElements[0].toString()
+                : Arrays.stream(initElements)
+                .map(ExpressionNode::toString)
+                .reduce((a, b) -> a + ", " + b).orElse("");
+
+        return "of " + opener + contents + closer;
     }
 }

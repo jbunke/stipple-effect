@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting;
+package com.jordanbunke.stipple_effect.scripting.util;
 
 import com.jordanbunke.delta_time.image.GameImage;
 

@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -39,16 +39,17 @@ public final class MapDefineNode extends StatementNode {
 
         if (!(mapType instanceof MapTypeNode m))
             ScrippleErrorListener.fireError(
-                    here, // TODO - expecting map but got
-                    map.getPosition(), mapType.toString());
+                    ScrippleErrorListener.Message.EXPECTED_FOR_CALL,
+                    map.getPosition(), "define()", "map - {:}",
+                    mapType.toString());
         else if (!keyType.equals(m.getKeyType()))
             ScrippleErrorListener.fireError(
-                    here, // TODO - key type mismatch
+                    ScrippleErrorListener.Message.MAP_KEY_TYPE_MISMATCH,
                     key.getPosition(), m.getKeyType().toString(),
                     keyType.toString());
         else if (!valueType.equals(m.getValueType()))
             ScrippleErrorListener.fireError(
-                    here, // TODO - value type mismatch
+                    ScrippleErrorListener.Message.MAP_VALUE_TYPE_MISMATCH,
                     value.getPosition(), m.getValueType().toString(),
                     valueType.toString());
     }
@@ -63,5 +64,10 @@ public final class MapDefineNode extends StatementNode {
         m.put(k, v);
 
         return FuncControlFlow.cont();
+    }
+
+    @Override
+    public String toString() {
+        return map + ".define(" + key + ", " + value + ");";
     }
 }

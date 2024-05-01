@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -48,8 +48,9 @@ public final class AddNode extends StatementNode {
 
         if (elemType == null || typeOfCol == null)
             ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.OWNER_NOT_COLLECTION,
-                    collection.getPosition(), colType.toString());
+                    ScrippleErrorListener.Message.EXPECTED_FOR_CALL,
+                    collection.getPosition(), "add()",
+                    "list - <>\" or \"set - {}", colType.toString());
         else if (!elemType.equals(addType))
             ScrippleErrorListener.fireError(
                     ScrippleErrorListener.Message.ELEMENT_DOES_NOT_MATCH_COL,
@@ -57,7 +58,7 @@ public final class AddNode extends StatementNode {
                     elemType.toString(), addType.toString());
         else if (typeOfCol == CollectionTypeNode.Type.ARRAY)
             ScrippleErrorListener.fireError(
-                    here, // TODO - cannot add element to array
+                    ScrippleErrorListener.Message.ADD_TO_ARRAY,
                     collection.getPosition());
         if (!iType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
             ScrippleErrorListener.fireError(
@@ -89,5 +90,11 @@ public final class AddNode extends StatementNode {
             c.add(element);
 
         return FuncControlFlow.cont();
+    }
+
+    @Override
+    public String toString() {
+        return collection + ".add(" + toAdd +
+                (index != null ? ", " + index : "") + ");";
     }
 }

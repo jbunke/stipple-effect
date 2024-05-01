@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
-import com.jordanbunke.stipple_effect.scripting.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
@@ -38,6 +38,10 @@ public final class ScriptFunctionNode extends ASTNode {
         return null;
     }
 
+    public boolean paramsMatch(final TypeNode[] spec) {
+        return signature.paramsMatch(spec);
+    }
+
     public TypeNode getReturnType() {
         return signature.getReturnType();
     }
@@ -48,5 +52,10 @@ public final class ScriptFunctionNode extends ASTNode {
 
         for (StatementNode statement : statements)
             statement.semanticErrorCheck(symbolTable);
+    }
+
+    @Override
+    public String toString() {
+        return "func" + signature;
     }
 }

@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -32,7 +32,7 @@ public abstract class AssignmentNode extends StatementNode {
         if (assignable instanceof IdentifierNode &&
                 var != null && !var.isMutable())
             ScrippleErrorListener.fireError(
-                    here, // TODO - attempting to reassign final variable
+                    ScrippleErrorListener.Message.REASSIGN_FINAL,
                     assignable.getPosition(), assignable.getName());
     }
 }
