@@ -1,5 +1,6 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
+
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -254,6 +255,12 @@ public interface ScrippleParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitIf_stat(ScrippleParser.If_statContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScrippleParser#if_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIf_def(ScrippleParser.If_defContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code LogicBinExpression}
 	 * labeled alternative in {@link ScrippleParser#expr()}.

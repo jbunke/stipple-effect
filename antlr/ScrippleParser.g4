@@ -68,8 +68,10 @@ while_def: WHILE LPAREN expr RPAREN;
 for_def: FOR LPAREN var_init SEMICOLON
 expr SEMICOLON assignment RPAREN;
 
-if_stat: IF LPAREN expr RPAREN ifBody=body
-(ELSE if_stat)* (ELSE elseBody=body)?;
+if_stat: if_def (ELSE if_def)*
+(ELSE elseBody=body)?;
+
+if_def: IF LPAREN cond=expr RPAREN body;
 
 expr
 : LPAREN expr RPAREN                        #NestedExpression

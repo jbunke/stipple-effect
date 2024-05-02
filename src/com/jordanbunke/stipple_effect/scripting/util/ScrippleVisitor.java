@@ -4,11 +4,11 @@ import com.jordanbunke.stipple_effect.scripting.ScrippleParser;
 import com.jordanbunke.stipple_effect.scripting.ScrippleParserBaseVisitor;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.*;
@@ -255,16 +255,17 @@ public final class ScrippleVisitor
     public IfStatementNode visitIf_stat(
             final ScrippleParser.If_statContext ctx
     ) {
-        final ExpressionNode condition = (ExpressionNode) visit(ctx.expr());
-        final StatementNode ifBody = (StatementNode) visit(ctx.ifBody);
-        final IfStatementNode[] elseIfs = ctx.if_stat().stream()
-                .map(this::visitIf_stat)
-                .toArray(IfStatementNode[]::new);
+        final ExpressionNode[] conditions = ctx.if_def().stream()
+                .map(i -> (ExpressionNode) visit(i.cond))
+                .toArray(ExpressionNode[]::new);
+        final StatementNode[] bodies = ctx.if_def().stream()
+                .map(i -> (StatementNode) visit(i.body()))
+                .toArray(StatementNode[]::new);
         final StatementNode elseBody = ctx.elseBody != null
                 ? (StatementNode) visit(ctx.elseBody) : null;
 
         return new IfStatementNode(TextPosition.fromToken(ctx.start),
-                condition, ifBody, elseIfs, elseBody);
+                conditions, bodies, elseBody);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.BodyStatementNode;
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
@@ -12,69 +13,69 @@ import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import java.util.Arrays;
 
 public final class IfStatementNode extends StatementNode {
-    private final ExpressionNode condition;
-    private final StatementNode ifBody;
-    private final IfStatementNode[] elseIfs;
+    private final ExpressionNode[] conditions;
+    private final StatementNode[] bodies;
     private final StatementNode elseBody;
 
     public IfStatementNode(
             final TextPosition position,
-            final ExpressionNode condition, final StatementNode ifBody,
-            final IfStatementNode[] elseIfs, final StatementNode elseBody
+            final ExpressionNode[] conditions, final StatementNode[] bodies,
+            final StatementNode elseBody
     ) {
         super(position);
 
-        this.condition = condition;
-        this.ifBody = ifBody;
-        this.elseIfs = elseIfs;
+        this.conditions = conditions;
+        this.bodies = bodies;
         this.elseBody = elseBody;
     }
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        condition.semanticErrorCheck(symbolTable);
-        ifBody.semanticErrorCheck(symbolTable);
-
-        for (IfStatementNode elseIf : elseIfs)
-            elseIf.semanticErrorCheck(symbolTable);
-        if (elseBody != null)
-            elseBody.semanticErrorCheck(symbolTable);
-
         final SimpleTypeNode
                 boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
-        final TypeNode condType = condition.getType(symbolTable);
 
-        if (!condType.equals(boolType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COND_NOT_BOOL,
-                    condition.getPosition(), condType.toString());
+        for (ExpressionNode condition : conditions) {
+            condition.semanticErrorCheck(symbolTable);
+
+            final TypeNode condType = condition.getType(symbolTable);
+
+            if (!condType.equals(boolType))
+                ScrippleErrorListener.fireError(
+                        ScrippleErrorListener.Message.COND_NOT_BOOL,
+                        condition.getPosition(), condType.toString());
+        }
+
+        for (StatementNode body : bodies)
+            body.semanticErrorCheck(symbolTable);
+        if (elseBody != null)
+            elseBody.semanticErrorCheck(symbolTable);
     }
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        if ((boolean) condition.evaluate(symbolTable))
-            return ifBody.execute(symbolTable);
-        else {
-            for (IfStatementNode elseIf : elseIfs)
-                if ((boolean) elseIf.condition.evaluate(symbolTable))
-                    return elseIf.ifBody.execute(symbolTable);
+        final int l = conditions.length;
 
-            return elseBody != null
-                    ? elseBody.execute(symbolTable)
-                    : FuncControlFlow.cont();
-        }
+        for (int i = 0; i < l; i++)
+            if ((boolean) conditions[i].evaluate(symbolTable))
+                return bodies[i].execute(symbolTable);
+
+        return elseBody != null
+                ? elseBody.execute(symbolTable)
+                : FuncControlFlow.cont();
     }
 
     @Override
     public String toString() {
-        final String elseIfStrings = elseIfs.length == 1
-                ? elseIfs[0].toString()
-                : Arrays.stream(elseIfs)
-                .map(IfStatementNode::toString)
-                .reduce((a, b) -> a + b).orElse("");
+        final int l = conditions.length;
+        final String[] branches = new String[l];
 
-        return "if (" + condition + ")\n" + ifBody +
-                (elseIfs.length > 0 ? "\n" : "") + elseIfStrings +
+        for (int i = 0; i < l; i++)
+            branches[i] = "if (" + conditions[i] + ")\n" +
+                    (bodies[i] instanceof BodyStatementNode ? "" : "\t") +
+                    bodies[i];
+
+        return Arrays.stream(branches)
+                .reduce((a, b) -> a + "\nelse " + b).orElse(branches[0]) +
                 (elseBody != null ? "\nelse\n" + elseBody : "");
     }
 }

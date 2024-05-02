@@ -1,7 +1,7 @@
 func(final string s -> string) {
     string bw = "";
 
-    foreach (final char c in s)
+    for (final char c in s)
         bw = c + bw;
 
     return bw;
