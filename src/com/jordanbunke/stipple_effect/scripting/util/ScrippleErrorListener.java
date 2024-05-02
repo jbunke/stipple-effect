@@ -50,12 +50,15 @@ public final class ScrippleErrorListener {
         VAR_NOT_INT,
         VAR_NOT_BOOL,
         VAR_NOT_NUM,
+        VAR_NOT_STRING,
         VAR_TYPE_MISMATCH,
         COND_NOT_BOOL,
         RETURN_TYPE_MISMATCH,
         VAR_ALREADY_DEFINED,
         ADD_TO_ARRAY,
-        REMOVE_FROM_SET_OR_ARRAY
+        REMOVE_FROM_SET_OR_ARRAY,
+        ASSIGN_EXPR_NOT_NUM,
+        ASSIGN_EXPR_NOT_STRING
         ;
 
         private String get(final String[] args) {
@@ -202,6 +205,14 @@ public final class ScrippleErrorListener {
                 case REASSIGN_FINAL ->
                         "Attempting to reassign variable \"" + args[0] +
                                 "\", which was declared as immutable";
+                case ASSIGN_EXPR_NOT_NUM ->
+                        typeMismatch("assignment expression",
+                                "int\" or \"float", args[0]);
+                case ASSIGN_EXPR_NOT_STRING ->
+                        typeMismatch("assignment expression",
+                                "string", args[0]);
+                case VAR_NOT_STRING ->
+                        assignableTypeMismatch("string", args[0]);
                 case VAR_NOT_INT ->
                         assignableTypeMismatch("int", args[0]);
                 case VAR_NOT_NUM ->

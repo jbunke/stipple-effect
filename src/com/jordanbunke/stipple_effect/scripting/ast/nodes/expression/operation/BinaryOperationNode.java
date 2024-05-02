@@ -104,7 +104,22 @@ public final class BinaryOperationNode extends ExpressionNode {
                             ScrippleErrorListener.Message.OPERAND_NOT_BOOL,
                             getPosition(), o2Type.toString());
             }
-            case ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
+            case ADD -> {
+                final Set<TypeNode> acceptedTypes = Set.of(
+                        new SimpleTypeNode(SimpleTypeNode.Type.STRING),
+                        new SimpleTypeNode(SimpleTypeNode.Type.INT),
+                        new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
+
+                if (!acceptedTypes.contains(o1Type))
+                    ScrippleErrorListener.fireError(
+                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                            getPosition(), o1Type.toString());
+                if (!acceptedTypes.contains(o2Type))
+                    ScrippleErrorListener.fireError(
+                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                            getPosition(), o2Type.toString());
+            }
+            case SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
                     GT, LT, GEQ, LEQ -> {
                 final Set<TypeNode> acceptedTypes = Set.of(
                         new SimpleTypeNode(SimpleTypeNode.Type.INT),
@@ -152,33 +167,43 @@ public final class BinaryOperationNode extends ExpressionNode {
                 yield (operator == Operator.EQUAL) == equal;
             }
             case ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE -> {
+                if (o1Value instanceof String s1 &&
+                        o2Value instanceof String s2 &&
+                        operator == Operator.ADD)
+                    yield s1 + s2;
+
                 final SimpleTypeNode
                         intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
                 final boolean bothInts =
                         o1.getType(symbolTable).equals(intType) &&
-                        o2.getType(symbolTable).equals(intType);
-                final double
-                        n1 = ((Number) o1Value).doubleValue(),
-                        n2 = ((Number) o2Value).doubleValue();
+                                o2.getType(symbolTable).equals(intType);
 
-                if (n2 == 0d && operator.isDiv())
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.DIV_BY_ZERO,
-                            o2.getPosition());
+                if (o1Value instanceof Number n1 &&
+                        o2Value instanceof Number n2) {
+                    final double d1 = n1.doubleValue(),
+                            d2 = n2.doubleValue();
 
-                final Double result = switch (operator) {
-                    case ADD -> n1 + n2;
-                    case SUBTRACT -> n1 - n2;
-                    case MULTIPLY -> n1 * n2;
-                    case DIVIDE -> n1 / n2;
-                    case MODULO -> n1 % n2;
-                    default -> Math.pow(n1, n2);
-                };
+                    if (d2 == 0d && operator.isDiv())
+                        ScrippleErrorListener.fireError(
+                                ScrippleErrorListener.Message.DIV_BY_ZERO,
+                                o2.getPosition());
 
-                if (bothInts)
-                    yield result.intValue();
+                    final Double result = switch (operator) {
+                        case ADD -> d1 + d2;
+                        case SUBTRACT -> d1 - d2;
+                        case MULTIPLY -> d1 * d2;
+                        case DIVIDE -> d1 / d2;
+                        case MODULO -> d1 % d2;
+                        default -> Math.pow(d1, d2);
+                    };
 
-                yield result;
+                    if (bothInts)
+                        yield result.intValue();
+
+                    yield result;
+                }
+
+                yield o1Value.toString() + o2Value.toString();
             }
         };
     }

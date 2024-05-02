@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting;
 
+import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
@@ -15,22 +16,24 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
-public final class ScriptRunner {
+public final class Script {
     public static void main(final String[] args) {
         // TODO - temp
-        final Path tempScript = Path.of("data", "script.sc");
+        final Path path = Path.of("data", "script.sc");
+        final String tempScript = FileIO.readFile(path);
 
-        final Integer sum = (Integer) run(tempScript,
-                ScriptArray.of(131, 642, 68));
-        System.out.println(sum);
+        final Object res = run(tempScript,
+                ScriptArray.of("e", "l", "g", "o", "o", "g"));
+        System.out.println(res);
     }
 
     public static boolean validatePreviewScript(
-            final Path scriptPath, final SEContext context
+            final String content, final SEContext context
     ) {
-        final ScriptFunctionNode script = getScript(scriptPath);
+        final ScriptFunctionNode script = build(content);
 
         if (script == null)
             return false;
@@ -51,25 +54,28 @@ public final class ScriptRunner {
     }
 
     public static Object run(
-            final Path filepath, final Object... args
+            final String content, final Object... args
     ) {
         ScrippleErrorListener.clearErrors();
 
-        final ScriptFunctionNode script = getScript(filepath);
+        final ScriptFunctionNode script = build(content);
 
-        if (script == null) {
-            // TODO - couldn't read script case
-            displayErrors();
+        if (script == null)
             return null;
-        }
 
+        return run(script, args);
+    }
+
+    public static Object run(
+            final ScriptFunctionNode script, final Object... args
+    ) {
         final SymbolTable scriptTable = SymbolTable.root(script);
 
-        final boolean passedChecks = runChecks(script, scriptTable);
+        final boolean passedChecks = check(script, scriptTable);
 
         if (passedChecks) {
             final Optional<Object> result =
-                    runScript(script, scriptTable, args);
+                    execute(script, scriptTable, args);
 
             if (result.isEmpty())
                 displayErrors();
@@ -81,9 +87,9 @@ public final class ScriptRunner {
         return null;
     }
 
-    public static ScriptFunctionNode getScript(final Path filepath) {
+    public static ScriptFunctionNode build(final String content) {
         try {
-            final CharStream input = CharStreams.fromPath(filepath);
+            final CharStream input = CharStreams.fromString(content);
 
             final ScrippleLexer lexer = new ScrippleLexer(input);
             lexer.removeErrorListeners();
@@ -95,12 +101,14 @@ public final class ScriptRunner {
             final ScrippleVisitor visitor = new ScrippleVisitor();
 
             return visitor.visitHead_rule(parser.head_rule());
-        } catch (IOException e) {
+        } catch (Exception e) {
+            // TODO - couldn't read script case
+            displayErrors();
             return null;
         }
     }
 
-    private static boolean runChecks(
+    private static boolean check(
             final ScriptFunctionNode script,
             final SymbolTable scriptTable
     ) {
@@ -113,7 +121,7 @@ public final class ScriptRunner {
         return ScrippleErrorListener.hasNoErrors();
     }
 
-    private static Optional<Object> runScript(
+    private static Optional<Object> execute(
             final ScriptFunctionNode script,
             final SymbolTable scriptTable,
             final Object... args
@@ -130,6 +138,10 @@ public final class ScriptRunner {
     }
 
     private static void displayErrors() {
+        final List<String> errors = ScrippleErrorListener.getErrors();
+
+        for (String error : errors)
+            System.out.println(error);
         // TODO
     }
 }

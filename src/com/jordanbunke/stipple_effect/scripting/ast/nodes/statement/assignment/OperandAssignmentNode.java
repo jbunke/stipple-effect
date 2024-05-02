@@ -61,7 +61,8 @@ public final class OperandAssignmentNode extends AssignmentNode {
         final SimpleTypeNode
                 intType = new SimpleTypeNode(SimpleTypeNode.Type.INT),
                 boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL),
-                floatType = new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);
+                floatType = new SimpleTypeNode(SimpleTypeNode.Type.FLOAT),
+                stringType = new SimpleTypeNode(SimpleTypeNode.Type.STRING);
 
         final Set<TypeNode> numTypes = Set.of(intType, floatType);
 
@@ -76,6 +77,25 @@ public final class OperandAssignmentNode extends AssignmentNode {
                         ScrippleErrorListener.Message.VAR_NOT_BOOL,
                         operand.getPosition(),
                         operandType.toString());
+        } else if (operator == Operator.ADD) {
+            if (numTypes.contains(assignableType)) {
+                if (!numTypes.contains(operandType))
+                    ScrippleErrorListener.fireError(
+                            ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_NUM,
+                            operand.getPosition(),
+                            operandType.toString());
+            } else if (assignableType.equals(stringType)) {
+                if (!stringType.equals(operandType))
+                    ScrippleErrorListener.fireError(
+                            ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_STRING,
+                            operand.getPosition(),
+                            operandType.toString());
+            } else {
+                ScrippleErrorListener.fireError(
+                        ScrippleErrorListener.Message.VAR_NOT_NUM,
+                        getAssignable().getPosition(),
+                        assignableType.toString());
+            }
         } else {
             if (!numTypes.contains(assignableType))
                 ScrippleErrorListener.fireError(
@@ -84,7 +104,7 @@ public final class OperandAssignmentNode extends AssignmentNode {
                         assignableType.toString());
             if (!numTypes.contains(operandType))
                 ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.VAR_NOT_NUM,
+                        ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_NUM,
                         operand.getPosition(),
                         operandType.toString());
         }
@@ -92,6 +112,8 @@ public final class OperandAssignmentNode extends AssignmentNode {
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
+        final Object opValue = operand.evaluate(symbolTable);
+
         final Object
                 before = getAssignable().evaluate(symbolTable),
                 after = switch (operator) {
@@ -100,35 +122,44 @@ public final class OperandAssignmentNode extends AssignmentNode {
                     case AND -> (Boolean) before &&
                             (Boolean) operand.evaluate(symbolTable);
                     case ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO -> {
-                        final SimpleTypeNode intType =
-                                new SimpleTypeNode(SimpleTypeNode.Type.INT);
-                        final boolean isInt =
-                                getAssignable().getType(symbolTable)
-                                        .equals(intType);
+                        if (before instanceof String bs &&
+                                opValue instanceof String s &&
+                                operator == Operator.ADD)
+                            yield bs + s;
 
-                        final double
-                                bef = ((Number) before).doubleValue(),
-                                op = ((Number) operand
-                                        .evaluate(symbolTable)).doubleValue();
+                        final SimpleTypeNode
+                                intType = new SimpleTypeNode(
+                                SimpleTypeNode.Type.INT);
+                        final TypeNode type = getAssignable()
+                                .getType(symbolTable);
+                        final boolean isInt = type.equals(intType);
 
-                        if (op == 0d && operator.isDiv())
-                            ScrippleErrorListener.fireError(
-                                    ScrippleErrorListener.Message.DIV_BY_ZERO,
-                                    operand.getPosition());
+                        if (before instanceof Number bn &&
+                                opValue instanceof Number on) {
+                            final double bef = bn.doubleValue(),
+                                    op = on.doubleValue();
 
-                        final Double res = switch (operator) {
-                            case ADD -> bef + op;
-                            case SUBTRACT -> bef - op;
-                            case MULTIPLY -> bef * op;
-                            case DIVIDE -> bef / op;
-                            case MODULO -> bef % op;
-                            default -> bef;
-                        };
+                            if (op == 0d && operator.isDiv())
+                                ScrippleErrorListener.fireError(
+                                        ScrippleErrorListener.Message.DIV_BY_ZERO,
+                                        operand.getPosition());
 
-                        if (isInt)
-                            yield res.intValue();
+                            final Double res = switch (operator) {
+                                case ADD -> bef + op;
+                                case SUBTRACT -> bef - op;
+                                case MULTIPLY -> bef * op;
+                                case DIVIDE -> bef / op;
+                                case MODULO -> bef % op;
+                                default -> bef;
+                            };
 
-                        yield res;
+                            if (isInt)
+                                yield res.intValue();
+
+                            yield res;
+                        }
+
+                        yield before;
                     }
                 };
         getAssignable().update(symbolTable, after);
