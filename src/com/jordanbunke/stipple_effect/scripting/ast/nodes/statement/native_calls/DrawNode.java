@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_call
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -45,21 +45,21 @@ public final class DrawNode extends StatementNode {
                 yType = y.getType(symbolTable);
 
         if (!cType.equals(imgType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARG_NOT_IMG,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARG_NOT_IMG,
                     canvas.getPosition(), "Canvas", cType.toString());
         if (!sType.equals(imgType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARG_NOT_IMG,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARG_NOT_IMG,
                     superimposed.getPosition(),
                     "Superimposed", sType.toString());
         if (!xType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
                     x.getPosition(), "X", xType.toString());
         if (!yType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
                     y.getPosition(), "Y", yType.toString());
     }
 

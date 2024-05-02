@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -57,8 +57,8 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
         final TypeNode indexType = index.getType(symbolTable);
 
         if (!indexType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.INDEX_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.INDEX_NOT_INT,
                     index.getPosition(), indexType.toString());
     }
 
@@ -67,8 +67,8 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
         final Variable var = symbolTable.get(getName());
 
         if (var == null) {
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.UNDEFINED_VAR,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.UNDEFINED_VAR,
                     getPosition(), getName());
             return null;
         }

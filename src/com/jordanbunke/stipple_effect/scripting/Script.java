@@ -1,13 +1,13 @@
 package com.jordanbunke.stipple_effect.scripting;
 
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleVisitor;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptVisitor;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -19,13 +19,13 @@ public final class Script {
     public static boolean validatePreviewScript(
             final String content, final SEContext context
     ) {
-        final ScriptFunctionNode script = build(content);
+        final HeadFuncNode script = build(content);
 
         return validatePreviewScript(script, context);
     }
 
     public static boolean validatePreviewScript(
-            final ScriptFunctionNode script, final SEContext context
+            final HeadFuncNode script, final SEContext context
     ) {
         if (script == null)
             return false;
@@ -48,9 +48,9 @@ public final class Script {
     public static Object run(
             final String content, final Object... args
     ) {
-        ScrippleErrorListener.clearErrors();
+        ScriptErrorLog.clearErrors();
 
-        final ScriptFunctionNode script = build(content);
+        final HeadFuncNode script = build(content);
 
         if (script == null)
             return null;
@@ -59,7 +59,7 @@ public final class Script {
     }
 
     public static Object run(
-            final ScriptFunctionNode script, final Object... args
+            final HeadFuncNode script, final Object... args
     ) {
         final SymbolTable scriptTable = SymbolTable.root(script);
 
@@ -79,18 +79,18 @@ public final class Script {
         return null;
     }
 
-    public static ScriptFunctionNode build(final String content) {
+    public static HeadFuncNode build(final String content) {
         try {
             final CharStream input = CharStreams.fromString(content);
 
-            final ScrippleLexer lexer = new ScrippleLexer(input);
+            final ScriptLexer lexer = new ScriptLexer(input);
             lexer.removeErrorListeners();
 
-            final ScrippleParser parser = new ScrippleParser(
+            final ScriptParser parser = new ScriptParser(
                     new CommonTokenStream(lexer));
             parser.removeErrorListeners();
 
-            final ScrippleVisitor visitor = new ScrippleVisitor();
+            final ScriptVisitor visitor = new ScriptVisitor();
 
             return visitor.visitHead_rule(parser.head_rule());
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public final class Script {
     }
 
     private static boolean check(
-            final ScriptFunctionNode script,
+            final HeadFuncNode script,
             final SymbolTable scriptTable
     ) {
         try {
@@ -110,11 +110,11 @@ public final class Script {
             return false;
         }
 
-        return ScrippleErrorListener.hasNoErrors();
+        return ScriptErrorLog.hasNoErrors();
     }
 
     private static Optional<Object> execute(
-            final ScriptFunctionNode script,
+            final HeadFuncNode script,
             final SymbolTable scriptTable,
             final Object... args
     ) {
@@ -130,7 +130,7 @@ public final class Script {
     }
 
     private static void displayErrors() {
-        final List<String> errors = ScrippleErrorListener.getErrors();
+        final List<String> errors = ScriptErrorLog.getErrors();
 
         for (String error : errors)
             System.out.println(error);

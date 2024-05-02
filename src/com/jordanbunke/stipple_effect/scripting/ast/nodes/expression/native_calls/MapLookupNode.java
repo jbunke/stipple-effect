@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -41,8 +41,8 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
             final TypeNode keyType = mapType.getKeyType();
 
             if (!keyType.equals(elemType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.MAP_KEY_TYPE_MISMATCH,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.MAP_KEY_TYPE_MISMATCH,
                         element.getPosition(), elemType.toString());
         }
     }
@@ -56,8 +56,8 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
             if (map.containsKey(elemValue))
                 return map.get(elemValue);
             else
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.MAP_DOES_NOT_CONTAIN_ELEMENT,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.MAP_DOES_NOT_CONTAIN_ELEMENT,
                         getPosition(), elemValue.toString());
         }
 

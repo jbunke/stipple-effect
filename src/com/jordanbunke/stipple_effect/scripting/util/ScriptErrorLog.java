@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ScrippleErrorListener {
+public final class ScriptErrorLog {
     private static final List<String> errors;
 
     static {
@@ -58,17 +58,17 @@ public final class ScrippleErrorListener {
         ADD_TO_ARRAY,
         REMOVE_FROM_SET_OR_ARRAY,
         ASSIGN_EXPR_NOT_NUM,
-        ASSIGN_EXPR_NOT_STRING
+        ASSIGN_EXPR_NOT_STRING,
+        NOT_ITERABLE
         ;
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
-                case PATH_NOT_STRING -> {
-                    final String actualType = args[0];
-
-                    yield "Filepath argument should be of type \"string\"," +
-                            " instead is of type \"" + actualType + "\"";
-                }
+                case NOT_ITERABLE ->
+                    typeMismatch("non-iterable type used in iterator loop",
+                            args[0], args[1]);
+                case PATH_NOT_STRING ->
+                        typeMismatch("filepath", "string", args[0]);
                 case PATH_DOES_NOT_CONTAIN_IMAGE -> {
                     final String filepath = args[0];
 
@@ -80,15 +80,15 @@ public final class ScrippleErrorListener {
                             prefix = this == TERN_COND_NOT_BOOL
                                     ? "Ternary c" : "C";
 
-                    yield prefix + "ondition should be of type \"bool\"," +
-                            " instead is of type \"" + actualType + "\"";
+                    yield typeMismatch(prefix + "ondition",
+                            "bool", actualType);
                 }
                 case TERNARY_BRANCHES_OF_DIFFERENT_TYPES -> {
                     final String ifType = args[0], elseType = args[1];
 
                     yield "Ternary branches are of different types;" +
-                            " \"if\" branch is of type \"" + ifType +
-                            "\", and the \"else\" branch is of type \"" +
+                            " branch A is of type \"" + ifType +
+                            "\", and branch B is of type \"" +
                             elseType + "\"";
 
                 }
@@ -136,8 +136,8 @@ public final class ScrippleErrorListener {
                 case COLOR_CHANNEL_NOT_INT -> {
                     final String channel = args[0], actualType = args[1];
 
-                    yield channel + "color channel should be of type \"int\"," +
-                            " instead is of type \"" + actualType + "\"";
+                    yield typeMismatch("color channel \"" + channel + "\"",
+                            "int", actualType);
                 }
                 case EXPECTED_FOR_CALL ->
                         callOwnerTypeMismatch(args[0], args[1], args[2]);
@@ -150,14 +150,14 @@ public final class ScrippleErrorListener {
                 case IMG_ARG_NOT_INT -> {
                     final String dimension = args[0], actualType = args[1];
 
-                    yield dimension + " argument should be of type \"int\"," +
-                            " instead is of type \"" + actualType + "\"";
+                    yield typeMismatch(dimension + " argument",
+                            "int", actualType);
                 }
                 case ARG_NOT_IMG -> {
                     final String arg = args[0], actualType = args[1];
 
-                    yield arg + " argument should be of type \"image\"," +
-                            " instead is of type \"" + actualType + "\"";
+                    yield typeMismatch(arg + " argument",
+                            "image", actualType);
                 }
                 case PIX_ARG_OUT_OF_BOUNDS -> {
                     final String dimension = args[0], value = args[1],

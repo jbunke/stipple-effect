@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -42,12 +42,12 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
                 yType = y.getType(symbolTable);
 
         if (!xType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
                     getPosition(), "X", xType.toString());
         if (!yType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
                     getPosition(), "Y", yType.toString());
     }
 
@@ -58,13 +58,13 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
         final GameImage img = ((GameImage) getOwner().evaluate(symbolTable));
 
         if (pixelX < 0 || pixelX >= img.getWidth())
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.PIX_ARG_OUT_OF_BOUNDS,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.PIX_ARG_OUT_OF_BOUNDS,
                     getPosition(), "X", String.valueOf(pixelX),
                     "width -- " + img.getWidth());
         if (pixelY < 0 || pixelY >= img.getHeight())
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.PIX_ARG_OUT_OF_BOUNDS,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.PIX_ARG_OUT_OF_BOUNDS,
                     getPosition(), "Y", String.valueOf(pixelY),
                     "height -- " + img.getHeight());
 

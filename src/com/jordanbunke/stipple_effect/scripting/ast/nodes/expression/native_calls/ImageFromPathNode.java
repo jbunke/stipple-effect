@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.GameImageIO;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -30,8 +30,8 @@ public final class ImageFromPathNode extends ExpressionNode {
         final TypeNode pathType = path.getType(symbolTable);
 
         if (!pathType.equals(new SimpleTypeNode(SimpleTypeNode.Type.STRING)))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.PATH_NOT_STRING,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.PATH_NOT_STRING,
                     getPosition(), pathType.toString());
     }
 
@@ -41,8 +41,8 @@ public final class ImageFromPathNode extends ExpressionNode {
         final GameImage image = GameImageIO.readImage(Path.of(fp));
 
         if (image == null)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.PATH_DOES_NOT_CONTAIN_IMAGE,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.PATH_DOES_NOT_CONTAIN_IMAGE,
                     getPosition(), fp);
 
         return image;

@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -39,16 +39,16 @@ public final class RGBColorNode extends ExpressionNode {
                 bType = b.getType(symbolTable);
 
         if (!rType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COLOR_CHANNEL_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COLOR_CHANNEL_NOT_INT,
                     getPosition(), "Red", rType.toString());
         if (!gType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COLOR_CHANNEL_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COLOR_CHANNEL_NOT_INT,
                     getPosition(), "Green", gType.toString());
         if (!bType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COLOR_CHANNEL_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COLOR_CHANNEL_NOT_INT,
                     getPosition(), "Blue", bType.toString());
     }
 
@@ -60,16 +60,16 @@ public final class RGBColorNode extends ExpressionNode {
                 bv = (int) b.evaluate(symbolTable);
 
         if (rv < MIN || rv > MAX)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COLOR_CHANNEL_OUT_OF_BOUNDS,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COLOR_CHANNEL_OUT_OF_BOUNDS,
                     getPosition(), "Red", String.valueOf(rv));
         if (gv < MIN || gv > MAX)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COLOR_CHANNEL_OUT_OF_BOUNDS,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COLOR_CHANNEL_OUT_OF_BOUNDS,
                     getPosition(), "Green", String.valueOf(gv));
         if (bv < MIN || bv > MAX)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COLOR_CHANNEL_OUT_OF_BOUNDS,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COLOR_CHANNEL_OUT_OF_BOUNDS,
                     getPosition(), "Blue", String.valueOf(bv));
 
         return new Color(rv, gv, bv);

@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -30,8 +30,8 @@ public final class NoOperandAssignmentNode extends AssignmentNode {
                 intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
 
         if (!assignableType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.VAR_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.VAR_NOT_INT,
                     getPosition(), assignableType.toString());
     }
 

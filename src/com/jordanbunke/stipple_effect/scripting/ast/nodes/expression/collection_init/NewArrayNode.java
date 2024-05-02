@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -32,8 +32,8 @@ public final class NewArrayNode extends ExpressionNode {
         final TypeNode lengthType = length.getType(symbolTable);
 
         if (!lengthType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARR_LENGTH_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARR_LENGTH_NOT_INT,
                     getPosition(), lengthType.toString());
     }
 
@@ -42,8 +42,8 @@ public final class NewArrayNode extends ExpressionNode {
         final int l = (int) length.evaluate(symbolTable);
 
         if (l < 0)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARR_LENGTH_NEGATIVE,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARR_LENGTH_NEGATIVE,
                     getPosition(), String.valueOf(l));
 
         return new ScriptArray(l);

@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
@@ -41,8 +41,8 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
             final TypeNode type = initElements[i].getType(symbolTable);
 
             if (!type.equals(firstElemType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.INCONSISTENT_COL_TYPES,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.INCONSISTENT_COL_TYPES,
                         initElements[i].getPosition(),
                         String.valueOf(i),
                         String.valueOf(firstElemType),

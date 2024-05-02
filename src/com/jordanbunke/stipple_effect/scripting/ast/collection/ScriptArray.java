@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.collection;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleEquality;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptEquality;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -32,7 +32,7 @@ public final class ScriptArray implements ScriptCollection {
     @Override
     public boolean contains(final Object element) {
         for (int i = 0; i < size(); i++)
-            if (ScrippleEquality.equal(structure[i], element))
+            if (ScriptEquality.equal(structure[i], element))
                 return true;
 
         return false;

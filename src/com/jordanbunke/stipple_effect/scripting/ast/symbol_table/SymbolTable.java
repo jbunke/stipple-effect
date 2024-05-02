@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.symbol_table;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,13 +27,13 @@ public final class SymbolTable {
     }
 
     public static SymbolTable root(
-            final ScriptFunctionNode func
+            final HeadFuncNode func
     ) {
         return new SymbolTable(func, null);
     }
 
-    public ScriptFunctionNode getFunc() {
-        if (scope instanceof ScriptFunctionNode func)
+    public HeadFuncNode getFunc() {
+        if (scope instanceof HeadFuncNode func)
             return func;
 
         return parent != null ? parent.getFunc() : null;

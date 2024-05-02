@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.util;
 
-import com.jordanbunke.stipple_effect.scripting.ScrippleParser;
-import com.jordanbunke.stipple_effect.scripting.ScrippleParserBaseVisitor;
+import com.jordanbunke.stipple_effect.scripting.ScriptParser;
+import com.jordanbunke.stipple_effect.scripting.ScriptParserBaseVisitor;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
@@ -16,11 +16,11 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
 
-public final class ScrippleVisitor
-        extends ScrippleParserBaseVisitor<ASTNode> {
+public final class ScriptVisitor
+        extends ScriptParserBaseVisitor<ASTNode> {
     @Override
-    public ScriptFunctionNode visitHead_rule(
-            final ScrippleParser.Head_ruleContext ctx
+    public HeadFuncNode visitHead_rule(
+            final ScriptParser.Head_ruleContext ctx
     ) {
         // signature
         final MethodSignatureNode signature =
@@ -29,14 +29,14 @@ public final class ScrippleVisitor
         final StatementNode[] statements = ctx.stat().stream()
                 .map(s -> (StatementNode) visit(s))
                 .toArray(StatementNode[]::new);
-        return new ScriptFunctionNode(
+        return new HeadFuncNode(
                 TextPosition.fromToken(ctx.FUNC().getSymbol()),
                 signature, statements);
     }
 
     @Override
     public MethodSignatureNode visitVoidReturnSignature(
-            final ScrippleParser.VoidReturnSignatureContext ctx
+            final ScriptParser.VoidReturnSignatureContext ctx
     ) {
         final boolean hasParams = ctx.param_list() != null;
 
@@ -52,7 +52,7 @@ public final class ScrippleVisitor
 
     @Override
     public MethodSignatureNode visitTypeReturnSignature(
-            final ScrippleParser.TypeReturnSignatureContext ctx
+            final ScriptParser.TypeReturnSignatureContext ctx
     ) {
         final boolean hasParams = ctx.param_list() != null;
 
@@ -69,7 +69,7 @@ public final class ScrippleVisitor
 
     @Override
     public ParametersNode visitParam_list(
-            final ScrippleParser.Param_listContext ctx
+            final ScriptParser.Param_listContext ctx
     ) {
         return new ParametersNode(
                 TextPosition.fromToken(ctx.start),
@@ -80,7 +80,7 @@ public final class ScrippleVisitor
 
     @Override
     public DeclarationNode visitDeclaration(
-            final ScrippleParser.DeclarationContext ctx
+            final ScriptParser.DeclarationContext ctx
     ) {
         return new DeclarationNode(
                 TextPosition.fromToken(ctx.start),
@@ -91,7 +91,7 @@ public final class ScrippleVisitor
 
     @Override
     public IdentifierNode visitIdent(
-            final ScrippleParser.IdentContext ctx
+            final ScriptParser.IdentContext ctx
     ) {
         return new IdentifierNode(
                 TextPosition.fromToken(ctx.start),
@@ -100,56 +100,56 @@ public final class ScrippleVisitor
 
     @Override
     public SimpleTypeNode visitBoolType(
-            final ScrippleParser.BoolTypeContext ctx
+            final ScriptParser.BoolTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
     }
 
     @Override
     public SimpleTypeNode visitIntType(
-            final ScrippleParser.IntTypeContext ctx
+            final ScriptParser.IntTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.INT);
     }
 
     @Override
     public SimpleTypeNode visitFloatType(
-            final ScrippleParser.FloatTypeContext ctx
+            final ScriptParser.FloatTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);
     }
 
     @Override
     public SimpleTypeNode visitCharType(
-            final ScrippleParser.CharTypeContext ctx
+            final ScriptParser.CharTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.CHAR);
     }
 
     @Override
     public SimpleTypeNode visitStringType(
-            final ScrippleParser.StringTypeContext ctx
+            final ScriptParser.StringTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.STRING);
     }
 
     @Override
     public SimpleTypeNode visitImageType(
-            final ScrippleParser.ImageTypeContext ctx
+            final ScriptParser.ImageTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
     }
 
     @Override
     public SimpleTypeNode visitColorType(
-            final ScrippleParser.ColorTypeContext ctx
+            final ScriptParser.ColorTypeContext ctx
     ) {
         return new SimpleTypeNode(SimpleTypeNode.Type.COLOR);
     }
 
     @Override
     public CollectionTypeNode visitArrayType(
-            final ScrippleParser.ArrayTypeContext ctx
+            final ScriptParser.ArrayTypeContext ctx
     ) {
         return new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
                 (TypeNode) visit(ctx.type()));
@@ -157,7 +157,7 @@ public final class ScrippleVisitor
 
     @Override
     public CollectionTypeNode visitSetType(
-            final ScrippleParser.SetTypeContext ctx
+            final ScriptParser.SetTypeContext ctx
     ) {
         return new CollectionTypeNode(CollectionTypeNode.Type.SET,
                 (TypeNode) visit(ctx.type()));
@@ -165,7 +165,7 @@ public final class ScrippleVisitor
 
     @Override
     public CollectionTypeNode visitListType(
-            final ScrippleParser.ListTypeContext ctx
+            final ScriptParser.ListTypeContext ctx
     ) {
         return new CollectionTypeNode(CollectionTypeNode.Type.LIST,
                 (TypeNode) visit(ctx.type()));
@@ -173,7 +173,7 @@ public final class ScrippleVisitor
 
     @Override
     public MapTypeNode visitMapType(
-            final ScrippleParser.MapTypeContext ctx
+            final ScriptParser.MapTypeContext ctx
     ) {
         return new MapTypeNode(
                 (TypeNode) visit(ctx.key),
@@ -182,14 +182,14 @@ public final class ScrippleVisitor
 
     @Override
     public StatementNode visitLoopStatement(
-            final ScrippleParser.LoopStatementContext ctx
+            final ScriptParser.LoopStatementContext ctx
     ) {
         return (StatementNode) visit(ctx.loop_stat());
     }
 
     @Override
     public WhileLoopNode visitWhileLoop(
-            final ScrippleParser.WhileLoopContext ctx
+            final ScriptParser.WhileLoopContext ctx
     ) {
         final ExpressionNode loopCondition =
                 (ExpressionNode) visit(ctx.while_def().expr());
@@ -202,7 +202,7 @@ public final class ScrippleVisitor
 
     @Override
     public DoWhileLoopNode visitDoWhileLoop(
-            final ScrippleParser.DoWhileLoopContext ctx
+            final ScriptParser.DoWhileLoopContext ctx
     ) {
         final ExpressionNode loopCondition =
                 (ExpressionNode) visit(ctx.while_def().expr());
@@ -215,7 +215,7 @@ public final class ScrippleVisitor
 
     @Override
     public IteratorLoopNode visitIteratorLoop(
-            final ScrippleParser.IteratorLoopContext ctx
+            final ScriptParser.IteratorLoopContext ctx
     ) {
         final DeclarationNode declaration =
                 visitDeclaration(ctx.iteration_def().declaration());
@@ -230,7 +230,7 @@ public final class ScrippleVisitor
 
     @Override
     public ForLoopNode visitForLoop(
-            final ScrippleParser.ForLoopContext ctx
+            final ScriptParser.ForLoopContext ctx
     ) {
         final InitializationNode initialization =
                 visitVar_init(ctx.for_def().var_init());
@@ -246,14 +246,14 @@ public final class ScrippleVisitor
 
     @Override
     public IfStatementNode visitIfStatement(
-            final ScrippleParser.IfStatementContext ctx
+            final ScriptParser.IfStatementContext ctx
     ) {
         return visitIf_stat(ctx.if_stat());
     }
 
     @Override
     public IfStatementNode visitIf_stat(
-            final ScrippleParser.If_statContext ctx
+            final ScriptParser.If_statContext ctx
     ) {
         final ExpressionNode[] conditions = ctx.if_def().stream()
                 .map(i -> (ExpressionNode) visit(i.cond))
@@ -270,14 +270,14 @@ public final class ScrippleVisitor
 
     @Override
     public DeclarationNode visitVarDefStatement(
-            final ScrippleParser.VarDefStatementContext ctx
+            final ScriptParser.VarDefStatementContext ctx
     ) {
         return (DeclarationNode) visit(ctx.var_def());
     }
 
     @Override
     public InitializationNode visitVar_init(
-            final ScrippleParser.Var_initContext ctx
+            final ScriptParser.Var_initContext ctx
     ) {
         return new InitializationNode(
                 TextPosition.fromToken(ctx.start),
@@ -289,14 +289,14 @@ public final class ScrippleVisitor
 
     @Override
     public AssignmentNode visitAssignmentStatement(
-            final ScrippleParser.AssignmentStatementContext ctx
+            final ScriptParser.AssignmentStatementContext ctx
     ) {
         return (AssignmentNode) visit(ctx.assignment());
     }
 
     @Override
     public ReturnStatementNode visitReturnStatement(
-            final ScrippleParser.ReturnStatementContext ctx
+            final ScriptParser.ReturnStatementContext ctx
     ) {
         final TextPosition position =
                 TextPosition.fromToken(ctx.return_stat().start);
@@ -310,7 +310,7 @@ public final class ScrippleVisitor
 
     @Override
     public AddNode visitAddToCollection(
-            final ScrippleParser.AddToCollectionContext ctx
+            final ScriptParser.AddToCollectionContext ctx
     ) {
         return new AddNode(
                 TextPosition.fromToken(ctx.start),
@@ -322,7 +322,7 @@ public final class ScrippleVisitor
 
     @Override
     public RemoveNode visitRemoveFromCollection(
-            final ScrippleParser.RemoveFromCollectionContext ctx
+            final ScriptParser.RemoveFromCollectionContext ctx
     ) {
         return new RemoveNode(
                 TextPosition.fromToken(ctx.start),
@@ -332,7 +332,7 @@ public final class ScrippleVisitor
 
     @Override
     public MapDefineNode visitDefineMapEntryStatement(
-            final ScrippleParser.DefineMapEntryStatementContext ctx
+            final ScriptParser.DefineMapEntryStatementContext ctx
     ) {
         return new MapDefineNode(
                 TextPosition.fromToken(ctx.start),
@@ -343,7 +343,7 @@ public final class ScrippleVisitor
 
     @Override
     public DrawNode visitDrawOntoImageStatement(
-            final ScrippleParser.DrawOntoImageStatementContext ctx
+            final ScriptParser.DrawOntoImageStatementContext ctx
     ) {
         return new DrawNode(
                 TextPosition.fromToken(ctx.start),
@@ -355,14 +355,14 @@ public final class ScrippleVisitor
 
     @Override
     public StatementNode visitSingleStatBody(
-            final ScrippleParser.SingleStatBodyContext ctx
+            final ScriptParser.SingleStatBodyContext ctx
     ) {
         return (StatementNode) visit(ctx.stat());
     }
 
     @Override
     public StatementNode visitComplexBody(
-            final ScrippleParser.ComplexBodyContext ctx
+            final ScriptParser.ComplexBodyContext ctx
     ) {
         return new BodyStatementNode(
                 TextPosition.fromToken(ctx.LCURLY().getSymbol()),
@@ -373,7 +373,7 @@ public final class ScrippleVisitor
 
     @Override
     public StandardAssignmentNode visitStandardAssignment(
-            final ScrippleParser.StandardAssignmentContext ctx
+            final ScriptParser.StandardAssignmentContext ctx
     ) {
         return new StandardAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -383,7 +383,7 @@ public final class ScrippleVisitor
 
     @Override
     public NoOperandAssignmentNode visitIncrementAssignment(
-            final ScrippleParser.IncrementAssignmentContext ctx
+            final ScriptParser.IncrementAssignmentContext ctx
     ) {
         return new NoOperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -393,7 +393,7 @@ public final class ScrippleVisitor
 
     @Override
     public NoOperandAssignmentNode visitDecrementAssignment(
-            final ScrippleParser.DecrementAssignmentContext ctx
+            final ScriptParser.DecrementAssignmentContext ctx
     ) {
         return new NoOperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -403,7 +403,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitAddAssignment(
-            final ScrippleParser.AddAssignmentContext ctx
+            final ScriptParser.AddAssignmentContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -414,7 +414,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitSubAssignment(
-            final ScrippleParser.SubAssignmentContext ctx
+            final ScriptParser.SubAssignmentContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -425,7 +425,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitMultAssignment(
-            final ScrippleParser.MultAssignmentContext ctx
+            final ScriptParser.MultAssignmentContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -436,7 +436,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitDivAssignmnet(
-            final ScrippleParser.DivAssignmnetContext ctx
+            final ScriptParser.DivAssignmnetContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -447,7 +447,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitModAssignment(
-            final ScrippleParser.ModAssignmentContext ctx
+            final ScriptParser.ModAssignmentContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -458,7 +458,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitAndAssignment(
-            final ScrippleParser.AndAssignmentContext ctx
+            final ScriptParser.AndAssignmentContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -469,7 +469,7 @@ public final class ScrippleVisitor
 
     @Override
     public OperandAssignmentNode visitOrAssignment(
-            final ScrippleParser.OrAssignmentContext ctx
+            final ScriptParser.OrAssignmentContext ctx
     ) {
         return new OperandAssignmentNode(
                 TextPosition.fromToken(ctx.start),
@@ -480,7 +480,7 @@ public final class ScrippleVisitor
 
     @Override
     public BoolLiteralNode visitBoolLiteral(
-            final ScrippleParser.BoolLiteralContext ctx
+            final ScriptParser.BoolLiteralContext ctx
     ) {
         return new BoolLiteralNode(
                 TextPosition.fromToken(ctx.BOOL_LIT().getSymbol()),
@@ -489,7 +489,7 @@ public final class ScrippleVisitor
 
     @Override
     public FloatLiteralNode visitFloatLiteral(
-            final ScrippleParser.FloatLiteralContext ctx
+            final ScriptParser.FloatLiteralContext ctx
     ) {
         return new FloatLiteralNode(
                 TextPosition.fromToken(ctx.FLOAT_LIT().getSymbol()),
@@ -498,7 +498,7 @@ public final class ScrippleVisitor
 
     @Override
     public IntLiteralNode visitIntLiteral(
-            final ScrippleParser.IntLiteralContext ctx
+            final ScriptParser.IntLiteralContext ctx
     ) {
         return new IntLiteralNode(
                 TextPosition.fromToken(ctx.int_lit().start),
@@ -507,7 +507,7 @@ public final class ScrippleVisitor
 
     @Override
     public CharLiteralNode visitCharLiteral(
-            final ScrippleParser.CharLiteralContext ctx
+            final ScriptParser.CharLiteralContext ctx
     ) {
         return new CharLiteralNode(
                 TextPosition.fromToken(ctx.CHAR_LIT().getSymbol()),
@@ -516,7 +516,7 @@ public final class ScrippleVisitor
 
     @Override
     public StringLiteralNode visitStringLiteral(
-            final ScrippleParser.StringLiteralContext ctx
+            final ScriptParser.StringLiteralContext ctx
     ) {
         final String withQuotes = ctx.STRING_LIT().getSymbol().getText();
 
@@ -527,28 +527,28 @@ public final class ScrippleVisitor
 
     @Override
     public ExpressionNode visitNestedExpression(
-            final ScrippleParser.NestedExpressionContext ctx
+            final ScriptParser.NestedExpressionContext ctx
     ) {
         return (ExpressionNode) visit(ctx.expr());
     }
 
     @Override
     public AssignableNode visitAssignableExpression(
-            final ScrippleParser.AssignableExpressionContext ctx
+            final ScriptParser.AssignableExpressionContext ctx
     ) {
         return (AssignableNode) visit(ctx.assignable());
     }
 
     @Override
     public IdentifierNode visitSimpleAssignable(
-            final ScrippleParser.SimpleAssignableContext ctx
+            final ScriptParser.SimpleAssignableContext ctx
     ) {
         return visitIdent(ctx.ident());
     }
 
     @Override
     public ListAssignableNode visitListAssignable(
-            final ScrippleParser.ListAssignableContext ctx
+            final ScriptParser.ListAssignableContext ctx
     ) {
         return new ListAssignableNode(
                 TextPosition.fromToken(ctx.start),
@@ -558,7 +558,7 @@ public final class ScrippleVisitor
 
     @Override
     public ArrayAssignableNode visitArrayAssignable(
-            final ScrippleParser.ArrayAssignableContext ctx
+            final ScriptParser.ArrayAssignableContext ctx
     ) {
         return new ArrayAssignableNode(
                 TextPosition.fromToken(ctx.start),
@@ -568,14 +568,14 @@ public final class ScrippleVisitor
 
     @Override
     public LiteralNode visitLiteralExpression(
-            final ScrippleParser.LiteralExpressionContext ctx
+            final ScriptParser.LiteralExpressionContext ctx
     ) {
         return (LiteralNode) visit(ctx.literal());
     }
 
     @Override
     public UnaryOperationNode visitUnaryExpression(
-            final ScrippleParser.UnaryExpressionContext ctx
+            final ScriptParser.UnaryExpressionContext ctx
     ) {
         return new UnaryOperationNode(TextPosition.fromToken(ctx.op),
                 ctx.op.getText(), (ExpressionNode) visit(ctx.expr()));
@@ -583,7 +583,7 @@ public final class ScrippleVisitor
 
     @Override
     public BinaryOperationNode visitArithmeticBinExpression(
-            final ScrippleParser.ArithmeticBinExpressionContext ctx
+            final ScriptParser.ArithmeticBinExpressionContext ctx
     ) {
         return new BinaryOperationNode(
                 TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
@@ -593,7 +593,7 @@ public final class ScrippleVisitor
 
     @Override
     public BinaryOperationNode visitMultBinExpression(
-            final ScrippleParser.MultBinExpressionContext ctx
+            final ScriptParser.MultBinExpressionContext ctx
     ) {
         return new BinaryOperationNode(
                 TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
@@ -603,7 +603,7 @@ public final class ScrippleVisitor
 
     @Override
     public BinaryOperationNode visitPowerBinExpression(
-            final ScrippleParser.PowerBinExpressionContext ctx
+            final ScriptParser.PowerBinExpressionContext ctx
     ) {
         return new BinaryOperationNode(
                 TextPosition.fromToken(ctx.a.start),
@@ -614,7 +614,7 @@ public final class ScrippleVisitor
 
     @Override
     public BinaryOperationNode visitComparisonBinExpression(
-            final ScrippleParser.ComparisonBinExpressionContext ctx
+            final ScriptParser.ComparisonBinExpressionContext ctx
     ) {
         return new BinaryOperationNode(
                 TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
@@ -624,7 +624,7 @@ public final class ScrippleVisitor
 
     @Override
     public BinaryOperationNode visitLogicBinExpression(
-            final ScrippleParser.LogicBinExpressionContext ctx
+            final ScriptParser.LogicBinExpressionContext ctx
     ) {
         return new BinaryOperationNode(
                 TextPosition.fromToken(ctx.a.start), ctx.op.getText(),
@@ -634,7 +634,7 @@ public final class ScrippleVisitor
 
     @Override
     public TernaryOperationNode visitTernaryExpression(
-            final ScrippleParser.TernaryExpressionContext ctx
+            final ScriptParser.TernaryExpressionContext ctx
     ) {
         return new TernaryOperationNode(
                 TextPosition.fromToken(ctx.start),
@@ -645,7 +645,7 @@ public final class ScrippleVisitor
 
     @Override
     public ContainsNode visitContainsExpression(
-            final ScrippleParser.ContainsExpressionContext ctx
+            final ScriptParser.ContainsExpressionContext ctx
     ) {
         return new ContainsNode(
                 TextPosition.fromToken(ctx.start),
@@ -655,7 +655,7 @@ public final class ScrippleVisitor
 
     @Override
     public MapLookupNode visitMapLookupExpression(
-            final ScrippleParser.MapLookupExpressionContext ctx
+            final ScriptParser.MapLookupExpressionContext ctx
     ) {
         return new MapLookupNode(
                 TextPosition.fromToken(ctx.start),
@@ -665,7 +665,7 @@ public final class ScrippleVisitor
 
     @Override
     public MapKeysetNode visitMapKeysetExpression(
-            final ScrippleParser.MapKeysetExpressionContext ctx
+            final ScriptParser.MapKeysetExpressionContext ctx
     ) {
         return new MapKeysetNode(
                 TextPosition.fromToken(ctx.start),
@@ -674,7 +674,7 @@ public final class ScrippleVisitor
 
     @Override
     public ColorChannelNode visitColorChannelExpression(
-            final ScrippleParser.ColorChannelExpressionContext ctx
+            final ScriptParser.ColorChannelExpressionContext ctx
     ) {
         return new ColorChannelNode(
                 TextPosition.fromToken(ctx.start),
@@ -684,7 +684,7 @@ public final class ScrippleVisitor
 
     @Override
     public ImageFromPathNode visitImageFromPathExpression(
-            final ScrippleParser.ImageFromPathExpressionContext ctx
+            final ScriptParser.ImageFromPathExpressionContext ctx
     ) {
         return new ImageFromPathNode(
                 TextPosition.fromToken(ctx.expr().start),
@@ -693,7 +693,7 @@ public final class ScrippleVisitor
 
     @Override
     public ImageOfBoundsNode visitImageOfBoundsExpression(
-            final ScrippleParser.ImageOfBoundsExpressionContext ctx
+            final ScriptParser.ImageOfBoundsExpressionContext ctx
     ) {
         return new ImageOfBoundsNode(
                 TextPosition.fromToken(ctx.BLANK().getSymbol()),
@@ -703,7 +703,7 @@ public final class ScrippleVisitor
 
     @Override
     public ColorAtPixelNode visitColorAtPixelExpression(
-            final ScrippleParser.ColorAtPixelExpressionContext ctx
+            final ScriptParser.ColorAtPixelExpressionContext ctx
     ) {
         return new ColorAtPixelNode(
                 TextPosition.fromToken(ctx.img.start),
@@ -714,7 +714,7 @@ public final class ScrippleVisitor
 
     @Override
     public ImageBoundNode visitImageBoundExpression(
-            final ScrippleParser.ImageBoundExpressionContext ctx
+            final ScriptParser.ImageBoundExpressionContext ctx
     ) {
         final String text = ctx.op.getText().substring(1);
 
@@ -725,7 +725,7 @@ public final class ScrippleVisitor
 
     @Override
     public TextureColorReplaceNode visitTextureColorReplaceExpression(
-            final ScrippleParser.TextureColorReplaceExpressionContext ctx
+            final ScriptParser.TextureColorReplaceExpressionContext ctx
     ) {
         return new TextureColorReplaceNode(
                 TextPosition.fromToken(ctx.TEX_COL_REPL().getSymbol()),
@@ -736,7 +736,7 @@ public final class ScrippleVisitor
 
     @Override
     public RGBColorNode visitRGBColorExpression(
-            final ScrippleParser.RGBColorExpressionContext ctx
+            final ScriptParser.RGBColorExpressionContext ctx
     ) {
         return new RGBColorNode(
                 TextPosition.fromToken(ctx.RGB().getSymbol()),
@@ -747,7 +747,7 @@ public final class ScrippleVisitor
 
     @Override
     public RGBAColorNode visitRGBAColorExpression(
-            final ScrippleParser.RGBAColorExpressionContext ctx
+            final ScriptParser.RGBAColorExpressionContext ctx
     ) {
         return new RGBAColorNode(
                 TextPosition.fromToken(ctx.RGBA().getSymbol()),
@@ -759,7 +759,7 @@ public final class ScrippleVisitor
 
     @Override
     public ExplicitCollectionInitNode visitExplicitArrayExpression(
-            final ScrippleParser.ExplicitArrayExpressionContext ctx
+            final ScriptParser.ExplicitArrayExpressionContext ctx
     ) {
         return new ExplicitCollectionInitNode(
                 TextPosition.fromToken(ctx.LBRACKET().getSymbol()),
@@ -771,7 +771,7 @@ public final class ScrippleVisitor
 
     @Override
     public ExplicitCollectionInitNode visitExplicitListExpression(
-            final ScrippleParser.ExplicitListExpressionContext ctx
+            final ScriptParser.ExplicitListExpressionContext ctx
     ) {
         return new ExplicitCollectionInitNode(
                 TextPosition.fromToken(ctx.LT().getSymbol()),
@@ -783,7 +783,7 @@ public final class ScrippleVisitor
 
     @Override
     public ExplicitCollectionInitNode visitExplicitSetExpression(
-            final ScrippleParser.ExplicitSetExpressionContext ctx
+            final ScriptParser.ExplicitSetExpressionContext ctx
     ) {
         return new ExplicitCollectionInitNode(
                 TextPosition.fromToken(ctx.LCURLY().getSymbol()),
@@ -795,7 +795,7 @@ public final class ScrippleVisitor
 
     @Override
     public NewArrayNode visitNewArrayExpression(
-            final ScrippleParser.NewArrayExpressionContext ctx
+            final ScriptParser.NewArrayExpressionContext ctx
     ) {
         return new NewArrayNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()),
@@ -805,7 +805,7 @@ public final class ScrippleVisitor
 
     @Override
     public NewCollectionNode visitNewListExpression(
-            final ScrippleParser.NewListExpressionContext ctx
+            final ScriptParser.NewListExpressionContext ctx
     ) {
         return new NewCollectionNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()),
@@ -814,7 +814,7 @@ public final class ScrippleVisitor
 
     @Override
     public NewCollectionNode visitNewSetExpression(
-            final ScrippleParser.NewSetExpressionContext ctx
+            final ScriptParser.NewSetExpressionContext ctx
     ) {
         return new NewCollectionNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()),
@@ -823,7 +823,7 @@ public final class ScrippleVisitor
 
     @Override
     public NewMapNode visitNewMapExpression(
-            final ScrippleParser.NewMapExpressionContext ctx
+            final ScriptParser.NewMapExpressionContext ctx
     ) {
         return new NewMapNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()));

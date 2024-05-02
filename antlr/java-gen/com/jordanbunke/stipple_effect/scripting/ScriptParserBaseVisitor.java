@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
- * This class provides an empty implementation of {@link ScrippleParserVisitor},
+ * This class provides an empty implementation of {@link ScriptParserVisitor},
  * which can be extended to create a visitor which only needs to handle a subset
  * of the available methods.
  *
@@ -11,628 +11,628 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * operations with no return type.
  */
 @SuppressWarnings("CheckReturnValue")
-public class ScrippleParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements ScrippleParserVisitor<T> {
+public class ScriptParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements ScriptParserVisitor<T> {
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitHead_rule(ScrippleParser.Head_ruleContext ctx) { return visitChildren(ctx); }
+	@Override public T visitHead_rule(ScriptParser.Head_ruleContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDeclaration(ScrippleParser.DeclarationContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDeclaration(ScriptParser.DeclarationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitVoidReturnSignature(ScrippleParser.VoidReturnSignatureContext ctx) { return visitChildren(ctx); }
+	@Override public T visitVoidReturnSignature(ScriptParser.VoidReturnSignatureContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTypeReturnSignature(ScrippleParser.TypeReturnSignatureContext ctx) { return visitChildren(ctx); }
+	@Override public T visitTypeReturnSignature(ScriptParser.TypeReturnSignatureContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitParam_list(ScrippleParser.Param_listContext ctx) { return visitChildren(ctx); }
+	@Override public T visitParam_list(ScriptParser.Param_listContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitArrayType(ScrippleParser.ArrayTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitArrayType(ScriptParser.ArrayTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitBoolType(ScrippleParser.BoolTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitBoolType(ScriptParser.BoolTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitStringType(ScrippleParser.StringTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitStringType(ScriptParser.StringTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSetType(ScrippleParser.SetTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSetType(ScriptParser.SetTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitListType(ScrippleParser.ListTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitListType(ScriptParser.ListTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitColorType(ScrippleParser.ColorTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitColorType(ScriptParser.ColorTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitCharType(ScrippleParser.CharTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitCharType(ScriptParser.CharTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMapType(ScrippleParser.MapTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMapType(ScriptParser.MapTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIntType(ScrippleParser.IntTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIntType(ScriptParser.IntTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFloatType(ScrippleParser.FloatTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFloatType(ScriptParser.FloatTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitImageType(ScrippleParser.ImageTypeContext ctx) { return visitChildren(ctx); }
+	@Override public T visitImageType(ScriptParser.ImageTypeContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSingleStatBody(ScrippleParser.SingleStatBodyContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSingleStatBody(ScriptParser.SingleStatBodyContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitComplexBody(ScrippleParser.ComplexBodyContext ctx) { return visitChildren(ctx); }
+	@Override public T visitComplexBody(ScriptParser.ComplexBodyContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLoopStatement(ScrippleParser.LoopStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLoopStatement(ScriptParser.LoopStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIfStatement(ScrippleParser.IfStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIfStatement(ScriptParser.IfStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitVarDefStatement(ScrippleParser.VarDefStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitVarDefStatement(ScriptParser.VarDefStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAssignmentStatement(ScrippleParser.AssignmentStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAssignmentStatement(ScriptParser.AssignmentStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitReturnStatement(ScrippleParser.ReturnStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitReturnStatement(ScriptParser.ReturnStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAddToCollection(ScrippleParser.AddToCollectionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAddToCollection(ScriptParser.AddToCollectionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRemoveFromCollection(ScrippleParser.RemoveFromCollectionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRemoveFromCollection(ScriptParser.RemoveFromCollectionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDefineMapEntryStatement(ScrippleParser.DefineMapEntryStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDefineMapEntryStatement(ScriptParser.DefineMapEntryStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDrawOntoImageStatement(ScrippleParser.DrawOntoImageStatementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDrawOntoImageStatement(ScriptParser.DrawOntoImageStatementContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitReturn_stat(ScrippleParser.Return_statContext ctx) { return visitChildren(ctx); }
+	@Override public T visitReturn_stat(ScriptParser.Return_statContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitWhileLoop(ScrippleParser.WhileLoopContext ctx) { return visitChildren(ctx); }
+	@Override public T visitWhileLoop(ScriptParser.WhileLoopContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIteratorLoop(ScrippleParser.IteratorLoopContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIteratorLoop(ScriptParser.IteratorLoopContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitForLoop(ScrippleParser.ForLoopContext ctx) { return visitChildren(ctx); }
+	@Override public T visitForLoop(ScriptParser.ForLoopContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDoWhileLoop(ScrippleParser.DoWhileLoopContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDoWhileLoop(ScriptParser.DoWhileLoopContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIteration_def(ScrippleParser.Iteration_defContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIteration_def(ScriptParser.Iteration_defContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitWhile_def(ScrippleParser.While_defContext ctx) { return visitChildren(ctx); }
+	@Override public T visitWhile_def(ScriptParser.While_defContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFor_def(ScrippleParser.For_defContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFor_def(ScriptParser.For_defContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIf_stat(ScrippleParser.If_statContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIf_stat(ScriptParser.If_statContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIf_def(ScrippleParser.If_defContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIf_def(ScriptParser.If_defContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLogicBinExpression(ScrippleParser.LogicBinExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLogicBinExpression(ScriptParser.LogicBinExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTernaryExpression(ScrippleParser.TernaryExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitTernaryExpression(ScriptParser.TernaryExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExplicitArrayExpression(ScrippleParser.ExplicitArrayExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExplicitArrayExpression(ScriptParser.ExplicitArrayExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMultBinExpression(ScrippleParser.MultBinExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMultBinExpression(ScriptParser.MultBinExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitImageBoundExpression(ScrippleParser.ImageBoundExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitImageBoundExpression(ScriptParser.ImageBoundExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitUnaryExpression(ScrippleParser.UnaryExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitUnaryExpression(ScriptParser.UnaryExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMapLookupExpression(ScrippleParser.MapLookupExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMapLookupExpression(ScriptParser.MapLookupExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPowerBinExpression(ScrippleParser.PowerBinExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPowerBinExpression(ScriptParser.PowerBinExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExplicitListExpression(ScrippleParser.ExplicitListExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExplicitListExpression(ScriptParser.ExplicitListExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitComparisonBinExpression(ScrippleParser.ComparisonBinExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitComparisonBinExpression(ScriptParser.ComparisonBinExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRGBColorExpression(ScrippleParser.RGBColorExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRGBColorExpression(ScriptParser.RGBColorExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitImageOfBoundsExpression(ScrippleParser.ImageOfBoundsExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitImageOfBoundsExpression(ScriptParser.ImageOfBoundsExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAssignableExpression(ScrippleParser.AssignableExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAssignableExpression(ScriptParser.AssignableExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExplicitSetExpression(ScrippleParser.ExplicitSetExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExplicitSetExpression(ScriptParser.ExplicitSetExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNewMapExpression(ScrippleParser.NewMapExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNewMapExpression(ScriptParser.NewMapExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRGBAColorExpression(ScrippleParser.RGBAColorExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitRGBAColorExpression(ScriptParser.RGBAColorExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNewSetExpression(ScrippleParser.NewSetExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNewSetExpression(ScriptParser.NewSetExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitContainsExpression(ScrippleParser.ContainsExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitContainsExpression(ScriptParser.ContainsExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLiteralExpression(ScrippleParser.LiteralExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLiteralExpression(ScriptParser.LiteralExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNewListExpression(ScrippleParser.NewListExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNewListExpression(ScriptParser.NewListExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMapKeysetExpression(ScrippleParser.MapKeysetExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMapKeysetExpression(ScriptParser.MapKeysetExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitTextureColorReplaceExpression(ScrippleParser.TextureColorReplaceExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitTextureColorReplaceExpression(ScriptParser.TextureColorReplaceExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNestedExpression(ScrippleParser.NestedExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNestedExpression(ScriptParser.NestedExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitColorAtPixelExpression(ScrippleParser.ColorAtPixelExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitColorAtPixelExpression(ScriptParser.ColorAtPixelExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitArithmeticBinExpression(ScrippleParser.ArithmeticBinExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitArithmeticBinExpression(ScriptParser.ArithmeticBinExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitColorChannelExpression(ScrippleParser.ColorChannelExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitColorChannelExpression(ScriptParser.ColorChannelExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNewArrayExpression(ScrippleParser.NewArrayExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitNewArrayExpression(ScriptParser.NewArrayExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitImageFromPathExpression(ScrippleParser.ImageFromPathExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitImageFromPathExpression(ScriptParser.ImageFromPathExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitStandardAssignment(ScrippleParser.StandardAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitStandardAssignment(ScriptParser.StandardAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIncrementAssignment(ScrippleParser.IncrementAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIncrementAssignment(ScriptParser.IncrementAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDecrementAssignment(ScrippleParser.DecrementAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDecrementAssignment(ScriptParser.DecrementAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAddAssignment(ScrippleParser.AddAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAddAssignment(ScriptParser.AddAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSubAssignment(ScrippleParser.SubAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSubAssignment(ScriptParser.SubAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMultAssignment(ScrippleParser.MultAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMultAssignment(ScriptParser.MultAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDivAssignmnet(ScrippleParser.DivAssignmnetContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDivAssignmnet(ScriptParser.DivAssignmnetContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitModAssignment(ScrippleParser.ModAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitModAssignment(ScriptParser.ModAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitAndAssignment(ScrippleParser.AndAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAndAssignment(ScriptParser.AndAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitOrAssignment(ScrippleParser.OrAssignmentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitOrAssignment(ScriptParser.OrAssignmentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitVar_init(ScrippleParser.Var_initContext ctx) { return visitChildren(ctx); }
+	@Override public T visitVar_init(ScriptParser.Var_initContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitImplicitVarDef(ScrippleParser.ImplicitVarDefContext ctx) { return visitChildren(ctx); }
+	@Override public T visitImplicitVarDef(ScriptParser.ImplicitVarDefContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitExplicitVarDef(ScrippleParser.ExplicitVarDefContext ctx) { return visitChildren(ctx); }
+	@Override public T visitExplicitVarDef(ScriptParser.ExplicitVarDefContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSimpleAssignable(ScrippleParser.SimpleAssignableContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSimpleAssignable(ScriptParser.SimpleAssignableContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitListAssignable(ScrippleParser.ListAssignableContext ctx) { return visitChildren(ctx); }
+	@Override public T visitListAssignable(ScriptParser.ListAssignableContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitArrayAssignable(ScrippleParser.ArrayAssignableContext ctx) { return visitChildren(ctx); }
+	@Override public T visitArrayAssignable(ScriptParser.ArrayAssignableContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIdent(ScrippleParser.IdentContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIdent(ScriptParser.IdentContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitStringLiteral(ScrippleParser.StringLiteralContext ctx) { return visitChildren(ctx); }
+	@Override public T visitStringLiteral(ScriptParser.StringLiteralContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitCharLiteral(ScrippleParser.CharLiteralContext ctx) { return visitChildren(ctx); }
+	@Override public T visitCharLiteral(ScriptParser.CharLiteralContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIntLiteral(ScrippleParser.IntLiteralContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIntLiteral(ScriptParser.IntLiteralContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFloatLiteral(ScrippleParser.FloatLiteralContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFloatLiteral(ScriptParser.FloatLiteralContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitBoolLiteral(ScrippleParser.BoolLiteralContext ctx) { return visitChildren(ctx); }
+	@Override public T visitBoolLiteral(ScriptParser.BoolLiteralContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitHexadecimal(ScrippleParser.HexadecimalContext ctx) { return visitChildren(ctx); }
+	@Override public T visitHexadecimal(ScriptParser.HexadecimalContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDecimal(ScrippleParser.DecimalContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDecimal(ScriptParser.DecimalContext ctx) { return visitChildren(ctx); }
 }

@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
@@ -48,16 +48,16 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
             final TypeNode keyType = mapType.getKeyType();
 
             if (!keyType.equals(elemType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.MAP_KEY_TYPE_MISMATCH,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.MAP_KEY_TYPE_MISMATCH,
                         element.getPosition(),
                         keyType.toString(), elemType.toString());
         } else if (ownerType instanceof CollectionTypeNode colType) {
             final TypeNode colElemType = colType.getElementType();
 
             if (!colElemType.equals(elemType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.ELEMENT_DOES_NOT_MATCH_COL,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.ELEMENT_DOES_NOT_MATCH_COL,
                         element.getPosition(),
                         colElemType.toString(), elemType.toString());
         }

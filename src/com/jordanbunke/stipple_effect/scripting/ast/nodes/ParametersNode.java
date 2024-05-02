@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.DeclarationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
@@ -25,8 +25,8 @@ public final class ParametersNode extends ASTNode {
             final Object... args
     ) {
         if (params.length != args.length) {
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARGS_PARAMS_MISMATCH,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARGS_PARAMS_MISMATCH,
                     getPosition(), String.valueOf(params.length),
                     String.valueOf(args.length));
             return;

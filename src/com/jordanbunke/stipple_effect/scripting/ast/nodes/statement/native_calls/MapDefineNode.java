@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -38,18 +38,18 @@ public final class MapDefineNode extends StatementNode {
                 valueType = value.getType(symbolTable);
 
         if (!(mapType instanceof MapTypeNode m))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.EXPECTED_FOR_CALL,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.EXPECTED_FOR_CALL,
                     map.getPosition(), "define()", "map - {:}",
                     mapType.toString());
         else if (!keyType.equals(m.getKeyType()))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.MAP_KEY_TYPE_MISMATCH,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.MAP_KEY_TYPE_MISMATCH,
                     key.getPosition(), m.getKeyType().toString(),
                     keyType.toString());
         else if (!valueType.equals(m.getValueType()))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.MAP_VALUE_TYPE_MISMATCH,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.MAP_VALUE_TYPE_MISMATCH,
                     value.getPosition(), m.getValueType().toString(),
                     valueType.toString());
     }

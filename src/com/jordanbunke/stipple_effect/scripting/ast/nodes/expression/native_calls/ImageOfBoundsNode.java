@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -35,12 +35,12 @@ public final class ImageOfBoundsNode extends ExpressionNode {
                 heightType = height.getType(symbolTable);
 
         if (!widthType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
                     width.getPosition(), "Width", widthType.toString());
         if (!heightType.equals(intType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.IMG_ARG_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
                     height.getPosition(), "Height", heightType.toString());
     }
 
@@ -52,12 +52,12 @@ public final class ImageOfBoundsNode extends ExpressionNode {
         if (w > 0 && h > 0)
             return new GameImage(w, h);
         else if (w <= 0)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.NON_POSITIVE_IMAGE_BOUND,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.NON_POSITIVE_IMAGE_BOUND,
                     width.getPosition(), "Width", String.valueOf(w));
         else
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.NON_POSITIVE_IMAGE_BOUND,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.NON_POSITIVE_IMAGE_BOUND,
                     height.getPosition(), "Height", String.valueOf(h));
 
         return null;

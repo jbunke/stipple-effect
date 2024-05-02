@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.sprite.TextureColorReplace;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -40,18 +40,18 @@ public final class TextureColorReplaceNode extends ExpressionNode {
                 replaceType = replacementColors.getType(symbolTable);
 
         if (!textureType.equals(imageType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARG_NOT_IMG,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARG_NOT_IMG,
                     texture.getPosition(), "Texture",
                     textureType.toString());
         if (!lookupType.equals(imageType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARG_NOT_IMG,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARG_NOT_IMG,
                     lookup.getPosition(), "Lookup",
                     lookupType.toString());
         if (!replaceType.equals(imageType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ARG_NOT_IMG,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ARG_NOT_IMG,
                     replacementColors.getPosition(), "Replacement color",
                     replaceType.toString());
     }

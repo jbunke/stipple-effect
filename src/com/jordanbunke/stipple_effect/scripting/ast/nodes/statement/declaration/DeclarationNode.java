@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.IdentifierNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
@@ -40,8 +40,8 @@ public sealed class DeclarationNode extends StatementNode
         type.semanticErrorCheck(symbolTable);
 
         if (symbolTable.hasVarAtLevel(getIdent()))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.VAR_ALREADY_DEFINED,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.VAR_ALREADY_DEFINED,
                     ident.getPosition(), getIdent());
         else
             symbolTable.put(getIdent(), new Variable(mutable, type));

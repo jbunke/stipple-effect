@@ -1,7 +1,7 @@
-parser grammar ScrippleParser;
+parser grammar ScriptParser;
 
 options {
-    tokenVocab=ScrippleLexer;
+    tokenVocab=ScriptLexer;
 }
 
 head_rule: FUNC signature LCURLY stat* RCURLY;

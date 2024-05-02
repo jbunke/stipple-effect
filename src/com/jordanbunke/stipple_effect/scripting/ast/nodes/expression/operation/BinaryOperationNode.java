@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleEquality;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptEquality;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -96,22 +96,22 @@ public final class BinaryOperationNode extends ExpressionNode {
                         new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
 
                 if (!o1Type.equals(boolType))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NOT_BOOL,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NOT_BOOL,
                             getPosition(), o1Type.toString());
                 if (!o1Type.equals(boolType))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NOT_BOOL,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NOT_BOOL,
                             getPosition(), o2Type.toString());
             }
             case ADD -> {
                 if (!(o1Type instanceof SimpleTypeNode))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM, // TODO - change error message
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NAN_SEM, // TODO - change error message
                             getPosition(), o1Type.toString());
                 if (!(o2Type instanceof SimpleTypeNode))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM, // TODO - "
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NAN_SEM, // TODO - "
                             getPosition(), o2Type.toString());
             }
             case SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
@@ -121,12 +121,12 @@ public final class BinaryOperationNode extends ExpressionNode {
                         new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
 
                 if (!acceptedTypes.contains(o1Type))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NAN_SEM,
                             getPosition(), o1Type.toString());
                 if (!acceptedTypes.contains(o2Type))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NAN_SEM,
                             getPosition(), o2Type.toString());
             }
         }
@@ -157,7 +157,7 @@ public final class BinaryOperationNode extends ExpressionNode {
             }
             case EQUAL, NOT_EQUAL -> {
                 final boolean equal =
-                        ScrippleEquality.equal(o1Value,  o2Value);
+                        ScriptEquality.equal(o1Value,  o2Value);
 
                 yield (operator == Operator.EQUAL) == equal;
             }
@@ -179,8 +179,8 @@ public final class BinaryOperationNode extends ExpressionNode {
                             d2 = n2.doubleValue();
 
                     if (d2 == 0d && operator.isDiv())
-                        ScrippleErrorListener.fireError(
-                                ScrippleErrorListener.Message.DIV_BY_ZERO,
+                        ScriptErrorLog.fireError(
+                                ScriptErrorLog.Message.DIV_BY_ZERO,
                                 o2.getPosition());
 
                     final Double result = switch (operator) {

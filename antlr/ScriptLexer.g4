@@ -1,4 +1,4 @@
-lexer grammar ScrippleLexer;
+lexer grammar ScriptLexer;
 
 // Ignore whitespace and line comment
 WS: [ \t\n]+ -> skip;

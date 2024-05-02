@@ -1,9 +1,9 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -35,7 +35,7 @@ public final class ReturnStatementNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final ScriptFunctionNode func = symbolTable.getFunc();
+        final HeadFuncNode func = symbolTable.getFunc();
 
         if (func != null) {
             final TypeNode
@@ -52,8 +52,8 @@ public final class ReturnStatementNode extends StatementNode {
             final boolean typeEquality = bothNull || bothEqual;
 
             if (!typeEquality)
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.RETURN_TYPE_MISMATCH,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.RETURN_TYPE_MISMATCH,
                         pos, String.valueOf(returnType),
                         String.valueOf(exprType));
         }

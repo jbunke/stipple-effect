@@ -6,12 +6,12 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNod
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public final class ScriptFunctionNode extends ASTNode {
+public final class HeadFuncNode extends ASTNode {
 
     private final MethodSignatureNode signature;
     private final StatementNode[] statements;
 
-    public ScriptFunctionNode(
+    public HeadFuncNode(
             final TextPosition position, final MethodSignatureNode signature,
             final StatementNode[] statements
     ) {

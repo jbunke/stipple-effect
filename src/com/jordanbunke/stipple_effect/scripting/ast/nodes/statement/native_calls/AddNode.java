@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
@@ -47,22 +47,22 @@ public final class AddNode extends StatementNode {
                         ? ct.getType() : null;
 
         if (elemType == null || typeOfCol == null)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.EXPECTED_FOR_CALL,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.EXPECTED_FOR_CALL,
                     collection.getPosition(), "add()",
                     "list - <>\" or \"set - {}", colType.toString());
         else if (!elemType.equals(addType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ELEMENT_DOES_NOT_MATCH_COL,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ELEMENT_DOES_NOT_MATCH_COL,
                     toAdd.getPosition(),
                     elemType.toString(), addType.toString());
         else if (typeOfCol == CollectionTypeNode.Type.ARRAY)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.ADD_TO_ARRAY,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.ADD_TO_ARRAY,
                     collection.getPosition());
         if (!iType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.INDEX_NOT_INT,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.INDEX_NOT_INT,
                     index.getPosition(), iType.toString());
     }
 
@@ -81,8 +81,8 @@ public final class AddNode extends StatementNode {
             try {
                 l.add(index, element);
             } catch (IllegalArgumentException e) {
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.INDEX_OUT_OF_BOUNDS,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.INDEX_OUT_OF_BOUNDS,
                         this.index.getPosition(), String.valueOf(index),
                         String.valueOf(c.size()), String.valueOf(true));
             }

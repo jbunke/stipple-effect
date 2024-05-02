@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public final class ScrippleEquality {
+public final class ScriptEquality {
     public static boolean equal(final Object a, final Object b) {
         if (a instanceof GameImage ai && b instanceof GameImage bi)
             return imagesEqual(ai, bi);

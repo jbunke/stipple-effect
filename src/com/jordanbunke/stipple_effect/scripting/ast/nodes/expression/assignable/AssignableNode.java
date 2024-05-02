@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
@@ -20,8 +20,8 @@ public abstract class AssignableNode extends ExpressionNode {
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         if (symbolTable.get(name) == null)
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.UNDEFINED_VAR,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.UNDEFINED_VAR,
                     getPosition(), name);
     }
 

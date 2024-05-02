@@ -14,7 +14,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.util.List;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
-public class ScrippleParser extends Parser {
+public class ScriptParser extends Parser {
 	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
@@ -129,19 +129,19 @@ public class ScrippleParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-	public ScrippleParser(TokenStream input) {
+	public ScriptParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Head_ruleContext extends ParserRuleContext {
-		public TerminalNode FUNC() { return getToken(ScrippleParser.FUNC, 0); }
+		public TerminalNode FUNC() { return getToken(ScriptParser.FUNC, 0); }
 		public SignatureContext signature() {
 			return getRuleContext(SignatureContext.class,0);
 		}
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
 		public List<StatContext> stat() {
 			return getRuleContexts(StatContext.class);
 		}
@@ -154,15 +154,15 @@ public class ScrippleParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_head_rule; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterHead_rule(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterHead_rule(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitHead_rule(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitHead_rule(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitHead_rule(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitHead_rule(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -217,22 +217,22 @@ public class ScrippleParser extends Parser {
 		public IdentContext ident() {
 			return getRuleContext(IdentContext.class,0);
 		}
-		public TerminalNode FINAL() { return getToken(ScrippleParser.FINAL, 0); }
+		public TerminalNode FINAL() { return getToken(ScriptParser.FINAL, 0); }
 		public DeclarationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_declaration; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDeclaration(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDeclaration(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDeclaration(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDeclaration(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDeclaration(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDeclaration(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -285,49 +285,49 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class VoidReturnSignatureContext extends SignatureContext {
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public Param_listContext param_list() {
 			return getRuleContext(Param_listContext.class,0);
 		}
 		public VoidReturnSignatureContext(SignatureContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterVoidReturnSignature(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterVoidReturnSignature(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitVoidReturnSignature(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitVoidReturnSignature(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitVoidReturnSignature(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitVoidReturnSignature(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class TypeReturnSignatureContext extends SignatureContext {
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode ARROW() { return getToken(ScrippleParser.ARROW, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode ARROW() { return getToken(ScriptParser.ARROW, 0); }
 		public TypeContext type() {
 			return getRuleContext(TypeContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public Param_listContext param_list() {
 			return getRuleContext(Param_listContext.class,0);
 		}
 		public TypeReturnSignatureContext(SignatureContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterTypeReturnSignature(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterTypeReturnSignature(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitTypeReturnSignature(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitTypeReturnSignature(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitTypeReturnSignature(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitTypeReturnSignature(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -405,9 +405,9 @@ public class ScrippleParser extends Parser {
 		public DeclarationContext declaration(int i) {
 			return getRuleContext(DeclarationContext.class,i);
 		}
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
 		public Param_listContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -415,15 +415,15 @@ public class ScrippleParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_param_list; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterParam_list(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterParam_list(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitParam_list(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitParam_list(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitParam_list(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitParam_list(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -483,56 +483,56 @@ public class ScrippleParser extends Parser {
 		public TypeContext type() {
 			return getRuleContext(TypeContext.class,0);
 		}
-		public TerminalNode LBRACKET() { return getToken(ScrippleParser.LBRACKET, 0); }
-		public TerminalNode RBRACKET() { return getToken(ScrippleParser.RBRACKET, 0); }
+		public TerminalNode LBRACKET() { return getToken(ScriptParser.LBRACKET, 0); }
+		public TerminalNode RBRACKET() { return getToken(ScriptParser.RBRACKET, 0); }
 		public ArrayTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterArrayType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterArrayType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitArrayType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitArrayType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitArrayType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitArrayType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class BoolTypeContext extends TypeContext {
-		public TerminalNode BOOL() { return getToken(ScrippleParser.BOOL, 0); }
+		public TerminalNode BOOL() { return getToken(ScriptParser.BOOL, 0); }
 		public BoolTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterBoolType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterBoolType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitBoolType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitBoolType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitBoolType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitBoolType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StringTypeContext extends TypeContext {
-		public TerminalNode STRING() { return getToken(ScrippleParser.STRING, 0); }
+		public TerminalNode STRING() { return getToken(ScriptParser.STRING, 0); }
 		public StringTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterStringType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterStringType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitStringType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitStringType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitStringType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitStringType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -541,20 +541,20 @@ public class ScrippleParser extends Parser {
 		public TypeContext type() {
 			return getRuleContext(TypeContext.class,0);
 		}
-		public TerminalNode LT() { return getToken(ScrippleParser.LT, 0); }
-		public TerminalNode GT() { return getToken(ScrippleParser.GT, 0); }
+		public TerminalNode LT() { return getToken(ScriptParser.LT, 0); }
+		public TerminalNode GT() { return getToken(ScriptParser.GT, 0); }
 		public SetTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterSetType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterSetType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitSetType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitSetType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitSetType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitSetType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -563,56 +563,56 @@ public class ScrippleParser extends Parser {
 		public TypeContext type() {
 			return getRuleContext(TypeContext.class,0);
 		}
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
 		public ListTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterListType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterListType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitListType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitListType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitListType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitListType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ColorTypeContext extends TypeContext {
-		public TerminalNode COLOR() { return getToken(ScrippleParser.COLOR, 0); }
+		public TerminalNode COLOR() { return getToken(ScriptParser.COLOR, 0); }
 		public ColorTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterColorType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterColorType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitColorType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitColorType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitColorType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitColorType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CharTypeContext extends TypeContext {
-		public TerminalNode CHAR() { return getToken(ScrippleParser.CHAR, 0); }
+		public TerminalNode CHAR() { return getToken(ScriptParser.CHAR, 0); }
 		public CharTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterCharType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterCharType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitCharType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitCharType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitCharType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitCharType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -620,9 +620,9 @@ public class ScrippleParser extends Parser {
 	public static class MapTypeContext extends TypeContext {
 		public TypeContext key;
 		public TypeContext val;
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
-		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
+		public TerminalNode COLON() { return getToken(ScriptParser.COLON, 0); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
 		public List<TypeContext> type() {
 			return getRuleContexts(TypeContext.class);
 		}
@@ -632,69 +632,69 @@ public class ScrippleParser extends Parser {
 		public MapTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterMapType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterMapType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitMapType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitMapType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitMapType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitMapType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class IntTypeContext extends TypeContext {
-		public TerminalNode INT() { return getToken(ScrippleParser.INT, 0); }
+		public TerminalNode INT() { return getToken(ScriptParser.INT, 0); }
 		public IntTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIntType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIntType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIntType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIntType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIntType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIntType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class FloatTypeContext extends TypeContext {
-		public TerminalNode FLOAT() { return getToken(ScrippleParser.FLOAT, 0); }
+		public TerminalNode FLOAT() { return getToken(ScriptParser.FLOAT, 0); }
 		public FloatTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterFloatType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterFloatType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitFloatType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitFloatType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitFloatType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitFloatType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ImageTypeContext extends TypeContext {
-		public TerminalNode IMAGE() { return getToken(ScrippleParser.IMAGE, 0); }
+		public TerminalNode IMAGE() { return getToken(ScriptParser.IMAGE, 0); }
 		public ImageTypeContext(TypeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterImageType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterImageType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitImageType(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitImageType(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitImageType(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitImageType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -889,22 +889,22 @@ public class ScrippleParser extends Parser {
 		public SingleStatBodyContext(BodyContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterSingleStatBody(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterSingleStatBody(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitSingleStatBody(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitSingleStatBody(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitSingleStatBody(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitSingleStatBody(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ComplexBodyContext extends BodyContext {
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
 		public List<StatContext> stat() {
 			return getRuleContexts(StatContext.class);
 		}
@@ -914,15 +914,15 @@ public class ScrippleParser extends Parser {
 		public ComplexBodyContext(BodyContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterComplexBody(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterComplexBody(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitComplexBody(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitComplexBody(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitComplexBody(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitComplexBody(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1000,15 +1000,15 @@ public class ScrippleParser extends Parser {
 		public IfStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIfStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIfStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIfStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIfStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIfStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIfStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1016,10 +1016,10 @@ public class ScrippleParser extends Parser {
 	public static class RemoveFromCollectionContext extends StatContext {
 		public ExprContext col;
 		public ExprContext arg;
-		public TerminalNode REMOVE() { return getToken(ScrippleParser.REMOVE, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode REMOVE() { return getToken(ScriptParser.REMOVE, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -1029,15 +1029,15 @@ public class ScrippleParser extends Parser {
 		public RemoveFromCollectionContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterRemoveFromCollection(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterRemoveFromCollection(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitRemoveFromCollection(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitRemoveFromCollection(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitRemoveFromCollection(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitRemoveFromCollection(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1046,11 +1046,11 @@ public class ScrippleParser extends Parser {
 		public ExprContext map;
 		public ExprContext key;
 		public ExprContext val;
-		public TerminalNode DEFINE() { return getToken(ScrippleParser.DEFINE, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode DEFINE() { return getToken(ScriptParser.DEFINE, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(ScriptParser.COMMA, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -1060,15 +1060,15 @@ public class ScrippleParser extends Parser {
 		public DefineMapEntryStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDefineMapEntryStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDefineMapEntryStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDefineMapEntryStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDefineMapEntryStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDefineMapEntryStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDefineMapEntryStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1077,19 +1077,19 @@ public class ScrippleParser extends Parser {
 		public AssignmentContext assignment() {
 			return getRuleContext(AssignmentContext.class,0);
 		}
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public AssignmentStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterAssignmentStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterAssignmentStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitAssignmentStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitAssignmentStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitAssignmentStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitAssignmentStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1099,14 +1099,14 @@ public class ScrippleParser extends Parser {
 		public ExprContext img;
 		public ExprContext x;
 		public ExprContext y;
-		public TerminalNode DRAW() { return getToken(ScrippleParser.DRAW, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode DRAW() { return getToken(ScriptParser.DRAW, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -1116,15 +1116,15 @@ public class ScrippleParser extends Parser {
 		public DrawOntoImageStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDrawOntoImageStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDrawOntoImageStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDrawOntoImageStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDrawOntoImageStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDrawOntoImageStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDrawOntoImageStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1136,15 +1136,15 @@ public class ScrippleParser extends Parser {
 		public ReturnStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterReturnStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterReturnStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitReturnStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitReturnStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitReturnStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitReturnStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1153,29 +1153,29 @@ public class ScrippleParser extends Parser {
 		public ExprContext col;
 		public ExprContext elem;
 		public ExprContext index;
-		public TerminalNode ADD() { return getToken(ScrippleParser.ADD, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode ADD() { return getToken(ScriptParser.ADD, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
+		public TerminalNode COMMA() { return getToken(ScriptParser.COMMA, 0); }
 		public AddToCollectionContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterAddToCollection(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterAddToCollection(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitAddToCollection(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitAddToCollection(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitAddToCollection(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitAddToCollection(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1187,15 +1187,15 @@ public class ScrippleParser extends Parser {
 		public LoopStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterLoopStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterLoopStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitLoopStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitLoopStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitLoopStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitLoopStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1204,19 +1204,19 @@ public class ScrippleParser extends Parser {
 		public Var_defContext var_def() {
 			return getRuleContext(Var_defContext.class,0);
 		}
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public VarDefStatementContext(StatContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterVarDefStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterVarDefStatement(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitVarDefStatement(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitVarDefStatement(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitVarDefStatement(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitVarDefStatement(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1384,8 +1384,8 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Return_statContext extends ParserRuleContext {
-		public TerminalNode RETURN() { return getToken(ScrippleParser.RETURN, 0); }
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode RETURN() { return getToken(ScriptParser.RETURN, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
@@ -1395,15 +1395,15 @@ public class ScrippleParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_return_stat; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterReturn_stat(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterReturn_stat(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitReturn_stat(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitReturn_stat(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitReturn_stat(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitReturn_stat(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1465,15 +1465,15 @@ public class ScrippleParser extends Parser {
 		public ForLoopContext(Loop_statContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterForLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterForLoop(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitForLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitForLoop(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitForLoop(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitForLoop(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1488,40 +1488,40 @@ public class ScrippleParser extends Parser {
 		public IteratorLoopContext(Loop_statContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIteratorLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIteratorLoop(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIteratorLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIteratorLoop(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIteratorLoop(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIteratorLoop(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DoWhileLoopContext extends Loop_statContext {
-		public TerminalNode DO() { return getToken(ScrippleParser.DO, 0); }
+		public TerminalNode DO() { return getToken(ScriptParser.DO, 0); }
 		public BodyContext body() {
 			return getRuleContext(BodyContext.class,0);
 		}
 		public While_defContext while_def() {
 			return getRuleContext(While_defContext.class,0);
 		}
-		public TerminalNode SEMICOLON() { return getToken(ScrippleParser.SEMICOLON, 0); }
+		public TerminalNode SEMICOLON() { return getToken(ScriptParser.SEMICOLON, 0); }
 		public DoWhileLoopContext(Loop_statContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDoWhileLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDoWhileLoop(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDoWhileLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDoWhileLoop(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDoWhileLoop(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDoWhileLoop(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1536,15 +1536,15 @@ public class ScrippleParser extends Parser {
 		public WhileLoopContext(Loop_statContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterWhileLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterWhileLoop(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitWhileLoop(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitWhileLoop(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitWhileLoop(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitWhileLoop(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1615,31 +1615,31 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Iteration_defContext extends ParserRuleContext {
-		public TerminalNode FOR() { return getToken(ScrippleParser.FOR, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode FOR() { return getToken(ScriptParser.FOR, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
 		public DeclarationContext declaration() {
 			return getRuleContext(DeclarationContext.class,0);
 		}
-		public TerminalNode IN() { return getToken(ScrippleParser.IN, 0); }
+		public TerminalNode IN() { return getToken(ScriptParser.IN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public Iteration_defContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_iteration_def; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIteration_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIteration_def(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIteration_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIteration_def(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIteration_def(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIteration_def(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1677,27 +1677,27 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class While_defContext extends ParserRuleContext {
-		public TerminalNode WHILE() { return getToken(ScrippleParser.WHILE, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode WHILE() { return getToken(ScriptParser.WHILE, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public While_defContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_while_def; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterWhile_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterWhile_def(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitWhile_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitWhile_def(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitWhile_def(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitWhile_def(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1731,14 +1731,14 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class For_defContext extends ParserRuleContext {
-		public TerminalNode FOR() { return getToken(ScrippleParser.FOR, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode FOR() { return getToken(ScriptParser.FOR, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
 		public Var_initContext var_init() {
 			return getRuleContext(Var_initContext.class,0);
 		}
-		public List<TerminalNode> SEMICOLON() { return getTokens(ScrippleParser.SEMICOLON); }
+		public List<TerminalNode> SEMICOLON() { return getTokens(ScriptParser.SEMICOLON); }
 		public TerminalNode SEMICOLON(int i) {
-			return getToken(ScrippleParser.SEMICOLON, i);
+			return getToken(ScriptParser.SEMICOLON, i);
 		}
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
@@ -1746,22 +1746,22 @@ public class ScrippleParser extends Parser {
 		public AssignmentContext assignment() {
 			return getRuleContext(AssignmentContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public For_defContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_for_def; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterFor_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterFor_def(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitFor_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitFor_def(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitFor_def(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitFor_def(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1810,9 +1810,9 @@ public class ScrippleParser extends Parser {
 		public If_defContext if_def(int i) {
 			return getRuleContext(If_defContext.class,i);
 		}
-		public List<TerminalNode> ELSE() { return getTokens(ScrippleParser.ELSE); }
+		public List<TerminalNode> ELSE() { return getTokens(ScriptParser.ELSE); }
 		public TerminalNode ELSE(int i) {
-			return getToken(ScrippleParser.ELSE, i);
+			return getToken(ScriptParser.ELSE, i);
 		}
 		public BodyContext body() {
 			return getRuleContext(BodyContext.class,0);
@@ -1823,15 +1823,15 @@ public class ScrippleParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_if_stat; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIf_stat(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIf_stat(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIf_stat(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIf_stat(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIf_stat(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIf_stat(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1891,9 +1891,9 @@ public class ScrippleParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class If_defContext extends ParserRuleContext {
 		public ExprContext cond;
-		public TerminalNode IF() { return getToken(ScrippleParser.IF, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode IF() { return getToken(ScriptParser.IF, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public BodyContext body() {
 			return getRuleContext(BodyContext.class,0);
 		}
@@ -1906,15 +1906,15 @@ public class ScrippleParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_if_def; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIf_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIf_def(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIf_def(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIf_def(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIf_def(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIf_def(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1971,20 +1971,20 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode OR() { return getToken(ScrippleParser.OR, 0); }
-		public TerminalNode AND() { return getToken(ScrippleParser.AND, 0); }
+		public TerminalNode OR() { return getToken(ScriptParser.OR, 0); }
+		public TerminalNode AND() { return getToken(ScriptParser.AND, 0); }
 		public LogicBinExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterLogicBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterLogicBinExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitLogicBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitLogicBinExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitLogicBinExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitLogicBinExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1993,8 +1993,8 @@ public class ScrippleParser extends Parser {
 		public ExprContext cond;
 		public ExprContext if_;
 		public ExprContext else_;
-		public TerminalNode QUESTION() { return getToken(ScrippleParser.QUESTION, 0); }
-		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
+		public TerminalNode QUESTION() { return getToken(ScriptParser.QUESTION, 0); }
+		public TerminalNode COLON() { return getToken(ScriptParser.COLON, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2004,44 +2004,44 @@ public class ScrippleParser extends Parser {
 		public TernaryExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterTernaryExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterTernaryExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitTernaryExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitTernaryExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitTernaryExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitTernaryExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExplicitArrayExpressionContext extends ExprContext {
-		public TerminalNode LBRACKET() { return getToken(ScrippleParser.LBRACKET, 0); }
+		public TerminalNode LBRACKET() { return getToken(ScriptParser.LBRACKET, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode RBRACKET() { return getToken(ScrippleParser.RBRACKET, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode RBRACKET() { return getToken(ScriptParser.RBRACKET, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
 		public ExplicitArrayExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterExplicitArrayExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterExplicitArrayExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitExplicitArrayExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitExplicitArrayExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitExplicitArrayExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitExplicitArrayExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2056,21 +2056,21 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode TIMES() { return getToken(ScrippleParser.TIMES, 0); }
-		public TerminalNode DIVIDE() { return getToken(ScrippleParser.DIVIDE, 0); }
-		public TerminalNode MOD() { return getToken(ScrippleParser.MOD, 0); }
+		public TerminalNode TIMES() { return getToken(ScriptParser.TIMES, 0); }
+		public TerminalNode DIVIDE() { return getToken(ScriptParser.DIVIDE, 0); }
+		public TerminalNode MOD() { return getToken(ScriptParser.MOD, 0); }
 		public MultBinExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterMultBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterMultBinExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitMultBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitMultBinExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitMultBinExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitMultBinExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2080,20 +2080,20 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode WIDTH() { return getToken(ScrippleParser.WIDTH, 0); }
-		public TerminalNode HEIGHT() { return getToken(ScrippleParser.HEIGHT, 0); }
+		public TerminalNode WIDTH() { return getToken(ScriptParser.WIDTH, 0); }
+		public TerminalNode HEIGHT() { return getToken(ScriptParser.HEIGHT, 0); }
 		public ImageBoundExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterImageBoundExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterImageBoundExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitImageBoundExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitImageBoundExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitImageBoundExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitImageBoundExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2103,21 +2103,21 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode MINUS() { return getToken(ScrippleParser.MINUS, 0); }
-		public TerminalNode NOT() { return getToken(ScrippleParser.NOT, 0); }
-		public TerminalNode SIZE() { return getToken(ScrippleParser.SIZE, 0); }
+		public TerminalNode MINUS() { return getToken(ScriptParser.MINUS, 0); }
+		public TerminalNode NOT() { return getToken(ScriptParser.NOT, 0); }
+		public TerminalNode SIZE() { return getToken(ScriptParser.SIZE, 0); }
 		public UnaryExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterUnaryExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterUnaryExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitUnaryExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitUnaryExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitUnaryExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitUnaryExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2125,9 +2125,9 @@ public class ScrippleParser extends Parser {
 	public static class MapLookupExpressionContext extends ExprContext {
 		public ExprContext map;
 		public ExprContext elem;
-		public TerminalNode LOOKUP() { return getToken(ScrippleParser.LOOKUP, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode LOOKUP() { return getToken(ScriptParser.LOOKUP, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2137,15 +2137,15 @@ public class ScrippleParser extends Parser {
 		public MapLookupExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterMapLookupExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterMapLookupExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitMapLookupExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitMapLookupExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitMapLookupExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitMapLookupExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2153,7 +2153,7 @@ public class ScrippleParser extends Parser {
 	public static class PowerBinExpressionContext extends ExprContext {
 		public ExprContext a;
 		public ExprContext b;
-		public TerminalNode RAISE() { return getToken(ScrippleParser.RAISE, 0); }
+		public TerminalNode RAISE() { return getToken(ScriptParser.RAISE, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2163,44 +2163,44 @@ public class ScrippleParser extends Parser {
 		public PowerBinExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterPowerBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterPowerBinExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitPowerBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitPowerBinExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitPowerBinExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitPowerBinExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExplicitListExpressionContext extends ExprContext {
-		public TerminalNode LT() { return getToken(ScrippleParser.LT, 0); }
+		public TerminalNode LT() { return getToken(ScriptParser.LT, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode GT() { return getToken(ScrippleParser.GT, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode GT() { return getToken(ScriptParser.GT, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
 		public ExplicitListExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterExplicitListExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterExplicitListExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitExplicitListExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitExplicitListExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitExplicitListExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitExplicitListExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2215,24 +2215,24 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode EQUAL() { return getToken(ScrippleParser.EQUAL, 0); }
-		public TerminalNode NOT_EQUAL() { return getToken(ScrippleParser.NOT_EQUAL, 0); }
-		public TerminalNode GT() { return getToken(ScrippleParser.GT, 0); }
-		public TerminalNode LT() { return getToken(ScrippleParser.LT, 0); }
-		public TerminalNode GEQ() { return getToken(ScrippleParser.GEQ, 0); }
-		public TerminalNode LEQ() { return getToken(ScrippleParser.LEQ, 0); }
+		public TerminalNode EQUAL() { return getToken(ScriptParser.EQUAL, 0); }
+		public TerminalNode NOT_EQUAL() { return getToken(ScriptParser.NOT_EQUAL, 0); }
+		public TerminalNode GT() { return getToken(ScriptParser.GT, 0); }
+		public TerminalNode LT() { return getToken(ScriptParser.LT, 0); }
+		public TerminalNode GEQ() { return getToken(ScriptParser.GEQ, 0); }
+		public TerminalNode LEQ() { return getToken(ScriptParser.LEQ, 0); }
 		public ComparisonBinExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterComparisonBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterComparisonBinExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitComparisonBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitComparisonBinExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitComparisonBinExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitComparisonBinExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2241,13 +2241,13 @@ public class ScrippleParser extends Parser {
 		public ExprContext r;
 		public ExprContext g;
 		public ExprContext b;
-		public TerminalNode RGB() { return getToken(ScrippleParser.RGB, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode RGB() { return getToken(ScriptParser.RGB, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2257,15 +2257,15 @@ public class ScrippleParser extends Parser {
 		public RGBColorExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterRGBColorExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterRGBColorExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitRGBColorExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitRGBColorExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitRGBColorExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitRGBColorExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2273,10 +2273,10 @@ public class ScrippleParser extends Parser {
 	public static class ImageOfBoundsExpressionContext extends ExprContext {
 		public ExprContext width;
 		public ExprContext height;
-		public TerminalNode BLANK() { return getToken(ScrippleParser.BLANK, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode BLANK() { return getToken(ScriptParser.BLANK, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(ScriptParser.COMMA, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2286,15 +2286,15 @@ public class ScrippleParser extends Parser {
 		public ImageOfBoundsExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterImageOfBoundsExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterImageOfBoundsExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitImageOfBoundsExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitImageOfBoundsExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitImageOfBoundsExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitImageOfBoundsExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2306,65 +2306,65 @@ public class ScrippleParser extends Parser {
 		public AssignableExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterAssignableExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterAssignableExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitAssignableExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitAssignableExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitAssignableExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitAssignableExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExplicitSetExpressionContext extends ExprContext {
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
 		public ExplicitSetExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterExplicitSetExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterExplicitSetExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitExplicitSetExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitExplicitSetExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitExplicitSetExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitExplicitSetExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NewMapExpressionContext extends ExprContext {
-		public TerminalNode NEW() { return getToken(ScrippleParser.NEW, 0); }
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
-		public TerminalNode COLON() { return getToken(ScrippleParser.COLON, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
+		public TerminalNode NEW() { return getToken(ScriptParser.NEW, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
+		public TerminalNode COLON() { return getToken(ScriptParser.COLON, 0); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
 		public NewMapExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterNewMapExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterNewMapExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitNewMapExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitNewMapExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitNewMapExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitNewMapExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2374,13 +2374,13 @@ public class ScrippleParser extends Parser {
 		public ExprContext g;
 		public ExprContext b;
 		public ExprContext a;
-		public TerminalNode RGBA() { return getToken(ScrippleParser.RGBA, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode RGBA() { return getToken(ScriptParser.RGBA, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2390,35 +2390,35 @@ public class ScrippleParser extends Parser {
 		public RGBAColorExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterRGBAColorExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterRGBAColorExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitRGBAColorExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitRGBAColorExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitRGBAColorExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitRGBAColorExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NewSetExpressionContext extends ExprContext {
-		public TerminalNode NEW() { return getToken(ScrippleParser.NEW, 0); }
-		public TerminalNode LCURLY() { return getToken(ScrippleParser.LCURLY, 0); }
-		public TerminalNode RCURLY() { return getToken(ScrippleParser.RCURLY, 0); }
+		public TerminalNode NEW() { return getToken(ScriptParser.NEW, 0); }
+		public TerminalNode LCURLY() { return getToken(ScriptParser.LCURLY, 0); }
+		public TerminalNode RCURLY() { return getToken(ScriptParser.RCURLY, 0); }
 		public NewSetExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterNewSetExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterNewSetExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitNewSetExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitNewSetExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitNewSetExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitNewSetExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2426,9 +2426,9 @@ public class ScrippleParser extends Parser {
 	public static class ContainsExpressionContext extends ExprContext {
 		public ExprContext col;
 		public ExprContext elem;
-		public TerminalNode HAS() { return getToken(ScrippleParser.HAS, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode HAS() { return getToken(ScriptParser.HAS, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2438,15 +2438,15 @@ public class ScrippleParser extends Parser {
 		public ContainsExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterContainsExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterContainsExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitContainsExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitContainsExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitContainsExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitContainsExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2458,59 +2458,59 @@ public class ScrippleParser extends Parser {
 		public LiteralExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterLiteralExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterLiteralExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitLiteralExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitLiteralExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitLiteralExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitLiteralExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NewListExpressionContext extends ExprContext {
-		public TerminalNode NEW() { return getToken(ScrippleParser.NEW, 0); }
-		public TerminalNode LT() { return getToken(ScrippleParser.LT, 0); }
-		public TerminalNode GT() { return getToken(ScrippleParser.GT, 0); }
+		public TerminalNode NEW() { return getToken(ScriptParser.NEW, 0); }
+		public TerminalNode LT() { return getToken(ScriptParser.LT, 0); }
+		public TerminalNode GT() { return getToken(ScriptParser.GT, 0); }
 		public NewListExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterNewListExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterNewListExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitNewListExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitNewListExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitNewListExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitNewListExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class MapKeysetExpressionContext extends ExprContext {
 		public ExprContext map;
-		public TerminalNode KEYS() { return getToken(ScrippleParser.KEYS, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode KEYS() { return getToken(ScriptParser.KEYS, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public MapKeysetExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterMapKeysetExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterMapKeysetExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitMapKeysetExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitMapKeysetExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitMapKeysetExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitMapKeysetExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2519,13 +2519,13 @@ public class ScrippleParser extends Parser {
 		public ExprContext texture;
 		public ExprContext lookup;
 		public ExprContext replace;
-		public TerminalNode TEX_COL_REPL() { return getToken(ScrippleParser.TEX_COL_REPL, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(ScrippleParser.COMMA); }
+		public TerminalNode TEX_COL_REPL() { return getToken(ScriptParser.TEX_COL_REPL, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
-			return getToken(ScrippleParser.COMMA, i);
+			return getToken(ScriptParser.COMMA, i);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2535,37 +2535,37 @@ public class ScrippleParser extends Parser {
 		public TextureColorReplaceExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterTextureColorReplaceExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterTextureColorReplaceExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitTextureColorReplaceExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitTextureColorReplaceExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitTextureColorReplaceExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitTextureColorReplaceExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NestedExpressionContext extends ExprContext {
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public NestedExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterNestedExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterNestedExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitNestedExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitNestedExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitNestedExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitNestedExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2574,10 +2574,10 @@ public class ScrippleParser extends Parser {
 		public ExprContext img;
 		public ExprContext x;
 		public ExprContext y;
-		public TerminalNode PIXEL() { return getToken(ScrippleParser.PIXEL, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
-		public TerminalNode COMMA() { return getToken(ScrippleParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode PIXEL() { return getToken(ScriptParser.PIXEL, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(ScriptParser.COMMA, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public List<ExprContext> expr() {
 			return getRuleContexts(ExprContext.class);
 		}
@@ -2587,15 +2587,15 @@ public class ScrippleParser extends Parser {
 		public ColorAtPixelExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterColorAtPixelExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterColorAtPixelExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitColorAtPixelExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitColorAtPixelExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitColorAtPixelExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitColorAtPixelExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2610,20 +2610,20 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode PLUS() { return getToken(ScrippleParser.PLUS, 0); }
-		public TerminalNode MINUS() { return getToken(ScrippleParser.MINUS, 0); }
+		public TerminalNode PLUS() { return getToken(ScriptParser.PLUS, 0); }
+		public TerminalNode MINUS() { return getToken(ScriptParser.MINUS, 0); }
 		public ArithmeticBinExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterArithmeticBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterArithmeticBinExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitArithmeticBinExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitArithmeticBinExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitArithmeticBinExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitArithmeticBinExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2634,71 +2634,71 @@ public class ScrippleParser extends Parser {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RED() { return getToken(ScrippleParser.RED, 0); }
-		public TerminalNode GREEN() { return getToken(ScrippleParser.GREEN, 0); }
-		public TerminalNode BLUE() { return getToken(ScrippleParser.BLUE, 0); }
-		public TerminalNode ALPHA() { return getToken(ScrippleParser.ALPHA, 0); }
+		public TerminalNode RED() { return getToken(ScriptParser.RED, 0); }
+		public TerminalNode GREEN() { return getToken(ScriptParser.GREEN, 0); }
+		public TerminalNode BLUE() { return getToken(ScriptParser.BLUE, 0); }
+		public TerminalNode ALPHA() { return getToken(ScriptParser.ALPHA, 0); }
 		public ColorChannelExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterColorChannelExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterColorChannelExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitColorChannelExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitColorChannelExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitColorChannelExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitColorChannelExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class NewArrayExpressionContext extends ExprContext {
-		public TerminalNode NEW() { return getToken(ScrippleParser.NEW, 0); }
+		public TerminalNode NEW() { return getToken(ScriptParser.NEW, 0); }
 		public TypeContext type() {
 			return getRuleContext(TypeContext.class,0);
 		}
-		public TerminalNode LBRACKET() { return getToken(ScrippleParser.LBRACKET, 0); }
+		public TerminalNode LBRACKET() { return getToken(ScriptParser.LBRACKET, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RBRACKET() { return getToken(ScrippleParser.RBRACKET, 0); }
+		public TerminalNode RBRACKET() { return getToken(ScriptParser.RBRACKET, 0); }
 		public NewArrayExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterNewArrayExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterNewArrayExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitNewArrayExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitNewArrayExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitNewArrayExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitNewArrayExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ImageFromPathExpressionContext extends ExprContext {
-		public TerminalNode FROM() { return getToken(ScrippleParser.FROM, 0); }
-		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
+		public TerminalNode FROM() { return getToken(ScriptParser.FROM, 0); }
+		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(ScrippleParser.RPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
 		public ImageFromPathExpressionContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterImageFromPathExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterImageFromPathExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitImageFromPathExpression(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitImageFromPathExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitImageFromPathExpression(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitImageFromPathExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3303,22 +3303,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode ASSIGN() { return getToken(ScrippleParser.ASSIGN, 0); }
+		public TerminalNode ASSIGN() { return getToken(ScriptParser.ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public StandardAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterStandardAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterStandardAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitStandardAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitStandardAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitStandardAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitStandardAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3327,22 +3327,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode ADD_ASSIGN() { return getToken(ScrippleParser.ADD_ASSIGN, 0); }
+		public TerminalNode ADD_ASSIGN() { return getToken(ScriptParser.ADD_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public AddAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterAddAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterAddAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitAddAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitAddAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitAddAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitAddAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3351,22 +3351,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode DIV_ASSIGN() { return getToken(ScrippleParser.DIV_ASSIGN, 0); }
+		public TerminalNode DIV_ASSIGN() { return getToken(ScriptParser.DIV_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public DivAssignmnetContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDivAssignmnet(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDivAssignmnet(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDivAssignmnet(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDivAssignmnet(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDivAssignmnet(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDivAssignmnet(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3375,19 +3375,19 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode INCREMENT() { return getToken(ScrippleParser.INCREMENT, 0); }
+		public TerminalNode INCREMENT() { return getToken(ScriptParser.INCREMENT, 0); }
 		public IncrementAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIncrementAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIncrementAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIncrementAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIncrementAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIncrementAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIncrementAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3396,22 +3396,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode OR_ASSIGN() { return getToken(ScrippleParser.OR_ASSIGN, 0); }
+		public TerminalNode OR_ASSIGN() { return getToken(ScriptParser.OR_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public OrAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterOrAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterOrAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitOrAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitOrAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitOrAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitOrAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3420,22 +3420,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode SUB_ASSIGN() { return getToken(ScrippleParser.SUB_ASSIGN, 0); }
+		public TerminalNode SUB_ASSIGN() { return getToken(ScriptParser.SUB_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public SubAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterSubAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterSubAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitSubAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitSubAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitSubAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitSubAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3444,22 +3444,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode AND_ASSIGN() { return getToken(ScrippleParser.AND_ASSIGN, 0); }
+		public TerminalNode AND_ASSIGN() { return getToken(ScriptParser.AND_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public AndAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterAndAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterAndAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitAndAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitAndAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitAndAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitAndAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3468,19 +3468,19 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode DECREMENT() { return getToken(ScrippleParser.DECREMENT, 0); }
+		public TerminalNode DECREMENT() { return getToken(ScriptParser.DECREMENT, 0); }
 		public DecrementAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDecrementAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDecrementAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDecrementAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDecrementAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDecrementAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDecrementAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3489,22 +3489,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode MUL_ASSIGN() { return getToken(ScrippleParser.MUL_ASSIGN, 0); }
+		public TerminalNode MUL_ASSIGN() { return getToken(ScriptParser.MUL_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public MultAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterMultAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterMultAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitMultAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitMultAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitMultAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitMultAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3513,22 +3513,22 @@ public class ScrippleParser extends Parser {
 		public AssignableContext assignable() {
 			return getRuleContext(AssignableContext.class,0);
 		}
-		public TerminalNode MOD_ASSIGN() { return getToken(ScrippleParser.MOD_ASSIGN, 0); }
+		public TerminalNode MOD_ASSIGN() { return getToken(ScriptParser.MOD_ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public ModAssignmentContext(AssignmentContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterModAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterModAssignment(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitModAssignment(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitModAssignment(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitModAssignment(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitModAssignment(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3674,7 +3674,7 @@ public class ScrippleParser extends Parser {
 		public DeclarationContext declaration() {
 			return getRuleContext(DeclarationContext.class,0);
 		}
-		public TerminalNode ASSIGN() { return getToken(ScrippleParser.ASSIGN, 0); }
+		public TerminalNode ASSIGN() { return getToken(ScriptParser.ASSIGN, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
@@ -3684,15 +3684,15 @@ public class ScrippleParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_var_init; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterVar_init(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterVar_init(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitVar_init(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitVar_init(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitVar_init(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitVar_init(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3742,15 +3742,15 @@ public class ScrippleParser extends Parser {
 		public ExplicitVarDefContext(Var_defContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterExplicitVarDef(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterExplicitVarDef(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitExplicitVarDef(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitExplicitVarDef(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitExplicitVarDef(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitExplicitVarDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3762,15 +3762,15 @@ public class ScrippleParser extends Parser {
 		public ImplicitVarDefContext(Var_defContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterImplicitVarDef(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterImplicitVarDef(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitImplicitVarDef(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitImplicitVarDef(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitImplicitVarDef(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitImplicitVarDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3828,23 +3828,23 @@ public class ScrippleParser extends Parser {
 		public IdentContext ident() {
 			return getRuleContext(IdentContext.class,0);
 		}
-		public TerminalNode LBRACKET() { return getToken(ScrippleParser.LBRACKET, 0); }
+		public TerminalNode LBRACKET() { return getToken(ScriptParser.LBRACKET, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RBRACKET() { return getToken(ScrippleParser.RBRACKET, 0); }
+		public TerminalNode RBRACKET() { return getToken(ScriptParser.RBRACKET, 0); }
 		public ArrayAssignableContext(AssignableContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterArrayAssignable(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterArrayAssignable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitArrayAssignable(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitArrayAssignable(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitArrayAssignable(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitArrayAssignable(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3856,15 +3856,15 @@ public class ScrippleParser extends Parser {
 		public SimpleAssignableContext(AssignableContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterSimpleAssignable(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterSimpleAssignable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitSimpleAssignable(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitSimpleAssignable(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitSimpleAssignable(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitSimpleAssignable(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3873,23 +3873,23 @@ public class ScrippleParser extends Parser {
 		public IdentContext ident() {
 			return getRuleContext(IdentContext.class,0);
 		}
-		public TerminalNode LT() { return getToken(ScrippleParser.LT, 0); }
+		public TerminalNode LT() { return getToken(ScriptParser.LT, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode GT() { return getToken(ScrippleParser.GT, 0); }
+		public TerminalNode GT() { return getToken(ScriptParser.GT, 0); }
 		public ListAssignableContext(AssignableContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterListAssignable(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterListAssignable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitListAssignable(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitListAssignable(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitListAssignable(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitListAssignable(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -3952,22 +3952,22 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class IdentContext extends ParserRuleContext {
-		public TerminalNode IDENTIFIER() { return getToken(ScrippleParser.IDENTIFIER, 0); }
+		public TerminalNode IDENTIFIER() { return getToken(ScriptParser.IDENTIFIER, 0); }
 		public IdentContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ident; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIdent(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIdent(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIdent(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIdent(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIdent(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIdent(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -4007,73 +4007,73 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StringLiteralContext extends LiteralContext {
-		public TerminalNode STRING_LIT() { return getToken(ScrippleParser.STRING_LIT, 0); }
+		public TerminalNode STRING_LIT() { return getToken(ScriptParser.STRING_LIT, 0); }
 		public StringLiteralContext(LiteralContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterStringLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterStringLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitStringLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitStringLiteral(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitStringLiteral(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitStringLiteral(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CharLiteralContext extends LiteralContext {
-		public TerminalNode CHAR_LIT() { return getToken(ScrippleParser.CHAR_LIT, 0); }
+		public TerminalNode CHAR_LIT() { return getToken(ScriptParser.CHAR_LIT, 0); }
 		public CharLiteralContext(LiteralContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterCharLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterCharLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitCharLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitCharLiteral(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitCharLiteral(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitCharLiteral(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class BoolLiteralContext extends LiteralContext {
-		public TerminalNode BOOL_LIT() { return getToken(ScrippleParser.BOOL_LIT, 0); }
+		public TerminalNode BOOL_LIT() { return getToken(ScriptParser.BOOL_LIT, 0); }
 		public BoolLiteralContext(LiteralContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterBoolLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterBoolLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitBoolLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitBoolLiteral(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitBoolLiteral(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitBoolLiteral(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class FloatLiteralContext extends LiteralContext {
-		public TerminalNode FLOAT_LIT() { return getToken(ScrippleParser.FLOAT_LIT, 0); }
+		public TerminalNode FLOAT_LIT() { return getToken(ScriptParser.FLOAT_LIT, 0); }
 		public FloatLiteralContext(LiteralContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterFloatLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterFloatLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitFloatLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitFloatLiteral(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitFloatLiteral(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitFloatLiteral(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -4085,15 +4085,15 @@ public class ScrippleParser extends Parser {
 		public IntLiteralContext(LiteralContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterIntLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterIntLiteral(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitIntLiteral(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitIntLiteral(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitIntLiteral(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitIntLiteral(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -4175,37 +4175,37 @@ public class ScrippleParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class HexadecimalContext extends Int_litContext {
-		public TerminalNode HEX_LIT() { return getToken(ScrippleParser.HEX_LIT, 0); }
+		public TerminalNode HEX_LIT() { return getToken(ScriptParser.HEX_LIT, 0); }
 		public HexadecimalContext(Int_litContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterHexadecimal(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterHexadecimal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitHexadecimal(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitHexadecimal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitHexadecimal(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitHexadecimal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DecimalContext extends Int_litContext {
-		public TerminalNode DEC_LIT() { return getToken(ScrippleParser.DEC_LIT, 0); }
+		public TerminalNode DEC_LIT() { return getToken(ScriptParser.DEC_LIT, 0); }
 		public DecimalContext(Int_litContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).enterDecimal(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).enterDecimal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScrippleParserListener ) ((ScrippleParserListener)listener).exitDecimal(this);
+			if ( listener instanceof ScriptParserListener) ((ScriptParserListener)listener).exitDecimal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ScrippleParserVisitor ) return ((ScrippleParserVisitor<? extends T>)visitor).visitDecimal(this);
+			if ( visitor instanceof ScriptParserVisitor) return ((ScriptParserVisitor<? extends T>)visitor).visitDecimal(this);
 			else return visitor.visitChildren(this);
 		}
 	}

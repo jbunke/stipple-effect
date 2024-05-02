@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.scripting;
 
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,18 +15,15 @@ public class ScriptTests {
 
     @Test
     public void reverse() {
-        final ScriptFunctionNode script = getScript("reverse");
-        Assert.assertNotNull(script);
+        final HeadFuncNode script = getScript("reverse");
 
         final String arg = "something";
-
         Assert.assertEquals("gnihtemos", Script.run(script, arg));
     }
 
     @Test
     public void imageBounds() {
-        final ScriptFunctionNode script = getScript("image_bounds");
-        Assert.assertNotNull(script);
+        final HeadFuncNode script = getScript("image_bounds");
 
         final int w = 12, h = 27;
 
@@ -38,14 +35,26 @@ public class ScriptTests {
 
         Arrays.stream(results).forEach(System.out::println);
 
-        Assert.assertEquals("Image is 15 pixels higher than it is wide", results[0]);
+        Assert.assertEquals(
+                "Image is 15 pixels higher than it is wide", results[0]);
     }
 
-    private ScriptFunctionNode getScript(final String filename) {
+    @Test
+    public void spiegelschrift() {
+        final HeadFuncNode script = getScript("spiegelschrift");
+
+        final Object result = Script.run(script, "E I SAW ELBA", "R");
+        System.out.println(result);
+    }
+
+    private HeadFuncNode getScript(final String filename) {
         final Path path = SCRIPTS_FOLDER.resolve(filename + SUFFIX);
         final String content = FileIO.readResource(
                 ResourceLoader.loadResource(path), "read script");
 
-        return Script.build(content);
+        final HeadFuncNode script = Script.build(content);
+        Assert.assertNotNull(script);
+
+        return script;
     }
 }

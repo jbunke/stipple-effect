@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.InitializationNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -46,8 +46,8 @@ public final class ForLoopNode extends StatementNode {
         final TypeNode condType = loopCondition.getType(symbolTable);
 
         if (!condType.equals(boolType))
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.COND_NOT_BOOL,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COND_NOT_BOOL,
                     loopCondition.getPosition(), condType.toString());
     }
 

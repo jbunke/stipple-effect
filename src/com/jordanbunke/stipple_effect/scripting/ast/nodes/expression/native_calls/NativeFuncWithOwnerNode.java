@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -37,8 +37,8 @@ public abstract sealed class NativeFuncWithOwnerNode extends ExpressionNode
                     : acceptedTypes.stream().map(TypeNode::toString)
                     .reduce((a, b) -> a + "\", \"" + b).orElse("");
 
-            ScrippleErrorListener.fireError(
-                    ScrippleErrorListener.Message.EXPECTED_FOR_CALL,
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.EXPECTED_FOR_CALL,
                     getPosition(), callName(), validTypes, type.toString());
         }
     }

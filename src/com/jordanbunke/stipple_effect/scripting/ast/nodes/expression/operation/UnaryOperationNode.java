@@ -6,7 +6,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNo
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
@@ -57,8 +57,8 @@ public final class UnaryOperationNode extends ExpressionNode {
             case NOT -> {
                 if (!operandType.equals(
                         new SimpleTypeNode(SimpleTypeNode.Type.BOOL)))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NOT_BOOL,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NOT_BOOL,
                             getPosition(), operandType.toString());
             }
             case NEGATE -> {
@@ -67,14 +67,14 @@ public final class UnaryOperationNode extends ExpressionNode {
                         new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
 
                 if (!acceptedTypes.contains(operandType))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NAN_SEM,
                             getPosition(), operandType.toString());
             }
             case SIZE -> {
                 if (!(operandType instanceof CollectionTypeNode))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NOT_A_COLLECTION_SEM,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NOT_A_COLLECTION_SEM,
                             getPosition(), operandType.toString());
             }
         }
@@ -90,8 +90,8 @@ public final class UnaryOperationNode extends ExpressionNode {
                 if (operandValue instanceof ScriptCollection c)
                     yield c.size();
 
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.OPERAND_NOT_A_COLLECTION_RT,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.OPERAND_NOT_A_COLLECTION_RT,
                         getPosition());
                 yield null;
             }
@@ -103,8 +103,8 @@ public final class UnaryOperationNode extends ExpressionNode {
                 else if (operandValue instanceof Float f)
                     yield -f;
                 else {
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_RT,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.OPERAND_NAN_RT,
                             getPosition());
                     yield null;
                 }

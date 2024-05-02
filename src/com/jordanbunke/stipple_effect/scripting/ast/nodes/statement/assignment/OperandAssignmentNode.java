@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment;
 
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScrippleErrorListener;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
@@ -71,43 +71,43 @@ public final class OperandAssignmentNode extends AssignmentNode {
 
         if (operator.isLogic()) {
             if (!assignableType.equals(boolType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.VAR_NOT_BOOL,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.VAR_NOT_BOOL,
                         getAssignable().getPosition(),
                         assignableType.toString());
             if (!operandType.equals(boolType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.VAR_NOT_BOOL,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.VAR_NOT_BOOL,
                         operand.getPosition(),
                         operandType.toString());
         } else if (operator == Operator.ADD) {
             if (numTypes.contains(assignableType)) {
                 if (!numTypes.contains(operandType))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_NUM,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.ASSIGN_EXPR_NOT_NUM,
                             operand.getPosition(),
                             operandType.toString());
             } else if (assignableType.equals(stringType)) {
                 if (!textTypes.contains(operandType))
-                    ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_STRING,
+                    ScriptErrorLog.fireError(
+                            ScriptErrorLog.Message.ASSIGN_EXPR_NOT_STRING,
                             operand.getPosition(),
                             operandType.toString());
             } else {
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.VAR_NOT_NUM,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.VAR_NOT_NUM,
                         getAssignable().getPosition(),
                         assignableType.toString());
             }
         } else {
             if (!numTypes.contains(assignableType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.VAR_NOT_NUM,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.VAR_NOT_NUM,
                         getAssignable().getPosition(),
                         assignableType.toString());
             if (!numTypes.contains(operandType))
-                ScrippleErrorListener.fireError(
-                        ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_NUM,
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.ASSIGN_EXPR_NOT_NUM,
                         operand.getPosition(),
                         operandType.toString());
         }
@@ -145,8 +145,8 @@ public final class OperandAssignmentNode extends AssignmentNode {
                                     op = on.doubleValue();
 
                             if (op == 0d && operator.isDiv())
-                                ScrippleErrorListener.fireError(
-                                        ScrippleErrorListener.Message.DIV_BY_ZERO,
+                                ScriptErrorLog.fireError(
+                                        ScriptErrorLog.Message.DIV_BY_ZERO,
                                         operand.getPosition());
 
                             final Double res = switch (operator) {
