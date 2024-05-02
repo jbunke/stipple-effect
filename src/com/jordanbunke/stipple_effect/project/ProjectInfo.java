@@ -29,7 +29,8 @@ public class ProjectInfo {
     private String name, indexPrefix, indexSuffix;
     private SaveType saveType;
 
-    private boolean editedSinceLastSave, saveRangeOfFrames;
+    private boolean editedSinceLastSave, editedSinceLastPreview,
+            saveRangeOfFrames;
 
     private int framesPerDim, fps, scaleUp, countFrom, lowerBound, upperBound;
 
@@ -74,6 +75,7 @@ public class ProjectInfo {
         }
 
         editedSinceLastSave = false;
+        editedSinceLastPreview = true;
         saveType = filepath != null && filepath.getFileName()
                 .toString().endsWith(SaveType.NATIVE.getFileSuffix())
                 ? SaveType.NATIVE : SaveType.PNG_STITCHED;
@@ -206,6 +208,11 @@ public class ProjectInfo {
 
     public void markAsEdited() {
         editedSinceLastSave = true;
+        editedSinceLastPreview = true;
+    }
+
+    public void logPreview() {
+        editedSinceLastPreview = false;
     }
 
     private Path buildFilepath(final String nameSuffix) {
@@ -244,6 +251,10 @@ public class ProjectInfo {
 
     public boolean hasUnsavedChanges() {
         return editedSinceLastSave;
+    }
+
+    public boolean hasChangesSincePreview() {
+        return editedSinceLastPreview;
     }
 
     public Path getFolder() {

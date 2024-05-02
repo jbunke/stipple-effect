@@ -34,6 +34,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.PreviewHou
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class PreviewWindow implements ProgramContext {
     public static final int BORDER = 1,
@@ -52,7 +53,7 @@ public class PreviewWindow implements ProgramContext {
     private int canvasW, canvasH, frameIndex, frameCount;
     private float zoom;
     private Coord2D mousePos;
-    private GameImage project;
+    private GameImage[] project;
 
     private PreviewImage previewImage;
     private PreviewHousingBox housingBox;
@@ -74,6 +75,7 @@ public class PreviewWindow implements ProgramContext {
 
         frameIndex = 0;
         frameCount = this.context.getState().getFrameCount();
+        project = new GameImage[frameCount];
         updateProject();
 
         menu = makeMenu();
@@ -267,7 +269,12 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private void updateProject() {
-        project = context.getState().draw(false, false, frameIndex);
+        if (context.projectInfo.hasChangesSincePreview()) {
+            project = IntStream.range(0, frameCount)
+                    .mapToObj(i -> context.getState().draw(false, false, i))
+                    .toArray(GameImage[]::new);
+            context.projectInfo.logPreview();
+        }
     }
 
     private boolean checkIfProjectHasBeenClosed() {
@@ -345,7 +352,7 @@ public class PreviewWindow implements ProgramContext {
 
         canvasContents.drawRectangle(SEColors.black(), 2f, BORDER, BORDER, w, h);
         canvasContents.draw(context.getCheckerboard(), BORDER, BORDER, w, h);
-        canvasContents.draw(project, BORDER, BORDER, w, h);
+        canvasContents.draw(project[frameIndex], BORDER, BORDER, w, h);
 
         previewImage.refresh(canvasContents.submit());
     }
