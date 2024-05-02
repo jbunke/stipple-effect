@@ -65,6 +65,10 @@ public final class ForLoopNode extends StatementNode {
 
         while (evaluateCondition(innerTable)) {
             status = loopBody.execute(innerTable);
+
+            if (!status.cont)
+                return status;
+
             incrementation.execute(innerTable);
         }
 

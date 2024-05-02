@@ -6,28 +6,35 @@ import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
-public final class DoWhileLoopNode extends StatementNode {
-    // TODO - visitor link and implementation
+public final class DoWhileLoopNode extends WhileLoopNode {
     public DoWhileLoopNode(
             final TextPosition position,
-            final StatementNode loopBody,
-            final ExpressionNode loopCondition
+            final ExpressionNode loopCondition,
+            final StatementNode loopBody
     ) {
-        super(position);
-    }
-
-    @Override
-    public void semanticErrorCheck(final SymbolTable symbolTable) {
-
+        super(position, loopCondition, loopBody);
     }
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        return null;
+        FuncControlFlow status = getLoopBody().execute(symbolTable);
+
+        if (!status.cont)
+            return status;
+
+        while (evaluateCondition(symbolTable)) {
+            status = getLoopBody().execute(symbolTable);
+
+            if (!status.cont)
+                return status;
+        }
+
+        return status;
     }
 
     @Override
     public String toString() {
-        return "";
+        return "do\n" + getLoopBody() + "\nwhile (" +
+                getLoopCondition() + ");";
     }
 }

@@ -1,8 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting;
 
-import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ScriptFunctionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -14,27 +12,21 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 public final class Script {
-    public static void main(final String[] args) {
-        // TODO - temp
-        final Path path = Path.of("data", "script.sc");
-        final String tempScript = FileIO.readFile(path);
-
-        final Object res = run(tempScript,
-                ScriptArray.of("e", "l", "g", "o", "o", "g"));
-        System.out.println(res);
-    }
-
     public static boolean validatePreviewScript(
             final String content, final SEContext context
     ) {
         final ScriptFunctionNode script = build(content);
 
+        return validatePreviewScript(script, context);
+    }
+
+    public static boolean validatePreviewScript(
+            final ScriptFunctionNode script, final SEContext context
+    ) {
         if (script == null)
             return false;
 
@@ -142,6 +134,8 @@ public final class Script {
 
         for (String error : errors)
             System.out.println(error);
+
+
         // TODO
     }
 }

@@ -13,4 +13,8 @@ public abstract class TypeNode extends ASTNode {
     public final void semanticErrorCheck(final SymbolTable symbolTable) {}
 
     public abstract Class<?> valueClass();
+
+    public boolean isNum() {
+        return false;
+    }
 }

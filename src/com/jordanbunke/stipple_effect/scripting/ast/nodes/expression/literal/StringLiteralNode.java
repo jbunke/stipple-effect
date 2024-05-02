@@ -29,6 +29,6 @@ public final class StringLiteralNode extends LiteralNode {
 
     @Override
     public String toString() {
-        return value;
+        return "\"" + value + "\"";
     }
 }

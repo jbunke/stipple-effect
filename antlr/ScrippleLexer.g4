@@ -67,7 +67,6 @@ STRING: 'string';
 RETURN: 'return';
 DO: 'do';
 WHILE: 'while';
-FOREACH: 'foreach';
 FOR: 'for';
 IF: 'if';
 ELSE: 'else';

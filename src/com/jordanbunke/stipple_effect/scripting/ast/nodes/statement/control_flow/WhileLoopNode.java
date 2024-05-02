@@ -9,7 +9,8 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
-public final class WhileLoopNode extends StatementNode {
+public sealed class WhileLoopNode extends StatementNode
+        permits DoWhileLoopNode {
     private final ExpressionNode loopCondition;
     private final StatementNode loopBody;
 
@@ -39,7 +40,7 @@ public final class WhileLoopNode extends StatementNode {
                     loopCondition.getPosition(), condType.toString());
     }
 
-    private boolean evaluateCondition(final SymbolTable symbolTable) {
+    boolean evaluateCondition(final SymbolTable symbolTable) {
         return (boolean) loopCondition.evaluate(symbolTable);
     }
 
@@ -47,8 +48,12 @@ public final class WhileLoopNode extends StatementNode {
     public FuncControlFlow execute(final SymbolTable symbolTable) {
         FuncControlFlow status = FuncControlFlow.cont();
 
-        while (evaluateCondition(symbolTable))
+        while (evaluateCondition(symbolTable)) {
             status = loopBody.execute(symbolTable);
+
+            if (!status.cont)
+                return status;
+        }
 
         return status;
     }
@@ -56,5 +61,13 @@ public final class WhileLoopNode extends StatementNode {
     @Override
     public String toString() {
         return "while (" + loopCondition + ")\n" + loopBody;
+    }
+
+    public ExpressionNode getLoopCondition() {
+        return loopCondition;
+    }
+
+    public StatementNode getLoopBody() {
+        return loopBody;
     }
 }

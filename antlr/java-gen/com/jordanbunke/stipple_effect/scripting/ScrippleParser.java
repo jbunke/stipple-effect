@@ -28,12 +28,12 @@ public class ScrippleParser extends Parser {
 		OR_ASSIGN=25, ARROW=26, EQUAL=27, NOT_EQUAL=28, GT=29, LT=30, GEQ=31, 
 		LEQ=32, RAISE=33, PLUS=34, MINUS=35, TIMES=36, DIVIDE=37, MOD=38, AND=39, 
 		OR=40, NOT=41, SIZE=42, IN=43, FUNC=44, FINAL=45, BOOL=46, FLOAT=47, INT=48, 
-		CHAR=49, COLOR=50, IMAGE=51, STRING=52, RETURN=53, DO=54, WHILE=55, FOREACH=56, 
-		FOR=57, IF=58, ELSE=59, TRUE=60, FALSE=61, NEW=62, FROM=63, RGBA=64, RGB=65, 
-		BLANK=66, TEX_COL_REPL=67, RED=68, GREEN=69, BLUE=70, ALPHA=71, WIDTH=72, 
-		HEIGHT=73, HAS=74, LOOKUP=75, KEYS=76, PIXEL=77, ADD=78, REMOVE=79, DEFINE=80, 
-		DRAW=81, BOOL_LIT=82, FLOAT_LIT=83, DEC_LIT=84, HEX_LIT=85, CHAR_QUOTE=86, 
-		STR_QUOTE=87, STRING_LIT=88, CHAR_LIT=89, ESC_CHAR=90, IDENTIFIER=91;
+		CHAR=49, COLOR=50, IMAGE=51, STRING=52, RETURN=53, DO=54, WHILE=55, FOR=56, 
+		IF=57, ELSE=58, TRUE=59, FALSE=60, NEW=61, FROM=62, RGBA=63, RGB=64, BLANK=65, 
+		TEX_COL_REPL=66, RED=67, GREEN=68, BLUE=69, ALPHA=70, WIDTH=71, HEIGHT=72, 
+		HAS=73, LOOKUP=74, KEYS=75, PIXEL=76, ADD=77, REMOVE=78, DEFINE=79, DRAW=80, 
+		BOOL_LIT=81, FLOAT_LIT=82, DEC_LIT=83, HEX_LIT=84, CHAR_QUOTE=85, STR_QUOTE=86, 
+		STRING_LIT=87, CHAR_LIT=88, ESC_CHAR=89, IDENTIFIER=90;
 	public static final int
 		RULE_head_rule = 0, RULE_declaration = 1, RULE_signature = 2, RULE_param_list = 3, 
 		RULE_type = 4, RULE_body = 5, RULE_stat = 6, RULE_return_stat = 7, RULE_loop_stat = 8, 
@@ -58,11 +58,10 @@ public class ScrippleParser extends Parser {
 			"'<'", "'>='", "'<='", "'^'", "'+'", "'-'", "'*'", "'/'", "'%'", "'&&'", 
 			"'||'", "'!'", "'#'", "'in'", "'func'", "'final'", "'bool'", "'float'", 
 			"'int'", "'char'", "'color'", "'image'", "'string'", "'return'", "'do'", 
-			"'while'", "'foreach'", "'for'", "'if'", "'else'", "'true'", "'false'", 
-			"'new'", "'from'", "'rgba'", "'rgb'", "'blank'", "'tex_col_repl'", null, 
-			null, null, null, null, null, "'.has'", "'.lookup'", "'.keys'", "'.pixel'", 
-			"'.add'", "'.remove'", "'.define'", "'.draw'", null, null, null, null, 
-			"'''", "'\"'"
+			"'while'", "'for'", "'if'", "'else'", "'true'", "'false'", "'new'", "'from'", 
+			"'rgba'", "'rgb'", "'blank'", "'tex_col_repl'", null, null, null, null, 
+			null, null, "'.has'", "'.lookup'", "'.keys'", "'.pixel'", "'.add'", "'.remove'", 
+			"'.define'", "'.draw'", null, null, null, null, "'''", "'\"'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -75,10 +74,10 @@ public class ScrippleParser extends Parser {
 			"OR_ASSIGN", "ARROW", "EQUAL", "NOT_EQUAL", "GT", "LT", "GEQ", "LEQ", 
 			"RAISE", "PLUS", "MINUS", "TIMES", "DIVIDE", "MOD", "AND", "OR", "NOT", 
 			"SIZE", "IN", "FUNC", "FINAL", "BOOL", "FLOAT", "INT", "CHAR", "COLOR", 
-			"IMAGE", "STRING", "RETURN", "DO", "WHILE", "FOREACH", "FOR", "IF", "ELSE", 
-			"TRUE", "FALSE", "NEW", "FROM", "RGBA", "RGB", "BLANK", "TEX_COL_REPL", 
-			"RED", "GREEN", "BLUE", "ALPHA", "WIDTH", "HEIGHT", "HAS", "LOOKUP", 
-			"KEYS", "PIXEL", "ADD", "REMOVE", "DEFINE", "DRAW", "BOOL_LIT", "FLOAT_LIT", 
+			"IMAGE", "STRING", "RETURN", "DO", "WHILE", "FOR", "IF", "ELSE", "TRUE", 
+			"FALSE", "NEW", "FROM", "RGBA", "RGB", "BLANK", "TEX_COL_REPL", "RED", 
+			"GREEN", "BLUE", "ALPHA", "WIDTH", "HEIGHT", "HAS", "LOOKUP", "KEYS", 
+			"PIXEL", "ADD", "REMOVE", "DEFINE", "DRAW", "BOOL_LIT", "FLOAT_LIT", 
 			"DEC_LIT", "HEX_LIT", "CHAR_QUOTE", "STR_QUOTE", "STRING_LIT", "CHAR_LIT", 
 			"ESC_CHAR", "IDENTIFIER"
 		};
@@ -183,7 +182,7 @@ public class ScrippleParser extends Parser {
 			setState(48);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -4035253817992806064L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 188481551L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -2017641184930823856L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 94240775L) != 0)) {
 				{
 				{
 				setState(45);
@@ -952,7 +951,7 @@ public class ScrippleParser extends Parser {
 				setState(117);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -4035253817992806064L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 188481551L) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & -2017641184930823856L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 94240775L) != 0)) {
 					{
 					{
 					setState(114);
@@ -1420,7 +1419,7 @@ public class ScrippleParser extends Parser {
 			setState(174);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -4611679385924140720L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 188481551L) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & -2305836376710446768L) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 94240775L) != 0)) {
 				{
 				setState(173);
 				expr(0);
@@ -1555,8 +1554,8 @@ public class ScrippleParser extends Parser {
 		try {
 			setState(192);
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case WHILE:
+			switch ( getInterpreter().adaptivePredict(_input,14,_ctx) ) {
+			case 1:
 				_localctx = new WhileLoopContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
@@ -1566,7 +1565,7 @@ public class ScrippleParser extends Parser {
 				body();
 				}
 				break;
-			case FOREACH:
+			case 2:
 				_localctx = new IteratorLoopContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
@@ -1576,7 +1575,7 @@ public class ScrippleParser extends Parser {
 				body();
 				}
 				break;
-			case FOR:
+			case 3:
 				_localctx = new ForLoopContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
@@ -1586,7 +1585,7 @@ public class ScrippleParser extends Parser {
 				body();
 				}
 				break;
-			case DO:
+			case 4:
 				_localctx = new DoWhileLoopContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
@@ -1600,8 +1599,6 @@ public class ScrippleParser extends Parser {
 				match(SEMICOLON);
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1617,7 +1614,7 @@ public class ScrippleParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class Iteration_defContext extends ParserRuleContext {
-		public TerminalNode FOREACH() { return getToken(ScrippleParser.FOREACH, 0); }
+		public TerminalNode FOR() { return getToken(ScrippleParser.FOR, 0); }
 		public TerminalNode LPAREN() { return getToken(ScrippleParser.LPAREN, 0); }
 		public DeclarationContext declaration() {
 			return getRuleContext(DeclarationContext.class,0);
@@ -1653,7 +1650,7 @@ public class ScrippleParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(194);
-			match(FOREACH);
+			match(FOR);
 			setState(195);
 			match(LPAREN);
 			setState(196);
@@ -2698,10 +2695,117 @@ public class ScrippleParser extends Parser {
 				break;
 			case 2:
 				{
-				_localctx = new UnaryExpressionContext(_localctx);
+				_localctx = new ImageFromPathExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(236);
+				match(FROM);
+				setState(237);
+				match(LPAREN);
+				setState(238);
+				expr(0);
+				setState(239);
+				match(RPAREN);
+				}
+				break;
+			case 3:
+				{
+				_localctx = new ImageOfBoundsExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(241);
+				match(BLANK);
+				setState(242);
+				match(LPAREN);
+				setState(243);
+				((ImageOfBoundsExpressionContext)_localctx).width = expr(0);
+				setState(244);
+				match(COMMA);
+				setState(245);
+				((ImageOfBoundsExpressionContext)_localctx).height = expr(0);
+				setState(246);
+				match(RPAREN);
+				}
+				break;
+			case 4:
+				{
+				_localctx = new TextureColorReplaceExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(248);
+				match(TEX_COL_REPL);
+				setState(249);
+				match(LPAREN);
+				setState(250);
+				((TextureColorReplaceExpressionContext)_localctx).texture = expr(0);
+				setState(251);
+				match(COMMA);
+				setState(252);
+				((TextureColorReplaceExpressionContext)_localctx).lookup = expr(0);
+				setState(253);
+				match(COMMA);
+				setState(254);
+				((TextureColorReplaceExpressionContext)_localctx).replace = expr(0);
+				setState(255);
+				match(RPAREN);
+				}
+				break;
+			case 5:
+				{
+				_localctx = new RGBColorExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(257);
+				match(RGB);
+				setState(258);
+				match(LPAREN);
+				setState(259);
+				((RGBColorExpressionContext)_localctx).r = expr(0);
+				setState(260);
+				match(COMMA);
+				setState(261);
+				((RGBColorExpressionContext)_localctx).g = expr(0);
+				setState(262);
+				match(COMMA);
+				setState(263);
+				((RGBColorExpressionContext)_localctx).b = expr(0);
+				setState(264);
+				match(RPAREN);
+				}
+				break;
+			case 6:
+				{
+				_localctx = new RGBAColorExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(266);
+				match(RGBA);
+				setState(267);
+				match(LPAREN);
+				setState(268);
+				((RGBAColorExpressionContext)_localctx).r = expr(0);
+				setState(269);
+				match(COMMA);
+				setState(270);
+				((RGBAColorExpressionContext)_localctx).g = expr(0);
+				setState(271);
+				match(COMMA);
+				setState(272);
+				((RGBAColorExpressionContext)_localctx).b = expr(0);
+				setState(273);
+				match(COMMA);
+				setState(274);
+				((RGBAColorExpressionContext)_localctx).a = expr(0);
+				setState(275);
+				match(RPAREN);
+				}
+				break;
+			case 7:
+				{
+				_localctx = new UnaryExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(277);
 				((UnaryExpressionContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 6631429505024L) != 0)) ) {
@@ -2712,115 +2816,8 @@ public class ScrippleParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(237);
-				expr(27);
-				}
-				break;
-			case 3:
-				{
-				_localctx = new ImageFromPathExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(238);
-				match(FROM);
-				setState(239);
-				match(LPAREN);
-				setState(240);
-				expr(0);
-				setState(241);
-				match(RPAREN);
-				}
-				break;
-			case 4:
-				{
-				_localctx = new ImageOfBoundsExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(243);
-				match(BLANK);
-				setState(244);
-				match(LPAREN);
-				setState(245);
-				((ImageOfBoundsExpressionContext)_localctx).width = expr(0);
-				setState(246);
-				match(COMMA);
-				setState(247);
-				((ImageOfBoundsExpressionContext)_localctx).height = expr(0);
-				setState(248);
-				match(RPAREN);
-				}
-				break;
-			case 5:
-				{
-				_localctx = new TextureColorReplaceExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(250);
-				match(TEX_COL_REPL);
-				setState(251);
-				match(LPAREN);
-				setState(252);
-				((TextureColorReplaceExpressionContext)_localctx).texture = expr(0);
-				setState(253);
-				match(COMMA);
-				setState(254);
-				((TextureColorReplaceExpressionContext)_localctx).lookup = expr(0);
-				setState(255);
-				match(COMMA);
-				setState(256);
-				((TextureColorReplaceExpressionContext)_localctx).replace = expr(0);
-				setState(257);
-				match(RPAREN);
-				}
-				break;
-			case 6:
-				{
-				_localctx = new RGBColorExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(259);
-				match(RGB);
-				setState(260);
-				match(LPAREN);
-				setState(261);
-				((RGBColorExpressionContext)_localctx).r = expr(0);
-				setState(262);
-				match(COMMA);
-				setState(263);
-				((RGBColorExpressionContext)_localctx).g = expr(0);
-				setState(264);
-				match(COMMA);
-				setState(265);
-				((RGBColorExpressionContext)_localctx).b = expr(0);
-				setState(266);
-				match(RPAREN);
-				}
-				break;
-			case 7:
-				{
-				_localctx = new RGBAColorExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(268);
-				match(RGBA);
-				setState(269);
-				match(LPAREN);
-				setState(270);
-				((RGBAColorExpressionContext)_localctx).r = expr(0);
-				setState(271);
-				match(COMMA);
-				setState(272);
-				((RGBAColorExpressionContext)_localctx).g = expr(0);
-				setState(273);
-				match(COMMA);
-				setState(274);
-				((RGBAColorExpressionContext)_localctx).b = expr(0);
-				setState(275);
-				match(COMMA);
-				setState(276);
-				((RGBAColorExpressionContext)_localctx).a = expr(0);
-				setState(277);
-				match(RPAREN);
+				setState(278);
+				expr(16);
 				}
 				break;
 			case 8:
@@ -3005,7 +3002,7 @@ public class ScrippleParser extends Parser {
 						((ArithmeticBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(332);
-						if (!(precpred(_ctx, 26))) throw new FailedPredicateException(this, "precpred(_ctx, 26)");
+						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
 						setState(333);
 						((ArithmeticBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -3018,7 +3015,7 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(334);
-						((ArithmeticBinExpressionContext)_localctx).b = expr(27);
+						((ArithmeticBinExpressionContext)_localctx).b = expr(16);
 						}
 						break;
 					case 2:
@@ -3027,7 +3024,7 @@ public class ScrippleParser extends Parser {
 						((MultBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(335);
-						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
+						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
 						setState(336);
 						((MultBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -3040,7 +3037,7 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(337);
-						((MultBinExpressionContext)_localctx).b = expr(26);
+						((MultBinExpressionContext)_localctx).b = expr(15);
 						}
 						break;
 					case 3:
@@ -3049,11 +3046,11 @@ public class ScrippleParser extends Parser {
 						((PowerBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(338);
-						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
+						if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
 						setState(339);
 						match(RAISE);
 						setState(340);
-						((PowerBinExpressionContext)_localctx).b = expr(25);
+						((PowerBinExpressionContext)_localctx).b = expr(14);
 						}
 						break;
 					case 4:
@@ -3062,7 +3059,7 @@ public class ScrippleParser extends Parser {
 						((ComparisonBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(341);
-						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
+						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
 						setState(342);
 						((ComparisonBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -3075,7 +3072,7 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(343);
-						((ComparisonBinExpressionContext)_localctx).b = expr(24);
+						((ComparisonBinExpressionContext)_localctx).b = expr(13);
 						}
 						break;
 					case 5:
@@ -3084,7 +3081,7 @@ public class ScrippleParser extends Parser {
 						((LogicBinExpressionContext)_localctx).a = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(344);
-						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
+						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
 						setState(345);
 						((LogicBinExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -3097,7 +3094,7 @@ public class ScrippleParser extends Parser {
 							consume();
 						}
 						setState(346);
-						((LogicBinExpressionContext)_localctx).b = expr(23);
+						((LogicBinExpressionContext)_localctx).b = expr(12);
 						}
 						break;
 					case 6:
@@ -3106,7 +3103,7 @@ public class ScrippleParser extends Parser {
 						((TernaryExpressionContext)_localctx).cond = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(347);
-						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
+						if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
 						setState(348);
 						match(QUESTION);
 						setState(349);
@@ -3114,7 +3111,7 @@ public class ScrippleParser extends Parser {
 						setState(350);
 						match(COLON);
 						setState(351);
-						((TernaryExpressionContext)_localctx).else_ = expr(22);
+						((TernaryExpressionContext)_localctx).else_ = expr(11);
 						}
 						break;
 					case 7:
@@ -3123,7 +3120,7 @@ public class ScrippleParser extends Parser {
 						((ContainsExpressionContext)_localctx).col = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(353);
-						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
+						if (!(precpred(_ctx, 27))) throw new FailedPredicateException(this, "precpred(_ctx, 27)");
 						setState(354);
 						match(HAS);
 						setState(355);
@@ -3140,7 +3137,7 @@ public class ScrippleParser extends Parser {
 						((MapLookupExpressionContext)_localctx).map = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(359);
-						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
+						if (!(precpred(_ctx, 26))) throw new FailedPredicateException(this, "precpred(_ctx, 26)");
 						setState(360);
 						match(LOOKUP);
 						setState(361);
@@ -3157,7 +3154,7 @@ public class ScrippleParser extends Parser {
 						((MapKeysetExpressionContext)_localctx).map = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(365);
-						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
+						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
 						setState(366);
 						match(KEYS);
 						setState(367);
@@ -3172,11 +3169,11 @@ public class ScrippleParser extends Parser {
 						((ColorChannelExpressionContext)_localctx).c = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(369);
-						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
+						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
 						setState(370);
 						((ColorChannelExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(((((_la - 68)) & ~0x3f) == 0 && ((1L << (_la - 68)) & 15L) != 0)) ) {
+						if ( !(((((_la - 67)) & ~0x3f) == 0 && ((1L << (_la - 67)) & 15L) != 0)) ) {
 							((ColorChannelExpressionContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -3192,7 +3189,7 @@ public class ScrippleParser extends Parser {
 						((ColorAtPixelExpressionContext)_localctx).img = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(371);
-						if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
+						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
 						setState(372);
 						match(PIXEL);
 						setState(373);
@@ -3212,7 +3209,7 @@ public class ScrippleParser extends Parser {
 						_localctx = new ImageBoundExpressionContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(379);
-						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
+						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
 						setState(380);
 						((ImageBoundExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -4231,35 +4228,35 @@ public class ScrippleParser extends Parser {
 	private boolean expr_sempred(ExprContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 3:
-			return precpred(_ctx, 26);
+			return precpred(_ctx, 15);
 		case 4:
-			return precpred(_ctx, 25);
+			return precpred(_ctx, 14);
 		case 5:
-			return precpred(_ctx, 24);
-		case 6:
-			return precpred(_ctx, 23);
-		case 7:
-			return precpred(_ctx, 22);
-		case 8:
-			return precpred(_ctx, 21);
-		case 9:
-			return precpred(_ctx, 20);
-		case 10:
-			return precpred(_ctx, 19);
-		case 11:
-			return precpred(_ctx, 18);
-		case 12:
-			return precpred(_ctx, 17);
-		case 13:
 			return precpred(_ctx, 13);
-		case 14:
+		case 6:
 			return precpred(_ctx, 12);
+		case 7:
+			return precpred(_ctx, 11);
+		case 8:
+			return precpred(_ctx, 10);
+		case 9:
+			return precpred(_ctx, 27);
+		case 10:
+			return precpred(_ctx, 26);
+		case 11:
+			return precpred(_ctx, 25);
+		case 12:
+			return precpred(_ctx, 24);
+		case 13:
+			return precpred(_ctx, 20);
+		case 14:
+			return precpred(_ctx, 19);
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001[\u01cd\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001Z\u01cd\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
 		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
 		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
@@ -4326,8 +4323,8 @@ public class ScrippleParser extends Parser {
 		"\u0014\u0001\u0014\u0003\u0014\u01cb\b\u0014\u0001\u0014\u0000\u0002\b"+
 		"\u001a\u0015\u0000\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016"+
 		"\u0018\u001a\u001c\u001e \"$&(\u0000\u0007\u0002\u0000##)*\u0001\u0000"+
-		"\"#\u0001\u0000$&\u0001\u0000\u001b \u0001\u0000\'(\u0001\u0000DG\u0001"+
-		"\u0000HI\u0207\u0000*\u0001\u0000\u0000\u0000\u00026\u0001\u0000\u0000"+
+		"\"#\u0001\u0000$&\u0001\u0000\u001b \u0001\u0000\'(\u0001\u0000CF\u0001"+
+		"\u0000GH\u0207\u0000*\u0001\u0000\u0000\u0000\u00026\u0001\u0000\u0000"+
 		"\u0000\u0004H\u0001\u0000\u0000\u0000\u0006J\u0001\u0000\u0000\u0000\b"+
 		"`\u0001\u0000\u0000\u0000\ny\u0001\u0000\u0000\u0000\f\u00aa\u0001\u0000"+
 		"\u0000\u0000\u000e\u00ac\u0001\u0000\u0000\u0000\u0010\u00c0\u0001\u0000"+
@@ -4376,20 +4373,20 @@ public class ScrippleParser extends Parser {
 		"\u00ab\u0001\u0000\u0000\u0000\u0080\u0081\u0003\u001c\u000e\u0000\u0081"+
 		"\u0082\u0005\n\u0000\u0000\u0082\u00ab\u0001\u0000\u0000\u0000\u0083\u00ab"+
 		"\u0003\u000e\u0007\u0000\u0084\u0085\u0003\u001a\r\u0000\u0085\u0086\u0005"+
-		"N\u0000\u0000\u0086\u0087\u0005\u0004\u0000\u0000\u0087\u008a\u0003\u001a"+
+		"M\u0000\u0000\u0086\u0087\u0005\u0004\u0000\u0000\u0087\u008a\u0003\u001a"+
 		"\r\u0000\u0088\u0089\u0005\f\u0000\u0000\u0089\u008b\u0003\u001a\r\u0000"+
 		"\u008a\u0088\u0001\u0000\u0000\u0000\u008a\u008b\u0001\u0000\u0000\u0000"+
 		"\u008b\u008c\u0001\u0000\u0000\u0000\u008c\u008d\u0005\u0005\u0000\u0000"+
 		"\u008d\u008e\u0005\n\u0000\u0000\u008e\u00ab\u0001\u0000\u0000\u0000\u008f"+
-		"\u0090\u0003\u001a\r\u0000\u0090\u0091\u0005O\u0000\u0000\u0091\u0092"+
+		"\u0090\u0003\u001a\r\u0000\u0090\u0091\u0005N\u0000\u0000\u0091\u0092"+
 		"\u0005\u0004\u0000\u0000\u0092\u0093\u0003\u001a\r\u0000\u0093\u0094\u0005"+
 		"\u0005\u0000\u0000\u0094\u0095\u0005\n\u0000\u0000\u0095\u00ab\u0001\u0000"+
-		"\u0000\u0000\u0096\u0097\u0003\u001a\r\u0000\u0097\u0098\u0005P\u0000"+
+		"\u0000\u0000\u0096\u0097\u0003\u001a\r\u0000\u0097\u0098\u0005O\u0000"+
 		"\u0000\u0098\u0099\u0005\u0004\u0000\u0000\u0099\u009a\u0003\u001a\r\u0000"+
 		"\u009a\u009b\u0005\f\u0000\u0000\u009b\u009c\u0003\u001a\r\u0000\u009c"+
 		"\u009d\u0005\u0005\u0000\u0000\u009d\u009e\u0005\n\u0000\u0000\u009e\u00ab"+
 		"\u0001\u0000\u0000\u0000\u009f\u00a0\u0003\u001a\r\u0000\u00a0\u00a1\u0005"+
-		"Q\u0000\u0000\u00a1\u00a2\u0005\u0004\u0000\u0000\u00a2\u00a3\u0003\u001a"+
+		"P\u0000\u0000\u00a1\u00a2\u0005\u0004\u0000\u0000\u00a2\u00a3\u0003\u001a"+
 		"\r\u0000\u00a3\u00a4\u0005\f\u0000\u0000\u00a4\u00a5\u0003\u001a\r\u0000"+
 		"\u00a5\u00a6\u0005\f\u0000\u0000\u00a6\u00a7\u0003\u001a\r\u0000\u00a7"+
 		"\u00a8\u0005\u0005\u0000\u0000\u00a8\u00a9\u0005\n\u0000\u0000\u00a9\u00ab"+
@@ -4416,41 +4413,41 @@ public class ScrippleParser extends Parser {
 		"\u00c8\u0013\u0001\u0000\u0000\u0000\u00c9\u00ca\u00057\u0000\u0000\u00ca"+
 		"\u00cb\u0005\u0004\u0000\u0000\u00cb\u00cc\u0003\u001a\r\u0000\u00cc\u00cd"+
 		"\u0005\u0005\u0000\u0000\u00cd\u0015\u0001\u0000\u0000\u0000\u00ce\u00cf"+
-		"\u00059\u0000\u0000\u00cf\u00d0\u0005\u0004\u0000\u0000\u00d0\u00d1\u0003"+
+		"\u00058\u0000\u0000\u00cf\u00d0\u0005\u0004\u0000\u0000\u00d0\u00d1\u0003"+
 		"\u001e\u000f\u0000\u00d1\u00d2\u0005\n\u0000\u0000\u00d2\u00d3\u0003\u001a"+
 		"\r\u0000\u00d3\u00d4\u0005\n\u0000\u0000\u00d4\u00d5\u0003\u001c\u000e"+
 		"\u0000\u00d5\u00d6\u0005\u0005\u0000\u0000\u00d6\u0017\u0001\u0000\u0000"+
-		"\u0000\u00d7\u00d8\u0005:\u0000\u0000\u00d8\u00d9\u0005\u0004\u0000\u0000"+
+		"\u0000\u00d7\u00d8\u00059\u0000\u0000\u00d8\u00d9\u0005\u0004\u0000\u0000"+
 		"\u00d9\u00da\u0003\u001a\r\u0000\u00da\u00db\u0005\u0005\u0000\u0000\u00db"+
-		"\u00e0\u0003\n\u0005\u0000\u00dc\u00dd\u0005;\u0000\u0000\u00dd\u00df"+
+		"\u00e0\u0003\n\u0005\u0000\u00dc\u00dd\u0005:\u0000\u0000\u00dd\u00df"+
 		"\u0003\u0018\f\u0000\u00de\u00dc\u0001\u0000\u0000\u0000\u00df\u00e2\u0001"+
 		"\u0000\u0000\u0000\u00e0\u00de\u0001\u0000\u0000\u0000\u00e0\u00e1\u0001"+
 		"\u0000\u0000\u0000\u00e1\u00e5\u0001\u0000\u0000\u0000\u00e2\u00e0\u0001"+
-		"\u0000\u0000\u0000\u00e3\u00e4\u0005;\u0000\u0000\u00e4\u00e6\u0003\n"+
+		"\u0000\u0000\u0000\u00e3\u00e4\u0005:\u0000\u0000\u00e4\u00e6\u0003\n"+
 		"\u0005\u0000\u00e5\u00e3\u0001\u0000\u0000\u0000\u00e5\u00e6\u0001\u0000"+
 		"\u0000\u0000\u00e6\u0019\u0001\u0000\u0000\u0000\u00e7\u00e8\u0006\r\uffff"+
 		"\uffff\u0000\u00e8\u00e9\u0005\u0004\u0000\u0000\u00e9\u00ea\u0003\u001a"+
 		"\r\u0000\u00ea\u00eb\u0005\u0005\u0000\u0000\u00eb\u014b\u0001\u0000\u0000"+
-		"\u0000\u00ec\u00ed\u0007\u0000\u0000\u0000\u00ed\u014b\u0003\u001a\r\u001b"+
-		"\u00ee\u00ef\u0005?\u0000\u0000\u00ef\u00f0\u0005\u0004\u0000\u0000\u00f0"+
-		"\u00f1\u0003\u001a\r\u0000\u00f1\u00f2\u0005\u0005\u0000\u0000\u00f2\u014b"+
-		"\u0001\u0000\u0000\u0000\u00f3\u00f4\u0005B\u0000\u0000\u00f4\u00f5\u0005"+
-		"\u0004\u0000\u0000\u00f5\u00f6\u0003\u001a\r\u0000\u00f6\u00f7\u0005\f"+
-		"\u0000\u0000\u00f7\u00f8\u0003\u001a\r\u0000\u00f8\u00f9\u0005\u0005\u0000"+
-		"\u0000\u00f9\u014b\u0001\u0000\u0000\u0000\u00fa\u00fb\u0005C\u0000\u0000"+
-		"\u00fb\u00fc\u0005\u0004\u0000\u0000\u00fc\u00fd\u0003\u001a\r\u0000\u00fd"+
+		"\u0000\u00ec\u00ed\u0005>\u0000\u0000\u00ed\u00ee\u0005\u0004\u0000\u0000"+
+		"\u00ee\u00ef\u0003\u001a\r\u0000\u00ef\u00f0\u0005\u0005\u0000\u0000\u00f0"+
+		"\u014b\u0001\u0000\u0000\u0000\u00f1\u00f2\u0005A\u0000\u0000\u00f2\u00f3"+
+		"\u0005\u0004\u0000\u0000\u00f3\u00f4\u0003\u001a\r\u0000\u00f4\u00f5\u0005"+
+		"\f\u0000\u0000\u00f5\u00f6\u0003\u001a\r\u0000\u00f6\u00f7\u0005\u0005"+
+		"\u0000\u0000\u00f7\u014b\u0001\u0000\u0000\u0000\u00f8\u00f9\u0005B\u0000"+
+		"\u0000\u00f9\u00fa\u0005\u0004\u0000\u0000\u00fa\u00fb\u0003\u001a\r\u0000"+
+		"\u00fb\u00fc\u0005\f\u0000\u0000\u00fc\u00fd\u0003\u001a\r\u0000\u00fd"+
 		"\u00fe\u0005\f\u0000\u0000\u00fe\u00ff\u0003\u001a\r\u0000\u00ff\u0100"+
-		"\u0005\f\u0000\u0000\u0100\u0101\u0003\u001a\r\u0000\u0101\u0102\u0005"+
-		"\u0005\u0000\u0000\u0102\u014b\u0001\u0000\u0000\u0000\u0103\u0104\u0005"+
-		"A\u0000\u0000\u0104\u0105\u0005\u0004\u0000\u0000\u0105\u0106\u0003\u001a"+
+		"\u0005\u0005\u0000\u0000\u0100\u014b\u0001\u0000\u0000\u0000\u0101\u0102"+
+		"\u0005@\u0000\u0000\u0102\u0103\u0005\u0004\u0000\u0000\u0103\u0104\u0003"+
+		"\u001a\r\u0000\u0104\u0105\u0005\f\u0000\u0000\u0105\u0106\u0003\u001a"+
 		"\r\u0000\u0106\u0107\u0005\f\u0000\u0000\u0107\u0108\u0003\u001a\r\u0000"+
-		"\u0108\u0109\u0005\f\u0000\u0000\u0109\u010a\u0003\u001a\r\u0000\u010a"+
-		"\u010b\u0005\u0005\u0000\u0000\u010b\u014b\u0001\u0000\u0000\u0000\u010c"+
-		"\u010d\u0005@\u0000\u0000\u010d\u010e\u0005\u0004\u0000\u0000\u010e\u010f"+
+		"\u0108\u0109\u0005\u0005\u0000\u0000\u0109\u014b\u0001\u0000\u0000\u0000"+
+		"\u010a\u010b\u0005?\u0000\u0000\u010b\u010c\u0005\u0004\u0000\u0000\u010c"+
+		"\u010d\u0003\u001a\r\u0000\u010d\u010e\u0005\f\u0000\u0000\u010e\u010f"+
 		"\u0003\u001a\r\u0000\u010f\u0110\u0005\f\u0000\u0000\u0110\u0111\u0003"+
 		"\u001a\r\u0000\u0111\u0112\u0005\f\u0000\u0000\u0112\u0113\u0003\u001a"+
-		"\r\u0000\u0113\u0114\u0005\f\u0000\u0000\u0114\u0115\u0003\u001a\r\u0000"+
-		"\u0115\u0116\u0005\u0005\u0000\u0000\u0116\u014b\u0001\u0000\u0000\u0000"+
+		"\r\u0000\u0113\u0114\u0005\u0005\u0000\u0000\u0114\u014b\u0001\u0000\u0000"+
+		"\u0000\u0115\u0116\u0007\u0000\u0000\u0000\u0116\u014b\u0003\u001a\r\u0010"+
 		"\u0117\u0118\u0005\u0006\u0000\u0000\u0118\u011d\u0003\u001a\r\u0000\u0119"+
 		"\u011a\u0005\f\u0000\u0000\u011a\u011c\u0003\u001a\r\u0000\u011b\u0119"+
 		"\u0001\u0000\u0000\u0000\u011c\u011f\u0001\u0000\u0000\u0000\u011d\u011b"+
@@ -4468,99 +4465,99 @@ public class ScrippleParser extends Parser {
 		"\u0135\u0001\u0000\u0000\u0000\u0133\u0131\u0001\u0000\u0000\u0000\u0133"+
 		"\u0134\u0001\u0000\u0000\u0000\u0134\u0136\u0001\u0000\u0000\u0000\u0135"+
 		"\u0133\u0001\u0000\u0000\u0000\u0136\u0137\u0005\t\u0000\u0000\u0137\u014b"+
-		"\u0001\u0000\u0000\u0000\u0138\u0139\u0005>\u0000\u0000\u0139\u013a\u0003"+
+		"\u0001\u0000\u0000\u0000\u0138\u0139\u0005=\u0000\u0000\u0139\u013a\u0003"+
 		"\b\u0004\u0000\u013a\u013b\u0005\u0006\u0000\u0000\u013b\u013c\u0003\u001a"+
 		"\r\u0000\u013c\u013d\u0005\u0007\u0000\u0000\u013d\u014b\u0001\u0000\u0000"+
-		"\u0000\u013e\u013f\u0005>\u0000\u0000\u013f\u0140\u0005\u001e\u0000\u0000"+
-		"\u0140\u014b\u0005\u001d\u0000\u0000\u0141\u0142\u0005>\u0000\u0000\u0142"+
+		"\u0000\u013e\u013f\u0005=\u0000\u0000\u013f\u0140\u0005\u001e\u0000\u0000"+
+		"\u0140\u014b\u0005\u001d\u0000\u0000\u0141\u0142\u0005=\u0000\u0000\u0142"+
 		"\u0143\u0005\b\u0000\u0000\u0143\u014b\u0005\t\u0000\u0000\u0144\u0145"+
-		"\u0005>\u0000\u0000\u0145\u0146\u0005\b\u0000\u0000\u0146\u0147\u0005"+
+		"\u0005=\u0000\u0000\u0145\u0146\u0005\b\u0000\u0000\u0146\u0147\u0005"+
 		"\u000b\u0000\u0000\u0147\u014b\u0005\t\u0000\u0000\u0148\u014b\u0003\""+
 		"\u0011\u0000\u0149\u014b\u0003&\u0013\u0000\u014a\u00e7\u0001\u0000\u0000"+
-		"\u0000\u014a\u00ec\u0001\u0000\u0000\u0000\u014a\u00ee\u0001\u0000\u0000"+
-		"\u0000\u014a\u00f3\u0001\u0000\u0000\u0000\u014a\u00fa\u0001\u0000\u0000"+
-		"\u0000\u014a\u0103\u0001\u0000\u0000\u0000\u014a\u010c\u0001\u0000\u0000"+
+		"\u0000\u014a\u00ec\u0001\u0000\u0000\u0000\u014a\u00f1\u0001\u0000\u0000"+
+		"\u0000\u014a\u00f8\u0001\u0000\u0000\u0000\u014a\u0101\u0001\u0000\u0000"+
+		"\u0000\u014a\u010a\u0001\u0000\u0000\u0000\u014a\u0115\u0001\u0000\u0000"+
 		"\u0000\u014a\u0117\u0001\u0000\u0000\u0000\u014a\u0122\u0001\u0000\u0000"+
 		"\u0000\u014a\u012d\u0001\u0000\u0000\u0000\u014a\u0138\u0001\u0000\u0000"+
 		"\u0000\u014a\u013e\u0001\u0000\u0000\u0000\u014a\u0141\u0001\u0000\u0000"+
 		"\u0000\u014a\u0144\u0001\u0000\u0000\u0000\u014a\u0148\u0001\u0000\u0000"+
 		"\u0000\u014a\u0149\u0001\u0000\u0000\u0000\u014b\u017f\u0001\u0000\u0000"+
-		"\u0000\u014c\u014d\n\u001a\u0000\u0000\u014d\u014e\u0007\u0001\u0000\u0000"+
-		"\u014e\u017e\u0003\u001a\r\u001b\u014f\u0150\n\u0019\u0000\u0000\u0150"+
-		"\u0151\u0007\u0002\u0000\u0000\u0151\u017e\u0003\u001a\r\u001a\u0152\u0153"+
-		"\n\u0018\u0000\u0000\u0153\u0154\u0005!\u0000\u0000\u0154\u017e\u0003"+
-		"\u001a\r\u0019\u0155\u0156\n\u0017\u0000\u0000\u0156\u0157\u0007\u0003"+
-		"\u0000\u0000\u0157\u017e\u0003\u001a\r\u0018\u0158\u0159\n\u0016\u0000"+
-		"\u0000\u0159\u015a\u0007\u0004\u0000\u0000\u015a\u017e\u0003\u001a\r\u0017"+
-		"\u015b\u015c\n\u0015\u0000\u0000\u015c\u015d\u0005\u000f\u0000\u0000\u015d"+
-		"\u015e\u0003\u001a\r\u0000\u015e\u015f\u0005\u000b\u0000\u0000\u015f\u0160"+
-		"\u0003\u001a\r\u0016\u0160\u017e\u0001\u0000\u0000\u0000\u0161\u0162\n"+
-		"\u0014\u0000\u0000\u0162\u0163\u0005J\u0000\u0000\u0163\u0164\u0005\u0004"+
-		"\u0000\u0000\u0164\u0165\u0003\u001a\r\u0000\u0165\u0166\u0005\u0005\u0000"+
-		"\u0000\u0166\u017e\u0001\u0000\u0000\u0000\u0167\u0168\n\u0013\u0000\u0000"+
-		"\u0168\u0169\u0005K\u0000\u0000\u0169\u016a\u0005\u0004\u0000\u0000\u016a"+
-		"\u016b\u0003\u001a\r\u0000\u016b\u016c\u0005\u0005\u0000\u0000\u016c\u017e"+
-		"\u0001\u0000\u0000\u0000\u016d\u016e\n\u0012\u0000\u0000\u016e\u016f\u0005"+
-		"L\u0000\u0000\u016f\u0170\u0005\u0004\u0000\u0000\u0170\u017e\u0005\u0005"+
-		"\u0000\u0000\u0171\u0172\n\u0011\u0000\u0000\u0172\u017e\u0007\u0005\u0000"+
-		"\u0000\u0173\u0174\n\r\u0000\u0000\u0174\u0175\u0005M\u0000\u0000\u0175"+
-		"\u0176\u0005\u0004\u0000\u0000\u0176\u0177\u0003\u001a\r\u0000\u0177\u0178"+
-		"\u0005\f\u0000\u0000\u0178\u0179\u0003\u001a\r\u0000\u0179\u017a\u0005"+
-		"\u0005\u0000\u0000\u017a\u017e\u0001\u0000\u0000\u0000\u017b\u017c\n\f"+
-		"\u0000\u0000\u017c\u017e\u0007\u0006\u0000\u0000\u017d\u014c\u0001\u0000"+
-		"\u0000\u0000\u017d\u014f\u0001\u0000\u0000\u0000\u017d\u0152\u0001\u0000"+
-		"\u0000\u0000\u017d\u0155\u0001\u0000\u0000\u0000\u017d\u0158\u0001\u0000"+
-		"\u0000\u0000\u017d\u015b\u0001\u0000\u0000\u0000\u017d\u0161\u0001\u0000"+
-		"\u0000\u0000\u017d\u0167\u0001\u0000\u0000\u0000\u017d\u016d\u0001\u0000"+
-		"\u0000\u0000\u017d\u0171\u0001\u0000\u0000\u0000\u017d\u0173\u0001\u0000"+
-		"\u0000\u0000\u017d\u017b\u0001\u0000\u0000\u0000\u017e\u0181\u0001\u0000"+
-		"\u0000\u0000\u017f\u017d\u0001\u0000\u0000\u0000\u017f\u0180\u0001\u0000"+
-		"\u0000\u0000\u0180\u001b\u0001\u0000\u0000\u0000\u0181\u017f\u0001\u0000"+
-		"\u0000\u0000\u0182\u0183\u0003\"\u0011\u0000\u0183\u0184\u0005\u0010\u0000"+
-		"\u0000\u0184\u0185\u0003\u001a\r\u0000\u0185\u01a9\u0001\u0000\u0000\u0000"+
-		"\u0186\u0187\u0003\"\u0011\u0000\u0187\u0188\u0005\u0011\u0000\u0000\u0188"+
-		"\u01a9\u0001\u0000\u0000\u0000\u0189\u018a\u0003\"\u0011\u0000\u018a\u018b"+
-		"\u0005\u0012\u0000\u0000\u018b\u01a9\u0001\u0000\u0000\u0000\u018c\u018d"+
-		"\u0003\"\u0011\u0000\u018d\u018e\u0005\u0013\u0000\u0000\u018e\u018f\u0003"+
-		"\u001a\r\u0000\u018f\u01a9\u0001\u0000\u0000\u0000\u0190\u0191\u0003\""+
-		"\u0011\u0000\u0191\u0192\u0005\u0014\u0000\u0000\u0192\u0193\u0003\u001a"+
-		"\r\u0000\u0193\u01a9\u0001\u0000\u0000\u0000\u0194\u0195\u0003\"\u0011"+
-		"\u0000\u0195\u0196\u0005\u0015\u0000\u0000\u0196\u0197\u0003\u001a\r\u0000"+
-		"\u0197\u01a9\u0001\u0000\u0000\u0000\u0198\u0199\u0003\"\u0011\u0000\u0199"+
-		"\u019a\u0005\u0016\u0000\u0000\u019a\u019b\u0003\u001a\r\u0000\u019b\u01a9"+
-		"\u0001\u0000\u0000\u0000\u019c\u019d\u0003\"\u0011\u0000\u019d\u019e\u0005"+
-		"\u0017\u0000\u0000\u019e\u019f\u0003\u001a\r\u0000\u019f\u01a9\u0001\u0000"+
-		"\u0000\u0000\u01a0\u01a1\u0003\"\u0011\u0000\u01a1\u01a2\u0005\u0018\u0000"+
-		"\u0000\u01a2\u01a3\u0003\u001a\r\u0000\u01a3\u01a9\u0001\u0000\u0000\u0000"+
-		"\u01a4\u01a5\u0003\"\u0011\u0000\u01a5\u01a6\u0005\u0019\u0000\u0000\u01a6"+
-		"\u01a7\u0003\u001a\r\u0000\u01a7\u01a9\u0001\u0000\u0000\u0000\u01a8\u0182"+
-		"\u0001\u0000\u0000\u0000\u01a8\u0186\u0001\u0000\u0000\u0000\u01a8\u0189"+
-		"\u0001\u0000\u0000\u0000\u01a8\u018c\u0001\u0000\u0000\u0000\u01a8\u0190"+
-		"\u0001\u0000\u0000\u0000\u01a8\u0194\u0001\u0000\u0000\u0000\u01a8\u0198"+
-		"\u0001\u0000\u0000\u0000\u01a8\u019c\u0001\u0000\u0000\u0000\u01a8\u01a0"+
-		"\u0001\u0000\u0000\u0000\u01a8\u01a4\u0001\u0000\u0000\u0000\u01a9\u001d"+
-		"\u0001\u0000\u0000\u0000\u01aa\u01ab\u0003\u0002\u0001\u0000\u01ab\u01ac"+
-		"\u0005\u0010\u0000\u0000\u01ac\u01ad\u0003\u001a\r\u0000\u01ad\u001f\u0001"+
-		"\u0000\u0000\u0000\u01ae\u01b1\u0003\u0002\u0001\u0000\u01af\u01b1\u0003"+
-		"\u001e\u000f\u0000\u01b0\u01ae\u0001\u0000\u0000\u0000\u01b0\u01af\u0001"+
-		"\u0000\u0000\u0000\u01b1!\u0001\u0000\u0000\u0000\u01b2\u01be\u0003$\u0012"+
-		"\u0000\u01b3\u01b4\u0003$\u0012\u0000\u01b4\u01b5\u0005\u001e\u0000\u0000"+
-		"\u01b5\u01b6\u0003\u001a\r\u0000\u01b6\u01b7\u0005\u001d\u0000\u0000\u01b7"+
-		"\u01be\u0001\u0000\u0000\u0000\u01b8\u01b9\u0003$\u0012\u0000\u01b9\u01ba"+
-		"\u0005\u0006\u0000\u0000\u01ba\u01bb\u0003\u001a\r\u0000\u01bb\u01bc\u0005"+
-		"\u0007\u0000\u0000\u01bc\u01be\u0001\u0000\u0000\u0000\u01bd\u01b2\u0001"+
-		"\u0000\u0000\u0000\u01bd\u01b3\u0001\u0000\u0000\u0000\u01bd\u01b8\u0001"+
-		"\u0000\u0000\u0000\u01be#\u0001\u0000\u0000\u0000\u01bf\u01c0\u0005[\u0000"+
-		"\u0000\u01c0%\u0001\u0000\u0000\u0000\u01c1\u01c7\u0005X\u0000\u0000\u01c2"+
-		"\u01c7\u0005Y\u0000\u0000\u01c3\u01c7\u0003(\u0014\u0000\u01c4\u01c7\u0005"+
-		"S\u0000\u0000\u01c5\u01c7\u0005R\u0000\u0000\u01c6\u01c1\u0001\u0000\u0000"+
-		"\u0000\u01c6\u01c2\u0001\u0000\u0000\u0000\u01c6\u01c3\u0001\u0000\u0000"+
-		"\u0000\u01c6\u01c4\u0001\u0000\u0000\u0000\u01c6\u01c5\u0001\u0000\u0000"+
-		"\u0000\u01c7\'\u0001\u0000\u0000\u0000\u01c8\u01cb\u0005U\u0000\u0000"+
-		"\u01c9\u01cb\u0005T\u0000\u0000\u01ca\u01c8\u0001\u0000\u0000\u0000\u01ca"+
-		"\u01c9\u0001\u0000\u0000\u0000\u01cb)\u0001\u0000\u0000\u0000\u001c06"+
-		"=BHO`kmuy\u008a\u00aa\u00ae\u00c0\u00e0\u00e5\u011d\u0128\u0133\u014a"+
-		"\u017d\u017f\u01a8\u01b0\u01bd\u01c6\u01ca";
+		"\u0000\u014c\u014d\n\u000f\u0000\u0000\u014d\u014e\u0007\u0001\u0000\u0000"+
+		"\u014e\u017e\u0003\u001a\r\u0010\u014f\u0150\n\u000e\u0000\u0000\u0150"+
+		"\u0151\u0007\u0002\u0000\u0000\u0151\u017e\u0003\u001a\r\u000f\u0152\u0153"+
+		"\n\r\u0000\u0000\u0153\u0154\u0005!\u0000\u0000\u0154\u017e\u0003\u001a"+
+		"\r\u000e\u0155\u0156\n\f\u0000\u0000\u0156\u0157\u0007\u0003\u0000\u0000"+
+		"\u0157\u017e\u0003\u001a\r\r\u0158\u0159\n\u000b\u0000\u0000\u0159\u015a"+
+		"\u0007\u0004\u0000\u0000\u015a\u017e\u0003\u001a\r\f\u015b\u015c\n\n\u0000"+
+		"\u0000\u015c\u015d\u0005\u000f\u0000\u0000\u015d\u015e\u0003\u001a\r\u0000"+
+		"\u015e\u015f\u0005\u000b\u0000\u0000\u015f\u0160\u0003\u001a\r\u000b\u0160"+
+		"\u017e\u0001\u0000\u0000\u0000\u0161\u0162\n\u001b\u0000\u0000\u0162\u0163"+
+		"\u0005I\u0000\u0000\u0163\u0164\u0005\u0004\u0000\u0000\u0164\u0165\u0003"+
+		"\u001a\r\u0000\u0165\u0166\u0005\u0005\u0000\u0000\u0166\u017e\u0001\u0000"+
+		"\u0000\u0000\u0167\u0168\n\u001a\u0000\u0000\u0168\u0169\u0005J\u0000"+
+		"\u0000\u0169\u016a\u0005\u0004\u0000\u0000\u016a\u016b\u0003\u001a\r\u0000"+
+		"\u016b\u016c\u0005\u0005\u0000\u0000\u016c\u017e\u0001\u0000\u0000\u0000"+
+		"\u016d\u016e\n\u0019\u0000\u0000\u016e\u016f\u0005K\u0000\u0000\u016f"+
+		"\u0170\u0005\u0004\u0000\u0000\u0170\u017e\u0005\u0005\u0000\u0000\u0171"+
+		"\u0172\n\u0018\u0000\u0000\u0172\u017e\u0007\u0005\u0000\u0000\u0173\u0174"+
+		"\n\u0014\u0000\u0000\u0174\u0175\u0005L\u0000\u0000\u0175\u0176\u0005"+
+		"\u0004\u0000\u0000\u0176\u0177\u0003\u001a\r\u0000\u0177\u0178\u0005\f"+
+		"\u0000\u0000\u0178\u0179\u0003\u001a\r\u0000\u0179\u017a\u0005\u0005\u0000"+
+		"\u0000\u017a\u017e\u0001\u0000\u0000\u0000\u017b\u017c\n\u0013\u0000\u0000"+
+		"\u017c\u017e\u0007\u0006\u0000\u0000\u017d\u014c\u0001\u0000\u0000\u0000"+
+		"\u017d\u014f\u0001\u0000\u0000\u0000\u017d\u0152\u0001\u0000\u0000\u0000"+
+		"\u017d\u0155\u0001\u0000\u0000\u0000\u017d\u0158\u0001\u0000\u0000\u0000"+
+		"\u017d\u015b\u0001\u0000\u0000\u0000\u017d\u0161\u0001\u0000\u0000\u0000"+
+		"\u017d\u0167\u0001\u0000\u0000\u0000\u017d\u016d\u0001\u0000\u0000\u0000"+
+		"\u017d\u0171\u0001\u0000\u0000\u0000\u017d\u0173\u0001\u0000\u0000\u0000"+
+		"\u017d\u017b\u0001\u0000\u0000\u0000\u017e\u0181\u0001\u0000\u0000\u0000"+
+		"\u017f\u017d\u0001\u0000\u0000\u0000\u017f\u0180\u0001\u0000\u0000\u0000"+
+		"\u0180\u001b\u0001\u0000\u0000\u0000\u0181\u017f\u0001\u0000\u0000\u0000"+
+		"\u0182\u0183\u0003\"\u0011\u0000\u0183\u0184\u0005\u0010\u0000\u0000\u0184"+
+		"\u0185\u0003\u001a\r\u0000\u0185\u01a9\u0001\u0000\u0000\u0000\u0186\u0187"+
+		"\u0003\"\u0011\u0000\u0187\u0188\u0005\u0011\u0000\u0000\u0188\u01a9\u0001"+
+		"\u0000\u0000\u0000\u0189\u018a\u0003\"\u0011\u0000\u018a\u018b\u0005\u0012"+
+		"\u0000\u0000\u018b\u01a9\u0001\u0000\u0000\u0000\u018c\u018d\u0003\"\u0011"+
+		"\u0000\u018d\u018e\u0005\u0013\u0000\u0000\u018e\u018f\u0003\u001a\r\u0000"+
+		"\u018f\u01a9\u0001\u0000\u0000\u0000\u0190\u0191\u0003\"\u0011\u0000\u0191"+
+		"\u0192\u0005\u0014\u0000\u0000\u0192\u0193\u0003\u001a\r\u0000\u0193\u01a9"+
+		"\u0001\u0000\u0000\u0000\u0194\u0195\u0003\"\u0011\u0000\u0195\u0196\u0005"+
+		"\u0015\u0000\u0000\u0196\u0197\u0003\u001a\r\u0000\u0197\u01a9\u0001\u0000"+
+		"\u0000\u0000\u0198\u0199\u0003\"\u0011\u0000\u0199\u019a\u0005\u0016\u0000"+
+		"\u0000\u019a\u019b\u0003\u001a\r\u0000\u019b\u01a9\u0001\u0000\u0000\u0000"+
+		"\u019c\u019d\u0003\"\u0011\u0000\u019d\u019e\u0005\u0017\u0000\u0000\u019e"+
+		"\u019f\u0003\u001a\r\u0000\u019f\u01a9\u0001\u0000\u0000\u0000\u01a0\u01a1"+
+		"\u0003\"\u0011\u0000\u01a1\u01a2\u0005\u0018\u0000\u0000\u01a2\u01a3\u0003"+
+		"\u001a\r\u0000\u01a3\u01a9\u0001\u0000\u0000\u0000\u01a4\u01a5\u0003\""+
+		"\u0011\u0000\u01a5\u01a6\u0005\u0019\u0000\u0000\u01a6\u01a7\u0003\u001a"+
+		"\r\u0000\u01a7\u01a9\u0001\u0000\u0000\u0000\u01a8\u0182\u0001\u0000\u0000"+
+		"\u0000\u01a8\u0186\u0001\u0000\u0000\u0000\u01a8\u0189\u0001\u0000\u0000"+
+		"\u0000\u01a8\u018c\u0001\u0000\u0000\u0000\u01a8\u0190\u0001\u0000\u0000"+
+		"\u0000\u01a8\u0194\u0001\u0000\u0000\u0000\u01a8\u0198\u0001\u0000\u0000"+
+		"\u0000\u01a8\u019c\u0001\u0000\u0000\u0000\u01a8\u01a0\u0001\u0000\u0000"+
+		"\u0000\u01a8\u01a4\u0001\u0000\u0000\u0000\u01a9\u001d\u0001\u0000\u0000"+
+		"\u0000\u01aa\u01ab\u0003\u0002\u0001\u0000\u01ab\u01ac\u0005\u0010\u0000"+
+		"\u0000\u01ac\u01ad\u0003\u001a\r\u0000\u01ad\u001f\u0001\u0000\u0000\u0000"+
+		"\u01ae\u01b1\u0003\u0002\u0001\u0000\u01af\u01b1\u0003\u001e\u000f\u0000"+
+		"\u01b0\u01ae\u0001\u0000\u0000\u0000\u01b0\u01af\u0001\u0000\u0000\u0000"+
+		"\u01b1!\u0001\u0000\u0000\u0000\u01b2\u01be\u0003$\u0012\u0000\u01b3\u01b4"+
+		"\u0003$\u0012\u0000\u01b4\u01b5\u0005\u001e\u0000\u0000\u01b5\u01b6\u0003"+
+		"\u001a\r\u0000\u01b6\u01b7\u0005\u001d\u0000\u0000\u01b7\u01be\u0001\u0000"+
+		"\u0000\u0000\u01b8\u01b9\u0003$\u0012\u0000\u01b9\u01ba\u0005\u0006\u0000"+
+		"\u0000\u01ba\u01bb\u0003\u001a\r\u0000\u01bb\u01bc\u0005\u0007\u0000\u0000"+
+		"\u01bc\u01be\u0001\u0000\u0000\u0000\u01bd\u01b2\u0001\u0000\u0000\u0000"+
+		"\u01bd\u01b3\u0001\u0000\u0000\u0000\u01bd\u01b8\u0001\u0000\u0000\u0000"+
+		"\u01be#\u0001\u0000\u0000\u0000\u01bf\u01c0\u0005Z\u0000\u0000\u01c0%"+
+		"\u0001\u0000\u0000\u0000\u01c1\u01c7\u0005W\u0000\u0000\u01c2\u01c7\u0005"+
+		"X\u0000\u0000\u01c3\u01c7\u0003(\u0014\u0000\u01c4\u01c7\u0005R\u0000"+
+		"\u0000\u01c5\u01c7\u0005Q\u0000\u0000\u01c6\u01c1\u0001\u0000\u0000\u0000"+
+		"\u01c6\u01c2\u0001\u0000\u0000\u0000\u01c6\u01c3\u0001\u0000\u0000\u0000"+
+		"\u01c6\u01c4\u0001\u0000\u0000\u0000\u01c6\u01c5\u0001\u0000\u0000\u0000"+
+		"\u01c7\'\u0001\u0000\u0000\u0000\u01c8\u01cb\u0005T\u0000\u0000\u01c9"+
+		"\u01cb\u0005S\u0000\u0000\u01ca\u01c8\u0001\u0000\u0000\u0000\u01ca\u01c9"+
+		"\u0001\u0000\u0000\u0000\u01cb)\u0001\u0000\u0000\u0000\u001c06=BHO`k"+
+		"muy\u008a\u00aa\u00ae\u00c0\u00e0\u00e5\u011d\u0128\u0133\u014a\u017d"+
+		"\u017f\u01a8\u01b0\u01bd\u01c6\u01ca";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

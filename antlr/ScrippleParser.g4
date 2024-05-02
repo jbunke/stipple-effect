@@ -60,7 +60,7 @@ loop_stat
 | DO body while_def SEMICOLON               #DoWhileLoop
 ;
 
-iteration_def: FOREACH LPAREN
+iteration_def: FOR LPAREN
 declaration IN expr RPAREN;
 
 while_def: WHILE LPAREN expr RPAREN;
@@ -73,15 +73,6 @@ if_stat: IF LPAREN expr RPAREN ifBody=body
 
 expr
 : LPAREN expr RPAREN                        #NestedExpression
-| op=(MINUS | NOT | SIZE) expr              #UnaryExpression
-| a=expr op=(PLUS | MINUS) b=expr           #ArithmeticBinExpression
-| a=expr op=(TIMES | DIVIDE | MOD) b=expr   #MultBinExpression
-| a=expr RAISE b=expr                       #PowerBinExpression
-| a=expr op=(EQUAL | NOT_EQUAL |
-  GT | LT | GEQ | LEQ) b=expr               #ComparisonBinExpression
-| a=expr op=(OR | AND) b=expr               #LogicBinExpression
-| cond=expr QUESTION if=expr
-  COLON else=expr                           #TernaryExpression
 | col=expr HAS LPAREN elem=expr RPAREN      #ContainsExpression
 | map=expr LOOKUP LPAREN elem=expr RPAREN   #MapLookupExpression
 | map=expr KEYS LPAREN RPAREN               #MapKeysetExpression
@@ -98,6 +89,15 @@ expr
   COMMA b=expr RPAREN                       #RGBColorExpression
 | RGBA LPAREN r=expr COMMA g=expr
   COMMA b=expr COMMA a=expr RPAREN          #RGBAColorExpression
+| op=(MINUS | NOT | SIZE) expr              #UnaryExpression
+| a=expr op=(PLUS | MINUS) b=expr           #ArithmeticBinExpression
+| a=expr op=(TIMES | DIVIDE | MOD) b=expr   #MultBinExpression
+| a=expr RAISE b=expr                       #PowerBinExpression
+| a=expr op=(EQUAL | NOT_EQUAL |
+  GT | LT | GEQ | LEQ) b=expr               #ComparisonBinExpression
+| a=expr op=(OR | AND) b=expr               #LogicBinExpression
+| cond=expr QUESTION if=expr
+  COLON else=expr                           #TernaryExpression
 | LBRACKET expr (COMMA expr)* RBRACKET      #ExplicitArrayExpression
 | LT expr (COMMA expr)* GT                  #ExplicitListExpression
 | LCURLY expr (COMMA expr)* RCURLY          #ExplicitSetExpression

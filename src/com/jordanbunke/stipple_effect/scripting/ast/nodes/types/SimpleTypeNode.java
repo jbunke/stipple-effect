@@ -18,6 +18,13 @@ public final class SimpleTypeNode extends TypeNode {
         public String toString() {
             return name().toLowerCase();
         }
+
+        private boolean isNum() {
+            return switch (this) {
+                case INT, FLOAT -> true;
+                default -> false;
+            };
+        }
     }
 
     public SimpleTypeNode(final Type type) {
@@ -54,5 +61,10 @@ public final class SimpleTypeNode extends TypeNode {
     @Override
     public int hashCode() {
         return type.ordinal();
+    }
+
+    @Override
+    public boolean isNum() {
+        return type.isNum();
     }
 }

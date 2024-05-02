@@ -1,6 +1,5 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
-
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**

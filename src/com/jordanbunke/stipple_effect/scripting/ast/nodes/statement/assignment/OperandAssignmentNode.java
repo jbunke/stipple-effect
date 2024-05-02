@@ -62,9 +62,12 @@ public final class OperandAssignmentNode extends AssignmentNode {
                 intType = new SimpleTypeNode(SimpleTypeNode.Type.INT),
                 boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL),
                 floatType = new SimpleTypeNode(SimpleTypeNode.Type.FLOAT),
+                charType = new SimpleTypeNode(SimpleTypeNode.Type.CHAR),
                 stringType = new SimpleTypeNode(SimpleTypeNode.Type.STRING);
 
-        final Set<TypeNode> numTypes = Set.of(intType, floatType);
+        final Set<TypeNode>
+                numTypes = Set.of(intType, floatType),
+                textTypes = Set.of(stringType, charType);
 
         if (operator.isLogic()) {
             if (!assignableType.equals(boolType))
@@ -85,7 +88,7 @@ public final class OperandAssignmentNode extends AssignmentNode {
                             operand.getPosition(),
                             operandType.toString());
             } else if (assignableType.equals(stringType)) {
-                if (!stringType.equals(operandType))
+                if (!textTypes.contains(operandType))
                     ScrippleErrorListener.fireError(
                             ScrippleErrorListener.Message.ASSIGN_EXPR_NOT_STRING,
                             operand.getPosition(),
@@ -122,10 +125,12 @@ public final class OperandAssignmentNode extends AssignmentNode {
                     case AND -> (Boolean) before &&
                             (Boolean) operand.evaluate(symbolTable);
                     case ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO -> {
-                        if (before instanceof String bs &&
-                                opValue instanceof String s &&
-                                operator == Operator.ADD)
-                            yield bs + s;
+                        if (operator == Operator.ADD &&
+                                before instanceof String bs) {
+                            final String os = String.valueOf(opValue);
+
+                            yield bs + os;
+                        }
 
                         final SimpleTypeNode
                                 intType = new SimpleTypeNode(

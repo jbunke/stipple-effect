@@ -201,6 +201,19 @@ public final class ScrippleVisitor
     }
 
     @Override
+    public DoWhileLoopNode visitDoWhileLoop(
+            final ScrippleParser.DoWhileLoopContext ctx
+    ) {
+        final ExpressionNode loopCondition =
+                (ExpressionNode) visit(ctx.while_def().expr());
+        final StatementNode loopBody = (StatementNode) visit(ctx.body());
+
+        return new DoWhileLoopNode(
+                TextPosition.fromToken(ctx.start),
+                loopCondition, loopBody);
+    }
+
+    @Override
     public IteratorLoopNode visitIteratorLoop(
             final ScrippleParser.IteratorLoopContext ctx
     ) {
@@ -665,7 +678,7 @@ public final class ScrippleVisitor
         return new ColorChannelNode(
                 TextPosition.fromToken(ctx.start),
                 (ExpressionNode) visit(ctx.expr()),
-                ctx.op.getText());
+                ctx.op.getText().substring(1).toLowerCase());
     }
 
     @Override
@@ -702,9 +715,11 @@ public final class ScrippleVisitor
     public ImageBoundNode visitImageBoundExpression(
             final ScrippleParser.ImageBoundExpressionContext ctx
     ) {
+        final String text = ctx.op.getText().substring(1);
+
         return new ImageBoundNode(TextPosition.fromToken(ctx.start),
                 (ExpressionNode) visit(ctx.expr()),
-                ctx.op.getText().toLowerCase().startsWith("w"));
+                text.toLowerCase().startsWith("w"));
     }
 
     @Override

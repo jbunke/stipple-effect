@@ -105,18 +105,13 @@ public final class BinaryOperationNode extends ExpressionNode {
                             getPosition(), o2Type.toString());
             }
             case ADD -> {
-                final Set<TypeNode> acceptedTypes = Set.of(
-                        new SimpleTypeNode(SimpleTypeNode.Type.STRING),
-                        new SimpleTypeNode(SimpleTypeNode.Type.INT),
-                        new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
-
-                if (!acceptedTypes.contains(o1Type))
+                if (!(o1Type instanceof SimpleTypeNode))
                     ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                            ScrippleErrorListener.Message.OPERAND_NAN_SEM, // TODO - change error message
                             getPosition(), o1Type.toString());
-                if (!acceptedTypes.contains(o2Type))
+                if (!(o2Type instanceof SimpleTypeNode))
                     ScrippleErrorListener.fireError(
-                            ScrippleErrorListener.Message.OPERAND_NAN_SEM,
+                            ScrippleErrorListener.Message.OPERAND_NAN_SEM, // TODO - "
                             getPosition(), o2Type.toString());
             }
             case SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
@@ -167,9 +162,9 @@ public final class BinaryOperationNode extends ExpressionNode {
                 yield (operator == Operator.EQUAL) == equal;
             }
             case ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE -> {
-                if (o1Value instanceof String s1 &&
-                        o2Value instanceof String s2 &&
-                        operator == Operator.ADD)
+                if (operator == Operator.ADD &&
+                        o1Value instanceof String s1 &&
+                        o2Value instanceof String s2)
                     yield s1 + s2;
 
                 final SimpleTypeNode
@@ -203,7 +198,10 @@ public final class BinaryOperationNode extends ExpressionNode {
                     yield result;
                 }
 
-                yield o1Value.toString() + o2Value.toString();
+                if (operator == Operator.ADD)
+                    yield String.valueOf(o1Value) + o2Value;
+
+                yield null;
             }
         };
     }
@@ -216,13 +214,20 @@ public final class BinaryOperationNode extends ExpressionNode {
         final TypeNode o1Type = o1.getType(symbolTable),
                 o2Type = o2.getType(symbolTable);
 
-        final SimpleTypeNode floatType =
-                new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);
+        final boolean bothNums = o1Type.isNum() && o2Type.isNum();
 
-        if (o1Type.equals(floatType) || o2Type.equals(floatType))
-            return floatType;
+        if (bothNums) {
+            final SimpleTypeNode floatType =
+                    new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);
 
-        return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+            if (o1Type.equals(floatType) || o2Type.equals(floatType))
+                return floatType;
+
+            return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        } else if (operator == Operator.ADD)
+            return new SimpleTypeNode(SimpleTypeNode.Type.STRING);
+
+        return new SimpleTypeNode(SimpleTypeNode.Type.RAW);
     }
 
     @Override
