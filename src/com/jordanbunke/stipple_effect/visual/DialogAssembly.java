@@ -916,6 +916,14 @@ public class DialogAssembly {
         for (int i = 0; i < formattedErrors.size() && i < MAX_TO_PRINT; i++)
             mb.add(makeDialogLeftLabel(i, formattedErrors.get(i)));
 
+        if (formattedErrors.size() > MAX_TO_PRINT) {
+            final int more = (int) formattedErrors.stream()
+                    .filter(s -> formattedErrors.indexOf(s) >= MAX_TO_PRINT)
+                    .filter(s -> !s.startsWith(CONT)).count();
+
+            mb.add(makeDialogLeftLabel(MAX_TO_PRINT, "... and " + more + " more"));
+        }
+
         setDialog(assembleDialog(
                 "Script encountered errors:",
                 new MenuElementGrouping(mb.build().getMenuElements()),
