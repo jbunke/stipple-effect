@@ -70,6 +70,8 @@ public class IconCodes {
             PIXEL_GRID_ON = "pixel_grid_on",
             NEW_FONT = "new_font",
             DELETE_FONT = "delete_font",
+            IMPORT_SCRIPT = "import_script",
+            REMOVE_SCRIPT = "remove_script",
             INCLUDED = "included",
             EXCLUDED = "excluded",
             SETTINGS = "settings",

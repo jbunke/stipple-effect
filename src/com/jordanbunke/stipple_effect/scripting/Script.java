@@ -8,6 +8,8 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptVisitor;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
+import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,12 +18,10 @@ import java.util.List;
 import java.util.Optional;
 
 public final class Script {
-    public static boolean validatePreviewScript(
-            final String content, final SEContext context
-    ) {
-        final HeadFuncNode script = build(content);
+    private static boolean printErrorsToDialog = false;
 
-        return validatePreviewScript(script, context);
+    public static void printErrorsToDialog() {
+        printErrorsToDialog = true;
     }
 
     public static boolean validatePreviewScript(
@@ -46,21 +46,10 @@ public final class Script {
     }
 
     public static Object run(
-            final String content, final Object... args
+            final HeadFuncNode script, final Object... args
     ) {
         ScriptErrorLog.clearErrors();
 
-        final HeadFuncNode script = build(content);
-
-        if (script == null)
-            return null;
-
-        return run(script, args);
-    }
-
-    public static Object run(
-            final HeadFuncNode script, final Object... args
-    ) {
         final SymbolTable scriptTable = SymbolTable.root(script);
 
         final boolean passedChecks = check(script, scriptTable);
@@ -69,10 +58,10 @@ public final class Script {
             final Optional<Object> result =
                     execute(script, scriptTable, args);
 
-            if (result.isEmpty())
-                displayErrors();
-            else
+            if (result.isPresent())
                 return result.get();
+            else if (!ScriptErrorLog.hasNoErrors())
+                displayErrors();
         } else
             displayErrors();
 
@@ -94,7 +83,9 @@ public final class Script {
 
             return visitor.visitHead_rule(parser.head_rule());
         } catch (Exception e) {
-            // TODO - couldn't read script case
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.COULD_NOT_READ,
+                    TextPosition.N_A);
             displayErrors();
             return null;
         }
@@ -130,12 +121,14 @@ public final class Script {
     }
 
     private static void displayErrors() {
+        if (printErrorsToDialog) {
+            DialogAssembly.setDialogToScriptErrors();
+            return;
+        }
+
         final List<String> errors = ScriptErrorLog.getErrors();
 
         for (String error : errors)
             System.out.println(error);
-
-
-        // TODO
     }
 }

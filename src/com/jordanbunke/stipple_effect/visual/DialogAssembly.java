@@ -26,6 +26,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
@@ -887,6 +888,20 @@ public class DialogAssembly {
         setDialog(assembleDialog("Define a new font...", contents,
                 precondition, "Add",
                 () -> TextTool.get().addFont(), true));
+    }
+
+    public static void setDialogToScriptErrors() {
+        final  MenuBuilder mb = new MenuBuilder();
+        final int MAX_TO_PRINT = 10;
+        final List<String> errors = ScriptErrorLog.getErrors();
+
+        for (int i = 0; i < errors.size() && i < MAX_TO_PRINT; i++)
+            mb.add(makeDialogLeftLabel(i, errors.get(i)));
+
+        setDialog(assembleDialog(
+                "Script encountered errors:",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                () -> false, Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
     public static void setDialogToExitProgramAYS() {

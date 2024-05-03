@@ -11,7 +11,7 @@ public final class ScriptErrorLog {
     }
 
     private enum ErrorClass {
-        COMPILE, RUNTIME;
+        COMPILE, RUNTIME, IO;
 
         private String prefix() {
             return name() + " ERROR: ";
@@ -59,11 +59,13 @@ public final class ScriptErrorLog {
         REMOVE_FROM_SET_OR_ARRAY,
         ASSIGN_EXPR_NOT_NUM,
         ASSIGN_EXPR_NOT_STRING,
-        NOT_ITERABLE
+        NOT_ITERABLE,
+        COULD_NOT_READ
         ;
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case COULD_NOT_READ -> "Couldn't read the script file";
                 case NOT_ITERABLE ->
                     typeMismatch("non-iterable type used in iterator loop",
                             args[0], args[1]);
@@ -283,6 +285,7 @@ public final class ScriptErrorLog {
                         UNINITIALIZED_VAR,
                         INDEX_OUT_OF_BOUNDS ->
                         ErrorClass.RUNTIME;
+                case COULD_NOT_READ -> ErrorClass.IO;
                 default -> ErrorClass.COMPILE;
             };
         }

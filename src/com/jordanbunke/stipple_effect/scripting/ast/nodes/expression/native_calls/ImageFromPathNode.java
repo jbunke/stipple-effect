@@ -9,6 +9,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public final class ImageFromPathNode extends ExpressionNode {
@@ -37,13 +38,16 @@ public final class ImageFromPathNode extends ExpressionNode {
 
     @Override
     public GameImage evaluate(final SymbolTable symbolTable) {
-        final String fp = (String) path.evaluate(symbolTable);
-        final GameImage image = GameImageIO.readImage(Path.of(fp));
+        final String fp = (String) path.evaluate(symbolTable),
+                formatted = fp.replace("/", File.separator)
+                        .replace("\\\\", "\\")
+                        .replace("\\", File.separator);
+        final GameImage image = GameImageIO.readImage(Path.of(formatted));
 
         if (image == null)
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.PATH_DOES_NOT_CONTAIN_IMAGE,
-                    getPosition(), fp);
+                    getPosition(), formatted);
 
         return image;
     }
