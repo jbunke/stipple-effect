@@ -894,9 +894,27 @@ public class DialogAssembly {
         final  MenuBuilder mb = new MenuBuilder();
         final int MAX_TO_PRINT = 10;
         final List<String> errors = ScriptErrorLog.getErrors();
+        final String CONT = " ".repeat(6) + "...";
 
-        for (int i = 0; i < errors.size() && i < MAX_TO_PRINT; i++)
-            mb.add(makeDialogLeftLabel(i, errors.get(i)));
+        final List<String> formattedErrors = new ArrayList<>();
+
+        for (String error : errors) {
+            String trimmedError = error;
+            while (trimmedError.length() > Layout.MAX_ERROR_CHARS_PER_LINE) {
+                final boolean first = error.equals(trimmedError);
+                final String beginning = cutOffAtNextSpace(trimmedError,
+                        Layout.CHARS_CUTOFF - (first ? 0 : CONT.length()));
+
+                formattedErrors.add((first ? "" : CONT) + beginning);
+                trimmedError = trimmedError.substring(beginning.length());
+            }
+
+            formattedErrors.add((error.equals(trimmedError) ? "" : CONT) +
+                    trimmedError);
+        }
+
+        for (int i = 0; i < formattedErrors.size() && i < MAX_TO_PRINT; i++)
+            mb.add(makeDialogLeftLabel(i, formattedErrors.get(i)));
 
         setDialog(assembleDialog(
                 "Script encountered errors:",
@@ -1846,6 +1864,16 @@ public class DialogAssembly {
             final MenuElement preceding) {
         return preceding.getRenderPosition()
                 .displace(preceding.getWidth() + Layout.CONTENT_BUFFER_PX, 0);
+    }
+
+    private static String cutOffAtNextSpace(String s, int i) {
+        while (i < s.length()) {
+            if (s.charAt(i) == ' ')
+                return s.substring(0, i);
+            i++;
+        }
+
+        return s;
     }
 
     private static VerticalScrollBox assembleScroller(
