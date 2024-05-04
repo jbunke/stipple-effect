@@ -18,11 +18,19 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitHead_rule(ScriptParser.Head_ruleContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ScriptParser#declaration}.
+	 * Visit a parse tree produced by the {@code StandardFuncBody}
+	 * labeled alternative in {@link ScriptParser#func_body}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclaration(ScriptParser.DeclarationContext ctx);
+	T visitStandardFuncBody(ScriptParser.StandardFuncBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FunctionalFuncBody}
+	 * labeled alternative in {@link ScriptParser#func_body}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionalFuncBody(ScriptParser.FunctionalFuncBodyContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code VoidReturnSignature}
 	 * labeled alternative in {@link ScriptParser#signature}.
@@ -43,6 +51,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParam_list(ScriptParser.Param_listContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScriptParser#declaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeclaration(ScriptParser.DeclarationContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ArrayType}
 	 * labeled alternative in {@link ScriptParser#type()}.

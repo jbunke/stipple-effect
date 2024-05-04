@@ -4,9 +4,11 @@ options {
     tokenVocab=ScriptLexer;
 }
 
-head_rule: FUNC signature LCURLY stat* RCURLY;
+head_rule: signature func_body;
 
-declaration: FINAL? type ident;
+func_body: body                             #StandardFuncBody
+| DEF expr                                  #FunctionalFuncBody
+;
 
 signature
 : LPAREN param_list? RPAREN                 #VoidReturnSignature
@@ -14,6 +16,8 @@ signature
 ;
 
 param_list: declaration (COMMA declaration)*;
+
+declaration: FINAL? type ident;
 
 type
 : BOOL                                      #BoolType

@@ -22,16 +22,26 @@ public final class ScriptVisitor
     public HeadFuncNode visitHead_rule(
             final ScriptParser.Head_ruleContext ctx
     ) {
-        // signature
-        final MethodSignatureNode signature =
-                (MethodSignatureNode) visit(ctx.signature());
-        // body
-        final StatementNode[] statements = ctx.stat().stream()
-                .map(s -> (StatementNode) visit(s))
-                .toArray(StatementNode[]::new);
         return new HeadFuncNode(
-                TextPosition.fromToken(ctx.FUNC().getSymbol()),
-                signature, statements);
+                TextPosition.fromToken(ctx.start),
+                (MethodSignatureNode) visit(ctx.signature()),
+                (StatementNode) visit(ctx.func_body()));
+    }
+
+    @Override
+    public StatementNode visitStandardFuncBody(
+            final ScriptParser.StandardFuncBodyContext ctx
+    ) {
+        return (StatementNode) visit(ctx.body());
+    }
+
+    @Override
+    public ReturnStatementNode visitFunctionalFuncBody(
+            final ScriptParser.FunctionalFuncBodyContext ctx
+    ) {
+        return ReturnStatementNode.forTyped(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.expr()));
     }
 
     @Override
@@ -402,7 +412,7 @@ public final class ScriptVisitor
     }
 
     @Override
-    public StatementNode visitComplexBody(
+    public BodyStatementNode visitComplexBody(
             final ScriptParser.ComplexBodyContext ctx
     ) {
         return new BodyStatementNode(

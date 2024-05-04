@@ -1,24 +1,24 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes;
 
-import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class HeadFuncNode extends ASTNode {
 
     private final MethodSignatureNode signature;
-    private final StatementNode[] statements;
+    private final StatementNode body;
 
     public HeadFuncNode(
-            final TextPosition position, final MethodSignatureNode signature,
-            final StatementNode[] statements
+            final TextPosition position,
+            final MethodSignatureNode signature,
+            final StatementNode body
     ) {
         super(position);
 
         this.signature = signature;
-        this.statements = statements;
+        this.body = body;
     }
 
     public Object execute(
@@ -26,16 +26,7 @@ public final class HeadFuncNode extends ASTNode {
             final Object... args
     ) {
         signature.execute(symbolTable, args);
-
-        // program execution
-        for (StatementNode statement : statements) {
-            final FuncControlFlow potential = statement.execute(symbolTable);
-
-            if (!potential.cont)
-                return potential.value;
-        }
-
-        return null;
+        return body.execute(symbolTable).value;
     }
 
     public boolean paramsMatch(final TypeNode[] spec) {
@@ -49,9 +40,7 @@ public final class HeadFuncNode extends ASTNode {
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         signature.semanticErrorCheck(symbolTable);
-
-        for (StatementNode statement : statements)
-            statement.semanticErrorCheck(symbolTable);
+        body.semanticErrorCheck(symbolTable);
     }
 
     @Override

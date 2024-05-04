@@ -30,7 +30,10 @@ DIV_ASSIGN: '/=';
 MOD_ASSIGN: '%=';
 AND_ASSIGN: '&=';
 OR_ASSIGN: '|=';
+
+// Function
 ARROW: '->';
+DEF: '::';
 
 // Binary Operators
 EQUAL: '==';
@@ -55,7 +58,6 @@ SIZE: '#|';
 
 // Keywords
 IN: 'in';
-FUNC: 'func';
 FINAL: 'final';
 BOOL: 'bool';
 FLOAT: 'float';
