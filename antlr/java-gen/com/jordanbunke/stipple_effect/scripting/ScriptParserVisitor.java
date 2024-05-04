@@ -1,6 +1,5 @@
-// Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScrippleParser.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScriptParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
-
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -198,6 +197,27 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDrawOntoImageStatement(ScriptParser.DrawOntoImageStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code DotStatement}
+	 * labeled alternative in {@link ScriptParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDotStatement(ScriptParser.DotStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DrawLineStatement}
+	 * labeled alternative in {@link ScriptParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDrawLineStatement(ScriptParser.DrawLineStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FillStatement}
+	 * labeled alternative in {@link ScriptParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFillStatement(ScriptParser.FillStatementContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ScriptParser#return_stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -381,6 +401,20 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNewSetExpression(ScriptParser.NewSetExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ImageSectionExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImageSectionExpression(ScriptParser.ImageSectionExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SubstringExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubstringExpression(ScriptParser.SubstringExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ContainsExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
@@ -443,6 +477,13 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitColorChannelExpression(ScriptParser.ColorChannelExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code CharAtExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCharAtExpression(ScriptParser.CharAtExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code NewArrayExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.

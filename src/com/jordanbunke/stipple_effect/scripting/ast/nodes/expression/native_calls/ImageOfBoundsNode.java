@@ -36,12 +36,14 @@ public final class ImageOfBoundsNode extends ExpressionNode {
 
         if (!widthType.equals(intType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
-                    width.getPosition(), "Width", widthType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    width.getPosition(), "Width",
+                    "int", widthType.toString());
         if (!heightType.equals(intType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
-                    height.getPosition(), "Height", heightType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    height.getPosition(), "Height",
+                    "int", heightType.toString());
     }
 
     @Override
@@ -51,14 +53,16 @@ public final class ImageOfBoundsNode extends ExpressionNode {
 
         if (w > 0 && h > 0)
             return new GameImage(w, h);
-        else if (w <= 0)
-            ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.NON_POSITIVE_IMAGE_BOUND,
-                    width.getPosition(), "Width", String.valueOf(w));
-        else
-            ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.NON_POSITIVE_IMAGE_BOUND,
-                    height.getPosition(), "Height", String.valueOf(h));
+        else {
+            if (w <= 0)
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.NON_POSITIVE_IMAGE_BOUND,
+                        width.getPosition(), "Width", String.valueOf(w));
+            if (h <= 0)
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.NON_POSITIVE_IMAGE_BOUND,
+                        height.getPosition(), "Height", String.valueOf(h));
+        }
 
         return null;
     }

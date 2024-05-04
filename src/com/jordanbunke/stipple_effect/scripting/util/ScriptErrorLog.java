@@ -32,8 +32,7 @@ public final class ScriptErrorLog {
         COLOR_CHANNEL_NOT_INT,
         COLOR_CHANNEL_OUT_OF_BOUNDS,
         EXPECTED_FOR_CALL,
-        IMG_ARG_NOT_INT,
-        ARG_NOT_IMG,
+        ARG_NOT_TYPE,
         PIX_ARG_OUT_OF_BOUNDS,
         NON_POSITIVE_IMAGE_BOUND,
         MAP_DOES_NOT_CONTAIN_ELEMENT,
@@ -60,11 +59,33 @@ public final class ScriptErrorLog {
         ASSIGN_EXPR_NOT_NUM,
         ASSIGN_EXPR_NOT_STRING,
         NOT_ITERABLE,
-        COULD_NOT_READ
+        COULD_NOT_READ,
+        SUB_BEG_OUT_OF_BOUNDS,
+        SUB_END_OUT_OF_BOUNDS,
+        SUB_END_GEQ_BEG
         ;
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case SUB_BEG_OUT_OF_BOUNDS -> {
+                    final String index = args[0];
+
+                    yield "Substring beginning index argument was evaluated " +
+                            "as " + index + ", but cannot be < 0";
+                }
+                case SUB_END_OUT_OF_BOUNDS -> {
+                    final String l = args[0], index = args[1];
+
+                    yield "Substring end index argument (" + index + ") " +
+                            "is greater than the string's length (" + l + ")";
+                }
+                case SUB_END_GEQ_BEG -> {
+                    final String beg = args[0], end = args[1];
+
+                    yield "Substring beginning index argument (" + beg +
+                            ") is greater than or equal to end index " +
+                            "argument (" + end + ")";
+                }
                 case COULD_NOT_READ -> "Couldn't read the script file";
                 case NOT_ITERABLE ->
                     typeMismatch("non-iterable type used in iterator loop",
@@ -149,17 +170,12 @@ public final class ScriptErrorLog {
                     yield "Attempted to fetch element with key \"" + element +
                             "from a map, but no such entry exists";
                 }
-                case IMG_ARG_NOT_INT -> {
-                    final String dimension = args[0], actualType = args[1];
-
-                    yield typeMismatch(dimension + " argument",
-                            "int", actualType);
-                }
-                case ARG_NOT_IMG -> {
-                    final String arg = args[0], actualType = args[1];
+                case ARG_NOT_TYPE -> {
+                    final String arg = args[0], expectedType = args[1],
+                            actualType = args[2];
 
                     yield typeMismatch(arg + " argument",
-                            "image", actualType);
+                            expectedType, actualType);
                 }
                 case PIX_ARG_OUT_OF_BOUNDS -> {
                     final String dimension = args[0], value = args[1],

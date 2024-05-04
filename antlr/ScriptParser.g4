@@ -49,6 +49,15 @@ stat
   COMMA val=expr RPAREN SEMICOLON           #DefineMapEntryStatement
 | canvas=expr DRAW LPAREN img=expr COMMA
   x=expr COMMA y=expr RPAREN SEMICOLON      #DrawOntoImageStatement
+| canvas=expr DOT LPAREN col=expr COMMA
+  x=expr COMMA y=expr RPAREN SEMICOLON      #DotStatement
+| canvas=expr LINE LPAREN col=expr COMMA
+  breadth=expr COMMA x1=expr COMMA y1=expr
+  COMMA x2=expr COMMA y2=expr RPAREN
+  SEMICOLON                                 #DrawLineStatement
+| canvas=expr FILL LPAREN col=expr COMMA
+  x=expr COMMA y=expr COMMA w=expr COMMA
+  h=expr RPAREN SEMICOLON                   #FillStatement
 ;
 
 return_stat: RETURN expr? SEMICOLON;
@@ -84,6 +93,8 @@ expr
   COMMA height=expr RPAREN                  #ImageOfBoundsExpression
 | TEX_COL_REPL LPAREN texture=expr COMMA
   lookup=expr COMMA replace=expr RPAREN     #TextureColorReplaceExpression
+| img=expr SECTION LPAREN x=expr COMMA
+  y=expr COMMA w=expr COMMA h=expr RPAREN   #ImageSectionExpression
 | img=expr PIXEL LPAREN x=expr
   COMMA y=expr RPAREN                       #ColorAtPixelExpression
 | expr op=(WIDTH | HEIGHT)                  #ImageBoundExpression
@@ -91,6 +102,9 @@ expr
   COMMA b=expr RPAREN                       #RGBColorExpression
 | RGBA LPAREN r=expr COMMA g=expr
   COMMA b=expr COMMA a=expr RPAREN          #RGBAColorExpression
+| string=expr AT LPAREN index=expr RPAREN   #CharAtExpression
+| string=expr SUB LPAREN beg=expr
+  COMMA end=expr RPAREN                     #SubstringExpression
 | op=(MINUS | NOT | SIZE) expr              #UnaryExpression
 | a=expr op=(PLUS | MINUS) b=expr           #ArithmeticBinExpression
 | a=expr op=(TIMES | DIVIDE | MOD) b=expr   #MultBinExpression

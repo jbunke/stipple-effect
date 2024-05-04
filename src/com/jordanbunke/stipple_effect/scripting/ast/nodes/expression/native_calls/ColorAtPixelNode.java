@@ -43,12 +43,12 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
 
         if (!xType.equals(intType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
-                    getPosition(), "X", xType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    getPosition(), "X", "int", xType.toString());
         if (!yType.equals(intType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.IMG_ARG_NOT_INT,
-                    getPosition(), "Y", yType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    getPosition(), "Y", "int", yType.toString());
     }
 
     @Override

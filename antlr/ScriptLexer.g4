@@ -98,6 +98,12 @@ ADD: '.add';
 REMOVE: '.remove';
 DEFINE: '.define';
 DRAW: '.draw';
+AT: '.at';
+SUB: '.sub';
+DOT: '.dot';
+LINE: '.line';
+FILL: '.fill';
+SECTION: '.section';
 
 BOOL_LIT: TRUE | FALSE;
 

@@ -41,19 +41,19 @@ public final class TextureColorReplaceNode extends ExpressionNode {
 
         if (!textureType.equals(imageType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.ARG_NOT_IMG,
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
                     texture.getPosition(), "Texture",
-                    textureType.toString());
+                    "image", textureType.toString());
         if (!lookupType.equals(imageType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.ARG_NOT_IMG,
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
                     lookup.getPosition(), "Lookup",
-                    lookupType.toString());
+                    "image", lookupType.toString());
         if (!replaceType.equals(imageType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.ARG_NOT_IMG,
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
                     replacementColors.getPosition(), "Replacement color",
-                    replaceType.toString());
+                    "image", replaceType.toString());
     }
 
     @Override

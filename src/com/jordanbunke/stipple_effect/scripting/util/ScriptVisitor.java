@@ -354,6 +354,47 @@ public final class ScriptVisitor
     }
 
     @Override
+    public DotNode visitDotStatement(
+            final ScriptParser.DotStatementContext ctx
+    ) {
+        return new DotNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.canvas),
+                (ExpressionNode) visit(ctx.col),
+                (ExpressionNode) visit(ctx.x),
+                (ExpressionNode) visit(ctx.y));
+    }
+
+    @Override
+    public DrawLineNode visitDrawLineStatement(
+            final ScriptParser.DrawLineStatementContext ctx
+    ) {
+        return new DrawLineNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.canvas),
+                (ExpressionNode) visit(ctx.col),
+                (ExpressionNode) visit(ctx.breadth),
+                (ExpressionNode) visit(ctx.x1),
+                (ExpressionNode) visit(ctx.y1),
+                (ExpressionNode) visit(ctx.x2),
+                (ExpressionNode) visit(ctx.y2));
+    }
+
+    @Override
+    public FillNode visitFillStatement(
+            final ScriptParser.FillStatementContext ctx
+    ) {
+        return new FillNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.canvas),
+                (ExpressionNode) visit(ctx.col),
+                (ExpressionNode) visit(ctx.x),
+                (ExpressionNode) visit(ctx.y),
+                (ExpressionNode) visit(ctx.w),
+                (ExpressionNode) visit(ctx.h));
+    }
+
+    @Override
     public StatementNode visitSingleStatBody(
             final ScriptParser.SingleStatBodyContext ctx
     ) {
@@ -732,6 +773,40 @@ public final class ScriptVisitor
                 (ExpressionNode) visit(ctx.texture),
                 (ExpressionNode) visit(ctx.lookup),
                 (ExpressionNode) visit(ctx.replace));
+    }
+
+    @Override
+    public ImageSectionNode visitImageSectionExpression(
+            final ScriptParser.ImageSectionExpressionContext ctx
+    ) {
+        return new ImageSectionNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.img),
+                (ExpressionNode) visit(ctx.x),
+                (ExpressionNode) visit(ctx.y),
+                (ExpressionNode) visit(ctx.w),
+                (ExpressionNode) visit(ctx.h));
+    }
+
+    @Override
+    public CharAtNode visitCharAtExpression(
+            final ScriptParser.CharAtExpressionContext ctx
+    ) {
+        return new CharAtNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.string),
+                (ExpressionNode) visit(ctx.index));
+    }
+
+    @Override
+    public SubstringNode visitSubstringExpression(
+            final ScriptParser.SubstringExpressionContext ctx
+    ) {
+        return new SubstringNode(
+                TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.string),
+                (ExpressionNode) visit(ctx.beg),
+                (ExpressionNode) visit(ctx.end));
     }
 
     @Override

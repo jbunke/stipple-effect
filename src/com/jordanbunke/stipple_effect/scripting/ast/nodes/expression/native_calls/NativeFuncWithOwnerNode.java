@@ -10,7 +10,8 @@ import java.util.Set;
 
 public abstract sealed class NativeFuncWithOwnerNode extends ExpressionNode
         permits ImageBoundNode, ColorAtPixelNode, ColorChannelNode,
-        MapKeysetNode, MapLookupNode, ContainsNode {
+        MapKeysetNode, MapLookupNode, ContainsNode, ImageSectionNode,
+        SubstringNode, CharAtNode {
     private final ExpressionNode owner;
     private final Set<TypeNode> acceptedTypes;
 

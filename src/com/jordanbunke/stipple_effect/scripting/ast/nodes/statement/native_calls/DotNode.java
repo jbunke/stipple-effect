@@ -1,28 +1,30 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
-public final class DrawNode extends StatementNode {
-    private final ExpressionNode canvas, superimposed, x, y;
+import java.awt.*;
 
-    public DrawNode(
+public final class DotNode extends StatementNode {
+    private final ExpressionNode canvas, color, x, y;
+
+    public DotNode(
             final TextPosition position,
             final ExpressionNode canvas,
-            final ExpressionNode superimposed,
+            final ExpressionNode color,
             final ExpressionNode x, final ExpressionNode y
     ) {
         super(position);
 
         this.canvas = canvas;
-        this.superimposed = superimposed;
+        this.color = color;
         this.x = x;
         this.y = y;
     }
@@ -30,17 +32,18 @@ public final class DrawNode extends StatementNode {
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         canvas.semanticErrorCheck(symbolTable);
-        superimposed.semanticErrorCheck(symbolTable);
+        color.semanticErrorCheck(symbolTable);
         x.semanticErrorCheck(symbolTable);
         y.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
                 imgType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
+                colType = new SimpleTypeNode(SimpleTypeNode.Type.COLOR),
                 intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
 
         final TypeNode
                 cType = canvas.getType(symbolTable),
-                sType = superimposed.getType(symbolTable),
+                colArgType = color.getType(symbolTable),
                 xType = x.getType(symbolTable),
                 yType = y.getType(symbolTable);
 
@@ -49,11 +52,11 @@ public final class DrawNode extends StatementNode {
                     ScriptErrorLog.Message.ARG_NOT_TYPE,
                     canvas.getPosition(), "Canvas",
                     "image", cType.toString());
-        if (!sType.equals(imgType))
+        if (!colArgType.equals(colType))
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.ARG_NOT_TYPE,
-                    superimposed.getPosition(), "Superimposed",
-                    "image", sType.toString());
+                    color.getPosition(), "Color",
+                    "color", colArgType.toString());
         if (!xType.equals(intType))
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.ARG_NOT_TYPE,
@@ -67,13 +70,13 @@ public final class DrawNode extends StatementNode {
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
         final GameImage
-                c = (GameImage) canvas.evaluate(symbolTable),
-                s = (GameImage) superimposed.evaluate(symbolTable);
+                c = (GameImage) canvas.evaluate(symbolTable);
+        final Color col = (Color) color.evaluate(symbolTable);
 
         final int xCoord = (int) x.evaluate(symbolTable),
                 yCoord = (int) y.evaluate(symbolTable);
 
-        c.draw(s, xCoord, yCoord);
+        c.dot(col, xCoord, yCoord);
         c.free();
 
         return FuncControlFlow.cont();
@@ -81,6 +84,6 @@ public final class DrawNode extends StatementNode {
 
     @Override
     public String toString() {
-        return canvas + ".draw(" + superimposed + ", " + x + ", " + y + ");";
+        return canvas + ".dot(" + color + ", " + x + ", " + y + ");";
     }
 }
