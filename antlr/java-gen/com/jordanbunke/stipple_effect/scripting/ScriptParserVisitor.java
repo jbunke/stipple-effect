@@ -672,4 +672,18 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitDecimal(ScriptParser.DecimalContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code True}
+	 * labeled alternative in {@link ScriptParser#bool_lit}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTrue(ScriptParser.TrueContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code False}
+	 * labeled alternative in {@link ScriptParser#bool_lit}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFalse(ScriptParser.FalseContext ctx);
 }

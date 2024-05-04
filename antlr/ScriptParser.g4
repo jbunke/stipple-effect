@@ -160,9 +160,13 @@ literal
 | CHAR_LIT                                  #CharLiteral
 | int_lit                                   #IntLiteral
 | FLOAT_LIT                                 #FloatLiteral
-| BOOL_LIT                                  #BoolLiteral
+| bool_lit                                  #BoolLiteral
 ;
 
 int_lit: HEX_LIT                            #Hexadecimal
 | DEC_LIT                                   #Decimal
+;
+
+bool_lit: TRUE                              #True
+| FALSE                                     #False
 ;

@@ -523,9 +523,19 @@ public final class ScriptVisitor
     public BoolLiteralNode visitBoolLiteral(
             final ScriptParser.BoolLiteralContext ctx
     ) {
+        return (BoolLiteralNode) visit(ctx.bool_lit());
+    }
+
+    @Override
+    public BoolLiteralNode visitTrue(final ScriptParser.TrueContext ctx) {
         return new BoolLiteralNode(
-                TextPosition.fromToken(ctx.BOOL_LIT().getSymbol()),
-                Boolean.parseBoolean(ctx.BOOL_LIT().getSymbol().getText()));
+                TextPosition.fromToken(ctx.TRUE().getSymbol()), true);
+    }
+
+    @Override
+    public BoolLiteralNode visitFalse(final ScriptParser.FalseContext ctx) {
+        return new BoolLiteralNode(
+                TextPosition.fromToken(ctx.FALSE().getSymbol()), false);
     }
 
     @Override

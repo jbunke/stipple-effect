@@ -72,6 +72,7 @@ public class IconCodes {
             DELETE_FONT = "delete_font",
             IMPORT_SCRIPT = "import_script",
             REMOVE_SCRIPT = "remove_script",
+            IMPORT_PREVIEW = "import_preview",
             INCLUDED = "included",
             EXCLUDED = "excluded",
             SETTINGS = "settings",

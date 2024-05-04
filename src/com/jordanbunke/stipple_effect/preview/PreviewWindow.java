@@ -13,17 +13,20 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.Script;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -108,24 +111,42 @@ public class PreviewWindow implements ProgramContext {
         final Supplier<Boolean> hasMultipleFrames =
                 () -> frameCount > 1;
 
-        final MenuElement smartScriptButton = new ThinkingMenuElement(
-                () -> script == null
-                        ? GraphicsUtils.generateIconButton(
-                                IconCodes.IMPORT_SCRIPT, initial,
-                        () -> true, this::openPreviewScript)
-                        : GraphicsUtils.generateIconButton(
+        final MenuElement smartScriptElement = new ThinkingMenuElement(() -> {
+            final boolean hasScript = script != null;
+            final String text = (hasScript ? "Running" : "No") + " script";
+
+            if (hasScript) {
+                final MenuElement removeButton =
+                        GraphicsUtils.generateIconButton(
                                 IconCodes.REMOVE_SCRIPT, initial,
-                        () -> true, this::removeScript)),
-                scriptText = labelAfterLastButton(smartScriptButton,
-                        () -> (script == null ? "No" : "Running") + " script",
-                        "Running script");
-        mb.addAll(smartScriptButton, scriptText);
+                                () -> true, this::removeScript),
+                        importButton = GraphicsUtils.generateIconButton(
+                                IconCodes.IMPORT_PREVIEW,
+                                initial.displace(Layout.BUTTON_INC, 0),
+                                () -> content != null && content.length > 0,
+                                this::importPreview),
+                        scriptText = labelAfterLastButton(
+                                importButton, () -> text, text);
+
+                return new MenuElementGrouping(
+                        removeButton, importButton, scriptText);
+            } else {
+                final MenuElement scriptButton =
+                        GraphicsUtils.generateIconButton(
+                                IconCodes.IMPORT_SCRIPT, initial,
+                                () -> true, this::openPreviewScript),
+                        scriptText = labelAfterLastButton(
+                                scriptButton, () -> text, text);
+
+                return new MenuElementGrouping(scriptButton, scriptText);
+            }
+        });
+        mb.addAll(smartScriptElement);
 
         final MenuElement firstFrame =
                 GraphicsUtils.generateIconButton(
-                        IconCodes.TO_FIRST_FRAME, smartScriptButton
-                                .getRenderPosition()
-                                .displace(0, Layout.BUTTON_INC),
+                        IconCodes.TO_FIRST_FRAME,
+                        initial.displace(0, Layout.BUTTON_INC),
                         hasMultipleFrames, () -> frameIndex = 0),
                 previousFrame = GraphicsUtils.generateIconButton(
                         IconCodes.PREVIOUS, firstFrame.getRenderPosition()
@@ -457,5 +478,17 @@ public class PreviewWindow implements ProgramContext {
         script = null;
         updateContent();
         animate(0d);
+    }
+
+    private void importPreview() {
+        final int frameCount = content.length,
+                w = content[0].getWidth(),
+                h = content[0].getHeight();
+
+        final ProjectState state = ProjectState.makeFromRasterFile(w, h,
+                SELayer.fromPreviewContent(content), frameCount);
+        final SEContext project = new SEContext(null, state, w, h);
+
+        StippleEffect.get().addContext(project, true);
     }
 }

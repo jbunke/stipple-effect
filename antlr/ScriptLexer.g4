@@ -106,8 +106,6 @@ LINE: '.line';
 FILL: '.fill';
 SECTION: '.section';
 
-BOOL_LIT: TRUE | FALSE;
-
 // numbers
 fragment DIGIT: '0'..'9';
 fragment HEX_DIGIT: DIGIT | 'a'..'f';
