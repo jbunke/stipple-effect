@@ -1,8 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
@@ -72,7 +72,7 @@ public final class UnaryOperationNode extends ExpressionNode {
                             getPosition(), operandType.toString());
             }
             case SIZE -> {
-                if (!(operandType instanceof CollectionTypeNode))
+                if (!operandType.hasSize())
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.OPERAND_NOT_A_COLLECTION_SEM,
                             getPosition(), operandType.toString());
@@ -89,6 +89,10 @@ public final class UnaryOperationNode extends ExpressionNode {
             case SIZE -> {
                 if (operandValue instanceof ScriptCollection c)
                     yield c.size();
+                else if (operandValue instanceof String s)
+                    yield s.length();
+                else if (operandValue instanceof ScriptMap m)
+                    yield m.size();
 
                 ScriptErrorLog.fireError(
                         ScriptErrorLog.Message.OPERAND_NOT_A_COLLECTION_RT,

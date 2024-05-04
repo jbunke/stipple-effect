@@ -93,6 +93,8 @@ expr
   COMMA height=expr RPAREN                  #ImageOfBoundsExpression
 | TEX_COL_REPL LPAREN texture=expr COMMA
   lookup=expr COMMA replace=expr RPAREN     #TextureColorReplaceExpression
+| GEN_LOOKUP LPAREN source=expr COMMA
+  vert=expr RPAREN                          #GenLookupExpression
 | img=expr SECTION LPAREN x=expr COMMA
   y=expr COMMA w=expr COMMA h=expr RPAREN   #ImageSectionExpression
 | img=expr PIXEL LPAREN x=expr

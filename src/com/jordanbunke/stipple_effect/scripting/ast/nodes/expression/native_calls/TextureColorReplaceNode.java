@@ -43,21 +43,21 @@ public final class TextureColorReplaceNode extends ExpressionNode {
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.ARG_NOT_TYPE,
                     texture.getPosition(), "Texture",
-                    "image", textureType.toString());
+                    imageType.toString(), textureType.toString());
         if (!lookupType.equals(imageType))
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.ARG_NOT_TYPE,
                     lookup.getPosition(), "Lookup",
-                    "image", lookupType.toString());
+                    imageType.toString(), lookupType.toString());
         if (!replaceType.equals(imageType))
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.ARG_NOT_TYPE,
                     replacementColors.getPosition(), "Replacement color",
-                    "image", replaceType.toString());
+                    imageType.toString(), replaceType.toString());
     }
 
     @Override
-    public Object evaluate(final SymbolTable symbolTable) {
+    public GameImage evaluate(final SymbolTable symbolTable) {
         final GameImage
                 tex = (GameImage) texture.evaluate(symbolTable),
                 lkp = (GameImage) lookup.evaluate(symbolTable),

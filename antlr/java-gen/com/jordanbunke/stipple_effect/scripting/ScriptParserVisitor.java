@@ -1,5 +1,6 @@
 // Generated from C:/Users/Jordan Bunke/Documents/Java/2022/stipple-effect/antlr/ScriptParser.g4 by ANTLR 4.13.1
 package com.jordanbunke.stipple_effect.scripting;
+
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -470,6 +471,13 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArithmeticBinExpression(ScriptParser.ArithmeticBinExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code GenLookupExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGenLookupExpression(ScriptParser.GenLookupExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ColorChannelExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.

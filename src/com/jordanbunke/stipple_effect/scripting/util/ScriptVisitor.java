@@ -776,6 +776,16 @@ public final class ScriptVisitor
     }
 
     @Override
+    public GenLookupNode visitGenLookupExpression(
+            final ScriptParser.GenLookupExpressionContext ctx
+    ) {
+        return new GenLookupNode(
+                TextPosition.fromToken(ctx.GEN_LOOKUP().getSymbol()),
+                (ExpressionNode) visit(ctx.source),
+                (ExpressionNode) visit(ctx.vert));
+    }
+
+    @Override
     public ImageSectionNode visitImageSectionExpression(
             final ScriptParser.ImageSectionExpressionContext ctx
     ) {

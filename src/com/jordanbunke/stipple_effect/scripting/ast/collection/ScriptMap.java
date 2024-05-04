@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class ScriptMap extends HashMap<Object, Object> {
+public final class ScriptMap extends HashMap<Object, Object> {
     @Override
     public String toString() {
         final List<Object> keys = keySet().stream()

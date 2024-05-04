@@ -50,7 +50,7 @@ OR: '||';
 
 // Unary Operators
 NOT: '!';
-SIZE: '#';
+SIZE: '#|';
 // negative handled as minus
 
 // Keywords
@@ -80,6 +80,7 @@ RGBA: 'rgba';
 RGB: 'rgb';
 BLANK: 'blank';
 TEX_COL_REPL: 'tex_col_repl';
+GEN_LOOKUP: 'gen_lookup';
 
 // Native field keywords
 RED: '.' ('red' | 'r');

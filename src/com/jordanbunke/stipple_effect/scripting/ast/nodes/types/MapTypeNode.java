@@ -48,4 +48,9 @@ public final class MapTypeNode extends TypeNode {
     public int hashCode() {
         return (31 * this.keyType.hashCode()) + this.valueType.hashCode();
     }
+
+    @Override
+    public boolean hasSize() {
+        return true;
+    }
 }

@@ -17,4 +17,6 @@ public abstract class TypeNode extends ASTNode {
     public boolean isNum() {
         return false;
     }
+
+    public abstract boolean hasSize();
 }

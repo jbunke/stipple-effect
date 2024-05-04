@@ -68,4 +68,9 @@ public final class CollectionTypeNode extends TypeNode {
     public int hashCode() {
         return (type.ordinal() * 31) + elementType.hashCode();
     }
+
+    @Override
+    public boolean hasSize() {
+        return true;
+    }
 }

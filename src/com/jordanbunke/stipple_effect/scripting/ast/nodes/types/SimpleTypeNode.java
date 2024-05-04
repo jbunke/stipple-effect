@@ -67,4 +67,9 @@ public final class SimpleTypeNode extends TypeNode {
     public boolean isNum() {
         return type.isNum();
     }
+
+    @Override
+    public boolean hasSize() {
+        return type == Type.STRING;
+    }
 }
