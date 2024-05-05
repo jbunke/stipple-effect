@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting;
 
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
@@ -29,11 +29,9 @@ public final class Script {
         if (script == null)
             return false;
 
-        final TypeNode
-                IMG_TYPE = TypeNode.getImage(),
+        final TypeNode IMG_TYPE = TypeNode.getImage(),
                 IMG_ARRAY_TYPE = new CollectionTypeNode(
-                        CollectionTypeNode.Type.ARRAY,
-                        TypeNode.getImage()),
+                        CollectionTypeNode.Type.ARRAY, TypeNode.getImage()),
                 returnType = script.getReturnType();
 
         final boolean animation = context.getState().getFrameCount() > 1;

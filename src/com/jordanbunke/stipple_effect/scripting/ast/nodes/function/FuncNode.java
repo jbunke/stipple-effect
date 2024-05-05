@@ -1,16 +1,17 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.function;
 
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
-public final class HeadFuncNode extends ASTNode {
-
+public sealed abstract class FuncNode extends ASTNode
+        permits HeadFuncNode, HelperFuncNode {
     private final MethodSignatureNode signature;
     private final StatementNode body;
 
-    public HeadFuncNode(
+    FuncNode(
             final TextPosition position,
             final MethodSignatureNode signature,
             final StatementNode body
@@ -45,6 +46,6 @@ public final class HeadFuncNode extends ASTNode {
 
     @Override
     public String toString() {
-        return "func" + signature;
+        return signature.toString();
     }
 }

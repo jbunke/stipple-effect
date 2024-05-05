@@ -2,23 +2,19 @@ package com.jordanbunke.stipple_effect.scripting.util;
 
 import com.jordanbunke.stipple_effect.scripting.ScriptParser;
 import com.jordanbunke.stipple_effect.scripting.ScriptParserBaseVisitor;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.color_def.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.img_gen.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.AbsoluteNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.ClampNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.MinMaxCollectionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.MinMaxTwoArgNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.FlipCoinNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.ProbabilityNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.RandNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.tex_lookup.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow.*;
@@ -37,7 +33,20 @@ public final class ScriptVisitor
         return new HeadFuncNode(
                 TextPosition.fromToken(ctx.start),
                 (MethodSignatureNode) visit(ctx.signature()),
-                (StatementNode) visit(ctx.func_body()));
+                (StatementNode) visit(ctx.func_body()),
+                ctx.helper().stream().map(this::visitHelper)
+                        .toArray(HelperFuncNode[]::new));
+    }
+
+    @Override
+    public HelperFuncNode visitHelper(
+            final ScriptParser.HelperContext ctx
+    ) {
+        return new HelperFuncNode(
+                TextPosition.fromToken(ctx.start),
+                (MethodSignatureNode) visit(ctx.signature()),
+                (StatementNode) visit(ctx.func_body()),
+                ctx.ident().getText());
     }
 
     @Override
@@ -615,6 +624,18 @@ public final class ScriptVisitor
     }
 
     @Override
+    public FuncCallNode visitFunctionCallExpression(
+            final ScriptParser.FunctionCallExpressionContext ctx
+    ) {
+        final ExpressionNode[] args = ctx.func_call().expr().stream()
+                .map(arg -> (ExpressionNode) visit(arg))
+                .toArray(ExpressionNode[]::new);
+
+        return new FuncCallNode(TextPosition.fromToken(ctx.start),
+                ctx.func_call().ident().getText(), args);
+    }
+
+    @Override
     public AssignableNode visitAssignableExpression(
             final ScriptParser.AssignableExpressionContext ctx
     ) {
@@ -855,7 +876,7 @@ public final class ScriptVisitor
                 ctx.FLIP_COIN().getSymbol());
         return new TernaryOperationNode(pos, new FlipCoinNode(pos),
                 (ExpressionNode) visit(ctx.t),
-                (ExpressionNode) visit(ctx.t));
+                (ExpressionNode) visit(ctx.f));
     }
 
     @Override

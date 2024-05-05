@@ -1,5 +1,6 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.function;
 
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;

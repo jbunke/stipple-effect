@@ -1,5 +1,6 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.function;
 
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
@@ -54,7 +55,8 @@ public final class MethodSignatureNode extends ASTNode {
 
     @Override
     public String toString() {
-        return "(" + parameters + " -> " + returnType + ")";
+        return "(" + parameters +
+                (returnType != null ? " -> " + returnType : "") + ")";
     }
 
     public TypeNode getReturnType() {

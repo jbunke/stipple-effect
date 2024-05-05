@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.scripting;
 
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.HeadFuncNode;
 import org.junit.Assert;
 import org.junit.Test;
 

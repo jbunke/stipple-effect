@@ -1,13 +1,13 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow;
 
-import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.FuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class ReturnStatementNode extends StatementNode {
     private final ExpressionNode expression;
@@ -35,7 +35,7 @@ public final class ReturnStatementNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final HeadFuncNode func = symbolTable.getFunc();
+        final FuncNode func = symbolTable.getFunc();
 
         if (func != null) {
             final TypeNode

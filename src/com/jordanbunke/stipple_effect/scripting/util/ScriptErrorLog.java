@@ -19,6 +19,7 @@ public final class ScriptErrorLog {
     }
 
     public enum Message {
+        ARGS_SIGNATURE_MISMATCH,
         CANNOT_REDUCE_EMPTY_COL,
         NAN,
         PATH_DOES_NOT_CONTAIN_IMAGE,
@@ -39,7 +40,7 @@ public final class ScriptErrorLog {
         MAP_DOES_NOT_CONTAIN_ELEMENT,
         ARGS_PARAMS_MISMATCH,
         UNINITIALIZED_VAR,
-        UNDEFINED_VAR,
+        UNDEFINED_VAR, UNDEFINED_FUNC,
         INDEX_NOT_INT,
         INDEX_OUT_OF_BOUNDS,
         ELEMENT_DOES_NOT_MATCH_COL,
@@ -68,6 +69,10 @@ public final class ScriptErrorLog {
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case ARGS_SIGNATURE_MISMATCH ->
+                        "Attempting to call the function \"" + args[0] +
+                                "\" with a set of arguments that do not " +
+                                "match its signature";
                 case INVALID_OPERAND_PLUS -> "Operand of type \"" + args[0] +
                         "\" can neither be added nor concatenated (+)";
                 case CANNOT_REDUCE_EMPTY_COL ->
@@ -205,6 +210,8 @@ public final class ScriptErrorLog {
                 case UNDEFINED_VAR ->
                         "Attempted to reference variable \"" + args[0] +
                                 "\" that is not defined in the current scope";
+                case UNDEFINED_FUNC -> "Attempted to call function \"" +
+                        args[0] + "\" that is not defined in this script";
                 case UNINITIALIZED_VAR ->
                         "Variable \"" + args[0] +
                                 "\" has not been initialized";

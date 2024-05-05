@@ -26,7 +26,7 @@ import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.Script;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.HeadFuncNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
@@ -55,9 +55,9 @@ public class PreviewWindow implements ProgramContext {
             MENU_Y_ALLOTMENT_PX = (Layout.BUTTON_INC * 4) +
                     (Layout.CONTENT_BUFFER_PX - Layout.BUTTON_OFFSET);
 
-    private static PreviewWindow INSTANCE = null;
+    private static PreviewWindow INSTANCE;
+    private static int winX, winY;
 
-    private int winX, winY;
     private GameWindow window;
     private final SEContext context;
     private final Program preview;
@@ -74,6 +74,13 @@ public class PreviewWindow implements ProgramContext {
 
     private HeadFuncNode script;
 
+    static {
+        INSTANCE = null;
+
+        winX = 0;
+        winY = 0;
+    }
+
     public static void set(final SEContext context) {
         if (INSTANCE != null)
             INSTANCE.window.closeInstance();
@@ -83,8 +90,6 @@ public class PreviewWindow implements ProgramContext {
 
     private PreviewWindow(final SEContext context) {
         mousePos = new Coord2D();
-        winX = 0;
-        winY = 0;
 
         this.context = context;
 

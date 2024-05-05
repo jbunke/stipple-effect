@@ -18,6 +18,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitHead_rule(ScriptParser.Head_ruleContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ScriptParser#helper}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHelper(ScriptParser.HelperContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code StandardFuncBody}
 	 * labeled alternative in {@link ScriptParser#func_body}.
 	 * @param ctx the parse tree
@@ -374,6 +380,13 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPowerBinExpression(ScriptParser.PowerBinExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code FunctionCallExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionCallExpression(ScriptParser.FunctionCallExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code FlipCoinArgExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
@@ -609,6 +622,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitK_v_pair(ScriptParser.K_v_pairContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScriptParser#func_call}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_call(ScriptParser.Func_callContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StandardAssignment}
 	 * labeled alternative in {@link ScriptParser#assignment}.

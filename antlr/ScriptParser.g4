@@ -4,7 +4,9 @@ options {
     tokenVocab=ScriptLexer;
 }
 
-head_rule: signature func_body;
+head_rule: signature func_body helper*;
+
+helper: ident signature func_body;
 
 func_body: body                             #StandardFuncBody
 | DEF expr                                  #FunctionalFuncBody
@@ -140,6 +142,7 @@ expr
 | NEW type LT GT                            #NewListExpression
 | NEW type LCURLY RCURLY                    #NewSetExpression
 | NEW LCURLY kt=type COLON vt=type RCURLY   #NewMapExpression
+| func_call                                 #FunctionCallExpression
 | assignable                                #AssignableExpression
 | literal                                   #LiteralExpression
 ;
@@ -147,6 +150,9 @@ expr
 k_v_pairs: k_v_pair (COMMA k_v_pair)*;
 
 k_v_pair: key=expr COLON val=expr;
+
+func_call: ident LPAREN
+(expr (COMMA expr)*)? RPAREN;
 
 assignment
 : assignable ASSIGN expr                    #StandardAssignment

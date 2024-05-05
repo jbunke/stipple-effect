@@ -1245,7 +1245,7 @@ public class DialogAssembly {
     public static void setDialogToProgramSettings() {
         final MenuBuilder mb = new MenuBuilder();
 
-        Settings.initializeMenu();
+        Settings.resetAssignments();
 
         Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
             final GameImage baseSS = GraphicsUtils.drawTextButton(
