@@ -262,7 +262,7 @@ public class StippleEffect implements ProgramContext {
         configureDebugger();
     }
 
-    public static synchronized StippleEffect get() {
+    public static StippleEffect get() {
         return INSTANCE;
     }
 
