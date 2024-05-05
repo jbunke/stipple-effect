@@ -359,6 +359,13 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnaryExpression(ScriptParser.UnaryExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code RandomTwoArgExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRandomTwoArgExpression(ScriptParser.RandomTwoArgExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code MapLookupExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree

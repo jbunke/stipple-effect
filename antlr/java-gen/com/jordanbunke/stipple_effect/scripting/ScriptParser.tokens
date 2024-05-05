@@ -143,7 +143,6 @@ IDENTIFIER=104
 '!'=42
 '#|'=43
 'in'=44
-'final'=45
 'bool'=46
 'float'=47
 'int'=48

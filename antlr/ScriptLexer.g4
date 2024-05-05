@@ -58,7 +58,7 @@ SIZE: '#|';
 
 // Keywords
 IN: 'in';
-FINAL: 'final';
+FINAL: 'final' | '~';
 BOOL: 'bool';
 FLOAT: 'float';
 INT: 'int';

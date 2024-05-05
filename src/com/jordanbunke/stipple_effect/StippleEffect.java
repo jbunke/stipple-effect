@@ -262,7 +262,7 @@ public class StippleEffect implements ProgramContext {
         configureDebugger();
     }
 
-    public static StippleEffect get() {
+    public static synchronized StippleEffect get() {
         return INSTANCE;
     }
 
@@ -1427,5 +1427,13 @@ public class StippleEffect implements ProgramContext {
 
     public void setDialog(final Menu dialog) {
         this.dialog = dialog;
+    }
+
+    /**
+     * Ensure thread safety by passing tasks from other threads
+     * into the job scheduler
+     * */
+    public void scheduleJob(final Runnable job) {
+        jobScheduler.add(job);
     }
 }

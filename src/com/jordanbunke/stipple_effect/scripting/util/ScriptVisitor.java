@@ -852,6 +852,16 @@ public final class ScriptVisitor
     }
 
     @Override
+    public RandTwoArgNode visitRandomTwoArgExpression(
+            final ScriptParser.RandomTwoArgExpressionContext ctx
+    ) {
+        return new RandTwoArgNode(
+                TextPosition.fromToken(ctx.RAND().getSymbol()),
+                (ExpressionNode) visit(ctx.min),
+                (ExpressionNode) visit(ctx.max));
+    }
+
+    @Override
     public ProbabilityNode visitProbabilityExpression(
             final ScriptParser.ProbabilityExpressionContext ctx
     ) {

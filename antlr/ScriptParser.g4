@@ -102,6 +102,8 @@ expr
 | CLAMP LPAREN min=expr COMMA val=expr
   COMMA max=expr RPAREN                     #ClampExpression
 | RAND LPAREN RPAREN                        #RandomExpression
+| RAND LPAREN min=expr COMMA
+  max=expr RPAREN                           #RandomTwoArgExpression
 | PROB LPAREN expr RPAREN                   #ProbabilityExpression
 | FLIP_COIN LPAREN RPAREN                   #FlipCoinBoolExpression
 | FLIP_COIN LPAREN t=expr COMMA

@@ -503,6 +503,7 @@ public class PreviewWindow implements ProgramContext {
                 SELayer.fromPreviewContent(content), frameCount);
         final SEContext project = new SEContext(null, state, w, h);
 
-        StippleEffect.get().addContext(project, true);
+        StippleEffect.get().scheduleJob(() ->
+                StippleEffect.get().addContext(project, true));
     }
 }
