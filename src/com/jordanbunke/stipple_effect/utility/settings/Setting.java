@@ -33,9 +33,10 @@ public class Setting<T> {
     public void setFromRead(final String value) {
         final Optional<T> ifValue = type.parseValueFromRead(value);
         set(ifValue.orElse(defaultValue));
+        resetAssignment();
     }
 
-    public void initializeMenu() {
+    public void resetAssignment() {
         assignment = value;
     }
 

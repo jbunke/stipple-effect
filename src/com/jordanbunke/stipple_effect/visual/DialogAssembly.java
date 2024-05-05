@@ -26,6 +26,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
@@ -889,6 +890,46 @@ public class DialogAssembly {
                 () -> TextTool.get().addFont(), true));
     }
 
+    public static void setDialogToScriptErrors() {
+        final  MenuBuilder mb = new MenuBuilder();
+        final int MAX_TO_PRINT = 10;
+        final List<String> errors = ScriptErrorLog.getErrors();
+        final String CONT = " ".repeat(6) + "...";
+
+        final List<String> formattedErrors = new ArrayList<>();
+
+        for (String error : errors) {
+            String trimmedError = error;
+            while (trimmedError.length() > Layout.MAX_ERROR_CHARS_PER_LINE) {
+                final boolean first = error.equals(trimmedError);
+                final String beginning = cutOffAtNextSpace(trimmedError,
+                        Layout.CHARS_CUTOFF - (first ? 0 : CONT.length()));
+
+                formattedErrors.add((first ? "" : CONT) + beginning);
+                trimmedError = trimmedError.substring(beginning.length());
+            }
+
+            formattedErrors.add((error.equals(trimmedError) ? "" : CONT) +
+                    trimmedError);
+        }
+
+        for (int i = 0; i < formattedErrors.size() && i < MAX_TO_PRINT; i++)
+            mb.add(makeDialogLeftLabel(i, formattedErrors.get(i)));
+
+        if (formattedErrors.size() > MAX_TO_PRINT) {
+            final int more = (int) formattedErrors.stream()
+                    .filter(s -> formattedErrors.indexOf(s) >= MAX_TO_PRINT)
+                    .filter(s -> !s.startsWith(CONT)).count();
+
+            mb.add(makeDialogLeftLabel(MAX_TO_PRINT, "... and " + more + " more"));
+        }
+
+        setDialog(assembleDialog(
+                "Script encountered errors:",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                () -> false, Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
+    }
+
     public static void setDialogToExitProgramAYS() {
         setDialogToAYS("Exit " + StippleEffect.PROGRAM_NAME + "?",
                 "All open projects will be closed without saving...",
@@ -1204,7 +1245,7 @@ public class DialogAssembly {
     public static void setDialogToProgramSettings() {
         final MenuBuilder mb = new MenuBuilder();
 
-        Settings.initializeMenu();
+        Settings.resetAssignments();
 
         Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
             final GameImage baseSS = GraphicsUtils.drawTextButton(
@@ -1831,6 +1872,16 @@ public class DialogAssembly {
             final MenuElement preceding) {
         return preceding.getRenderPosition()
                 .displace(preceding.getWidth() + Layout.CONTENT_BUFFER_PX, 0);
+    }
+
+    private static String cutOffAtNextSpace(String s, int i) {
+        while (i < s.length()) {
+            if (s.charAt(i) == ' ')
+                return s.substring(0, i);
+            i++;
+        }
+
+        return s;
     }
 
     private static VerticalScrollBox assembleScroller(

@@ -170,9 +170,9 @@ public class Settings {
         FileIO.writeFile(SETTINGS_FILE, sb.toString());
     }
 
-    public static void initializeMenu() {
+    public static void resetAssignments() {
         for (Code code : Code.values())
-            code.setting.initializeMenu();
+            code.setting.resetAssignment();
     }
 
     public static void apply() {

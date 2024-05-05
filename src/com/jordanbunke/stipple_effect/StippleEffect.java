@@ -29,6 +29,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.Script;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
@@ -123,6 +124,7 @@ public class StippleEffect implements ProgramContext {
         OnStartup.run();
         Settings.read();
         readProgramFile();
+        Script.printErrorsToDialog();
 
         INSTANCE = new StippleEffect();
 
@@ -1036,7 +1038,6 @@ public class StippleEffect implements ProgramContext {
             else
                 StatusUpdates.openFailed(filepath);
         }
-        // extend with else-ifs for additional file types classes (scripts, palettes)
     }
 
     public void openNativeProject(final String contents, final Path filepath) {
@@ -1426,5 +1427,13 @@ public class StippleEffect implements ProgramContext {
 
     public void setDialog(final Menu dialog) {
         this.dialog = dialog;
+    }
+
+    /**
+     * Ensure thread safety by passing tasks from other threads
+     * into the job scheduler
+     * */
+    public void scheduleJob(final Runnable job) {
+        jobScheduler.add(job);
     }
 }

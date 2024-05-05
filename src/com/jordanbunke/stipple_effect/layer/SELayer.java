@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -22,6 +23,15 @@ public final class SELayer {
     private final String name;
 
     private OnionSkinMode onionSkinMode;
+
+    public static SELayer fromPreviewContent(
+            final GameImage[] content
+    ) {
+        final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
+
+        return new SELayer(frames, content[0], Constants.OPAQUE,
+                true, false, OnionSkinMode.NONE, giveLayerDefaultName());
+    }
 
     public static SELayer newLayer(
             final int w, final int h, final int frameCount

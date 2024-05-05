@@ -11,6 +11,11 @@ import java.util.Set;
 
 public class StatusUpdates {
     // not permitted
+    public static void invalidPreviewScript() {
+        actionNotPermitted("upload script",
+                "this script is not a valid preview script for this project");
+    }
+
     public static void cannotSetCheckAndGridToBounds(
             final boolean fromSelection
     ) {

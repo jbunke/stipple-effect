@@ -7,21 +7,31 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
 import com.jordanbunke.delta_time.events.GameWindowEvent;
+import com.jordanbunke.delta_time.events.WindowMovedEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.Script;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
@@ -31,17 +41,22 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.PreviewHousingBox;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 public class PreviewWindow implements ProgramContext {
     public static final int BORDER = 1,
             MENU_X_ALLOTMENT_PX = Layout.BUTTON_INC * 10,
-            MENU_Y_ALLOTMENT_PX = (Layout.BUTTON_INC * 3) +
+            MENU_Y_ALLOTMENT_PX = (Layout.BUTTON_INC * 4) +
                     (Layout.CONTENT_BUFFER_PX - Layout.BUTTON_OFFSET);
 
-    private static PreviewWindow INSTANCE = null;
+    private static PreviewWindow INSTANCE;
+    private static int winX, winY;
 
     private GameWindow window;
     private final SEContext context;
@@ -52,10 +67,19 @@ public class PreviewWindow implements ProgramContext {
     private int canvasW, canvasH, frameIndex, frameCount;
     private float zoom;
     private Coord2D mousePos;
-    private GameImage project;
+    private GameImage[] content;
 
     private PreviewImage previewImage;
     private PreviewHousingBox housingBox;
+
+    private HeadFuncNode script;
+
+    static {
+        INSTANCE = null;
+
+        winX = 0;
+        winY = 0;
+    }
 
     public static void set(final SEContext context) {
         if (INSTANCE != null)
@@ -72,9 +96,10 @@ public class PreviewWindow implements ProgramContext {
         playbackInfo = PlaybackInfo.forPreview();
         zoom = Constants.NO_ZOOM;
 
-        frameIndex = 0;
-        frameCount = this.context.getState().getFrameCount();
-        updateProject();
+        script = null;
+
+        updateContent();
+        animate(0d);
 
         menu = makeMenu();
         window = makeWindow();
@@ -93,11 +118,44 @@ public class PreviewWindow implements ProgramContext {
                 Layout.PREVIEW_WINDOW_BUFFER_PX,
                 Layout.PREVIEW_WINDOW_BUFFER_PX);
         final Supplier<Boolean> hasMultipleFrames =
-                () -> context.getState().getFrameCount() > 1;
+                () -> frameCount > 1;
+
+        final MenuElement smartScriptElement = new ThinkingMenuElement(() -> {
+            final boolean hasScript = script != null;
+            final String text = (hasScript ? "Running" : "No") + " script";
+
+            if (hasScript) {
+                final MenuElement removeButton =
+                        GraphicsUtils.generateIconButton(
+                                IconCodes.REMOVE_SCRIPT, initial,
+                                () -> true, this::removeScript),
+                        importButton = GraphicsUtils.generateIconButton(
+                                IconCodes.IMPORT_PREVIEW,
+                                initial.displace(Layout.BUTTON_INC, 0),
+                                () -> content != null && content.length > 0,
+                                this::importPreview),
+                        scriptText = labelAfterLastButton(
+                                importButton, () -> text, text);
+
+                return new MenuElementGrouping(
+                        removeButton, importButton, scriptText);
+            } else {
+                final MenuElement scriptButton =
+                        GraphicsUtils.generateIconButton(
+                                IconCodes.IMPORT_SCRIPT, initial,
+                                () -> true, this::openPreviewScript),
+                        scriptText = labelAfterLastButton(
+                                scriptButton, () -> text, text);
+
+                return new MenuElementGrouping(scriptButton, scriptText);
+            }
+        });
+        mb.addAll(smartScriptElement);
 
         final MenuElement firstFrame =
                 GraphicsUtils.generateIconButton(
-                        IconCodes.TO_FIRST_FRAME, initial,
+                        IconCodes.TO_FIRST_FRAME,
+                        initial.displace(0, Layout.BUTTON_INC),
                         hasMultipleFrames, () -> frameIndex = 0),
                 previousFrame = GraphicsUtils.generateIconButton(
                         IconCodes.PREVIOUS, firstFrame.getRenderPosition()
@@ -152,7 +210,7 @@ public class PreviewWindow implements ProgramContext {
                         -(Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX),
                         Layout.BUTTON_INC), Layout.ICON_DIMS,
                 MenuElement.Anchor.LEFT_TOP, GameImage.dummy());
-        final int fpsButtonY = initial.y + Layout.BUTTON_INC;
+        final int fpsButtonY = initial.y + Layout.BUTTON_INC * 2;
         final IncrementalRangeElements<Integer> fps =
                 IncrementalRangeElements.makeForInt(fpsReference, fpsButtonY,
                         (fpsButtonY - Layout.BUTTON_OFFSET) + Layout.TEXT_Y_OFFSET,
@@ -234,6 +292,11 @@ public class PreviewWindow implements ProgramContext {
                     else
                         zoomOut();
                 }
+            } else if (event instanceof WindowMovedEvent wme) {
+                wme.markAsProcessed();
+
+                winX = wme.x;
+                winY = wme.y;
             }
     }
 
@@ -252,9 +315,6 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private void animate(final double deltaTime) {
-        frameCount = context.getState().getFrameCount();
-        frameIndex = frameIndex % frameCount;
-
         if (playbackInfo.isPlaying()) {
             final boolean nextFrameDue = playbackInfo.checkIfNextFrameDue(deltaTime);
 
@@ -263,11 +323,45 @@ public class PreviewWindow implements ProgramContext {
                         frameIndex, frameCount);
         }
 
-        updateProject();
+        if (context.projectInfo.hasChangesSincePreview())
+            updateContent();
+
+        frameCount = content.length;
+        frameIndex %= frameCount;
     }
 
-    private void updateProject() {
-        project = context.getState().draw(false, false, frameIndex);
+    private void updateContent() {
+        context.projectInfo.logPreview();
+
+        content = IntStream.range(0, context.getState().getFrameCount())
+                .mapToObj(i -> context.getState()
+                        .draw(false, false, i))
+                .toArray(GameImage[]::new);
+
+        if (script != null)
+            runScript();
+    }
+
+    private void runScript() {
+        frameIndex %= content.length;
+
+        final Object arg = content.length > 1
+                ? ScriptArray.of((Object[]) content)
+                : content[frameIndex];
+
+        final Object result = Script.run(script, arg);
+
+        if (result instanceof GameImage image)
+            content = new GameImage[] { image };
+        else if (result instanceof ScriptArray arr) {
+            final GameImage[] images = new GameImage[arr.size()];
+
+            for (int i = 0; i < images.length; i++)
+                images[i] = (GameImage) arr.get(i);
+
+            content = images;
+        } else
+            window.closeInstance();
     }
 
     private boolean checkIfProjectHasBeenClosed() {
@@ -275,8 +369,8 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private void windowUpdateCheck() {
-        final int w = context.getState().getImageWidth(),
-                h = context.getState().getImageHeight();
+        final int w = content[frameIndex].getWidth(),
+                h = content[frameIndex].getHeight();
 
         if (canvasW != w || canvasH != h)
             updateWindow();
@@ -294,8 +388,8 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private GameWindow makeWindow() {
-        canvasW = context.getState().getImageWidth();
-        canvasH = context.getState().getImageHeight();
+        canvasW = content[frameIndex].getWidth();
+        canvasH = content[frameIndex].getHeight();
 
         final int zoomW = (int) (zoom * canvasW),
                 zoomH = (int) (zoom * canvasH);
@@ -317,6 +411,8 @@ public class PreviewWindow implements ProgramContext {
                 width, height, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 false, false, false);
         window.hideCursor();
+        window.setPosition(winX, winY);
+
         return window;
     }
 
@@ -345,7 +441,7 @@ public class PreviewWindow implements ProgramContext {
 
         canvasContents.drawRectangle(SEColors.black(), 2f, BORDER, BORDER, w, h);
         canvasContents.draw(context.getCheckerboard(), BORDER, BORDER, w, h);
-        canvasContents.draw(project, BORDER, BORDER, w, h);
+        canvasContents.draw(content[frameIndex], BORDER, BORDER, w, h);
 
         previewImage.refresh(canvasContents.submit());
     }
@@ -359,5 +455,55 @@ public class PreviewWindow implements ProgramContext {
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {
 
+    }
+
+    private void openPreviewScript() {
+        FileIO.setDialogToFilesOnly();
+        final Optional<File> opened = FileIO.openFileFromSystem(
+                new String[] {
+                        StippleEffect.PROGRAM_NAME + " scripts (." +
+                                Constants.SCRIPT_FILE_SUFFIX + ")"
+                },
+                new String[][] {
+                        new String[] { Constants.SCRIPT_FILE_SUFFIX }
+                });
+        window.getEventLogger().unpressAllKeys();
+        StippleEffect.get().window.getEventLogger().unpressAllKeys();
+
+        if (opened.isEmpty())
+            return;
+
+        final Path filepath = opened.get().toPath();
+        final HeadFuncNode script = Script.build(FileIO.readFile(filepath));
+
+        if (Script.validatePreviewScript(script, context))
+            setScript(script);
+        else
+            StatusUpdates.invalidPreviewScript();
+    }
+
+    private void setScript(final HeadFuncNode script) {
+        this.script = script;
+        updateContent();
+        animate(0d);
+    }
+
+    private void removeScript() {
+        script = null;
+        updateContent();
+        animate(0d);
+    }
+
+    private void importPreview() {
+        final int frameCount = content.length,
+                w = content[0].getWidth(),
+                h = content[0].getHeight();
+
+        final ProjectState state = ProjectState.makeFromRasterFile(w, h,
+                SELayer.fromPreviewContent(content), frameCount);
+        final SEContext project = new SEContext(null, state, w, h);
+
+        StippleEffect.get().scheduleJob(() ->
+                StippleEffect.get().addContext(project, true));
     }
 }

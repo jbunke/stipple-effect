@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 
-public class Layout {
+public final class Layout {
     // panel variables
     private static boolean framesPanelShowing, layersPanelShowing,
             colorsPanelShowing, toolbarShowing, projectsExpanded;
@@ -52,7 +52,8 @@ public class Layout {
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             FULL_COLOR_SLIDER_W = RIGHT_PANEL_W - (SLIDER_BALL_DIM + 10),
             HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
-            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100;
+            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
+            MAX_ERROR_CHARS_PER_LINE = 60, CHARS_CUTOFF = MAX_ERROR_CHARS_PER_LINE - 5;
 
     public static final Bounds2D ICON_DIMS = new Bounds2D(BUTTON_DIM, BUTTON_DIM),
             PALETTE_DIMS = new Bounds2D(24, 24);
