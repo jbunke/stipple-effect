@@ -54,8 +54,8 @@ public final class ScriptArray implements ScriptCollection {
     }
 
     @Override
-    public String collectionName() {
-        return "array - []";
+    public Stream<Object> stream() {
+        return Arrays.stream(structure);
     }
 
     @Override

@@ -1,7 +1,6 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
@@ -9,7 +8,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import java.awt.*;
 import java.util.Set;
 
-public final class ColorChannelNode extends NativeFuncWithOwnerNode {
+public final class ColorChannelNode extends NativePropertyFuncNode {
     private enum ColorChannel {
         RED, GREEN, BLUE, ALPHA;
 
@@ -41,8 +40,7 @@ public final class ColorChannelNode extends NativeFuncWithOwnerNode {
             final ExpressionNode owner,
             final String channelString
     ) {
-        super(position, owner,
-                Set.of(new SimpleTypeNode(SimpleTypeNode.Type.COLOR)));
+        super(position, owner, Set.of(TypeNode.getColor()));
 
         channel = ColorChannel.fromString(channelString);
     }
@@ -54,7 +52,7 @@ public final class ColorChannelNode extends NativeFuncWithOwnerNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        return TypeNode.getInt();
     }
 
     @Override

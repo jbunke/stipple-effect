@@ -45,10 +45,10 @@ public final class DrawLineNode extends StatementNode {
         y2.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
-                imgType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
-                colType = new SimpleTypeNode(SimpleTypeNode.Type.COLOR),
-                floatType = new SimpleTypeNode(SimpleTypeNode.Type.FLOAT),
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+                imgType = TypeNode.getImage(),
+                colType = TypeNode.getColor(),
+                floatType = TypeNode.getFloat(),
+                intType = TypeNode.getInt();
 
         final TypeNode
                 cType = canvas.getType(symbolTable),

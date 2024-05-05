@@ -28,8 +28,8 @@ type
 | IMAGE                                     #ImageType
 | COLOR                                     #ColorType
 | type LBRACKET RBRACKET                    #ArrayType
-| type LT GT                                #SetType
-| type LCURLY RCURLY                        #ListType
+| type LT GT                                #ListType
+| type LCURLY RCURLY                        #SetType
 | LCURLY key=type COLON val=type RCURLY     #MapType
 ;
 
@@ -92,6 +92,18 @@ expr
 | map=expr LOOKUP LPAREN elem=expr RPAREN   #MapLookupExpression
 | map=expr KEYS LPAREN RPAREN               #MapKeysetExpression
 | c=expr op=(RED | GREEN | BLUE | ALPHA)    #ColorChannelExpression
+| ABS LPAREN expr RPAREN                    #AbsoluteExpression
+| MIN LPAREN expr RPAREN                    #MinCollectionExpression
+| MIN LPAREN a=expr COMMA b=expr RPAREN     #MinTwoArgExpression
+| MAX LPAREN expr RPAREN                    #MaxCollectionExpression
+| MAX LPAREN a=expr COMMA b=expr RPAREN     #MaxTwoArgExpression
+| CLAMP LPAREN min=expr COMMA val=expr
+  COMMA max=expr RPAREN                     #ClampExpression
+| RAND LPAREN RPAREN                        #RandomExpression
+| PROB LPAREN expr RPAREN                   #ProbabilityExpression
+| FLIP_COIN LPAREN RPAREN                   #FlipCoinBoolExpression
+| FLIP_COIN LPAREN t=expr COMMA
+  f=expr RPAREN                             #FlipCoinArgExpression
 | FROM LPAREN expr RPAREN                   #ImageFromPathExpression
 | BLANK LPAREN width=expr
   COMMA height=expr RPAREN                  #ImageOfBoundsExpression
@@ -120,16 +132,21 @@ expr
 | a=expr op=(OR | AND) b=expr               #LogicBinExpression
 | cond=expr QUESTION if=expr
   COLON else=expr                           #TernaryExpression
+| LCURLY k_v_pairs RCURLY                   #ExplicitMapExpression
 | LBRACKET expr (COMMA expr)* RBRACKET      #ExplicitArrayExpression
 | LT expr (COMMA expr)* GT                  #ExplicitListExpression
 | LCURLY expr (COMMA expr)* RCURLY          #ExplicitSetExpression
 | NEW type LBRACKET expr RBRACKET           #NewArrayExpression
-| NEW LT GT                                 #NewListExpression
-| NEW LCURLY RCURLY                         #NewSetExpression
-| NEW LCURLY COLON RCURLY                   #NewMapExpression
+| NEW type LT GT                            #NewListExpression
+| NEW type LCURLY RCURLY                    #NewSetExpression
+| NEW LCURLY kt=type COLON vt=type RCURLY   #NewMapExpression
 | assignable                                #AssignableExpression
 | literal                                   #LiteralExpression
 ;
+
+k_v_pairs: k_v_pair (COMMA k_v_pair)*;
+
+k_v_pair: key=expr COLON val=expr;
 
 assignment
 : assignable ASSIGN expr                    #StandardAssignment
@@ -162,6 +179,7 @@ ident: IDENTIFIER;
 literal
 : STRING_LIT                                #StringLiteral
 | CHAR_LIT                                  #CharLiteral
+| COL_LIT                                   #ColorLiteral
 | int_lit                                   #IntLiteral
 | FLOAT_LIT                                 #FloatLiteral
 | bool_lit                                  #BoolLiteral

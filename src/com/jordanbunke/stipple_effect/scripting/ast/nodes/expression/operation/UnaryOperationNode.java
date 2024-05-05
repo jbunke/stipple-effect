@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
@@ -56,15 +55,15 @@ public final class UnaryOperationNode extends ExpressionNode {
         switch (operator) {
             case NOT -> {
                 if (!operandType.equals(
-                        new SimpleTypeNode(SimpleTypeNode.Type.BOOL)))
+                        TypeNode.getBool()))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.OPERAND_NOT_BOOL,
                             getPosition(), operandType.toString());
             }
             case NEGATE -> {
                 final Set<TypeNode> acceptedTypes = Set.of(
-                        new SimpleTypeNode(SimpleTypeNode.Type.INT),
-                        new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
+                        TypeNode.getInt(),
+                        TypeNode.getFloat());
 
                 if (!acceptedTypes.contains(operandType))
                     ScriptErrorLog.fireError(
@@ -119,7 +118,7 @@ public final class UnaryOperationNode extends ExpressionNode {
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
         if (operator == Operator.SIZE)
-            return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+            return TypeNode.getInt();
 
         return operand.getType(symbolTable);
     }

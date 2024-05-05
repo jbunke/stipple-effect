@@ -52,8 +52,7 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
 
         index.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        final SimpleTypeNode intType = TypeNode.getInt();
         final TypeNode indexType = index.getType(symbolTable);
 
         if (!indexType.equals(intType))

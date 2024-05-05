@@ -1,15 +1,14 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class RemoveNode extends StatementNode {
     private final ExpressionNode collection, index;
@@ -48,7 +47,7 @@ public final class RemoveNode extends StatementNode {
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.REMOVE_FROM_SET_OR_ARRAY,
                     collection.getPosition());
-        if (!iType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
+        if (!iType.equals(TypeNode.getInt()))
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.INDEX_NOT_INT,
                     index.getPosition(), iType.toString());

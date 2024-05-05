@@ -1,18 +1,24 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class NewMapNode extends ExpressionNode {
+    private final TypeNode keyType, valType;
+
     public NewMapNode(
-            final TextPosition position
+            final TextPosition position,
+            final TypeNode keyType,
+            final TypeNode valType
     ) {
         super(position);
+
+        this.keyType = keyType;
+        this.valType = valType;
     }
 
     @Override
@@ -24,13 +30,11 @@ public final class NewMapNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new MapTypeNode(
-                new SimpleTypeNode(SimpleTypeNode.Type.RAW),
-                new SimpleTypeNode(SimpleTypeNode.Type.RAW));
+        return new MapTypeNode(keyType, valType);
     }
 
     @Override
     public String toString() {
-        return "new {:}";
+        return "new { " + keyType + " : " + valType + " }";
     }
 }

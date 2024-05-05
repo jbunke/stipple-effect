@@ -30,14 +30,14 @@ public sealed class WhileLoopNode extends StatementNode
         loopCondition.semanticErrorCheck(symbolTable);
         loopBody.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode
-                boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+        final SimpleTypeNode boolType = TypeNode.getBool();
         final TypeNode condType = loopCondition.getType(symbolTable);
 
         if (!condType.equals(boolType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.COND_NOT_BOOL,
-                    loopCondition.getPosition(), condType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    loopCondition.getPosition(), "Condition",
+                    boolType.toString(), condType.toString());
     }
 
     boolean evaluateCondition(final SymbolTable symbolTable) {

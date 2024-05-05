@@ -92,8 +92,7 @@ public final class BinaryOperationNode extends ExpressionNode {
 
         switch (operator) {
             case AND, OR -> {
-                final SimpleTypeNode boolType =
-                        new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+                final SimpleTypeNode boolType = TypeNode.getBool();
 
                 if (!o1Type.equals(boolType))
                     ScriptErrorLog.fireError(
@@ -117,8 +116,8 @@ public final class BinaryOperationNode extends ExpressionNode {
             case SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
                     GT, LT, GEQ, LEQ -> {
                 final Set<TypeNode> acceptedTypes = Set.of(
-                        new SimpleTypeNode(SimpleTypeNode.Type.INT),
-                        new SimpleTypeNode(SimpleTypeNode.Type.FLOAT));
+                        TypeNode.getInt(),
+                        TypeNode.getFloat());
 
                 if (!acceptedTypes.contains(o1Type))
                     ScriptErrorLog.fireError(
@@ -168,7 +167,7 @@ public final class BinaryOperationNode extends ExpressionNode {
                     yield s1 + s2;
 
                 final SimpleTypeNode
-                        intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+                        intType = TypeNode.getInt();
                 final boolean bothInts =
                         o1.getType(symbolTable).equals(intType) &&
                                 o2.getType(symbolTable).equals(intType);
@@ -209,7 +208,7 @@ public final class BinaryOperationNode extends ExpressionNode {
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
         if (operator.isLogic())
-            return new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+            return TypeNode.getBool();
 
         final TypeNode o1Type = o1.getType(symbolTable),
                 o2Type = o2.getType(symbolTable);
@@ -217,17 +216,16 @@ public final class BinaryOperationNode extends ExpressionNode {
         final boolean bothNums = o1Type.isNum() && o2Type.isNum();
 
         if (bothNums) {
-            final SimpleTypeNode floatType =
-                    new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);
+            final SimpleTypeNode floatType = TypeNode.getFloat();
 
             if (o1Type.equals(floatType) || o2Type.equals(floatType))
                 return floatType;
 
-            return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+            return TypeNode.getInt();
         } else if (operator == Operator.ADD)
-            return new SimpleTypeNode(SimpleTypeNode.Type.STRING);
+            return TypeNode.getString();
 
-        return new SimpleTypeNode(SimpleTypeNode.Type.RAW);
+        return TypeNode.wildcard();
     }
 
     @Override

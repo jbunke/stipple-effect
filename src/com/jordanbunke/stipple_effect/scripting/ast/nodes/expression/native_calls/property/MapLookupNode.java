@@ -1,17 +1,16 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class MapLookupNode extends NativeFuncWithOwnerNode {
+public final class MapLookupNode extends NativePropertyFuncNode {
     private final ExpressionNode element;
 
     public MapLookupNode(
@@ -21,8 +20,8 @@ public final class MapLookupNode extends NativeFuncWithOwnerNode {
     ) {
         super(position, owner,
                 Set.of(new MapTypeNode(
-                        new SimpleTypeNode(SimpleTypeNode.Type.RAW),
-                        new SimpleTypeNode(SimpleTypeNode.Type.RAW))));
+                        TypeNode.wildcard(),
+                        TypeNode.wildcard())));
 
         this.element = element;
     }

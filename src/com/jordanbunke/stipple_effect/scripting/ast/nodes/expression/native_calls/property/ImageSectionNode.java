@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class ImageSectionNode extends NativeFuncWithOwnerNode {
+public final class ImageSectionNode extends NativePropertyFuncNode {
     final ExpressionNode x, y, width, height;
 
     public ImageSectionNode(
@@ -22,7 +22,7 @@ public final class ImageSectionNode extends NativeFuncWithOwnerNode {
             final ExpressionNode height
     ) {
         super(position, owner,
-                Set.of(new SimpleTypeNode(SimpleTypeNode.Type.IMAGE)));
+                Set.of(TypeNode.getImage()));
 
         this.x = x;
         this.y = y;
@@ -39,8 +39,7 @@ public final class ImageSectionNode extends NativeFuncWithOwnerNode {
 
         super.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode intType =
-                new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        final SimpleTypeNode intType = TypeNode.getInt();
 
         final TypeNode
                 xType = x.getType(symbolTable),
@@ -96,7 +95,7 @@ public final class ImageSectionNode extends NativeFuncWithOwnerNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+        return TypeNode.getImage();
     }
 
     @Override

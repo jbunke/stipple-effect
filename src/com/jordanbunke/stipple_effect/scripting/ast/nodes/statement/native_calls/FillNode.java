@@ -41,9 +41,9 @@ public final class FillNode extends StatementNode {
         height.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
-                imgType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
-                colType = new SimpleTypeNode(SimpleTypeNode.Type.COLOR),
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+                imgType = TypeNode.getImage(),
+                colType = TypeNode.getColor(),
+                intType = TypeNode.getInt();
 
         final TypeNode
                 cType = canvas.getType(symbolTable),

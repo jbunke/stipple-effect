@@ -33,16 +33,18 @@ public final class TernaryOperationNode extends ExpressionNode {
                 cType = condition.getType(symbolTable),
                 aType = a.getType(symbolTable),
                 bType = b.getType(symbolTable);
+        final SimpleTypeNode boolType = TypeNode.getBool();
 
-        if (!cType.equals(new SimpleTypeNode(SimpleTypeNode.Type.BOOL)))
+        if (!cType.equals(boolType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.TERN_COND_NOT_BOOL,
-                    getPosition(), cType.toString());
-
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    getPosition(), "Ternary condition",
+                    boolType.toString(), cType.toString());
         if (!aType.equals(bType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.TERNARY_BRANCHES_OF_DIFFERENT_TYPES,
-                    getPosition(), aType.toString(), bType.toString());
+                    ScriptErrorLog.Message.DIFFERENT_TYPES, getPosition(),
+                    "Ternary branches", "true case", "false case",
+                    aType.toString(), bType.toString());
     }
 
     @Override

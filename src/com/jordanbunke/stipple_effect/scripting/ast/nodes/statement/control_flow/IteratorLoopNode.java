@@ -38,8 +38,7 @@ public final class IteratorLoopNode extends StatementNode {
         collection.semanticErrorCheck(innerTable);
         loopBody.semanticErrorCheck(innerTable);
 
-        final SimpleTypeNode
-                stringType = new SimpleTypeNode(SimpleTypeNode.Type.STRING);
+        final SimpleTypeNode stringType = TypeNode.getString();
         final TypeNode colType = collection.getType(symbolTable),
                 varType = declaration.getType();
 
@@ -52,8 +51,7 @@ public final class IteratorLoopNode extends StatementNode {
                         declaration.getPosition(),
                         elemType.toString(), varType.toString());
         } else if (stringType.equals(colType)) {
-            final SimpleTypeNode charType =
-                    new SimpleTypeNode(SimpleTypeNode.Type.CHAR);
+            final SimpleTypeNode charType = TypeNode.getChar();
 
             if (!varType.equals(charType))
                 ScriptErrorLog.fireError(

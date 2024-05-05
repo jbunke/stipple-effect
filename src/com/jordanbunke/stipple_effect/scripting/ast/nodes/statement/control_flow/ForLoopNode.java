@@ -41,14 +41,14 @@ public final class ForLoopNode extends StatementNode {
         incrementation.semanticErrorCheck(innerTable);
         loopBody.semanticErrorCheck(innerTable);
 
-        final SimpleTypeNode
-                boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+        final SimpleTypeNode boolType = TypeNode.getBool();
         final TypeNode condType = loopCondition.getType(symbolTable);
 
         if (!condType.equals(boolType))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.COND_NOT_BOOL,
-                    loopCondition.getPosition(), condType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    loopCondition.getPosition(), "Condition",
+                    boolType.toString(), condType.toString());
     }
 
     private boolean evaluateCondition(final SymbolTable symbolTable) {

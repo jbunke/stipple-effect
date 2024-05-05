@@ -1,16 +1,15 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls;
 
-import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Optional;
 
@@ -32,16 +31,20 @@ public final class AddNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        final boolean hasIndex = index != null;
+
         collection.semanticErrorCheck(symbolTable);
         toAdd.semanticErrorCheck(symbolTable);
-        index.semanticErrorCheck(symbolTable);
+
+        if (hasIndex)
+            index.semanticErrorCheck(symbolTable);
 
         final TypeNode
                 colType = collection.getType(symbolTable),
                 elemType = (colType instanceof CollectionTypeNode ct)
                         ? ct.getElementType() : null,
                 addType = toAdd.getType(symbolTable),
-                iType = index.getType(symbolTable);
+                iType = hasIndex ? index.getType(symbolTable) : null;
         final CollectionTypeNode.Type typeOfCol =
                 (colType instanceof CollectionTypeNode ct)
                         ? ct.getType() : null;
@@ -60,7 +63,7 @@ public final class AddNode extends StatementNode {
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.ADD_TO_ARRAY,
                     collection.getPosition());
-        if (!iType.equals(new SimpleTypeNode(SimpleTypeNode.Type.INT)))
+        if (hasIndex && !iType.equals(TypeNode.getInt()))
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.INDEX_NOT_INT,
                     index.getPosition(), iType.toString());

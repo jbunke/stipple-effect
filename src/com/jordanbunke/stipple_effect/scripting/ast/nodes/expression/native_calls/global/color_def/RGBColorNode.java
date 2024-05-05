@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.color_def;
 
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
@@ -30,8 +30,7 @@ public final class RGBColorNode extends ExpressionNode {
         g.semanticErrorCheck(symbolTable);
         b.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode intType =
-                new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        final SimpleTypeNode intType = TypeNode.getInt();
 
         final TypeNode
                 rType = r.getType(symbolTable),
@@ -77,7 +76,7 @@ public final class RGBColorNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.COLOR);
+        return TypeNode.getColor();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.img_gen;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
@@ -27,8 +27,7 @@ public final class ImageOfBoundsNode extends ExpressionNode {
         width.semanticErrorCheck(symbolTable);
         height.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode intType =
-                new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        final SimpleTypeNode intType = TypeNode.getInt();
 
         final TypeNode
                 widthType = width.getType(symbolTable),
@@ -69,7 +68,7 @@ public final class ImageOfBoundsNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+        return TypeNode.getImage();
     }
 
     @Override

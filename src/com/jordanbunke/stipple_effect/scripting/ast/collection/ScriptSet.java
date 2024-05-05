@@ -1,15 +1,14 @@
 package com.jordanbunke.stipple_effect.scripting.ast.collection;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 public final class ScriptSet implements ScriptCollection {
-    private final Set<Object> structure;
+    private final List<Object> structure;
 
     public ScriptSet() {
-        structure = new HashSet<>();
+        structure = new ArrayList<>();
     }
 
     public ScriptSet(final Stream<Object> elements) {
@@ -35,7 +34,7 @@ public final class ScriptSet implements ScriptCollection {
 
     @Override
     public Object get(int index) {
-        return null;
+        return structure.get(index);
     }
 
     @Override
@@ -47,8 +46,8 @@ public final class ScriptSet implements ScriptCollection {
     }
 
     @Override
-    public String collectionName() {
-        return "set - {}";
+    public Stream<Object> stream() {
+        return structure.stream();
     }
 
     @Override

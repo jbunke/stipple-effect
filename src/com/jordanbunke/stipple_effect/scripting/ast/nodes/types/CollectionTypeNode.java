@@ -2,16 +2,16 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
-import java.lang.reflect.Array;
-import java.util.List;
-import java.util.Set;
-
 public final class CollectionTypeNode extends TypeNode {
     private final Type type;
     private final TypeNode elementType;
 
     public enum Type {
         ARRAY, SET, LIST;
+
+        public String description() {
+            return name().toLowerCase() + " - " + this;
+        }
 
         @Override
         public String toString() {
@@ -38,16 +38,6 @@ public final class CollectionTypeNode extends TypeNode {
 
     public Type getType() {
         return type;
-    }
-
-    @Override
-    public Class<?> valueClass() {
-        return switch (type) {
-            case LIST -> List.class;
-            case SET -> Set.class;
-            case ARRAY -> Array.newInstance(
-                    elementType.valueClass(), 1).getClass();
-        };
     }
 
     @Override

@@ -83,6 +83,13 @@ RGB: 'rgb';
 BLANK: 'blank';
 TEX_COL_REPL: 'tex_col_repl';
 GEN_LOOKUP: 'gen_lookup';
+ABS: 'abs';
+MIN: 'min';
+MAX: 'max';
+CLAMP: 'clamp';
+RAND: 'rand';
+PROB: 'prob';
+FLIP_COIN: 'flip_coin';
 
 // Native field keywords
 RED: '.' ('red' | 'r');
@@ -111,9 +118,11 @@ SECTION: '.section';
 // numbers
 fragment DIGIT: '0'..'9';
 fragment HEX_DIGIT: DIGIT | 'a'..'f';
+fragment CHANNEL: HEX_DIGIT HEX_DIGIT;
 FLOAT_LIT: (DIGIT+ '.' DIGIT+) | (DIGIT+ 'f');
 DEC_LIT: DIGIT+;
 HEX_LIT: '0x' HEX_DIGIT+;
+COL_LIT: '#' CHANNEL CHANNEL CHANNEL CHANNEL?;
 
 CHAR_QUOTE: '\'';
 STR_QUOTE: '"';

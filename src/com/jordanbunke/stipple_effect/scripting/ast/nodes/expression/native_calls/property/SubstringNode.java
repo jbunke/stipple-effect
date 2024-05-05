@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
@@ -9,7 +9,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class SubstringNode extends NativeFuncWithOwnerNode {
+public final class SubstringNode extends NativePropertyFuncNode {
     private final ExpressionNode beginning, end;
 
     public SubstringNode(
@@ -19,7 +19,7 @@ public final class SubstringNode extends NativeFuncWithOwnerNode {
             final ExpressionNode end
     ) {
         super(position, owner,
-                Set.of(new SimpleTypeNode(SimpleTypeNode.Type.STRING)));
+                Set.of(TypeNode.getString()));
 
         this.beginning = beginning;
         this.end = end;
@@ -32,8 +32,7 @@ public final class SubstringNode extends NativeFuncWithOwnerNode {
 
         super.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode intType =
-                new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        final SimpleTypeNode intType = TypeNode.getInt();
 
         final TypeNode
                 begType = beginning.getType(symbolTable),
@@ -82,7 +81,7 @@ public final class SubstringNode extends NativeFuncWithOwnerNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.STRING);
+        return TypeNode.getString();
     }
 
     @Override

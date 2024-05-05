@@ -1,25 +1,27 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class NewCollectionNode extends ExpressionNode {
     private final CollectionTypeNode.Type collectionType;
+    private final TypeNode elementType;
 
     public NewCollectionNode(
             final TextPosition position,
-            final CollectionTypeNode.Type collectionType
+            final CollectionTypeNode.Type collectionType,
+            final TypeNode elementType
     ) {
         super(position);
 
         this.collectionType = collectionType;
+        this.elementType = elementType;
     }
 
     @Override
@@ -35,8 +37,7 @@ public final class NewCollectionNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new CollectionTypeNode(collectionType,
-                new SimpleTypeNode(SimpleTypeNode.Type.RAW));
+        return new CollectionTypeNode(collectionType, elementType);
     }
 
     @Override

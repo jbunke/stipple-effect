@@ -2,8 +2,6 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
-import java.util.Map;
-
 public final class MapTypeNode extends TypeNode {
     private final TypeNode keyType;
     private final TypeNode valueType;
@@ -23,11 +21,6 @@ public final class MapTypeNode extends TypeNode {
 
     public TypeNode getValueType() {
         return valueType;
-    }
-
-    @Override
-    public Class<?> valueClass() {
-        return Map.class;
     }
 
     @Override

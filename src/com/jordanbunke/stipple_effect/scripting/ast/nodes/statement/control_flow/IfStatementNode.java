@@ -31,8 +31,7 @@ public final class IfStatementNode extends StatementNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        final SimpleTypeNode
-                boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+        final SimpleTypeNode boolType = TypeNode.getBool();
 
         for (ExpressionNode condition : conditions) {
             condition.semanticErrorCheck(symbolTable);
@@ -41,8 +40,9 @@ public final class IfStatementNode extends StatementNode {
 
             if (!condType.equals(boolType))
                 ScriptErrorLog.fireError(
-                        ScriptErrorLog.Message.COND_NOT_BOOL,
-                        condition.getPosition(), condType.toString());
+                        ScriptErrorLog.Message.ARG_NOT_TYPE,
+                        condition.getPosition(), "Condition",
+                        boolType.toString(), condType.toString());
         }
 
         for (StatementNode body : bodies)

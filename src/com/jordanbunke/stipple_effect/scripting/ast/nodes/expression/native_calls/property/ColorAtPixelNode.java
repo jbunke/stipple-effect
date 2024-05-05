@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
@@ -11,7 +11,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import java.awt.*;
 import java.util.Set;
 
-public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
+public final class ColorAtPixelNode extends NativePropertyFuncNode {
     private final ExpressionNode x, y;
 
     public ColorAtPixelNode(
@@ -21,7 +21,7 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
             final ExpressionNode y
     ) {
         super(position, owner,
-                Set.of(new SimpleTypeNode(SimpleTypeNode.Type.IMAGE)));
+                Set.of(TypeNode.getImage()));
 
         this.x = x;
         this.y = y;
@@ -34,8 +34,7 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
 
         super.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode intType =
-                new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        final SimpleTypeNode intType = TypeNode.getInt();
 
         final TypeNode
                 xType = x.getType(symbolTable),
@@ -73,7 +72,7 @@ public final class ColorAtPixelNode extends NativeFuncWithOwnerNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.COLOR);
+        return TypeNode.getColor();
     }
 
     @Override

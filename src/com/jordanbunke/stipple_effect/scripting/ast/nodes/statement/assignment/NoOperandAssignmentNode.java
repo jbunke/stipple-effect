@@ -27,7 +27,7 @@ public final class NoOperandAssignmentNode extends AssignmentNode {
 
         final TypeNode assignableType = getAssignable().getType(symbolTable);
         final SimpleTypeNode
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+                intType = TypeNode.getInt();
 
         if (!assignableType.equals(intType))
             ScriptErrorLog.fireError(

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.tex_lookup;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.sprite.TextureColorReplace;
@@ -29,8 +29,8 @@ public final class GenLookupNode extends ExpressionNode {
         vert.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
-                imageType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
-                boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+                imageType = TypeNode.getImage(),
+                boolType = TypeNode.getBool();
 
         final TypeNode
                 sourceType = source.getType(symbolTable),
@@ -58,7 +58,7 @@ public final class GenLookupNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+        return TypeNode.getImage();
     }
 
     @Override

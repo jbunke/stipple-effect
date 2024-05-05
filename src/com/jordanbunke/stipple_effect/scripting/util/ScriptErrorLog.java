@@ -19,10 +19,10 @@ public final class ScriptErrorLog {
     }
 
     public enum Message {
-        PATH_NOT_STRING,
+        CANNOT_REDUCE_EMPTY_COL,
+        NAN,
         PATH_DOES_NOT_CONTAIN_IMAGE,
-        TERN_COND_NOT_BOOL,
-        TERNARY_BRANCHES_OF_DIFFERENT_TYPES,
+        DIFFERENT_TYPES,
         OPERAND_NAN_RT, OPERAND_NAN_SEM,
         OPERAND_NOT_A_COLLECTION_RT, OPERAND_NOT_A_COLLECTION_SEM,
         OPERAND_NOT_BOOL,
@@ -51,7 +51,6 @@ public final class ScriptErrorLog {
         VAR_NOT_NUM,
         VAR_NOT_STRING,
         VAR_TYPE_MISMATCH,
-        COND_NOT_BOOL,
         RETURN_TYPE_MISMATCH,
         VAR_ALREADY_DEFINED,
         ADD_TO_ARRAY,
@@ -67,6 +66,14 @@ public final class ScriptErrorLog {
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case CANNOT_REDUCE_EMPTY_COL ->
+                        "Attempted to reduce an empty collection to a value";
+                case NAN -> {
+                    final String description = args[0], actualType = args[1];
+
+                    yield typeMismatch(description + " is not a number",
+                            "int\" or \"float", actualType);
+                }
                 case SUB_BEG_OUT_OF_BOUNDS -> {
                     final String index = args[0];
 
@@ -90,29 +97,20 @@ public final class ScriptErrorLog {
                 case NOT_ITERABLE ->
                     typeMismatch("non-iterable type used in iterator loop",
                             args[0], args[1]);
-                case PATH_NOT_STRING ->
-                        typeMismatch("filepath", "string", args[0]);
                 case PATH_DOES_NOT_CONTAIN_IMAGE -> {
                     final String filepath = args[0];
 
                     yield "No image was found at the filepath \"" +
                             filepath + "\"";
                 }
-                case TERN_COND_NOT_BOOL, COND_NOT_BOOL -> {
-                    final String actualType = args[0],
-                            prefix = this == TERN_COND_NOT_BOOL
-                                    ? "Ternary c" : "C";
+                case DIFFERENT_TYPES -> {
+                    final String description = args[0],
+                            a = args[1], b = args[2],
+                            typeA = args[3], typeB = args[4];
 
-                    yield typeMismatch(prefix + "ondition",
-                            "bool", actualType);
-                }
-                case TERNARY_BRANCHES_OF_DIFFERENT_TYPES -> {
-                    final String ifType = args[0], elseType = args[1];
-
-                    yield "Ternary branches are of different types;" +
-                            " branch A is of type \"" + ifType +
-                            "\", and branch B is of type \"" +
-                            elseType + "\"";
+                    yield description + " are of different types; " + a +
+                            " is \"" + typeA + "\" and " + b + "is \"" +
+                            typeB + "\"";
 
                 }
                 case OPERAND_NAN_RT ->
@@ -246,8 +244,8 @@ public final class ScriptErrorLog {
                         typeMismatch("return expression does not match " +
                                 "method signature", args[0], args[1]);
                 case INCONSISTENT_COL_TYPES -> typeMismatch(
-                        "at index " + args[0] + " of explicit collection " +
-                                "initialization", args[1], args[2]);
+                        "at index " + args[0] + " of explicit " +
+                                args[1] + " initialization", args[2], args[3]);
                 case MAP_KEY_TYPE_MISMATCH ->
                         typeMismatch("map key", args[0], args[1]);
                 case MAP_VALUE_TYPE_MISMATCH ->

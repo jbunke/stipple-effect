@@ -59,11 +59,11 @@ public final class OperandAssignmentNode extends AssignmentNode {
                 assignableType = getAssignable().getType(symbolTable),
                 operandType = operand.getType(symbolTable);
         final SimpleTypeNode
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT),
-                boolType = new SimpleTypeNode(SimpleTypeNode.Type.BOOL),
-                floatType = new SimpleTypeNode(SimpleTypeNode.Type.FLOAT),
-                charType = new SimpleTypeNode(SimpleTypeNode.Type.CHAR),
-                stringType = new SimpleTypeNode(SimpleTypeNode.Type.STRING);
+                intType = TypeNode.getInt(),
+                boolType = TypeNode.getBool(),
+                floatType = TypeNode.getFloat(),
+                charType = TypeNode.getChar(),
+                stringType = TypeNode.getString();
 
         final Set<TypeNode>
                 numTypes = Set.of(intType, floatType),
@@ -132,12 +132,9 @@ public final class OperandAssignmentNode extends AssignmentNode {
                             yield bs + os;
                         }
 
-                        final SimpleTypeNode
-                                intType = new SimpleTypeNode(
-                                SimpleTypeNode.Type.INT);
                         final TypeNode type = getAssignable()
                                 .getType(symbolTable);
-                        final boolean isInt = type.equals(intType);
+                        final boolean isInt = type.equals(TypeNode.getInt());
 
                         if (before instanceof Number bn &&
                                 opValue instanceof Number on) {

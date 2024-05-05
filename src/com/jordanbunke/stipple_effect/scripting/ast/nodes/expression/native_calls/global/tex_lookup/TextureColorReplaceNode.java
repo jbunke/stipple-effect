@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.tex_lookup;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.sprite.TextureColorReplace;
@@ -32,7 +32,7 @@ public final class TextureColorReplaceNode extends ExpressionNode {
         replacementColors.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
-                imageType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+                imageType = TypeNode.getImage();
 
         final TypeNode
                 textureType = texture.getType(symbolTable),
@@ -68,7 +68,7 @@ public final class TextureColorReplaceNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+        return TypeNode.getImage();
     }
 
     @Override

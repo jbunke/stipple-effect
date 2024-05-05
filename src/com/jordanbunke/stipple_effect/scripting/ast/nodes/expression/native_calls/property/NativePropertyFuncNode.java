@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
@@ -8,14 +8,11 @@ import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 import java.util.Set;
 
-public abstract sealed class NativeFuncWithOwnerNode extends ExpressionNode
-        permits ImageBoundNode, ColorAtPixelNode, ColorChannelNode,
-        MapKeysetNode, MapLookupNode, ContainsNode, ImageSectionNode,
-        SubstringNode, CharAtNode {
+public abstract class NativePropertyFuncNode extends ExpressionNode {
     private final ExpressionNode owner;
     private final Set<TypeNode> acceptedTypes;
 
-    NativeFuncWithOwnerNode(
+    NativePropertyFuncNode(
             final TextPosition position,
             final ExpressionNode owner,
             final Set<TypeNode> acceptedTypes

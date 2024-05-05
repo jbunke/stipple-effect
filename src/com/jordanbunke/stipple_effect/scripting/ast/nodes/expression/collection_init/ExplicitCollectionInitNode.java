@@ -1,16 +1,15 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.CollectionHelper;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -32,22 +31,11 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        Arrays.stream(initElements).forEach(
-                e -> e.semanticErrorCheck(symbolTable));
+        for (ExpressionNode initElement : initElements)
+            initElement.semanticErrorCheck(symbolTable);
 
-        final TypeNode firstElemType = initElements[0].getType(symbolTable);
-
-        for (int i = 1; i < initElements.length; i++) {
-            final TypeNode type = initElements[i].getType(symbolTable);
-
-            if (!type.equals(firstElemType))
-                ScriptErrorLog.fireError(
-                        ScriptErrorLog.Message.INCONSISTENT_COL_TYPES,
-                        initElements[i].getPosition(),
-                        String.valueOf(i),
-                        String.valueOf(firstElemType),
-                        String.valueOf(type));
-        }
+        CollectionHelper.checkInteralTypeConsistency(
+                initElements, symbolTable, collectionType.description());
     }
 
     @Override
@@ -64,12 +52,8 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        final TypeNode notRawType = Arrays.stream(initElements)
-                .map(e -> e.getType(symbolTable))
-                .reduce((a, b) -> !a.equals(
-                                new SimpleTypeNode(SimpleTypeNode.Type.RAW))
-                                ? a : b).orElse(
-                                        initElements[0].getType(symbolTable));
+        final TypeNode notRawType =
+                CollectionHelper.getConcreteType(initElements, symbolTable);
 
         return new CollectionTypeNode(collectionType, notRawType);
     }
@@ -92,6 +76,6 @@ public final class ExplicitCollectionInitNode extends ExpressionNode {
                 .map(ExpressionNode::toString)
                 .reduce((a, b) -> a + ", " + b).orElse("");
 
-        return "of " + opener + contents + closer;
+        return opener + contents + closer;
     }
 }

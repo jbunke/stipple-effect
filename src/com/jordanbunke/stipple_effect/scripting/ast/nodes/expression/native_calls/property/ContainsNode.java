@@ -1,19 +1,18 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
 
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.MapTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class ContainsNode extends NativeFuncWithOwnerNode {
+public final class ContainsNode extends NativePropertyFuncNode {
     private final ExpressionNode element;
 
     public ContainsNode(
@@ -22,14 +21,13 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
             final ExpressionNode element
     ) {
         super(position, owner, Set.of(new MapTypeNode(
-                new SimpleTypeNode(SimpleTypeNode.Type.RAW),
-                                new SimpleTypeNode(SimpleTypeNode.Type.RAW)),
-                        new CollectionTypeNode(CollectionTypeNode.Type.LIST,
-                                new SimpleTypeNode(SimpleTypeNode.Type.RAW)),
-                        new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
-                                new SimpleTypeNode(SimpleTypeNode.Type.RAW)),
-                        new CollectionTypeNode(CollectionTypeNode.Type.SET,
-                                new SimpleTypeNode(SimpleTypeNode.Type.RAW))));
+                TypeNode.wildcard(), TypeNode.wildcard()),
+                new CollectionTypeNode(CollectionTypeNode.Type.LIST,
+                        TypeNode.wildcard()),
+                new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
+                        TypeNode.wildcard()),
+                new CollectionTypeNode(CollectionTypeNode.Type.SET,
+                        TypeNode.wildcard())));
 
         this.element = element;
     }
@@ -78,7 +76,7 @@ public final class ContainsNode extends NativeFuncWithOwnerNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+        return TypeNode.getBool();
     }
 
     @Override

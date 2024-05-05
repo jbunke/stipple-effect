@@ -52,8 +52,8 @@ public final class ScriptList implements ScriptCollection {
     }
 
     @Override
-    public String collectionName() {
-        return "list - <>";
+    public Stream<Object> stream() {
+        return structure.stream();
     }
 
     @Override

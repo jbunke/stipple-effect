@@ -7,7 +7,17 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionN
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.color_def.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.img_gen.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.AbsoluteNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.ClampNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.MinMaxCollectionNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.MinMaxTwoArgNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.FlipCoinNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.ProbabilityNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.RandNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.tex_lookup.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.assignment.*;
@@ -15,6 +25,8 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flow
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.declaration.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_calls.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
+
+import java.util.List;
 
 public final class ScriptVisitor
         extends ScriptParserBaseVisitor<ASTNode> {
@@ -112,49 +124,49 @@ public final class ScriptVisitor
     public SimpleTypeNode visitBoolType(
             final ScriptParser.BoolTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.BOOL);
+        return TypeNode.getBool();
     }
 
     @Override
     public SimpleTypeNode visitIntType(
             final ScriptParser.IntTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.INT);
+        return TypeNode.getInt();
     }
 
     @Override
     public SimpleTypeNode visitFloatType(
             final ScriptParser.FloatTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);
+        return TypeNode.getFloat();
     }
 
     @Override
     public SimpleTypeNode visitCharType(
             final ScriptParser.CharTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.CHAR);
+        return TypeNode.getChar();
     }
 
     @Override
     public SimpleTypeNode visitStringType(
             final ScriptParser.StringTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.STRING);
+        return TypeNode.getString();
     }
 
     @Override
     public SimpleTypeNode visitImageType(
             final ScriptParser.ImageTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+        return TypeNode.getImage();
     }
 
     @Override
     public SimpleTypeNode visitColorType(
             final ScriptParser.ColorTypeContext ctx
     ) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.COLOR);
+        return TypeNode.getColor();
     }
 
     @Override
@@ -567,6 +579,15 @@ public final class ScriptVisitor
     }
 
     @Override
+    public ColorHexCodeLiteralNode visitColorLiteral(
+            final ScriptParser.ColorLiteralContext ctx
+    ) {
+        return new ColorHexCodeLiteralNode(
+                TextPosition.fromToken(ctx.start),
+                ctx.getText());
+    }
+
+    @Override
     public CharLiteralNode visitCharLiteral(
             final ScriptParser.CharLiteralContext ctx
     ) {
@@ -744,6 +765,100 @@ public final class ScriptVisitor
     }
 
     @Override
+    public AbsoluteNode visitAbsoluteExpression(
+            final ScriptParser.AbsoluteExpressionContext ctx
+    ) {
+        return new AbsoluteNode(
+                TextPosition.fromToken(ctx.ABS().getSymbol()),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public MinMaxCollectionNode visitMinCollectionExpression(
+            final ScriptParser.MinCollectionExpressionContext ctx
+    ) {
+        return new MinMaxCollectionNode(
+                TextPosition.fromToken(ctx.MIN().getSymbol()),
+                true, (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public MinMaxTwoArgNode visitMinTwoArgExpression(
+            final ScriptParser.MinTwoArgExpressionContext ctx
+    ) {
+        return new MinMaxTwoArgNode(
+                TextPosition.fromToken(ctx.MIN().getSymbol()),
+                false, (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public MinMaxCollectionNode visitMaxCollectionExpression(
+            final ScriptParser.MaxCollectionExpressionContext ctx
+    ) {
+        return new MinMaxCollectionNode(
+                TextPosition.fromToken(ctx.MAX().getSymbol()),
+                true, (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public MinMaxTwoArgNode visitMaxTwoArgExpression(
+            final ScriptParser.MaxTwoArgExpressionContext ctx
+    ) {
+        return new MinMaxTwoArgNode(
+                TextPosition.fromToken(ctx.MAX().getSymbol()),
+                true, (ExpressionNode) visit(ctx.a),
+                (ExpressionNode) visit(ctx.b));
+    }
+
+    @Override
+    public ClampNode visitClampExpression(
+            final ScriptParser.ClampExpressionContext ctx
+    ) {
+        return new ClampNode(
+                TextPosition.fromToken(ctx.CLAMP().getSymbol()),
+                (ExpressionNode) visit(ctx.min),
+                (ExpressionNode) visit(ctx.val),
+                (ExpressionNode) visit(ctx.max));
+    }
+
+    @Override
+    public RandNode visitRandomExpression(
+            final ScriptParser.RandomExpressionContext ctx
+    ) {
+        return new RandNode(
+                TextPosition.fromToken(ctx.RAND().getSymbol()));
+    }
+
+    @Override
+    public ProbabilityNode visitProbabilityExpression(
+            final ScriptParser.ProbabilityExpressionContext ctx
+    ) {
+        return new ProbabilityNode(
+                TextPosition.fromToken(ctx.PROB().getSymbol()),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
+    public FlipCoinNode visitFlipCoinBoolExpression(
+            ScriptParser.FlipCoinBoolExpressionContext ctx
+    ) {
+        return new FlipCoinNode(TextPosition.fromToken(
+                ctx.FLIP_COIN().getSymbol()));
+    }
+
+    @Override
+    public TernaryOperationNode visitFlipCoinArgExpression(
+            ScriptParser.FlipCoinArgExpressionContext ctx
+    ) {
+        final TextPosition pos = TextPosition.fromToken(
+                ctx.FLIP_COIN().getSymbol());
+        return new TernaryOperationNode(pos, new FlipCoinNode(pos),
+                (ExpressionNode) visit(ctx.t),
+                (ExpressionNode) visit(ctx.t));
+    }
+
+    @Override
     public ImageFromPathNode visitImageFromPathExpression(
             final ScriptParser.ImageFromPathExpressionContext ctx
     ) {
@@ -863,6 +978,27 @@ public final class ScriptVisitor
     }
 
     @Override
+    public ExplicitMapInitNode visitExplicitMapExpression(
+            final ScriptParser.ExplicitMapExpressionContext ctx
+    ) {
+        final List<ScriptParser.K_v_pairContext> keyValPairs =
+                ctx.k_v_pairs().k_v_pair();
+        final int n = keyValPairs.size();
+
+        final ExpressionNode[] keys = new ExpressionNode[n];
+        final ExpressionNode[] vals = new ExpressionNode[n];
+
+        for (int i = 0; i < n; i++) {
+            keys[i] = (ExpressionNode) visit(keyValPairs.get(i).key);
+            vals[i] = (ExpressionNode) visit(keyValPairs.get(i).val);
+        }
+
+        return new ExplicitMapInitNode(
+                TextPosition.fromToken(ctx.LCURLY().getSymbol()),
+                keys, vals);
+    }
+
+    @Override
     public ExplicitCollectionInitNode visitExplicitArrayExpression(
             final ScriptParser.ExplicitArrayExpressionContext ctx
     ) {
@@ -914,7 +1050,8 @@ public final class ScriptVisitor
     ) {
         return new NewCollectionNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()),
-                CollectionTypeNode.Type.LIST);
+                CollectionTypeNode.Type.LIST,
+                (TypeNode) visit(ctx.type()));
     }
 
     @Override
@@ -923,7 +1060,8 @@ public final class ScriptVisitor
     ) {
         return new NewCollectionNode(
                 TextPosition.fromToken(ctx.NEW().getSymbol()),
-                CollectionTypeNode.Type.SET);
+                CollectionTypeNode.Type.SET,
+                (TypeNode) visit(ctx.type()));
     }
 
     @Override
@@ -931,6 +1069,7 @@ public final class ScriptVisitor
             final ScriptParser.NewMapExpressionContext ctx
     ) {
         return new NewMapNode(
-                TextPosition.fromToken(ctx.NEW().getSymbol()));
+                TextPosition.fromToken(ctx.NEW().getSymbol()),
+                (TypeNode) visit(ctx.kt), (TypeNode) visit(ctx.vt));
     }
 }

@@ -35,8 +35,8 @@ public final class DrawNode extends StatementNode {
         y.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
-                imgType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+                imgType = TypeNode.getImage(),
+                intType = TypeNode.getInt();
 
         final TypeNode
                 cType = canvas.getType(symbolTable),

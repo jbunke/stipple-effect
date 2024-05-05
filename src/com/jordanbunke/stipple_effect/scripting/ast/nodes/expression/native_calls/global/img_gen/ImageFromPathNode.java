@@ -1,13 +1,12 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.img_gen;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.GameImageIO;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
-import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
+import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -30,10 +29,11 @@ public final class ImageFromPathNode extends ExpressionNode {
 
         final TypeNode pathType = path.getType(symbolTable);
 
-        if (!pathType.equals(new SimpleTypeNode(SimpleTypeNode.Type.STRING)))
+        if (!pathType.equals(TypeNode.getString()))
             ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.PATH_NOT_STRING,
-                    getPosition(), pathType.toString());
+                    ScriptErrorLog.Message.ARG_NOT_TYPE,
+                    path.getPosition(), "Image filepath",
+                    TypeNode.getString().toString(), pathType.toString());
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class ImageFromPathNode extends ExpressionNode {
 
     @Override
     public TypeNode getType(final SymbolTable symbolTable) {
-        return new SimpleTypeNode(SimpleTypeNode.Type.IMAGE);
+        return TypeNode.getImage();
     }
 
     @Override

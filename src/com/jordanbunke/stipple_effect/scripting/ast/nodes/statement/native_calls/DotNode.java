@@ -37,9 +37,9 @@ public final class DotNode extends StatementNode {
         y.semanticErrorCheck(symbolTable);
 
         final SimpleTypeNode
-                imgType = new SimpleTypeNode(SimpleTypeNode.Type.IMAGE),
-                colType = new SimpleTypeNode(SimpleTypeNode.Type.COLOR),
-                intType = new SimpleTypeNode(SimpleTypeNode.Type.INT);
+                imgType = TypeNode.getImage(),
+                colType = TypeNode.getColor(),
+                intType = TypeNode.getInt();
 
         final TypeNode
                 cType = canvas.getType(symbolTable),
@@ -76,7 +76,7 @@ public final class DotNode extends StatementNode {
         final int xCoord = (int) x.evaluate(symbolTable),
                 yCoord = (int) y.evaluate(symbolTable);
 
-        c.dot(col, xCoord, yCoord);
+        c.setRGB(xCoord, yCoord, col.getRGB());
         c.free();
 
         return FuncControlFlow.cont();
