@@ -10,6 +10,9 @@ public final class SimpleTypeNode extends TypeNode {
 
         @Override
         public String toString() {
+            if (this == WILDCARD)
+                return "_";
+
             return name().toLowerCase();
         }
 

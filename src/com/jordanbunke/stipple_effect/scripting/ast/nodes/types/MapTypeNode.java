@@ -25,7 +25,7 @@ public final class MapTypeNode extends TypeNode {
 
     @Override
     public String toString() {
-        return "{" + keyType + ":" + valueType + "}";
+        return "{ " + keyType + " : " + valueType + " }";
     }
 
     @Override
@@ -39,7 +39,7 @@ public final class MapTypeNode extends TypeNode {
 
     @Override
     public int hashCode() {
-        return (31 * this.keyType.hashCode()) + this.valueType.hashCode();
+        return 0;
     }
 
     @Override

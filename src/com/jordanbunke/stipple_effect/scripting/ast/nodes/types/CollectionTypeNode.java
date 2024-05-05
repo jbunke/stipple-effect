@@ -56,7 +56,7 @@ public final class CollectionTypeNode extends TypeNode {
 
     @Override
     public int hashCode() {
-        return (type.ordinal() * 31) + elementType.hashCode();
+        return type.ordinal();
     }
 
     @Override
