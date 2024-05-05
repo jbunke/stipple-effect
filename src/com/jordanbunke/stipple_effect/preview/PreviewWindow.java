@@ -325,10 +325,10 @@ public class PreviewWindow implements ProgramContext {
                 .toArray(GameImage[]::new);
 
         if (script != null)
-            content = runScript();
+            runScript();
     }
 
-    private GameImage[] runScript() {
+    private void runScript() {
         frameIndex %= content.length;
 
         final Object arg = content.length > 1
@@ -337,19 +337,17 @@ public class PreviewWindow implements ProgramContext {
 
         final Object result = Script.run(script, arg);
 
-        if (result == null)
-            return content;
-        else if (result instanceof GameImage image)
-            return new GameImage[] { image };
+        if (result instanceof GameImage image)
+            content = new GameImage[] { image };
         else if (result instanceof ScriptArray arr) {
             final GameImage[] images = new GameImage[arr.size()];
 
             for (int i = 0; i < images.length; i++)
                 images[i] = (GameImage) arr.get(i);
 
-            return images;
+            content = images;
         } else
-            return content;
+            window.closeInstance();
     }
 
     private boolean checkIfProjectHasBeenClosed() {

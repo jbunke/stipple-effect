@@ -23,6 +23,8 @@ public final class StandardAssignmentNode extends AssignmentNode {
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
+        super.semanticErrorCheck(symbolTable);
+
         final TypeNode
                 assignableType = getAssignable().getType(symbolTable),
                 exprType = expression.getType(symbolTable);
