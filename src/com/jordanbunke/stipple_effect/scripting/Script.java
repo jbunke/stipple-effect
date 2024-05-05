@@ -115,6 +115,9 @@ public final class Script {
                     ? Optional.of(result)
                     : Optional.empty();
         } catch (Exception e) {
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.UNEXPECTED_RUNTIME_ERROR,
+                    TextPosition.N_A);
             return Optional.empty();
         }
     }

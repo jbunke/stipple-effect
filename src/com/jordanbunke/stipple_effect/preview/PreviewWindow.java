@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
 import com.jordanbunke.delta_time.events.GameWindowEvent;
+import com.jordanbunke.delta_time.events.WindowMovedEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
@@ -56,6 +57,7 @@ public class PreviewWindow implements ProgramContext {
 
     private static PreviewWindow INSTANCE = null;
 
+    private int winX, winY;
     private GameWindow window;
     private final SEContext context;
     private final Program preview;
@@ -81,6 +83,8 @@ public class PreviewWindow implements ProgramContext {
 
     private PreviewWindow(final SEContext context) {
         mousePos = new Coord2D();
+        winX = 0;
+        winY = 0;
 
         this.context = context;
 
@@ -283,6 +287,11 @@ public class PreviewWindow implements ProgramContext {
                     else
                         zoomOut();
                 }
+            } else if (event instanceof WindowMovedEvent wme) {
+                wme.markAsProcessed();
+
+                winX = wme.x;
+                winY = wme.y;
             }
     }
 
@@ -397,6 +406,8 @@ public class PreviewWindow implements ProgramContext {
                 width, height, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
                 false, false, false);
         window.hideCursor();
+        window.setPosition(winX, winY);
+
         return window;
     }
 

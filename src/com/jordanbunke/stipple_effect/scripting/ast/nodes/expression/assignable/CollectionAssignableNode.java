@@ -40,8 +40,7 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
     public final Object evaluate(final SymbolTable symbolTable) {
         final ScriptCollection c = getCollection(symbolTable);
 
-        if (c == null)
-            return null; // TODO - error
+        assert c != null;
 
         return c.get((Integer) index.evaluate(symbolTable));
     }
@@ -82,6 +81,6 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
 
     private ScriptCollection getCollection(final SymbolTable symbolTable) {
         final Variable var = symbolTable.get(getName());
-        return var != null ? (ScriptCollection) var.get(): null;
+        return var != null ? (ScriptCollection) var.get() : null;
     }
 }

@@ -24,9 +24,7 @@ public final class IdentifierNode extends AssignableNode {
     @Override
     public Object evaluate(final SymbolTable symbolTable) {
         final Variable var = symbolTable.get(getName());
-
-        if (var == null)
-            return null;
+        assert var != null;
 
         final Object value = var.get();
 

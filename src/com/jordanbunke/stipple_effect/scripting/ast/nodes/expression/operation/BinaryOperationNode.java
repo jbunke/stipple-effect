@@ -97,36 +97,35 @@ public final class BinaryOperationNode extends ExpressionNode {
                 if (!o1Type.equals(boolType))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.OPERAND_NOT_BOOL,
-                            getPosition(), o1Type.toString());
-                if (!o1Type.equals(boolType))
+                            o1.getPosition(), o1Type.toString());
+                if (!o2Type.equals(boolType))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.OPERAND_NOT_BOOL,
-                            getPosition(), o2Type.toString());
+                            o2.getPosition(), o2Type.toString());
             }
             case ADD -> {
                 if (!(o1Type instanceof SimpleTypeNode))
                     ScriptErrorLog.fireError(
-                            ScriptErrorLog.Message.OPERAND_NAN_SEM, // TODO - change error message
-                            getPosition(), o1Type.toString());
+                            ScriptErrorLog.Message.INVALID_OPERAND_PLUS,
+                            o1.getPosition(), o1Type.toString());
                 if (!(o2Type instanceof SimpleTypeNode))
                     ScriptErrorLog.fireError(
-                            ScriptErrorLog.Message.OPERAND_NAN_SEM, // TODO - "
-                            getPosition(), o2Type.toString());
+                            ScriptErrorLog.Message.INVALID_OPERAND_PLUS,
+                            o2.getPosition(), o2Type.toString());
             }
             case SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
                     GT, LT, GEQ, LEQ -> {
                 final Set<TypeNode> acceptedTypes = Set.of(
-                        TypeNode.getInt(),
-                        TypeNode.getFloat());
+                        TypeNode.getInt(), TypeNode.getFloat());
 
                 if (!acceptedTypes.contains(o1Type))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.OPERAND_NAN_SEM,
-                            getPosition(), o1Type.toString());
+                            o1.getPosition(), o1Type.toString());
                 if (!acceptedTypes.contains(o2Type))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.OPERAND_NAN_SEM,
-                            getPosition(), o2Type.toString());
+                            o2.getPosition(), o2Type.toString());
             }
         }
     }

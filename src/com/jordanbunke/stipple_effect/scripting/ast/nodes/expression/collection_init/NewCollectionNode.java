@@ -42,7 +42,7 @@ public final class NewCollectionNode extends ExpressionNode {
 
     @Override
     public String toString() {
-        return "new" +
+        return "new " + elementType +
                 (collectionType == CollectionTypeNode.Type.SET ? "{}" : "<>");
     }
 }

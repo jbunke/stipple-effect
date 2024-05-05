@@ -24,6 +24,7 @@ public final class ScriptErrorLog {
         PATH_DOES_NOT_CONTAIN_IMAGE,
         DIFFERENT_TYPES,
         OPERAND_NAN_RT, OPERAND_NAN_SEM,
+        INVALID_OPERAND_PLUS,
         OPERAND_NOT_A_COLLECTION_RT, OPERAND_NOT_A_COLLECTION_SEM,
         OPERAND_NOT_BOOL,
         DIV_BY_ZERO,
@@ -59,6 +60,7 @@ public final class ScriptErrorLog {
         ASSIGN_EXPR_NOT_STRING,
         NOT_ITERABLE,
         COULD_NOT_READ,
+        UNEXPECTED_RUNTIME_ERROR,
         SUB_BEG_OUT_OF_BOUNDS,
         SUB_END_OUT_OF_BOUNDS,
         SUB_END_GEQ_BEG
@@ -66,6 +68,8 @@ public final class ScriptErrorLog {
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case INVALID_OPERAND_PLUS -> "Operand of type \"" + args[0] +
+                        "\" can neither be added nor concatenated (+)";
                 case CANNOT_REDUCE_EMPTY_COL ->
                         "Attempted to reduce an empty collection to a value";
                 case NAN -> {
@@ -94,6 +98,7 @@ public final class ScriptErrorLog {
                             "argument (" + end + ")";
                 }
                 case COULD_NOT_READ -> "Couldn't read the script file";
+                case UNEXPECTED_RUNTIME_ERROR -> "Unknown and unexpected";
                 case NOT_ITERABLE ->
                     typeMismatch("non-iterable type used in iterator loop",
                             args[0], args[1]);
