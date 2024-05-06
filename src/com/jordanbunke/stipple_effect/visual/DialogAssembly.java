@@ -893,7 +893,7 @@ public class DialogAssembly {
     public static void setDialogToScriptErrors() {
         final  MenuBuilder mb = new MenuBuilder();
         final int MAX_TO_PRINT = 10;
-        final List<String> errors = ScriptErrorLog.getErrors();
+        final String[] errors = ScriptErrorLog.getErrors();
         final String CONT = " ".repeat(6) + "...";
 
         final List<String> formattedErrors = new ArrayList<>();

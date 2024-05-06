@@ -1,0 +1,11 @@
+(~ bool[] bs -> bool) {
+    if (#|bs == 0)
+        return false;
+
+    bool res = bs[0];
+
+    for (~ bool b in bs)
+        res |= b;
+
+    return res;
+}

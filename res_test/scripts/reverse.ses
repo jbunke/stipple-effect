@@ -1,4 +1,4 @@
-func(final string s -> string) {
+(final string s -> string) {
     string bw = "";
 
     for (final char c in s)

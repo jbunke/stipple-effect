@@ -37,6 +37,15 @@ public final class ParametersNode extends ASTNode {
             final DeclarationNode param = params[i];
             final Object arg = args[i];
 
+            final TypeNode type = param.getType();
+
+            if (type.complies(arg))
+                symbolTable.update(param.getIdent(), arg);
+            else
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.ARG_PARAM_MISMATCH,
+                        param.getPosition(), type.toString());
+
             symbolTable.put(param.getIdent(),
                     new Variable(param.isMutable(), param.getType(), arg));
         }

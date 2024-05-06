@@ -614,6 +614,13 @@ public class ScriptParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> impl
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitCastExpression(ScriptParser.CastExpressionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitNewArrayExpression(ScriptParser.NewArrayExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

@@ -4,6 +4,8 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
+import java.util.Set;
+
 public abstract class TypeNode extends ASTNode {
     public TypeNode(final TextPosition position) {
         super(position);
@@ -17,6 +19,12 @@ public abstract class TypeNode extends ASTNode {
     }
 
     public abstract boolean hasSize();
+
+    public abstract boolean complies(final Object o);
+
+    public static Set<TypeNode> numTypes() {
+        return Set.of(getInt(), getFloat());
+    }
 
     public static SimpleTypeNode getFloat() {
         return new SimpleTypeNode(SimpleTypeNode.Type.FLOAT);

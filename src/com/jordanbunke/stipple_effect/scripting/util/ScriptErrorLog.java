@@ -19,6 +19,8 @@ public final class ScriptErrorLog {
     }
 
     public enum Message {
+        ARG_PARAM_MISMATCH,
+        INVALID_ARG_TYPE,
         ARGS_SIGNATURE_MISMATCH,
         CANNOT_REDUCE_EMPTY_COL,
         NAN,
@@ -69,6 +71,12 @@ public final class ScriptErrorLog {
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case ARG_PARAM_MISMATCH -> "Attempting to pass an argument" +
+                        " into the script that does not comply with the type" +
+                        " of the parameter: \"" + args[0] + "\"";
+                case INVALID_ARG_TYPE ->
+                        "Attempting to pass an invalid data type into the " +
+                                "script: \"" + args[0] + "\"";
                 case ARGS_SIGNATURE_MISMATCH ->
                         "Attempting to call the function \"" + args[0] +
                                 "\" with a set of arguments that do not " +
@@ -162,7 +170,7 @@ public final class ScriptErrorLog {
                     final String channel = args[0], value = args[1];
 
                     yield channel + " color channel was evaluated as " +
-                            value + ", which is out of bounds (0 <= x <= 255)";
+                            value + ", which is out of bounds (0 <= c <= 255)";
                 }
                 case COLOR_CHANNEL_NOT_INT -> {
                     final String channel = args[0], actualType = args[1];
@@ -218,13 +226,17 @@ public final class ScriptErrorLog {
                 case INDEX_NOT_INT -> typeMismatch("collection index",
                         "int", args[0]);
                 case INDEX_OUT_OF_BOUNDS -> {
-                    final String index = args[0], size = args[1];
+                    final int index = Integer.parseInt(args[0]),
+                            size = Integer.parseInt(args[1]);
                     final boolean include = args.length > 2 &&
                             Boolean.parseBoolean(args[2]);
 
+                    if (!include && size == 0)
+                        yield "Empty collection cannot be indexed";
+
                     yield "Collection index " + index + " is out of bounds" +
                             " for collection of size " + size +
-                            "; (0 <= x <" + (include ? "= " : " ") +
+                            "; (0 <= i <" + (include ? "= " : " ") +
                             size + ")";
                 }
                 case ELEMENT_DOES_NOT_MATCH_COL ->
@@ -335,8 +347,8 @@ public final class ScriptErrorLog {
         return errors.isEmpty();
     }
 
-    public static List<String> getErrors() {
-        return errors;
+    public static String[] getErrors() {
+        return errors.toArray(String[]::new);
     }
 
     public static void clearErrors() {

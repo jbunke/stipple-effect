@@ -1,0 +1,8 @@
+(~ color[] cs -> color) {
+    color sum = #00000000;
+
+    for (~ color c in cs)
+        sum = rgba(sum.r + c.r, sum.g + c.g, sum.b + c.b, min(255, sum.a + c.a));
+
+    return sum;
+}

@@ -7,7 +7,7 @@ public record TextPosition(int line, int column) {
 
     public static TextPosition fromToken(final Token token) {
         return new TextPosition(token.getLine(),
-                token.getCharPositionInLine());
+                token.getCharPositionInLine() + 1);
     }
 
     @Override

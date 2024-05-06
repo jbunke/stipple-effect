@@ -1,0 +1,14 @@
+(~ image src -> image) {
+    ~ image res = blank(src.w, src.h);
+
+    ~ int w = res.w;
+    ~ int h = res.h;
+
+    for (int x = 0; x < w; x++)
+        for (int y = 0; y < h; y++)
+            res.dot(iso_r(src.pixel(x, y)), x, y);
+
+    return res;
+}
+
+iso_r(~ color c -> color) -> rgba(c.r, 0, 0, c.a)

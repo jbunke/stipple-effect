@@ -9,7 +9,7 @@ head_rule: signature func_body helper*;
 helper: ident signature func_body;
 
 func_body: body                             #StandardFuncBody
-| DEF expr                                  #FunctionalFuncBody
+| ARROW expr                                #FunctionalFuncBody
 ;
 
 signature
@@ -90,6 +90,7 @@ if_def: IF LPAREN cond=expr RPAREN body;
 
 expr
 : LPAREN expr RPAREN                        #NestedExpression
+| LPAREN type RPAREN expr                   #CastExpression
 | col=expr HAS LPAREN elem=expr RPAREN      #ContainsExpression
 | map=expr LOOKUP LPAREN elem=expr RPAREN   #MapLookupExpression
 | map=expr KEYS LPAREN RPAREN               #MapKeysetExpression

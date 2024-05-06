@@ -26,8 +26,7 @@ public final class MethodSignatureNode extends ASTNode {
     }
 
     public void execute(
-            final SymbolTable symbolTable,
-            final Object... args
+            final SymbolTable symbolTable, final Object[] args
     ) {
         parameters.populateArgs(symbolTable, args);
     }

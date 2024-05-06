@@ -728,6 +728,7 @@ public class StippleEffect implements ProgramContext {
         // bottom bar - zoom, animation
         final GameImage bottomBar = drawBottomBar();
         canvas.draw(bottomBar, bbp.x, bbp.y);
+        bottomBarMenu.render(canvas);
 
         // tools
         if (Layout.isToolbarShowing()) {
@@ -739,28 +740,33 @@ public class StippleEffect implements ProgramContext {
                 canvas.draw(toolOptionsBar, tobp.x, tobp.y);
             }
         }
+        toolButtonMenu.render(canvas);
 
         // layers
         if (Layout.isLayersPanelShowing()) {
             final GameImage layers = drawLayers();
             canvas.draw(layers, lp.x, lp.y);
         }
+        layersMenu.render(canvas);
 
         // colors
         if (Layout.isColorsPanelShowing()) {
             final GameImage colors = drawColorsSegment();
             canvas.draw(colors, cp.x, cp.y);
         }
+        colorsMenu.render(canvas);
 
         // projects / contexts
         final GameImage projects = drawProjects();
         canvas.draw(projects, pp.x, pp.y);
+        projectsMenu.render(canvas);
 
         // frames
         if (Layout.isFramesPanelShowing()) {
             final GameImage frames = drawFrames();
             canvas.draw(frames, fp.x, fp.y);
         }
+        framesMenu.render(canvas);
 
         // borders
         final float strokeWidth = 2f;
@@ -773,14 +779,6 @@ public class StippleEffect implements ProgramContext {
         canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
         canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace/option bar and right segments separation
-
-        // menu elements
-        bottomBarMenu.render(canvas);
-        toolButtonMenu.render(canvas);
-        layersMenu.render(canvas);
-        colorsMenu.render(canvas);
-        projectsMenu.render(canvas);
-        framesMenu.render(canvas);
 
         if (dialog != null) {
             canvas.fillRectangle(Settings.getTheme().dialogVeil.get(),

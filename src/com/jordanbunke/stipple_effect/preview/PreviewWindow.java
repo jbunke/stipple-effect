@@ -478,8 +478,10 @@ public class PreviewWindow implements ProgramContext {
 
         if (Script.validatePreviewScript(script, context))
             setScript(script);
-        else
+        else if (script != null)
             StatusUpdates.invalidPreviewScript();
+        else
+            StatusUpdates.failedToCompileScript(filepath);
     }
 
     private void setScript(final HeadFuncNode script) {

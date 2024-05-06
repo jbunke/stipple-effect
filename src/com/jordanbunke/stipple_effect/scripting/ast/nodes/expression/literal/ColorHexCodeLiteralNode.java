@@ -35,7 +35,6 @@ public final class ColorHexCodeLiteralNode extends LiteralNode {
 
     @Override
     public String toString() {
-        return "R: " + value.getRed() + ", G: " + value.getGreen() +
-                ", B: " + value.getBlue() + ", A: " + value.getAlpha();
+        return "#" + ParserSerializer.serializeColor(value, true);
     }
 }

@@ -1,5 +1,8 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptList;
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class CollectionTypeNode extends TypeNode {
@@ -62,5 +65,14 @@ public final class CollectionTypeNode extends TypeNode {
     @Override
     public boolean hasSize() {
         return true;
+    }
+
+    @Override
+    public boolean complies(final Object o) {
+        return switch (type) {
+            case ARRAY -> o instanceof ScriptArray;
+            case LIST -> o instanceof ScriptList;
+            case SET -> o instanceof ScriptSet;
+        };
     }
 }

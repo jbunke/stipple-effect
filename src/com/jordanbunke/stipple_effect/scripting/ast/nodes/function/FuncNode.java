@@ -23,8 +23,7 @@ public sealed abstract class FuncNode extends ASTNode
     }
 
     public Object execute(
-            final SymbolTable symbolTable,
-            final Object... args
+            final SymbolTable symbolTable, final Object[] args
     ) {
         signature.execute(symbolTable, args);
         return body.execute(symbolTable).value;

@@ -597,6 +597,13 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCharAtExpression(ScriptParser.CharAtExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code CastExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCastExpression(ScriptParser.CastExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code NewArrayExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree

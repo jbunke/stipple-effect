@@ -1,6 +1,9 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
+
+import java.awt.*;
 
 public final class SimpleTypeNode extends TypeNode {
     private final Type type;
@@ -58,5 +61,19 @@ public final class SimpleTypeNode extends TypeNode {
 
     public boolean isWildcard() {
         return type == Type.WILDCARD;
+    }
+
+    @Override
+    public boolean complies(final Object o) {
+        return switch (type) {
+            case INT -> o instanceof Integer;
+            case BOOL -> o instanceof Boolean;
+            case STRING -> o instanceof String;
+            case COLOR -> o instanceof Color;
+            case FLOAT -> o instanceof Double;
+            case CHAR -> o instanceof Character;
+            case IMAGE -> o instanceof GameImage;
+            case WILDCARD -> true;
+        };
     }
 }

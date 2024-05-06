@@ -1,0 +1,14 @@
+(~ image img -> image) {
+    ~ int w = img.w;
+    ~ int h = img.h;
+
+    ~ image reflected = blank(w, h);
+
+    for (int x = 0; x < w; x++)
+        for (int y = 0; y < h; y++) {
+            ~ color c = img.pixel(x, y);
+            reflected.dot(c, (w - 1) - x, y);
+        }
+    
+    return reflected;
+}

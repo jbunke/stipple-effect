@@ -624,6 +624,15 @@ public final class ScriptVisitor
     }
 
     @Override
+    public CastNode visitCastExpression(
+            final ScriptParser.CastExpressionContext ctx
+    ) {
+        return new CastNode(TextPosition.fromToken(ctx.start),
+                (TypeNode) visit(ctx.type()),
+                (ExpressionNode) visit(ctx.expr()));
+    }
+
+    @Override
     public FuncCallNode visitFunctionCallExpression(
             final ScriptParser.FunctionCallExpressionContext ctx
     ) {

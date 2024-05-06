@@ -1,11 +1,1 @@
-func(final int w, final int h -> string) {
-    final image img = blank(w, h);
-
-    if (img.w > img.h) {
-        final int diff = img.w - img.h;
-        return "Image is " + diff + " pixels wider than it is high";
-    } else if (img.h > img.w)
-        return "Image is " + (img.h - img.w) + " pixels higher than it is wide";
-    else
-        return "Image bounds: " + img.w + "x" + img.h;
-}
+(~ image img -> int[]) -> [img.w, img.h]

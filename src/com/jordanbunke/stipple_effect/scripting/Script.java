@@ -8,12 +8,12 @@ import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptVisitor;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.util.TypeCompatibility;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.util.List;
 import java.util.Optional;
 
 public final class Script {
@@ -55,10 +55,10 @@ public final class Script {
             final Optional<Object> result =
                     execute(script, scriptTable, args);
 
-            if (result.isPresent())
-                return result.get();
-            else if (!ScriptErrorLog.hasNoErrors())
+            if (!ScriptErrorLog.hasNoErrors())
                 displayErrors();
+            else if (result.isPresent())
+                return result.get();
         } else
             displayErrors();
 
@@ -104,9 +104,10 @@ public final class Script {
     private static Optional<Object> execute(
             final HeadFuncNode script,
             final SymbolTable scriptTable,
-            final Object... args
+            final Object[] args
     ) {
         try {
+            TypeCompatibility.prepArgs(args);
             final Object result = script.execute(scriptTable, args);
 
             return result != null
@@ -126,7 +127,7 @@ public final class Script {
             return;
         }
 
-        final List<String> errors = ScriptErrorLog.getErrors();
+        final String[] errors = ScriptErrorLog.getErrors();
 
         for (String error : errors)
             System.out.println(error);

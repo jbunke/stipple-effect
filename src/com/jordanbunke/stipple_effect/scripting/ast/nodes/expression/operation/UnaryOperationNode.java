@@ -25,7 +25,7 @@ public final class UnaryOperationNode extends ExpressionNode {
         @Override
         public String toString() {
             return switch (this) {
-                case SIZE -> "#";
+                case SIZE -> "#|";
                 case NEGATE -> "-";
                 case NOT -> "!";
             };

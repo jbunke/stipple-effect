@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.types;
 
+import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 public final class MapTypeNode extends TypeNode {
@@ -45,5 +46,10 @@ public final class MapTypeNode extends TypeNode {
     @Override
     public boolean hasSize() {
         return true;
+    }
+
+    @Override
+    public boolean complies(final Object o) {
+        return o instanceof ScriptMap;
     }
 }
