@@ -29,7 +29,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.Script;
+import com.jordanbunke.stipple_effect.scripting.SEScriptRunner;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
@@ -124,7 +124,7 @@ public class StippleEffect implements ProgramContext {
         OnStartup.run();
         Settings.read();
         readProgramFile();
-        Script.printErrorsToDialog();
+        SEScriptRunner.printErrorsToDialog();
 
         INSTANCE = new StippleEffect();
 

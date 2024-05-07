@@ -1,4 +1,0 @@
-(-> int) {
-    ~ int l = $SE.getProject()$getLayer();
-    return 0;
-}

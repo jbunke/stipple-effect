@@ -17,6 +17,8 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.scripting.ast.collection.ScriptArray;
+import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
@@ -24,9 +26,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.Script;
-import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptArray;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.stipple_effect.scripting.SEScriptRunner;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
@@ -349,7 +349,7 @@ public class PreviewWindow implements ProgramContext {
                 ? ScriptArray.of((Object[]) content)
                 : content[frameIndex];
 
-        final Object result = Script.run(script, arg);
+        final Object result = SEScriptRunner.get().run(script, arg);
 
         if (result instanceof GameImage image)
             content = new GameImage[] { image };
@@ -474,9 +474,9 @@ public class PreviewWindow implements ProgramContext {
             return;
 
         final Path filepath = opened.get().toPath();
-        final HeadFuncNode script = Script.build(FileIO.readFile(filepath));
+        final HeadFuncNode script = SEScriptRunner.get().build(FileIO.readFile(filepath));
 
-        if (Script.validatePreviewScript(script, context))
+        if (SEScriptRunner.validatePreviewScript(script, context))
             setScript(script);
         else if (script != null)
             StatusUpdates.invalidPreviewScript();
