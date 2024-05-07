@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.util;
 import com.jordanbunke.stipple_effect.scripting.ScriptParser;
 import com.jordanbunke.stipple_effect.scripting.ScriptParserBaseVisitor;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.IllegalLanguageFeatureNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;
@@ -15,7 +16,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_call
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.min_max.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.rng.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.tex_lookup.*;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.scoped.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.operation.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.*;
@@ -29,6 +30,50 @@ import java.util.List;
 
 public class ScriptVisitor
         extends ScriptParserBaseVisitor<ASTNode> {
+    // to extend
+    @Override
+    public ASTNode visitExtensionType(
+            ScriptParser.ExtensionTypeContext ctx
+    ) {
+        return new IllegalLanguageFeatureNode(
+                TextPosition.fromToken(ctx.start),
+                "Extension type");
+    }
+
+    @Override
+    public ASTNode visitExtFuncCallStatement(
+            final ScriptParser.ExtFuncCallStatementContext ctx) {
+        return new IllegalLanguageFeatureNode(
+                TextPosition.fromToken(ctx.start),
+                "Global extension function call expression");
+    }
+
+    @Override
+    public ASTNode visitExtScopedCallStatement(
+            final ScriptParser.ExtScopedCallStatementContext ctx) {
+        return new IllegalLanguageFeatureNode(
+                TextPosition.fromToken(ctx.start),
+                "Scoped extension function call statement");
+    }
+
+    @Override
+    public ASTNode visitExtFuncCallExpression(
+            final ScriptParser.ExtFuncCallExpressionContext ctx) {
+        return new IllegalLanguageFeatureNode(
+                TextPosition.fromToken(ctx.start),
+                "Global extension function call expression");
+    }
+
+    @Override
+    public ASTNode visitExtScopedCallExpression(
+            final ScriptParser.ExtScopedCallExpressionContext ctx
+    ) {
+        return new IllegalLanguageFeatureNode(
+                TextPosition.fromToken(ctx.start),
+                "Scoped extension function call expression");
+    }
+
+    // concrete implementations
     @Override
     public HeadFuncNode visitHead_rule(
             final ScriptParser.Head_ruleContext ctx

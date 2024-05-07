@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.scoped;
 
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptMap;
@@ -12,7 +12,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class ContainsNode extends NativePropertyFuncNode {
+public final class ContainsNode extends ScopedNativeCallNode {
     private final ExpressionNode element;
 
     public ContainsNode(
@@ -39,7 +39,7 @@ public final class ContainsNode extends NativePropertyFuncNode {
         super.semanticErrorCheck(symbolTable);
 
         final TypeNode
-                ownerType = getOwner().getType(symbolTable),
+                ownerType = getScope().getType(symbolTable),
                 elemType = element.getType(symbolTable);
 
         if (ownerType instanceof MapTypeNode mapType) {
@@ -63,7 +63,7 @@ public final class ContainsNode extends NativePropertyFuncNode {
 
     @Override
     public Boolean evaluate(final SymbolTable symbolTable) {
-        final Object owner = getOwner().evaluate(symbolTable);
+        final Object owner = getScope().evaluate(symbolTable);
         final Object elemValue = element.evaluate(symbolTable);
 
         if (owner instanceof ScriptMap map)

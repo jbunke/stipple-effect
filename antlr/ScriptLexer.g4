@@ -34,6 +34,7 @@ OR_ASSIGN: '|=';
 // Function
 ARROW: '->';
 DEF: '::';
+EXTENSION: '$';
 
 // Binary Operators
 EQUAL: '==';
@@ -138,3 +139,4 @@ ESC_CHAR: '\\' ('0' | 'b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\');
 
 // Identifier
 IDENTIFIER: [_A-Za-z] [_A-Za-z0-9]*;
+PATH: IDENTIFIER (PERIOD IDENTIFIER)*;

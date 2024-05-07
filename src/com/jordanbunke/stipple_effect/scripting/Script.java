@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import java.util.Optional;
 
 public final class Script {
+    private static ScriptVisitor visitor = new ScriptVisitor();
     private static boolean printErrorsToDialog = false;
 
     public static void printErrorsToDialog() {
@@ -76,9 +77,6 @@ public final class Script {
                     new CommonTokenStream(lexer));
             parser.removeErrorListeners();
 
-            // TODO - generalize visitor
-            final ScriptVisitor visitor = new ScriptVisitor();
-
             return visitor.visitHead_rule(parser.head_rule());
         } catch (Exception e) {
             ScriptErrorLog.fireError(
@@ -132,5 +130,9 @@ public final class Script {
 
         for (String error : errors)
             System.out.println(error);
+    }
+
+    public static void overrideVisitor(final ScriptVisitor visitor) {
+        Script.visitor = visitor;
     }
 }

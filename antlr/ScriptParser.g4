@@ -34,7 +34,7 @@ type
 | type LCURLY RCURLY                        #SetType
 | LCURLY key=type COLON val=type RCURLY     #MapType
 | LPAREN func_type RPAREN                   #FunctionType
-// | ident                                     #ExtensionType
+| ident                                     #ExtensionType
 ;
 
 func_type: param_types ARROW ret=type;
@@ -70,7 +70,8 @@ stat
 | canvas=expr FILL LPAREN col=expr COMMA
   x=expr COMMA y=expr COMMA w=expr COMMA
   h=expr RPAREN SEMICOLON                   #FillStatement
-// extension statement
+| expr EXTENSION ident args SEMICOLON       #ExtScopedCallStatement
+| EXTENSION PATH args SEMICOLON             #ExtFuncCallStatement
 ;
 
 return_stat: RETURN expr? SEMICOLON;
@@ -136,6 +137,7 @@ expr
   COMMA end=expr RPAREN                     #SubstringExpression
 // Higher-order function call comes after natives with owners
 | func=expr CALL args                       #HOFuncCallExpression
+| expr EXTENSION ident args                 #ExtScopedCallExpression
 | op=(MINUS | NOT | SIZE) expr              #UnaryExpression
 | LPAREN type RPAREN expr                   #CastExpression
 | a=expr op=(PLUS | MINUS) b=expr           #ArithmeticBinExpression
@@ -156,8 +158,7 @@ expr
 | NEW LCURLY kt=type COLON vt=type RCURLY   #NewMapExpression
 | ident args                                #FunctionCallExpression
 | DEF ident                                 #HOFuncExpression
-// extension native owner function call expression
-// extension native global function call expression ($)
+| EXTENSION PATH args                       #ExtFuncCallExpression
 | assignable                                #AssignableExpression
 | literal                                   #LiteralExpression
 ;

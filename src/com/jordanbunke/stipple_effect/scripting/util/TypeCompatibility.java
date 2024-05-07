@@ -66,7 +66,9 @@ public final class TypeCompatibility {
         return arg;
     }
 
-    // TODO - public static <T> void addBaseType(Class<T> typeObjectClass)
+    public static <T> void addBaseType(final Class<T> typeObjectClass) {
+        BASE_TYPES.add(typeObjectClass);
+    }
 
     private static boolean notABaseType(final Object arg) {
         for (Class<?> baseType : BASE_TYPES)

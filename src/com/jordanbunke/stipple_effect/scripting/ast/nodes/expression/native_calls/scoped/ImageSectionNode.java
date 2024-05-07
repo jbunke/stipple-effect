@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.scoped;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class ImageSectionNode extends NativePropertyFuncNode {
+public final class ImageSectionNode extends ScopedNativeCallNode {
     final ExpressionNode x, y, width, height;
 
     public ImageSectionNode(
@@ -72,7 +72,7 @@ public final class ImageSectionNode extends NativePropertyFuncNode {
                 yVal = (int) y.evaluate(symbolTable),
                 w = (int) width.evaluate(symbolTable),
                 h = (int) height.evaluate(symbolTable);
-        final GameImage source = (GameImage) getOwner().evaluate(symbolTable);
+        final GameImage source = (GameImage) getScope().evaluate(symbolTable);
 
         if (w > 0 && h > 0) {
             final GameImage section = new GameImage(w, h);

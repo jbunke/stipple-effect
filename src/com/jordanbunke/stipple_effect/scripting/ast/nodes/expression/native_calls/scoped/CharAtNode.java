@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.scoped;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
@@ -9,7 +9,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Set;
 
-public final class CharAtNode extends NativePropertyFuncNode {
+public final class CharAtNode extends ScopedNativeCallNode {
     private final ExpressionNode index;
 
     public CharAtNode(
@@ -44,7 +44,7 @@ public final class CharAtNode extends NativePropertyFuncNode {
     @Override
     public Object evaluate(final SymbolTable symbolTable) {
         final int i = (int) index.evaluate(symbolTable);
-        final String s = (String) getOwner().evaluate(symbolTable);
+        final String s = (String) getScope().evaluate(symbolTable);
 
         if (i >= 0 && i < s.length())
             return s.charAt(i);

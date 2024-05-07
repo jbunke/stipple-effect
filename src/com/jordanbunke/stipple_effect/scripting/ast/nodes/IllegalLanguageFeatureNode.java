@@ -13,6 +13,8 @@ public final class IllegalLanguageFeatureNode extends ASTNode {
     ) {
         super(position);
         this.description = description;
+
+        semanticErrorCheck(null);
     }
 
     @Override

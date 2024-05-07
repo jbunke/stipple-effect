@@ -25,6 +25,15 @@ public abstract class TypeNode extends ASTNode {
 
     public abstract boolean complies(final Object o);
 
+    @Override
+    public abstract boolean equals(final Object o);
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract String toString();
+
     public static Set<TypeNode> numTypes() {
         return Set.of(getInt(), getFloat());
     }
