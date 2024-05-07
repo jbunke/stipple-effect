@@ -10,7 +10,7 @@ public final class HelperFuncNode extends FuncNode {
 
     public HelperFuncNode(
             final TextPosition position,
-            final MethodSignatureNode signature,
+            final FuncSignatureNode signature,
             final StatementNode body, final String name
     ) {
         super(position, signature, body);

@@ -33,7 +33,13 @@ type
 | type LT GT                                #ListType
 | type LCURLY RCURLY                        #SetType
 | LCURLY key=type COLON val=type RCURLY     #MapType
+| LPAREN func_type RPAREN                   #FunctionType
+// | ident                                     #ExtensionType
 ;
+
+func_type: param_types ARROW ret=type;
+
+param_types: (type (COMMA type)*)?;
 
 body
 : stat                                      #SingleStatBody
@@ -64,6 +70,7 @@ stat
 | canvas=expr FILL LPAREN col=expr COMMA
   x=expr COMMA y=expr COMMA w=expr COMMA
   h=expr RPAREN SEMICOLON                   #FillStatement
+// extension statement
 ;
 
 return_stat: RETURN expr? SEMICOLON;
@@ -90,7 +97,6 @@ if_def: IF LPAREN cond=expr RPAREN body;
 
 expr
 : LPAREN expr RPAREN                        #NestedExpression
-| LPAREN type RPAREN expr                   #CastExpression
 | col=expr HAS LPAREN elem=expr RPAREN      #ContainsExpression
 | map=expr LOOKUP LPAREN elem=expr RPAREN   #MapLookupExpression
 | map=expr KEYS LPAREN RPAREN               #MapKeysetExpression
@@ -128,7 +134,10 @@ expr
 | string=expr AT LPAREN index=expr RPAREN   #CharAtExpression
 | string=expr SUB LPAREN beg=expr
   COMMA end=expr RPAREN                     #SubstringExpression
+// Higher-order function call comes after natives with owners
+| func=expr CALL args                       #HOFuncCallExpression
 | op=(MINUS | NOT | SIZE) expr              #UnaryExpression
+| LPAREN type RPAREN expr                   #CastExpression
 | a=expr op=(PLUS | MINUS) b=expr           #ArithmeticBinExpression
 | a=expr op=(TIMES | DIVIDE | MOD) b=expr   #MultBinExpression
 | a=expr RAISE b=expr                       #PowerBinExpression
@@ -145,7 +154,10 @@ expr
 | NEW type LT GT                            #NewListExpression
 | NEW type LCURLY RCURLY                    #NewSetExpression
 | NEW LCURLY kt=type COLON vt=type RCURLY   #NewMapExpression
-| func_call                                 #FunctionCallExpression
+| ident args                                #FunctionCallExpression
+| DEF ident                                 #HOFuncExpression
+// extension native owner function call expression
+// extension native global function call expression ($)
 | assignable                                #AssignableExpression
 | literal                                   #LiteralExpression
 ;
@@ -154,8 +166,7 @@ k_v_pairs: k_v_pair (COMMA k_v_pair)*;
 
 k_v_pair: key=expr COLON val=expr;
 
-func_call: ident LPAREN
-(expr (COMMA expr)*)? RPAREN;
+args: LPAREN (expr (COMMA expr)*)? RPAREN;
 
 assignment
 : assignable ASSIGN expr                    #StandardAssignment

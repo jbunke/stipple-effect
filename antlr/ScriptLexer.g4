@@ -114,6 +114,7 @@ DOT: '.dot';
 LINE: '.line';
 FILL: '.fill';
 SECTION: '.section';
+CALL: '.call';
 
 // numbers
 fragment DIGIT: '0'..'9';

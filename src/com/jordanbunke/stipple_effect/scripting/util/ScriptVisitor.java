@@ -6,6 +6,9 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.ASTNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.collection_init.*;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.function.FuncCallNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.function.HOFuncCallNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.function.HOFuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.literal.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.color_def.*;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.global.img_gen.*;
@@ -24,7 +27,7 @@ import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.*;
 
 import java.util.List;
 
-public final class ScriptVisitor
+public class ScriptVisitor
         extends ScriptParserBaseVisitor<ASTNode> {
     @Override
     public HeadFuncNode visitHead_rule(
@@ -32,7 +35,7 @@ public final class ScriptVisitor
     ) {
         return new HeadFuncNode(
                 TextPosition.fromToken(ctx.start),
-                (MethodSignatureNode) visit(ctx.signature()),
+                (FuncSignatureNode) visit(ctx.signature()),
                 (StatementNode) visit(ctx.func_body()),
                 ctx.helper().stream().map(this::visitHelper)
                         .toArray(HelperFuncNode[]::new));
@@ -44,7 +47,7 @@ public final class ScriptVisitor
     ) {
         return new HelperFuncNode(
                 TextPosition.fromToken(ctx.start),
-                (MethodSignatureNode) visit(ctx.signature()),
+                (FuncSignatureNode) visit(ctx.signature()),
                 (StatementNode) visit(ctx.func_body()),
                 ctx.ident().getText());
     }
@@ -66,7 +69,7 @@ public final class ScriptVisitor
     }
 
     @Override
-    public MethodSignatureNode visitVoidReturnSignature(
+    public FuncSignatureNode visitVoidReturnSignature(
             final ScriptParser.VoidReturnSignatureContext ctx
     ) {
         final boolean hasParams = ctx.param_list() != null;
@@ -77,12 +80,12 @@ public final class ScriptVisitor
                         TextPosition.fromToken(ctx.RPAREN().getSymbol()),
                 new DeclarationNode[] {});
 
-        return new MethodSignatureNode(
+        return new FuncSignatureNode(
                 TextPosition.fromToken(ctx.LPAREN().getSymbol()), parameters);
     }
 
     @Override
-    public MethodSignatureNode visitTypeReturnSignature(
+    public FuncSignatureNode visitTypeReturnSignature(
             final ScriptParser.TypeReturnSignatureContext ctx
     ) {
         final boolean hasParams = ctx.param_list() != null;
@@ -93,7 +96,7 @@ public final class ScriptVisitor
                 TextPosition.fromToken(ctx.RPAREN().getSymbol()),
                 new DeclarationNode[] {});
 
-        return new MethodSignatureNode(
+        return new FuncSignatureNode(
                 TextPosition.fromToken(ctx.LPAREN().getSymbol()),
                 parameters, (TypeNode) visit(ctx.type()));
     }
@@ -130,59 +133,68 @@ public final class ScriptVisitor
     }
 
     @Override
-    public SimpleTypeNode visitBoolType(
+    public BaseTypeNode visitBoolType(
             final ScriptParser.BoolTypeContext ctx
     ) {
-        return TypeNode.getBool();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.BOOL);
     }
 
     @Override
-    public SimpleTypeNode visitIntType(
+    public BaseTypeNode visitIntType(
             final ScriptParser.IntTypeContext ctx
     ) {
-        return TypeNode.getInt();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.INT);
     }
 
     @Override
-    public SimpleTypeNode visitFloatType(
+    public BaseTypeNode visitFloatType(
             final ScriptParser.FloatTypeContext ctx
     ) {
-        return TypeNode.getFloat();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.FLOAT);
     }
 
     @Override
-    public SimpleTypeNode visitCharType(
+    public BaseTypeNode visitCharType(
             final ScriptParser.CharTypeContext ctx
     ) {
-        return TypeNode.getChar();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.CHAR);
     }
 
     @Override
-    public SimpleTypeNode visitStringType(
+    public BaseTypeNode visitStringType(
             final ScriptParser.StringTypeContext ctx
     ) {
-        return TypeNode.getString();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.STRING);
     }
 
     @Override
-    public SimpleTypeNode visitImageType(
+    public BaseTypeNode visitImageType(
             final ScriptParser.ImageTypeContext ctx
     ) {
-        return TypeNode.getImage();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.IMAGE);
     }
 
     @Override
-    public SimpleTypeNode visitColorType(
+    public BaseTypeNode visitColorType(
             final ScriptParser.ColorTypeContext ctx
     ) {
-        return TypeNode.getColor();
+        return new BaseTypeNode(TextPosition.fromToken(ctx.start),
+                BaseTypeNode.Type.COLOR);
     }
 
     @Override
     public CollectionTypeNode visitArrayType(
             final ScriptParser.ArrayTypeContext ctx
     ) {
-        return new CollectionTypeNode(CollectionTypeNode.Type.ARRAY,
+        return new CollectionTypeNode(
+                TextPosition.fromToken(ctx.start),
+                CollectionTypeNode.Type.ARRAY,
                 (TypeNode) visit(ctx.type()));
     }
 
@@ -190,7 +202,9 @@ public final class ScriptVisitor
     public CollectionTypeNode visitSetType(
             final ScriptParser.SetTypeContext ctx
     ) {
-        return new CollectionTypeNode(CollectionTypeNode.Type.SET,
+        return new CollectionTypeNode(
+                TextPosition.fromToken(ctx.start),
+                CollectionTypeNode.Type.SET,
                 (TypeNode) visit(ctx.type()));
     }
 
@@ -198,7 +212,9 @@ public final class ScriptVisitor
     public CollectionTypeNode visitListType(
             final ScriptParser.ListTypeContext ctx
     ) {
-        return new CollectionTypeNode(CollectionTypeNode.Type.LIST,
+        return new CollectionTypeNode(
+                TextPosition.fromToken(ctx.start),
+                CollectionTypeNode.Type.LIST,
                 (TypeNode) visit(ctx.type()));
     }
 
@@ -207,8 +223,21 @@ public final class ScriptVisitor
             final ScriptParser.MapTypeContext ctx
     ) {
         return new MapTypeNode(
+                TextPosition.fromToken(ctx.start),
                 (TypeNode) visit(ctx.key),
                 (TypeNode) visit(ctx.val));
+    }
+
+    @Override
+    public FuncTypeNode visitFunctionType(
+            final ScriptParser.FunctionTypeContext ctx
+    ) {
+        final TypeNode[] paramTypes = ctx.func_type().param_types().type()
+                .stream().map(p -> (TypeNode) visit(p))
+                .toArray(TypeNode[]::new);
+
+        return new FuncTypeNode(TextPosition.fromToken(ctx.start),
+                paramTypes, (TypeNode) visit(ctx.func_type().ret));
     }
 
     @Override
@@ -636,12 +665,32 @@ public final class ScriptVisitor
     public FuncCallNode visitFunctionCallExpression(
             final ScriptParser.FunctionCallExpressionContext ctx
     ) {
-        final ExpressionNode[] args = ctx.func_call().expr().stream()
+        final ExpressionNode[] args = ctx.args().expr().stream()
                 .map(arg -> (ExpressionNode) visit(arg))
                 .toArray(ExpressionNode[]::new);
 
         return new FuncCallNode(TextPosition.fromToken(ctx.start),
-                ctx.func_call().ident().getText(), args);
+                ctx.ident().getText(), args);
+    }
+
+    @Override
+    public HOFuncCallNode visitHOFuncCallExpression(
+            final ScriptParser.HOFuncCallExpressionContext ctx
+    ) {
+        final ExpressionNode[] args = ctx.args().expr().stream()
+                .map(arg -> (ExpressionNode) visit(arg))
+                .toArray(ExpressionNode[]::new);
+
+        return new HOFuncCallNode(TextPosition.fromToken(ctx.start),
+                (ExpressionNode) visit(ctx.func), args);
+    }
+
+    @Override
+    public HOFuncNode visitHOFuncExpression(
+            final ScriptParser.HOFuncExpressionContext ctx
+    ) {
+        return new HOFuncNode(TextPosition.fromToken(ctx.start),
+                ctx.ident().getText());
     }
 
     @Override

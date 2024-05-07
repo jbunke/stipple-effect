@@ -76,6 +76,7 @@ public final class Script {
                     new CommonTokenStream(lexer));
             parser.removeErrorListeners();
 
+            // TODO - generalize visitor
             final ScriptVisitor visitor = new ScriptVisitor();
 
             return visitor.visitHead_rule(parser.head_rule());

@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 import java.util.Set;
@@ -92,7 +92,7 @@ public final class BinaryOperationNode extends ExpressionNode {
 
         switch (operator) {
             case AND, OR -> {
-                final SimpleTypeNode boolType = TypeNode.getBool();
+                final BaseTypeNode boolType = TypeNode.getBool();
 
                 if (!o1Type.equals(boolType))
                     ScriptErrorLog.fireError(
@@ -104,19 +104,18 @@ public final class BinaryOperationNode extends ExpressionNode {
                             o2.getPosition(), o2Type.toString());
             }
             case ADD -> {
-                if (!(o1Type instanceof SimpleTypeNode))
+                if (!(o1Type instanceof BaseTypeNode))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.INVALID_OPERAND_PLUS,
                             o1.getPosition(), o1Type.toString());
-                if (!(o2Type instanceof SimpleTypeNode))
+                if (!(o2Type instanceof BaseTypeNode))
                     ScriptErrorLog.fireError(
                             ScriptErrorLog.Message.INVALID_OPERAND_PLUS,
                             o2.getPosition(), o2Type.toString());
             }
             case SUBTRACT, MULTIPLY, DIVIDE, MODULO, RAISE,
                     GT, LT, GEQ, LEQ -> {
-                final Set<TypeNode> acceptedTypes = Set.of(
-                        TypeNode.getInt(), TypeNode.getFloat());
+                final Set<TypeNode> acceptedTypes = TypeNode.numTypes();
 
                 if (!acceptedTypes.contains(o1Type))
                     ScriptErrorLog.fireError(
@@ -165,7 +164,7 @@ public final class BinaryOperationNode extends ExpressionNode {
                         o2Value instanceof String s2)
                     yield s1 + s2;
 
-                final SimpleTypeNode
+                final BaseTypeNode
                         intType = TypeNode.getInt();
                 final boolean bothInts =
                         o1.getType(symbolTable).equals(intType) &&
@@ -215,7 +214,7 @@ public final class BinaryOperationNode extends ExpressionNode {
         final boolean bothNums = o1Type.isNum() && o2Type.isNum();
 
         if (bothNums) {
-            final SimpleTypeNode floatType = TypeNode.getFloat();
+            final BaseTypeNode floatType = TypeNode.getFloat();
 
             if (o1Type.equals(floatType) || o2Type.equals(floatType))
                 return floatType;

@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -58,15 +58,13 @@ public final class OperandAssignmentNode extends AssignmentNode {
         final TypeNode
                 assignableType = getAssignable().getType(symbolTable),
                 operandType = operand.getType(symbolTable);
-        final SimpleTypeNode
-                intType = TypeNode.getInt(),
+        final BaseTypeNode intType = TypeNode.getInt(),
                 boolType = TypeNode.getBool(),
                 floatType = TypeNode.getFloat(),
                 charType = TypeNode.getChar(),
                 stringType = TypeNode.getString();
 
-        final Set<TypeNode>
-                numTypes = Set.of(intType, floatType),
+        final Set<TypeNode> numTypes = Set.of(intType, floatType),
                 textTypes = Set.of(stringType, charType);
 
         if (operator.isLogic()) {

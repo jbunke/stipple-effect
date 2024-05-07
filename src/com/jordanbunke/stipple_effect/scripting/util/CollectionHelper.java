@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.util;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -13,7 +13,7 @@ public final class CollectionHelper {
     ) {
         return Arrays.stream(elements)
                 .map(e -> e.getType(symbolTable))
-                .filter(t -> t instanceof SimpleTypeNode st &&
+                .filter(t -> t instanceof BaseTypeNode st &&
                         !st.isWildcard())
                 .reduce((a, b) -> a).orElse(
                         elements[0].getType(symbolTable));

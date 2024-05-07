@@ -9,7 +9,7 @@ public final class HeadFuncNode extends FuncNode {
 
     public HeadFuncNode(
             final TextPosition position,
-            final MethodSignatureNode signature,
+            final FuncSignatureNode signature,
             final StatementNode body,
             final HelperFuncNode[] helpers
     ) {

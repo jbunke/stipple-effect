@@ -6,7 +6,7 @@ import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class TextureColorReplaceNode extends ExpressionNode {
@@ -31,7 +31,7 @@ public final class TextureColorReplaceNode extends ExpressionNode {
         lookup.semanticErrorCheck(symbolTable);
         replacementColors.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode
+        final BaseTypeNode
                 imageType = TypeNode.getImage();
 
         final TypeNode

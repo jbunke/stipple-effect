@@ -1,16 +1,16 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.function;
 
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.function.HelperFuncNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
-import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
+import com.jordanbunke.stipple_effect.scripting.util.FuncHelper;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.util.Arrays;
 
-public final class FuncCallNode extends ExpressionNode {
-    private final String name;
+public final class FuncCallNode extends FuncRetrievableNode {
     private final ExpressionNode[] args;
 
     public FuncCallNode(
@@ -18,9 +18,8 @@ public final class FuncCallNode extends ExpressionNode {
             final String name,
             final ExpressionNode[] args
     ) {
-        super(position);
+        super(position, name);
 
-        this.name = name;
         this.args = args;
     }
 
@@ -47,14 +46,9 @@ public final class FuncCallNode extends ExpressionNode {
     @Override
     public Object evaluate(final SymbolTable symbolTable) {
         final HelperFuncNode func = getFunc(symbolTable);
-
         assert func != null;
 
-        final SymbolTable funcTable = symbolTable.getRoot().getChild(func);
-        final Object[] argVals = Arrays.stream(args)
-                .map(a -> a.evaluate(symbolTable)).toArray(Object[]::new);
-
-        return func.execute(funcTable, argVals);
+        return FuncHelper.evaluate(func, args, symbolTable);
     }
 
     @Override
@@ -62,20 +56,6 @@ public final class FuncCallNode extends ExpressionNode {
         final HelperFuncNode func = getFunc(symbolTable);
 
         return func == null ? null : func.getReturnType();
-    }
-
-    private HelperFuncNode getFunc(final SymbolTable symbolTable) {
-        final Variable var = symbolTable.get(SymbolTable.funcWithName(name));
-
-        if (var == null) {
-            ScriptErrorLog.fireError(
-                    ScriptErrorLog.Message.UNDEFINED_FUNC,
-                    getPosition(), name);
-
-            return null;
-        }
-
-        return (HelperFuncNode) var.get();
     }
 
     @Override

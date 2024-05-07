@@ -61,9 +61,7 @@ public final class UnaryOperationNode extends ExpressionNode {
                             getPosition(), operandType.toString());
             }
             case NEGATE -> {
-                final Set<TypeNode> acceptedTypes = Set.of(
-                        TypeNode.getInt(),
-                        TypeNode.getFloat());
+                final Set<TypeNode> acceptedTypes = TypeNode.numTypes();
 
                 if (!acceptedTypes.contains(operandType))
                     ScriptErrorLog.fireError(

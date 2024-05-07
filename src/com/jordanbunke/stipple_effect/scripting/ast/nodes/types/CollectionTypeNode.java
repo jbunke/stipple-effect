@@ -29,7 +29,14 @@ public final class CollectionTypeNode extends TypeNode {
     public CollectionTypeNode(
             final Type type, final TypeNode elementType
     ) {
-        super(TextPosition.N_A);
+        this(TextPosition.N_A, type, elementType);
+    }
+
+    public CollectionTypeNode(
+            final TextPosition position,
+            final Type type, final TypeNode elementType
+    ) {
+        super(position);
 
         this.type = type;
         this.elementType = elementType;

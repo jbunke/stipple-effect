@@ -1,0 +1,47 @@
+(~ string s -> string) {
+    ~ (string -> string)[] string_fs = [ ::identity, ::capitalize, ::miniscule ];
+    ~ int l = #|string_fs;
+    ~ string[] results = new string[l];
+
+    for (int i = 0; i < l; i++) results[i] = string_fs[i].call(s);
+
+    return collate_strings(results);
+}
+
+collate_strings(~ string[] ss -> string) {
+    string s = "";
+
+    for (int i = 0; i < #|ss; i++) {
+        s += ss[i];
+
+        if (i + 1 < #|ss) s += ", ";
+    }
+
+    return s;
+}
+
+identity(~ string s -> string) -> s
+capitalize(~ string s -> string) -> element_wise(::to_upper, s)
+miniscule(~ string s -> string) -> element_wise(::to_lower, s)
+
+element_wise(~ (char -> char) char_func, ~ string s -> string) {
+    string r = "";
+
+    for (~ char c in s) r += char_func.call(c);
+
+    return r;
+}
+
+to_upper(~ char c -> char) -> case_convert('a', 'z', c, ::subtract)
+to_lower(~char c -> char) -> case_convert('A', 'Z', c, ::add)
+
+case_convert(~ char a, ~ char z, ~ char c, ~ (int, int -> int) op -> char) {
+    if ((int) c >= (int) a && (int) c <= (int) z)
+        return (char) op.call((int) c, cap_offset());
+
+    return c;
+}
+
+cap_offset(-> int) -> (int) 'a' - (int) 'A'
+subtract(~ int a, ~ int b -> int) -> a - b
+add(~ int a, ~ int b -> int) -> a + b

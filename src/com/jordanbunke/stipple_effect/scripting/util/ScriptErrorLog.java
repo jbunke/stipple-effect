@@ -19,6 +19,8 @@ public final class ScriptErrorLog {
     }
 
     public enum Message {
+        CUSTOM_CT, CUSTOM_RT,
+        NOT_HOF,
         ARG_PARAM_MISMATCH,
         INVALID_ARG_TYPE,
         ARGS_SIGNATURE_MISMATCH,
@@ -71,6 +73,10 @@ public final class ScriptErrorLog {
 
         private String get(final String[] args) {
             return errorClass().prefix() + switch (this) {
+                case CUSTOM_CT, CUSTOM_RT -> args[0];
+                case NOT_HOF -> "Treating the expression \"" + args[0] +
+                        "\" as a higher-order function although it is " +
+                        "of type \"" + args[1] + "\"";
                 case ARG_PARAM_MISMATCH -> "Attempting to pass an argument" +
                         " into the script that does not comply with the type" +
                         " of the parameter: \"" + args[0] + "\"";
@@ -127,7 +133,7 @@ public final class ScriptErrorLog {
                             typeA = args[3], typeB = args[4];
 
                     yield description + " are of different types; " + a +
-                            " is \"" + typeA + "\" and " + b + "is \"" +
+                            " is \"" + typeA + "\" and " + b + " is \"" +
                             typeB + "\"";
 
                 }
@@ -321,7 +327,11 @@ public final class ScriptErrorLog {
                         MAP_DOES_NOT_CONTAIN_ELEMENT,
                         ARGS_PARAMS_MISMATCH,
                         UNINITIALIZED_VAR,
-                        INDEX_OUT_OF_BOUNDS ->
+                        INDEX_OUT_OF_BOUNDS,
+                        SUB_BEG_OUT_OF_BOUNDS,
+                        SUB_END_GEQ_BEG,
+                        SUB_END_OUT_OF_BOUNDS,
+                        CUSTOM_RT ->
                         ErrorClass.RUNTIME;
                 case COULD_NOT_READ -> ErrorClass.IO;
                 default -> ErrorClass.COMPILE;

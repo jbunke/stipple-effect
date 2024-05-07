@@ -1,0 +1,58 @@
+(-> string) {
+    ~ string[] input = ["this", "is", "a", "sentence", "made", "up", "of", "words"];
+
+    input[0] = cap_first_letter(input[0]);
+
+    for (int i = 1; i < #|input; i++) {
+        (string -> string) f = prob(0.1) ? ::reverse : ::capitalize;
+        input[i] = f.call(input[i]);
+    }
+
+    return concat_words(input);
+}
+
+concat_words(~ string[] words -> string) {
+    string sentence = "";
+
+    for (int i = 0; i < #|words; i++) {
+        sentence += words[i];
+
+        if (i + 1 < #|words) sentence += " ";
+    }
+
+    return sentence + ".";
+}
+
+reverse(string s -> string) {
+    string r = "";
+
+    for (final char c in s)
+        r = c + r;
+
+    return r;
+}
+
+cap_first_letter(string s -> string) {
+    if (s == "")
+        return s;
+    else if (#|s == 1)
+        return capitalize(s);
+    else
+        return capitalize(s.sub(0, 1)) + s.sub(1, #|s);
+}
+
+capitalize(string s -> string) {
+    ~ int cap_offset = (int) 'a' - (int) 'A';
+    ~ int l = #|s;
+
+    for (int i = 0; i < l; i++) {
+        ~ string before = i == 0 ? "" : s.sub(0, i);
+        ~ string after = i + 1 == l ? "" : s.sub(i + 1, l);
+        ~ char c = s.at(i);
+
+        if ((int) c >= (int) 'a' && (int) c <= (int) 'z')
+            s = before + (char) ((int) c - cap_offset) + after;
+    }
+
+    return s;
+}

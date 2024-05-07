@@ -4,7 +4,7 @@ import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 public final class TernaryOperationNode extends ExpressionNode {
@@ -33,7 +33,7 @@ public final class TernaryOperationNode extends ExpressionNode {
                 cType = condition.getType(symbolTable),
                 aType = a.getType(symbolTable),
                 bType = b.getType(symbolTable);
-        final SimpleTypeNode boolType = TypeNode.getBool();
+        final BaseTypeNode boolType = TypeNode.getBool();
 
         if (!cType.equals(boolType))
             ScriptErrorLog.fireError(

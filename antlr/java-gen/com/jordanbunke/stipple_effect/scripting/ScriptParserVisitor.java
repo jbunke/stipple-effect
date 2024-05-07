@@ -92,6 +92,13 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSetType(ScriptParser.SetTypeContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code FunctionType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionType(ScriptParser.FunctionTypeContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ListType}
 	 * labeled alternative in {@link ScriptParser#type()}.
 	 * @param ctx the parse tree
@@ -140,6 +147,18 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitImageType(ScriptParser.ImageTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScriptParser#func_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_type(ScriptParser.Func_typeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScriptParser#param_types}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParam_types(ScriptParser.Param_typesContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code SingleStatBody}
 	 * labeled alternative in {@link ScriptParser#body}.
@@ -555,12 +574,26 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExplicitMapExpression(ScriptParser.ExplicitMapExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code HOFuncCallExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHOFuncCallExpression(ScriptParser.HOFuncCallExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ColorAtPixelExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitColorAtPixelExpression(ScriptParser.ColorAtPixelExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code HOFuncExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHOFuncExpression(ScriptParser.HOFuncExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ArithmeticBinExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
@@ -637,11 +670,11 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitK_v_pair(ScriptParser.K_v_pairContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ScriptParser#func_call}.
+	 * Visit a parse tree produced by {@link ScriptParser#args}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunc_call(ScriptParser.Func_callContext ctx);
+	T visitArgs(ScriptParser.ArgsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StandardAssignment}
 	 * labeled alternative in {@link ScriptParser#assignment}.
