@@ -31,8 +31,7 @@ public final class ClampNode extends ExpressionNode {
         value.semanticErrorCheck(symbolTable);
         max.semanticErrorCheck(symbolTable);
 
-        final Set<TypeNode> acceptedTypes = Set.of(
-                TypeNode.getInt(), TypeNode.getFloat());
+        final Set<TypeNode> acceptedTypes = TypeNode.numTypes();
 
         final TypeNode
                 minType = min.getType(symbolTable),

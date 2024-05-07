@@ -64,13 +64,6 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDeclaration(ScriptParser.DeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ArrayType}
-	 * labeled alternative in {@link ScriptParser#type()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArrayType(ScriptParser.ArrayTypeContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code BoolType}
 	 * labeled alternative in {@link ScriptParser#type()}.
 	 * @param ctx the parse tree
@@ -85,33 +78,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStringType(ScriptParser.StringTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SetType}
+	 * Visit a parse tree produced by the {@code FunctionType}
 	 * labeled alternative in {@link ScriptParser#type()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSetType(ScriptParser.SetTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ListType}
-	 * labeled alternative in {@link ScriptParser#type()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitListType(ScriptParser.ListTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ColorType}
-	 * labeled alternative in {@link ScriptParser#type()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitColorType(ScriptParser.ColorTypeContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code CharType}
-	 * labeled alternative in {@link ScriptParser#type()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCharType(ScriptParser.CharTypeContext ctx);
+	T visitFunctionType(ScriptParser.FunctionTypeContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code MapType}
 	 * labeled alternative in {@link ScriptParser#type()}.
@@ -140,6 +112,60 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitImageType(ScriptParser.ImageTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ArrayType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArrayType(ScriptParser.ArrayTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SetType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSetType(ScriptParser.SetTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExtensionType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExtensionType(ScriptParser.ExtensionTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ListType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitListType(ScriptParser.ListTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ColorType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitColorType(ScriptParser.ColorTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code CharType}
+	 * labeled alternative in {@link ScriptParser#type()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCharType(ScriptParser.CharTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScriptParser#func_type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunc_type(ScriptParser.Func_typeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ScriptParser#param_types}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParam_types(ScriptParser.Param_typesContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code SingleStatBody}
 	 * labeled alternative in {@link ScriptParser#body}.
@@ -239,6 +265,20 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFillStatement(ScriptParser.FillStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ExtScopedCallStatement}
+	 * labeled alternative in {@link ScriptParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExtScopedCallStatement(ScriptParser.ExtScopedCallStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExtFuncCallStatement}
+	 * labeled alternative in {@link ScriptParser#stat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExtFuncCallStatement(ScriptParser.ExtFuncCallStatementContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ScriptParser#return_stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -303,27 +343,6 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIf_def(ScriptParser.If_defContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code LogicBinExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLogicBinExpression(ScriptParser.LogicBinExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code TernaryExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTernaryExpression(ScriptParser.TernaryExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FlipCoinBoolExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFlipCoinBoolExpression(ScriptParser.FlipCoinBoolExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code MinCollectionExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
@@ -352,33 +371,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitImageBoundExpression(ScriptParser.ImageBoundExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code UnaryExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitUnaryExpression(ScriptParser.UnaryExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code RandomTwoArgExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitRandomTwoArgExpression(ScriptParser.RandomTwoArgExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code MapLookupExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMapLookupExpression(ScriptParser.MapLookupExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code MaxCollectionExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMaxCollectionExpression(ScriptParser.MaxCollectionExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code PowerBinExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
@@ -401,20 +399,6 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFlipCoinArgExpression(ScriptParser.FlipCoinArgExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ExplicitListExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExplicitListExpression(ScriptParser.ExplicitListExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code RandomExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRandomExpression(ScriptParser.RandomExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code ComparisonBinExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
@@ -429,13 +413,6 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRGBColorExpression(ScriptParser.RGBColorExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ImageOfBoundsExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitImageOfBoundsExpression(ScriptParser.ImageOfBoundsExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code AssignableExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
@@ -449,6 +426,174 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExplicitSetExpression(ScriptParser.ExplicitSetExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExtScopedCallExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExtScopedCallExpression(ScriptParser.ExtScopedCallExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExtFuncCallExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExtFuncCallExpression(ScriptParser.ExtFuncCallExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SubstringExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubstringExpression(ScriptParser.SubstringExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ContainsExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitContainsExpression(ScriptParser.ContainsExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code LiteralExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralExpression(ScriptParser.LiteralExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MapKeysetExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMapKeysetExpression(ScriptParser.MapKeysetExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ClampExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClampExpression(ScriptParser.ClampExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NestedExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNestedExpression(ScriptParser.NestedExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code HOFuncExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHOFuncExpression(ScriptParser.HOFuncExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AbsoluteExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAbsoluteExpression(ScriptParser.AbsoluteExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code GenLookupExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGenLookupExpression(ScriptParser.GenLookupExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ColorChannelExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitColorChannelExpression(ScriptParser.ColorChannelExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code CastExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCastExpression(ScriptParser.CastExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MinTwoArgExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMinTwoArgExpression(ScriptParser.MinTwoArgExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ImageFromPathExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImageFromPathExpression(ScriptParser.ImageFromPathExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code LogicBinExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicBinExpression(ScriptParser.LogicBinExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code TernaryExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTernaryExpression(ScriptParser.TernaryExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FlipCoinBoolExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFlipCoinBoolExpression(ScriptParser.FlipCoinBoolExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code UnaryExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnaryExpression(ScriptParser.UnaryExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MapLookupExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMapLookupExpression(ScriptParser.MapLookupExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MaxCollectionExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMaxCollectionExpression(ScriptParser.MaxCollectionExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExplicitListExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExplicitListExpression(ScriptParser.ExplicitListExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code RandomExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRandomExpression(ScriptParser.RandomExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ImageOfBoundsExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImageOfBoundsExpression(ScriptParser.ImageOfBoundsExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code MaxTwoArgExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
@@ -485,40 +630,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitImageSectionExpression(ScriptParser.ImageSectionExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SubstringExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubstringExpression(ScriptParser.SubstringExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ContainsExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitContainsExpression(ScriptParser.ContainsExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code LiteralExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLiteralExpression(ScriptParser.LiteralExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code NewListExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNewListExpression(ScriptParser.NewListExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code MapKeysetExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMapKeysetExpression(ScriptParser.MapKeysetExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ProbabilityExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
@@ -534,26 +651,19 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTextureColorReplaceExpression(ScriptParser.TextureColorReplaceExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ClampExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitClampExpression(ScriptParser.ClampExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NestedExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNestedExpression(ScriptParser.NestedExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code ExplicitMapExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExplicitMapExpression(ScriptParser.ExplicitMapExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code HOFuncCallExpression}
+	 * labeled alternative in {@link ScriptParser#expr()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHOFuncCallExpression(ScriptParser.HOFuncCallExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ColorAtPixelExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
@@ -569,27 +679,6 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArithmeticBinExpression(ScriptParser.ArithmeticBinExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code AbsoluteExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAbsoluteExpression(ScriptParser.AbsoluteExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code GenLookupExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitGenLookupExpression(ScriptParser.GenLookupExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ColorChannelExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitColorChannelExpression(ScriptParser.ColorChannelExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code CharAtExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
@@ -597,33 +686,12 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCharAtExpression(ScriptParser.CharAtExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CastExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCastExpression(ScriptParser.CastExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code NewArrayExpression}
 	 * labeled alternative in {@link ScriptParser#expr()}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNewArrayExpression(ScriptParser.NewArrayExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code MinTwoArgExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMinTwoArgExpression(ScriptParser.MinTwoArgExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ImageFromPathExpression}
-	 * labeled alternative in {@link ScriptParser#expr()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitImageFromPathExpression(ScriptParser.ImageFromPathExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ScriptParser#k_v_pairs}.
 	 * @param ctx the parse tree
@@ -637,11 +705,11 @@ public interface ScriptParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitK_v_pair(ScriptParser.K_v_pairContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ScriptParser#func_call}.
+	 * Visit a parse tree produced by {@link ScriptParser#args}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunc_call(ScriptParser.Func_callContext ctx);
+	T visitArgs(ScriptParser.ArgsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StandardAssignment}
 	 * labeled alternative in {@link ScriptParser#assignment}.

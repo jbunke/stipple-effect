@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.Variable;
@@ -51,7 +51,7 @@ public sealed abstract class CollectionAssignableNode extends AssignableNode
 
         index.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode intType = TypeNode.getInt();
+        final BaseTypeNode intType = TypeNode.getInt();
         final TypeNode indexType = index.getType(symbolTable);
 
         if (!indexType.equals(intType))

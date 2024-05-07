@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
 import java.awt.*;
 
-public final class SimpleTypeNode extends TypeNode {
+public final class BaseTypeNode extends TypeNode {
     private final Type type;
 
     public enum Type {
@@ -27,10 +27,19 @@ public final class SimpleTypeNode extends TypeNode {
         }
     }
 
-    SimpleTypeNode(final Type type) {
-        super(TextPosition.N_A);
+    BaseTypeNode(final Type type) {
+        this(TextPosition.N_A, type);
+    }
 
+    public BaseTypeNode(
+            final TextPosition position, final Type type
+    ) {
+        super(position);
         this.type = type;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -40,7 +49,7 @@ public final class SimpleTypeNode extends TypeNode {
 
     @Override
     public boolean equals(final Object o) {
-        return o instanceof SimpleTypeNode that && (this.type == that.type ||
+        return o instanceof BaseTypeNode that && (this.type == that.type ||
                 this.type == Type.WILDCARD || that.type == Type.WILDCARD);
     }
 

@@ -4,11 +4,20 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.ast.collection.*;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public final class TypeCompatibility {
+    private static final Set<Class<?>> BASE_TYPES;
+
+    static {
+        BASE_TYPES = new HashSet<>(Set.of(Integer.class,
+                Boolean.class, Double.class, Character.class,
+                GameImage.class, Color.class, String.class));
+    }
+
     public static void prepArgs(final Object[] args) {
         for (int i = 0; i < args.length; i++)
             args[i] = prepArg(args[i]);
@@ -48,7 +57,7 @@ public final class TypeCompatibility {
             return prepArg(objectifyIntArray(a));
         else if (arg instanceof char[] a)
             return prepArg(objectifyCharArray(a));
-        else if (notAnIdentityType(arg)) {
+        else if (notABaseType(arg)) {
             ScriptErrorLog.fireError(
                     ScriptErrorLog.Message.INVALID_ARG_TYPE,
                     TextPosition.N_A, arg.getClass().getName());
@@ -57,11 +66,16 @@ public final class TypeCompatibility {
         return arg;
     }
 
-    private static boolean notAnIdentityType(final Object arg) {
-        return !(arg instanceof String || arg instanceof GameImage ||
-                arg instanceof Color || arg instanceof Boolean ||
-                arg instanceof Integer || arg instanceof Double ||
-                arg instanceof Character);
+    public static <T> void addBaseType(final Class<T> typeObjectClass) {
+        BASE_TYPES.add(typeObjectClass);
+    }
+
+    private static boolean notABaseType(final Object arg) {
+        for (Class<?> baseType : BASE_TYPES)
+            if (baseType.isInstance(arg))
+                return false;
+
+        return true;
     }
 
     private static Boolean[] objectifyBoolArray(final boolean[] bs) {

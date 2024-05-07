@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_cal
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.sprite.TextureColorReplace;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
@@ -28,7 +28,7 @@ public final class GenLookupNode extends ExpressionNode {
         source.semanticErrorCheck(symbolTable);
         vert.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode
+        final BaseTypeNode
                 imageType = TypeNode.getImage(),
                 boolType = TypeNode.getBool();
 

@@ -6,7 +6,7 @@ import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -34,7 +34,7 @@ public final class DrawNode extends StatementNode {
         x.semanticErrorCheck(symbolTable);
         y.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode
+        final BaseTypeNode
                 imgType = TypeNode.getImage(),
                 intType = TypeNode.getInt();
 

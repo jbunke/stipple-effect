@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.scoped;
 
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
@@ -8,26 +8,26 @@ import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
 import java.util.Set;
 
-public abstract class NativePropertyFuncNode extends ExpressionNode {
-    private final ExpressionNode owner;
+public abstract class ScopedNativeCallNode extends ExpressionNode {
+    private final ExpressionNode scope;
     private final Set<TypeNode> acceptedTypes;
 
-    NativePropertyFuncNode(
+    ScopedNativeCallNode(
             final TextPosition position,
-            final ExpressionNode owner,
+            final ExpressionNode scope,
             final Set<TypeNode> acceptedTypes
     ) {
         super(position);
 
-        this.owner = owner;
+        this.scope = scope;
         this.acceptedTypes = acceptedTypes;
     }
 
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
-        owner.semanticErrorCheck(symbolTable);
+        scope.semanticErrorCheck(symbolTable);
 
-        final TypeNode type = owner.getType(symbolTable);
+        final TypeNode type = scope.getType(symbolTable);
 
         if (!acceptedTypes.contains(type)) {
             final String validTypes = acceptedTypes.size() == 1
@@ -41,14 +41,14 @@ public abstract class NativePropertyFuncNode extends ExpressionNode {
         }
     }
 
-    public ExpressionNode getOwner() {
-        return owner;
+    public ExpressionNode getScope() {
+        return scope;
     }
 
     abstract String callName();
 
     @Override
     public String toString() {
-        return owner + "." + callName();
+        return scope + "." + callName();
     }
 }

@@ -4,7 +4,7 @@ import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.assignable.AssignableNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -26,7 +26,7 @@ public final class NoOperandAssignmentNode extends AssignmentNode {
         super.semanticErrorCheck(symbolTable);
 
         final TypeNode assignableType = getAssignable().getType(symbolTable);
-        final SimpleTypeNode
+        final BaseTypeNode
                 intType = TypeNode.getInt();
 
         if (!assignableType.equals(intType))

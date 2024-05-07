@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.control_flo
 
 import com.jordanbunke.stipple_effect.scripting.ast.collection.ScriptCollection;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.CollectionTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
@@ -38,7 +38,7 @@ public final class IteratorLoopNode extends StatementNode {
         collection.semanticErrorCheck(innerTable);
         loopBody.semanticErrorCheck(innerTable);
 
-        final SimpleTypeNode stringType = TypeNode.getString();
+        final BaseTypeNode stringType = TypeNode.getString();
         final TypeNode colType = collection.getType(symbolTable),
                 varType = declaration.getType();
 
@@ -51,7 +51,7 @@ public final class IteratorLoopNode extends StatementNode {
                         declaration.getPosition(),
                         elemType.toString(), varType.toString());
         } else if (stringType.equals(colType)) {
-            final SimpleTypeNode charType = TypeNode.getChar();
+            final BaseTypeNode charType = TypeNode.getChar();
 
             if (!varType.equals(charType))
                 ScriptErrorLog.fireError(

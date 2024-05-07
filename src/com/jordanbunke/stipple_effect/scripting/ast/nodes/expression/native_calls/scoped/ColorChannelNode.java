@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.property;
+package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.native_calls.scoped;
 
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import java.awt.*;
 import java.util.Set;
 
-public final class ColorChannelNode extends NativePropertyFuncNode {
+public final class ColorChannelNode extends ScopedNativeCallNode {
     private enum ColorChannel {
         RED, GREEN, BLUE, ALPHA;
 
@@ -47,7 +47,7 @@ public final class ColorChannelNode extends NativePropertyFuncNode {
 
     @Override
     public Integer evaluate(final SymbolTable symbolTable) {
-        return channel.evaluate(((Color) getOwner().evaluate(symbolTable)));
+        return channel.evaluate(((Color) getScope().evaluate(symbolTable)));
     }
 
     @Override

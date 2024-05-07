@@ -1,13 +1,34 @@
 package com.jordanbunke.stipple_effect.scripting.ast.nodes.expression;
 
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 
+import java.util.Map;
 import java.util.Set;
 
 public final class CastNode extends ExpressionNode {
+    private static final Map<TypeNode, Set<TypeNode>>
+            CAST_MATRIX = Map.ofEntries(
+                    Map.entry(TypeNode.getInt(), Set.of(TypeNode.getInt(),
+                            TypeNode.getFloat(), TypeNode.getChar())),
+                    Map.entry(TypeNode.getFloat(), TypeNode.numTypes()),
+                    Map.entry(TypeNode.getChar(), Set.of(TypeNode.getInt())),
+                    Map.entry(TypeNode.getString(), Set.of(
+                            TypeNode.getChar(), TypeNode.getBool(),
+                            TypeNode.getInt(), TypeNode.getFloat())));
+
+    /*
+        {
+            int : { int, float, char },
+            float : { int, float },
+            char : { int },
+            string : { char, bool, int, float }
+        }
+    */
+
     private final TypeNode type;
     private final ExpressionNode e;
 
@@ -28,34 +49,43 @@ public final class CastNode extends ExpressionNode {
 
         final TypeNode eType = e.getType(symbolTable);
 
-        final Set<TypeNode> acceptedTypes = TypeNode.numTypes();
-
-        if (!acceptedTypes.contains(type))
-            ScriptErrorLog.fireError(ScriptErrorLog.Message.NAN,
-                    type.getPosition(), "Cast type");
-        if (!acceptedTypes.contains(eType))
-            ScriptErrorLog.fireError(ScriptErrorLog.Message.NAN,
-                    e.getPosition(), "Expression to be cast");
+        if (!CAST_MATRIX.containsKey(type))
+            ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_CT,
+                    type.getPosition(), "Type \"" + type + "\" is uncastable");
+        else if (!CAST_MATRIX.get(type).contains(eType))
+            ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_CT,
+                    e.getPosition(), "Type \"" + eType +
+                            "\" cannot be cast to \"" + type + "\"");
     }
 
     @Override
-    public Number evaluate(final SymbolTable symbolTable) {
-        final Number v = (Number) e.evaluate(symbolTable);
-        final boolean castToInt = type.equals(TypeNode.getInt());
+    public Object evaluate(final SymbolTable symbolTable) {
+        final Object val = e.evaluate(symbolTable);
 
-        if (v instanceof Integer i) {
-            if (castToInt)
-                return i;
+        return switch (((BaseTypeNode) type).getType()) {
+            case INT -> {
+                if (val instanceof Double d)
+                    yield d.intValue();
+                else if (val instanceof Character c)
+                    yield (int) c;
 
-            return i.doubleValue();
-        } else if (v instanceof Double d) {
-            if (castToInt)
-                return d.intValue();
+                yield val;
+            }
+            case FLOAT -> {
+                if (val instanceof Integer i)
+                    yield i.doubleValue();
 
-            return d;
-        }
+                yield val;
+            }
+            case CHAR -> {
+                if (val instanceof Integer i)
+                    yield (char) ((int) i);
 
-        return null;
+                yield val;
+            }
+            case STRING -> String.valueOf(val);
+            default -> val;
+        };
     }
 
     @Override

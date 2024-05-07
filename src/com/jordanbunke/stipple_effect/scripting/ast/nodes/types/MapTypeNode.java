@@ -10,7 +10,14 @@ public final class MapTypeNode extends TypeNode {
     public MapTypeNode(
             final TypeNode keyType, final TypeNode valueType
     ) {
-        super(TextPosition.N_A);
+        this(TextPosition.N_A, keyType, valueType);
+    }
+
+    public MapTypeNode(
+            final TextPosition position,
+            final TypeNode keyType, final TypeNode valueType
+    ) {
+        super(position);
 
         this.keyType = keyType;
         this.valueType = valueType;

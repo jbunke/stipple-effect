@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.native_call
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.stipple_effect.scripting.util.FuncControlFlow;
@@ -44,7 +44,7 @@ public final class DrawLineNode extends StatementNode {
         x2.semanticErrorCheck(symbolTable);
         y2.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode
+        final BaseTypeNode
                 imgType = TypeNode.getImage(),
                 colType = TypeNode.getColor(),
                 floatType = TypeNode.getFloat(),

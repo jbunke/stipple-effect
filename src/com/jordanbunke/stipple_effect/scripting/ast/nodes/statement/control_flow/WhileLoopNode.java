@@ -5,7 +5,7 @@ import com.jordanbunke.stipple_effect.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.statement.StatementNode;
-import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.SimpleTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.stipple_effect.scripting.ast.symbol_table.SymbolTable;
 
@@ -30,7 +30,7 @@ public sealed class WhileLoopNode extends StatementNode
         loopCondition.semanticErrorCheck(symbolTable);
         loopBody.semanticErrorCheck(symbolTable);
 
-        final SimpleTypeNode boolType = TypeNode.getBool();
+        final BaseTypeNode boolType = TypeNode.getBool();
         final TypeNode condType = loopCondition.getType(symbolTable);
 
         if (!condType.equals(boolType))
