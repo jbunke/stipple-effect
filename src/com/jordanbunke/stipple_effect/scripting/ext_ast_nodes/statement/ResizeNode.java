@@ -33,8 +33,9 @@ public final class ResizeNode extends SEExtStatementNode {
 
         if (w <= 0 || w > Constants.MAX_CANVAS_W ||
                 h <= 0 || h > Constants.MAX_CANVAS_H)
-            StatusUpdates.send("Script failed to resize the project " +
-                    "due to invalid dimensions: width = " + w + ", height = " + h);
+            StatusUpdates.scriptActionNotPermitted("resize the project",
+                    "the supplied dimensions are invalid: width = " +
+                            w + ", height = " + h);
         else
             project.resize(w, h);
 

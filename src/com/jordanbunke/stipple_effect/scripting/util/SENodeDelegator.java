@@ -17,6 +17,9 @@ public final class SENodeDelegator {
             case NewProjectStatementNode.NAME ->
                     new NewProjectStatementNode(position, args);
             case ResizeNode.NAME -> new ResizeNode(position, args);
+            case SaveNode.NAME -> new SaveNode(position, args);
+            case UnlinkFramesNode.NAME -> new UnlinkFramesNode(position, args);
+            case LinkFramesNode.NAME -> new LinkFramesNode(position, args);
             // TODO - extend
             default -> null;
         };
@@ -37,6 +40,14 @@ public final class SENodeDelegator {
             case GetProjectNoArgsNode.NAME ->
                     new GetProjectNoArgsNode(position, args);
             case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
+            case NewProjectExpressionNode.NAME ->
+                    new NewProjectExpressionNode(position, args);
+            case GetLayerNode.NAME -> switch (args.length) {
+                case 0 -> new GetLayerNoArgsNode(position, args);
+                case 1 -> new GetLayerOneArgNode(position, args);
+                default -> new GetLayerTwoArgsNode(position, args);
+            };
+            case GetLayersNode.NAME -> new GetLayersNode(position, args);
             // TODO - extend
             default -> null;
         };

@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type;
 
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
 public final class LayerTypeNode extends SEExtTypeNode {
     public static final String NAME = "layer";
@@ -25,7 +25,7 @@ public final class LayerTypeNode extends SEExtTypeNode {
 
     @Override
     public boolean complies(final Object o) {
-        return o instanceof SELayer;
+        return o instanceof LayerRep;
     }
 
     @Override

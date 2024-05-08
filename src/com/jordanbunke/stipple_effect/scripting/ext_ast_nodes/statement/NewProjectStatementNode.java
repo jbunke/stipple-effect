@@ -31,8 +31,9 @@ public final class NewProjectStatementNode extends SEExtStatementNode {
 
         if (w <= 0 || w > Constants.MAX_CANVAS_W ||
                 h <= 0 || h > Constants.MAX_CANVAS_H)
-            StatusUpdates.send("Script failed to create a new project " +
-                    "due to invalid dimensions: width = " + w + ", height = " + h);
+            StatusUpdates.scriptActionNotPermitted("create a new project",
+                    "the supplied dimensions are invalid: width = " +
+                            w + ", height = " + h);
         else
             StippleEffect.get().addContext(new SEContext(w, h), true);
 

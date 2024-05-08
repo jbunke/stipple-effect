@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.util.Set;
 
 public class StatusUpdates {
-    public static void send(final String update) {
+    private static void send(final String update) {
         StippleEffect.get().sendStatusUpdate(update);
     }
 
@@ -141,6 +141,12 @@ public class StatusUpdates {
                         " in the palette \"" + p.getName() + "\"",
                 "the current selected color " + processColor(c) +
                         " is not included in the palette");
+    }
+
+    public static void scriptActionNotPermitted(
+            final String attempt, final String reason
+    ) {
+        send("Script failed to " + attempt + " because " + reason);
     }
 
     private static void actionNotPermitted(

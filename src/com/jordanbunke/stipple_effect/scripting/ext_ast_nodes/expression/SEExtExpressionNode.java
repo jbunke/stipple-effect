@@ -66,6 +66,6 @@ public abstract class SEExtExpressionNode extends ExpressionNode {
 
     @Override
     public String toString() {
-        return "$" + callName() + "(" + argsToString() + ");";
+        return "$" + callName() + "(" + argsToString() + ")";
     }
 }
