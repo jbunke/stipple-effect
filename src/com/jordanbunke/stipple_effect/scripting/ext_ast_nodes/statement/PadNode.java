@@ -12,32 +12,38 @@ import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.Arrays;
 
-public final class ResizeNode extends SEExtStatementNode {
-    public static final String NAME = "resize";
+public final class PadNode extends SEExtStatementNode {
+    public static final String NAME = "pad";
 
-    public ResizeNode(
+    public PadNode(
             final TextPosition position,
             final ExpressionNode[] args
     ) {
         super(position, args, ProjectTypeNode.get(),
+                TypeNode.getInt(), TypeNode.getInt(),
                 TypeNode.getInt(), TypeNode.getInt());
     }
 
     @Override
-    public FuncControlFlow execute(final SymbolTable symbolTable) {
+    public FuncControlFlow execute(SymbolTable symbolTable) {
         final Object[] dims = Arrays.stream(getArgs())
                 .map(a -> a.evaluate(symbolTable))
                 .toArray(Object[]::new);
         final SEContext project = (SEContext) dims[0];
-        final int w = (int) dims[1], h = (int) dims[2];
+        final int l = (int) dims[1], r = (int) dims[2],
+                t = (int) dims[3], b = (int) dims[4];
 
-        if (w <= 0 || w > Constants.MAX_CANVAS_W ||
-                h <= 0 || h > Constants.MAX_CANVAS_H)
-            StatusUpdates.scriptActionNotPermitted("resize the project",
-                    "the supplied dimensions are invalid: width = " +
-                            w + ", height = " + h, getPosition());
+        final int w = project.getState().getImageWidth(),
+                h = project.getState().getImageHeight(),
+                pw = l + w + r, ph = t + h + b;
+
+        if (pw <= 0 || pw > Constants.MAX_CANVAS_W ||
+                ph <= 0 || ph > Constants.MAX_CANVAS_H)
+            StatusUpdates.scriptActionNotPermitted("pad the canvas dimensions",
+                    "the prospective dimensions are invalid: width = " +
+                            pw + ", height = " + ph, getPosition());
         else
-            project.resize(w, h);
+            project.pad(l, r, t, b);
 
         return FuncControlFlow.cont();
     }

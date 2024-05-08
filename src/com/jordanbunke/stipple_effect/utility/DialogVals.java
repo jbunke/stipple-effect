@@ -82,9 +82,11 @@ public class DialogVals {
             };
         }
 
-        public String complementaryDimName() {
-            final SequenceOrder[] vs = values();
-            return vs[(vs.length - 1) - ordinal()].dimName();
+        public SequenceOrder complement() {
+            return switch (this) {
+                case VERTICAL -> HORIZONTAL;
+                case HORIZONTAL -> VERTICAL;
+            };
         }
     }
 

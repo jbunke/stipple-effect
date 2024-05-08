@@ -1648,6 +1648,12 @@ public class SEContext {
                 top = DialogVals.getPadTop(),
                 bottom = DialogVals.getPadBottom();
 
+        pad(left, right, top, bottom);
+    }
+
+    public void pad(
+            final int left, final int right, final int top, final int bottom
+    ) {
         if (left == 0 && right == 0 && top == 0 && bottom == 0)
             return;
 

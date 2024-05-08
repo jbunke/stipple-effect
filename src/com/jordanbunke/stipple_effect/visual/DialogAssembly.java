@@ -1479,7 +1479,7 @@ public class DialogAssembly {
                     return FPCD_PREFIX + comp + (
                             comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
                     ) + DialogVals.getSequenceOrder()
-                            .complementaryDimName();
+                            .complement().dimName();
                 }, FPCD_PREFIX +
                         Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
         mb.add(framesPerCompDim);

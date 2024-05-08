@@ -27,7 +27,8 @@ public final class SaveNode extends SEExtStatementNode {
             project.projectInfo.save();
         else
             StatusUpdates.scriptActionNotPermitted("save the project",
-                    "the project does not have a valid save association");
+                    "the project does not have a valid save association",
+                    getArgs()[0].getPosition());
 
         return FuncControlFlow.cont();
     }

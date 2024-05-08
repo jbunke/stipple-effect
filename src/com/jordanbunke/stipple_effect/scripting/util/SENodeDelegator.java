@@ -20,6 +20,13 @@ public final class SENodeDelegator {
             case SaveNode.NAME -> new SaveNode(position, args);
             case UnlinkFramesNode.NAME -> new UnlinkFramesNode(position, args);
             case LinkFramesNode.NAME -> new LinkFramesNode(position, args);
+            case PadNode.NAME -> new PadNode(position, args);
+            case StitchNode.NAME -> new StitchNode(position, args);
+            case SplitByPixelsNode.NAME ->
+                    new SplitByPixelsNode(position, args);
+            case SplitByDimsNode.NAME -> new SplitByDimsNode(position, args);
+            case DisableLayerNode.NAME -> new DisableLayerNode(position, args);
+            case EnableLayerNode.NAME -> new EnableLayerNode(position, args);
             // TODO - extend
             default -> null;
         };
@@ -48,6 +55,13 @@ public final class SENodeDelegator {
                 default -> new GetLayerTwoArgsNode(position, args);
             };
             case GetLayersNode.NAME -> new GetLayersNode(position, args);
+            case IsAnimNode.NAME -> new IsAnimNode(position, args);
+            case GetFrameCountNode.NAME ->
+                    new GetFrameCountNode(position, args);
+            case GetFrameIndexNode.NAME ->
+                    new GetFrameIndexNode(position, args);
+            case GetLayerIndexNode.NAME ->
+                    new GetLayerIndexNode(position, args);
             // TODO - extend
             default -> null;
         };

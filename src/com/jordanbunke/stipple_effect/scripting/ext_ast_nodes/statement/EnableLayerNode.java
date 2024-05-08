@@ -4,10 +4,10 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
-public final class LinkFramesNode extends TrivialLayerOpNode {
-    public static final String NAME = "link_frames";
+public final class EnableLayerNode extends TrivialLayerOpNode {
+    public static final String NAME = "enable_layer";
 
-    public LinkFramesNode(
+    public EnableLayerNode(
             final TextPosition position, final ExpressionNode[] args
     ) {
         super(position, args);
@@ -15,7 +15,7 @@ public final class LinkFramesNode extends TrivialLayerOpNode {
 
     @Override
     protected void layerOp(final LayerRep layer) {
-        layer.project().linkFramesInLayer(layer.index());
+        layer.project().enableLayer(layer.index());
     }
 
     @Override

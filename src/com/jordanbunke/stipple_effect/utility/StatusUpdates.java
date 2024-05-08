@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
+import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
@@ -144,9 +146,14 @@ public class StatusUpdates {
     }
 
     public static void scriptActionNotPermitted(
-            final String attempt, final String reason
+            final String attempt, final String reason,
+            final TextPosition position
     ) {
-        send("Script failed to " + attempt + " because " + reason);
+        final String update = "Script failed to " +
+                attempt + " because " + reason;
+        send(update);
+        ScriptErrorLog.fireError(
+                ScriptErrorLog.Message.CUSTOM_RT, position, update);
     }
 
     private static void actionNotPermitted(
