@@ -2410,6 +2410,7 @@ public class DialogAssembly {
                         IconCodes.PAD,
                         IconCodes.STITCH_SPLIT_FRAMES,
                         IconCodes.PREVIEW,
+                        IconCodes.AUTOMATION_SCRIPT,
                         IconCodes.UNDO,
                         IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO,
@@ -2419,6 +2420,7 @@ public class DialogAssembly {
                         "Info", "Open panel manager", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad", "Stitch or split frames", "Preview",
+                        "Automation script",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"
                 }, contentAssembler, contentStart, initialBottomY
         );

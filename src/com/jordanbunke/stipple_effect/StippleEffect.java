@@ -417,6 +417,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
                     this::stitchOrSplit);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
+                    this::openAutomationScript);
         } else if (eventLogger.isPressed(Key.CTRL)) {
             // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
@@ -1014,6 +1017,27 @@ public class StippleEffect implements ProgramContext {
             return;
 
         verifyFilepath(opened.get().toPath());
+    }
+
+    public void openAutomationScript() {
+        FileIO.setDialogToFilesOnly();
+        final Optional<File> opened = FileIO.openFileFromSystem(
+                new String[] {
+                        StippleEffect.PROGRAM_NAME + " scripts (." +
+                                Constants.SCRIPT_FILE_SUFFIX + ")"
+                },
+                new String[][] {
+                        new String[] { Constants.SCRIPT_FILE_SUFFIX }
+                });
+        window.getEventLogger().unpressAllKeys();
+
+        if (opened.isEmpty())
+            return;
+
+        final Path filepath = opened.get().toPath();
+        final String content = FileIO.readFile(filepath);
+
+        SEScriptRunner.get().runAutomationScript(content);
     }
 
     private void verifyFilepath(final Path filepath) {

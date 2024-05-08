@@ -52,4 +52,20 @@ public abstract class SEExtExpressionNode extends ExpressionNode {
                         expected.toString(), argType.toString());
         }
     }
+
+    private String argsToString() {
+        return switch (args.length) {
+            case 0 -> "";
+            case 1 -> args[0].toString();
+            default -> Arrays.stream(args).map(ExpressionNode::toString)
+                    .reduce((a, b) -> a + ", " + b).orElse("");
+        };
+    }
+
+    protected abstract String callName();
+
+    @Override
+    public String toString() {
+        return "$" + callName() + "(" + argsToString() + ");";
+    }
 }

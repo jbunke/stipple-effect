@@ -60,10 +60,12 @@ public class MenuAssembly {
                         IconCodes.SAVE, IconCodes.SAVE_AS,
                         IconCodes.RESIZE, IconCodes.PAD,
                         IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
+                        IconCodes.AUTOMATION_SCRIPT,
                         IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO, IconCodes.REDO
                 },
                 getPreconditions(
+                        () -> true,
                         () -> true,
                         () -> true,
                         () -> true,
@@ -87,6 +89,7 @@ public class MenuAssembly {
                         DialogAssembly::setDialogToPad,
                         () -> StippleEffect.get().stitchOrSplit(),
                         () -> PreviewWindow.set(c),
+                        () -> StippleEffect.get().openAutomationScript(),
                         () -> c.getStateManager().undoToCheckpoint(),
                         () -> c.getStateManager().undo(true),
                         () -> c.getStateManager().redo(true),

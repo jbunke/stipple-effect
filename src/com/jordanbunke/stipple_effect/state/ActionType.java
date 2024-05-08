@@ -16,6 +16,8 @@ public enum ActionType {
                 StippleEffect.get().rebuildFramesMenu();
                 StippleEffect.get().rebuildProjectsMenu();
             }
+            // TODO - make these menus dynamic so they don't have to be redrawn
+            // Causing lag for brush and related tools
             case CANVAS -> {
                 StippleEffect.get().rebuildToolButtonMenu();
                 StippleEffect.get().rebuildProjectsMenu();

@@ -1646,8 +1646,12 @@ public class SEContext {
         final int left = DialogVals.getPadLeft(),
                 right = DialogVals.getPadRight(),
                 top = DialogVals.getPadTop(),
-                bottom = DialogVals.getPadBottom(),
-                w = left + getState().getImageWidth() + right,
+                bottom = DialogVals.getPadBottom();
+
+        if (left == 0 && right == 0 && top == 0 && bottom == 0)
+            return;
+
+        final int w = left + getState().getImageWidth() + right,
                 h = top + getState().getImageHeight() + bottom;
 
         final List<SELayer> layers = getState().getLayers().stream()
@@ -1666,6 +1670,13 @@ public class SEContext {
                 rw = DialogVals.calculcateResizeWidth(w),
                 rh = DialogVals.calculateResizeHeight(h);
 
+        if (w == rw && h == rh)
+            return;
+
+        resize(rw, rh);
+    }
+
+    public void resize(final int rw, final int rh) {
         final List<SELayer> layers = getState().getLayers().stream()
                 .map(layer -> layer.returnResized(rw, rh)).toList();
 

@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 
 public final class SEScriptRunner extends ScriptRunner {
@@ -21,6 +22,24 @@ public final class SEScriptRunner extends ScriptRunner {
 
     public static void printErrorsToDialog() {
         printErrorsToDialog = true;
+    }
+
+    public void runAutomationScript(final String content) {
+        final HeadFuncNode script = build(content);
+
+        if (validateAutomationScript(script))
+            run(script);
+        else
+            StatusUpdates.invalidAutomationScript();
+    }
+
+    private boolean validateAutomationScript(
+            final HeadFuncNode script) {
+        if (script == null)
+            return false;
+
+        return script.paramsMatch(new TypeNode[] {}) &&
+                script.getReturnType() == null;
     }
 
     public static boolean validatePreviewScript(

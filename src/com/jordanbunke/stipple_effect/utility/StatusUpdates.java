@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.util.Set;
 
 public class StatusUpdates {
-    private static void send(final String update) {
+    public static void send(final String update) {
         StippleEffect.get().sendStatusUpdate(update);
     }
 
@@ -21,7 +21,12 @@ public class StatusUpdates {
     // not permitted
     public static void invalidPreviewScript() {
         actionNotPermitted("upload script",
-                "this script violates the preview script contract demanded by this project");
+                "this script does not fulfill this project's preview script contract");
+    }
+
+    public static void invalidAutomationScript() {
+        actionNotPermitted("upload script",
+                "this script does not fulfill the automation script contract");
     }
 
     public static void cannotSetCheckAndGridToBounds(

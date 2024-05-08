@@ -3,12 +3,9 @@ package com.jordanbunke.stipple_effect.scripting.util;
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.SEExtExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.SEExtStatementNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.LayerTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SEExtTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ToolTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
 public final class SENodeDelegator {
     public static SEExtStatementNode delegateStatement(
@@ -17,7 +14,10 @@ public final class SENodeDelegator {
             final ExpressionNode[] args
     ) {
         final SEExtStatementNode s = switch (fID) {
-            // TODO
+            case NewProjectStatementNode.NAME ->
+                    new NewProjectStatementNode(position, args);
+            case ResizeNode.NAME -> new ResizeNode(position, args);
+            // TODO - extend
             default -> null;
         };
 
@@ -34,7 +34,10 @@ public final class SENodeDelegator {
             final ExpressionNode[] args
     ) {
         final SEExtExpressionNode e = switch (fID) {
-            // TODO
+            case GetProjectNoArgsNode.NAME ->
+                    new GetProjectNoArgsNode(position, args);
+            case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
+            // TODO - extend
             default -> null;
         };
 
@@ -52,7 +55,7 @@ public final class SENodeDelegator {
         final SEExtTypeNode t = switch (typeID) {
             case LayerTypeNode.NAME -> new LayerTypeNode(position);
             case ProjectTypeNode.NAME -> new ProjectTypeNode(position);
-            case ToolTypeNode.NAME -> new ToolTypeNode(position);
+            // TODO - extend
             default -> null;
         };
 
