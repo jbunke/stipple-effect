@@ -18,10 +18,12 @@ public abstract class TrivialLayerOpNode extends SEExtStatementNode {
     public final FuncControlFlow execute(final SymbolTable symbolTable) {
         final LayerRep layer = (LayerRep) getArgs()[0].evaluate(symbolTable);
 
-        layerOp(layer);
+        // TODO - verify index
+
+        operation(layer);
 
         return FuncControlFlow.cont();
     }
 
-    protected abstract void layerOp(final LayerRep layer);
+    protected abstract void operation(final LayerRep layer);
 }

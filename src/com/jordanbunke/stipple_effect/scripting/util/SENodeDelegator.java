@@ -27,6 +27,16 @@ public final class SENodeDelegator {
             case SplitByDimsNode.NAME -> new SplitByDimsNode(position, args);
             case DisableLayerNode.NAME -> new DisableLayerNode(position, args);
             case EnableLayerNode.NAME -> new EnableLayerNode(position, args);
+            case AddFrameNode.ADD_NAME -> AddFrameNode.newAdd(position, args);
+            case AddFrameNode.DUPE_NAME -> AddFrameNode.newDupe(position, args);
+            case AddLayerNode.ADD_NAME -> AddLayerNode.newAdd(position, args);
+            case AddLayerNode.DUPE_NAME -> AddLayerNode.newDupe(position, args);
+            case RemoveFrameNode.NAME -> new RemoveFrameNode(position, args);
+            case RemoveLayerNode.NAME -> new RemoveLayerNode(position, args);
+            case SetIndexNode.FRAME_NAME ->
+                    SetIndexNode.newFrame(position, args);
+            case SetIndexNode.LAYER_NAME ->
+                    SetIndexNode.newLayer(position, args);
             // TODO - extend
             default -> null;
         };

@@ -15,7 +15,7 @@ public final class DisableLayerNode extends TrivialLayerOpNode {
     }
 
     @Override
-    protected void layerOp(final LayerRep layer) {
+    protected void operation(final LayerRep layer) {
         layer.project().disableLayer(layer.index());
     }
 

@@ -14,7 +14,7 @@ public final class UnlinkFramesNode extends TrivialLayerOpNode {
     }
 
     @Override
-    protected void layerOp(final LayerRep layer) {
+    protected void operation(final LayerRep layer) {
         layer.project().unlinkFramesInLayer(layer.index());
     }
 
