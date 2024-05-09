@@ -1728,6 +1728,30 @@ public class SEContext {
     }
 
     // IMAGE EDITING
+    public void setFrameContent(
+            final GameImage content, final int layerIndex,
+            final int frameIndex, final boolean set
+    ) {
+        final Set<Coord2D> pixels = new HashSet<>();
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                pixels.add(new Coord2D(x, y));
+
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+        final SELayer layer = getState().getLayers().get(layerIndex),
+                replacement = set
+                        ? layer.returnStamped(content, pixels, frameIndex)
+                        : layer.returnPaintedOver(content, frameIndex);
+        layers.set(layerIndex, replacement);
+
+        final ProjectState result = getState().changeLayers(layers)
+                .changeIsCheckpoint(true);
+        stateManager.performAction(result, Operation.EDIT_IMAGE);
+    }
+
     public void stampImage(final GameImage edit, final Set<Coord2D> pixels) {
         editImage(f -> getState().getEditingLayer()
                 .returnStamped(edit, pixels, f), false);

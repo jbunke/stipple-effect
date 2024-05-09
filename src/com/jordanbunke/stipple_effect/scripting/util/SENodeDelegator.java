@@ -37,6 +37,10 @@ public final class SENodeDelegator {
                     SetIndexNode.newFrame(position, args);
             case SetIndexNode.LAYER_NAME ->
                     SetIndexNode.newLayer(position, args);
+            case SetFrameContentNode.SET_NAME ->
+                    SetFrameContentNode.newSet(position, args);
+            case SetFrameContentNode.EDIT_NAME ->
+                    SetFrameContentNode.newEdit(position, args);
             // TODO - extend
             default -> null;
         };
@@ -72,6 +76,10 @@ public final class SENodeDelegator {
                     new GetFrameIndexNode(position, args);
             case GetLayerIndexNode.NAME ->
                     new GetLayerIndexNode(position, args);
+            case GetFrameContentNode.NAME ->
+                    new GetFrameContentNode(position, args);
+            case IsEnabledNode.NAME -> new IsEnabledNode(position, args);
+            case IsLinkedNode.NAME -> new IsLinkedNode(position, args);
             // TODO - extend
             default -> null;
         };

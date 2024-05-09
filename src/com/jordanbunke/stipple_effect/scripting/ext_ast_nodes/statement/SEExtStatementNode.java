@@ -28,6 +28,12 @@ public abstract class SEExtStatementNode extends StatementNode {
         return args;
     }
 
+    protected Object[] getValues(final SymbolTable symbolTable) {
+        return Arrays.stream(args)
+                .map(a -> a.evaluate(symbolTable))
+                .toArray(Object[]::new);
+    }
+
     @Override
     public void semanticErrorCheck(final SymbolTable symbolTable) {
         final TypeNode[] argTypes = Arrays.stream(args)
