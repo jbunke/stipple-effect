@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
-public final class IsEnabledNode extends TrivialLayerGetterNode {
+public final class IsEnabledNode extends LayerGetterNode {
     public static final String NAME = "is_enabled";
 
     public IsEnabledNode(

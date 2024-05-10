@@ -6,8 +6,8 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 
-public abstract class TrivialProjectGetterNode extends SEExtExpressionNode {
-    public TrivialProjectGetterNode(
+public abstract class ProjectGetterNode extends SEExtExpressionNode {
+    public ProjectGetterNode(
             final TextPosition position,
             final ExpressionNode[] args
     ) {

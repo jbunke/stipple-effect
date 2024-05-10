@@ -9,8 +9,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
 public final class SENodeDelegator {
     public static SEExtStatementNode delegateStatement(
-            final TextPosition position,
-            final String fID,
+            final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
         final SEExtStatementNode s = switch (fID) {
@@ -41,6 +40,18 @@ public final class SENodeDelegator {
                     SetFrameContentNode.newSet(position, args);
             case SetFrameContentNode.EDIT_NAME ->
                     SetFrameContentNode.newEdit(position, args);
+            case WipeFrameNode.NAME -> new WipeFrameNode(position, args);
+            case AssignColorNode.PRIM_NAME ->
+                    AssignColorNode.primary(position, args);
+            case AssignColorNode.SEC_NAME ->
+                    AssignColorNode.secondary(position, args);
+            case NewPaletteNode.NAME -> new NewPaletteNode(position, args);
+            case MoveFrameNode.BACK -> MoveFrameNode.back(position, args);
+            case MoveFrameNode.FORWARD -> MoveFrameNode.forward(position, args);
+            case MoveLayerNode.DOWN -> MoveLayerNode.down(position, args);
+            case MoveLayerNode.UP -> MoveLayerNode.up(position, args);
+            case MergeLayersNode.NAME -> new MergeLayersNode(position, args);
+            case SetSelectionNode.NAME -> new SetSelectionNode(position, args);
             // TODO - extend
             default -> null;
         };
@@ -53,8 +64,7 @@ public final class SENodeDelegator {
     }
 
     public static SEExtExpressionNode delegateExpression(
-            final TextPosition position,
-            final String fID,
+            final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
         final SEExtExpressionNode e = switch (fID) {
@@ -80,6 +90,20 @@ public final class SENodeDelegator {
                     new GetFrameContentNode(position, args);
             case IsEnabledNode.NAME -> new IsEnabledNode(position, args);
             case IsLinkedNode.NAME -> new IsLinkedNode(position, args);
+            case GetColorNode.PRIM_NAME ->
+                    GetColorNode.primary(position, args);
+            case GetColorNode.SEC_NAME ->
+                    GetColorNode.secondary(position, args);
+            case PaletteGetterNode.GET ->
+                    PaletteGetterNode.newGet(position, args);
+            case PaletteGetterNode.HAS ->
+                    PaletteGetterNode.newHas(position, args);
+            case SelectionGetter.GET -> SelectionGetter.newGet(position, args);
+            case SelectionGetter.HAS -> SelectionGetter.newHas(position, args);
+            case IsSelectedNode.NAME -> new IsSelectedNode(position, args);
+            case FillSelectionNode.NAME -> args.length == 2
+                    ? FillSelectionNode.system(position, args)
+                    : FillSelectionNode.custom(position, args);
             // TODO - extend
             default -> null;
         };
@@ -92,13 +116,11 @@ public final class SENodeDelegator {
     }
 
     public static SEExtTypeNode delegateType(
-            final TextPosition position,
-            final String typeID
+            final TextPosition position, final String typeID
     ) {
         final SEExtTypeNode t = switch (typeID) {
             case LayerTypeNode.NAME -> new LayerTypeNode(position);
             case ProjectTypeNode.NAME -> new ProjectTypeNode(position);
-            // TODO - extend
             default -> null;
         };
 

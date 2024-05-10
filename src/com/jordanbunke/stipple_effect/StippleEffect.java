@@ -29,7 +29,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.SEScriptRunner;
+import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
@@ -124,7 +124,7 @@ public class StippleEffect implements ProgramContext {
         OnStartup.run();
         Settings.read();
         readProgramFile();
-        SEScriptRunner.printErrorsToDialog();
+        SEInterpreter.printErrorsToDialog();
 
         INSTANCE = new StippleEffect();
 
@@ -417,9 +417,6 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
                     this::stitchOrSplit);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
-                    this::openAutomationScript);
         } else if (eventLogger.isPressed(Key.CTRL)) {
             // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
@@ -456,6 +453,9 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
                     this::selectPaletteColorToTheRight);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
+                    this::openAutomationScript);
         } else if (eventLogger.isPressed(Key.SHIFT)) {
             // Shift + ?
             eventLogger.checkForMatchingKeyStroke(
@@ -1037,7 +1037,7 @@ public class StippleEffect implements ProgramContext {
         final Path filepath = opened.get().toPath();
         final String content = FileIO.readFile(filepath);
 
-        SEScriptRunner.get().runAutomationScript(content);
+        SEInterpreter.get().runAutomationScript(content);
     }
 
     private void verifyFilepath(final Path filepath) {

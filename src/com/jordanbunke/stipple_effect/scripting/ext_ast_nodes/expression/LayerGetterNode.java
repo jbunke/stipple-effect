@@ -7,8 +7,8 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.LayerTypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
-public abstract class TrivialLayerGetterNode extends SEExtExpressionNode {
-    public TrivialLayerGetterNode(
+public abstract class LayerGetterNode extends SEExtExpressionNode {
+    public LayerGetterNode(
             final TextPosition position, final ExpressionNode[] args
     ) {
         super(position, args, LayerTypeNode.get());

@@ -34,8 +34,7 @@ public final class AddLayerNode extends CondProjectOpNode {
 
     @Override
     protected boolean condition(final SEContext project) {
-        return project.getState().getLayers().size() <
-                Constants.MAX_NUM_LAYERS;
+        return project.getState().canAddLayer();
     }
 
     @Override

@@ -26,7 +26,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.SEScriptRunner;
+import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
@@ -349,7 +349,7 @@ public class PreviewWindow implements ProgramContext {
                 ? ScriptArray.of((Object[]) content)
                 : content[frameIndex];
 
-        final Object result = SEScriptRunner.get().run(script, arg);
+        final Object result = SEInterpreter.get().run(script, arg);
 
         if (result instanceof GameImage image)
             content = new GameImage[] { image };
@@ -474,9 +474,9 @@ public class PreviewWindow implements ProgramContext {
             return;
 
         final Path filepath = opened.get().toPath();
-        final HeadFuncNode script = SEScriptRunner.get().build(FileIO.readFile(filepath));
+        final HeadFuncNode script = SEInterpreter.get().build(FileIO.readFile(filepath));
 
-        if (SEScriptRunner.validatePreviewScript(script, context))
+        if (SEInterpreter.validatePreviewScript(script, context))
             setScript(script);
         else if (script != null)
             StatusUpdates.invalidPreviewScript();

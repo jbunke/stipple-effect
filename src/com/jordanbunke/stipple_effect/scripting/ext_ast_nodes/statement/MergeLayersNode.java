@@ -4,10 +4,10 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
-public final class RemoveFrameNode extends CondProjectOpNode {
-    public static final String NAME = "remove_frame";
+public final class MergeLayersNode extends CondProjectOpNode {
+    public static final String NAME = "merge_with_below";
 
-    public RemoveFrameNode(
+    public MergeLayersNode(
             final TextPosition position, final ExpressionNode[] args
     ) {
         super(position, args);
@@ -15,22 +15,22 @@ public final class RemoveFrameNode extends CondProjectOpNode {
 
     @Override
     protected boolean condition(final SEContext project) {
-        return project.getState().canRemoveFrame();
+        return project.getState().canMoveLayerDown();
     }
 
     @Override
     protected String attempt() {
-        return "remove the current frame from the project";
+        return "merge the selected layer with the layer below it";
     }
 
     @Override
     protected String failReason(final SEContext project) {
-        return "the project only has a single frame";
+        return "the selected layer is already the lowest in the project";
     }
 
     @Override
     protected void operation(final SEContext project) {
-        project.removeFrame();
+        project.mergeWithLayerBelow();
     }
 
     @Override

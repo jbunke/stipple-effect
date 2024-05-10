@@ -39,14 +39,13 @@ public final class Fill extends ToolThatSearches {
             final Coord2D tp = context.getTargetPixel();
 
             final GameImage image = context.getState().getActiveLayerFrame();
-            final Color initial = image.getColorAt(tp.x, tp.y),
-                    fillColor = me.button == GameMouseEvent.Button.LEFT
-                            ? StippleEffect.get().getPrimary()
-                            : StippleEffect.get().getSecondary();
+            final Color fillColor = me.button == GameMouseEvent.Button.LEFT
+                    ? StippleEffect.get().getPrimary()
+                    : StippleEffect.get().getSecondary();
 
             // search
             final Set<Coord2D> selection = context.getState().getSelection(),
-                    matched = search(image, initial, tp).stream()
+                    matched = search(image, tp).stream()
                             .filter(m -> selection.isEmpty() || selection.contains(m))
                             .collect(Collectors.toSet());
 

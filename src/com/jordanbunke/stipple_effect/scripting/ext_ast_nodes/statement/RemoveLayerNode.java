@@ -15,7 +15,7 @@ public final class RemoveLayerNode extends CondProjectOpNode {
 
     @Override
     protected boolean condition(final SEContext project) {
-        return project.getState().getLayers().size() > 1;
+        return project.getState().canRemoveLayer();
     }
 
     @Override

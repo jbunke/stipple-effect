@@ -1,4 +1,4 @@
-Shortcut: {Ctrl + Shift + Q}
+Shortcut: {Ctrl + W}
 
 Upload and run an automation script. Scripts are written in DeltaScript, which has been extended
 for Stipple Effect's specifications and needs.

@@ -34,7 +34,7 @@ public final class AddFrameNode extends CondProjectOpNode {
 
     @Override
     protected boolean condition(final SEContext project) {
-        return project.getState().getFrameCount() < Constants.MAX_NUM_FRAMES;
+        return project.getState().canAddFrame();
     }
 
     @Override
