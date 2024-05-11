@@ -40,6 +40,7 @@ import com.jordanbunke.stipple_effect.visual.color.Theme;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.OutlineTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
@@ -995,10 +996,14 @@ public class DialogAssembly {
         Arrays.stream(Outliner.Direction.values()).forEach(direction -> {
             final Coord2D rc = direction.relativeCoordinate();
 
-            mb.add(new OutlineDirectionWatcher(buttonPos.displace(
-                    rc.x * Layout.STD_TEXT_BUTTON_INC,
-                    rc.y * Layout.STD_TEXT_BUTTON_INC), direction));
-            // TODO
+            final OutlineDirectionWatcher watcher =
+                    new OutlineDirectionWatcher(buttonPos.displace(
+                            rc.x * Layout.STD_TEXT_BUTTON_INC,
+                            rc.y * Layout.STD_TEXT_BUTTON_INC), direction);
+            final OutlineTextbox textbox =
+                    OutlineTextbox.make(watcher, direction);
+
+            mb.addAll(watcher, textbox);
         });
 
         final MenuElementGrouping contents =
