@@ -1,0 +1,1 @@
+Flatten project | {Ctrl + M}

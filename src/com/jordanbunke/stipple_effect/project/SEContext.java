@@ -473,6 +473,9 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     this::addLayer);
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    this::flatten);
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
                     this::toggleLayerLinking);
             eventLogger.checkForMatchingKeyStroke(
@@ -2181,6 +2184,35 @@ public class SEContext {
             StatusUpdates.cannotMergeWithLayerBelow(
                     getState().getEditingLayer().getName());
         }
+    }
+
+    // flatten layers
+    public void flatten() {
+        // pre-check - identical pass case as can remove layer
+        if (getState().canRemoveLayer()) {
+            final boolean drop = getState().hasSelection() &&
+                    getState().getSelectionMode() == SelectionMode.CONTENTS;
+
+            if (drop)
+                dropContentsToLayer(false, true);
+
+            final int frameCount = getState().getFrameCount();
+            final List<GameImage> frames = new ArrayList<>();
+
+            for (int i = 0; i < frameCount; i++)
+                frames.add(getState().draw(false, false, i));
+
+            final SELayer flattened = new SELayer(frames, frames.get(0),
+                    Constants.OPAQUE, true, false, OnionSkinMode.NONE,
+                    Constants.FLATTENED_LAYER_NAME);
+            final ProjectState result = getState().changeLayers(
+                    new ArrayList<>(List.of(flattened)), 0);
+            stateManager.performAction(result, Operation.FLATTEN);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.flattened();
+        } else if (!Layout.isLayersPanelShowing())
+            StatusUpdates.cannotFlatten();
     }
 
     // GETTERS

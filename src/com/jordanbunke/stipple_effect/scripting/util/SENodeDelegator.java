@@ -51,6 +51,7 @@ public final class SENodeDelegator {
             case MoveLayerNode.DOWN -> MoveLayerNode.down(position, args);
             case MoveLayerNode.UP -> MoveLayerNode.up(position, args);
             case MergeLayersNode.NAME -> new MergeLayersNode(position, args);
+            case FlattenNode.NAME -> new FlattenNode(position, args);
             case SetSelectionNode.NAME -> new SetSelectionNode(position, args);
             case SelectionOpNode.INV -> new SelectionOpNode(
                     position, args, SelectionOpNode.Op.INVERT_SELECTION);

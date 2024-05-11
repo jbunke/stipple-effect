@@ -38,6 +38,7 @@ public class IconCodes {
             MOVE_LAYER_UP = "move_layer_up",
             MOVE_LAYER_DOWN = "move_layer_down",
             MERGE_WITH_LAYER_BELOW = "merge_with_layer_below",
+            FLATTEN = "flatten",
             LAYER_ENABLED = "layer_enabled",
             LAYER_DISABLED = "layer_disabled",
             ONION_SKIN_NONE = "onion_skin_none",

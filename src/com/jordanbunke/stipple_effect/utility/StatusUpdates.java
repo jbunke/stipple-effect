@@ -47,6 +47,11 @@ public class StatusUpdates {
                 "the pixel grid cannot be rendered for this project's current dimensions and/or zoom level");
     }
 
+    public static void cannotFlatten() {
+        actionNotPermitted("flatten the project",
+                "it only has a single layer");
+    }
+
     public static void cannotMergeWithLayerBelow(final String layerName) {
         actionNotPermitted("merge \"" + layerName + "\" with the layer below",
                 "it is the bottommost layer");
@@ -303,6 +308,10 @@ public class StatusUpdates {
     ) {
         send("Merged layer \"" + aboveName + "\" onto \"" + belowName +
                 "\" (" + (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void flattened() {
+        send("Flattened the project down to a single layer");
     }
 
     public static void movedLayer(
