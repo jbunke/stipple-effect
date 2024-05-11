@@ -60,10 +60,12 @@ public class MenuAssembly {
                         IconCodes.SAVE, IconCodes.SAVE_AS,
                         IconCodes.RESIZE, IconCodes.PAD,
                         IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
+                        IconCodes.AUTOMATION_SCRIPT,
                         IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO, IconCodes.REDO
                 },
                 getPreconditions(
+                        () -> true,
                         () -> true,
                         () -> true,
                         () -> true,
@@ -87,6 +89,7 @@ public class MenuAssembly {
                         DialogAssembly::setDialogToPad,
                         () -> StippleEffect.get().stitchOrSplit(),
                         () -> PreviewWindow.set(c),
+                        () -> StippleEffect.get().openAutomationScript(),
                         () -> c.getStateManager().undoToCheckpoint(),
                         () -> c.getStateManager().undo(true),
                         () -> c.getStateManager().redo(true),
@@ -379,7 +382,8 @@ public class MenuAssembly {
                         IconCodes.REMOVE_LAYER,
                         IconCodes.MOVE_LAYER_UP,
                         IconCodes.MOVE_LAYER_DOWN,
-                        IconCodes.MERGE_WITH_LAYER_BELOW
+                        IconCodes.MERGE_WITH_LAYER_BELOW,
+                        IconCodes.FLATTEN
                 },
                 getPreconditions(
                         () -> c.getState().canAddLayer(),
@@ -387,14 +391,16 @@ public class MenuAssembly {
                         () -> c.getState().canRemoveLayer(),
                         () -> c.getState().canMoveLayerUp(),
                         () -> c.getState().canMoveLayerDown(),
-                        () -> c.getState().canMoveLayerDown()),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> c.getState().canRemoveLayer()),
                 new Runnable[] {
                         c::addLayer,
                         c::duplicateLayer,
                         c::removeLayer,
                         c::moveLayerUp,
                         c::moveLayerDown,
-                        c::mergeWithLayerBelow
+                        c::mergeWithLayerBelow,
+                        c::flatten
                 }, Layout.getLayersPosition());
 
         addHidePanelToMenuBuilder(mb, Layout.getLayersPosition()

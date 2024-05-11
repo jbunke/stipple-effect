@@ -69,9 +69,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         ToolThatSearches.searchDiag = searchDiag;
     }
 
-    public Set<Coord2D> search(
-            final GameImage image, final Color initial, final Coord2D target
-    ) {
+    public static Set<Coord2D> search(final GameImage image, final Coord2D target) {
+        final Color initial = image.getColorAt(target.x, target.y);
+
         return ToolWithMode.isGlobal()
                 ? globalSearch(image, initial)
                 : contiguousSearch(image, initial, target);

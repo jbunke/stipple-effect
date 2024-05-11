@@ -1,0 +1,10 @@
+Shortcut: {Ctrl + W}
+
+Upload and run an automation script. Scripts are written in DeltaScript, which has been extended
+for Stipple Effect's specifications and needs.
+
+Automation scripts must fulfill the contract {()}.
+That is to say, they take no parameters and return nothing.
+
+For more information on DeltaScript and its Stipple Effect extension, you can consult the {Script}
+tab, or visit the GitHub repositories for {Stipple Effect} and {Delta Time} for the full documentation.

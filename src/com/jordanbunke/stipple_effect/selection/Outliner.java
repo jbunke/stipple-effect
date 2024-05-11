@@ -50,8 +50,28 @@ public class Outliner {
 
         final Direction[] directions = Direction.values();
 
-        for (Coord2D pixel : selection) {
+        for (Coord2D pixel : selection)
             for (int i = 0; i < NUM_DIRS; i++) {
+                /* TODO: reimplement with sideMask as int array for pixels in dim
+                 *
+                 *   final Coord2D relative = directions[i].relativeCoordinate();
+                 *   Coord2D shifted = pixel.displace(relative);
+                 *
+                 *   for (int s = 0; s < sideMask[i] && s < Constants.MAX_OUTLINE_PX &&
+                 *           !selection.contains(shifted); s++) {
+                 *       outline.add(shifted);
+                 *       shifted = shifted.displace(relative);
+                 *   }
+                 *
+                 *   shifted = pixel.displace(-relative.x, -relative.y);
+                 *
+                 *   for (int s = 0; s < -sideMask[i] && s < Constants.MAX_OUTLINE_PX &&
+                 *           selection.contains(shifted); s++) {
+                 *       outline.add(shifted);
+                 *       shifted = shifted.displace(-relative.x, -relative.y);
+                 *   }
+                 * */
+
                 if (!sideMask[i])
                     continue;
 
@@ -60,7 +80,6 @@ public class Outliner {
                 if (!selection.contains(wouldBe))
                     outline.add(wouldBe);
             }
-        }
 
         return outline;
     }

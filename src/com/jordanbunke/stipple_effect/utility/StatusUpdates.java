@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
+import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
+import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
@@ -21,7 +23,12 @@ public class StatusUpdates {
     // not permitted
     public static void invalidPreviewScript() {
         actionNotPermitted("upload script",
-                "this script violates the preview script contract demanded by this project");
+                "this script does not fulfill this project's preview script contract");
+    }
+
+    public static void invalidAutomationScript() {
+        actionNotPermitted("upload script",
+                "this script does not fulfill the automation script contract");
     }
 
     public static void cannotSetCheckAndGridToBounds(
@@ -38,6 +45,11 @@ public class StatusUpdates {
     public static void cannotSetPixelGrid() {
         actionNotPermitted("turn pixel grid on or off",
                 "the pixel grid cannot be rendered for this project's current dimensions and/or zoom level");
+    }
+
+    public static void cannotFlatten() {
+        actionNotPermitted("flatten the project",
+                "it only has a single layer");
     }
 
     public static void cannotMergeWithLayerBelow(final String layerName) {
@@ -136,6 +148,17 @@ public class StatusUpdates {
                         " in the palette \"" + p.getName() + "\"",
                 "the current selected color " + processColor(c) +
                         " is not included in the palette");
+    }
+
+    public static void scriptActionNotPermitted(
+            final String attempt, final String reason,
+            final TextPosition position
+    ) {
+        final String update = "Script failed to " +
+                attempt + " because " + reason;
+        send(update);
+        ScriptErrorLog.fireError(
+                ScriptErrorLog.Message.CUSTOM_RT, position, update);
     }
 
     private static void actionNotPermitted(
@@ -285,6 +308,10 @@ public class StatusUpdates {
     ) {
         send("Merged layer \"" + aboveName + "\" onto \"" + belowName +
                 "\" (" + (index + 1) + "/" + layerCount + ")");
+    }
+
+    public static void flattened() {
+        send("Flattened the project down to a single layer");
     }
 
     public static void movedLayer(

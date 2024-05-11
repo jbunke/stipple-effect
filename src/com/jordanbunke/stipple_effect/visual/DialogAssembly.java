@@ -1479,7 +1479,7 @@ public class DialogAssembly {
                     return FPCD_PREFIX + comp + (
                             comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
                     ) + DialogVals.getSequenceOrder()
-                            .complementaryDimName();
+                            .complement().dimName();
                 }, FPCD_PREFIX +
                         Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
         mb.add(framesPerCompDim);
@@ -2410,6 +2410,7 @@ public class DialogAssembly {
                         IconCodes.PAD,
                         IconCodes.STITCH_SPLIT_FRAMES,
                         IconCodes.PREVIEW,
+                        IconCodes.AUTOMATION_SCRIPT,
                         IconCodes.UNDO,
                         IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO,
@@ -2419,6 +2420,7 @@ public class DialogAssembly {
                         "Info", "Open panel manager", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad", "Stitch or split frames", "Preview",
+                        "Automation script",
                         "Undo", "Granular Undo", "Granular Redo", "Redo"
                 }, contentAssembler, contentStart, initialBottomY
         );
@@ -2436,6 +2438,7 @@ public class DialogAssembly {
                         IconCodes.MOVE_LAYER_UP,
                         IconCodes.MOVE_LAYER_DOWN,
                         IconCodes.MERGE_WITH_LAYER_BELOW,
+                        IconCodes.FLATTEN,
                         IconCodes.LAYER_VISIBILITY,
                         IconCodes.LAYER_ENABLED,
                         IconCodes.LAYER_DISABLED,
@@ -2456,6 +2459,7 @@ public class DialogAssembly {
                         "Move layer up",
                         "Move layer down",
                         "Merge with layer below",
+                        "Flatten project",
                         "Layer visibility controls",
                         "Layer is visible/enabled",
                         "Layer is invisible/disabled",

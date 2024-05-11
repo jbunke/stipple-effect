@@ -473,6 +473,9 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     this::addLayer);
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
+                    this::flatten);
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
                     this::toggleLayerLinking);
             eventLogger.checkForMatchingKeyStroke(
@@ -1646,8 +1649,18 @@ public class SEContext {
         final int left = DialogVals.getPadLeft(),
                 right = DialogVals.getPadRight(),
                 top = DialogVals.getPadTop(),
-                bottom = DialogVals.getPadBottom(),
-                w = left + getState().getImageWidth() + right,
+                bottom = DialogVals.getPadBottom();
+
+        pad(left, right, top, bottom);
+    }
+
+    public void pad(
+            final int left, final int right, final int top, final int bottom
+    ) {
+        if (left == 0 && right == 0 && top == 0 && bottom == 0)
+            return;
+
+        final int w = left + getState().getImageWidth() + right,
                 h = top + getState().getImageHeight() + bottom;
 
         final List<SELayer> layers = getState().getLayers().stream()
@@ -1666,6 +1679,13 @@ public class SEContext {
                 rw = DialogVals.calculcateResizeWidth(w),
                 rh = DialogVals.calculateResizeHeight(h);
 
+        if (w == rw && h == rh)
+            return;
+
+        resize(rw, rh);
+    }
+
+    public void resize(final int rw, final int rh) {
         final List<SELayer> layers = getState().getLayers().stream()
                 .map(layer -> layer.returnResized(rw, rh)).toList();
 
@@ -1711,6 +1731,17 @@ public class SEContext {
     }
 
     // IMAGE EDITING
+    public void setLayerFromScript(
+            final SELayer layer, final int layerIndex
+    ) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+        layers.set(layerIndex, layer);
+
+        final ProjectState result = getState().changeLayers(layers)
+                .changeIsCheckpoint(true);
+        stateManager.performAction(result, Operation.EDIT_IMAGE);
+    }
+
     public void stampImage(final GameImage edit, final Set<Coord2D> pixels) {
         editImage(f -> getState().getEditingLayer()
                 .returnStamped(edit, pixels, f), false);
@@ -2153,6 +2184,35 @@ public class SEContext {
             StatusUpdates.cannotMergeWithLayerBelow(
                     getState().getEditingLayer().getName());
         }
+    }
+
+    // flatten layers
+    public void flatten() {
+        // pre-check - identical pass case as can remove layer
+        if (getState().canRemoveLayer()) {
+            final boolean drop = getState().hasSelection() &&
+                    getState().getSelectionMode() == SelectionMode.CONTENTS;
+
+            if (drop)
+                dropContentsToLayer(false, true);
+
+            final int frameCount = getState().getFrameCount();
+            final List<GameImage> frames = new ArrayList<>();
+
+            for (int i = 0; i < frameCount; i++)
+                frames.add(getState().draw(false, false, i));
+
+            final SELayer flattened = new SELayer(frames, frames.get(0),
+                    Constants.OPAQUE, true, false, OnionSkinMode.NONE,
+                    Constants.FLATTENED_LAYER_NAME);
+            final ProjectState result = getState().changeLayers(
+                    new ArrayList<>(List.of(flattened)), 0);
+            stateManager.performAction(result, Operation.FLATTEN);
+
+            if (!Layout.isLayersPanelShowing())
+                StatusUpdates.flattened();
+        } else if (!Layout.isLayersPanelShowing())
+            StatusUpdates.cannotFlatten();
     }
 
     // GETTERS

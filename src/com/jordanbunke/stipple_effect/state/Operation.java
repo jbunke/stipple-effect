@@ -9,7 +9,8 @@ public enum Operation {
     MOVE_FRAME_BACK, MOVE_FRAME_FORWARD,
     // layer operations
     ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
-    MOVE_LAYER_DOWN, MOVE_LAYER_UP, MERGE_WITH_LAYER_BELOW,
+    MOVE_LAYER_DOWN, MOVE_LAYER_UP,
+    MERGE_WITH_LAYER_BELOW, FLATTEN,
     CHANGE_LAYER_NAME,
     // layer operations without menu redraw consequences
     LAYER_VISIBILITY_CHANGE, LAYER_LINKING_CHANGE, LAYER_OPACITY_CHANGE,
@@ -63,7 +64,8 @@ public enum Operation {
             case ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
                     MOVE_FRAME_BACK, MOVE_FRAME_FORWARD -> ActionType.FRAME;
             case ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
-                    MOVE_LAYER_DOWN, MOVE_LAYER_UP, MERGE_WITH_LAYER_BELOW,
+                    MOVE_LAYER_DOWN, MOVE_LAYER_UP,
+                    MERGE_WITH_LAYER_BELOW, FLATTEN,
                     CHANGE_LAYER_NAME -> ActionType.LAYER;
             case STITCH, SPLIT -> ActionType.MAJOR;
             default -> ActionType.CANVAS;
