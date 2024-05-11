@@ -11,15 +11,13 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.SEExtSta
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SEExtTypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 import com.jordanbunke.stipple_effect.scripting.util.SENodeDelegator;
-import com.jordanbunke.stipple_effect.tools.Tool;
 
 import java.util.Set;
 
 public final class SEScriptVisitor extends ScriptVisitor {
     static {
-        // TODO - what else?
         final Set<Class<?>> extensionTypeObjects =
-                Set.of(SEContext.class, LayerRep.class, Tool.class);
+                Set.of(SEContext.class, LayerRep.class);
 
         extensionTypeObjects.forEach(TypeCompatibility::addBaseType);
     }

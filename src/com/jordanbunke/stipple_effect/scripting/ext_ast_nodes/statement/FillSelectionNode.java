@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
@@ -10,9 +9,9 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.SEExtExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 
 import java.awt.*;
-import java.util.HashSet;
 import java.util.Set;
 
 public class FillSelectionNode extends SEExtExpressionNode {
@@ -52,23 +51,13 @@ public class FillSelectionNode extends SEExtExpressionNode {
         final Color c = (Color) vs[1];
         final Set<Coord2D> pixels = systemSelection
                 ? StippleEffect.get().getContext().getState().getSelection()
-                : convertSelection((ScriptSet) vs[2]);
+                : ScriptSelectionUtils.convertSelection(
+                        (ScriptSet) vs[2], img.getWidth(), img.getHeight());
 
         for (Coord2D pixel : pixels)
             res.setRGB(pixel.x, pixel.y, c.getRGB());
 
         return res;
-    }
-
-    private Set<Coord2D> convertSelection(final ScriptSet input) {
-        final Set<Coord2D> pixels = new HashSet<>();
-
-        input.stream().map(px -> (ScriptArray) px).forEach(a -> {
-            final int x = (int) a.get(0), y = (int) a.get(1);
-            pixels.add(new Coord2D(x, y));
-        });
-
-        return pixels;
     }
 
     @Override

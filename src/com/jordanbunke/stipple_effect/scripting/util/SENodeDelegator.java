@@ -52,7 +52,14 @@ public final class SENodeDelegator {
             case MoveLayerNode.UP -> MoveLayerNode.up(position, args);
             case MergeLayersNode.NAME -> new MergeLayersNode(position, args);
             case SetSelectionNode.NAME -> new SetSelectionNode(position, args);
-            // TODO - extend
+            case SelectionOpNode.INV -> new SelectionOpNode(
+                    position, args, SelectionOpNode.Op.INVERT_SELECTION);
+            case SelectionOpNode.ALL -> new SelectionOpNode(
+                    position, args, SelectionOpNode.Op.SELECT_ALL);
+            case SelectionOpNode.DESELECT -> new SelectionOpNode(
+                    position, args, SelectionOpNode.Op.DESELECT);
+            case SetOpacityNode.NAME -> new SetOpacityNode(position, args);
+            // extend here
             default -> null;
         };
 
@@ -104,7 +111,16 @@ public final class SENodeDelegator {
             case FillSelectionNode.NAME -> args.length == 2
                     ? FillSelectionNode.system(position, args)
                     : FillSelectionNode.custom(position, args);
-            // TODO - extend
+            case OpacityGetterNode.OPACITY ->
+                    OpacityGetterNode.opacity(position, args);
+            case OpacityGetterNode.OPAQUE ->
+                    OpacityGetterNode.opaque(position, args);
+            case FillNode.NAME -> new FillNode(position, args);
+            case WandNode.NAME -> new WandNode(position, args);
+            case HSVNode.NAME -> args.length == 4
+                    ? HSVNode.withAlpha(position, args)
+                    : HSVNode.newHSV(position, args);
+            // extend here
             default -> null;
         };
 

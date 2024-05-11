@@ -18,8 +18,7 @@ public final class IsLinkedNode extends LayerGetterNode {
 
     @Override
     protected Boolean getter(final LayerRep layer) {
-        return layer.project().getState().getLayers()
-                .get(layer.index()).areFramesLinked();
+        return getLayer(layer).areFramesLinked();
     }
 
     @Override

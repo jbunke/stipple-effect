@@ -161,7 +161,7 @@ public class ColorMath {
                 ? fRGBToAttribute.apply(c) : last;
     }
 
-    private static Color fromHSV(
+    public static Color fromHSV(
             final double hue, final double saturation,
             final double value, final int alpha
     ) {

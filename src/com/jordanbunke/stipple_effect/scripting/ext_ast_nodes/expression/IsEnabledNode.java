@@ -18,8 +18,7 @@ public final class IsEnabledNode extends LayerGetterNode {
 
     @Override
     protected Object getter(final LayerRep layer) {
-        return layer.project().getState().getLayers()
-                .get(layer.index()).isEnabled();
+        return getLayer(layer).isEnabled();
     }
 
     @Override
