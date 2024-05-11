@@ -963,6 +963,8 @@ public class DialogAssembly {
         final SEContext c = StippleEffect.get().getContext();
         final MenuBuilder mb = new MenuBuilder();
 
+        // TODO
+
         // presets: single & double
         final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
         mb.add(presets);
@@ -986,27 +988,17 @@ public class DialogAssembly {
         // direction buttons
         final Coord2D buttonPos = Layout.getCanvasMiddle();
 
-        mb.add(new StaticMenuElement(buttonPos, Layout.ICON_DIMS,
-                MenuElement.Anchor.CENTRAL, GraphicsUtils.SELECT_OVERLAY));
-
-        final GameImage highlight, included, excluded;
-
-        highlight = GraphicsUtils.HIGHLIGHT_OVERLAY;
-        included = GraphicsUtils.loadIcon(IconCodes.INCLUDED);
-        excluded = GraphicsUtils.loadIcon(IconCodes.EXCLUDED);
+        mb.add(new StaticMenuElement(buttonPos, Layout.OUTLINE_BUTTON_DIMS,
+                MenuElement.Anchor.CENTRAL,
+                GraphicsUtils.loadIcon(IconCodes.SELECTION_REPRESENTATION)));
 
         Arrays.stream(Outliner.Direction.values()).forEach(direction -> {
             final Coord2D rc = direction.relativeCoordinate();
-            final int index = direction.ordinal();
 
-            mb.add(new SimpleToggleMenuButton(buttonPos.displace(
-                    rc.x * Layout.BUTTON_INC, rc.y * Layout.BUTTON_INC),
-                    Layout.ICON_DIMS, MenuElement.Anchor.CENTRAL,
-                    true, new GameImage[] { included, excluded },
-                    new GameImage[] { highlight, highlight },
-                    new Runnable[] { () -> {}, () -> {} },
-                    () -> DialogVals.isThisOutlineSide(index) ? 0 : 1,
-                    () -> DialogVals.toggleThisOutlineSide(index)));
+            mb.add(new OutlineDirectionWatcher(buttonPos.displace(
+                    rc.x * Layout.STD_TEXT_BUTTON_INC,
+                    rc.y * Layout.STD_TEXT_BUTTON_INC), direction));
+            // TODO
         });
 
         final MenuElementGrouping contents =

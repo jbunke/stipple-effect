@@ -75,8 +75,8 @@ public class IconCodes {
             IMPORT_SCRIPT = "import_script",
             REMOVE_SCRIPT = "remove_script",
             IMPORT_PREVIEW = "import_preview",
-            INCLUDED = "included",
-            EXCLUDED = "excluded",
+            SELECTION_REPRESENTATION = "sel_rep",
+            NO_OUTLINE = "no_outline",
             SETTINGS = "settings",
             BULLET_POINT = "bullet_point",
             EXPAND = "expand",
@@ -91,7 +91,7 @@ public class IconCodes {
             PANEL_MANAGER = "panel_manager",
             INFO = "info";
 
-    public static final String NO_ICON_PREFIX = "__";
+    public static final String NO_ICON_PREFIX = "__", OUTLINE_PREFIX = "outline_";
 
     public static final String
             ABOUT = NO_ICON_PREFIX + "about",

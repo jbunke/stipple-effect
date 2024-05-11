@@ -36,7 +36,7 @@ public class DialogVals {
             truncateSplitY = true,
             resizePreserveAspectRatio = false,
             sortPaletteBackwards = false;
-    private static boolean[] outlineSideMask = Outliner.getSingleOutlineMask();
+    private static int[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
             paletteName = "",
@@ -148,12 +148,12 @@ public class DialogVals {
         DialogVals.paletteFolder = paletteFolder;
     }
 
-    public static void setOutlineSideMask(final boolean[] outlineSideMask) {
+    public static void setOutlineSideMask(final int[] outlineSideMask) {
         DialogVals.outlineSideMask = outlineSideMask;
     }
 
-    public static void toggleThisOutlineSide(final int index) {
-        outlineSideMask[index] = !outlineSideMask[index];
+    public static void setThisOutlineSide(final int index, final int value) {
+        outlineSideMask[index] = value;
     }
 
     public static void setInfoScreen(final InfoScreen infoScreen) {
@@ -686,11 +686,11 @@ public class DialogVals {
         return sortPaletteBackwards;
     }
 
-    public static boolean isThisOutlineSide(final int index) {
+    public static int getThisOutlineSide(final int index) {
         return outlineSideMask[index];
     }
 
-    public static boolean[] getOutlineSideMask() {
+    public static int[] getOutlineSideMask() {
         return outlineSideMask;
     }
 }
