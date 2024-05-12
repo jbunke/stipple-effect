@@ -60,6 +60,7 @@ public final class SENodeDelegator {
             case SelectionOpNode.DESELECT -> new SelectionOpNode(
                     position, args, SelectionOpNode.Op.DESELECT);
             case SetOpacityNode.NAME -> new SetOpacityNode(position, args);
+            case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
             default -> null;
         };
@@ -121,6 +122,10 @@ public final class SENodeDelegator {
             case HSVNode.NAME -> args.length == 4
                     ? HSVNode.withAlpha(position, args)
                     : HSVNode.newHSV(position, args);
+            case OutlineNode.NAME -> new OutlineNode(position, args);
+            case PresetOutlineNode.SINGLE -> PresetOutlineNode.sng(position, args);
+            case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
+            case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
             // extend here
             default -> null;
         };
