@@ -126,6 +126,12 @@ public final class SENodeDelegator {
             case PresetOutlineNode.SINGLE -> PresetOutlineNode.sng(position, args);
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
+            case ColorPropertyGetterNode.HUE ->
+                    ColorPropertyGetterNode.hue(position, args);
+            case ColorPropertyGetterNode.SAT ->
+                    ColorPropertyGetterNode.sat(position, args);
+            case ColorPropertyGetterNode.VAL ->
+                    ColorPropertyGetterNode.val(position, args);
             // extend here
             default -> null;
         };
