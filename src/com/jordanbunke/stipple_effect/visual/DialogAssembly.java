@@ -40,6 +40,7 @@ import com.jordanbunke.stipple_effect.visual.color.Theme;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.OutlineTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
@@ -963,9 +964,14 @@ public class DialogAssembly {
         final SEContext c = StippleEffect.get().getContext();
         final MenuBuilder mb = new MenuBuilder();
 
-        // presets: single & double
-        final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
-        mb.add(presets);
+        // labels
+        final TextLabel setAllLabel = makeDialogLeftLabel(0, "Set all edges:"),
+                presets = TextLabel.make(textBelowPos(setAllLabel), "Presets:"),
+                validity = TextLabel.make(textBelowPos(presets),
+                        "Valid outline thickness can range from -" +
+                                Constants.MAX_OUTLINE_PX + " to " +
+                                Constants.MAX_OUTLINE_PX + ".");
+        mb.addAll(setAllLabel, presets, validity);
 
         // no selection notification
         if (!c.getState().hasSelection())
@@ -981,32 +987,33 @@ public class DialogAssembly {
                         getDialogContentToRightOfContent(singlePreset),
                         () -> DialogVals.setOutlineSideMask(
                                 Outliner.getDoubleOutlineMask()));
-        mb.addAll(singlePreset, doublePreset);
+
+        // set all textbox
+        final Textbox setAll = makeDialogPixelDynamicTextbox(setAllLabel,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                -Constants.MAX_OUTLINE_PX, Constants.MAX_OUTLINE_PX,
+                DialogVals::setGlobalOutline, DialogVals::getGlobalOutline, 3);
+
+        mb.addAll(setAll, singlePreset, doublePreset);
 
         // direction buttons
         final Coord2D buttonPos = Layout.getCanvasMiddle();
 
-        mb.add(new StaticMenuElement(buttonPos, Layout.ICON_DIMS,
-                MenuElement.Anchor.CENTRAL, GraphicsUtils.SELECT_OVERLAY));
-
-        final GameImage highlight, included, excluded;
-
-        highlight = GraphicsUtils.HIGHLIGHT_OVERLAY;
-        included = GraphicsUtils.loadIcon(IconCodes.INCLUDED);
-        excluded = GraphicsUtils.loadIcon(IconCodes.EXCLUDED);
+        mb.add(new StaticMenuElement(buttonPos, Layout.OUTLINE_BUTTON_DIMS,
+                MenuElement.Anchor.CENTRAL,
+                GraphicsUtils.loadIcon(IconCodes.SELECTION_REPRESENTATION)));
 
         Arrays.stream(Outliner.Direction.values()).forEach(direction -> {
             final Coord2D rc = direction.relativeCoordinate();
-            final int index = direction.ordinal();
 
-            mb.add(new SimpleToggleMenuButton(buttonPos.displace(
-                    rc.x * Layout.BUTTON_INC, rc.y * Layout.BUTTON_INC),
-                    Layout.ICON_DIMS, MenuElement.Anchor.CENTRAL,
-                    true, new GameImage[] { included, excluded },
-                    new GameImage[] { highlight, highlight },
-                    new Runnable[] { () -> {}, () -> {} },
-                    () -> DialogVals.isThisOutlineSide(index) ? 0 : 1,
-                    () -> DialogVals.toggleThisOutlineSide(index)));
+            final OutlineDirectionWatcher watcher =
+                    new OutlineDirectionWatcher(buttonPos.displace(
+                            rc.x * Layout.STD_TEXT_BUTTON_INC,
+                            rc.y * Layout.STD_TEXT_BUTTON_INC), direction);
+            final OutlineTextbox textbox =
+                    OutlineTextbox.make(watcher, direction);
+
+            mb.addAll(watcher, textbox);
         });
 
         final MenuElementGrouping contents =

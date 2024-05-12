@@ -698,12 +698,13 @@ public class StippleEffect implements ProgramContext {
         }
 
         final GameImage text = tb.build().draw();
-        final int w = text.getWidth() + (4 * Layout.BUTTON_BORDER_PX),
-                h = text.getHeight() - (4 * Layout.BUTTON_BORDER_PX);
+        final int w = text.getWidth() + (6 * Layout.BUTTON_BORDER_PX),
+                h = text.getHeight() - (6 * Layout.BUTTON_BORDER_PX);
 
         final GameImage tt = new GameImage(w, h);
         tt.fillRectangle(t.panelBackground.get(), 0, 0, w, h);
-        tt.draw(text, 2 * Layout.BUTTON_BORDER_PX, Layout.TEXT_Y_OFFSET);
+        tt.drawRectangle(t.panelDivisions.get(), 2f, 1, 1, w - 2, h - 2);
+        tt.draw(text, 3 * Layout.BUTTON_BORDER_PX, Layout.TEXT_Y_OFFSET);
 
         return tt.submit();
     }

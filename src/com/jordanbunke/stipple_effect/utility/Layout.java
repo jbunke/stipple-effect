@@ -55,7 +55,9 @@ public final class Layout {
             COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
             MAX_ERROR_CHARS_PER_LINE = 60, CHARS_CUTOFF = MAX_ERROR_CHARS_PER_LINE - 5;
 
-    public static final Bounds2D ICON_DIMS = new Bounds2D(BUTTON_DIM, BUTTON_DIM),
+    public static final Bounds2D
+            ICON_DIMS = new Bounds2D(BUTTON_DIM, BUTTON_DIM),
+            OUTLINE_BUTTON_DIMS = new Bounds2D(STD_TEXT_BUTTON_H, STD_TEXT_BUTTON_H),
             PALETTE_DIMS = new Bounds2D(24, 24);
 
     private static Bounds2D size;

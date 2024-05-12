@@ -1196,7 +1196,7 @@ public class SEContext {
     // SELECTION
 
     // outline selection
-    public void outlineSelection(final boolean[] sideMask) {
+    public void outlineSelection(final int[] sideMask) {
         if (getState().hasSelection()) {
             ToolWithMode.setGlobal(false);
             ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
