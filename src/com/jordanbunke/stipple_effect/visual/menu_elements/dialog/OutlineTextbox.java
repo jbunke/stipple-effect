@@ -16,7 +16,7 @@ public final class OutlineTextbox extends DynamicTextbox {
             final Consumer<String> setter, final Supplier<String> getter
     ) {
         super(position, (Layout.STD_TEXT_BUTTON_INC * 3) - Layout.BUTTON_OFFSET,
-                anchor, "", initialText, "",
+                anchor, "", initialText, "px",
                 Textbox.getIntTextValidator(-Constants.MAX_OUTLINE_PX,
                         Constants.MAX_OUTLINE_PX), setter, getter, 3);
     }
@@ -28,17 +28,16 @@ public final class OutlineTextbox extends DynamicTextbox {
         final Anchor anchor = switch (direction) {
             case TL, L, BL -> Anchor.RIGHT_CENTRAL;
             case TR, R, BR -> Anchor.LEFT_CENTRAL;
-            case B -> Anchor.CENTRAL_TOP;
-            case T -> Anchor.CENTRAL_BOTTOM;
+            case B, T -> Anchor.CENTRAL;
         };
 
-        final int unit = Layout.STD_TEXT_BUTTON_INC;
+        final int unit = Layout.STD_TEXT_BUTTON_INC, half = unit / 2;
 
         final Coord2D shift = switch (direction) {
             case T -> new Coord2D(0, -unit);
             case B -> new Coord2D(0, unit);
-            case TL, L, BL -> new Coord2D(-unit, 0);
-            case TR, R, BR -> new Coord2D(unit, 0);
+            case TL, L, BL -> new Coord2D(-half - 1, 0);
+            case TR, R, BR -> new Coord2D(half + 2, 0);
         };
 
         final Supplier<String> getter = () -> String.valueOf(

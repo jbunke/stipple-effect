@@ -24,7 +24,8 @@ public class DialogVals {
             framesPerDim = 1,
             frameWidth = Constants.DEFAULT_CANVAS_W,
             frameHeight = Constants.DEFAULT_CANVAS_H,
-            splitColumns = 1, splitRows = 1;
+            splitColumns = 1, splitRows = 1,
+            globalOutline = 0;
     private static double
             layerOpacity = Constants.OPAQUE,
             resizeScale = 1d,
@@ -154,6 +155,13 @@ public class DialogVals {
 
     public static void setThisOutlineSide(final int index, final int value) {
         outlineSideMask[index] = value;
+    }
+
+    public static void setGlobalOutline(final int globalOutline) {
+        DialogVals.globalOutline = globalOutline;
+
+        for (int i = 0; i < Outliner.Direction.values().length; i++)
+            outlineSideMask[i] = globalOutline;
     }
 
     public static void setInfoScreen(final InfoScreen infoScreen) {
@@ -688,6 +696,10 @@ public class DialogVals {
 
     public static int getThisOutlineSide(final int index) {
         return outlineSideMask[index];
+    }
+
+    public static int getGlobalOutline() {
+        return globalOutline;
     }
 
     public static int[] getOutlineSideMask() {

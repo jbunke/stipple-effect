@@ -964,11 +964,14 @@ public class DialogAssembly {
         final SEContext c = StippleEffect.get().getContext();
         final MenuBuilder mb = new MenuBuilder();
 
-        // TODO
-
-        // presets: single & double
-        final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
-        mb.add(presets);
+        // labels
+        final TextLabel setAllLabel = makeDialogLeftLabel(0, "Set all edges:"),
+                presets = TextLabel.make(textBelowPos(setAllLabel), "Presets:"),
+                validity = TextLabel.make(textBelowPos(presets),
+                        "Valid outline thickness can range from -" +
+                                Constants.MAX_OUTLINE_PX + " to " +
+                                Constants.MAX_OUTLINE_PX + ".");
+        mb.addAll(setAllLabel, presets, validity);
 
         // no selection notification
         if (!c.getState().hasSelection())
@@ -984,7 +987,14 @@ public class DialogAssembly {
                         getDialogContentToRightOfContent(singlePreset),
                         () -> DialogVals.setOutlineSideMask(
                                 Outliner.getDoubleOutlineMask()));
-        mb.addAll(singlePreset, doublePreset);
+
+        // set all textbox
+        final Textbox setAll = makeDialogPixelDynamicTextbox(setAllLabel,
+                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                -Constants.MAX_OUTLINE_PX, Constants.MAX_OUTLINE_PX,
+                DialogVals::setGlobalOutline, DialogVals::getGlobalOutline, 3);
+
+        mb.addAll(setAll, singlePreset, doublePreset);
 
         // direction buttons
         final Coord2D buttonPos = Layout.getCanvasMiddle();

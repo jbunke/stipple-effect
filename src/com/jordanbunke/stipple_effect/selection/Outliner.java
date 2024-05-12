@@ -3,8 +3,7 @@ package com.jordanbunke.stipple_effect.selection;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class Outliner {
@@ -61,55 +60,108 @@ public class Outliner {
             return selection;
 
         final Set<Coord2D> outline = new HashSet<>();
+        final Map<Direction, Set<Coord2D>> frontier =
+                calculateFrontier(selection, sideMask);
 
         final Direction[] directions = Direction.values();
 
         // edges
-        for (int i = 0; i < FIRST_DIAG; i++)
-            for (Coord2D pixel : selection) {
-                final Coord2D relative = directions[i].relativeCoordinate();
-                Coord2D shifted = pixel.displace(relative);
+        for (int i = 0; i < FIRST_DIAG; i++) {
+            if (sideMask[i] == 0)
+                continue;
 
-                for (int s = 0; s < sideMask[i] && s < Constants.MAX_OUTLINE_PX &&
-                        !selection.contains(shifted); s++) {
+            final Direction dir = directions[i];
+            final Coord2D relative = dir.relativeCoordinate();
+            final int externalBound =
+                    Math.min(sideMask[i], Constants.MAX_OUTLINE_PX),
+                    internalBound =
+                            Math.min(-sideMask[i], Constants.MAX_OUTLINE_PX);
+            final boolean internal = sideMask[i] < 0;
+
+            for (Coord2D pixel : frontier.get(dir)) {
+                final Coord2D shift = internal
+                        ? new Coord2D(-relative.x, -relative.y) : relative;
+                final int bound = internal ? internalBound : externalBound;
+
+                Coord2D shifted = internal ? pixel : pixel.displace(relative);
+
+                if (internal && !frontier.get(directions[i]).contains(shifted))
+                    continue;
+
+                for (int s = 0; s < bound &&
+                        selection.contains(shifted) == internal; s++) {
                     outline.add(shifted);
-                    shifted = shifted.displace(relative);
-                }
-
-                shifted = pixel.displace(-relative.x, -relative.y);
-
-                for (int s = 0; s < -sideMask[i] && s < Constants.MAX_OUTLINE_PX &&
-                        selection.contains(shifted); s++) {
-                    outline.add(shifted);
-                    shifted = shifted.displace(-relative.x, -relative.y);
+                    shifted = shifted.displace(shift);
                 }
             }
+        }
 
         // corners
-        for (int i = FIRST_DIAG; i < NUM_DIRS; i++)
-            for (Coord2D pixel : selection) {
-                final Coord2D relative = directions[i].relativeCoordinate(),
-                        shift = sideMask[i] >= 0 ? relative
-                                : new Coord2D(-relative.x, -relative.y);
+        for (int i = FIRST_DIAG; i < NUM_DIRS; i++) {
+            if (sideMask[i] == 0)
+                continue;
+
+            final Direction dir = directions[i];
+            final Coord2D relative = dir.relativeCoordinate();
+            final boolean internal = sideMask[i] < 0;
+
+            for (Coord2D pixel : frontier.get(dir)) {
+                final Coord2D shift = internal
+                        ? new Coord2D(-relative.x, -relative.y) : relative;
 
                 final Set<Coord2D> shiftCands = new HashSet<>();
-                final int px = Math.abs(sideMask[i]);
+                final int px = Math.abs(sideMask[i]),
+                        start = internal ? 0 : 1, end = px + start;
 
-                for (int x = 1; x <= px; x++)
-                    for (int y = 1; y <= px; y++) {
+                for (int x = start; x < end; x++)
+                    for (int y = start; y < end; y++) {
                         final Coord2D shifted =
                                 pixel.displace(shift.x * x, shift.y * y);
-                        shiftCands.add(shifted);
+
+                        if (!outline.contains(shifted))
+                            shiftCands.add(shifted);
                     }
 
-                final int thickness = sideMask[i];
                 final Function<Coord2D, Boolean> pass =
-                        c -> (thickness > 0) != selection.contains(c);
+                        c -> internal == selection.contains(c);
                 shiftCands.stream().filter(cand -> (int) Math.round(
-                        Coord2D.unitDistanceBetween(pixel, cand)) <= px &&
-                                pass.apply(cand)).forEach(outline::add);
+                        Coord2D.unitDistanceBetween(pixel, cand)) <= (end - 1) &&
+                        pass.apply(cand)).forEach(outline::add);
             }
+        }
 
         return outline;
+    }
+
+    private static Map<Direction, Set<Coord2D>> calculateFrontier(
+            final Set<Coord2D> selection, final int[] sideMask
+    ) {
+        final Map<Direction, Set<Coord2D>> frontier = new HashMap<>();
+
+        for (Direction dir : Direction.values()) {
+            final Set<Coord2D> dirFrontier = new HashSet<>();
+            final boolean diag = dir.ordinal() >= FIRST_DIAG,
+                    internal = sideMask[dir.ordinal()] < 0;
+            final Coord2D rc = dir.relativeCoordinate();
+
+            selection.stream().filter(px -> {
+                if (selection.contains(px.displace(rc)))
+                    return false;
+
+                if (diag) {
+                    final boolean
+                            compX = selection.contains(px.displace(rc.x, 0)),
+                            compY = selection.contains(px.displace(0, rc.y));
+
+                    return internal ? compX && compY : !(compX || compY);
+                }
+
+                return true;
+            }).forEach(dirFrontier::add);
+
+            frontier.put(dir, dirFrontier);
+        }
+
+        return frontier;
     }
 }
