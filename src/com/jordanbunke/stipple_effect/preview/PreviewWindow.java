@@ -19,6 +19,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuEleme
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
@@ -345,9 +346,11 @@ public class PreviewWindow implements ProgramContext {
     private void runScript() {
         frameIndex %= content.length;
 
-        final Object arg = content.length > 1
-                ? ScriptArray.of((Object[]) content)
-                : content[frameIndex];
+        final boolean animScript = script.paramsMatch(
+                new TypeNode[] { TypeNode.arrayOf(TypeNode.getImage()) });
+
+        final Object arg = animScript || content.length > 1
+                ? content : content[frameIndex];
 
         final Object result = SEInterpreter.get().run(script, arg);
 
