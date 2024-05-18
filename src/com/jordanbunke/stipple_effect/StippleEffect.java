@@ -38,8 +38,8 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.*;
-import com.jordanbunke.stipple_effect.visual.color.SEColors;
-import com.jordanbunke.stipple_effect.visual.color.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
 import java.io.File;

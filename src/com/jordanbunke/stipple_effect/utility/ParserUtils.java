@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.color.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

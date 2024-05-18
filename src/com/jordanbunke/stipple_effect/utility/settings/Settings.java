@@ -12,7 +12,8 @@ import com.jordanbunke.stipple_effect.utility.settings.types.IntSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
-import com.jordanbunke.stipple_effect.visual.color.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
 import java.nio.file.Path;
 
@@ -93,8 +94,8 @@ public class Settings {
                     StippleEffect.get().rebuildAllMenus();
                 })),
         THEME(new Setting<>(
-                new EnumSettingType<>(Theme.class),
-                Theme.DEFAULT, theme -> {
+                new EnumSettingType<>(Themes.class),
+                Themes.DEFAULT, theme -> {
                     StippleEffect.get().getContexts()
                             .forEach(SEContext::redrawCheckerboard);
                     StippleEffect.get().rebuildAllMenus();
@@ -275,7 +276,7 @@ public class Settings {
         Code.PROGRAM_FONT.set(fontCode);
     }
 
-    public static void setTheme(final Theme theme) {
+    public static void setTheme(final Themes theme) {
         Code.THEME.set(theme);
     }
 
@@ -352,8 +353,8 @@ public class Settings {
         return (SEFonts.Code) Code.PROGRAM_FONT.setting.check();
     }
 
-    public static Theme checkTheme() {
-        return (Theme) Code.THEME.setting.check();
+    public static Themes checkTheme() {
+        return (Themes) Code.THEME.setting.check();
     }
 
     // getters
@@ -414,7 +415,7 @@ public class Settings {
     }
 
     public static Theme getTheme() {
-        return (Theme) Code.THEME.setting.get();
+        return ((Themes) Code.THEME.setting.get()).get();
     }
 
     public static int getScrollClicks(
