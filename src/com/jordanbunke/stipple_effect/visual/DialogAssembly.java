@@ -36,13 +36,14 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.color.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.OutlineTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -1037,7 +1038,8 @@ public class DialogAssembly {
                         getDialogContentOffsetFollowingLabel(presets),
                         Layout::showAllPanels),
                 minimalUIPreset = GraphicsUtils.makeStandardTextButton("Minimal",
-                        getDialogContentToRightOfContent(showAllPreset), Layout::minimalUI),
+                        getDialogContentToRightOfContent(showAllPreset),
+                        Layout::minimalUI),
                 noAnimationPreset = GraphicsUtils.makeStandardTextButton(
                         "No Anim", getDialogContentToRightOfContent(minimalUIPreset),
                         () -> Layout.adjustPanels(() -> {
@@ -1077,8 +1079,9 @@ public class DialogAssembly {
                     labelTexts[i] + ":");
 
             // panel toggle
-            final Consumer<Boolean> adj =
-                    adjustmentFunctionMap.get(labelTexts[i]);
+            final Consumer<Boolean>
+                    setter = adjustmentFunctionMap.get(labelTexts[i]),
+                    adj = b -> Layout.adjustPanels(() -> setter.accept(b));
             final Supplier<Boolean> ret =
                     retrievalFunctionMap.get(labelTexts[i]);
 
@@ -1096,8 +1099,8 @@ public class DialogAssembly {
                                 .map(GraphicsUtils::drawHighlightedButton)
                                 .toArray(GameImage[]::new),
                         new Runnable[] {
-                                () -> Layout.adjustPanels(() -> adj.accept(false)),
-                                () -> Layout.adjustPanels(() -> adj.accept(true))
+                                () -> adj.accept(false),
+                                () -> adj.accept(true)
                         }, () -> ret.get() ? 0 : 1, () -> {});
 
                 mb.add(new GatewayMenuElement(
@@ -2100,10 +2103,10 @@ public class DialogAssembly {
                         () -> Settings.checkProgramFont().ordinal()),
                         themeDropdown = Dropdown.forDialog(
                                 getDialogContentOffsetFollowingLabel(themeLabel),
-                                EnumUtils.stream(Theme.class)
-                                        .map(Theme::forButtonText)
+                                EnumUtils.stream(Themes.class)
+                                        .map(Themes::forButtonText)
                                         .toArray(String[]::new),
-                                EnumUtils.stream(Theme.class)
+                                EnumUtils.stream(Themes.class)
                                         .map(theme -> (Runnable) () -> Settings
                                                 .setTheme(theme))
                                         .toArray(Runnable[]::new),
@@ -2279,6 +2282,7 @@ public class DialogAssembly {
                     new String[] { IconCodes.ROADMAP },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
+            // TODO: scripting
         };
 
         final Scrollable[] scrollingElements =

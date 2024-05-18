@@ -20,7 +20,7 @@ import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
-import com.jordanbunke.stipple_effect.visual.color.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 
 import java.awt.*;

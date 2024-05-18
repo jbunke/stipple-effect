@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.visual.color;
+package com.jordanbunke.stipple_effect.visual.theme;
 
 import java.awt.*;
 
@@ -21,6 +21,12 @@ public class SEColors {
             GOLD = new Color(210, 169, 34),
             DARK_GOLD = new Color(77, 60, 10),
             TRANSLUCENT_GOLD = new Color(210, 169, 34, 100),
+            RED = new Color(255, 0, 0),
+            PURPLE = new Color(100, 0, 125),
+            VERDANT = new Color(30, 255, 15),
+            BONE = new Color(224, 210, 181),
+            CRACKED = new Color(231, 223, 212),
+            CREAM = new Color(216, 182, 138),
             TRANSPARENT = new Color(0, 0, 0, 0);
 
     public static Color black() {

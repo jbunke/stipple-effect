@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
-import com.jordanbunke.stipple_effect.visual.color.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 

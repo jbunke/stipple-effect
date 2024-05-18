@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.LineMath;
 import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.color.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
 import java.util.ArrayList;

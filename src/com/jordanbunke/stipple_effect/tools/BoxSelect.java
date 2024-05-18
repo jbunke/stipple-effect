@@ -9,7 +9,7 @@ import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.SECursor;
-import com.jordanbunke.stipple_effect.visual.color.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
 import java.util.HashSet;
