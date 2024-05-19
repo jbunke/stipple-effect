@@ -131,31 +131,13 @@ public class MenuAssembly {
         int realRightX = firstPos.x, cumulativeWidth = 0, initialOffsetX = 0;
 
         for (int i = 0; i < amount; i++) {
-            final String text = StippleEffect.get().getContexts().get(i)
-                    .projectInfo.getFormattedName(true, true);
-            final int paddedTextWidth = GraphicsUtils.uiText()
-                    .addText(text).build().draw().getWidth() +
-                    Layout.PROJECT_NAME_BUTTON_PADDING_W;
-
-            final GameImage baseImage = GraphicsUtils
-                    .drawTextButton(paddedTextWidth, text, false),
-                    highlightedImage = GraphicsUtils
-                            .drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils
-                            .drawTextButton(paddedTextWidth, text, true);
-
             int offsetX = 0;
 
             final Coord2D pos = firstPos.displace(cumulativeWidth, 0);
-            final Bounds2D dims = new Bounds2D(baseImage.getWidth(),
-                    baseImage.getHeight());
+            final ProjectButton projectButton = ProjectButton.make(pos, i);
+            toScroll.add(projectButton);
 
-            offsetX += paddedTextWidth + Layout.BUTTON_OFFSET;
-
-            toScroll.add(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP, baseImage, highlightedImage, selectedImage,
-                    i, () -> StippleEffect.get().getContextIndex(),
-                    s -> StippleEffect.get().setContextIndex(s)));
+            offsetX += projectButton.getWidth() + Layout.BUTTON_OFFSET;
 
             // close project button
 
