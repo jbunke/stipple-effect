@@ -36,17 +36,21 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.OutlineTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
+import java.awt.*;
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -2238,10 +2242,8 @@ public class DialogAssembly {
         contentAssembler.add(headingLabel);
 
         final int deltaBottomY = switch (infoScreen) {
-            case ABOUT -> assembleInfoScreenContents(
-                    new String[] { IconCodes.ABOUT }, new String[] { "" },
-                    contentAssembler, contentStart, initialbottomY
-            );
+            case ABOUT -> assembleAboutInfoScreen(contentAssembler,
+                    contentStart, initialbottomY);
             case PROJECT -> assembleProjectInfoScreenContents(
                     contentAssembler, contentStart, initialbottomY);
             case FRAMES -> assembleFramesInfoScreen(contentAssembler,
@@ -2274,7 +2276,9 @@ public class DialogAssembly {
                             "Advanced color shortcuts"
                     },
                     contentAssembler, contentStart, initialbottomY);
-            case CHANGELOG -> assembleInfoScreenContents(
+            case SCRIPTS -> assembleScriptingInfoScreen(contentAssembler,
+                    contentStart, initialbottomY);
+            case CHANGES -> assembleInfoScreenContents(
                     new String[] { IconCodes.CHANGELOG },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
@@ -2282,7 +2286,6 @@ public class DialogAssembly {
                     new String[] { IconCodes.ROADMAP },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
-            // TODO: scripting
         };
 
         final Scrollable[] scrollingElements =
@@ -2359,6 +2362,73 @@ public class DialogAssembly {
 
             bottomY += incY;
         }
+
+        return bottomY - initialBottomY;
+    }
+
+    private static int assembleAboutInfoScreen(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        final Theme t = Settings.getTheme();
+
+        final int indent = (2 * Layout.BUTTON_INC),
+                incY = Layout.DIALOG_CONTENT_INC_Y;
+
+        int bottomY = initialBottomY + assembleInfoScreenContents(
+                new String[] { IconCodes.ABOUT }, new String[] { "" },
+                contentAssembler, contentStart, initialBottomY);
+
+        final TextLabel storePageLabel = TextLabel.make(
+                contentStart.displace(indent, bottomY + Layout.TEXT_Y_OFFSET),
+                "Donate on the store page: ", t.textLight.get()),
+                sponsorLabel = TextLabel.make(textBelowPos(storePageLabel),
+                "Sponsor me on GitHub: ", t.textLight.get()),
+                patreonLabel = TextLabel.make(textBelowPos(sponsorLabel),
+                        "Become a patron on Patreon: ", t.textLight.get());
+        final SimpleMenuButton storePageButton =
+                GraphicsUtils.makeStandardTextButton("Go",
+                        getDialogContentOffsetFollowingLabel(storePageLabel),
+                        () -> visitSite(Constants.DONATE_LINK)),
+                sponsorButton = GraphicsUtils.makeStandardTextButton("Go",
+                        getDialogContentOffsetFollowingLabel(sponsorLabel),
+                        () -> visitSite(Constants.SPONSOR_LINK)),
+                patreonButton = GraphicsUtils.makeStandardTextButton("Go",
+                        getDialogContentOffsetFollowingLabel(patreonLabel),
+                        () -> visitSite(Constants.PATREON_LINK));
+        contentAssembler.addAll(Set.of(
+                storePageLabel, sponsorLabel, patreonLabel,
+                storePageButton, sponsorButton, patreonButton));
+
+        bottomY += (incY * 4);
+
+        return bottomY - initialBottomY;
+    }
+
+    private static int assembleScriptingInfoScreen(
+            final Set<MenuElement> contentAssembler, final Coord2D contentStart,
+            final int initialBottomY
+    ) {
+        final Theme t = Settings.getTheme();
+
+        final int indent = (2 * Layout.BUTTON_INC),
+                incY = Layout.DIALOG_CONTENT_INC_Y;
+
+        int bottomY = initialBottomY + assembleInfoScreenContents(
+                new String[] { IconCodes.SCRIPTING }, new String[] { "" },
+                contentAssembler, contentStart, initialBottomY);
+
+        final TextLabel scriptLabel = TextLabel.make(
+                contentStart.displace(indent, bottomY + Layout.TEXT_Y_OFFSET),
+                "For a more thorough breakdown of scripting and the scripting API: ",
+                t.textLight.get());
+        final SimpleMenuButton scriptButton =
+                GraphicsUtils.makeStandardTextButton("Go",
+                        getDialogContentOffsetFollowingLabel(scriptLabel),
+                        () -> visitSite(Constants.SCRIPT_WIKI_LINK));
+        contentAssembler.addAll(Set.of(scriptLabel, scriptButton));
+
+        bottomY += (incY * 2);
 
         return bottomY - initialBottomY;
     }
@@ -2689,5 +2759,13 @@ public class DialogAssembly {
         mb.add(border);
 
         return mb.build();
+    }
+
+    private static void visitSite(final String link) {
+        try {
+            Desktop.getDesktop().browse(new URI(link));
+        } catch (Exception e) {
+            StatusUpdates.invalidLink(link);
+        }
     }
 }

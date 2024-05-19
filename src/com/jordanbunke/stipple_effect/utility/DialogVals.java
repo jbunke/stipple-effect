@@ -108,10 +108,15 @@ public class DialogVals {
     }
 
     public enum InfoScreen {
-        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, ROADMAP, CHANGELOG;
+        ABOUT, PROJECT, TOOLS, LAYERS, FRAMES, COLORS, MORE, SCRIPTS, CHANGES, ROADMAP;
 
         public String getTitle() {
-            return this == MORE ? "More Shortcuts & Advanced Info" : toString();
+            return switch (this) {
+                case MORE -> "More Shortcuts & Advanced Info";
+                case CHANGES -> "Changelog";
+                case SCRIPTS -> "Scripting";
+                default -> toString();
+            };
         }
 
         @Override

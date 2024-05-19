@@ -97,6 +97,8 @@ public class ThemeBuilder {
                 .setDialogVeil(TRANSLUCENT_GOLD)
                 .setCheckerboard1(BONE)
                 .setCheckerboard2(CREAM)
+                .setStubButtonBody(RED)
+                .setInvalid(RED)
                 .build();
     }
 
@@ -120,6 +122,7 @@ public class ThemeBuilder {
                 .setSplashBackground(BLACK)
                 .setSplashText(WHITE)
                 .setSplashFlashingText(PURPLE)
+                .setStubButtonBody(BLACK)
                 .build();
     }
 

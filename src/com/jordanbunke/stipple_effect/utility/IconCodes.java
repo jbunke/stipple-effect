@@ -97,6 +97,7 @@ public class IconCodes {
             ABOUT = NO_ICON_PREFIX + "about",
             CHANGELOG = NO_ICON_PREFIX + "changelog",
             ROADMAP = NO_ICON_PREFIX + "roadmap",
+            SCRIPTING = NO_ICON_PREFIX + "scripting",
             GENERAL = NO_ICON_PREFIX + "general",
             CLIPBOARD_SHORTCUTS = NO_ICON_PREFIX + "clipboard_shortcuts",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",

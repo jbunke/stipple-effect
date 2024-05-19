@@ -21,6 +21,11 @@ public class StatusUpdates {
     }
 
     // not permitted
+    public static void invalidLink(final String link) {
+        actionNotPermitted("visit the link \"" + link + "\"",
+                "it is not a valid URL");
+    }
+
     public static void invalidPreviewScript() {
         actionNotPermitted("upload script",
                 "this script does not fulfill this project's preview script contract");
