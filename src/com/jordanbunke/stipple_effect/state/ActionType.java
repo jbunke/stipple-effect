@@ -10,7 +10,6 @@ public enum ActionType {
             case MAJOR -> StippleEffect.get().rebuildStateDependentMenus();
             case LAYER -> StippleEffect.get().rebuildLayersMenu();
             case FRAME -> StippleEffect.get().rebuildFramesMenu();
-            case CANVAS -> StippleEffect.get().rebuildToolButtonMenu();
         }
     }
 }
