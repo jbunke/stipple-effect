@@ -47,13 +47,18 @@ public class SelectableListItemButton extends MenuButton {
 
     @Override
     public void render(final GameImage canvas) {
-        draw(isHighlighted() ? highlightedImage
-                : (selected ? selectedImage : baseImage),
+        draw(selected ? selectedImage
+                : (isHighlighted() ? highlightedImage : baseImage),
                 canvas);
     }
 
     @Override
     public void debugRender(GameImage canvas, GameDebugger debugger) {
 
+    }
+
+    @Override
+    public boolean isSelected() {
+        return selected;
     }
 }
