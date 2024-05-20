@@ -50,6 +50,8 @@ public class IconCodes {
             LAYER_SETTINGS = "layer_settings",
             SWAP_COLORS = "swap_colors",
             COLOR_MENU_MODE = "color_menu_mode",
+            HSV_SHIFT = "hsv_shift",
+            COLOR_SCRIPT = "color_script",
             MOVE_LEFT_IN_PALETTE = "move_color_left_in_palette",
             MOVE_RIGHT_IN_PALETTE = "move_color_right_in_palette",
             NEW_PALETTE = "new_palette",

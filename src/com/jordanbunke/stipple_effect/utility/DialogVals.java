@@ -25,7 +25,8 @@ public class DialogVals {
             frameWidth = Constants.DEFAULT_CANVAS_W,
             frameHeight = Constants.DEFAULT_CANVAS_H,
             splitColumns = 1, splitRows = 1,
-            globalOutline = 0;
+            globalOutline = 0,
+            hueShift = 0, satShift = 0, valueShift = 0;
     private static double
             layerOpacity = Constants.OPAQUE,
             resizeScale = 1d,
@@ -142,6 +143,10 @@ public class DialogVals {
     public enum Scope {
         SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
 
+        public boolean considersLayers() {
+            return this == FRAME || this == PROJECT;
+        }
+
         @Override
         public String toString() {
             if (this == LAYER_FRAME)
@@ -208,6 +213,18 @@ public class DialogVals {
 
     public static void setResizeScaleY(final double resizeScaleY) {
         DialogVals.resizeScaleY = resizeScaleY;
+    }
+
+    public static void setHueShift(final int hueShift) {
+        DialogVals.hueShift = hueShift;
+    }
+
+    public static void setSatShift(final int satShift) {
+        DialogVals.satShift = satShift;
+    }
+
+    public static void setValueShift(final int valueShift) {
+        DialogVals.valueShift = valueShift;
     }
 
     public static void setNewProjectHeight(final int newProjectHeight) {
@@ -513,6 +530,18 @@ public class DialogVals {
 
     public static Scope getScope() {
         return scope;
+    }
+
+    public static int getHueShift() {
+        return hueShift;
+    }
+
+    public static int getSatShift() {
+        return satShift;
+    }
+
+    public static int getValueShift() {
+        return valueShift;
     }
 
     public static int getImportFrameHeight() {

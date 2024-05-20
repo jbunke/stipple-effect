@@ -1,7 +1,5 @@
 package com.jordanbunke.stipple_effect.palette;
 
-import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
@@ -114,37 +112,8 @@ public class Palette {
             Collections.reverse(colorSequence);
     }
 
-    public GameImage palettize(final GameImage source) {
-        return palettize(source, null);
-    }
-
-    public GameImage palettize(final GameImage source, final Set<Coord2D> pixels) {
-        final Map<Color, Color> palettizationMap = new HashMap<>();
-        final GameImage palettized = new GameImage(source.getWidth(),
-                source.getHeight());
-
-        for (int x = 0; x < source.getWidth(); x++) {
-            for (int y = 0; y < source.getHeight(); y++) {
-                final Color c = source.getColorAt(x, y);
-
-                if (c.getAlpha() == 0)
-                    continue;
-
-                final Color cp = palettizationMap.getOrDefault(c,
-                        nearest(c, palettizationMap));
-
-                if (pixels != null && !pixels.contains(new Coord2D(x, y)))
-                    palettized.setRGB(x, y, c.getRGB());
-                else
-                    palettized.dot(cp, x, y);
-            }
-        }
-
-        return palettized.submit();
-    }
-
-    private Color nearest(
-            final Color source, final Map<Color, Color> palettizationMap
+    public Color palettize(
+            final Color source
     ) {
         if (colorSequence.isEmpty())
             return source;
@@ -154,16 +123,13 @@ public class Palette {
                 (source.getRed() + (max / 2)) % max,
                 (source.getGreen() + (max / 2)) % max,
                 (source.getBlue() + (max / 2)) % max,
-                (source.getAlpha() + (max / 2)) % max
-        ), nearest = MathPlus.findBest(source, worst, c -> c,
+                (source.getAlpha() + (max / 2)) % max);
+
+        return MathPlus.findBest(source, worst, c -> c,
                 (c1, c2) -> ColorMath.diff(c1, source) <
                         ColorMath.diff(c2, source),
                 colorSequence.stream().filter(this::isIncluded)
                         .toArray(Color[]::new));
-
-        palettizationMap.put(source, nearest);
-
-        return nearest;
     }
 
     public boolean canAdd(final Color candidate) {

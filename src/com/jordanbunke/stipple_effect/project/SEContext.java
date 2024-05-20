@@ -16,6 +16,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -1101,6 +1102,18 @@ public class SEContext {
         }
     }
 
+    public ProjectState prepHSVShift() {
+        // TODO
+
+        return getState();
+    }
+
+    public ProjectState prepColorScript() {
+        // TODO
+
+        return getState();
+    }
+
     // state changes - process all actions here and feed through state manager
 
     // palettize
@@ -1171,7 +1184,7 @@ public class SEContext {
         final SELayer layer = layers.get(layerIndex);
 
         final GameImage source = layer.getFrame(frameIndex),
-                edit = palette.palettize(source);
+                edit = ColorMath.algo(palette::palettize, source);
 
         final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
         layers.set(layerIndex, replacement);
@@ -1194,7 +1207,7 @@ public class SEContext {
             final int frameIndex = getState().getFrameIndex();
 
             final GameImage source = layer.getFrame(frameIndex),
-                    edit = palette.palettize(source, selection);
+                    edit = ColorMath.algo(palette::palettize, source, selection);
 
             final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
             layers.set(getState().getLayerEditIndex(), replacement);

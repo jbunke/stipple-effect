@@ -547,14 +547,20 @@ public class MenuAssembly {
                 mb, new String[] {
                         IconCodes.SWAP_COLORS,
                         IconCodes.COLOR_MENU_MODE,
+                        IconCodes.HSV_SHIFT,
+                        IconCodes.COLOR_SCRIPT
                 },
                 getPreconditions(
+                        () -> true,
+                        () -> true,
                         () -> true,
                         () -> true
                 ),
                 new Runnable[] {
                         () -> StippleEffect.get().swapColors(),
                         () -> StippleEffect.get().toggleColorMenuMode(),
+                        DialogAssembly::setDialogToHSVShift,
+                        DialogAssembly::setDialogToColorScript
                 },
                 Layout.getColorsPosition()
         );

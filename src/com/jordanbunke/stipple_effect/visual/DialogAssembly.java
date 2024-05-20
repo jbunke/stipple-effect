@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.visual;
 import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.fonts.FontConstants;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
@@ -30,6 +31,8 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
+import com.jordanbunke.stipple_effect.state.Operation;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.TextTool;
 import com.jordanbunke.stipple_effect.tools.Tool;
@@ -1124,6 +1127,103 @@ public class DialogAssembly {
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
+    // TODO: Color action dialogs
+
+    public static void setDialogToHSVShift() {
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+
+        makeCommonColorOperationElements(mb, c);
+
+        final TextLabel hueLabel = makeDialogLeftLabel(3, "Shift hue:"),
+                satLabel = makeDialogLeftLabel(4, "Shift saturation:"),
+                valueLabel = makeDialogLeftLabel(5, "Shift value:");
+
+        final IncrementalRangeElements<Integer> h =
+                IncrementalRangeElements.makeForInt(hueLabel,
+                        hueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        hueLabel.getY(),
+                        1, Constants.MIN_HUE_SHIFT, Constants.MAX_HUE_SHIFT,
+                        DialogVals::setHueShift, DialogVals::getHueShift,
+                        i -> i, i -> i, String::valueOf, "-XXX");
+        mb.addAll(hueLabel, h.decButton, h.incButton, h.slider, h.value);
+
+        setDialog(assembleDialog("Shift color levels...",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                () -> true, "Preview",
+                () -> DialogAssembly.setDialogToPreviewAction(
+                        c.prepHSVShift(), DialogAssembly::setDialogToHSVShift,
+                        "shifted color levels"), false));
+    }
+
+    public static void setDialogToColorScript() {
+        // TODO
+    }
+
+    private static void setDialogToPreviewAction(
+            final ProjectState preview, final Runnable backButtonAction,
+            final String previewAppend
+    ) {
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+
+        final SimpleMenuButton backButton =
+                GraphicsUtils.makeStandardTextButton(
+                        "< Back",
+                        Layout.getDialogContentInitial(), backButtonAction);
+        mb.add(backButton);
+
+        final int fc = preview.getFrameCount(),
+                w = preview.getImageWidth(),
+                h = preview.getImageHeight();
+
+        final int pw, ph, MIN = 1,
+                maxW = Layout.getDialogWidth() - (4 * Layout.CONTENT_BUFFER_PX),
+                maxH = Layout.getDialogHeight() / 2;
+
+        if (w < maxW && h < maxH) {
+            final int timesFits = Math.min(maxW / w, maxH / h);
+
+            pw = w * timesFits;
+            ph = h * timesFits;
+        } else if (w < maxW) {
+            ph = maxH;
+            pw = Math.max(MIN, (int) (w * (ph / (double) h)));
+        } else if (h < maxH) {
+            pw = maxW;
+            ph = Math.max(MIN, (int) (h * (pw / (double) w)));
+        } else {
+            final double scaleDownW = maxW / (double) w,
+                    scaleDownH = maxH / (double) h;
+
+            if (scaleDownW > scaleDownH) {
+                ph = Math.max(MIN, (int) (h * scaleDownH));
+                pw = Math.max(MIN, (int) (w * scaleDownH));
+            } else {
+                ph = Math.max(MIN, (int) (h * scaleDownW));
+                pw = Math.max(MIN, (int) (w * scaleDownW));
+            }
+        }
+
+        final GameImage[] previewContent = new GameImage[fc];
+
+        for (int i = 0; i < fc; i++) {
+            final GameImage frame = preview.draw(false, false, i);
+            previewContent[i] = ImageProcessing.scale(frame, pw, ph);
+        }
+
+        final AnimationMenuElement previewAnim = new AnimationMenuElement(
+                new Coord2D(Layout.getCanvasMiddle().x,
+                        textBelowPos(backButton, 1).y), new Bounds2D(pw, ph),
+                MenuElement.Anchor.CENTRAL_TOP, 20, previewContent);
+        mb.add(previewAnim);
+
+        setDialog(assembleDialog("Preview of " + previewAppend,
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                () -> true, "Apply", () -> c.getStateManager()
+                        .performAction(preview, Operation.EDIT_IMAGE), true));
+    }
+
     public static void setDialogToSavePalette(final Palette palette) {
         final MenuBuilder mb = new MenuBuilder();
 
@@ -1438,8 +1538,11 @@ public class DialogAssembly {
                 getDialogContentOffsetFollowingLabel(flagLabel),
                 new ConcreteProperty<>(DialogVals::isIncludeDisabledLayers,
                         DialogVals::setIncludeDisabledLayers));
+        final GatewayMenuElement flagGate = new GatewayMenuElement(
+                new MenuElementGrouping(flagLabel, checkbox),
+                () -> DialogVals.getScope().considersLayers());
 
-        mb.addAll(scopeLabel, dropdown, flagLabel, checkbox);
+        mb.addAll(scopeLabel, dropdown, flagGate);
     }
 
     private static void makeStitchElementsForSaveSpriteSheet(
