@@ -36,7 +36,8 @@ public class DialogVals {
             truncateSplitX = true,
             truncateSplitY = true,
             resizePreserveAspectRatio = false,
-            sortPaletteBackwards = false;
+            sortPaletteBackwards = false,
+            includeDisabledLayers = false;
     private static int[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -381,6 +382,10 @@ public class DialogVals {
         setFrameHeight(canvasHeight / splitRows, canvasHeight);
     }
 
+    public static void setIncludeDisabledLayers(final boolean includeDisabledLayers) {
+        DialogVals.includeDisabledLayers = includeDisabledLayers;
+    }
+
     public static void setResizePreserveAspectRatio(
             final boolean resizePreserveAspectRatio
     ) {
@@ -614,6 +619,10 @@ public class DialogVals {
 
     public static boolean isCharSpecificSpacing() {
         return charSpecificSpacing;
+    }
+
+    public static boolean isIncludeDisabledLayers() {
+        return includeDisabledLayers;
     }
 
     public static String getFontName() {

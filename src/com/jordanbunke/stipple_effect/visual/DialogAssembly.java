@@ -1201,7 +1201,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        makeContentScopeDropdown(mb, c);
+        makeCommonColorOperationElements(mb, c);
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
@@ -1216,7 +1216,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        makeContentScopeDropdown(mb, c);
+        makeCommonColorOperationElements(mb, c);
 
         if (palette.size() == 0)
             mb.add(makeDialogLeftLabelAtBottom(
@@ -1410,7 +1410,7 @@ public class DialogAssembly {
         StippleEffect.get().setDialog(dialog);
     }
 
-    private static void makeContentScopeDropdown(
+    private static void makeCommonColorOperationElements(
             final MenuBuilder mb, final SEContext c
     ) {
         final DialogVals.Scope[] vs =
@@ -1421,9 +1421,11 @@ public class DialogAssembly {
 
         DialogVals.setScope(vs[0]);
 
-        final TextLabel label = makeDialogLeftLabel(0, "Scope:");
+        final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope:"),
+                flagLabel = TextLabel.make(textBelowPos(scopeLabel),
+                        "Include disabled layers?");
         final Dropdown dropdown = Dropdown.forDialog(
-                getDialogContentOffsetFollowingLabel(label),
+                getDialogContentOffsetFollowingLabel(scopeLabel),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
                 Arrays.stream(vs)
                         .map(DialogVals.Scope::toString)
@@ -1432,8 +1434,12 @@ public class DialogAssembly {
                         .map(s -> (Runnable) () -> DialogVals.setScope(s))
                         .toArray(Runnable[]::new),
                 () -> 0);
+        final Checkbox checkbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(flagLabel),
+                new ConcreteProperty<>(DialogVals::isIncludeDisabledLayers,
+                        DialogVals::setIncludeDisabledLayers));
 
-        mb.addAll(label, dropdown);
+        mb.addAll(scopeLabel, dropdown, flagLabel, checkbox);
     }
 
     private static void makeStitchElementsForSaveSpriteSheet(
@@ -2370,8 +2376,6 @@ public class DialogAssembly {
             final Set<MenuElement> contentAssembler, final Coord2D contentStart,
             final int initialBottomY
     ) {
-        final Theme t = Settings.getTheme();
-
         final int indent = (2 * Layout.BUTTON_INC),
                 incY = Layout.DIALOG_CONTENT_INC_Y;
 
@@ -2381,11 +2385,11 @@ public class DialogAssembly {
 
         final TextLabel storePageLabel = TextLabel.make(
                 contentStart.displace(indent, bottomY + Layout.TEXT_Y_OFFSET),
-                "Donate on the store page: ", t.textLight.get()),
+                "Donate on the store page: "),
                 sponsorLabel = TextLabel.make(textBelowPos(storePageLabel),
-                "Sponsor me on GitHub: ", t.textLight.get()),
+                "Sponsor me on GitHub: "),
                 patreonLabel = TextLabel.make(textBelowPos(sponsorLabel),
-                        "Become a patron on Patreon: ", t.textLight.get());
+                        "Become a patron on Patreon: ");
         final SimpleMenuButton storePageButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         getDialogContentOffsetFollowingLabel(storePageLabel),
@@ -2409,8 +2413,6 @@ public class DialogAssembly {
             final Set<MenuElement> contentAssembler, final Coord2D contentStart,
             final int initialBottomY
     ) {
-        final Theme t = Settings.getTheme();
-
         final int indent = (2 * Layout.BUTTON_INC),
                 incY = Layout.DIALOG_CONTENT_INC_Y;
 
@@ -2420,8 +2422,7 @@ public class DialogAssembly {
 
         final TextLabel scriptLabel = TextLabel.make(
                 contentStart.displace(indent, bottomY + Layout.TEXT_Y_OFFSET),
-                "For a more thorough breakdown of scripting and the scripting API: ",
-                t.textLight.get());
+                "For a more thorough breakdown of scripting and the scripting API: ");
         final SimpleMenuButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         getDialogContentOffsetFollowingLabel(scriptLabel),

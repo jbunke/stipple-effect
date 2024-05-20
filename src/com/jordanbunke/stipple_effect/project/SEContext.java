@@ -1028,6 +1028,9 @@ public class SEContext {
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
+        final boolean includeDisabledLayers =
+                DialogVals.isIncludeDisabledLayers();
+
         switch (scope) {
             case SELECTION -> extractColorsFromSelection(colors);
             case LAYER_FRAME -> extractColorsFromFrame(colors, state,
@@ -1043,7 +1046,9 @@ public class SEContext {
                 final int layerCount = state.getLayers().size();
 
                 for (int i = 0; i < layerCount; i++)
-                    extractColorsFromFrame(colors, state,
+                    if (includeDisabledLayers ||
+                            state.getLayers().get(i).isEnabled())
+                        extractColorsFromFrame(colors, state,
                             state.getFrameIndex(), i);
             }
             case PROJECT -> {
@@ -1052,7 +1057,9 @@ public class SEContext {
 
                 for (int f = 0; f < frameCount; f++)
                     for (int l = 0; l < layerCount; l++)
-                        extractColorsFromFrame(colors, state, f, l);
+                        if (includeDisabledLayers ||
+                                state.getLayers().get(l).isEnabled())
+                            extractColorsFromFrame(colors, state, f, l);
             }
         }
 
@@ -1101,6 +1108,9 @@ public class SEContext {
         final DialogVals.Scope scope = DialogVals.getScope();
         ProjectState state = getState();
 
+        final boolean includeDisabledLayers =
+                DialogVals.isIncludeDisabledLayers();
+
         switch (scope) {
             case SELECTION -> palettizeSelection(palette);
             case LAYER_FRAME -> state = palettizeFrame(palette, state,
@@ -1122,14 +1132,20 @@ public class SEContext {
                 final int layerCount = state.getLayers().size();
 
                 for (int i = 0; i < layerCount; i++)
-                    state = palettizeFrame(palette, state,
-                            state.getFrameIndex(), i);
+                    if (includeDisabledLayers ||
+                            state.getLayers().get(i).isEnabled())
+                        state = palettizeFrame(palette, state,
+                                state.getFrameIndex(), i);
             }
             case PROJECT -> {
                 final int frameCount = state.getFrameCount(),
                         layerCount = state.getLayers().size();
 
                 for (int l = 0; l < layerCount; l++) {
+                    if (!(includeDisabledLayers ||
+                            state.getLayers().get(l).isEnabled()))
+                        continue;
+
                     if (state.getLayers().get(l).areFramesLinked()) {
                         state = palettizeFrame(palette, state,
                                 state.getFrameIndex(), l);
