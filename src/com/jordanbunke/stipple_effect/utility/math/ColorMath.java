@@ -7,7 +7,6 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -22,16 +21,17 @@ public class ColorMath {
 
     public static GameImage algo(
             final Function<Color, Color> internal,
+            final Map<Color, Color> map,
             final GameImage source
     ) {
-        return algo(internal, source, null);
+        return algo(internal, map, source, null);
     }
 
     public static GameImage algo(
             final Function<Color, Color> internal,
+            final Map<Color, Color> map,
             final GameImage source, final Set<Coord2D> pixels
     ) {
-        final Map<Color, Color> map = new HashMap<>();
         final int w = source.getWidth(), h = source.getHeight();
         final GameImage res = new GameImage(w, h);
 

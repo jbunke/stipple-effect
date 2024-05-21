@@ -2702,6 +2702,8 @@ public class DialogAssembly {
                 new String[] {
                         IconCodes.SWAP_COLORS,
                         IconCodes.COLOR_MENU_MODE,
+                        IconCodes.HSV_SHIFT,
+                        IconCodes.COLOR_SCRIPT,
                         IconCodes.NEW_PALETTE,
                         IconCodes.IMPORT_PALETTE,
                         IconCodes.CONTENTS_TO_PALETTE,
@@ -2718,6 +2720,8 @@ public class DialogAssembly {
                 new String[] {
                         "Swap primary and secondary color",
                         "Toggle between palettes and RGBA-HSV color selection",
+                        "Shift color levels",
+                        "Run a color script",
                         "Create a new palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +
                                 Constants.PALETTE_FILE_SUFFIX + ")",
