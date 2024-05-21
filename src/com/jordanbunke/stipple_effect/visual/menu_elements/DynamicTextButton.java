@@ -2,9 +2,9 @@ package com.jordanbunke.stipple_effect.visual.menu_elements;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.menus.menu_elements.button.MenuButton;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.delta_time.menu.menu_elements.button.MenuButton;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
@@ -21,7 +21,7 @@ public class DynamicTextButton extends MenuButton {
             final Anchor anchor, final Runnable onClick,
             final Supplier<String> getter
     ) {
-        super(position, new Coord2D(width, Layout.STD_TEXT_BUTTON_H),
+        super(position, new Bounds2D(width, Layout.STD_TEXT_BUTTON_H),
                 anchor, true, onClick);
 
         this.getter = getter;
@@ -51,7 +51,7 @@ public class DynamicTextButton extends MenuButton {
     }
 
     private void updateAssets() {
-        baseImage = GraphicsUtils.drawTextButton(getWidth(), text, false, Constants.GREY);
+        baseImage = GraphicsUtils.drawTextButton(getWidth(), text, false);
         highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
     }
 }

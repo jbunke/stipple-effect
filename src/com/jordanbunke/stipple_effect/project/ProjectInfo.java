@@ -6,14 +6,16 @@ import com.jordanbunke.anim.MP4Writer;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
-import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
-import com.jordanbunke.stipple_effect.selection.SelectionMode;
-import com.jordanbunke.stipple_effect.utility.*;
 
 import java.nio.file.Path;
 import java.util.function.BinaryOperator;
@@ -27,7 +29,8 @@ public class ProjectInfo {
     private String name, indexPrefix, indexSuffix;
     private SaveType saveType;
 
-    private boolean editedSinceLastSave, saveRangeOfFrames;
+    private boolean editedSinceLastSave, editedSinceLastPreview,
+            saveRangeOfFrames;
 
     private int framesPerDim, fps, scaleUp, countFrom, lowerBound, upperBound;
 
@@ -72,6 +75,7 @@ public class ProjectInfo {
         }
 
         editedSinceLastSave = false;
+        editedSinceLastPreview = true;
         saveType = filepath != null && filepath.getFileName()
                 .toString().endsWith(SaveType.NATIVE.getFileSuffix())
                 ? SaveType.NATIVE : SaveType.PNG_STITCHED;
@@ -204,6 +208,11 @@ public class ProjectInfo {
 
     public void markAsEdited() {
         editedSinceLastSave = true;
+        editedSinceLastPreview = true;
+    }
+
+    public void logPreview() {
+        editedSinceLastPreview = false;
     }
 
     private Path buildFilepath(final String nameSuffix) {
@@ -242,6 +251,10 @@ public class ProjectInfo {
 
     public boolean hasUnsavedChanges() {
         return editedSinceLastSave;
+    }
+
+    public boolean hasChangesSincePreview() {
+        return editedSinceLastPreview;
     }
 
     public Path getFolder() {

@@ -3,16 +3,17 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
-import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementContainer;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementContainer;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
-import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ColorComponent extends MenuElementContainer {
             final Function<Integer, Color> spectralFunction,
             final Consumer<Color> setter, final Supplier<Integer> getter
     ) {
-        super(new Coord2D(), new Coord2D(), Anchor.LEFT_TOP, false);
+        super(new Coord2D(), new Bounds2D(1, 1), Anchor.LEFT_TOP, false);
 
         final boolean isFull = alignment == Alignment.FULL;
 
@@ -45,21 +46,22 @@ public class ColorComponent extends MenuElementContainer {
                 width = isFull
                         ? Layout.getColorsWidth() : Layout.getColorsWidth() / 2,
                 indent = Layout.CONTENT_BUFFER_PX;
-        final Coord2D startingPos = Layout.getColorsPosition().displace(
-                globalOffsetX, globalOffsetY),
-                buttonDims = new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM);
+        final Coord2D startingPos = Layout.getColorsPosition()
+                .displace(globalOffsetX, globalOffsetY);
+        final Bounds2D buttonDims = new Bounds2D(
+                Layout.BUTTON_DIM, Layout.BUTTON_DIM);
 
         final List<MenuElement> elements = new ArrayList<>();
 
         // label
         elements.add(TextLabel.make(
                 startingPos.displace(indent, Layout.COLOR_LABEL_OFFSET_Y),
-                label, Constants.WHITE));
+                label, Settings.getTheme().textLight.get()));
 
         // value
         elements.add(new DynamicLabel(startingPos.displace(
                 width - indent, Layout.COLOR_LABEL_OFFSET_Y),
-                Anchor.RIGHT_TOP, Constants.WHITE,
+                Anchor.RIGHT_TOP, Settings.getTheme().textLight.get(),
                 () -> String.valueOf(getter.get()),
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 

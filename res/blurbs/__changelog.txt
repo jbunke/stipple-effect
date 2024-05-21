@@ -1,3 +1,33 @@
+{0.4.0} - The Scripting Update - 2024-05-21
+
+Added:
+> Added scripting
+    > Added automation scripts
+    > Added preview scripts
+    > Added color scripts
+> Added HSV level shifting
+> Added "Flatten project" layer action
+> Added themes
+    > Added "Zo" theme inspired by Haiti
+    > Added "Neon" theme
+    > Added "Bunkering" theme inspired by the environmental degradation the Niger Delta
+> Added transparency checkerboard to the color slider core
+> Dialog menus can now be closed by pressing {Enter} if the precondition is passing
+> Added settings for windowed program size
+> Added flag to include or exclude disabled layers in color actions
+
+Changed:
+> Overhauled outlines
+    > Outlines can now be internal as well as external and up to 10 pixels thick
+    > Redesigned outlines dialog menu
+> Optimization: "Project" menu elements are no longer redrawn after the canvas is edited
+
+Fixed:
+> Bug: The dynamic label showing an example file name for the prefix and suffix doesn't update
+> Bug: Lowest menu elements were clipped on the default settings page
+> Bug: Not redrawing menus after a panel is shown/hidden in the panel manager dialog
+> Bug: Setting pixel grid and checkerboard via shortcut (Ctrl + B) is resetting window size and theme
+
 {0.3.0} - The Settings and Options Update - 2024-04-08
 
 Added:

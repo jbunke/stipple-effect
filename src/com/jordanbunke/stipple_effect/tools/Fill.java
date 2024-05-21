@@ -2,8 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
@@ -40,14 +39,13 @@ public final class Fill extends ToolThatSearches {
             final Coord2D tp = context.getTargetPixel();
 
             final GameImage image = context.getState().getActiveLayerFrame();
-            final Color initial = ImageProcessing.colorAtPixel(image, tp.x, tp.y),
-                    fillColor = me.button == GameMouseEvent.Button.LEFT
-                            ? StippleEffect.get().getPrimary()
-                            : StippleEffect.get().getSecondary();
+            final Color fillColor = me.button == GameMouseEvent.Button.LEFT
+                    ? StippleEffect.get().getPrimary()
+                    : StippleEffect.get().getSecondary();
 
             // search
             final Set<Coord2D> selection = context.getState().getSelection(),
-                    matched = search(image, initial, tp).stream()
+                    matched = search(image, tp).stream()
                             .filter(m -> selection.isEmpty() || selection.contains(m))
                             .collect(Collectors.toSet());
 

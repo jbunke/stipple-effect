@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;

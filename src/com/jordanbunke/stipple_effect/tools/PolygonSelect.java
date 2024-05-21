@@ -2,13 +2,15 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.LineMath;
 import com.jordanbunke.stipple_effect.utility.math.LineSegment;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -209,13 +211,14 @@ public final class PolygonSelect extends ToolWithMode {
     }
 
     private void updateToolContentPreview(final SEContext context) {
+        final Theme t = Settings.getTheme();
+
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
         final Coord2D tp = context.getTargetPixel(), first = vertices.get(0);
 
         final Color border = tp.equals(first)
-                ? Constants.HIGHLIGHT_1
-                : Constants.HIGHLIGHT_2;
+                ? t.highlightOutline.get() : t.highlightOverlay.get();
 
         toolContentPreview = new GameImage(w, h);
 
@@ -225,8 +228,7 @@ public final class PolygonSelect extends ToolWithMode {
                     continue;
 
                 final Color c = (x + y) % 2 == 0
-                        ? Constants.WHITE
-                        : Constants.BLACK;
+                        ? t.textLight.get() : t.textDark.get();
 
                 toolContentPreview.dot(c, first.x + x, first.y + y);
             }
@@ -237,7 +239,7 @@ public final class PolygonSelect extends ToolWithMode {
         defineLine(getLastVertex(), tp).forEach(next ->
                 toolContentPreview.dot(border, next.x, next.y));
         vertices.forEach(v ->
-                toolContentPreview.dot(Constants.HIGHLIGHT_1, v.x, v.y));
+                toolContentPreview.dot(t.highlightOutline.get(), v.x, v.y));
     }
 
     private void addEdge(final Coord2D v1, final Coord2D v2) {

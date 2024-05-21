@@ -1,0 +1,20 @@
+Stipple Effect allows for users to write scripts that fall into one of three categories:
+
+> Automation scripts
+> Preview scripts
+> Color scripts
+
+{Automation scripts} are scripts that are called from the main editor window that run a series of
+program actions automatically. For example, a script can be written that reverses the frames in a
+project. The full list of Stipple Effect program actions that can be executed via script are outlined
+in the {scripting API} (abstract programming interface).
+
+{Preview scripts} allow for the alteration of the contents of the preview window. By default, the
+preview window merely previews the contents of the project as they are. This can already be used in
+a variety of ways, but it is made exponentially more powerful with scripting.
+
+{Color scripts} transform an input color into a different color. They are useful for defining complex
+transformation behaviours.
+
+Stipple Effect scripts are written in an extension dialect of my scripting language {DeltaScript}.
+Script files can be written in the text editor of your choosing and use the file extension {.ses}.

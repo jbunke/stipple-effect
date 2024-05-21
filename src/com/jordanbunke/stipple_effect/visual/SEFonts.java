@@ -1,8 +1,6 @@
 package com.jordanbunke.stipple_effect.visual;
 
-import com.jordanbunke.delta_time.fonts.Font;
-import com.jordanbunke.delta_time.fonts.FontConstants;
-import com.jordanbunke.delta_time.fonts.FontFamily;
+import com.jordanbunke.delta_time.fonts.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.GameImageIO;
@@ -10,7 +8,11 @@ import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
-import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
+import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.ParserUtils;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -30,33 +32,27 @@ public class SEFonts {
 
         public Font associated() {
             return switch (this) {
-                case CLASSIC -> SEFonts.CLASSIC.getStandard();
-                case SCHIEF -> SEFonts.CLASSIC.getItalics();
+                case CLASSIC -> SEFonts.CLASSIC;
+                case SCHIEF -> SEFonts.SCHIEF;
                 case ZIFFER -> SEFonts.ZIFFER;
-                case SKINNY -> SEFonts.DELTAN.getBold();
-                case DELTAN -> SEFonts.DELTAN.getStandard();
+                case SKINNY -> SEFonts.SKINNY;
+                case DELTAN -> SEFonts.DELTAN;
             };
         }
     }
 
     public static final Path FONT_FOLDER = Path.of("fonts");
 
-    public static final FontFamily CLASSIC = new FontFamily("Classic",
-            Font.loadFromSource(FONT_FOLDER, true, "font-classic",
-                    true, 0.6, 2, false, true),
-            null,
-            Font.loadFromSource(FONT_FOLDER, true, "font-classic-italics",
-                    true, 0.5, 2, false, true)),
-            DELTAN = new FontFamily("Deltan",
-                    Font.loadFromSource(FONT_FOLDER, true, "font-deltan",
-                            true, 0.6, 2, false, true),
-                    Font.loadFromSource(FONT_FOLDER, true, "font-skinny-deltan",
-                            true, 0.6, 2, false, true),
-                    null);
+    private static final FontBuilder builder = new FontBuilder()
+            .setPixelSpacing(2).setWhitespaceBreadthMultiplier(0.6);
 
-    public static final Font
-            ZIFFER = Font.loadFromSource(FONT_FOLDER, true, "font-basic-bold",
-            true, 0.6, 2, false, true);
+    private static final Font
+            DELTAN = builder.build(DeltaTimeFonts.DELTAN),
+            SKINNY = builder.build(DeltaTimeFonts.SKINNY),
+            CLASSIC = builder.build(FONT_FOLDER, true, "classic"),
+            ZIFFER = builder.build(FONT_FOLDER, true, "ziffer"),
+            SCHIEF = builder.setWhitespaceBreadthMultiplier(0.5)
+                    .build(FONT_FOLDER, true, "schief");
 
     public static void uploadASCIISourceFile() {
         uploadFontSourceFile(DialogVals::resetAscii,
@@ -124,8 +120,8 @@ public class SEFonts {
 
         final String[] previewText = ParserUtils.getBlurb(
                 IconCodes.FONT_EXAMPLE_TEXT);
-        final TextBuilder tb = new TextBuilder(1d,
-                Text.Orientation.LEFT, Constants.WHITE, buildNewFont());
+        final TextBuilder tb = new TextBuilder(1d, Text.Orientation.LEFT,
+                Settings.getTheme().textLight.get(), buildNewFont());
         Arrays.stream(previewText).forEach(line -> {
             tb.addText(line);
             tb.addLineBreak();
@@ -141,7 +137,7 @@ public class SEFonts {
         final int pixelSpacing = DialogVals.getNewFontPixelSpacing();
         final boolean charSpecificSpacing = DialogVals.isCharSpecificSpacing();
 
-        return Font.loadFromImages(ascii, latinExtended, 1d,
-                pixelSpacing, false, charSpecificSpacing);
+        return Font.loadFromFontSources(new FontSources(ascii, latinExtended),
+                1d, pixelSpacing, false, charSpecificSpacing);
     }
 }

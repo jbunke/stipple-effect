@@ -1,17 +1,16 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
-import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 import java.util.*;
@@ -70,9 +69,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         ToolThatSearches.searchDiag = searchDiag;
     }
 
-    public Set<Coord2D> search(
-            final GameImage image, final Color initial, final Coord2D target
-    ) {
+    public static Set<Coord2D> search(final GameImage image, final Coord2D target) {
+        final Color initial = image.getColorAt(target.x, target.y);
+
         return ToolWithMode.isGlobal()
                 ? globalSearch(image, initial)
                 : contiguousSearch(image, initial, target);
@@ -93,8 +92,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
             final Coord2D active = searching.pop();
             searched.add(active);
 
-            final Color pixel = ImageProcessing.colorAtPixel(
-                    image, active.x, active.y);
+            final Color pixel = image.getColorAt(active.x, active.y);
 
             final boolean result =
                     pixelMatchesToleranceCondition(initial, pixel);
@@ -144,7 +142,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                final Color pixel = ImageProcessing.colorAtPixel(image, x, y);
+                final Color pixel = image.getColorAt(x, y);
 
                 final boolean result =
                         pixelMatchesToleranceCondition(initial, pixel);
@@ -184,7 +182,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
     public MenuElementGrouping buildToolOptionsBar() {
         // tolerance label
         final TextLabel toleranceLabel = TextLabel.make(
-                getFirstOptionLabelPosition(), "Tolerance", Constants.WHITE);
+                getFirstOptionLabelPosition(), "Tolerance");
 
         final int SLIDER_MULT = 100;
         final IncrementalRangeElements<Double> tolerance =
@@ -209,9 +207,9 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         // diagonal checkbox
         final Checkbox diagonalCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(diagonalLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                ToolThatSearches::isSearchDiag,
-                ToolThatSearches::setSearchDiag);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                ToolThatSearches::isSearchDiag, ToolThatSearches::setSearchDiag
+        ));
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 toleranceLabel, tolerance.decButton, tolerance.incButton,

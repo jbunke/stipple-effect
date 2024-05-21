@@ -1,8 +1,7 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
@@ -36,8 +35,8 @@ public final class ColorPicker extends Tool {
             final int index = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.PRIMARY : StippleEffect.SECONDARY;
 
-            final Color c = ImageProcessing.colorAtPixel(
-                    context.getState().getActiveLayerFrame(), tp.x, tp.y);
+            final Color c = context.getState().getActiveLayerFrame()
+                    .getColorAt(tp.x, tp.y);
 
             StippleEffect.get().setColorIndexAndColor(index, c);
         }

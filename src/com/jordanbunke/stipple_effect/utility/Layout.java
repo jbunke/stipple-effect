@@ -1,13 +1,14 @@
 package com.jordanbunke.stipple_effect.utility;
 
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 
-public class Layout {
+public final class Layout {
     // panel variables
     private static boolean framesPanelShowing, layersPanelShowing,
             colorsPanelShowing, toolbarShowing, projectsExpanded;
@@ -19,7 +20,11 @@ public class Layout {
             CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
-            MIN_WINDOW_H = 666, TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
+            MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
+            MIN_WINDOW_H = 666,
+            MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),
+            MIN_WINDOW_W = (int)(MIN_WINDOW_H * (16 / 9.)),
+            TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
             TEXT_CARET_W = 1, TEXT_CARET_H = 23,
             TEXT_CARET_Y_OFFSET = -11, TEXT_LINE_PX_H = TEXT_CARET_H + 2,
             CONTENT_BUFFER_PX = 8, PREVIEW_WINDOW_BUFFER_PX = 20,
@@ -47,15 +52,18 @@ public class Layout {
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             FULL_COLOR_SLIDER_W = RIGHT_PANEL_W - (SLIDER_BALL_DIM + 10),
             HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
-            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100;
+            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
+            MAX_ERROR_CHARS_PER_LINE = 60, CHARS_CUTOFF = MAX_ERROR_CHARS_PER_LINE - 5;
 
-    public static final Coord2D ICON_DIMS = new Coord2D(BUTTON_DIM, BUTTON_DIM),
-            PALETTE_DIMS = new Coord2D(24, 24);
+    public static final Bounds2D
+            ICON_DIMS = new Bounds2D(BUTTON_DIM, BUTTON_DIM),
+            OUTLINE_BUTTON_DIMS = new Bounds2D(STD_TEXT_BUTTON_H, STD_TEXT_BUTTON_H),
+            PALETTE_DIMS = new Bounds2D(24, 24);
 
-    private static Coord2D size;
+    private static Bounds2D size;
 
     static {
-        size = new Coord2D(Toolkit.getDefaultToolkit().getScreenSize().width,
+        size = new Bounds2D(Toolkit.getDefaultToolkit().getScreenSize().width,
                 Toolkit.getDefaultToolkit().getScreenSize().height);
 
         projectsExpanded = true;
@@ -148,15 +156,15 @@ public class Layout {
 
     // program canvas size
     public static int width() {
-        return size.x;
+        return size.width();
     }
 
     public static int height() {
-        return size.y;
+        return size.height();
     }
 
     public static void setSize(final int w, final int h) {
-        Layout.size = new Coord2D(w, h);
+        size = new Bounds2D(w, h);
     }
 
     // bottom bar layout
@@ -234,15 +242,7 @@ public class Layout {
     ) {
         return TextLabel.make(new Coord2D(
                 optionsBarNextElementX(preceding, true),
-                optionsBarTextY()), text, Constants.WHITE);
-    }
-
-    public static int estimateDynamicLabelMaxWidth(
-            final String widestTextCase
-    ) {
-        return TextLabel
-                .make(new Coord2D(), widestTextCase, Constants.WHITE)
-                .getWidth();
+                optionsBarTextY()), text);
     }
 
     // segments layout

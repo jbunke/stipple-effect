@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.selection;
 
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 

@@ -1,10 +1,10 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -17,9 +17,8 @@ public class HorizontalSlider extends Slider {
             final Supplier<Integer> getter, final Consumer<Integer> setter,
             final boolean canSetImplicitly
     ) {
-        super(position, new Coord2D(width, Layout.SLIDER_OFF_DIM), anchor,
-                minValue, maxValue, getter, setter,
-                canSetImplicitly, c -> c.x, MenuElement::getWidth);
+        super(position, new Bounds2D(width, Layout.SLIDER_OFF_DIM), anchor,
+                minValue, maxValue, getter, setter, canSetImplicitly);
     }
 
     public HorizontalSlider(
@@ -40,7 +39,8 @@ public class HorizontalSlider extends Slider {
         slider.draw(drawSliderCore(sd, sh), Layout.SLIDER_BALL_DIM / 2, Layout.SLIDER_THINNING);
 
         // slider outline
-        slider.drawRectangle(Constants.BLACK, Layout.BUTTON_BORDER_PX, Layout.SLIDER_BALL_DIM / 2,
+        slider.drawRectangle(Settings.getTheme().buttonOutline.get(),
+                Layout.BUTTON_BORDER_PX, Layout.SLIDER_BALL_DIM / 2,
                 Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2), sd,
                 getHeight() - (Layout.BUTTON_BORDER_PX + (2 * Layout.SLIDER_THINNING)));
     }
@@ -48,5 +48,15 @@ public class HorizontalSlider extends Slider {
     @Override
     public Coord2D getSliderBallRenderPos(final int sliderBallRenderDim) {
         return new Coord2D(sliderBallRenderDim, 0);
+    }
+
+    @Override
+    protected int getCoordDimension(final Coord2D position) {
+        return position.x;
+    }
+
+    @Override
+    protected int getSizeDimension() {
+        return getWidth();
     }
 }

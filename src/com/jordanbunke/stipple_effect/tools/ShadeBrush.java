@@ -2,8 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.project.SEContext;
@@ -104,8 +103,7 @@ public final class ShadeBrush extends ToolWithBreadth {
                 if (!(selection.isEmpty() || selection.contains(b)))
                     continue;
 
-                final Color candidate = ImageProcessing
-                        .colorAtPixel(current, b.x, b.y);
+                final Color candidate = current.getColorAt(b.x, b.y);
                 if (mask[x][y] && !painted.contains(b) &&
                         palette.isIncluded(candidate)) {
                     edit.dot(c.apply(candidate), b.x, b.y);

@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.layer;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -22,6 +23,15 @@ public final class SELayer {
     private final String name;
 
     private OnionSkinMode onionSkinMode;
+
+    public static SELayer fromPreviewContent(
+            final GameImage[] content
+    ) {
+        final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
+
+        return new SELayer(frames, content[0], Constants.OPAQUE,
+                true, false, OnionSkinMode.NONE, giveLayerDefaultName());
+    }
 
     public static SELayer newLayer(
             final int w, final int h, final int frameCount
@@ -113,7 +123,7 @@ public final class SELayer {
 
         pixels.stream().filter(p -> p.x >= 0 && p.x < w &&
                 p.y >= 0 && p.y < h).forEach(p -> {
-            final Color c = ImageProcessing.colorAtPixel(edit, p.x, p.y);
+            final Color c = edit.getColorAt(p.x, p.y);
             composed.setRGB(p.x, p.y, c.getRGB());
         });
 
@@ -378,7 +388,7 @@ public final class SELayer {
 
         for (int x = 0; x < render.getWidth(); x++) {
             for (int y = 0; y < render.getHeight(); y++) {
-                final Color c = ImageProcessing.colorAtPixel(frame, x, y);
+                final Color c = frame.getColorAt(x, y);
 
                 if (c.getAlpha() == 0)
                     continue;

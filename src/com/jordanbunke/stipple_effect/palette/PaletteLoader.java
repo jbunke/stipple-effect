@@ -1,10 +1,10 @@
 package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -28,7 +28,7 @@ public class PaletteLoader {
 
     private static void loadHardCodedPalettes(final List<Palette> palettes) {
         palettes.add(new Palette("Black & White (1-bit)",
-                new Color[] { Constants.BLACK, Constants.WHITE }, false));
+                new Color[] { SEColors.black(), SEColors.white() }, false));
         palettes.add(new Palette("NES",
                 paletteColorsFromCode(NES_PALETTE), false));
         palettes.add(new Palette("PICO-8",
@@ -52,7 +52,7 @@ public class PaletteLoader {
     ) {
         for (int y = 0; y < image.getHeight(); y++)
             for (int x = 0; x < image.getWidth(); x++) {
-                final Color c = ImageProcessing.colorAtPixel(image, x, y);
+                final Color c = image.getColorAt(x, y);
 
                 if (c.getAlpha() == 0)
                     continue;

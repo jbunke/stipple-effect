@@ -12,6 +12,8 @@ import com.jordanbunke.stipple_effect.utility.settings.types.IntSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
 import java.nio.file.Path;
 
@@ -29,23 +31,43 @@ public class Settings {
         DUMP_STATES(new Setting<>(BooleanSettingType.get(), true)),
 
         // int settings
+        WINDOWED_W(new Setting<>(
+                IntSettingType.get(), Layout.MAX_WINDOW_W,
+                ww -> {
+                    StippleEffect.get().remakeWindow();
+                })),
+        WINDOWED_H(new Setting<>(
+                IntSettingType.get(), Layout.MAX_WINDOW_H,
+                wh -> {
+                    StippleEffect.get().remakeWindow();
+                })),
         CHECKERBOARD_W_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
-                cbw -> StippleEffect.get().getContext().redrawCheckerboard())),
+                cbw -> {
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawCheckerboard);
+                })),
         CHECKERBOARD_H_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_CHECKERBOARD_DIM,
-                cbh -> StippleEffect.get().getContext().redrawCheckerboard())),
+                cbh -> {
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawCheckerboard);
+                })),
         PIXEL_GRID_X_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgx -> {
                     final SEContext c = StippleEffect.get().getContext();
                     c.renderInfo.setPixelGrid(true);
-                    c.redrawPixelGrid();
+
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawPixelGrid);
                 })),
         PIXEL_GRID_Y_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgy -> {
                     final SEContext c = StippleEffect.get().getContext();
                     c.renderInfo.setPixelGrid(true);
-                    c.redrawPixelGrid();
+
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawPixelGrid);
                 })),
         DEFAULT_CANVAS_W_PX(new Setting<>(
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_W)),
@@ -69,6 +91,13 @@ public class Settings {
                 new EnumSettingType<>(SEFonts.Code.class),
                 SEFonts.DEFAULT_FONT, code -> {
                     DialogAssembly.setDialogToProgramSettings();
+                    StippleEffect.get().rebuildAllMenus();
+                })),
+        THEME(new Setting<>(
+                new EnumSettingType<>(Themes.class),
+                Themes.DEFAULT, theme -> {
+                    StippleEffect.get().getContexts()
+                            .forEach(SEContext::redrawCheckerboard);
                     StippleEffect.get().rebuildAllMenus();
                 }));
 
@@ -142,9 +171,9 @@ public class Settings {
         FileIO.writeFile(SETTINGS_FILE, sb.toString());
     }
 
-    public static void initializeMenu() {
+    public static void resetAssignments() {
         for (Code code : Code.values())
-            code.setting.initializeMenu();
+            code.setting.resetAssignment();
     }
 
     public static void apply() {
@@ -181,6 +210,18 @@ public class Settings {
 
     public static void setDumpStates(final boolean dumpStates) {
         Code.DUMP_STATES.set(dumpStates);
+    }
+
+    public static void setWindowedWidth(
+            final int windowedWidth
+    ) {
+        Code.WINDOWED_W.set(windowedWidth);
+    }
+
+    public static void setWindowedHeight(
+            final int windowedHeight
+    ) {
+        Code.WINDOWED_H.set(windowedHeight);
     }
 
     public static void setCheckerboardWPixels(
@@ -235,6 +276,10 @@ public class Settings {
         Code.PROGRAM_FONT.set(fontCode);
     }
 
+    public static void setTheme(final Themes theme) {
+        Code.THEME.set(theme);
+    }
+
     // checkers
     public static boolean checkIsFullscreenOnStartup() {
         return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.check();
@@ -262,6 +307,14 @@ public class Settings {
 
     public static boolean checkIsDumpStates() {
         return (boolean) Code.DUMP_STATES.setting.check();
+    }
+
+    public static int checkWindowedWidth() {
+        return (int) Code.WINDOWED_W.setting.check();
+    }
+
+    public static int checkWindowedHeight() {
+        return (int) Code.WINDOWED_H.setting.check();
     }
 
     public static int checkCheckerboardWPixels() {
@@ -300,6 +353,10 @@ public class Settings {
         return (SEFonts.Code) Code.PROGRAM_FONT.setting.check();
     }
 
+    public static Themes checkTheme() {
+        return (Themes) Code.THEME.setting.check();
+    }
+
     // getters
     public static boolean isFullscreenOnStartup() {
         return (boolean) Code.FULLSCREEN_ON_STARTUP.setting.get();
@@ -311,6 +368,14 @@ public class Settings {
 
     public static boolean isDumpStates() {
         return (boolean) Code.DUMP_STATES.setting.get();
+    }
+
+    public static int getWindowedWidth() {
+        return (int) Code.WINDOWED_W.setting.get();
+    }
+
+    public static int getWindowedHeight() {
+        return (int) Code.WINDOWED_H.setting.get();
     }
 
     public static int getCheckerboardWPixels() {
@@ -347,6 +412,10 @@ public class Settings {
 
     public static SEFonts.Code getProgramFont() {
         return (SEFonts.Code) Code.PROGRAM_FONT.setting.get();
+    }
+
+    public static Theme getTheme() {
+        return ((Themes) Code.THEME.setting.get()).get();
     }
 
     public static int getScrollClicks(

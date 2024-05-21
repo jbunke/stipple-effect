@@ -2,25 +2,28 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
-import com.jordanbunke.delta_time.menus.menu_elements.invisible.GatewayMenuElement;
-import com.jordanbunke.delta_time.utility.Coord2D;
-import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.DropdownMenu;
-import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class GradientTool extends ToolWithBreadth
@@ -103,7 +106,7 @@ public final class GradientTool extends ToolWithBreadth
         final GameImage frame = context.getState().getActiveLayerFrame();
 
         final Color maskColor = masked && anchorInBounds(w, h)
-                ? ImageProcessing.colorAtPixel(frame, anchor.x, anchor.y)
+                ? frame.getColorAt(anchor.x, anchor.y)
                 : null;
         accessible = maskColor != null ? search(frame, maskColor) : new HashSet<>();
     }
@@ -402,21 +405,21 @@ public final class GradientTool extends ToolWithBreadth
         // dithered label
         final TextLabel ditheredLabel = TextLabel.make(
                 new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
-                "Dithered", Constants.WHITE);
+                "Dithered");
 
         // dithered checkbox
         final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(ditheredLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> dithered, this::setDithered);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                () -> dithered, this::setDithered));
 
         // shape label
         final TextLabel shapeLabel = TextLabel.make(new Coord2D(
                         Layout.optionsBarNextElementX(ditheredCheckbox, true),
-                        Layout.optionsBarTextY()), "Shape", Constants.WHITE);
+                        Layout.optionsBarTextY()), "Shape");
 
         // shape dropdown
-        final DropdownMenu shapeDropdown = DropdownMenu.forToolOptionsBar(
+        final Dropdown shapeDropdown = Dropdown.forToolOptionsBar(
                 Layout.optionsBarNextElementX(shapeLabel, false),
                 EnumUtils.stream(Shape.class).map(EnumUtils::formattedName)
                         .toArray(String[]::new),
@@ -427,35 +430,35 @@ public final class GradientTool extends ToolWithBreadth
         // bounded label
         final TextLabel boundedLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(shapeDropdown, true),
-                Layout.optionsBarTextY()), "Bounded", Constants.WHITE);
+                Layout.optionsBarTextY()), "Bounded");
 
         // bounded checkbox
         final Checkbox boundedCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(boundedLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> bounded, this::setBounded);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                        () -> bounded, this::setBounded));
 
         // masked label
         final TextLabel maskedLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(boundedCheckbox, true),
-                Layout.optionsBarTextY()), "Mask", Constants.WHITE);
+                Layout.optionsBarTextY()), "Mask");
 
         // masked checkbox
         final Checkbox maskedCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(maskedLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> masked, this::setMasked);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                () -> masked, this::setMasked));
 
         // contiguous label
         final TextLabel contiguousLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(maskedCheckbox, true),
-                Layout.optionsBarTextY()), "Contiguous", Constants.WHITE);
+                Layout.optionsBarTextY()), "Contiguous");
 
         // contiguous checkbox
         final Checkbox contiguousCheckbox = new Checkbox(new Coord2D(
                 Layout.optionsBarNextElementX(contiguousLabel, false),
-                Layout.optionsBarButtonY()), MenuElement.Anchor.LEFT_TOP,
-                () -> contiguous, this::setContiguous);
+                Layout.optionsBarButtonY()), new ConcreteProperty<>(
+                () -> contiguous, this::setContiguous));
 
         // tolerance
         final TextLabel toleranceLabel = Layout.optionsBarNextSectionLabel(

@@ -1,20 +1,21 @@
 package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.button.SimpleMenuButton;
-import com.jordanbunke.delta_time.menus.menu_elements.invisible.ThinkingMenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
 
@@ -36,7 +37,7 @@ public class GraphicsUtils {
                     Constants.MISC_FOLDER.resolve("checkmark.png"));
 
     public static TextBuilder uiText() {
-        return uiText(Constants.WHITE);
+        return uiText(Settings.getTheme().textLight.get());
     }
 
     public static TextBuilder uiText(final Color color) {
@@ -49,21 +50,26 @@ public class GraphicsUtils {
     }
 
     public static Color buttonBorderColor(final boolean selected) {
-        return selected ? Constants.HIGHLIGHT_1 : Constants.BLACK;
+        return selected ? Settings.getTheme().highlightOutline.get()
+                : Settings.getTheme().buttonOutline.get();
     }
 
-    public static Color buttonBorderColorAlt(final boolean selected) {
-        return selected ? Constants.HIGHLIGHT_1 : Constants.WHITE;
+    public static GameImage drawScrollBoxBackground(
+            final int w, final int h
+    ) {
+        final GameImage background = new GameImage(w, h);
+        background.fillRectangle(
+                Settings.getTheme().scrollBackground.get(), 0, 0, w, h);
+        return background.submit();
     }
 
     public static GameImage drawCheckbox(
             final boolean isHighlighted, final boolean isChecked
     ) {
-        final Coord2D dims = Layout.ICON_DIMS;
-        final int w = dims.x, h = dims.y;
+        final int w = Layout.ICON_DIMS.width(), h = Layout.ICON_DIMS.height();
 
         final GameImage checkbox = new GameImage(w, h);
-        checkbox.fillRectangle(Constants.GREY, 0, 0, w, h);
+        checkbox.fillRectangle(Settings.getTheme().buttonBody.get(), 0, 0, w, h);
 
         if (isChecked)
             checkbox.draw(CHECKMARK);
@@ -76,11 +82,26 @@ public class GraphicsUtils {
                 : checkbox.submit();
     }
 
-    public static GameImage drawTextBox(
+    public static GameImage drawTextbox(
+            final Coord2D dimensions,
+            final String prefix, final String text, final String suffix,
+            final int cursorIndex, final int selectionIndex,
+            final boolean valid, final boolean highlighted, final boolean typing
+    ) {
+        final Theme t = Settings.getTheme();
+
+        final Color accent = typing ? t.highlightOutline.get() : t.buttonOutline.get(),
+                background = valid ? t.buttonBody.get() : t.invalid.get();
+
+        return drawTextbox(dimensions.x, prefix, text, suffix,
+                cursorIndex, selectionIndex, highlighted, accent, background);
+    }
+
+    public static GameImage drawTextbox(
             final int width,
             final String prefix, final String text, final String suffix,
             final int cursorIndex, final int selectionIndex,
-            final boolean isHighlighted, final Color accentColor,
+            final boolean highlighted, final Color accentColor,
             final Color backgroundColor
     ) {
         final Color mainTextC = textButtonColorFromBackgroundColor(
@@ -130,8 +151,8 @@ public class GraphicsUtils {
                 textPos = textPos.displace(2 * px, 0);
 
             nhi.draw(selImage, textPos.x, textPos.y);
-            nhi.fillRectangle(Constants.HIGHLIGHT_2, textPos.x - px, 0,
-                    selImage.getWidth() + (2 * px), height);
+            nhi.fillRectangle(Settings.getTheme().highlightOverlay.get(),
+                    textPos.x - px, 0, selImage.getWidth() + (2 * px), height);
             textPos = textPos.displace(selImage.getWidth() + px, 0);
         }
 
@@ -154,7 +175,7 @@ public class GraphicsUtils {
                 0, 0, width, height);
 
         // highlighting
-        if (isHighlighted)
+        if (highlighted)
             return drawHighlightedButton(nhi.submit());
         else
             return nhi.submit();
@@ -162,10 +183,10 @@ public class GraphicsUtils {
 
     public static GameImage drawDropDownButton(
             final int width, final String text,
-            final boolean isSelected, final Color backgroundColor
+            final boolean isSelected
     ) {
         final GameImage base = drawTextButton(width, text, isSelected,
-                backgroundColor, true, true);
+                Settings.getTheme().buttonBody.get(), true, true);
 
         final GameImage icon = GraphicsUtils.loadIcon(isSelected
                 ? IconCodes.COLLAPSE : IconCodes.EXPAND);
@@ -177,7 +198,7 @@ public class GraphicsUtils {
 
     public static GameImage drawTextButton(
             final int width, final String text,
-            final boolean isSelected, final Color backgroundColor,
+            final boolean selected, final Color backgroundColor,
             final boolean leftAligned, final boolean drawBorder
     ) {
         final Color textColor = textButtonColorFromBackgroundColor(
@@ -199,7 +220,7 @@ public class GraphicsUtils {
         nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
 
         if (drawBorder) {
-            final Color frame = GraphicsUtils.buttonBorderColor(isSelected);
+            final Color frame = GraphicsUtils.buttonBorderColor(selected);
             nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
         }
 
@@ -208,17 +229,25 @@ public class GraphicsUtils {
 
     public static GameImage drawTextButton(
             final int width, final String text,
-            final boolean isSelected, final Color backgroundColor
+            final boolean selected, final Color backgroundColor
     ) {
-        return drawTextButton(width, text, isSelected, backgroundColor, false, true);
+        return drawTextButton(width, text, selected,
+                backgroundColor, false, true);
+    }
+
+    public static GameImage drawTextButton(
+            final int width, final String text, final boolean selected
+    ) {
+        return drawTextButton(width, text, selected,
+                Settings.getTheme().buttonBody.get());
     }
 
     public static SimpleMenuButton makeStandardTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final GameImage base = drawTextButton(Layout.STD_TEXT_BUTTON_W,
-                text, false, Constants.GREY);
-        return new SimpleMenuButton(pos, new Coord2D(Layout.STD_TEXT_BUTTON_W,
+        final GameImage base =
+                drawTextButton(Layout.STD_TEXT_BUTTON_W, text, false);
+        return new SimpleMenuButton(pos, new Bounds2D(Layout.STD_TEXT_BUTTON_W,
                 Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
                 true, onClick, base, drawHighlightedButton(base));
     }
@@ -226,13 +255,12 @@ public class GraphicsUtils {
     public static SimpleMenuButton makeBespokeTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final int w = GraphicsUtils.uiText(Constants.BLACK)
+        final int w = GraphicsUtils.uiText(Settings.getTheme().textDark.get())
                 .addText(text).build().draw()
                 .getWidth() + Layout.CONTENT_BUFFER_PX;
 
-        final GameImage base = drawTextButton(w,
-                text, false, Constants.GREY);
-        return new SimpleMenuButton(pos, new Coord2D(w,
+        final GameImage base = drawTextButton(w, text, false);
+        return new SimpleMenuButton(pos, new Bounds2D(w,
                 Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
                 true, onClick, base, drawHighlightedButton(base));
     }
@@ -242,8 +270,10 @@ public class GraphicsUtils {
     ) {
         return (b.getRed() + b.getGreen() + b.getBlue()) / 3 >
                 Layout.COLOR_TEXTBOX_AVG_C_THRESHOLD
-                ? (main ? Constants.BLACK : Constants.BACKGROUND)
-                : (main ? Constants.WHITE : Constants.GREY);
+                ? (main ? Settings.getTheme().textDark.get()
+                    : Settings.getTheme().affixTextDark.get())
+                : (main ? Settings.getTheme().textLight.get()
+                    : Settings.getTheme().affixTextLight.get());
     }
 
     public static GameImage drawSelectedTextBox(
@@ -262,9 +292,9 @@ public class GraphicsUtils {
     ) {
         final GameImage hi = new GameImage(nhi);
         final int w = hi.getWidth(), h = hi.getHeight();
-        hi.fillRectangle(Constants.HIGHLIGHT_2, 0, 0, w, h);
-        hi.drawRectangle(Constants.BLACK, 2f * Layout.BUTTON_BORDER_PX,
-                0, 0, w, h);
+        hi.fillRectangle(Settings.getTheme().highlightOverlay.get(), 0, 0, w, h);
+        hi.drawRectangle(Settings.getTheme().buttonOutline.get(),
+                2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return hi.submit();
     }
@@ -281,8 +311,10 @@ public class GraphicsUtils {
                 .collect(Collectors.toSet());
         final int w = br.x - tl.x, h = br.y - tl.y;
 
-        return drawOverlay(w, h, z, adjusted, Constants.BLACK,
-                Constants.HIGHLIGHT_1, filled, canTransform);
+        return drawOverlay(w, h, z, adjusted,
+                Settings.getTheme().buttonOutline.get(),
+                Settings.getTheme().highlightOutline.get(),
+                filled, canTransform);
     }
 
     public static GameImage drawOverlay(
@@ -340,7 +372,7 @@ public class GraphicsUtils {
             );
 
             if (filled)
-                overlay.fillRectangle(Constants.OVERLAY_FILL_C,
+                overlay.fillRectangle(Settings.getTheme().selectionFill.get(),
                         o.x, o.y, zoomInc, zoomInc);
 
             if (leftFrontier) {
@@ -404,8 +436,7 @@ public class GraphicsUtils {
     ) {
         final IconButton icon = IconButton.make(iconID, position, behaviour);
         final StaticMenuElement stub = new StaticMenuElement(position,
-                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_TOP,
+                Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
                 greyscaleVersionOf(loadIcon(iconID)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
@@ -420,8 +451,7 @@ public class GraphicsUtils {
         final IconToggleButton icon = IconToggleButton.make(position,
                 codes, behaviours, updateIndexLogic, global);
         final StaticMenuElement stub = new StaticMenuElement(position,
-                new Coord2D(Layout.BUTTON_DIM, Layout.BUTTON_DIM),
-                MenuElement.Anchor.LEFT_TOP,
+                Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
                 greyscaleVersionOf(loadIcon(stubIconCode)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
@@ -433,7 +463,7 @@ public class GraphicsUtils {
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                final Color cWas = ImageProcessing.colorAtPixel(image, x, y);
+                final Color cWas = image.getColorAt(x, y);
                 final int rgbAvg = (cWas.getRed() + cWas.getGreen() + cWas.getBlue()) / 3;
                 final Color cIs = new Color(rgbAvg, rgbAvg, rgbAvg, cWas.getAlpha());
 

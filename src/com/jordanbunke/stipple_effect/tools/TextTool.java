@@ -7,19 +7,20 @@ import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.fonts.Font;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menus.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menus.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.Coord2D;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
-import com.jordanbunke.delta_time.utility.MathPlus;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 
 import java.awt.*;
@@ -247,8 +248,7 @@ public final class TextTool extends Tool {
     public void update(final SEContext context, final Coord2D mousePosition) {
         if (typing) {
             // emergency cancellation
-            if (DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
-                    .orElse(Boolean.FALSE) instanceof Boolean b && !b) {
+            if (!Permissions.isTyping()) {
                 setTyping(false);
                 return;
             }
@@ -279,7 +279,7 @@ public final class TextTool extends Tool {
         toolContentPreview.draw(textImage, getFormattedTextX(), textPos.y);
 
         final Color caretColor = StippleEffect.get().isTimerToggle()
-                ? Constants.WHITE : Constants.BLACK;
+                ? SEColors.white() : SEColors.black();
         final int caretX = getFormattedTextX() + textImage.getWidth();
         toolContentPreview.fillRectangle(caretColor, caretX, textPos.y,
                 Layout.TEXT_CARET_W * fontScale,
@@ -381,7 +381,7 @@ public final class TextTool extends Tool {
     public MenuElementGrouping buildToolOptionsBar() {
         // scale label
         final TextLabel scaleLabel = TextLabel.make(
-                getFirstOptionLabelPosition(), "Scale", Constants.WHITE);
+                getFirstOptionLabelPosition(), "Scale");
 
         final IncrementalRangeElements<Integer> scale =
                 IncrementalRangeElements.makeForInt(scaleLabel,
@@ -394,7 +394,7 @@ public final class TextTool extends Tool {
         // alignment label
         final TextLabel alignmentLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(scale.value, true),
-                Layout.optionsBarTextY()), "Alignment", Constants.WHITE);
+                Layout.optionsBarTextY()), "Alignment");
 
         // alignment toggle
         final IconToggleButton alignmentToggle = IconToggleButton.make(new Coord2D(
@@ -410,11 +410,10 @@ public final class TextTool extends Tool {
         // font label
         final TextLabel fontLabel = TextLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(alignmentToggle, true),
-                        Layout.optionsBarTextY()),
-                "Font", Constants.WHITE);
+                        Layout.optionsBarTextY()), "Font");
 
         // font dropdown
-        final DropdownMenu fontDropdown = DropdownMenu.forToolOptionsBar(
+        final Dropdown fontDropdown = Dropdown.forToolOptionsBar(
                 Layout.optionsBarNextElementX(fontLabel, false),
                 fonts.stream().map(TextToolFont::name).toArray(String[]::new),
                 fonts.stream().map(ttf -> (Runnable) () ->

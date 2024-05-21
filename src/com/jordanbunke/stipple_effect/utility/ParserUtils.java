@@ -5,7 +5,9 @@ import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,16 +17,17 @@ public class ParserUtils {
     public static final int CODE = 0, VALUE = 1, DESIRED = 2;
 
     public static GameImage generateStatusEffectText(final String message) {
-        final TextBuilder tb = GraphicsUtils.uiText(Constants.WHITE);
+        final Theme t = Settings.getTheme();
+        final TextBuilder tb = GraphicsUtils.uiText(t.textLight.get());
 
         final String[] segments = extractHighlight(message,
                 Constants.OPEN_COLOR, Constants.CLOSE_COLOR);
 
         for (int i = 0; i < segments.length; i++) {
             if (i % 2 == 0)
-                tb.setColor(Constants.WHITE);
+                tb.setColor(t.textLight.get());
             else {
-                tb.setColor(Constants.GREY);
+                tb.setColor(t.affixTextLight.get());
                 tb.addText("#");
                 tb.setColor(ParserSerializer.deserializeColor(segments[i]));
             }

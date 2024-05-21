@@ -38,6 +38,7 @@ public class IconCodes {
             MOVE_LAYER_UP = "move_layer_up",
             MOVE_LAYER_DOWN = "move_layer_down",
             MERGE_WITH_LAYER_BELOW = "merge_with_layer_below",
+            FLATTEN = "flatten",
             LAYER_ENABLED = "layer_enabled",
             LAYER_DISABLED = "layer_disabled",
             ONION_SKIN_NONE = "onion_skin_none",
@@ -49,6 +50,8 @@ public class IconCodes {
             LAYER_SETTINGS = "layer_settings",
             SWAP_COLORS = "swap_colors",
             COLOR_MENU_MODE = "color_menu_mode",
+            HSV_SHIFT = "hsv_shift",
+            COLOR_SCRIPT = "color_script",
             MOVE_LEFT_IN_PALETTE = "move_color_left_in_palette",
             MOVE_RIGHT_IN_PALETTE = "move_color_right_in_palette",
             NEW_PALETTE = "new_palette",
@@ -70,8 +73,12 @@ public class IconCodes {
             PIXEL_GRID_ON = "pixel_grid_on",
             NEW_FONT = "new_font",
             DELETE_FONT = "delete_font",
-            INCLUDED = "included",
-            EXCLUDED = "excluded",
+            AUTOMATION_SCRIPT = "automation_script",
+            IMPORT_SCRIPT = "import_script",
+            REMOVE_SCRIPT = "remove_script",
+            IMPORT_PREVIEW = "import_preview",
+            SELECTION_REPRESENTATION = "sel_rep",
+            NO_OUTLINE = "no_outline",
             SETTINGS = "settings",
             BULLET_POINT = "bullet_point",
             EXPAND = "expand",
@@ -86,11 +93,13 @@ public class IconCodes {
             PANEL_MANAGER = "panel_manager",
             INFO = "info";
 
-    public static final String NO_ICON_PREFIX = "__";
+    public static final String NO_ICON_PREFIX = "__", OUTLINE_PREFIX = "outline_";
 
     public static final String
+            ABOUT = NO_ICON_PREFIX + "about",
             CHANGELOG = NO_ICON_PREFIX + "changelog",
             ROADMAP = NO_ICON_PREFIX + "roadmap",
+            SCRIPTING = NO_ICON_PREFIX + "scripting",
             GENERAL = NO_ICON_PREFIX + "general",
             CLIPBOARD_SHORTCUTS = NO_ICON_PREFIX + "clipboard_shortcuts",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",
