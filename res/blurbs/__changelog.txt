@@ -1,3 +1,8 @@
+{0.4.1} - 2024-05-22
+
+Changed:
+> Running Stipple Effect on Windows will now read and write settings from %appdata%.
+
 {0.4.0} - The Scripting Update - 2024-05-21
 
 Added:
