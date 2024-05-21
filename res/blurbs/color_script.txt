@@ -1,0 +1,4 @@
+Shortcut: {Ctrl + Shift + W}
+
+Allows for the transformation of a scope of the project (whole project, layer, frame, etc.) via an
+uploaded color script. A color script must take a single color as a parameter and return a color.

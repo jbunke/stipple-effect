@@ -1,9 +1,14 @@
 package com.jordanbunke.stipple_effect.utility.math;
 
+import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
 
 import java.awt.*;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public class ColorMath {
@@ -12,6 +17,69 @@ public class ColorMath {
 
     public enum LastHSVEdit {
         HUE, SAT, VAL, NONE
+    }
+
+    public static GameImage algo(
+            final Function<Color, Color> internal,
+            final Map<Color, Color> map,
+            final GameImage source
+    ) {
+        return algo(internal, map, source, null);
+    }
+
+    public static GameImage algo(
+            final Function<Color, Color> internal,
+            final Map<Color, Color> map,
+            final GameImage source, final Set<Coord2D> pixels
+    ) {
+        final int w = source.getWidth(), h = source.getHeight();
+        final GameImage res = new GameImage(w, h);
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                final Color c = source.getColorAt(x, y);
+
+                if (c.getAlpha() == 0)
+                    continue;
+
+                final Color cp;
+
+                if (map.containsKey(c))
+                    cp = map.get(c);
+                else {
+                    cp = internal.apply(c);
+                    map.put(c, cp);
+                }
+
+                if (pixels != null && !pixels.contains(new Coord2D(x, y)))
+                    res.setRGB(x, y, c.getRGB());
+                else if (cp != null)
+                    res.setRGB(x, y, cp.getRGB());
+            }
+        }
+
+        return res.submit();
+    }
+
+    public static Color shiftHSV(final Color input) {
+        final double h = rgbToHue(input),
+                s = rgbToSat(input), v = rgbToValue(input);
+
+        final int shiftH = DialogVals.getHueShift();
+        final double shiftS = DialogVals.getSatShift(),
+                shiftV = DialogVals.getValueShift();
+
+        double nh = h + normalize(shiftH, Constants.HUE_SCALE);
+
+        if (nh < 0d)
+            nh += 1d;
+        else if (nh >= 1d)
+            nh -= 1d;
+
+        final double ns = MathPlus.bounded(0d, s * shiftS, 1d),
+                nv = MathPlus.bounded(0d, v * shiftV, 1d);
+
+        return fromHSV(nh, ns, nv, input.getAlpha());
     }
 
     public static void setLastHSVEdit(final LastHSVEdit lastHSVEdit, final Color c) {

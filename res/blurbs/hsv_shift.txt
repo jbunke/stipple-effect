@@ -1,0 +1,8 @@
+Shortcut: {Ctrl + Shift + H}
+
+Allows for the transformation of a scope of the project (whole project, layer, frame, etc.) by
+shifting the HSV color levels in the scope. These are:
+
+> Hue
+> Saturation
+> Value

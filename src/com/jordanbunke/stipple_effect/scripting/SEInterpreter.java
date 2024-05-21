@@ -41,6 +41,16 @@ public final class SEInterpreter extends Interpreter {
                 script.getReturnType() == null;
     }
 
+    public static boolean validateColorScript(final HeadFuncNode script) {
+        if (script == null)
+            return false;
+
+        final TypeNode COL_TYPE = TypeNode.getColor();
+
+        return script.paramsMatch(new TypeNode[] { COL_TYPE }) &&
+                script.getReturnType().equals(COL_TYPE);
+    }
+
     public static boolean validatePreviewScript(
             final HeadFuncNode script, final SEContext context
     ) {

@@ -1,8 +1,10 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
@@ -25,10 +27,12 @@ public class DialogVals {
             frameWidth = Constants.DEFAULT_CANVAS_W,
             frameHeight = Constants.DEFAULT_CANVAS_H,
             splitColumns = 1, splitRows = 1,
-            globalOutline = 0;
+            globalOutline = 0,
+            hueShift = 0;
     private static double
             layerOpacity = Constants.OPAQUE,
             resizeScale = 1d,
+            satShift = 1d, valueShift = 1d,
             resizeScaleX = resizeScale, resizeScaleY = resizeScale;
     private static boolean
             hasLatinEx = false,
@@ -36,7 +40,9 @@ public class DialogVals {
             truncateSplitX = true,
             truncateSplitY = true,
             resizePreserveAspectRatio = false,
-            sortPaletteBackwards = false;
+            sortPaletteBackwards = false,
+            includeDisabledLayers = false,
+            colorScriptValid = false;
     private static int[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -56,6 +62,8 @@ public class DialogVals {
             asciiImage = null,
             latinExImage = null,
             fontPreviewImage = GameImage.dummy();
+
+    private static HeadFuncNode colorScript = null;
 
     public enum ResizeBy {
         PIXELS, SCALE_FACTOR;
@@ -141,6 +149,10 @@ public class DialogVals {
     public enum Scope {
         SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
 
+        public boolean considersLayers() {
+            return this == FRAME || this == PROJECT;
+        }
+
         @Override
         public String toString() {
             if (this == LAYER_FRAME)
@@ -148,6 +160,12 @@ public class DialogVals {
 
             return EnumUtils.formattedName(this);
         }
+    }
+
+    public static void setColorScript(final HeadFuncNode colorScript) {
+        DialogVals.colorScript = colorScript;
+        DialogVals.colorScriptValid = SEInterpreter
+                .validateColorScript(DialogVals.colorScript);
     }
 
     public static void setPaletteFolder(final Path paletteFolder) {
@@ -207,6 +225,18 @@ public class DialogVals {
 
     public static void setResizeScaleY(final double resizeScaleY) {
         DialogVals.resizeScaleY = resizeScaleY;
+    }
+
+    public static void setHueShift(final int hueShift) {
+        DialogVals.hueShift = hueShift;
+    }
+
+    public static void setSatShift(final double satShift) {
+        DialogVals.satShift = satShift;
+    }
+
+    public static void setValueShift(final double valueShift) {
+        DialogVals.valueShift = valueShift;
     }
 
     public static void setNewProjectHeight(final int newProjectHeight) {
@@ -381,6 +411,10 @@ public class DialogVals {
         setFrameHeight(canvasHeight / splitRows, canvasHeight);
     }
 
+    public static void setIncludeDisabledLayers(final boolean includeDisabledLayers) {
+        DialogVals.includeDisabledLayers = includeDisabledLayers;
+    }
+
     public static void setResizePreserveAspectRatio(
             final boolean resizePreserveAspectRatio
     ) {
@@ -490,6 +524,23 @@ public class DialogVals {
         DialogVals.resizeBy = resizeBy;
     }
 
+    public static String colorScriptMessage() {
+        if (isColorScriptValid())
+            return "Validated color script";
+        else if (colorScript == null)
+            return "Nothing uploaded / failed to read";
+        else
+            return "Not a valid color script";
+    }
+
+    public static boolean isColorScriptValid() {
+        return colorScriptValid;
+    }
+
+    public static HeadFuncNode getColorScript() {
+        return colorScript;
+    }
+
     public static Path getPaletteFolder() {
         return paletteFolder;
     }
@@ -508,6 +559,18 @@ public class DialogVals {
 
     public static Scope getScope() {
         return scope;
+    }
+
+    public static int getHueShift() {
+        return hueShift;
+    }
+
+    public static double getSatShift() {
+        return satShift;
+    }
+
+    public static double getValueShift() {
+        return valueShift;
     }
 
     public static int getImportFrameHeight() {
@@ -614,6 +677,10 @@ public class DialogVals {
 
     public static boolean isCharSpecificSpacing() {
         return charSpecificSpacing;
+    }
+
+    public static boolean isIncludeDisabledLayers() {
+        return includeDisabledLayers;
     }
 
     public static String getFontName() {

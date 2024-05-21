@@ -16,6 +16,7 @@ import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.Menu;
+import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.Version;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
@@ -417,6 +418,12 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
                     this::stitchOrSplit);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToColorScript);
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToHSVShift);
         } else if (eventLogger.isPressed(Key.CTRL)) {
             // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
@@ -1021,6 +1028,27 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void openAutomationScript() {
+        final Path filepath = openScript();
+
+        if (filepath == null)
+            return;
+
+        final String content = FileIO.readFile(filepath);
+        SEInterpreter.get().runAutomationScript(content);
+    }
+
+    public void openColorScript() {
+        final Path filepath = openScript();
+
+        if (filepath == null)
+            return;
+
+        final HeadFuncNode script =
+                SEInterpreter.get().build(FileIO.readFile(filepath));
+        DialogVals.setColorScript(script);
+    }
+
+    public Path openScript() {
         FileIO.setDialogToFilesOnly();
         final Optional<File> opened = FileIO.openFileFromSystem(
                 new String[] {
@@ -1033,12 +1061,9 @@ public class StippleEffect implements ProgramContext {
         window.getEventLogger().unpressAllKeys();
 
         if (opened.isEmpty())
-            return;
+            return null;
 
-        final Path filepath = opened.get().toPath();
-        final String content = FileIO.readFile(filepath);
-
-        SEInterpreter.get().runAutomationScript(content);
+        return opened.get().toPath();
     }
 
     private void verifyFilepath(final Path filepath) {

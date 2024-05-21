@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.project;
 import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
+import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
@@ -10,12 +11,14 @@ import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
+import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -1028,6 +1031,9 @@ public class SEContext {
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
+        final boolean includeDisabledLayers =
+                DialogVals.isIncludeDisabledLayers();
+
         switch (scope) {
             case SELECTION -> extractColorsFromSelection(colors);
             case LAYER_FRAME -> extractColorsFromFrame(colors, state,
@@ -1043,7 +1049,9 @@ public class SEContext {
                 final int layerCount = state.getLayers().size();
 
                 for (int i = 0; i < layerCount; i++)
-                    extractColorsFromFrame(colors, state,
+                    if (includeDisabledLayers ||
+                            state.getLayers().get(i).isEnabled())
+                        extractColorsFromFrame(colors, state,
                             state.getFrameIndex(), i);
             }
             case PROJECT -> {
@@ -1052,7 +1060,9 @@ public class SEContext {
 
                 for (int f = 0; f < frameCount; f++)
                     for (int l = 0; l < layerCount; l++)
-                        extractColorsFromFrame(colors, state, f, l);
+                        if (includeDisabledLayers ||
+                                state.getLayers().get(l).isEnabled())
+                            extractColorsFromFrame(colors, state, f, l);
             }
         }
 
@@ -1094,68 +1104,109 @@ public class SEContext {
         }
     }
 
-    // state changes - process all actions here and feed through state manager
+    // rpeviewed state changes - not state changes in and of themselves
 
-    // palettize
-    public void palettize(final Palette palette) {
+    public ProjectState prepHSVShift() {
+        final ProjectState state = getState();
+
+        final boolean dropAndRaise = state.hasSelection() &&
+                state.getSelectionMode() == SelectionMode.CONTENTS;
+
+        if (dropAndRaise)
+            dropContentsToLayer(false, false);
+
+        return runColorAlgorithm(ColorMath::shiftHSV);
+    }
+
+    public ProjectState prepColorScript(final HeadFuncNode script) {
+        final ProjectState state = getState();
+
+        final boolean dropAndRaise = state.hasSelection() &&
+                state.getSelectionMode() == SelectionMode.CONTENTS;
+
+        if (dropAndRaise)
+            dropContentsToLayer(false, false);
+
+        return runColorAlgorithm(c ->
+                (Color) SEInterpreter.get().run(script, c));
+    }
+
+    // color algorithm auxiliaries
+    public ProjectState runColorAlgorithm(
+            final Function<Color, Color> internal
+    ) {
         final DialogVals.Scope scope = DialogVals.getScope();
         ProjectState state = getState();
 
-        switch (scope) {
-            case SELECTION -> palettizeSelection(palette);
-            case LAYER_FRAME -> state = palettizeFrame(palette, state,
+        final boolean includeDisabledLayers =
+                DialogVals.isIncludeDisabledLayers();
+
+        final Map<Color, Color> map = new HashMap<>();
+
+        return switch (scope) {
+            case SELECTION -> runCAOnSelection(internal, map);
+            case LAYER_FRAME -> runCAOnFrame(internal, map, state,
                     state.getFrameIndex(), state.getLayerEditIndex());
             case LAYER -> {
                 if (state.getEditingLayer().areFramesLinked()) {
-                    state = palettizeFrame(palette, state,
+                    yield runCAOnFrame(internal, map, state,
                             state.getFrameIndex(),
                             state.getLayerEditIndex());
                 } else {
                     final int frameCount = state.getFrameCount();
 
                     for (int i = 0; i < frameCount; i++)
-                        state = palettizeFrame(palette, state,
+                        state = runCAOnFrame(internal, map, state,
                                 i, state.getLayerEditIndex());
+
+                    yield state;
                 }
             }
             case FRAME -> {
                 final int layerCount = state.getLayers().size();
 
                 for (int i = 0; i < layerCount; i++)
-                    state = palettizeFrame(palette, state,
-                            state.getFrameIndex(), i);
+                    if (includeDisabledLayers ||
+                            state.getLayers().get(i).isEnabled())
+                        state = runCAOnFrame(internal, map, state,
+                                state.getFrameIndex(), i);
+
+                yield state;
             }
             case PROJECT -> {
                 final int frameCount = state.getFrameCount(),
                         layerCount = state.getLayers().size();
 
                 for (int l = 0; l < layerCount; l++) {
+                    if (!(includeDisabledLayers ||
+                            state.getLayers().get(l).isEnabled()))
+                        continue;
+
                     if (state.getLayers().get(l).areFramesLinked()) {
-                        state = palettizeFrame(palette, state,
+                        state = runCAOnFrame(internal, map, state,
                                 state.getFrameIndex(), l);
                     } else {
                         for (int f = 0; f < frameCount; f++)
-                            state = palettizeFrame(palette, state, f, l);
+                            state = runCAOnFrame(internal, map, state, f, l);
                     }
                 }
-            }
-        }
 
-        if (scope != DialogVals.Scope.SELECTION) {
-            state.markAsCheckpoint(false);
-            stateManager.performAction(state, Operation.PALETTIZE);
-        }
+                yield state;
+            }
+        };
     }
 
-    private ProjectState palettizeFrame(
-            final Palette palette, final ProjectState state,
+    private ProjectState runCAOnFrame(
+            final Function<Color, Color> internal,
+            final Map<Color, Color> map,
+            final ProjectState state,
             final int frameIndex, final int layerIndex
     ) {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
         final GameImage source = layer.getFrame(frameIndex),
-                edit = palette.palettize(source);
+                edit = ColorMath.algo(internal, map, source);
 
         final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
         layers.set(layerIndex, replacement);
@@ -1163,7 +1214,10 @@ public class SEContext {
         return state.changeLayers(layers).changeIsCheckpoint(false);
     }
 
-    private void palettizeSelection(final Palette palette) {
+    private ProjectState runCAOnSelection(
+            final Function<Color, Color> internal,
+            final Map<Color, Color> map
+    ) {
         if (getState().hasSelection()) {
             final boolean dropAndRaise = getState().getSelectionMode() ==
                     SelectionMode.CONTENTS;
@@ -1178,19 +1232,36 @@ public class SEContext {
             final int frameIndex = getState().getFrameIndex();
 
             final GameImage source = layer.getFrame(frameIndex),
-                    edit = palette.palettize(source, selection);
+                    edit = ColorMath.algo(internal, map, source, selection);
 
             final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
             layers.set(getState().getLayerEditIndex(), replacement);
 
-            final ProjectState result = getState().changeLayers(layers);
-            stateManager.performAction(result, Operation.PALETTIZE);
+            return getState().changeLayers(layers);
+        } else
+            return getState();
+    }
 
-            if (dropAndRaise)
-                raiseSelectionToContents(true);
-            else
-                getState().markAsCheckpoint(true);
-        }
+    // state changes - process all actions here and feed through state manager
+
+    // palettize
+    public void palettize(final Palette palette) {
+        final ProjectState state = getState();
+
+        final boolean dropAndRaise = state.hasSelection() &&
+                state.getSelectionMode() == SelectionMode.CONTENTS;
+
+        if (dropAndRaise)
+            dropContentsToLayer(false, false);
+
+        final ProjectState res = runColorAlgorithm(palette::palettize);
+
+        stateManager.performAction(res, Operation.PALETTIZE);
+
+        if (dropAndRaise)
+            raiseSelectionToContents(true);
+        else
+            getState().markAsCheckpoint(true);
     }
 
     // SELECTION
