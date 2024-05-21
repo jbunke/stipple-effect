@@ -883,8 +883,7 @@ public class DialogAssembly {
                 return new StaticMenuElement(
                         getDialogLeftContentPositionForRow(previewRow),
                         MenuElement.Anchor.LEFT_TOP,
-                        DialogVals.getFontPreviewImage()
-                );
+                        DialogVals.getFontPreviewImage());
             else
                 return new PlaceholderMenuElement();
         });
@@ -1127,8 +1126,6 @@ public class DialogAssembly {
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
-    // TODO: Color action dialogs
-
     public static void setDialogToHSVShift() {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
@@ -1136,7 +1133,7 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel hueLabel = makeDialogLeftLabel(3, "Shift hue:"),
-                satLabel = makeDialogLeftLabel(4, "Shift saturation:"),
+                satLabel = makeDialogLeftLabel(4, "Shift sat.:"),
                 valueLabel = makeDialogLeftLabel(5, "Shift value:");
 
         final IncrementalRangeElements<Integer> h =
@@ -1148,6 +1145,133 @@ public class DialogAssembly {
                         i -> i, i -> i, String::valueOf, "-XXX");
         mb.addAll(hueLabel, h.decButton, h.incButton, h.slider, h.value);
 
+        final double MIN = Constants.MIN_SV_SHIFT, MAX = Constants.MAX_SV_SHIFT;
+        final int STEPS = 5;
+        final double[] bounds = new double[] { MIN, 1d, 2d, 5d, 10d, MAX },
+                increments = new double[] { 0.05, 0.1, 0.25, 0.5, 2.5 };
+
+        final int[] valuesPerSlice = new int[STEPS], sums = new int[STEPS];
+
+        for (int i = 0; i < STEPS; i++) {
+            valuesPerSlice[i] =
+                    sliceValues(bounds[i], bounds[i + 1], increments[i]);
+
+            sums[i] = i == 0
+                    ? valuesPerSlice[i]
+                    : sums[i - 1] + valuesPerSlice[i];
+        }
+
+        final Runnable satDecrement = () -> {
+            final double was = DialogVals.getSatShift();
+
+            for (int i = 0; i < STEPS; i++)
+                if (was <= bounds[i + 1]) {
+                    DialogVals.setSatShift(Math.max(was - increments[i], MIN));
+                    break;
+                }
+        }, satIncrement = () -> {
+            final double was = DialogVals.getSatShift();
+
+            for (int i = 0; i < STEPS; i++)
+                if (was < bounds[i + 1]) {
+                    DialogVals.setSatShift(Math.min(was + increments[i], MAX));
+                    break;
+                }
+        }, valueDecrement = () -> {
+            final double was = DialogVals.getValueShift();
+
+            for (int i = 0; i < STEPS; i++)
+                if (was <= bounds[i + 1]) {
+                    DialogVals.setValueShift(
+                            Math.max(was - increments[i], MIN));
+                    break;
+                }
+        }, valueIncrement = () -> {
+            final double was = DialogVals.getValueShift();
+
+            for (int i = 0; i < STEPS; i++)
+                if (was < bounds[i + 1]) {
+                    DialogVals.setValueShift(
+                            Math.min(was + increments[i], MAX));
+                    break;
+                }
+        };
+
+        final Function<Double, Integer> svfToSlider = d -> {
+            for (int step = 0; step < STEPS; step++) {
+                final double lb = bounds[step],
+                        ub = bounds[step + 1],
+                        inc = increments[step];
+
+                if (d <= ub) {
+                    final int prevSliceVs = step == 0 ? 0 : sums[step - 1],
+                            inSlice = (int) ((d - lb) / inc);
+
+                    return prevSliceVs + inSlice;
+                }
+            }
+
+            // should never reach
+            return 0;
+        };
+
+        final Function<Integer, Double> svfFromSlider = i -> {
+            for (int step = 0; step < STEPS; step++) {
+                final int sum = sums[step];
+
+                if (i <= sum) {
+                    final double lb = bounds[step],
+                            inc = increments[step];
+
+                    final int lowerSum = step == 0 ? 0 : sums[step - 1];
+
+                    return lb + (inc * (i - lowerSum));
+                }
+            }
+
+            // should never reach
+            return 1d;
+        };
+
+        Function<Double, String> svfFormat = d -> {
+            final int _20x = (int) Math.round(d * 20);
+
+            return "x" + (_20x / 20d);
+        };
+
+        final IncrementalRangeElements<Double> s =
+                IncrementalRangeElements.makeForDouble(satLabel,
+                        satLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        satLabel.getY(), satDecrement, satIncrement,
+                        Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                        DialogVals::setSatShift, DialogVals::getSatShift,
+                        svfToSlider, svfFromSlider, svfFormat,
+                        "x" + "X".repeat(20));
+        mb.addAll(satLabel, s.decButton, s.incButton, s.slider, s.value);
+
+        final IncrementalRangeElements<Double> v =
+                IncrementalRangeElements.makeForDouble(valueLabel,
+                        valueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        valueLabel.getY(), valueDecrement, valueIncrement,
+                        Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                        DialogVals::setValueShift, DialogVals::getValueShift,
+                        svfToSlider, svfFromSlider, svfFormat,
+                        "x" + "X".repeat(20));
+        mb.addAll(valueLabel, v.decButton, v.incButton, v.slider, v.value);
+
+        final SimpleMenuButton resetHue =
+                GraphicsUtils.makeStandardTextButton("Reset",
+                        getDialogRightContentPositionForRow(3),
+                        () -> DialogVals.setHueShift(0)),
+                resetSat = GraphicsUtils.makeStandardTextButton("Reset",
+                        getDialogRightContentPositionForRow(4),
+                        () -> DialogVals.setSatShift(1d)),
+                resetValue = GraphicsUtils.makeStandardTextButton("Reset",
+                        getDialogRightContentPositionForRow(5),
+                        () -> DialogVals.setValueShift(1d));
+
+        mb.addAll(resetHue, resetSat, resetValue);
+
         setDialog(assembleDialog("Shift color levels...",
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 () -> true, "Preview",
@@ -1156,8 +1280,37 @@ public class DialogAssembly {
                         "shifted color levels"), false));
     }
 
+    private static int sliceValues(
+            final double lowerBound, final double upperBound,
+            final double increment
+    ) {
+        return (int) ((upperBound - lowerBound) / increment);
+    }
+
     public static void setDialogToColorScript() {
-        // TODO
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+
+        makeCommonColorOperationElements(mb, c);
+
+        final TextLabel scriptLabel = makeDialogLeftLabel(
+                3, "Script file:");
+        final SimpleMenuButton scriptButton =
+                GraphicsUtils.makeStandardTextButton("Upload",
+                        getDialogContentOffsetFollowingLabel(scriptLabel),
+                        StippleEffect.get()::openColorScript);
+        final DynamicLabel scriptConfirmation = makeDynamicLabel(
+                getDialogRightContentPositionForRow(3),
+                DialogVals::colorScriptMessage, "X".repeat(50));
+        mb.addAll(scriptLabel, scriptButton, scriptConfirmation);
+
+        setDialog(assembleDialog("Run a color script...",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                DialogVals::isColorScriptValid, "Preview",
+                () -> DialogAssembly.setDialogToPreviewAction(
+                        c.prepColorScript(DialogVals.getColorScript()),
+                        DialogAssembly::setDialogToColorScript,
+                        "executed color script"), false));
     }
 
     private static void setDialogToPreviewAction(
@@ -1179,13 +1332,14 @@ public class DialogAssembly {
 
         final int pw, ph, MIN = 1,
                 maxW = Layout.getDialogWidth() - (4 * Layout.CONTENT_BUFFER_PX),
-                maxH = Layout.getDialogHeight() / 2;
+                maxH = (int) (Layout.getDialogHeight() * (2/3d));
 
         if (w < maxW && h < maxH) {
-            final int timesFits = Math.min(maxW / w, maxH / h);
+            final double timesFits = Math.min(
+                    maxW / (double) w, maxH / (double) h);
 
-            pw = w * timesFits;
-            ph = h * timesFits;
+            pw = (int) (w * timesFits);
+            ph = (int) (h * timesFits);
         } else if (w < maxW) {
             ph = maxH;
             pw = Math.max(MIN, (int) (w * (ph / (double) h)));
@@ -1513,13 +1667,18 @@ public class DialogAssembly {
     private static void makeCommonColorOperationElements(
             final MenuBuilder mb, final SEContext c
     ) {
-        final DialogVals.Scope[] vs =
+        final List<DialogVals.Scope> vs =
                 Arrays.stream(DialogVals.Scope.values())
                         .filter(s -> s != DialogVals.Scope.SELECTION ||
-                                c.getState().hasSelection())
-                        .toArray(DialogVals.Scope[]::new);
+                                c.getState().hasSelection()).toList();
 
-        DialogVals.setScope(vs[0]);
+        final DialogVals.Scope was = DialogVals.getScope();
+        final boolean hasScope = vs.contains(was);
+
+        if (!hasScope)
+            DialogVals.setScope(vs.get(0));
+
+        final int initialIndex = vs.indexOf(DialogVals.getScope());
 
         final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope:"),
                 flagLabel = TextLabel.make(textBelowPos(scopeLabel),
@@ -1527,13 +1686,11 @@ public class DialogAssembly {
         final Dropdown dropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(scopeLabel),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
-                Arrays.stream(vs)
-                        .map(DialogVals.Scope::toString)
+                vs.stream().map(DialogVals.Scope::toString)
                         .toArray(String[]::new),
-                Arrays.stream(vs)
-                        .map(s -> (Runnable) () -> DialogVals.setScope(s))
+                vs.stream().map(s -> (Runnable) () -> DialogVals.setScope(s))
                         .toArray(Runnable[]::new),
-                () -> 0);
+                () -> initialIndex);
         final Checkbox checkbox = new Checkbox(
                 getDialogContentOffsetFollowingLabel(flagLabel),
                 new ConcreteProperty<>(DialogVals::isIncludeDisabledLayers,

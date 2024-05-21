@@ -53,7 +53,7 @@ public class ColorMath {
 
                 if (pixels != null && !pixels.contains(new Coord2D(x, y)))
                     res.setRGB(x, y, c.getRGB());
-                else
+                else if (cp != null)
                     res.setRGB(x, y, cp.getRGB());
             }
         }
@@ -61,19 +61,25 @@ public class ColorMath {
         return res.submit();
     }
 
-    public static Color shiftHue(final Color input) {
+    public static Color shiftHSV(final Color input) {
         final double h = rgbToHue(input),
                 s = rgbToSat(input), v = rgbToValue(input);
 
-        final int shift = DialogVals.getHueShift();
-        double nh = h + normalize(shift, Constants.HUE_SCALE);
+        final int shiftH = DialogVals.getHueShift();
+        final double shiftS = DialogVals.getSatShift(),
+                shiftV = DialogVals.getValueShift();
+
+        double nh = h + normalize(shiftH, Constants.HUE_SCALE);
 
         if (nh < 0d)
             nh += 1d;
         else if (nh >= 1d)
             nh -= 1d;
 
-        return fromHSV(nh, s, v, input.getAlpha());
+        final double ns = MathPlus.bounded(0d, s * shiftS, 1d),
+                nv = MathPlus.bounded(0d, v * shiftV, 1d);
+
+        return fromHSV(nh, ns, nv, input.getAlpha());
     }
 
     public static void setLastHSVEdit(final LastHSVEdit lastHSVEdit, final Color c) {

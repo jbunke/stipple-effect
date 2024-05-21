@@ -1,8 +1,10 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
@@ -26,10 +28,11 @@ public class DialogVals {
             frameHeight = Constants.DEFAULT_CANVAS_H,
             splitColumns = 1, splitRows = 1,
             globalOutline = 0,
-            hueShift = 0, satShift = 0, valueShift = 0;
+            hueShift = 0;
     private static double
             layerOpacity = Constants.OPAQUE,
             resizeScale = 1d,
+            satShift = 1d, valueShift = 1d,
             resizeScaleX = resizeScale, resizeScaleY = resizeScale;
     private static boolean
             hasLatinEx = false,
@@ -38,7 +41,8 @@ public class DialogVals {
             truncateSplitY = true,
             resizePreserveAspectRatio = false,
             sortPaletteBackwards = false,
-            includeDisabledLayers = false;
+            includeDisabledLayers = false,
+            colorScriptValid = false;
     private static int[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -58,6 +62,8 @@ public class DialogVals {
             asciiImage = null,
             latinExImage = null,
             fontPreviewImage = GameImage.dummy();
+
+    private static HeadFuncNode colorScript = null;
 
     public enum ResizeBy {
         PIXELS, SCALE_FACTOR;
@@ -156,6 +162,12 @@ public class DialogVals {
         }
     }
 
+    public static void setColorScript(final HeadFuncNode colorScript) {
+        DialogVals.colorScript = colorScript;
+        DialogVals.colorScriptValid = SEInterpreter
+                .validateColorScript(DialogVals.colorScript);
+    }
+
     public static void setPaletteFolder(final Path paletteFolder) {
         DialogVals.paletteFolder = paletteFolder;
     }
@@ -219,11 +231,11 @@ public class DialogVals {
         DialogVals.hueShift = hueShift;
     }
 
-    public static void setSatShift(final int satShift) {
+    public static void setSatShift(final double satShift) {
         DialogVals.satShift = satShift;
     }
 
-    public static void setValueShift(final int valueShift) {
+    public static void setValueShift(final double valueShift) {
         DialogVals.valueShift = valueShift;
     }
 
@@ -512,6 +524,23 @@ public class DialogVals {
         DialogVals.resizeBy = resizeBy;
     }
 
+    public static String colorScriptMessage() {
+        if (isColorScriptValid())
+            return "Validated color script";
+        else if (colorScript == null)
+            return "Nothing uploaded / failed to read";
+        else
+            return "Not a valid color script";
+    }
+
+    public static boolean isColorScriptValid() {
+        return colorScriptValid;
+    }
+
+    public static HeadFuncNode getColorScript() {
+        return colorScript;
+    }
+
     public static Path getPaletteFolder() {
         return paletteFolder;
     }
@@ -536,11 +565,11 @@ public class DialogVals {
         return hueShift;
     }
 
-    public static int getSatShift() {
+    public static double getSatShift() {
         return satShift;
     }
 
-    public static int getValueShift() {
+    public static double getValueShift() {
         return valueShift;
     }
 

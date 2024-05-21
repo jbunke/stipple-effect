@@ -36,17 +36,15 @@ import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.PreviewHousingBox;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -461,23 +459,14 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private void openPreviewScript() {
-        FileIO.setDialogToFilesOnly();
-        final Optional<File> opened = FileIO.openFileFromSystem(
-                new String[] {
-                        StippleEffect.PROGRAM_NAME + " scripts (." +
-                                Constants.SCRIPT_FILE_SUFFIX + ")"
-                },
-                new String[][] {
-                        new String[] { Constants.SCRIPT_FILE_SUFFIX }
-                });
+        final Path filepath = StippleEffect.get().openScript();
         window.getEventLogger().unpressAllKeys();
-        StippleEffect.get().window.getEventLogger().unpressAllKeys();
 
-        if (opened.isEmpty())
+        if (filepath == null)
             return;
 
-        final Path filepath = opened.get().toPath();
-        final HeadFuncNode script = SEInterpreter.get().build(FileIO.readFile(filepath));
+        final HeadFuncNode script =
+                SEInterpreter.get().build(FileIO.readFile(filepath));
 
         if (SEInterpreter.validatePreviewScript(script, context))
             setScript(script);
