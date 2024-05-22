@@ -5,6 +5,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.OSUtils;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.settings.types.BooleanSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.EnumSettingType;
@@ -18,7 +19,7 @@ import com.jordanbunke.stipple_effect.visual.theme.Themes;
 import java.nio.file.Path;
 
 public class Settings {
-    private static final Path SETTINGS_FILE = Path.of("data", ".settings");
+    private static final Path SETTINGS_FILE;
 
     public enum Code {
         // boolean settings
@@ -130,6 +131,17 @@ public class Settings {
         private void read(final String value) {
             setting.setFromRead(value);
         }
+    }
+
+    static {
+        final Path internal = Path.of("data", ".settings"),
+                medial = Path.of(StippleEffect.PROGRAM_NAME).resolve(internal);
+
+        if (OSUtils.isWindows()) {
+            final String appData = System.getenv("APPDATA");
+            SETTINGS_FILE = Path.of(appData).resolve(medial);
+        } else
+            SETTINGS_FILE = internal;
     }
 
     public static void read() {

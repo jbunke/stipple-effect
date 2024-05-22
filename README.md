@@ -13,37 +13,37 @@ SE was made by a solo indie game developer with the needs and skill sets of othe
 <div align="center">A custom preview in action... one of many applications of scripting</div>
 
 ## Features
-* Projects consist of layers and frames
-  * [Linked and unlinked layers](https://i.imgur.com/kGmxS0q.gif)
-* Two-color system: Stipple Effect's brush, pencil, and gradient tool allow for interesting combinations of the primary and secondary colors
-  * Dither mode
-  * Blend mode
-  * Noise mode
+* Symbiotic relationship between layers and frames
+    * [Linked and unlinked layers](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/linked-layers.gif)
+* [Two-color system: Stipple Effect's brush, pencil, and gradient tool allow for interesting combinations of the primary and secondary colors](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/combination-modes.gif)
+    * Dither mode
+    * Blend mode
+    * Noise mode
 * State management
-  * [Granular undo and redo](https://i.imgur.com/0v1a0na.gif)
+    * [Granular undo and redo](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/granular-undo-redo.gif)
 * Animation playback
-  * [Onion skinning](https://i.imgur.com/FuhTIir.gif)
-  * [Edit during playback](https://i.imgur.com/pNjlHng.gif)
-* Split/stitch
-  * [Split a project into frames](https://i.imgur.com/nzGI6z7.gif)
-  * Stitch frames together into a sprite sheet
+    * [Onion skinning](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/onion-skin.gif)
+    * Edit during playback
+* [Split/stitch](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/split-stitch.gif)
+    * Split a project into frames
+    * Stitch frames together into a sprite sheet
 * Palettes
-  * Import and export palettes
-  * Palette colors can be sorted and manually rearranged
-  * [Palettization](https://i.imgur.com/j3W1fd9.gif)
-  * Extract colors in a project to a palette
+    * Import and export palettes
+    * [Palettization](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/palettization.gif)
+    * [Extract colors in a project to a palette](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/extract-colors.gif)
 * Selection
-  * [Family of selection tools designed for pixel-perfect selection](https://i.imgur.com/U0qONz3.gif)
-  * [Intuitive and powerful outlining utilities](https://i.imgur.com/Fp48y2v.gif)
-* Pixel grid
-  * Easily enable/disable and modify the size of the pixel grid cells
-  * The box select tool can snap to the grid
+    * [Family of selection tools designed for pixel-perfect selection](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/selection-tools.gif)
+    * [Intuitive and powerful outlining utilities](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/outline.gif)
+* [Pixel grid](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/pixel-grid.gif)
+    * Easily enable/disable and modify the size of the pixel grid cells
+    * The box select tool can snap to the grid
 * And much more!
 
 ## Scripting
 _Stipple Effect_ supports scripting for three different use cases: **automation**, **custom previews** and **color transformation**. It is highly recommended for users that want to get the most out of the program to read the API and familiarize themselves with its potential applications.
 * [Scripting overview](https://github.com/jbunke/stipple-effect/wiki/Scripting)
 * [API](https://github.com/jbunke/stipple-effect/wiki/Scripting-API)
+* [Example scripts](https://github.com/jbunke/se-script-examples)
 
 ## External Dependencies
 * [Delta Time](https://github.com/jbunke/delta-time) - my lightweight graphics library that handles GUI and execution loop boilerplate
