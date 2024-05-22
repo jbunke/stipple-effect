@@ -13,31 +13,30 @@ SE was made by a solo indie game developer with the needs and skill sets of othe
 <div align="center">A custom preview in action... one of many applications of scripting</div>
 
 ## Features
-* Projects consist of layers and frames
-    * [Linked and unlinked layers](TODO)
-* Two-color system: Stipple Effect's brush, pencil, and gradient tool allow for interesting combinations of the primary and secondary colors
-    * [Dither mode](TODO)
-    * [Blend mode](TODO)
-    * [Noise mode](TODO)
+* Symbiotic relationship between layers and frames
+    * [Linked and unlinked layers](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/linked-layers.gif)
+* [Two-color system: Stipple Effect's brush, pencil, and gradient tool allow for interesting combinations of the primary and secondary colors](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/combination-modes.gif)
+    * Dither mode
+    * Blend mode
+    * Noise mode
 * State management
-    * [Granular undo and redo](TODO)
+    * [Granular undo and redo](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/granular-undo-redo.gif)
 * Animation playback
-    * [Onion skinning](TODO)
+    * [Onion skinning](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/onion-skin.gif)
     * Edit during playback
-* Split/stitch
-    * [Split a project into frames](TODO)
-    * [Stitch frames together into a sprite sheet](TODO)
+* [Split/stitch](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/split-stitch.gif)
+    * Split a project into frames
+    * Stitch frames together into a sprite sheet
 * Palettes
     * Import and export palettes
-    * [Palette colors can be sorted and manually rearranged](TODO)
-    * [Palettization](TODO)
-    * [Extract colors in a project to a palette](TODO)
+    * [Palettization](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/palettization.gif)
+    * [Extract colors in a project to a palette](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/extract-colors.gif)
 * Selection
-    * [Family of selection tools designed for pixel-perfect selection](https://i.imgur.com/U0qONz3.gif)
-    * [Intuitive and powerful outlining utilities](TODO)
-* Pixel grid
-    * [Easily enable/disable and modify the size of the pixel grid cells](TODO)
-    * [The box select tool can snap to the grid](TODO)
+    * [Family of selection tools designed for pixel-perfect selection](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/selection-tools.gif)
+    * [Intuitive and powerful outlining utilities](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/outline.gif)
+* [Pixel grid](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/pixel-grid.gif)
+    * Easily enable/disable and modify the size of the pixel grid cells
+    * The box select tool can snap to the grid
 * And much more!
 
 ## Scripting
