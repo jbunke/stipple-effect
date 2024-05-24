@@ -1,3 +1,27 @@
+TODO for 0.4.2:
+> Extend scripting API
+  > Color functions
+    > `$palettize(project p, bool ignore_disabled, int scope);`
+    > `$extract_to_pal(project p, bool ignore_disabled, int scope);`
+    > `$hsv_shift(project p, int scope, bool ignore_disabled, int h_shift, float s_shift, float v_shift);`
+    > `$color_script(project p, int scope, bool ignore_disabled, string script_path);`
+  > Project functions
+    > `$run(string script_path);`
+  > Complete accompanying documentation
+
+{0.4.2} - 2024-05-24
+
+Added:
+> Color scripts that encounter errors now display their errors
+
+Changed:
+> Color action previews (HSV level shift, color script execution) now show transparency checkerboard
+    behind previewed image
+
+Fixed:
+> Bug: $hue(), $sat(), $value() were erroneously defined as color functions rather than float
+    functions by the semantic error checker
+
 {0.4.1} - 2024-05-22
 
 Changed:

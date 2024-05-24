@@ -54,7 +54,7 @@ public final class ColorPropertyGetterNode extends SEExtExpressionNode {
 
     @Override
     public BaseTypeNode getType(final SymbolTable symbolTable) {
-        return TypeNode.getColor();
+        return TypeNode.getFloat();
     }
 
     @Override

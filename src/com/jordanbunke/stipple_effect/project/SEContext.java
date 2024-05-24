@@ -1143,57 +1143,61 @@ public class SEContext {
 
         final Map<Color, Color> map = new HashMap<>();
 
-        return switch (scope) {
-            case SELECTION -> runCAOnSelection(internal, map);
-            case LAYER_FRAME -> runCAOnFrame(internal, map, state,
-                    state.getFrameIndex(), state.getLayerEditIndex());
-            case LAYER -> {
-                if (state.getEditingLayer().areFramesLinked()) {
-                    yield runCAOnFrame(internal, map, state,
-                            state.getFrameIndex(),
-                            state.getLayerEditIndex());
-                } else {
-                    final int frameCount = state.getFrameCount();
+        try {
+            return switch (scope) {
+                case SELECTION -> runCAOnSelection(internal, map);
+                case LAYER_FRAME -> runCAOnFrame(internal, map, state,
+                        state.getFrameIndex(), state.getLayerEditIndex());
+                case LAYER -> {
+                    if (state.getEditingLayer().areFramesLinked()) {
+                        yield runCAOnFrame(internal, map, state,
+                                state.getFrameIndex(),
+                                state.getLayerEditIndex());
+                    } else {
+                        final int frameCount = state.getFrameCount();
 
-                    for (int i = 0; i < frameCount; i++)
-                        state = runCAOnFrame(internal, map, state,
-                                i, state.getLayerEditIndex());
+                        for (int i = 0; i < frameCount; i++)
+                            state = runCAOnFrame(internal, map, state,
+                                    i, state.getLayerEditIndex());
+
+                        yield state;
+                    }
+                }
+                case FRAME -> {
+                    final int layerCount = state.getLayers().size();
+
+                    for (int i = 0; i < layerCount; i++)
+                        if (includeDisabledLayers ||
+                                state.getLayers().get(i).isEnabled())
+                            state = runCAOnFrame(internal, map, state,
+                                    state.getFrameIndex(), i);
 
                     yield state;
                 }
-            }
-            case FRAME -> {
-                final int layerCount = state.getLayers().size();
+                case PROJECT -> {
+                    final int frameCount = state.getFrameCount(),
+                            layerCount = state.getLayers().size();
 
-                for (int i = 0; i < layerCount; i++)
-                    if (includeDisabledLayers ||
-                            state.getLayers().get(i).isEnabled())
-                        state = runCAOnFrame(internal, map, state,
-                                state.getFrameIndex(), i);
+                    for (int l = 0; l < layerCount; l++) {
+                        if (!(includeDisabledLayers ||
+                                state.getLayers().get(l).isEnabled()))
+                            continue;
 
-                yield state;
-            }
-            case PROJECT -> {
-                final int frameCount = state.getFrameCount(),
-                        layerCount = state.getLayers().size();
-
-                for (int l = 0; l < layerCount; l++) {
-                    if (!(includeDisabledLayers ||
-                            state.getLayers().get(l).isEnabled()))
-                        continue;
-
-                    if (state.getLayers().get(l).areFramesLinked()) {
-                        state = runCAOnFrame(internal, map, state,
-                                state.getFrameIndex(), l);
-                    } else {
-                        for (int f = 0; f < frameCount; f++)
-                            state = runCAOnFrame(internal, map, state, f, l);
+                        if (state.getLayers().get(l).areFramesLinked()) {
+                            state = runCAOnFrame(internal, map, state,
+                                    state.getFrameIndex(), l);
+                        } else {
+                            for (int f = 0; f < frameCount; f++)
+                                state = runCAOnFrame(internal, map, state, f, l);
+                        }
                     }
-                }
 
-                yield state;
-            }
-        };
+                    yield state;
+                }
+            };
+        } catch (RuntimeException re) {
+            return null;
+        }
     }
 
     private ProjectState runCAOnFrame(

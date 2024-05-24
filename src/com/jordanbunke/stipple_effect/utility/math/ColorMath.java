@@ -31,7 +31,7 @@ public class ColorMath {
             final Function<Color, Color> internal,
             final Map<Color, Color> map,
             final GameImage source, final Set<Coord2D> pixels
-    ) {
+    ) throws RuntimeException {
         final int w = source.getWidth(), h = source.getHeight();
         final GameImage res = new GameImage(w, h);
 
@@ -48,6 +48,10 @@ public class ColorMath {
                     cp = map.get(c);
                 else {
                     cp = internal.apply(c);
+
+                    if (cp == null)
+                        throw new RuntimeException("Color function did not return a value");
+
                     map.put(c, cp);
                 }
 

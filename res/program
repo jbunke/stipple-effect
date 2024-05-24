@@ -1,5 +1,5 @@
 name:{Stipple Effect}
-version:{0.4.1}
-devbuild:{false}
+version:{0.4.2.1}
+devbuild:{true}
 native_standard:{1.1}
 palette_standard:{1.0}

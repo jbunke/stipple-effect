@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.visual;
 import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.fonts.FontConstants;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
@@ -1317,6 +1316,11 @@ public class DialogAssembly {
             final ProjectState preview, final Runnable backButtonAction,
             final String previewAppend
     ) {
+        if (preview == null) {
+            setDialogToScriptErrors();
+            return;
+        }
+
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
@@ -1360,10 +1364,16 @@ public class DialogAssembly {
         }
 
         final GameImage[] previewContent = new GameImage[fc];
+        final GameImage checkerboard = c.getCheckerboard();
 
         for (int i = 0; i < fc; i++) {
-            final GameImage frame = preview.draw(false, false, i);
-            previewContent[i] = ImageProcessing.scale(frame, pw, ph);
+            final GameImage frame = preview.draw(false, false, i),
+                    composed = new GameImage(pw, ph);
+
+            composed.draw(checkerboard, 0, 0, pw, ph);
+            composed.draw(frame, 0, 0, pw, ph);
+
+            previewContent[i] = composed.submit();
         }
 
         final AnimationMenuElement previewAnim = new AnimationMenuElement(
@@ -1374,8 +1384,11 @@ public class DialogAssembly {
 
         setDialog(assembleDialog("Preview of " + previewAppend,
                 new MenuElementGrouping(mb.build().getMenuElements()),
-                () -> true, "Apply", () -> c.getStateManager()
-                        .performAction(preview, Operation.EDIT_IMAGE), true));
+                () -> true, "Apply", () -> {
+                    preview.markAsCheckpoint(false);
+                    c.getStateManager()
+                            .performAction(preview, Operation.EDIT_IMAGE);
+                }, true));
     }
 
     public static void setDialogToSavePalette(final Palette palette) {
