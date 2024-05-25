@@ -10,13 +10,14 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteMutableNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
 public final class SENodeDelegator {
-    public static GlobalStatementNode globalFunctionStatement(
+    public static StatementNode globalFunctionStatement(
             final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
@@ -70,7 +71,7 @@ public final class SENodeDelegator {
         return s;
     }
 
-    public static GlobalExpressionNode globalFunctionExpression(
+    public static ExpressionNode globalFunctionExpression(
             final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
@@ -80,19 +81,6 @@ public final class SENodeDelegator {
             case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
             case NewProjectExpressionNode.NAME ->
                     new NewProjectExpressionNode(position, args);
-            case GetLayerNode.NAME -> switch (args.length) {
-                case 0 -> new GetLayerNoArgsNode(position, args);
-                case 1 -> new GetLayerOneArgNode(position, args);
-                default -> new GetLayerTwoArgsNode(position, args);
-            };
-            case GetLayersNode.NAME -> new GetLayersNode(position, args);
-            case IsAnimNode.NAME -> new IsAnimNode(position, args);
-            case GetFrameCountNode.NAME ->
-                    new GetFrameCountNode(position, args);
-            case GetFrameIndexNode.NAME ->
-                    new GetFrameIndexNode(position, args);
-            case GetLayerIndexNode.NAME ->
-                    new GetLayerIndexNode(position, args);
             case GetColorNode.PRIM_NAME ->
                     GetColorNode.primary(position, args);
             case GetColorNode.SEC_NAME ->
@@ -101,9 +89,6 @@ public final class SENodeDelegator {
                     PaletteGetterNode.newGet(position, args);
             case PaletteGetterNode.HAS ->
                     PaletteGetterNode.newHas(position, args);
-            case SelectionGetter.GET -> SelectionGetter.newGet(position, args);
-            case SelectionGetter.HAS -> SelectionGetter.newHas(position, args);
-            case IsSelectedNode.NAME -> new IsSelectedNode(position, args);
             case FillSelectionNode.NAME -> args.length == 2
                     ? FillSelectionNode.system(position, args)
                     : FillSelectionNode.custom(position, args);
@@ -165,7 +150,30 @@ public final class SENodeDelegator {
                     new IsEnabledNode(position, scope, args);
             case IsLinkedNode.NAME ->
                     new IsLinkedNode(position, scope, args);
-            // TODO
+            case IsSelectedNode.NAME ->
+                    new IsSelectedNode(position, scope, args);
+            case GetLayersNode.NAME ->
+                    new GetLayersNode(position, scope, args);
+            case IsAnimNode.NAME ->
+                    new IsAnimNode(position, scope, args);
+            case GetFrameCountNode.NAME ->
+                    new GetFrameCountNode(position, scope, args);
+            case GetFrameIndexNode.NAME ->
+                    new GetFrameIndexNode(position, scope, args);
+            case GetLayerIndexNode.NAME ->
+                    new GetLayerIndexNode(position, scope, args);
+            case GetLayerNode.NAME -> switch (args.length) {
+                case 0 -> new GetEditingLayerNode(position, scope, args);
+                case 1 -> new GetIndexLayerNode(position, scope, args);
+                default -> new IllegalExpressionNode(position,
+                        "Scoped function \"" + fID +
+                                "\" takes 0 or 1 argument(s)");
+            };
+            case SelectionGetter.GET ->
+                    SelectionGetter.newGet(position, scope, args);
+            case SelectionGetter.HAS ->
+                    SelectionGetter.newHas(position, scope, args);
+            // TODO - extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
                             args.length + " arguments exists");
@@ -193,7 +201,7 @@ public final class SENodeDelegator {
                     new DisableLayerNode(position, scope, args);
             case EnableLayerNode.NAME ->
                     new EnableLayerNode(position, scope, args);
-            // TODO
+            // TODO - extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
                             args.length + " arguments exists");

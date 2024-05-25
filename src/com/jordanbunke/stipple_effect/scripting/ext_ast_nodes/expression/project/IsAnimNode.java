@@ -1,29 +1,29 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.project.SEContext;
 
-public final class GetFrameIndexNode extends ProjectGetterNode {
-    public static final String NAME = "get_frame_index";
+public final class IsAnimNode extends ProjectExpressionNode {
+    public static final String NAME = "is_anim";
 
-    public GetFrameIndexNode(
-            final TextPosition position, ExpressionNode[] args
+    public IsAnimNode(
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args);
+        super(position, scope, args);
     }
 
     @Override
-    protected Integer getter(final SEContext project) {
-        return project.getState().getFrameIndex();
+    public Boolean evaluate(final SymbolTable symbolTable) {
+        return getProject(symbolTable).getState().getFrameCount() > 1;
     }
 
     @Override
     public BaseTypeNode getType(final SymbolTable symbolTable) {
-        return TypeNode.getInt();
+        return TypeNode.getBool();
     }
 
     @Override

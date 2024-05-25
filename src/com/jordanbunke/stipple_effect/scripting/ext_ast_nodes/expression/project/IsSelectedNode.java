@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
@@ -7,24 +7,23 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 
-public final class IsSelectedNode extends GlobalExpressionNode {
+public final class IsSelectedNode extends ProjectExpressionNode {
     public static final String NAME = "is_selected";
 
     public IsSelectedNode(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args, ProjectTypeNode.get(),
+        super(position, scope, args,
                 TypeNode.getInt(), TypeNode.getInt());
     }
 
     @Override
     public Boolean evaluate(final SymbolTable symbolTable) {
-        final Object[] vs = getValues(symbolTable);
-        final SEContext project = (SEContext) vs[0];
-        final int x = (int) vs[1], y = (int) vs[2];
+        final Object[] vs = arguments.getValues(symbolTable);
+        final SEContext project = getProject(symbolTable);
+        final int x = (int) vs[0], y = (int) vs[1];
 
         return project.getState().getSelection().contains(new Coord2D(x, y));
     }

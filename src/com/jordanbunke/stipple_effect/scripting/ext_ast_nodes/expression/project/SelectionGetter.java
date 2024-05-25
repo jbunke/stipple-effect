@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project;
 
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptSet;
@@ -8,37 +8,41 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
-public final class SelectionGetter extends ProjectGetterNode {
+public final class SelectionGetter extends ProjectExpressionNode {
     public static final String GET = "get_selection", HAS = "has_selection";
 
     private final boolean get;
 
     private SelectionGetter(
-            final TextPosition position, final ExpressionNode[] args,
-            final boolean get
+            final TextPosition position, final ExpressionNode scope,
+            final ExpressionNode[] args, final boolean get
     ) {
-        super(position, args);
+        super(position, scope, args);
 
         this.get = get;
     }
 
     public static SelectionGetter newGet(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new SelectionGetter(position, args, true);
+        return new SelectionGetter(position, scope, args, true);
     }
 
     public static SelectionGetter newHas(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new SelectionGetter(position, args, false);
+        return new SelectionGetter(position, scope, args, false);
     }
 
     @Override
-    protected Object getter(final SEContext project) {
+    public Object evaluate(final SymbolTable symbolTable) {
+        final SEContext project = getProject(symbolTable);
+
         return get
                 ? new ScriptSet(project.getState().getSelection().stream()
-                        .map(c -> ScriptArray.of(c.x, c.y)))
+                .map(c -> ScriptArray.of(c.x, c.y)))
                 : project.getState().hasSelection();
     }
 
