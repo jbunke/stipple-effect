@@ -9,10 +9,12 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteMutableNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.MutablePaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
@@ -133,6 +135,10 @@ public final class SENodeDelegator {
                     SelectionGetter.newGet(position, scope, args);
             case SelectionGetter.HAS ->
                     SelectionGetter.newHas(position, scope, args);
+            case PaletteColorSetGetterNode.COLORS ->
+                    PaletteColorSetGetterNode.colors(position, scope, args);
+            case PaletteColorSetGetterNode.INCLUDED ->
+                    PaletteColorSetGetterNode.included(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -212,6 +218,18 @@ public final class SENodeDelegator {
             case SelectionOpNode.DESELECT ->
                     new SelectionOpNode(position, scope,
                             args, SelectionOpNode.Op.DESELECT);
+            case PaletteActionNode.PALETTIZE ->
+                    PaletteActionNode.palettize(position, scope, args);
+            case PaletteActionNode.EXTRACT ->
+                    PaletteActionNode.extract(position, scope, args);
+            case MutablePaletteColorOpNode.ADD ->
+                    MutablePaletteColorOpNode.add(position, scope, args);
+            case MutablePaletteColorOpNode.REMOVE ->
+                    MutablePaletteColorOpNode.remove(position, scope, args);
+            case MutablePaletteColorOpNode.MOVE_LEFT ->
+                    MutablePaletteColorOpNode.moveLeft(position, scope, args);
+            case MutablePaletteColorOpNode.MOVE_RIGHT ->
+                    MutablePaletteColorOpNode.moveRight(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
