@@ -7,12 +7,12 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.LayerIndexPropertyNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.LayerProjectPropertyNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteMutableNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
 public final class SENodeDelegator {
@@ -25,15 +25,11 @@ public final class SENodeDelegator {
                     new NewProjectStatementNode(position, args);
             case ResizeNode.NAME -> new ResizeNode(position, args);
             case SaveNode.NAME -> new SaveNode(position, args);
-            case UnlinkFramesNode.NAME -> new UnlinkFramesNode(position, args);
-            case LinkFramesNode.NAME -> new LinkFramesNode(position, args);
             case PadNode.NAME -> new PadNode(position, args);
             case StitchNode.NAME -> new StitchNode(position, args);
             case SplitByPixelsNode.NAME ->
                     new SplitByPixelsNode(position, args);
             case SplitByDimsNode.NAME -> new SplitByDimsNode(position, args);
-            case DisableLayerNode.NAME -> new DisableLayerNode(position, args);
-            case EnableLayerNode.NAME -> new EnableLayerNode(position, args);
             case AddFrameNode.ADD_NAME -> AddFrameNode.newAdd(position, args);
             case AddFrameNode.DUPE_NAME -> AddFrameNode.newDupe(position, args);
             case AddLayerNode.ADD_NAME -> AddLayerNode.newAdd(position, args);
@@ -44,11 +40,6 @@ public final class SENodeDelegator {
                     SetIndexNode.newFrame(position, args);
             case SetIndexNode.LAYER_NAME ->
                     SetIndexNode.newLayer(position, args);
-            case SetFrameContentNode.SET_NAME ->
-                    SetFrameContentNode.newSet(position, args);
-            case SetFrameContentNode.EDIT_NAME ->
-                    SetFrameContentNode.newEdit(position, args);
-            case WipeFrameNode.NAME -> new WipeFrameNode(position, args);
             case AssignColorNode.PRIM_NAME ->
                     AssignColorNode.primary(position, args);
             case AssignColorNode.SEC_NAME ->
@@ -67,7 +58,6 @@ public final class SENodeDelegator {
                     position, args, SelectionOpNode.Op.SELECT_ALL);
             case SelectionOpNode.DESELECT -> new SelectionOpNode(
                     position, args, SelectionOpNode.Op.DESELECT);
-            case SetOpacityNode.NAME -> new SetOpacityNode(position, args);
             case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
             default -> null;
@@ -103,10 +93,6 @@ public final class SENodeDelegator {
                     new GetFrameIndexNode(position, args);
             case GetLayerIndexNode.NAME ->
                     new GetLayerIndexNode(position, args);
-            case GetFrameContentNode.NAME ->
-                    new GetFrameContentNode(position, args);
-            case IsEnabledNode.NAME -> new IsEnabledNode(position, args);
-            case IsLinkedNode.NAME -> new IsLinkedNode(position, args);
             case GetColorNode.PRIM_NAME ->
                     GetColorNode.primary(position, args);
             case GetColorNode.SEC_NAME ->
@@ -121,10 +107,6 @@ public final class SENodeDelegator {
             case FillSelectionNode.NAME -> args.length == 2
                     ? FillSelectionNode.system(position, args)
                     : FillSelectionNode.custom(position, args);
-            case OpacityGetterNode.OPACITY ->
-                    OpacityGetterNode.opacity(position, args);
-            case OpacityGetterNode.OPAQUE ->
-                    OpacityGetterNode.opaque(position, args);
             case FillNode.NAME -> new FillNode(position, args);
             case WandNode.NAME -> new WandNode(position, args);
             case HSVNode.NAME -> args.length == 4
@@ -173,6 +155,16 @@ public final class SENodeDelegator {
             final String fID, final ExpressionNode... args
     ) {
         return switch (fID) {
+            case OpacityGetterNode.OPACITY ->
+                    OpacityGetterNode.opacity(position, scope, args);
+            case OpacityGetterNode.OPAQUE ->
+                    OpacityGetterNode.opaque(position, scope, args);
+            case GetFrameNode.NAME ->
+                    new GetFrameNode(position, scope, args);
+            case IsEnabledNode.NAME ->
+                    new IsEnabledNode(position, scope, args);
+            case IsLinkedNode.NAME ->
+                    new IsLinkedNode(position, scope, args);
             // TODO
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -185,6 +177,22 @@ public final class SENodeDelegator {
             final String fID, final ExpressionNode... args
     ) {
         return switch (fID) {
+            case SetFrameNode.SET_NAME ->
+                    SetFrameNode.newSet(position, scope, args);
+            case SetFrameNode.EDIT_NAME ->
+                    SetFrameNode.newEdit(position, scope, args);
+            case SetOpacityNode.NAME ->
+                    new SetOpacityNode(position, scope, args);
+            case WipeFrameNode.NAME ->
+                    new WipeFrameNode(position, scope, args);
+            case UnlinkFramesNode.NAME ->
+                    new UnlinkFramesNode(position, scope, args);
+            case LinkFramesNode.NAME ->
+                    new LinkFramesNode(position, scope, args);
+            case DisableLayerNode.NAME ->
+                    new DisableLayerNode(position, scope, args);
+            case EnableLayerNode.NAME ->
+                    new EnableLayerNode(position, scope, args);
             // TODO
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
