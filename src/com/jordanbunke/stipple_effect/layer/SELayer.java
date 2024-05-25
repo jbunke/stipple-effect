@@ -340,7 +340,7 @@ public final class SELayer {
     public SELayer returnDuplicatedFrame(final int fromIndex) {
         final List<GameImage> frames = new ArrayList<>(this.frames);
 
-        frames.add(fromIndex + 1, frames.get(fromIndex));
+        frames.add(fromIndex + 1, new GameImage(frames.get(fromIndex)));
 
         return new SELayer(frames, frameLinkedContent, opacity, enabled,
                 framesLinked, onionSkinMode, name);

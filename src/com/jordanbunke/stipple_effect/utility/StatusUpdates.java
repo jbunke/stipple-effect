@@ -222,7 +222,7 @@ public class StatusUpdates {
                 " in \"" + p.getName() + "\": " + processColor(next));
     }
 
-    private static String processColor(final Color c) {
+    public static String processColor(final Color c) {
         return Constants.OPEN_COLOR +
                 ParserSerializer.serializeColor(c, true) +
                 Constants.CLOSE_COLOR;

@@ -48,8 +48,7 @@ public final class WipeFrameNode extends LayerStatementNode {
 
             for (boolean[] column : mask) Arrays.fill(column, true);
 
-            final SELayer old = layer.project().getState().getLayers()
-                    .get(layer.index()),
+            final SELayer old = evalLayer(symbolTable),
                     wiped = old.returnErased(mask, frameIndex);
 
             layer.project().setLayerFromScript(wiped, layer.index());

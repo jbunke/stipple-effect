@@ -7,7 +7,6 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.LayerTypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
@@ -15,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class SetFrameNode extends LayerStatementNode {
-    public static final String SET_NAME = "set_frame_content",
+    public static final String SET_NAME = "set_frame",
             EDIT_NAME = "edit_frame";
 
     private final boolean set;
@@ -24,8 +23,7 @@ public final class SetFrameNode extends LayerStatementNode {
             final TextPosition position, final ExpressionNode scope,
             final ExpressionNode[] args, final boolean set
     ) {
-        super(position, scope, args, LayerTypeNode.get(),
-                TypeNode.getInt(), TypeNode.getImage());
+        super(position, scope, args, TypeNode.getInt(), TypeNode.getImage());
 
         this.set = set;
     }
@@ -83,8 +81,7 @@ public final class SetFrameNode extends LayerStatementNode {
                 for (int y = 0; y < h; y++)
                     pixels.add(new Coord2D(x, y));
 
-            final SELayer old = layer.project().getState().getLayers()
-                    .get(layer.index()),
+            final SELayer old = evalLayer(symbolTable),
                     replacement = set
                             ? old.returnStamped(content, pixels, frameIndex)
                             : old.returnPaintedOver(content, frameIndex);
