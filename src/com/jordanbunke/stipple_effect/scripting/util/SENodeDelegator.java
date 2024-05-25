@@ -222,6 +222,10 @@ public final class SENodeDelegator {
                     PaletteActionNode.palettize(position, scope, args);
             case PaletteActionNode.EXTRACT ->
                     PaletteActionNode.extract(position, scope, args);
+            case ColorScriptNode.NAME ->
+                    new ColorScriptNode(position, scope, args);
+            case HSVShiftNode.NAME ->
+                    new HSVShiftNode(position, scope, args);
             case MutablePaletteColorOpNode.ADD ->
                     MutablePaletteColorOpNode.add(position, scope, args);
             case MutablePaletteColorOpNode.REMOVE ->

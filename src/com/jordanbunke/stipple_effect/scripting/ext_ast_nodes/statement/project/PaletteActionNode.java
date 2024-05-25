@@ -56,7 +56,7 @@ public final class PaletteActionNode extends ProjectStatementNode {
                             palette.getName() + "\"",
                     "the scope (" + scopeIndex +
                             ") is not a valid index for this enumeration",
-                    arguments.args()[0].getPosition());
+                    arguments.args()[1].getPosition());
         else {
             final DialogVals.Scope scope = DialogVals.Scope.values()[scopeIndex];
 
