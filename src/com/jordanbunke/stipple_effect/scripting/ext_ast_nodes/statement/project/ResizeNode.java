@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
@@ -6,31 +6,29 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.Arrays;
 
-public final class ResizeNode extends GlobalStatementNode {
+public final class ResizeNode extends ProjectStatementNode {
     public static final String NAME = "resize";
 
     public ResizeNode(
             final TextPosition position,
-            final ExpressionNode[] args
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args, ProjectTypeNode.get(),
+        super(position, scope, args,
                 TypeNode.getInt(), TypeNode.getInt());
     }
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(getArgs())
+        final Object[] dims = Arrays.stream(arguments.args())
                 .map(a -> a.evaluate(symbolTable))
                 .toArray(Object[]::new);
-        final SEContext project = (SEContext) dims[0];
-        final int w = (int) dims[1], h = (int) dims[2];
+        final SEContext project = getProject(symbolTable);
+        final int w = (int) dims[0], h = (int) dims[1];
 
         if (w <= 0 || w > Constants.MAX_CANVAS_W ||
                 h <= 0 || h > Constants.MAX_CANVAS_H)

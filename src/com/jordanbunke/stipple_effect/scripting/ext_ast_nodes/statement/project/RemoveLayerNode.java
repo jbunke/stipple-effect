@@ -1,36 +1,37 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
-public final class RemoveFrameNode extends CondProjectOpNode {
-    public static final String NAME = "remove_frame";
+public final class RemoveLayerNode extends CondProjectOpNode {
+    public static final String NAME = "remove_layer";
 
-    public RemoveFrameNode(
-            final TextPosition position, final ExpressionNode[] args
+    public RemoveLayerNode(
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args);
+        super(position, scope, args);
     }
 
     @Override
     protected boolean condition(final SEContext project) {
-        return project.getState().canRemoveFrame();
+        return project.getState().canRemoveLayer();
     }
 
     @Override
     protected String attempt() {
-        return "remove the current frame from the project";
+        return "remove the current layer from the project";
     }
 
     @Override
     protected String failReason(final SEContext project) {
-        return "the project only has a single frame";
+        return "the project only has a single layer";
     }
 
     @Override
     protected void operation(final SEContext project) {
-        project.removeFrame();
+        project.removeLayer();
     }
 
     @Override

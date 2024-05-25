@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
@@ -19,10 +19,10 @@ public final class SelectionOpNode extends CondProjectOpNode {
     private final Op operation;
 
     public SelectionOpNode(
-            final TextPosition position, final ExpressionNode[] args,
-            final Op operation
+            final TextPosition position, final ExpressionNode scope,
+            final ExpressionNode[] args, final Op operation
     ) {
-        super(position, args);
+        super(position, scope, args);
 
         this.operation = operation;
     }

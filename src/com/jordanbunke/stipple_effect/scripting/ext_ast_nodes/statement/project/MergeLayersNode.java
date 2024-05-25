@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
@@ -8,9 +8,10 @@ public final class MergeLayersNode extends CondProjectOpNode {
     public static final String NAME = "merge_with_below";
 
     public MergeLayersNode(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args);
+        super(position, scope, args);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
@@ -11,24 +11,26 @@ public final class MoveFrameNode extends CondProjectOpNode {
     private final boolean back;
 
     private MoveFrameNode(
-            final TextPosition position, final ExpressionNode[] args,
-            final boolean back
+            final TextPosition position, final ExpressionNode scope,
+            final ExpressionNode[] args, final boolean back
     ) {
-        super(position, args);
+        super(position, scope, args);
 
         this.back = back;
     }
 
     public static MoveFrameNode back(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new MoveFrameNode(position, args, true);
+        return new MoveFrameNode(position, scope, args, true);
     }
 
     public static MoveFrameNode forward(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new MoveFrameNode(position, args, false);
+        return new MoveFrameNode(position, scope, args, false);
     }
 
     @Override

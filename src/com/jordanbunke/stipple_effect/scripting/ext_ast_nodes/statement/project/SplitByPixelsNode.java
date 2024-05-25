@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
@@ -16,21 +16,21 @@ public final class SplitByPixelsNode extends SplitNode {
 
     public SplitByPixelsNode(
             final TextPosition position,
-            final ExpressionNode[] args
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args);
+        super(position, scope, args);
     }
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(getArgs())
+        final Object[] dims = Arrays.stream(arguments.args())
                 .map(a -> a.evaluate(symbolTable))
                 .toArray(Object[]::new);
-        final SEContext project = (SEContext) dims[0];
-        final int fw = (int) dims[1], fh = (int) dims[2];
-        final boolean horizontal = (boolean) dims[3],
-                truncateX = (boolean) dims[4],
-                truncateY = (boolean) dims[5];
+        final SEContext project = getProject(symbolTable);
+        final int fw = (int) dims[0], fh = (int) dims[1];
+        final boolean horizontal = (boolean) dims[2],
+                truncateX = (boolean) dims[3],
+                truncateY = (boolean) dims[4];
 
         final int w = project.getState().getImageWidth(),
                 h = project.getState().getImageHeight(),
@@ -43,13 +43,13 @@ public final class SplitByPixelsNode extends SplitNode {
                     "split the project into frames",
                     "the single frame width (" + fw + " px) is invalid... " +
                             "should be 0 < fw <= " + w,
-                    getArgs()[1].getPosition());
+                    arguments.args()[0].getPosition());
         else if (fh <= 0 || fh > h)
             StatusUpdates.scriptActionNotPermitted(
                     "split the project into frames",
                     "the single frame height (" + fh + " px) is invalid... " +
                             "should be 0 < fh <= " + h,
-                    getArgs()[2].getPosition());
+                    arguments.args()[1].getPosition());
         else if (frames > Constants.MAX_NUM_FRAMES)
             StatusUpdates.scriptActionNotPermitted(
                     "split the project into frames",

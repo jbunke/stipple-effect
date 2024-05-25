@@ -1,16 +1,17 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
-public final class RemoveLayerNode extends CondProjectOpNode {
-    public static final String NAME = "remove_layer";
+public final class FlattenNode extends CondProjectOpNode {
+    public static final String NAME = "flatten";
 
-    public RemoveLayerNode(
-            final TextPosition position, final ExpressionNode[] args
+    public FlattenNode(
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args);
+        super(position, scope, args);
     }
 
     @Override
@@ -20,7 +21,7 @@ public final class RemoveLayerNode extends CondProjectOpNode {
 
     @Override
     protected String attempt() {
-        return "remove the current layer from the project";
+        return "flatten the project";
     }
 
     @Override
@@ -30,7 +31,7 @@ public final class RemoveLayerNode extends CondProjectOpNode {
 
     @Override
     protected void operation(final SEContext project) {
-        project.removeLayer();
+        project.flatten();
     }
 
     @Override

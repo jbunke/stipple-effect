@@ -1,17 +1,15 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 
-public abstract class SplitNode extends GlobalStatementNode {
+public abstract class SplitNode extends ProjectStatementNode {
     public SplitNode(
             final TextPosition position,
-            final ExpressionNode[] args
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args, ProjectTypeNode.get(),
+        super(position, scope, args,
                 TypeNode.getInt(), TypeNode.getInt(),
                 TypeNode.getBool(), TypeNode.getBool(), TypeNode.getBool());
     }

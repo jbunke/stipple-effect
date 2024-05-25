@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
@@ -6,33 +6,31 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.Arrays;
 
-public final class PadNode extends GlobalStatementNode {
+public final class PadNode extends ProjectStatementNode {
     public static final String NAME = "pad";
 
     public PadNode(
             final TextPosition position,
-            final ExpressionNode[] args
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args, ProjectTypeNode.get(),
+        super(position, scope, args,
                 TypeNode.getInt(), TypeNode.getInt(),
                 TypeNode.getInt(), TypeNode.getInt());
     }
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(getArgs())
+        final Object[] dims = Arrays.stream(arguments.args())
                 .map(a -> a.evaluate(symbolTable))
                 .toArray(Object[]::new);
-        final SEContext project = (SEContext) dims[0];
-        final int l = (int) dims[1], r = (int) dims[2],
-                t = (int) dims[3], b = (int) dims[4];
+        final SEContext project = getProject(symbolTable);
+        final int l = (int) dims[0], r = (int) dims[1],
+                t = (int) dims[2], b = (int) dims[3];
 
         final int w = project.getState().getImageWidth(),
                 h = project.getState().getImageHeight(),

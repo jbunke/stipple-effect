@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
@@ -6,40 +6,38 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.Arrays;
 
-public final class StitchNode extends GlobalStatementNode {
+public final class StitchNode extends ProjectStatementNode {
     public static final String NAME = "stitch";
 
     public StitchNode(
             final TextPosition position,
-            final ExpressionNode[] args
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, args, ProjectTypeNode.get(),
+        super(position, scope, args,
                 TypeNode.getInt(), TypeNode.getBool());
     }
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(getArgs())
+        final Object[] dims = Arrays.stream(arguments.args())
                 .map(a -> a.evaluate(symbolTable))
                 .toArray(Object[]::new);
-        final SEContext project = (SEContext) dims[0];
-        final int fpd = (int) dims[1];
-        final boolean horizontal = (boolean) dims[2];
+        final SEContext project = getProject(symbolTable);
+        final int fpd = (int) dims[0];
+        final boolean horizontal = (boolean) dims[1];
 
         if (fpd <= 0)
             StatusUpdates.scriptActionNotPermitted(
                     "stitch the project's frames together",
                     "the number of frames per " +
                             (horizontal ? "row" : "column") + " was negative",
-                    getArgs()[1].getPosition());
+                    arguments.args()[0].getPosition());
         else {
             final int fc = project.getState().getFrameCount(),
                     w = project.getState().getImageWidth(),

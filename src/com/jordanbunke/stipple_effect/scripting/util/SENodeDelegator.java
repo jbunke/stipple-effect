@@ -11,9 +11,9 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteMutableNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
 public final class SENodeDelegator {
@@ -21,61 +21,26 @@ public final class SENodeDelegator {
             final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
-        final GlobalStatementNode s = switch (fID) {
+        return switch (fID) {
             case NewProjectStatementNode.NAME ->
                     new NewProjectStatementNode(position, args);
-            case ResizeNode.NAME -> new ResizeNode(position, args);
-            case SaveNode.NAME -> new SaveNode(position, args);
-            case PadNode.NAME -> new PadNode(position, args);
-            case StitchNode.NAME -> new StitchNode(position, args);
-            case SplitByPixelsNode.NAME ->
-                    new SplitByPixelsNode(position, args);
-            case SplitByDimsNode.NAME -> new SplitByDimsNode(position, args);
-            case AddFrameNode.ADD_NAME -> AddFrameNode.newAdd(position, args);
-            case AddFrameNode.DUPE_NAME -> AddFrameNode.newDupe(position, args);
-            case AddLayerNode.ADD_NAME -> AddLayerNode.newAdd(position, args);
-            case AddLayerNode.DUPE_NAME -> AddLayerNode.newDupe(position, args);
-            case RemoveFrameNode.NAME -> new RemoveFrameNode(position, args);
-            case RemoveLayerNode.NAME -> new RemoveLayerNode(position, args);
-            case SetIndexNode.FRAME_NAME ->
-                    SetIndexNode.newFrame(position, args);
-            case SetIndexNode.LAYER_NAME ->
-                    SetIndexNode.newLayer(position, args);
             case AssignColorNode.PRIM_NAME ->
                     AssignColorNode.primary(position, args);
             case AssignColorNode.SEC_NAME ->
                     AssignColorNode.secondary(position, args);
             case NewPaletteNode.NAME -> new NewPaletteNode(position, args);
-            case MoveFrameNode.BACK -> MoveFrameNode.back(position, args);
-            case MoveFrameNode.FORWARD -> MoveFrameNode.forward(position, args);
-            case MoveLayerNode.DOWN -> MoveLayerNode.down(position, args);
-            case MoveLayerNode.UP -> MoveLayerNode.up(position, args);
-            case MergeLayersNode.NAME -> new MergeLayersNode(position, args);
-            case FlattenNode.NAME -> new FlattenNode(position, args);
-            case SetSelectionNode.NAME -> new SetSelectionNode(position, args);
-            case SelectionOpNode.INV -> new SelectionOpNode(
-                    position, args, SelectionOpNode.Op.INVERT_SELECTION);
-            case SelectionOpNode.ALL -> new SelectionOpNode(
-                    position, args, SelectionOpNode.Op.SELECT_ALL);
-            case SelectionOpNode.DESELECT -> new SelectionOpNode(
-                    position, args, SelectionOpNode.Op.DESELECT);
             case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
-            default -> null;
+            default -> new IllegalStatementNode(position,
+                    "Undefined function \"$" + fID + "\"");
         };
-
-        if (s == null)
-            ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_CT,
-                    position, "Undefined function \"$" + fID + "\"");
-
-        return s;
     }
 
     public static ExpressionNode globalFunctionExpression(
             final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
-        final GlobalExpressionNode e = switch (fID) {
+        return switch (fID) {
             case GetProjectNoArgsNode.NAME ->
                     new GetProjectNoArgsNode(position, args);
             case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
@@ -102,14 +67,9 @@ public final class SENodeDelegator {
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
             // extend here
-            default -> null;
+            default -> new IllegalExpressionNode(position,
+                    "Undefined function \"$" + fID + "\"");
         };
-
-        if (e == null)
-            ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_CT,
-                    position, "Undefined function \"$" + fID + "\"");
-
-        return e;
     }
 
     public static ExpressionNode property(
@@ -173,7 +133,7 @@ public final class SENodeDelegator {
                     SelectionGetter.newGet(position, scope, args);
             case SelectionGetter.HAS ->
                     SelectionGetter.newHas(position, scope, args);
-            // TODO - extend here
+            // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
                             args.length + " arguments exists");
@@ -201,7 +161,58 @@ public final class SENodeDelegator {
                     new DisableLayerNode(position, scope, args);
             case EnableLayerNode.NAME ->
                     new EnableLayerNode(position, scope, args);
-            // TODO - extend here
+            case ResizeNode.NAME ->
+                    new ResizeNode(position, scope, args);
+            case SaveNode.NAME ->
+                    new SaveNode(position, scope, args);
+            case PadNode.NAME ->
+                    new PadNode(position, scope, args);
+            case StitchNode.NAME ->
+                    new StitchNode(position, scope, args);
+            case SplitByPixelsNode.NAME ->
+                    new SplitByPixelsNode(position, scope, args);
+            case SplitByDimsNode.NAME ->
+                    new SplitByDimsNode(position, scope, args);
+            case AddFrameNode.ADD_NAME ->
+                    AddFrameNode.newAdd(position, scope, args);
+            case AddFrameNode.DUPE_NAME ->
+                    AddFrameNode.newDupe(position, scope, args);
+            case AddLayerNode.ADD_NAME ->
+                    AddLayerNode.newAdd(position, scope, args);
+            case AddLayerNode.DUPE_NAME ->
+                    AddLayerNode.newDupe(position, scope, args);
+            case RemoveFrameNode.NAME ->
+                    new RemoveFrameNode(position, scope, args);
+            case RemoveLayerNode.NAME ->
+                    new RemoveLayerNode(position, scope, args);
+            case SetIndexNode.FRAME_NAME ->
+                    SetIndexNode.newFrame(position, scope, args);
+            case SetIndexNode.LAYER_NAME ->
+                    SetIndexNode.newLayer(position, scope, args);
+            case MoveFrameNode.BACK ->
+                    MoveFrameNode.back(position, scope, args);
+            case MoveFrameNode.FORWARD ->
+                    MoveFrameNode.forward(position, scope, args);
+            case MoveLayerNode.DOWN ->
+                    MoveLayerNode.down(position, scope, args);
+            case MoveLayerNode.UP ->
+                    MoveLayerNode.up(position, scope, args);
+            case MergeLayersNode.NAME ->
+                    new MergeLayersNode(position, scope, args);
+            case FlattenNode.NAME ->
+                    new FlattenNode(position, scope, args);
+            case SetSelectionNode.NAME ->
+                    new SetSelectionNode(position, scope, args);
+            case SelectionOpNode.INV ->
+                    new SelectionOpNode(position, scope,
+                            args, SelectionOpNode.Op.INVERT_SELECTION);
+            case SelectionOpNode.ALL ->
+                    new SelectionOpNode(position, scope,
+                            args, SelectionOpNode.Op.SELECT_ALL);
+            case SelectionOpNode.DESELECT ->
+                    new SelectionOpNode(position, scope,
+                            args, SelectionOpNode.Op.DESELECT);
+            // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
                             args.length + " arguments exists");

@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
@@ -12,24 +12,26 @@ public final class AddFrameNode extends CondProjectOpNode {
     private final boolean duplicate;
 
     private AddFrameNode(
-            final TextPosition position, final ExpressionNode[] args,
-            final boolean duplicate
+            final TextPosition position, final ExpressionNode scope,
+            final ExpressionNode[] args, final boolean duplicate
     ) {
-        super(position, args);
+        super(position, scope, args);
 
         this.duplicate = duplicate;
     }
 
     public static AddFrameNode newAdd(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new AddFrameNode(position, args, false);
+        return new AddFrameNode(position, scope, args, false);
     }
 
     public static AddFrameNode newDupe(
-            final TextPosition position, final ExpressionNode[] args
+            final TextPosition position,
+            final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new AddFrameNode(position, args, true);
+        return new AddFrameNode(position, scope, args, true);
     }
 
     @Override

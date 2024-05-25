@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptSet;
@@ -8,7 +8,6 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 
 import java.awt.*;
@@ -45,7 +44,7 @@ public class FillSelectionNode extends GlobalExpressionNode {
 
     @Override
     public GameImage evaluate(final SymbolTable symbolTable) {
-        final Object[] vs = getValues(symbolTable);
+        final Object[] vs = arguments.getValues(symbolTable);
         final GameImage img = (GameImage) vs[0],
                 res = new GameImage(img.getWidth(), img.getHeight());
         final Color c = (Color) vs[1];
