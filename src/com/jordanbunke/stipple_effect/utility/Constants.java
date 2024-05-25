@@ -43,7 +43,7 @@ public class Constants {
             SUBSEQUENT_LAYER_PREFIX = "Layer ", FLATTENED_LAYER_NAME = "Flattened",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
-            SCRIPT_FILE_SUFFIX = "ses",
+            SCRIPT_FILE_SUFFIX = "ses", SCRIPT_GLOBAL_NAMESPACE = "SE",
             ASCII_TEMPLATE = "ascii", LATIN_EXTENDED_TEMPLATE = "latin-extended",
             COLOR_TOOL_TIP_PREFIX = "color:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
