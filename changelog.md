@@ -1,5 +1,36 @@
 # Changelog
 
+## **0.4.2** - 2024-05-26
+
+### Added:
+* Color scripts that encounter errors now display their errors
+
+### Changed:
+* Color action previews (HSV level shift, color script execution) now show transparency checkerboard behind previewed image
+
+### API Changes:
+**Note: This update completely redesigned the API and altered the syntax of every API function. Scripts that utilize API functions that were written for versions 0.4.0 or 0.4.1 will need to be rewritten in order to execute on subsequent versions of Stipple Effect.**
+
+* Added:
+  * `palette` type
+  * Global namespace `$SE`
+  * `project` color action functions:
+    * ```js
+      P.palettize(palette pal, int scope, bool include_disabled);
+      ```
+    * ```js
+      P.extract_to_pal(palette pal, int scope, bool include_disabled);
+      ```
+    * ```js
+      P.hsv_shift(int scope, bool include_disabled, int h_shift, float s_shift, float v_shift);
+      ```
+    * ```js
+      P.color_script(int scope, bool include_disabled, string script_path);
+      ```
+* Changed:
+  * Renamed `set_frame_content` to `set_frame`
+  * Renamed `get_frame_content` to `get_frame`
+
 ## **0.4.1** - 2024-05-22
 
 ### Changed:
