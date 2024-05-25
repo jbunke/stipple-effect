@@ -5,7 +5,6 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 public abstract class CondProjectOpNode extends ProjectStatementNode {
@@ -13,7 +12,7 @@ public abstract class CondProjectOpNode extends ProjectStatementNode {
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        super(position, scope, args, ProjectTypeNode.get());
+        super(position, scope, args);
     }
 
     @Override
