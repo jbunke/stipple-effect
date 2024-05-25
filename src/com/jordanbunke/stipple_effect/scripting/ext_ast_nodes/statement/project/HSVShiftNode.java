@@ -74,6 +74,10 @@ public final class HSVShiftNode extends ProjectStatementNode {
                 DialogVals.setScope(scope);
                 DialogVals.setIncludeDisabledLayers(includeDisabled);
 
+                DialogVals.setHueShift(hShift);
+                DialogVals.setSatShift(sShift);
+                DialogVals.setValueShift(vShift);
+
                 final ProjectState res = project.prepHSVShift();
                 project.getStateManager()
                         .performAction(res, Operation.EDIT_IMAGE);
