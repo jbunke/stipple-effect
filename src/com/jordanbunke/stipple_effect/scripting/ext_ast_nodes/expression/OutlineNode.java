@@ -8,12 +8,13 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 
 import java.util.Set;
 
-public final class OutlineNode extends SEExtExpressionNode {
+public final class OutlineNode extends GlobalExpressionNode {
     public static final String NAME = "outline";
 
     public OutlineNode(

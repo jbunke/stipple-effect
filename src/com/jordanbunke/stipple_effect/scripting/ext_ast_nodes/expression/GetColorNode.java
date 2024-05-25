@@ -6,10 +6,11 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 
 import java.awt.*;
 
-public final class GetColorNode extends SEExtExpressionNode {
+public final class GetColorNode extends GlobalExpressionNode {
     public static final String PRIM_NAME = "get_primary",
             SEC_NAME = "get_secondary";
 

@@ -7,9 +7,10 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 
-public final class IsSelectedNode extends SEExtExpressionNode {
+public final class IsSelectedNode extends GlobalExpressionNode {
     public static final String NAME = "is_selected";
 
     public IsSelectedNode(

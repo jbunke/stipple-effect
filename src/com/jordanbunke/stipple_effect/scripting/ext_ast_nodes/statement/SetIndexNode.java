@@ -6,12 +6,13 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.Arrays;
 
-public final class SetIndexNode extends SEExtStatementNode {
+public final class SetIndexNode extends GlobalStatementNode {
     public static final String LAYER_NAME = "set_layer_index",
             FRAME_NAME = "set_frame_index";
 

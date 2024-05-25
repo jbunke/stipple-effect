@@ -11,7 +11,7 @@ public final class ProjectTypeNode extends SEExtTypeNode {
         super(position);
     }
 
-    public ProjectTypeNode() {
+    private ProjectTypeNode() {
         this(TextPosition.N_A);
     }
 

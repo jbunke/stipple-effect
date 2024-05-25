@@ -8,13 +8,13 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.SEExtExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 
 import java.awt.*;
 import java.util.Set;
 
-public class FillSelectionNode extends SEExtExpressionNode {
+public class FillSelectionNode extends GlobalExpressionNode {
     public static final String NAME = "fill_selection";
 
     private final boolean systemSelection;

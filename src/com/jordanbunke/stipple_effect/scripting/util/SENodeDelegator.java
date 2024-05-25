@@ -1,18 +1,26 @@
 package com.jordanbunke.stipple_effect.scripting.util;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
+import com.jordanbunke.delta_time.scripting.ast.nodes.expression.IllegalExpressionNode;
+import com.jordanbunke.delta_time.scripting.ast.nodes.statement.IllegalStatementNode;
+import com.jordanbunke.delta_time.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.LayerIndexPropertyNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.LayerProjectPropertyNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteMutableNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.GlobalStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 
 public final class SENodeDelegator {
-    public static SEExtStatementNode delegateStatement(
+    public static GlobalStatementNode globalFunctionStatement(
             final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
-        final SEExtStatementNode s = switch (fID) {
+        final GlobalStatementNode s = switch (fID) {
             case NewProjectStatementNode.NAME ->
                     new NewProjectStatementNode(position, args);
             case ResizeNode.NAME -> new ResizeNode(position, args);
@@ -72,11 +80,11 @@ public final class SENodeDelegator {
         return s;
     }
 
-    public static SEExtExpressionNode delegateExpression(
+    public static GlobalExpressionNode globalFunctionExpression(
             final TextPosition position, final String fID,
             final ExpressionNode[] args
     ) {
-        final SEExtExpressionNode e = switch (fID) {
+        final GlobalExpressionNode e = switch (fID) {
             case GetProjectNoArgsNode.NAME ->
                     new GetProjectNoArgsNode(position, args);
             case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
@@ -126,12 +134,6 @@ public final class SENodeDelegator {
             case PresetOutlineNode.SINGLE -> PresetOutlineNode.sng(position, args);
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
-            case ColorPropertyGetterNode.HUE ->
-                    ColorPropertyGetterNode.hue(position, args);
-            case ColorPropertyGetterNode.SAT ->
-                    ColorPropertyGetterNode.sat(position, args);
-            case ColorPropertyGetterNode.VAL ->
-                    ColorPropertyGetterNode.val(position, args);
             // extend here
             default -> null;
         };
@@ -143,12 +145,60 @@ public final class SENodeDelegator {
         return e;
     }
 
-    public static SEExtTypeNode delegateType(
+    public static ExpressionNode property(
+            final TextPosition position, final ExpressionNode scope,
+            final String propertyID
+    ) {
+        return switch (propertyID) {
+            case ColorPropertyGetterNode.HUE ->
+                    ColorPropertyGetterNode.hue(position, scope);
+            case ColorPropertyGetterNode.SAT ->
+                    ColorPropertyGetterNode.sat(position, scope);
+            case ColorPropertyGetterNode.VAL ->
+                    ColorPropertyGetterNode.val(position, scope);
+            case PaletteMutableNode.NAME ->
+                    new PaletteMutableNode(position, scope);
+            case LayerIndexPropertyNode.NAME ->
+                    new LayerIndexPropertyNode(position, scope);
+            case LayerProjectPropertyNode.NAME ->
+                    new LayerProjectPropertyNode(position, scope);
+            // extend here
+            default -> new IllegalExpressionNode(position,
+                    "No property \"" + propertyID + "\" exists");
+        };
+    }
+
+    public static ExpressionNode scopedFunctionExpression(
+            final TextPosition position, final ExpressionNode scope,
+            final String fID, final ExpressionNode... args
+    ) {
+        return switch (fID) {
+            // TODO
+            default -> new IllegalExpressionNode(position,
+                    "No scoped function \"" + fID + "\" with " +
+                            args.length + " arguments exists");
+        };
+    }
+
+    public static StatementNode scopedFunctionStatement(
+            final TextPosition position, final ExpressionNode scope,
+            final String fID, final ExpressionNode... args
+    ) {
+        return switch (fID) {
+            // TODO
+            default -> new IllegalStatementNode(position,
+                    "No scoped function \"" + fID + "\" with " +
+                            args.length + " arguments exists");
+        };
+    }
+
+    public static SEExtTypeNode type(
             final TextPosition position, final String typeID
     ) {
         final SEExtTypeNode t = switch (typeID) {
             case LayerTypeNode.NAME -> new LayerTypeNode(position);
             case ProjectTypeNode.NAME -> new ProjectTypeNode(position);
+            case PaletteTypeNode.NAME -> new PaletteTypeNode(position);
             default -> null;
         };
 

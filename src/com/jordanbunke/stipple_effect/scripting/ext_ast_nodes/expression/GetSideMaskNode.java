@@ -6,11 +6,12 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 
 import java.util.Arrays;
 
-public final class GetSideMaskNode extends SEExtExpressionNode {
+public final class GetSideMaskNode extends GlobalExpressionNode {
     public static final String NAME = "get_side_mask";
 
     public GetSideMaskNode(

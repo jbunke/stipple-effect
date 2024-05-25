@@ -5,10 +5,11 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.LayerTypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
-public abstract class LayerGetterNode extends SEExtExpressionNode {
+public abstract class LayerGetterNode extends GlobalExpressionNode {
     public LayerGetterNode(
             final TextPosition position, final ExpressionNode[] args
     ) {

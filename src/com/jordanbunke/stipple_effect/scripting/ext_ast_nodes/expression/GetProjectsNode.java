@@ -7,9 +7,10 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 
-public final class GetProjectsNode extends SEExtExpressionNode {
+public final class GetProjectsNode extends GlobalExpressionNode {
     public static final String NAME = "get_projects";
 
     public GetProjectsNode(

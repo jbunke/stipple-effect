@@ -7,12 +7,13 @@ import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.Arrays;
 
-public final class NewProjectExpressionNode extends SEExtExpressionNode {
+public final class NewProjectExpressionNode extends GlobalExpressionNode {
     public static final String NAME = "new_project";
 
     public NewProjectExpressionNode(

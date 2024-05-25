@@ -5,12 +5,13 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.tools.ToolThatSearches;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class SearchNode extends SEExtExpressionNode {
+public abstract class SearchNode extends GlobalExpressionNode {
     protected SearchNode(
             final TextPosition position, final ExpressionNode[] args,
             final TypeNode... expectedTypes

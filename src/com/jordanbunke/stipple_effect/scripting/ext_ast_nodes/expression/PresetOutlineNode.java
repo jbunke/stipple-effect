@@ -9,13 +9,14 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.GlobalExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.Set;
 
-public final class PresetOutlineNode extends SEExtExpressionNode {
+public final class PresetOutlineNode extends GlobalExpressionNode {
     public static final String SINGLE = "single_outline",
             DOUBLE = "double_outline";
 

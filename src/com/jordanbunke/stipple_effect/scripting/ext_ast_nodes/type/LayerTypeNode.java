@@ -11,7 +11,7 @@ public final class LayerTypeNode extends SEExtTypeNode {
         super(position);
     }
 
-    public LayerTypeNode() {
+    private LayerTypeNode() {
         this(TextPosition.N_A);
     }
 
