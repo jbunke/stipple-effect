@@ -253,18 +253,10 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
 
                         final Coord2D tp = context.getTargetPixel(),
                                 gridPos = new Coord2D(
-                                        (tp.x / px) * px, (tp.y / py) * py);
+                                        ((tp.x / px) - (tp.x < 0 ? 1 : 0)) * px,
+                                        ((tp.y / py) - (tp.y < 0 ? 1 : 0)) * py);
                         displacement = new Coord2D(
                                 gridPos.x - topLeft.x, gridPos.y - topLeft.y);
-//                        final Coord2D prospective = topLeft.displace(displacement),
-//                                gridPos = new Coord2D(
-//                                        (prospective.x / px) * px,
-//                                        (prospective.y / py) * py),
-//                                shift = new Coord2D(
-//                                        gridPos.x - prospective.x,
-//                                        gridPos.y - prospective.y);
-//
-//                        displacement = displacement.displace(shift);
                     }
                 }
 

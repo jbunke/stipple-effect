@@ -7,7 +7,6 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,11 @@ public final class SelectionOverlay {
     private boolean wasFilled, couldTransform;
     private GameImage last;
 
+    private long tempTime;
+
     public SelectionOverlay(final Set<Coord2D> selection) {
+        tempTime = System.currentTimeMillis();
+
         frontierMap = new HashMap<>();
         filledMap = new HashMap<>();
         transformMap = new HashMap<>();
@@ -31,10 +34,12 @@ public final class SelectionOverlay {
         final Coord2D tl = SelectionUtils.topLeft(selection),
                 br = SelectionUtils.bottomRight(selection);
 
-        final Set<Coord2D> adjusted = selection.stream()
+        final Set<Coord2D> adjusted = selection.parallelStream()
                 .map(p -> p.displace(-tl.x, -tl.y))
                 .collect(Collectors.toSet());
         final int w = br.x - tl.x, h = br.y - tl.y;
+
+        System.out.println("Adjusted selection: " + updateTime());
 
         for (float z = Constants.ZOOM_FOR_OVERLAY;
              z <= Constants.MAX_ZOOM;
@@ -60,7 +65,7 @@ public final class SelectionOverlay {
                 outside = Settings.getTheme().highlightOutline.get(),
                 fill = Settings.getTheme().selectionFill.get();
 
-        final float threshold = Constants.MAX_ZOOM_FOR_OVERLAY;
+        final float threshold = Constants.MAX_ZOOM;
 
         if (z <= threshold)
             GraphicsUtils.populateOverlay(selection, zoomInc,
@@ -83,6 +88,8 @@ public final class SelectionOverlay {
                     refFilled.getHeight() * scaleUp);
         }
 
+        System.out.println("Drew frontier and fill for " + zoomInc + "x: " + updateTime());
+
         final Coord2D tl = SelectionUtils.topLeft(selection),
                 br = SelectionUtils.bottomRight(selection);
 
@@ -102,11 +109,21 @@ public final class SelectionOverlay {
                 if (x != MID || y != MID)
                     transform.draw(TRANSFORM_NODE, xs[x], ys[y]);
 
+        System.out.println("Drew transformation nodes for " + zoomInc + "x: " + updateTime());
+
         frontierMap.put(z, frontier);
         filledMap.put(z, filled);
         transformMap.put(z, transform);
 
-        System.out.println(zoomInc + "x: " + LocalTime.now());
+        System.out.println("Completed " + zoomInc + "x: " + updateTime());
+    }
+
+    private String updateTime() {
+        final long now = System.currentTimeMillis(),
+                elapsed = now - tempTime;
+        tempTime = now;
+
+        return elapsed + " ms";
     }
 
     public GameImage draw(
@@ -124,10 +141,12 @@ public final class SelectionOverlay {
                 filled = filledMap.get(z),
                 transform = transformMap.get(z);
 
-        GameImage overlay = new GameImage(frontier);
+        GameImage overlay = new GameImage(frontier.getWidth(), frontier.getHeight());
 
         if (isFilled)
             overlay.draw(filled, 0, 0);
+
+        overlay.draw(frontier);
 
         if (canTransform)
             overlay.draw(transform, 0, 0);
@@ -135,7 +154,7 @@ public final class SelectionOverlay {
         lastZ = z;
         wasFilled = isFilled;
         couldTransform = canTransform;
-        last = overlay;
+        last = overlay.submit();
 
         return overlay;
     }

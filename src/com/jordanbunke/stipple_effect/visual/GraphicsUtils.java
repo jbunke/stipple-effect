@@ -380,39 +380,32 @@ public class GraphicsUtils {
             final Color inside, final Color outside, final Color fill
     ) {
         selection.forEach(pixel -> {
-            boolean leftFrontier = false, rightFrontier = false,
-                    topFrontier = false, bottomFrontier = false;
-
-            if (!selection.contains(pixel.displace(-1, 0)))
-                leftFrontier = true;
-            if (!selection.contains(pixel.displace(1, 0)))
-                rightFrontier = true;
-            if (!selection.contains(pixel.displace(0, -1)))
-                topFrontier = true;
-            if (!selection.contains(pixel.displace(0, 1)))
-                bottomFrontier = true;
+            final boolean
+                    left = !selection.contains(pixel.displace(-1, 0)),
+                    right = !selection.contains(pixel.displace(1, 0)),
+                    top = !selection.contains(pixel.displace(0, -1)),
+                    bottom = !selection.contains(pixel.displace(0, 1));
 
             final Coord2D o = new Coord2D(
                     Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.x),
-                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y)
-            );
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y));
 
             if (fill != null)
                 filled.fillRectangle(fill, o.x, o.y, zoomInc, zoomInc);
 
-            if (leftFrontier) {
+            if (left) {
                 frontier.fillRectangle(inside, o.x, o.y, 1, zoomInc);
                 frontier.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
             }
-            if (rightFrontier) {
+            if (right) {
                 frontier.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
                 frontier.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
             }
-            if (topFrontier) {
+            if (top) {
                 frontier.fillRectangle(inside, o.x, o.y, zoomInc, 1);
                 frontier.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
             }
-            if (bottomFrontier) {
+            if (bottom) {
                 frontier.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
                 frontier.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
             }
