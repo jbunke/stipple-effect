@@ -259,7 +259,7 @@ public class SEContext {
         if (tool instanceof SnappableTool st)
             st.setSnap(eventLogger.isPressed(Key.SHIFT));
 
-        if (tool instanceof MoverTool mt)
+        if (tool instanceof MoverTool<?> mt)
             mt.setSnapToggled(eventLogger.isPressed(Key.CTRL));
 
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
@@ -786,28 +786,28 @@ public class SEContext {
         }
 
         // special case where shifting would constitute snap and is permitted
-        if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool mt &&
+        if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool<?> mt &&
                 getState().hasSelection()) {
+            final int w = SelectionUtils.width(getState().getSelection()),
+                    h = SelectionUtils.height(getState().getSelection());
+
+
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            0, -1 * (mt.isSnap() ? SelectionUtils.height(
-                            getState().getSelection()) : 1)), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(0, -1 * (mt.isSnap() ? h : 1))));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            0, mt.isSnap() ? SelectionUtils.height(
-                            getState().getSelection()) : 1), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(0, mt.isSnap() ? h : 1)));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            -1 * (mt.isSnap() ? SelectionUtils.width(
-                                    getState().getSelection()) : 1), 0), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(-1 * (mt.isSnap() ? w : 1), 0)));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            mt.isSnap() ? SelectionUtils.width(
-                                    getState().getSelection()) : 1, 0), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(mt.isSnap() ? w : 1, 0)));
         }
     }
 
@@ -1295,62 +1295,6 @@ public class SEContext {
         }
     }
 
-    // move selection contents
-    public void moveSelectionContents(
-            final Coord2D displacement, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents moved = getState()
-                    .getSelectionContents().returnDisplaced(displacement);
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(moved)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.MOVE_SELECTION_CONTENTS);
-        }
-    }
-
-    // stretch selection contents
-    public void stretchSelectionContents(
-            final Set<Coord2D> initialSelection, final Coord2D change,
-            final MoverTool.Direction direction, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents stretched =
-                    getState().getSelectionContents()
-                    .returnStretched(initialSelection, change, direction);
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(stretched)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.STRETCH_SELECTION_CONTENTS);
-        }
-    }
-
-    // rotate selection contents
-    public void rotateSelectionContents(
-            final Set<Coord2D> initialSelection, final double deltaR,
-            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents rotated =
-                    getState().getSelectionContents()
-                            .returnRotated(initialSelection,
-                                    deltaR, pivot, offset);
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(rotated)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.ROTATE_SELECTION_CONTENTS);
-        }
-    }
-
     // reflect selection contents
     public void reflectSelectionContents(final boolean horizontal) {
         if (getState().hasSelection()) {
@@ -1368,7 +1312,7 @@ public class SEContext {
                     .changeSelectionContents(reflected)
                     .changeIsCheckpoint(!raiseAndDrop);
             stateManager.performAction(result,
-                    Operation.REFLECT_SELECTION_CONTENTS);
+                    Operation.TRANSFORM_SELECTION_CONTENTS);
 
             if (raiseAndDrop)
                 dropContentsToLayer(true, false);
@@ -1392,42 +1336,6 @@ public class SEContext {
         }
     }
 
-    // stretch selection
-    public void stretchSelectionBounds(
-            final Set<Coord2D> initialSelection, final Coord2D change,
-            final MoverTool.Direction direction, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.BOUNDS) {
-            final Set<Coord2D> stretched = SelectionUtils
-                    .stretchedPixels(initialSelection, change, direction);
-
-            final ProjectState result = getState()
-                    .changeSelectionBounds(stretched)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.STRETCH_SELECTION_BOUNDS);
-        }
-    }
-
-    // rotate selection
-    public void rotateSelectionBounds(
-            final Set<Coord2D> initialSelection, final double deltaR,
-            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.BOUNDS) {
-            final Set<Coord2D> rotated = SelectionUtils
-                    .rotatedPixels(initialSelection, deltaR, pivot, offset);
-
-            final ProjectState result = getState()
-                    .changeSelectionBounds(rotated)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.ROTATE_SELECTION_BOUNDS);
-        }
-    }
-
     // reflect selection
     public void reflectSelection(final boolean horizontal) {
         if (getState().hasSelection()) {
@@ -1444,7 +1352,7 @@ public class SEContext {
                     .changeSelectionBounds(reflected)
                     .changeIsCheckpoint(!dropAndRaise);
             stateManager.performAction(result,
-                    Operation.REFLECT_SELECTION_BOUNDS);
+                    Operation.TRANSFORM_SELECTION_BOUNDS);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
