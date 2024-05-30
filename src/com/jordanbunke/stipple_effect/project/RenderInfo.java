@@ -42,10 +42,8 @@ public class RenderInfo {
                 Math.min(zoomFactor, Constants.MAX_ZOOM));
 
         if (this.zoomFactor != was &&
-                this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY) {
+                this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY)
             ToolWithBreadth.redrawToolOverlays();
-            StippleEffect.get().getContext().redrawSelectionOverlay();
-        }
     }
 
     public void setAnchor(final Coord2D anchor) {

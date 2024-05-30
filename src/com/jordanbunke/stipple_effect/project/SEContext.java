@@ -11,6 +11,7 @@ import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
+import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
@@ -22,8 +23,6 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -44,7 +43,8 @@ public class SEContext {
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
 
-    private GameImage selectionOverlay, checkerboard;
+    private GameImage checkerboard;
+    private SelectionOverlay selectionOverlay;
     private Map<Float, GameImage> pixelGridMap;
 
     public SEContext(
@@ -70,17 +70,7 @@ public class SEContext {
     }
 
     public void redrawSelectionOverlay() {
-        final Set<Coord2D> selection = getState().getSelection();
-        final Tool tool = StippleEffect.get().getTool();
-
-        final boolean movable = Tool.canMoveSelectionBounds(tool) ||
-                tool.equals(Wand.get());
-
-        selectionOverlay = getState().hasSelection()
-                ? GraphicsUtils.drawSelectionOverlay(
-                        renderInfo.getZoomFactor(), selection,
-                movable, tool instanceof MoverTool)
-                : GameImage.dummy();
+        selectionOverlay = new SelectionOverlay(getState().getSelection());
     }
 
     private Coord2D[] getImageRenderBounds(
@@ -196,7 +186,13 @@ public class SEContext {
                     !(tool instanceof MoverTool<?> mt && mt.isMoving())) {
                 final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
 
-                workspace.draw(selectionOverlay,
+                final boolean movable = Tool.canMoveSelectionBounds(tool) ||
+                        tool.equals(Wand.get());
+
+                final GameImage selectionAsset = selectionOverlay.draw(
+                        zoomFactor, movable, tool instanceof MoverTool);
+
+                workspace.draw(selectionAsset,
                         (render.x + (int)(tl.x * zoomFactor))
                                 - Constants.OVERLAY_BORDER_PX,
                         (render.y + (int)(tl.y * zoomFactor))
@@ -924,7 +920,8 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM; fZ *= 2f) {
+        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM;
+             fZ *= Constants.ZOOM_CHANGE_LEVEL) {
             final int z = (int) fZ, altPx = Math.max(2,
                     z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
