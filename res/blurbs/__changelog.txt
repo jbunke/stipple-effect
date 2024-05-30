@@ -1,3 +1,17 @@
+{0.5.0} - The Performance Update - 2024-06-??
+
+TODO:
+Add:
+> Paste images from the system clipboard
+
+Change:
+> Implement massive performance optimizations to make the program faster and less demanding
+    on the machine
+> Overhaul the move selection and pick up selection tools
+
+Fix:
+> Memory issues and related crashes
+
 {0.4.2} - 2024-05-26
 
 Added:
