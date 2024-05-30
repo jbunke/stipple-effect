@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.tools;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
@@ -78,7 +79,12 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
     }
 
     @Override
-    Runnable getMouseUpConsequence(final SEContext context) {
-        return context::resetContentOriginal;
+    GameImage updateToolContentPreview(
+            final SEContext context, final SelectionContents transformation
+    ) {
+        final int w = context.getState().getImageWidth(),
+                h = context.getState().getImageHeight();
+
+        return transformation.getContentForCanvas(w, h);
     }
 }

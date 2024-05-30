@@ -1,11 +1,13 @@
 package com.jordanbunke.stipple_effect.tools;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,7 +73,40 @@ public final class MoveSelection extends MoverTool<Set<Coord2D>> {
     }
 
     @Override
-    Runnable getMouseUpConsequence(final SEContext context) {
-        return () -> context.getState().markAsCheckpoint(true);
+    GameImage updateToolContentPreview(
+            final SEContext context, final Set<Coord2D> transformation
+    ) {
+        final int w = context.getState().getImageWidth(),
+                h = context.getState().getImageHeight();
+
+        final GameImage toolContentPreview = new GameImage(w, h);
+
+        final Set<Coord2D> frontier = transformation.stream().filter(
+                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h
+        ).filter(pixel -> {
+            final boolean
+                    left = !transformation.contains(pixel.displace(-1, 0)),
+                    right = !transformation.contains(pixel.displace(1, 0)),
+                    top = !transformation.contains(pixel.displace(0, -1)),
+                    bottom = !transformation.contains(pixel.displace(0, 1)),
+                    tl = !transformation.contains(pixel.displace(-1, -1)),
+                    tr = !transformation.contains(pixel.displace(1, -1)),
+                    bl = !transformation.contains(pixel.displace(-1, 1)),
+                    br = !transformation.contains(pixel.displace(1, 1));
+
+            return left || right || top || bottom || tl || tr || bl || br;
+        }).collect(Collectors.toSet());
+
+        transformation.forEach(p -> toolContentPreview.dot(
+                Settings.getTheme().highlightOverlay.get(), p.x, p.y));
+        frontier.forEach(p -> toolContentPreview.dot(
+                Settings.getTheme().highlightOutline.get(), p.x, p.y));
+
+        return toolContentPreview;
+    }
+
+    @Override
+    public boolean previewScopeIsGlobal() {
+        return true;
     }
 }

@@ -192,7 +192,8 @@ public class SEContext {
             }
 
             // persistent selection overlay
-            if (getState().hasSelection()) {
+            if (getState().hasSelection() &&
+                    !(tool instanceof MoverTool<?> mt && mt.isMoving())) {
                 final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
 
                 workspace.draw(selectionOverlay,
@@ -1278,20 +1279,6 @@ public class SEContext {
 
             editSelection(Outliner.outline(
                     getState().getSelection(), sideMask), true);
-        }
-    }
-
-    public void resetContentOriginal() {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents reset = getState()
-                    .getSelectionContents().returnDisplaced(new Coord2D());
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(reset)
-                    .changeIsCheckpoint(true);
-            stateManager.performAction(result,
-                    Operation.RESET_SELECTION_CONTENTS);
         }
     }
 

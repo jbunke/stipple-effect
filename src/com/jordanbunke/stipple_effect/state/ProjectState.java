@@ -6,6 +6,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.tools.PickUpSelection;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
@@ -216,7 +217,9 @@ public class ProjectState {
                 // is being moved
                 final boolean previewCondition = inProjectRender &&
                         layer.equals(getEditingLayer()) && hasSelection() &&
-                        selectionMode == SelectionMode.CONTENTS;
+                        selectionMode == SelectionMode.CONTENTS &&
+                        !(tool.equals(PickUpSelection.get()) &&
+                                PickUpSelection.get().isMoving());
 
                 if (previewCondition) {
                     final Set<Coord2D> pixels = selectionContents.getPixels();
