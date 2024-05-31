@@ -43,6 +43,14 @@ public enum Operation {
         };
     }
 
+    public boolean triggersOverlayOffsetUpdate() {
+        return switch (this) {
+            case MOVE_SELECTION_BOUNDS,
+                    MOVE_SELECTION_CONTENTS -> true;
+            default -> false;
+        };
+    }
+
     public boolean constitutesEdit() {
         return switch (this) {
             case NONE, RAISE, DROP, DESELECT, SELECT,

@@ -74,6 +74,10 @@ public class SEContext {
         selectionOverlay = new SelectionOverlay(getState().getSelection());
     }
 
+    public void updateOverlayOffset() {
+        selectionOverlay.updateTL(getState().getSelection());
+    }
+
     private Coord2D[] getImageRenderBounds(
             final Coord2D render, final int w, final int h, final float z
     ) {

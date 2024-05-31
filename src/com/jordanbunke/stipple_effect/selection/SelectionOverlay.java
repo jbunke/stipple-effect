@@ -8,6 +8,7 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -18,10 +19,11 @@ public final class SelectionOverlay {
     // directional frontiers
     private final Set<Coord2D> left, right, top, bottom;
     private final GameImage filled;
-    private final Coord2D tl;
+    private Coord2D tl;
     private final int w, h;
 
     private float lastZ;
+    private Coord2D lastTL;
     private int lastWW, lastWH;
     private Coord2D lastRender;
     private boolean wasFilled, couldTransform;
@@ -29,6 +31,7 @@ public final class SelectionOverlay {
 
     public SelectionOverlay(final Set<Coord2D> selection) {
         lastZ = Constants.MIN_ZOOM;
+        lastTL = new Coord2D();
         lastRender = new Coord2D();
         lastWW = 0;
         lastWH = 0;
@@ -48,7 +51,7 @@ public final class SelectionOverlay {
         final Color fillC = Settings.getTheme().selectionFill.get();
         filled.setColor(fillC);
 
-        selection.parallelStream().forEach(p -> {
+        selection.forEach(p -> {
             if (!selection.contains(p.displace(-1, 0))) left.add(p);
             if (!selection.contains(p.displace(1, 0))) right.add(p);
             if (!selection.contains(p.displace(0, -1))) top.add(p);
@@ -60,6 +63,25 @@ public final class SelectionOverlay {
         filled.free();
     }
 
+    public void updateTL(final Set<Coord2D> selection) {
+        lastTL = tl;
+        tl = SelectionUtils.topLeft(selection);
+
+        if (!lastTL.equals(tl)) {
+            final Coord2D displacement = new Coord2D(
+                    tl.x - lastTL.x, tl.y - lastTL.y);
+
+            final List<Set<Coord2D>> dirs = List.of(left, right, top, bottom);
+
+            for (Set<Coord2D> dir : dirs) {
+                final Set<Coord2D> bank = new HashSet<>(dir);
+                dir.clear();
+
+                bank.forEach(p -> dir.add(p.displace(displacement)));
+            }
+        }
+    }
+
     public GameImage draw(
             final float z, final Coord2D render, final int ww, final int wh,
             final boolean isFilled, final boolean canTransform
@@ -68,8 +90,8 @@ public final class SelectionOverlay {
             return GameImage.dummy();
 
         final boolean sameSelection = wasFilled == isFilled &&
-                couldTransform == canTransform,
-                sameWindow = lastZ == z && lastRender == render &&
+                couldTransform == canTransform && lastTL.equals(tl),
+                sameWindow = lastZ == z && lastRender.equals(render) &&
                         lastWW == ww && lastWH == wh;
 
         if (last != null && sameSelection && sameWindow)
@@ -158,6 +180,8 @@ public final class SelectionOverlay {
 
         wasFilled = isFilled;
         couldTransform = canTransform;
+        lastTL = tl;
+
         last = overlay.submit();
 
         return overlay;
