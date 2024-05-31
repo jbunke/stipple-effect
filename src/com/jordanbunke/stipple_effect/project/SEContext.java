@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
@@ -11,6 +12,7 @@ import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
+import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
@@ -22,8 +24,6 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -44,7 +44,8 @@ public class SEContext {
     private boolean inWorkspaceBounds;
     private Coord2D targetPixel;
 
-    private GameImage selectionOverlay, checkerboard;
+    private GameImage checkerboard;
+    private SelectionOverlay selectionOverlay;
     private Map<Float, GameImage> pixelGridMap;
 
     public SEContext(
@@ -70,17 +71,11 @@ public class SEContext {
     }
 
     public void redrawSelectionOverlay() {
-        final Set<Coord2D> selection = getState().getSelection();
-        final Tool tool = StippleEffect.get().getTool();
+        selectionOverlay = new SelectionOverlay(getState().getSelection());
+    }
 
-        final boolean movable = Tool.canMoveSelectionBounds(tool) ||
-                tool.equals(Wand.get());
-
-        selectionOverlay = getState().hasSelection()
-                ? GraphicsUtils.drawSelectionOverlay(
-                        renderInfo.getZoomFactor(), selection,
-                movable, tool instanceof MoverTool)
-                : GameImage.dummy();
+    public void updateOverlayOffset() {
+        selectionOverlay.updateTL(getState().getSelection());
     }
 
     private Coord2D[] getImageRenderBounds(
@@ -192,14 +187,16 @@ public class SEContext {
             }
 
             // persistent selection overlay
-            if (getState().hasSelection()) {
-                final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
+            if (getState().hasSelection() &&
+                    !(tool instanceof MoverTool<?> mt && mt.isMoving())) {
+                final boolean movable = Tool.canMoveSelectionBounds(tool) ||
+                        tool.equals(Wand.get());
 
-                workspace.draw(selectionOverlay,
-                        (render.x + (int)(tl.x * zoomFactor))
-                                - Constants.OVERLAY_BORDER_PX,
-                        (render.y + (int)(tl.y * zoomFactor))
-                                - Constants.OVERLAY_BORDER_PX);
+                final GameImage selectionAsset =
+                        selectionOverlay.draw(zoomFactor, render, ww, wh,
+                                movable, tool instanceof MoverTool);
+
+                workspace.draw(selectionAsset, 0, 0);
             }
         }
 
@@ -259,7 +256,7 @@ public class SEContext {
         if (tool instanceof SnappableTool st)
             st.setSnap(eventLogger.isPressed(Key.SHIFT));
 
-        if (tool instanceof MoverTool mt)
+        if (tool instanceof MoverTool<?> mt)
             mt.setSnapToggled(eventLogger.isPressed(Key.CTRL));
 
         for (GameEvent e : eventLogger.getUnprocessedEvents()) {
@@ -786,28 +783,28 @@ public class SEContext {
         }
 
         // special case where shifting would constitute snap and is permitted
-        if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool mt &&
+        if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool<?> mt &&
                 getState().hasSelection()) {
+            final int w = SelectionUtils.width(getState().getSelection()),
+                    h = SelectionUtils.height(getState().getSelection());
+
+
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            0, -1 * (mt.isSnap() ? SelectionUtils.height(
-                            getState().getSelection()) : 1)), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(0, -1 * (mt.isSnap() ? h : 1))));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            0, mt.isSnap() ? SelectionUtils.height(
-                            getState().getSelection()) : 1), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(0, mt.isSnap() ? h : 1)));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            -1 * (mt.isSnap() ? SelectionUtils.width(
-                                    getState().getSelection()) : 1), 0), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(-1 * (mt.isSnap() ? w : 1), 0)));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> mt.getMoverFunction(this).accept(new Coord2D(
-                            mt.isSnap() ? SelectionUtils.width(
-                                    getState().getSelection()) : 1, 0), true));
+                    () -> mt.applyMove(this,
+                            new Coord2D(mt.isSnap() ? w : 1, 0)));
         }
     }
 
@@ -923,7 +920,8 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM; fZ *= 2f) {
+        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM;
+             fZ *= Constants.ZOOM_CHANGE_LEVEL) {
             final int z = (int) fZ, altPx = Math.max(2,
                     z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
@@ -1281,76 +1279,6 @@ public class SEContext {
         }
     }
 
-    public void resetContentOriginal() {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents reset = getState()
-                    .getSelectionContents().returnDisplaced(new Coord2D());
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(reset)
-                    .changeIsCheckpoint(true);
-            stateManager.performAction(result,
-                    Operation.RESET_SELECTION_CONTENTS);
-        }
-    }
-
-    // move selection contents
-    public void moveSelectionContents(
-            final Coord2D displacement, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents moved = getState()
-                    .getSelectionContents().returnDisplaced(displacement);
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(moved)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.MOVE_SELECTION_CONTENTS);
-        }
-    }
-
-    // stretch selection contents
-    public void stretchSelectionContents(
-            final Set<Coord2D> initialSelection, final Coord2D change,
-            final MoverTool.Direction direction, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents stretched =
-                    getState().getSelectionContents()
-                    .returnStretched(initialSelection, change, direction);
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(stretched)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.STRETCH_SELECTION_CONTENTS);
-        }
-    }
-
-    // rotate selection contents
-    public void rotateSelectionContents(
-            final Set<Coord2D> initialSelection, final double deltaR,
-            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.CONTENTS) {
-            final SelectionContents rotated =
-                    getState().getSelectionContents()
-                            .returnRotated(initialSelection,
-                                    deltaR, pivot, offset);
-
-            final ProjectState result = getState()
-                    .changeSelectionContents(rotated)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.ROTATE_SELECTION_CONTENTS);
-        }
-    }
-
     // reflect selection contents
     public void reflectSelectionContents(final boolean horizontal) {
         if (getState().hasSelection()) {
@@ -1368,7 +1296,7 @@ public class SEContext {
                     .changeSelectionContents(reflected)
                     .changeIsCheckpoint(!raiseAndDrop);
             stateManager.performAction(result,
-                    Operation.REFLECT_SELECTION_CONTENTS);
+                    Operation.TRANSFORM_SELECTION_CONTENTS);
 
             if (raiseAndDrop)
                 dropContentsToLayer(true, false);
@@ -1392,42 +1320,6 @@ public class SEContext {
         }
     }
 
-    // stretch selection
-    public void stretchSelectionBounds(
-            final Set<Coord2D> initialSelection, final Coord2D change,
-            final MoverTool.Direction direction, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.BOUNDS) {
-            final Set<Coord2D> stretched = SelectionUtils
-                    .stretchedPixels(initialSelection, change, direction);
-
-            final ProjectState result = getState()
-                    .changeSelectionBounds(stretched)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.STRETCH_SELECTION_BOUNDS);
-        }
-    }
-
-    // rotate selection
-    public void rotateSelectionBounds(
-            final Set<Coord2D> initialSelection, final double deltaR,
-            final Coord2D pivot, final boolean[] offset, final boolean checkpoint
-    ) {
-        if (getState().hasSelection() && getState().getSelectionMode() ==
-                SelectionMode.BOUNDS) {
-            final Set<Coord2D> rotated = SelectionUtils
-                    .rotatedPixels(initialSelection, deltaR, pivot, offset);
-
-            final ProjectState result = getState()
-                    .changeSelectionBounds(rotated)
-                    .changeIsCheckpoint(checkpoint);
-            stateManager.performAction(result,
-                    Operation.ROTATE_SELECTION_BOUNDS);
-        }
-    }
-
     // reflect selection
     public void reflectSelection(final boolean horizontal) {
         if (getState().hasSelection()) {
@@ -1444,7 +1336,7 @@ public class SEContext {
                     .changeSelectionBounds(reflected)
                     .changeIsCheckpoint(!dropAndRaise);
             stateManager.performAction(result,
-                    Operation.REFLECT_SELECTION_BOUNDS);
+                    Operation.TRANSFORM_SELECTION_BOUNDS);
 
             if (dropAndRaise)
                 raiseSelectionToContents(true);
@@ -2316,14 +2208,14 @@ public class SEContext {
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
         final Coord2D tl = SelectionUtils.topLeft(selection),
-                br = SelectionUtils.bottomRight(selection),
-                bounds = SelectionUtils.bounds(selection);
+                br = SelectionUtils.bottomRight(selection);
+        final Bounds2D bounds = SelectionUtils.bounds(selection);
         final boolean multiple = selection.size() > 1;
 
         return selection.isEmpty() ? "No selection" : "Selection: " +
                 selection.size() + "px " + (multiple ? "from " : "at ") + tl +
-                (multiple ? (" to " + br + "; " + bounds.x + "x" + bounds.y +
-                        " bounding box") : "");
+                (multiple ? (" to " + br + "; " + bounds.width() + "x" +
+                        bounds.height() + " bounding box") : "");
     }
 
     public ProjectState getState() {

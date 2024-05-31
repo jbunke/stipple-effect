@@ -300,8 +300,7 @@ public class GraphicsUtils {
     }
 
     public static GameImage drawSelectionOverlay(
-            final double z, final Set<Coord2D> selection,
-            final boolean filled, final boolean canTransform
+            final double z, final Set<Coord2D> selection
     ) {
         final Coord2D tl = SelectionUtils.topLeft(selection),
                 br = SelectionUtils.bottomRight(selection);
@@ -314,7 +313,7 @@ public class GraphicsUtils {
         return drawOverlay(w, h, z, adjusted,
                 Settings.getTheme().buttonOutline.get(),
                 Settings.getTheme().highlightOutline.get(),
-                filled, canTransform);
+                false, false);
     }
 
     public static GameImage drawOverlay(
@@ -348,50 +347,8 @@ public class GraphicsUtils {
                 scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
                 scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
-        selection.stream().filter(
-                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h
-        ).forEach(pixel -> {
-            boolean leftFrontier = false,
-                    rightFrontier = false,
-                    topFrontier = false,
-                    bottomFrontier = false;
-
-            // frontier defined as unmarked or off canvas
-            if (pixel.x - 1 < 0 || !selection.contains(pixel.displace(-1, 0)))
-                leftFrontier = true;
-            if (pixel.x + 1 >= w || !selection.contains(pixel.displace(1, 0)))
-                rightFrontier = true;
-            if (pixel.y - 1 < 0 || !selection.contains(pixel.displace(0, -1)))
-                topFrontier = true;
-            if (pixel.y + 1 >= h || !selection.contains(pixel.displace(0, 1)))
-                bottomFrontier = true;
-
-            final Coord2D o = new Coord2D(
-                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.x),
-                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y)
-            );
-
-            if (filled)
-                overlay.fillRectangle(Settings.getTheme().selectionFill.get(),
-                        o.x, o.y, zoomInc, zoomInc);
-
-            if (leftFrontier) {
-                overlay.fillRectangle(inside, o.x, o.y, 1, zoomInc);
-                overlay.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
-            }
-            if (rightFrontier) {
-                overlay.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
-                overlay.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
-            }
-            if (topFrontier) {
-                overlay.fillRectangle(inside, o.x, o.y, zoomInc, 1);
-                overlay.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
-            }
-            if (bottomFrontier) {
-                overlay.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
-                overlay.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
-            }
-        });
+        populateOverlay(selection, zoomInc, overlay, overlay, inside, outside,
+                filled ? Settings.getTheme().selectionFill.get() : null);
 
         if (canTransform) {
             final Coord2D tl = SelectionUtils.topLeft(selection),
@@ -415,6 +372,44 @@ public class GraphicsUtils {
         }
 
         return overlay.submit();
+    }
+
+    public static void populateOverlay(
+            final Set<Coord2D> selection, final int zoomInc,
+            final GameImage frontier, final GameImage filled,
+            final Color inside, final Color outside, final Color fill
+    ) {
+        selection.forEach(pixel -> {
+            final boolean
+                    left = !selection.contains(pixel.displace(-1, 0)),
+                    right = !selection.contains(pixel.displace(1, 0)),
+                    top = !selection.contains(pixel.displace(0, -1)),
+                    bottom = !selection.contains(pixel.displace(0, 1));
+
+            final Coord2D o = new Coord2D(
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.x),
+                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y));
+
+            if (fill != null)
+                filled.fillRectangle(fill, o.x, o.y, zoomInc, zoomInc);
+
+            if (left) {
+                frontier.fillRectangle(inside, o.x, o.y, 1, zoomInc);
+                frontier.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
+            }
+            if (right) {
+                frontier.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
+                frontier.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
+            }
+            if (top) {
+                frontier.fillRectangle(inside, o.x, o.y, zoomInc, 1);
+                frontier.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
+            }
+            if (bottom) {
+                frontier.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
+                frontier.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
+            }
+        });
     }
 
     public static GameImage loadIcon(final String iconID) {

@@ -124,6 +124,7 @@ public class StateManager {
         final int inc = (int) Math.signum(index - was);
         boolean edited = false,
                 redrawSelectionOverlay = false,
+                updateOverlayOffset = false,
                 redrawCanvasAuxiliaries = false;
 
         final Set<ActionType> triggeredActions = new HashSet<>();
@@ -135,6 +136,8 @@ public class StateManager {
             edited |= s.getOperation().constitutesEdit();
             redrawSelectionOverlay |= s.getOperation()
                     .triggersSelectionOverlayRedraw();
+            updateOverlayOffset |= s.getOperation()
+                    .triggersOverlayOffsetUpdate();
             redrawCanvasAuxiliaries |= s.getOperation()
                     .triggersCanvasAuxiliaryRedraw();
 
@@ -148,6 +151,8 @@ public class StateManager {
 
         if (redrawSelectionOverlay)
             c.redrawSelectionOverlay();
+        else if (updateOverlayOffset)
+            c.updateOverlayOffset();
 
         if (redrawCanvasAuxiliaries)
             c.redrawCanvasAuxiliaries();
@@ -173,6 +178,8 @@ public class StateManager {
     private void redrawSelectionOverlayIfTriggered(final ProjectState state) {
         if (state.getOperation().triggersSelectionOverlayRedraw())
             StippleEffect.get().getContext().redrawSelectionOverlay();
+        else if (state.getOperation().triggersOverlayOffsetUpdate())
+            StippleEffect.get().getContext().updateOverlayOffset();
     }
 
     private void redrawCanvasAuxiliariesIfTriggered(final ProjectState state) {

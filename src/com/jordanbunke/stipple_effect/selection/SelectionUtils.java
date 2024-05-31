@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.selection;
 
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
@@ -34,17 +35,17 @@ public class SelectionUtils {
     }
 
     public static int height(final Set<Coord2D> pixels) {
-        return bounds(pixels).y;
+        return bounds(pixels).height();
     }
 
     public static int width(final Set<Coord2D> pixels) {
-        return bounds(pixels).x;
+        return bounds(pixels).width();
     }
 
-    public static Coord2D bounds(final Set<Coord2D> pixels) {
+    public static Bounds2D bounds(final Set<Coord2D> pixels) {
         final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
 
-        return new Coord2D(br.x - tl.x, br.y - tl.y);
+        return new Bounds2D(br.x - tl.x, br.y - tl.y);
     }
 
     public static Set<Coord2D> stretchedPixels(

@@ -18,10 +18,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class PolygonSelect extends ToolWithMode {
+public final class PolygonSelect extends ToolWithMode implements SnappableTool {
     private static final PolygonSelect INSTANCE;
 
-    private boolean selecting;
+    private boolean selecting, finishing, wasFinishing;
     private Coord2D lastTP;
     private List<Coord2D> vertices;
     private Set<Coord2D> edges;
@@ -33,6 +33,8 @@ public final class PolygonSelect extends ToolWithMode {
 
     private PolygonSelect() {
         selecting = false;
+        finishing = false;
+        wasFinishing = false;
         lastTP = Constants.NO_VALID_TARGET;
         vertices = new ArrayList<>();
         edges = new HashSet<>();
@@ -76,11 +78,19 @@ public final class PolygonSelect extends ToolWithMode {
 
             if (selecting) {
                 // add to selection
-                addEdge(getLastVertex(), tp);
-                vertices.add(tp);
+                if (finishing) {
+                    final Coord2D first = vertices.get(0);
+                    addEdge(getLastVertex(), first);
+                    vertices.add(first);
 
-                if (tp.equals(vertices.get(0)))
                     finish(context);
+                } else {
+                    addEdge(getLastVertex(), tp);
+                    vertices.add(tp);
+
+                    if (tp.equals(vertices.get(0)))
+                        finish(context);
+                }
             } else if (tp.x >= 0 && tp.x < w && tp.y >= 0 && tp.y < h) {
                 // Start selection
                 // bounds check only necessary for first vertex
@@ -98,12 +108,14 @@ public final class PolygonSelect extends ToolWithMode {
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();
 
-        if (!selecting || tp.equals(Constants.NO_VALID_TARGET) || tp.equals(lastTP))
+        if (!selecting || tp.equals(Constants.NO_VALID_TARGET) ||
+                (tp.equals(lastTP) && finishing == wasFinishing))
             return;
 
         updateToolContentPreview(context);
 
         lastTP = tp;
+        wasFinishing = finishing;
     }
 
     private void finish(final SEContext context) {
@@ -215,9 +227,11 @@ public final class PolygonSelect extends ToolWithMode {
 
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
-        final Coord2D tp = context.getTargetPixel(), first = vertices.get(0);
+        final Coord2D tp = context.getTargetPixel(),
+                first = vertices.get(0),
+                prospect = finishing ? first : tp;
 
-        final Color border = tp.equals(first)
+        final Color border = prospect.equals(first)
                 ? t.highlightOutline.get() : t.highlightOverlay.get();
 
         toolContentPreview = new GameImage(w, h);
@@ -236,7 +250,7 @@ public final class PolygonSelect extends ToolWithMode {
 
         edges.forEach(e ->
                 toolContentPreview.dot(border, e.x, e.y));
-        defineLine(getLastVertex(), tp).forEach(next ->
+        defineLine(getLastVertex(), prospect).forEach(next ->
                 toolContentPreview.dot(border, next.x, next.y));
         vertices.forEach(v ->
                 toolContentPreview.dot(t.highlightOutline.get(), v.x, v.y));
@@ -293,5 +307,15 @@ public final class PolygonSelect extends ToolWithMode {
     @Override
     public GameImage getToolContentPreview() {
         return toolContentPreview;
+    }
+
+    @Override
+    public void setSnap(final boolean finishing) {
+        this.finishing = finishing;
+    }
+
+    @Override
+    public boolean isSnap() {
+        return finishing;
     }
 }

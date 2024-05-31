@@ -1,21 +1,20 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
+import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.selection.RotateFunction;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
-import com.jordanbunke.stipple_effect.selection.StretcherFunction;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
-public sealed abstract class MoverTool extends Tool implements SnappableTool
+public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         permits MoveSelection, PickUpSelection {
     public enum TransformType {
         NONE, MOVE, STRETCH, ROTATE
@@ -37,8 +36,10 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
     private TransformType transformType, prospectiveType;
     private Direction direction;
     private Set<Coord2D> startSelection;
+    private T transformation;
     private Coord2D startMousePosition, lastMousePosition,
             startTopLeft, startBottomRight, startTP, lastTP;
+    private GameImage toolContentPreview;
 
     public MoverTool() {
         transformType = TransformType.NONE;
@@ -46,6 +47,7 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
         direction = Direction.NA;
 
         startSelection = new HashSet<>();
+        transformation = null;
 
         startMousePosition = new Coord2D();
         lastMousePosition = new Coord2D();
@@ -53,12 +55,30 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
         lastTP = Constants.NO_VALID_TARGET;
         startTopLeft = Constants.NO_VALID_TARGET;
         startBottomRight = Constants.NO_VALID_TARGET;
+
+        toolContentPreview = GameImage.dummy();
     }
 
-    public abstract BiConsumer<Coord2D, Boolean> getMoverFunction(final SEContext context);
-    abstract StretcherFunction getStretcherFunction(final SEContext context);
-    abstract RotateFunction getRotateFunction(final SEContext context);
-    abstract Runnable getMouseUpConsequence(final SEContext context);
+    abstract boolean canBeMoved(final SEContext context);
+    abstract T move(final SEContext context, final Coord2D displacement);
+    abstract T stretch(
+            final SEContext context, final Set<Coord2D> initial,
+            final Coord2D change, final Direction direction
+    );
+    abstract T rotate(
+            final SEContext context, final Set<Coord2D> initial,
+            final double deltaR, final Coord2D pivot, final boolean[] offset
+    );
+    abstract void applyTransformation(
+            final SEContext context, final T transformation, final boolean transform
+    );
+    abstract GameImage updateToolContentPreview(
+            final SEContext context, final T transformation
+    );
+
+    public final void applyMove(final SEContext context, final Coord2D displacement) {
+        applyTransformation(context, move(context, displacement), false);
+    }
 
     public TransformType determineTransformType(
             final SEContext context
@@ -187,8 +207,10 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
         transformType = determineTransformType(context);
         prospectiveType = TransformType.NONE;
 
-        if (context.getState().hasSelection()) {
+        if (canBeMoved(context)) {
             startSelection = new HashSet<>(context.getState().getSelection());
+            transformation = move(context, new Coord2D());
+            toolContentPreview = updateToolContentPreview(context, transformation);
 
             startMousePosition = me.mousePosition;
             lastMousePosition = me.mousePosition;
@@ -218,30 +240,29 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
                 if (isSnap()) {
                     if (!snapToggled) {
                         // displace in multiples of own bounds
-                        final Coord2D bounds = SelectionUtils.bounds(selection);
+                        final Bounds2D bounds = SelectionUtils.bounds(selection);
 
-                        final int snappedX = bounds.x * (int)Math.round(
-                                displacement.x / (double) bounds.x),
-                                snappedY = bounds.y * (int)Math.round(
-                                        displacement.y / (double) bounds.y);
+                        final int snappedX = bounds.width() * (int)Math.round(
+                                displacement.x / (double) bounds.width()),
+                                snappedY = bounds.height() * (int)Math.round(
+                                        displacement.y / (double) bounds.height());
                         displacement = new Coord2D(snappedX, snappedY);
                     } else if (canSnapToGrid(context)) {
                         // snap to top left of pixel grid
                         final int px = Settings.getPixelGridXPixels(),
                                 py = Settings.getPixelGridYPixels();
-                        final Coord2D prospective = topLeft.displace(displacement),
-                                gridPos = new Coord2D(
-                                        (prospective.x / px) * px,
-                                        (prospective.y / py) * py),
-                                shift = new Coord2D(
-                                        gridPos.x - prospective.x,
-                                        gridPos.y - prospective.y);
 
-                        displacement = displacement.displace(shift);
+                        final Coord2D tp = context.getTargetPixel(),
+                                gridPos = new Coord2D(
+                                        ((tp.x / px) - (tp.x < 0 ? 1 : 0)) * px,
+                                        ((tp.y / py) - (tp.y < 0 ? 1 : 0)) * py);
+                        displacement = new Coord2D(
+                                gridPos.x - topLeft.x, gridPos.y - topLeft.y);
                     }
                 }
 
-                getMoverFunction(context).accept(displacement, false);
+                transformation = move(context, displacement);
+                toolContentPreview = updateToolContentPreview(context, transformation);
             }
             case STRETCH -> {
                 final Coord2D delta = new Coord2D(
@@ -256,8 +277,8 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
                     default -> new Coord2D(delta.x, delta.y);
                 };
 
-                getStretcherFunction(context).accept(startSelection,
-                        change, direction, false);
+                transformation = stretch(context, startSelection, change, direction);
+                toolContentPreview = updateToolContentPreview(context, transformation);
             }
             case ROTATE -> {
                 final Coord2D tp = context.getTargetPixel();
@@ -286,8 +307,9 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
                                     Geometry.angleDiff(angle, b),
                             Direction.values());
 
-                    getRotateFunction(context).accept(startSelection,
-                            deltaR, pivot, offset, false);
+                    transformation = rotate(context,
+                            startSelection, deltaR, pivot, offset);
+                    toolContentPreview = updateToolContentPreview(context, transformation);
 
                     lastTP = tp;
                 }
@@ -299,11 +321,27 @@ public sealed abstract class MoverTool extends Tool implements SnappableTool
 
     @Override
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
-        if (transformType != TransformType.NONE) {
+        if (isMoving() && transformation != null) {
+            applyTransformation(context, transformation,
+                    transformType != TransformType.MOVE);
+
             transformType = TransformType.NONE;
-            getMouseUpConsequence(context).run();
             me.markAsProcessed();
         }
+    }
+
+    public boolean isMoving() {
+        return transformType != TransformType.NONE;
+    }
+
+    @Override
+    public boolean hasToolContentPreview() {
+        return isMoving();
+    }
+
+    @Override
+    public GameImage getToolContentPreview() {
+        return toolContentPreview;
     }
 
     private boolean canSnapToGrid(final SEContext context) {

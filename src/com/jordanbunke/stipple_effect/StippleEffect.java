@@ -1444,7 +1444,6 @@ public class StippleEffect implements ProgramContext {
 
     public void autoAssignPickUpSelection() {
         this.tool = PickUpSelection.get();
-        getContext().redrawSelectionOverlay();
         rebuildToolButtonMenu();
     }
 
@@ -1464,7 +1463,6 @@ public class StippleEffect implements ProgramContext {
                 tool.equals(PickUpSelection.get()))
             PickUpSelection.get().engage(getContext());
 
-        getContext().redrawSelectionOverlay();
         rebuildToolButtonMenu();
     }
 
