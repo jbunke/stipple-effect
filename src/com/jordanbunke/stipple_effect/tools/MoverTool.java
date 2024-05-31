@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
@@ -239,12 +240,12 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                 if (isSnap()) {
                     if (!snapToggled) {
                         // displace in multiples of own bounds
-                        final Coord2D bounds = SelectionUtils.bounds(selection);
+                        final Bounds2D bounds = SelectionUtils.bounds(selection);
 
-                        final int snappedX = bounds.x * (int)Math.round(
-                                displacement.x / (double) bounds.x),
-                                snappedY = bounds.y * (int)Math.round(
-                                        displacement.y / (double) bounds.y);
+                        final int snappedX = bounds.width() * (int)Math.round(
+                                displacement.x / (double) bounds.width()),
+                                snappedY = bounds.height() * (int)Math.round(
+                                        displacement.y / (double) bounds.height());
                         displacement = new Coord2D(snappedX, snappedY);
                     } else if (canSnapToGrid(context)) {
                         // snap to top left of pixel grid

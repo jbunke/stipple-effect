@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
@@ -184,19 +185,14 @@ public class SEContext {
             // persistent selection overlay
             if (getState().hasSelection() &&
                     !(tool instanceof MoverTool<?> mt && mt.isMoving())) {
-                final Coord2D tl = SelectionUtils.topLeft(getState().getSelection());
-
                 final boolean movable = Tool.canMoveSelectionBounds(tool) ||
                         tool.equals(Wand.get());
 
-                final GameImage selectionAsset = selectionOverlay.draw(
-                        zoomFactor, movable, tool instanceof MoverTool);
+                final GameImage selectionAsset =
+                        selectionOverlay.draw(zoomFactor, render, ww, wh,
+                                movable, tool instanceof MoverTool);
 
-                workspace.draw(selectionAsset,
-                        (render.x + (int)(tl.x * zoomFactor))
-                                - Constants.OVERLAY_BORDER_PX,
-                        (render.y + (int)(tl.y * zoomFactor))
-                                - Constants.OVERLAY_BORDER_PX);
+                workspace.draw(selectionAsset, 0, 0);
             }
         }
 
@@ -2208,14 +2204,14 @@ public class SEContext {
     public String getSelectionText() {
         final Set<Coord2D> selection = getState().getSelection();
         final Coord2D tl = SelectionUtils.topLeft(selection),
-                br = SelectionUtils.bottomRight(selection),
-                bounds = SelectionUtils.bounds(selection);
+                br = SelectionUtils.bottomRight(selection);
+        final Bounds2D bounds = SelectionUtils.bounds(selection);
         final boolean multiple = selection.size() > 1;
 
         return selection.isEmpty() ? "No selection" : "Selection: " +
                 selection.size() + "px " + (multiple ? "from " : "at ") + tl +
-                (multiple ? (" to " + br + "; " + bounds.x + "x" + bounds.y +
-                        " bounding box") : "");
+                (multiple ? (" to " + br + "; " + bounds.width() + "x" +
+                        bounds.height() + " bounding box") : "");
     }
 
     public ProjectState getState() {

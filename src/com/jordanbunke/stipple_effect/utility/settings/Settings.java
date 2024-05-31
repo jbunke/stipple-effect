@@ -111,14 +111,12 @@ public class Settings {
         public String toString() {
             final String name = name();
 
-            return name.toLowerCase().replace("default", "def");
+            return name.toLowerCase();
         }
 
         public static Code fromString(final String code) {
             try {
-                final String formattedCode = code
-                        .replace("def_", "default_").toUpperCase();
-                return Code.valueOf(formattedCode);
+                return Code.valueOf(code.toUpperCase());
             } catch (IllegalArgumentException e) {
                 return null;
             }
