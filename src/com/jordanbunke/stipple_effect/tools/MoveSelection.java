@@ -29,7 +29,7 @@ public final class MoveSelection extends MoverTool<Set<Coord2D>> {
     }
 
     @Override
-    boolean canBeMoved(SEContext context) {
+    boolean canBeMoved(final SEContext context) {
         return context.getState().hasSelection() &&
                 context.getState().getSelectionMode() == SelectionMode.BOUNDS;
     }

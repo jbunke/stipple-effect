@@ -1,4 +1,4 @@
-Shortcut: {S}
+Shortcut: {R}
 
 The shape tool plots a shape of a determined pixel width.
 

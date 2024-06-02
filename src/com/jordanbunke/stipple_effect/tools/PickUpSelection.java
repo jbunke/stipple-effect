@@ -27,7 +27,7 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
     }
 
     @Override
-    boolean canBeMoved(SEContext context) {
+    boolean canBeMoved(final SEContext context) {
         return context.getState().hasSelection() &&
                 context.getState().getSelectionMode() == SelectionMode.CONTENTS;
     }

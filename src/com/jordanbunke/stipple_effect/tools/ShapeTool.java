@@ -6,6 +6,7 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public final class ShapeTool extends GeometryTool implements SnappableTool {
@@ -44,7 +45,42 @@ public final class ShapeTool extends GeometryTool implements SnappableTool {
             final Set<Coord2D> selection
     ) {
         if (ellipse) {
-            // TODO
+            final Set<Coord2D> points = new HashSet<>();
+
+            final int w = Math.abs(anchor.x - endpoint.x),
+                    h = Math.abs(anchor.y - endpoint.y);
+
+            final double a = w / 2d, b = h / 2d;
+
+            final Coord2D left = new Coord2D(
+                    Math.min(anchor.x, endpoint.x),
+                    (anchor.y + endpoint.y) / 2),
+                    right = left.displace(w, 0);
+
+            points.add(left);
+            points.add(right);
+
+            for (int x = 0; x <= a; x++) {
+                final int y = (int) Math.round(Math.sqrt(Math.pow(b, 2) -
+                        ((Math.pow(b, 2) * Math.pow(x, 2)) / Math.pow(a, 2))));
+
+                points.add(new Coord2D(left.x + (int) a + x, left.y + y));
+                points.add(new Coord2D(left.x + (int) a - x, left.y + y));
+                points.add(new Coord2D(left.x + (int) a + x, left.y - y));
+                points.add(new Coord2D(left.x + (int) a - x, left.y - y));
+            }
+
+            for (int y = 0; y <= b; y++) {
+                final int x = (int) Math.round(Math.sqrt(Math.pow(a, 2) -
+                        ((Math.pow(a, 2) * Math.pow(y, 2)) / Math.pow(b, 2))));
+
+                points.add(new Coord2D(left.x + (int) a + x, left.y + y));
+                points.add(new Coord2D(left.x + (int) a - x, left.y + y));
+                points.add(new Coord2D(left.x + (int) a + x, left.y - y));
+                points.add(new Coord2D(left.x + (int) a - x, left.y - y));
+            }
+
+            points.forEach(p -> populateAround(p, selection));
         } else {
             final Coord2D corner3 = new Coord2D(anchor.x, endpoint.y),
                     corner4 = new Coord2D(endpoint.x, anchor.y);

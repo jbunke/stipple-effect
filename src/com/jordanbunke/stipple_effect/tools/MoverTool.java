@@ -226,6 +226,9 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         if (mousePosition.equals(lastMousePosition))
             return;
 
+        if (isMoving() && !context.getState().hasSelection())
+            transformType = TransformType.NONE;
+
         switch (transformType) {
             case NONE -> prospectiveType = determineTransformType(context);
             case MOVE -> {
