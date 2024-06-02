@@ -61,7 +61,7 @@ public class Constants {
             MIN_BREADTH = 1, MAX_BREADTH = 100, BREADTH_INC = 5,
             MIN_FONT_SCALE = 1, MAX_FONT_SCALE = 10,
             DEFAULT_FONT_PX_SPACING = 2, MIN_FONT_PX_SPACING = 0, MAX_FONT_PX_SPACING = 10,
-            MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, MAX_OUTLINE_PX = 10,
+            MAX_NUM_LAYERS = 50, MAX_NUM_FRAMES = 300, MAX_OUTLINE_PX = 10,
             MIN_NUM_STATES = 100, DUMP_STATES_CUSHION_FACTOR = 2,
             MILLIS_IN_SECOND = 1000, MIN_PLAYBACK_FPS = 1, MAX_PLAYBACK_FPS = 24,
             PLAYBACK_FPS_INC = 1, DEFAULT_PLAYBACK_FPS = 10,
@@ -77,8 +77,7 @@ public class Constants {
 
     public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f,
             ZOOM_FOR_OVERLAY = 1f, ZOOM_FOR_GRID = DEF_ZOOM,
-            NO_ZOOM = 1f, ZOOM_CHANGE_LEVEL = 2f,
-            MAX_PREVIEW_ZOOM = 8f, MAX_ZOOM_FOR_OVERLAY = 8f;
+            NO_ZOOM = 1f, ZOOM_CHANGE_LEVEL = 2f, MAX_PREVIEW_ZOOM = 8f;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

@@ -17,7 +17,7 @@ public abstract class Tool {
                 Hand.get(), Zoom.get(),
                 StipplePencil.get(), Pencil.get(),
                 Brush.get(), ShadeBrush.get(), Eraser.get(),
-                GradientTool.get(), LineTool.get(),
+                GradientTool.get(), LineTool.get(), ShapeTool.get(),
                 TextTool.get(), Fill.get(), ColorPicker.get(),
                 Wand.get(), BrushSelect.get(), BoxSelect.get(), PolygonSelect.get(),
                 MoveSelection.get(), PickUpSelection.get()

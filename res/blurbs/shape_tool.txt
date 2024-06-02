@@ -1,0 +1,10 @@
+Shortcut: {S}
+
+The shape tool plots a shape of a determined pixel width.
+
+Primary color: {Left Click & Drag}
+Secondary color: {Right Click & Drag}
+
+Snap a rectangle to a square or an ellipse to a circle by holding {Shift}.
+
+Increment/decrement brush width: {Arrow Keys} or {Shift + Scroll Wheel}

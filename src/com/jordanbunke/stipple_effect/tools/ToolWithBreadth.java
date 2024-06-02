@@ -16,7 +16,7 @@ import java.awt.*;
 import java.util.Arrays;
 
 public sealed abstract class ToolWithBreadth extends ToolThatDraws implements BreadthTool
-        permits Brush, Eraser, BrushSelect, ShadeBrush, LineTool, GradientTool {
+        permits Brush, Eraser, BrushSelect, ShadeBrush, GeometryTool, GradientTool {
     private int breadth;
     private GameImage overlay;
 

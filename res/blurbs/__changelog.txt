@@ -6,6 +6,7 @@ Added:
 Changed:
 > Optimized selection overlays
 > Move selection and pick up selection action previews are rendered in a different style
+> Changed frame limit from 100 to 300 and layer limit from 100 to 50
 
 Fixed:
 > Bug: PIXEL_GRID_ON_BY_DEFAULT setting flag is not persistent
