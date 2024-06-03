@@ -256,11 +256,11 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private void zoomIn() {
-        setZoom(zoom * Constants.ZOOM_CHANGE_LEVEL);
+        setZoom(zoom + 1f);
     }
 
     private void zoomOut() {
-        setZoom(zoom / Constants.ZOOM_CHANGE_LEVEL);
+        setZoom(zoom - 1f);
     }
 
     @Override
@@ -386,6 +386,8 @@ public class PreviewWindow implements ProgramContext {
         window.setOnCloseBehaviour(preview::terminateExecution);
 
         StippleEffect.get().window.getEventLogger().unpressAllKeys();
+        // refocus Stipple Effect window
+        StippleEffect.get().window.focus();
     }
 
     private GameWindow makeWindow() {

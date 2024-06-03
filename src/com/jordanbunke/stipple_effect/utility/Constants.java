@@ -77,7 +77,7 @@ public class Constants {
 
     public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f,
             ZOOM_FOR_OVERLAY = 1f, ZOOM_FOR_GRID = DEF_ZOOM,
-            NO_ZOOM = 1f, ZOOM_CHANGE_LEVEL = 2f, MAX_PREVIEW_ZOOM = 8f;
+            NO_ZOOM = 1f, ZOOM_CHANGE_LEVEL = 2f, MAX_PREVIEW_ZOOM = 12f;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
