@@ -2324,7 +2324,7 @@ public class DialogAssembly {
                                 "Theme:"),
                         windowedSizeLabel = TextLabel.make(
                                 textBelowPos(fontLabel, 1),
-                                "Program size when windowed"),
+                                "Windowed program size"),
                         windowedWidthLabel = TextLabel.make(
                                 textBelowPos(windowedSizeLabel),
                                 "Window width:"),

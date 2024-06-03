@@ -40,7 +40,7 @@ public final class MoveSelection extends MoverTool<Set<Coord2D>> {
     ) {
         final Set<Coord2D> selection = context.getState().getSelection();
 
-        return selection.stream().map(s ->
+        return selection.parallelStream().map(s ->
                 s.displace(displacement)).collect(Collectors.toSet());
     }
 
