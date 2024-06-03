@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
@@ -24,7 +25,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     private int ditherTextX;
 
     ToolWithBreadth() {
-        breadth = Constants.DEFAULT_BRUSH_BREADTH;
+        breadth = Settings.getDefaultToolBreadth();
 
         ditherTextX = 0;
     }

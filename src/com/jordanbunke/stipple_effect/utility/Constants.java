@@ -57,7 +57,7 @@ public class Constants {
             OVERLAY_BORDER_PX = 6, SPLASH_TIMEOUT_SECS = 1800, NO_SELECTION = -1,
             MAX_PALETTE_SIZE = 300;
 
-    public static final int DEFAULT_BRUSH_BREADTH = 3,
+    public static final int DEFAULT_BRUSH_BREADTH = 1,
             MIN_BREADTH = 1, MAX_BREADTH = 100, BREADTH_INC = 5,
             MIN_FONT_SCALE = 1, MAX_FONT_SCALE = 10,
             DEFAULT_FONT_PX_SPACING = 2, MIN_FONT_PX_SPACING = 0, MAX_FONT_PX_SPACING = 10,

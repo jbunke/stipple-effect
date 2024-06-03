@@ -74,6 +74,8 @@ public class Settings {
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_W)),
         DEFAULT_CANVAS_H_PX(new Setting<>(
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_H)),
+        DEFAULT_TOOL_BREADTH(new Setting<>(
+                IntSettingType.get(), Constants.DEFAULT_BRUSH_BREADTH)),
 
         // string settings
         DEFAULT_INDEX_PREFIX(new Setting<>(
@@ -270,6 +272,12 @@ public class Settings {
         Code.DEFAULT_CANVAS_H_PX.set(defaultCanvasHPixels);
     }
 
+    public static void setDefaultToolBreadth(
+            final int defaultToolBreadth
+    ) {
+        Code.DEFAULT_TOOL_BREADTH.set(defaultToolBreadth);
+    }
+
     public static void setDefaultIndexPrefix(
             final String defIndexPrefix
     ) {
@@ -351,6 +359,10 @@ public class Settings {
         return (int) Code.DEFAULT_CANVAS_H_PX.setting.check();
     }
 
+    public static int checkDefaultToolBreadth() {
+        return (int) Code.DEFAULT_TOOL_BREADTH.setting.check();
+    }
+
     public static String checkDefaultIndexPrefix() {
         return (String) Code.DEFAULT_INDEX_PREFIX.setting.check();
     }
@@ -410,6 +422,10 @@ public class Settings {
 
     public static int getDefaultCanvasHPixels() {
         return (int) Code.DEFAULT_CANVAS_H_PX.setting.get();
+    }
+
+    public static int getDefaultToolBreadth() {
+        return (int) Code.DEFAULT_TOOL_BREADTH.setting.get();
     }
 
     public static String getDefaultIndexPrefix() {

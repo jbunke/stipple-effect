@@ -2208,8 +2208,11 @@ public class DialogAssembly {
                                 "Width:"),
                         newProjectHeightLabel = makeDialogRightLabel(
                                 newProjectWidthLabel, "Height:"),
-                        frameAffixLabel = TextLabel.make(
+                        defaultToolBreadthLabel = TextLabel.make(
                                 textBelowPos(newProjectWidthLabel, 1),
+                                "Default tool breadth:"),
+                        frameAffixLabel = TextLabel.make(
+                                textBelowPos(defaultToolBreadthLabel, 1),
                                 "Default separate PNGs frame affixes"),
                         prefixLabel = TextLabel.make(
                                 textBelowPos(frameAffixLabel),
@@ -2240,7 +2243,13 @@ public class DialogAssembly {
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                                 Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                                 Settings::setDefaultCanvasHPixels,
-                                Settings::checkDefaultCanvasHPixels, 3);
+                                Settings::checkDefaultCanvasHPixels, 3),
+                        toolBreadthTextbox = makeDialogPixelDynamicTextbox(
+                                defaultToolBreadthLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Constants.MIN_BREADTH, Constants.MAX_BREADTH,
+                                Settings::setDefaultToolBreadth,
+                                Settings::checkDefaultToolBreadth, 3);
 
                 final String FA_EXAMPLE = "Example: base_name", FA_MAX_VALUE = "WWWWW";
                 final DynamicLabel frameAffixExample = makeDynamicLabel(
@@ -2261,9 +2270,10 @@ public class DialogAssembly {
                         pixelGridDefaultLabel, pixelGridCheckbox,
                         defaultNewProjectSizeLabel,
                         newProjectWidthLabel, widthTextbox,
-                        newProjectHeightLabel, heightTextbox)
-                        .addAll(frameAffixLabel, prefixLabel, suffixLabel,
-                                frameAffixExample, prefixTextbox, suffixTextbox);
+                        newProjectHeightLabel, heightTextbox,
+                        defaultToolBreadthLabel, toolBreadthTextbox,
+                        frameAffixLabel, prefixLabel, suffixLabel,
+                        frameAffixExample, prefixTextbox, suffixTextbox);
 
                 // update as new settings are added to category
                 yield frameAffixExample;
