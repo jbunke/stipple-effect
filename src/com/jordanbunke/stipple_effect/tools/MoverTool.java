@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.ToolTaskHandler;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
@@ -31,6 +32,8 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         }
     }
 
+    private ToolTaskHandler handler;
+
     private boolean snap = false, snapToggled = false;
 
     private TransformType transformType, prospectiveType;
@@ -42,6 +45,8 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
     private GameImage toolContentPreview;
 
     public MoverTool() {
+        handler = ToolTaskHandler.dummy();
+
         transformType = TransformType.NONE;
         prospectiveType = TransformType.NONE;
         direction = Direction.NA;
@@ -264,8 +269,13 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                     }
                 }
 
-                transformation = move(context, displacement);
-                toolContentPreview = updateToolContentPreview(context, transformation);
+                final Coord2D disp = displacement;
+
+                handler = ToolTaskHandler.update(handler, () -> {
+                    transformation = move(context, disp);
+                    toolContentPreview =
+                            updateToolContentPreview(context, transformation);
+                }, transformType, context, displacement);
             }
             case STRETCH -> {
                 final Coord2D delta = new Coord2D(
@@ -280,8 +290,12 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                     default -> new Coord2D(delta.x, delta.y);
                 };
 
-                transformation = stretch(context, startSelection, change, direction);
-                toolContentPreview = updateToolContentPreview(context, transformation);
+                handler = ToolTaskHandler.update(handler, () -> {
+                    transformation = stretch(context,
+                            startSelection, change, direction);
+                    toolContentPreview =
+                            updateToolContentPreview(context, transformation);
+                }, transformType, context, startSelection, change, direction);
             }
             case ROTATE -> {
                 final Coord2D tp = context.getTargetPixel();
@@ -310,9 +324,12 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                                     Geometry.angleDiff(angle, b),
                             Direction.values());
 
-                    transformation = rotate(context,
-                            startSelection, deltaR, pivot, offset);
-                    toolContentPreview = updateToolContentPreview(context, transformation);
+                    handler = ToolTaskHandler.update(handler, () -> {
+                        transformation = rotate(context,
+                                startSelection, deltaR, pivot, offset);
+                        toolContentPreview =
+                                updateToolContentPreview(context, transformation);
+                    }, transformType, context, startSelection, deltaR, pivot, offset);
 
                     lastTP = tp;
                 }
