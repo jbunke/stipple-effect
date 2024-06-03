@@ -259,8 +259,8 @@ public class MenuAssembly {
                         Layout.ICON_BUTTON_OFFSET_Y, Layout.TEXT_Y_OFFSET, 1,
                         Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
                         c.playbackInfo::setFps, c.playbackInfo::getFps,
-                        fps -> fps, fps -> fps, fps -> fps + " fps",
-                        "XXX fps");
+                        fps -> fps, fps -> fps, fps -> fps + " FPS",
+                        "XXX FPS");
         mb.addAll(playbackLabel, playback.decButton, playback.incButton,
                 playback.slider, playback.value);
 

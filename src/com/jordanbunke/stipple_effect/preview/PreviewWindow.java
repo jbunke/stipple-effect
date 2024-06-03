@@ -215,7 +215,7 @@ public class PreviewWindow implements ProgramContext {
                         (fpsButtonY - Layout.BUTTON_OFFSET) + Layout.TEXT_Y_OFFSET,
                         1, Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
                         playbackInfo::setFps, playbackInfo::getFps,
-                        i -> i, sv -> sv, sv -> sv + " fps", "XXX fps");
+                        i -> i, sv -> sv, sv -> sv + " FPS", "XXX FPS");
         mb.addAll(fps.decButton, fps.incButton, fps.slider, fps.value);
 
         final IconButton decZoom = IconButton.make(IconCodes.DECREMENT,

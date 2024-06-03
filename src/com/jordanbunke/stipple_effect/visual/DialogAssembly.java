@@ -222,7 +222,7 @@ public class DialogAssembly {
                         fpsLabel.getY(), 1, Constants.MIN_PLAYBACK_FPS,
                         Constants.MAX_PLAYBACK_FPS,
                         c.projectInfo::setFps, c.projectInfo::getFps,
-                        i -> i, sv -> sv, i -> i + " fps", "XXX fps");
+                        i -> i, sv -> sv, i -> i + " FPS", "XXX FPS");
 
         // GIF and MP4 contents
         final MenuElementGrouping gifContents = new MenuElementGrouping(
