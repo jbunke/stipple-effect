@@ -419,8 +419,8 @@ public class GraphicsUtils {
     }
 
     public static GameImage highlightIconButton(final GameImage icon) {
-        final GameImage highlighted = new GameImage(HIGHLIGHT_OVERLAY);
-        highlighted.draw(icon);
+        final GameImage highlighted = new GameImage(icon);
+        highlighted.draw(HIGHLIGHT_OVERLAY);
 
         return highlighted.submit();
     }

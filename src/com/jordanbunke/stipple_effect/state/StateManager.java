@@ -6,13 +6,18 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class StateManager {
     private int index;
     private final List<ProjectState> states;
 
     public StateManager(final ProjectState initialState) {
+        initialState.markAsCheckpoint(false);
+
         this.states = new ArrayList<>(List.of(initialState));
         index = 0;
     }
@@ -188,6 +193,34 @@ public class StateManager {
     }
 
     public ProjectState getState() {
+        return getState(index);
+    }
+
+    public ProjectState getState(final int index) {
         return states.get(index);
+    }
+
+    public void setState(final int index, final SEContext c) {
+        this.index = index;
+
+        c.projectInfo.markAsEdited();
+        c.redrawSelectionOverlay();
+        c.redrawCanvasAuxiliaries();
+
+        ActionType.MAJOR.consequence();
+    }
+
+    public int relativePosition(final int reference) {
+        return reference - index;
+    }
+
+    public List<Integer> getCheckpoints() {
+        final List<Integer> checkpoints = new ArrayList<>();
+
+        for (int i = 0; i < states.size(); i++)
+            if (getState(i).isCheckpoint())
+                checkpoints.add(i);
+
+        return checkpoints;
     }
 }

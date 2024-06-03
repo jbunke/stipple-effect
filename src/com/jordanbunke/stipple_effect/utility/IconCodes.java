@@ -16,6 +16,7 @@ public class IconCodes {
             GRANULAR_UNDO = "granular_undo",
             GRANULAR_REDO = "granular_redo",
             REDO = "redo",
+            HISTORY = "history",
             EXIT_PROGRAM = "exit_program",
             NEW_FRAME = "new_frame",
             DUPLICATE_FRAME = "duplicate_frame",

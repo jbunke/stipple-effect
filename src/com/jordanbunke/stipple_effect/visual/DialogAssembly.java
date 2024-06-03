@@ -40,11 +40,9 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.OutlineTextbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
@@ -54,6 +52,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -764,6 +763,118 @@ public class DialogAssembly {
                 "Create", () -> StippleEffect.get().newProject(), true));
     }
 
+    public static void setDialogToHistory() {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        final Coord2D thirdDisp = new Coord2D(Layout.getDialogWidth() / 3, 0);
+
+        final TextLabel stateHeader = makeDialogLeftLabel(0, "RELATIVE POSITION"),
+                causeHeader = TextLabel.make(
+                        stateHeader.getPosition().displace(thirdDisp),
+                        "CAUSE");
+
+        mb.addAll(stateHeader, causeHeader);
+
+        AtomicInteger i = new AtomicInteger(-1);
+        final List<Integer> checkpoints = c.getStateManager().getCheckpoints();
+        final int size = checkpoints.size();
+
+        final MenuBuilder smb = new MenuBuilder();
+        MenuElement bottomLabel = new PlaceholderMenuElement();
+
+        for (int ci = 0; ci < size; ci++) {
+            final int checkpoint = checkpoints.get((size - 1) - ci);
+
+            final ProjectState state = c.getStateManager().getState(checkpoint);
+
+            final int relative = c.getStateManager().relativePosition(checkpoint),
+                    abs = Math.abs(relative);
+
+            final Color col;
+            final String text;
+
+            if (relative < 0) {
+                col = SEColors.red();
+                text = abs + " state" + (abs > 1 ? "s" : "") + " behind";
+            } else if (relative == 0) {
+                col = Settings.getTheme().textLight.get();
+                text = "[ CURRENT ]";
+            } else {
+                col = SEColors.green();
+                text = abs + " state" + (abs > 1 ? "s" : "") + " ahead";
+            }
+
+            final TextLabel stateLabel =
+                    TextLabel.make(getDialogLeftContentPositionForRow(ci + 1),
+                    text, col),
+                    causeLabel = TextLabel.make(
+                            stateLabel.getPosition().displace(thirdDisp),
+                            state.getOperation().toString());
+            final SelectStateButton selectButton = SelectStateButton.make(
+                    getDialogLeftContentPositionForRow(ci + 1)
+                            .displace(thirdDisp.x * 2, 0),
+                    () -> i.set(checkpoint), () -> i.get() != checkpoint);
+
+            smb.addAll(stateLabel, causeLabel, selectButton);
+            bottomLabel = stateLabel;
+        }
+
+        final int scrollerEndY = (Layout.getCanvasMiddle().y +
+                Layout.getDialogHeight() / 2) - ((2 * Layout.CONTENT_BUFFER_PX) +
+                Layout.STD_TEXT_BUTTON_H);
+
+        final Coord2D scrollerPos = Layout.getDialogPosition().displace(0,
+                (int)(3.5 * Layout.STD_TEXT_BUTTON_INC) +
+                        Layout.TEXT_Y_OFFSET - Layout.BUTTON_DIM);
+        final Bounds2D scrollerDims = new Bounds2D(Layout.getDialogWidth(),
+                scrollerEndY - scrollerPos.y);
+
+        final int realBottomY = bottomLabel.getRenderPosition().y +
+                bottomLabel.getHeight() + Layout.STD_TEXT_BUTTON_H;
+
+        mb.add(new VerticalScrollBox(scrollerPos, scrollerDims,
+                Arrays.stream(smb.build().getMenuElements())
+                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                realBottomY, 0));
+
+        final Supplier<Boolean> precondition = () -> i.get() >= 0;
+
+        final DynamicLabel selectedLabel =
+                makeDialogLeftDynamicLabelAtBottom(() -> {
+                    if (precondition.get()) {
+                        final int relative = c.getStateManager().relativePosition(i.get()),
+                                abs = Math.abs(relative);
+
+                        final String before = "Selected state ",
+                                after = "the current state", middle;
+
+                        if (relative < 0)
+                            middle = abs + " state" +
+                                    (abs > 1 ? "s" : "") + " behind ";
+                        else if (relative == 0)
+                            middle = "";
+                        else
+                            middle = abs + " state" +
+                                    (abs > 1 ? "s" : "") + " ahead of ";
+
+                        return before + middle + after;
+                    } else
+                        return "No selection";
+                });
+        mb.add(selectedLabel);
+
+        setDialog(assembleDialog("History of " +
+                        c.projectInfo.getFormattedName(false, false) + "...",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                precondition, "Revert...",
+                () -> setDialogToPreviewAction(
+                        c.getStateManager().getState(i.get()),
+                        () -> c.getStateManager().setState(i.get(), c),
+                        DialogAssembly::setDialogToHistory,
+                        "project state reversion"), false));
+    }
+
     public static void setDialogToNewFont() {
         DialogVals.setNewFontPixelSpacing(Constants.DEFAULT_FONT_PX_SPACING, false);
         DialogVals.setHasLatinEx(false, false);
@@ -1316,6 +1427,20 @@ public class DialogAssembly {
             final ProjectState preview, final Runnable backButtonAction,
             final String previewAppend
     ) {
+
+        final SEContext c = StippleEffect.get().getContext();
+
+        setDialogToPreviewAction(preview, () -> {
+                    preview.markAsCheckpoint(false);
+                    c.getStateManager()
+                            .performAction(preview, Operation.EDIT_IMAGE);
+                }, backButtonAction, "preview of " + previewAppend);
+    }
+
+    private static void setDialogToPreviewAction(
+            final ProjectState preview, final Runnable onApproval,
+            final Runnable backButtonAction, final String previewAppend
+    ) {
         if (preview == null) {
             setDialogToScriptErrors();
             return;
@@ -1384,11 +1509,7 @@ public class DialogAssembly {
 
         setDialog(assembleDialog("Preview of " + previewAppend,
                 new MenuElementGrouping(mb.build().getMenuElements()),
-                () -> true, "Apply", () -> {
-                    preview.markAsCheckpoint(false);
-                    c.getStateManager()
-                            .performAction(preview, Operation.EDIT_IMAGE);
-                }, true));
+                () -> true, "Apply", onApproval, true));
     }
 
     public static void setDialogToSavePalette(final Palette palette) {
@@ -2783,14 +2904,16 @@ public class DialogAssembly {
                         IconCodes.UNDO,
                         IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO,
-                        IconCodes.REDO
+                        IconCodes.REDO,
+                        IconCodes.HISTORY
                 },
                 new String[] {
                         "Info", "Open panel manager", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad", "Stitch or split frames", "Preview",
                         "Automation script",
-                        "Undo", "Granular Undo", "Granular Redo", "Redo"
+                        "Undo", "Granular Undo", "Granular Redo", "Redo",
+                        "History"
                 }, contentAssembler, contentStart, initialBottomY
         );
     }

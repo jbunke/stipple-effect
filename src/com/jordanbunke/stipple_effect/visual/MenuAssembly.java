@@ -62,7 +62,8 @@ public class MenuAssembly {
                         IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
                         IconCodes.AUTOMATION_SCRIPT,
                         IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
-                        IconCodes.GRANULAR_REDO, IconCodes.REDO
+                        IconCodes.GRANULAR_REDO, IconCodes.REDO,
+                        IconCodes.HISTORY
                 },
                 getPreconditions(
                         () -> true,
@@ -78,7 +79,8 @@ public class MenuAssembly {
                         () -> c.getStateManager().canUndo(),
                         () -> c.getStateManager().canUndo(),
                         () -> c.getStateManager().canRedo(),
-                        () -> c.getStateManager().canRedo()),
+                        () -> c.getStateManager().canRedo(),
+                        () -> true),
                 new Runnable[] {
                         DialogAssembly::setDialogToProgramSettings,
                         DialogAssembly::setDialogToNewProject,
@@ -93,7 +95,8 @@ public class MenuAssembly {
                         () -> c.getStateManager().undoToCheckpoint(),
                         () -> c.getStateManager().undo(true),
                         () -> c.getStateManager().redo(true),
-                        () -> c.getStateManager().redoToCheckpoint()
+                        () -> c.getStateManager().redoToCheckpoint(),
+                        DialogAssembly::setDialogToHistory
                 }, Layout.getProjectsPosition());
 
         // exit program button

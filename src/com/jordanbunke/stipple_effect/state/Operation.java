@@ -72,4 +72,10 @@ public enum Operation {
             default -> ActionType.CANVAS;
         };
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(name().charAt(0)).toUpperCase() +
+                name().substring(1).replace("_", " ").toLowerCase();
+    }
 }

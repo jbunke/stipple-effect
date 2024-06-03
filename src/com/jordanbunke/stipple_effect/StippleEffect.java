@@ -466,6 +466,9 @@ public class StippleEffect implements ProgramContext {
         } else if (eventLogger.isPressed(Key.SHIFT)) {
             // Shift + ?
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
+                    DialogAssembly::setDialogToHistory);
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::swapColors);
             eventLogger.checkForMatchingKeyStroke(

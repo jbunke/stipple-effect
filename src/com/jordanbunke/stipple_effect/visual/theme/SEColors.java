@@ -44,4 +44,12 @@ public class SEColors {
     public static Color def() {
         return BLACK;
     }
+
+    public static Color red() {
+        return RED;
+    }
+
+    public static Color green() {
+        return new Color(0, 0xA0, 0);
+    }
 }
