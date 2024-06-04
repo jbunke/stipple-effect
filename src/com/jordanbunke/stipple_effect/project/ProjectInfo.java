@@ -1,14 +1,16 @@
 package com.jordanbunke.stipple_effect.project;
 
-import com.jordanbunke.anim.AnimWriter;
-import com.jordanbunke.anim.GIFWriter;
-import com.jordanbunke.anim.MP4Writer;
+import com.jordanbunke.anim.data.AnimBuilder;
+import com.jordanbunke.anim.writers.AnimWriter;
+import com.jordanbunke.anim.writers.GIFWriter;
+import com.jordanbunke.anim.writers.MP4Writer;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
@@ -18,6 +20,7 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.BinaryOperator;
 
 public class ProjectInfo {
@@ -131,14 +134,27 @@ public class ProjectInfo {
 
             switch (saveType) {
                 case GIF, MP4 -> {
-                    final GameImage[] images = new GameImage[framesToSave];
+                    final ProjectState state = context.getState();
+                    final List<Double> frameDurations = state.getFrameDurations();
+
+                    final int standardDurationMillis = Constants.MILLIS_IN_SECOND / fps;
+
+                    final AnimBuilder ab = new AnimBuilder();
 
                     for (int i = 0; i < framesToSave; i++) {
-                        images[i] = context.getState().draw(
-                                false, false, f0 + i);
+                        final int frameIndex = f0 + i;
+
+                        final int frameDurationMillis =
+                                (int)(standardDurationMillis *
+                                        frameDurations.get(frameIndex));
+
+                        GameImage img = context.getState().draw(
+                                false, false, frameIndex);
 
                         if (scaleUp > 1)
-                            images[i] = ImageProcessing.scale(images[i], scaleUp);
+                            img = ImageProcessing.scale(img, scaleUp);
+
+                        ab.addFrame(img, frameDurationMillis);
                     }
 
                     final AnimWriter writer = saveType == SaveType.GIF
@@ -147,8 +163,7 @@ public class ProjectInfo {
                     final Thread animSaverThread = new Thread(() -> {
                         final Path filepath = buildFilepath();
 
-                        writer.write(filepath, images,
-                                Constants.MILLIS_IN_SECOND / fps);
+                        writer.write(filepath, ab.build());
                         StatusUpdates.saved(filepath);
                     });
 
