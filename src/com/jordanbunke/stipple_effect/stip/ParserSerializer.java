@@ -43,6 +43,7 @@ public class ParserSerializer {
             LAYER_ONION_SKIN_TAG = "onion_skin",
             LAYER_OPACITY_TAG = "opacity",
             FRAME_COUNT_TAG = "frame_count",
+            FRAME_DURATIONS_TAG = "frame_durations",
             FRAMES_TAG = "frames",
             LINKED_LAYER_TAG = "linked_layer",
             FRAME_TAG = "frame",
@@ -135,6 +136,7 @@ public class ParserSerializer {
 
         final List<SELayer> layers = new ArrayList<>();
         int frameCount = 1, w = 1, h = 1;
+        List<Double> frameDurations = ProjectState.defaultFrameDurations(frameCount);
         double fileStandard = FS_INITIAL;
 
         for (SerialBlock block : stateBlocks) {
@@ -151,6 +153,14 @@ public class ParserSerializer {
                         fileStandard = Double.parseDouble(block.value());
                 case FRAME_COUNT_TAG ->
                         frameCount = Integer.parseInt(block.value());
+                case FRAME_DURATIONS_TAG -> {
+                    final String[] vals = block.value().split(CONTENT_SEPARATOR);
+
+                    frameDurations = new ArrayList<>();
+
+                    for (String val : vals)
+                        frameDurations.add(Double.parseDouble(val));
+                }
                 case LAYERS_TAG -> {
                     final SerialBlock[] layerBlocks = deserializeBlocksAtDepthLevel(block.value());
 
@@ -162,8 +172,7 @@ public class ParserSerializer {
             }
         }
 
-        // TODO - add frame durations and add to static constructor signature
-        return ProjectState.makeFromNativeFile(w, h, layers, frameCount);
+        return ProjectState.makeFromNativeFile(w, h, layers, frameCount, frameDurations);
     }
 
     private static SELayer deserializeLayer(
@@ -347,6 +356,12 @@ public class ParserSerializer {
 
         final int w = state.getImageWidth(), h = state.getImageHeight(),
                 frameCount = state.getFrameCount();
+        final List<Double> frameDurations = state.getFrameDurations();
+        final String durationsText = frameDurations.size() == 1
+                ? String.valueOf(frameDurations.get(0))
+                : frameDurations.stream().map(String::valueOf)
+                    .reduce((a, b) -> a + CONTENT_SEPARATOR + b)
+                    .orElse("1.0");
 
         // dims definition
         openWithTag(sb, DIMENSION_TAG).append(w).append(CONTENT_SEPARATOR)
@@ -354,6 +369,10 @@ public class ParserSerializer {
 
         // frame count definition
         openWithTag(sb, FRAME_COUNT_TAG).append(frameCount)
+                .append(ENCLOSER_CLOSE).append(NL);
+
+        // frame durations definition
+        openWithTag(sb, FRAME_DURATIONS_TAG).append(durationsText)
                 .append(ENCLOSER_CLOSE).append(NL);
 
         // layers tag opener

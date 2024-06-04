@@ -69,19 +69,20 @@ public class ColorMath {
         final double h = rgbToHue(input),
                 s = rgbToSat(input), v = rgbToValue(input);
 
-        final int shiftH = DialogVals.getHueShift();
-        final double shiftS = DialogVals.getSatShift(),
+        final int shiftH = DialogVals.getHueShift(),
+                shiftS = DialogVals.getSatShift(),
                 shiftV = DialogVals.getValueShift();
+        final double scaleS = DialogVals.getSatScale(),
+                scaleV = DialogVals.getValueScale();
 
-        double nh = h + normalize(shiftH, Constants.HUE_SCALE);
-
-        if (nh < 0d)
-            nh += 1d;
-        else if (nh >= 1d)
-            nh -= 1d;
-
-        final double ns = MathPlus.bounded(0d, s * shiftS, 1d),
-                nv = MathPlus.bounded(0d, v * shiftV, 1d);
+        final double nh =
+                normalize(h + scaleDown(shiftH, Constants.HUE_SCALE)),
+                ns = MathPlus.bounded(0d, (DialogVals.isShiftingSat()
+                        ? s + scaleDown(shiftS, Constants.SAT_SCALE)
+                        : s * scaleS), 1d),
+                nv = MathPlus.bounded(0d, (DialogVals.isShiftingValue()
+                        ? v + scaleDown(shiftV, Constants.VALUE_SCALE)
+                        : v * scaleV), 1d);
 
         return fromHSV(nh, ns, nv, input.getAlpha());
     }
@@ -131,33 +132,47 @@ public class ColorMath {
     }
 
     public static int hueGetter(final Color c) {
-        return scale(lastHSVEdit == LastHSVEdit.NONE
+        return scaleUp(lastHSVEdit == LastHSVEdit.NONE
                 ? rgbToHue(c) : lastHue, Constants.HUE_SCALE);
     }
 
     public static int satGetter(final Color c) {
-        return scale(lastHSVEdit == LastHSVEdit.NONE
+        return scaleUp(lastHSVEdit == LastHSVEdit.NONE
                 ? rgbToSat(c) : lastSat, Constants.SAT_SCALE);
     }
 
     public static int valueGetter(final Color c) {
-        return scale(lastHSVEdit == LastHSVEdit.NONE
+        return scaleUp(lastHSVEdit == LastHSVEdit.NONE
                 ? rgbToValue(c) : lastValue, Constants.VALUE_SCALE);
     }
 
-    public static int scale(final double value, final int scaleMax) {
+    private static int scaleUp(final double value, final int scaleMax) {
         return MathPlus.bounded(0, (int) Math.round(value * scaleMax), scaleMax);
     }
 
-    private static double normalize(final int value, final int scaleMax) {
+    private static double scaleDown(final int value, final int scaleMax) {
         return value / (double) scaleMax;
+    }
+
+    private static double normalize(final double n) {
+        final double UNIT = 1d;
+
+        double res = n;
+
+        while (res < 0d)
+            res += UNIT;
+
+        while (res >= UNIT)
+            res -= UNIT;
+
+        return res;
     }
 
     public static double rgbToHue(final Color c) {
         final int R = 0, G = 1, B = 2;
         final double[] rgb = rgbAsArray(c);
         final double max = getMaxOfRGB(rgb), range = getRangeOfRGB(rgb),
-                multiplier = normalize(Constants.HUE_SCALE / 6, Constants.HUE_SCALE);
+                multiplier = scaleDown(Constants.HUE_SCALE / 6, Constants.HUE_SCALE);
 
         if (range == 0d)
             return 0d;
@@ -201,7 +216,7 @@ public class ColorMath {
     public static Color hueAdjustedColor(final int hue, final Color c) {
         final double saturation = getHSVAttribute(ColorMath::rgbToSat, c, lastSat),
                 value = getHSVAttribute(ColorMath::rgbToValue, c, lastValue),
-                nHue = normalize(hue, Constants.HUE_SCALE);
+                nHue = scaleDown(hue, Constants.HUE_SCALE);
 
         lastHue = nHue;
         return fromHSV(nHue, saturation, value, c.getAlpha());
@@ -210,7 +225,7 @@ public class ColorMath {
     public static Color satAdjustedColor(final int saturation, final Color c) {
         final double hue = getHSVAttribute(ColorMath::rgbToHue, c, lastHue),
                 value = getHSVAttribute(ColorMath::rgbToValue, c, lastValue),
-                nSat = normalize(saturation, Constants.SAT_SCALE);
+                nSat = scaleDown(saturation, Constants.SAT_SCALE);
 
         lastSat = nSat;
         return fromHSV(hue, nSat, value, c.getAlpha());
@@ -219,7 +234,7 @@ public class ColorMath {
     public static Color valueAdjustedColor(final int value, final Color c) {
         final double saturation = getHSVAttribute(ColorMath::rgbToSat, c, lastSat),
                 hue = getHSVAttribute(ColorMath::rgbToHue, c, lastHue),
-                nValue = normalize(value, Constants.VALUE_SCALE);
+                nValue = scaleDown(value, Constants.VALUE_SCALE);
 
         lastValue = nValue;
         return fromHSV(hue, saturation, nValue, c.getAlpha());
@@ -238,28 +253,28 @@ public class ColorMath {
             final double value, final int alpha
     ) {
         final double c = saturation * value,
-                x = c * (1d - Math.abs(((hue / normalize(
+                x = c * (1d - Math.abs(((hue / scaleDown(
                         Constants.HUE_SCALE / 6,
                         Constants.HUE_SCALE)) % 2) - 1)),
                 m = value - c, r, g, b;
 
-        if (hue < normalize((int)(Constants.HUE_SCALE * (1 / 6d)), Constants.HUE_SCALE)) {
+        if (hue < scaleDown((int)(Constants.HUE_SCALE * (1 / 6d)), Constants.HUE_SCALE)) {
             r = c;
             g = x;
             b = 0d;
-        } else if (hue < normalize((int)(Constants.HUE_SCALE * (2 / 6d)), Constants.HUE_SCALE)) {
+        } else if (hue < scaleDown((int)(Constants.HUE_SCALE * (2 / 6d)), Constants.HUE_SCALE)) {
             r = x;
             g = c;
             b = 0d;
-        } else if (hue < normalize((int)(Constants.HUE_SCALE * (3 / 6d)), Constants.HUE_SCALE)) {
+        } else if (hue < scaleDown((int)(Constants.HUE_SCALE * (3 / 6d)), Constants.HUE_SCALE)) {
             r = 0d;
             g = c;
             b = x;
-        } else if (hue < normalize((int)(Constants.HUE_SCALE * (4 / 6d)), Constants.HUE_SCALE)) {
+        } else if (hue < scaleDown((int)(Constants.HUE_SCALE * (4 / 6d)), Constants.HUE_SCALE)) {
             r = 0d;
             g = x;
             b = c;
-        } else if (hue < normalize((int)(Constants.HUE_SCALE * (5 / 6d)), Constants.HUE_SCALE)) {
+        } else if (hue < scaleDown((int)(Constants.HUE_SCALE * (5 / 6d)), Constants.HUE_SCALE)) {
             r = x;
             g = 0d;
             b = c;
@@ -270,9 +285,9 @@ public class ColorMath {
         }
 
         return new Color(
-                scale(r + m, Constants.RGBA_SCALE),
-                scale(g + m, Constants.RGBA_SCALE),
-                scale(b + m, Constants.RGBA_SCALE),
+                scaleUp(r + m, Constants.RGBA_SCALE),
+                scaleUp(g + m, Constants.RGBA_SCALE),
+                scaleUp(b + m, Constants.RGBA_SCALE),
                 alpha);
     }
 

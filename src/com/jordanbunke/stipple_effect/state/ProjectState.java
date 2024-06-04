@@ -52,9 +52,12 @@ public class ProjectState {
 
     public static ProjectState makeFromNativeFile(
             final int imageWidth, final int imageHeight,
-            final List<SELayer> layers, final int frameCount
+            final List<SELayer> layers,
+            final int frameCount, final List<Double> frameDurations
     ) {
-        return new ProjectState(imageWidth, imageHeight, layers, frameCount);
+        return new ProjectState(imageWidth, imageHeight, layers, 0,
+                frameCount, frameDurations, 0,
+                SelectionMode.BOUNDS, new HashSet<>(), null, true);
     }
 
     private ProjectState(
@@ -109,7 +112,7 @@ public class ProjectState {
         this.operation = Operation.NONE;
     }
 
-    private static List<Double> defaultFrameDurations(final int frameCount) {
+    public static List<Double> defaultFrameDurations(final int frameCount) {
         final List<Double> frameDurations = new ArrayList<>();
 
         while (frameDurations.size() < frameCount)

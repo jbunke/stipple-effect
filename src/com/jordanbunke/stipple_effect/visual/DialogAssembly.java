@@ -8,15 +8,10 @@ import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.PlaceholderMenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.TimedMenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.visual.AnimationMenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.*;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.*;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -38,13 +33,11 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
-import com.jordanbunke.stipple_effect.visual.theme.Theme;
-import com.jordanbunke.stipple_effect.visual.theme.Themes;
+import com.jordanbunke.stipple_effect.visual.theme.*;
 
 import java.awt.*;
 import java.io.File;
@@ -813,7 +806,7 @@ public class DialogAssembly {
                             state.getOperation().toString());
             final SelectStateButton selectButton = SelectStateButton.make(
                     getDialogLeftContentPositionForRow(ci + 1)
-                            .displace(thirdDisp.x * 2, -Layout.TEXT_Y_OFFSET),
+                            .displace(thirdDisp.x * 2, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
                     () -> i.set(checkpoint), () -> i.get() != checkpoint);
 
             smb.addAll(stateLabel, causeLabel, selectButton);
@@ -1202,18 +1195,9 @@ public class DialogAssembly {
                     retrievalFunctionMap.get(labelTexts[i]);
 
             if (isProject) {
-                final String[] toggleText =
-                        new String[] { "Expanded", "Collapsed" };
-                final GameImage[] bases = makeToggleButtonSet(toggleText);
-
-                final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
+                final TextToggleButton toggle = TextToggleButton.make(
                         getDialogContentOffsetFollowingLabel(label),
-                        new Bounds2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                                Layout.STD_TEXT_BUTTON_H),
-                        MenuElement.Anchor.LEFT_TOP, true, bases,
-                        Arrays.stream(bases)
-                                .map(GraphicsUtils::drawHighlightedButton)
-                                .toArray(GameImage[]::new),
+                        new String[] { "Expanded", "Collapsed" },
                         new Runnable[] {
                                 () -> adj.accept(false),
                                 () -> adj.accept(true)
@@ -1242,9 +1226,21 @@ public class DialogAssembly {
 
         makeCommonColorOperationElements(mb, c);
 
-        final TextLabel hueLabel = makeDialogLeftLabel(3, "Shift hue:"),
-                satLabel = makeDialogLeftLabel(4, "Shift sat.:"),
-                valueLabel = makeDialogLeftLabel(5, "Shift value:");
+        final TextLabel hueLabel = makeDialogLeftLabel(3, "Shift hue:");
+
+        final String T_SHIFT = "Shift ", T_SCALE = "Scale ",
+                T_SAT = "sat:", T_VAL = "value:";
+
+        final DynamicLabel satLabel = makeDynamicLabel(
+                getDialogLeftContentPositionForRow(4),
+                () -> (DialogVals.isShiftingSat()
+                        ? T_SHIFT : T_SCALE) + T_SAT,
+                T_SCALE + T_SAT),
+                valueLabel = makeDynamicLabel(
+                        getDialogLeftContentPositionForRow(5),
+                        () -> (DialogVals.isShiftingValue()
+                                ? T_SHIFT : T_SCALE) + T_VAL,
+                        T_SCALE + T_VAL);
 
         final IncrementalRangeElements<Integer> h =
                 IncrementalRangeElements.makeForInt(hueLabel,
@@ -1272,36 +1268,36 @@ public class DialogAssembly {
         }
 
         final Runnable satDecrement = () -> {
-            final double was = DialogVals.getSatShift();
+            final double was = DialogVals.getSatScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was <= bounds[i + 1]) {
-                    DialogVals.setSatShift(Math.max(was - increments[i], MIN));
+                    DialogVals.setSatScale(Math.max(was - increments[i], MIN));
                     break;
                 }
         }, satIncrement = () -> {
-            final double was = DialogVals.getSatShift();
+            final double was = DialogVals.getSatScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was < bounds[i + 1]) {
-                    DialogVals.setSatShift(Math.min(was + increments[i], MAX));
+                    DialogVals.setSatScale(Math.min(was + increments[i], MAX));
                     break;
                 }
         }, valueDecrement = () -> {
-            final double was = DialogVals.getValueShift();
+            final double was = DialogVals.getValueScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was <= bounds[i + 1]) {
-                    DialogVals.setValueShift(
+                    DialogVals.setValueScale(
                             Math.max(was - increments[i], MIN));
                     break;
                 }
         }, valueIncrement = () -> {
-            final double was = DialogVals.getValueShift();
+            final double was = DialogVals.getValueScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was < bounds[i + 1]) {
-                    DialogVals.setValueShift(
+                    DialogVals.setValueScale(
                             Math.min(was + increments[i], MAX));
                     break;
                 }
@@ -1346,41 +1342,86 @@ public class DialogAssembly {
         Function<Double, String> svfFormat = d -> {
             final int _20x = (int) Math.round(d * 20);
 
-            return "x" + (_20x / 20d);
+            return (_20x / 20d) + "x";
         };
 
-        final IncrementalRangeElements<Double> s =
+        final MenuElementGrouping satScale = new MenuElementGrouping(
                 IncrementalRangeElements.makeForDouble(satLabel,
                         satLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
                         satLabel.getY(), satDecrement, satIncrement,
                         Constants.MIN_SV_SCALE, Constants.MAX_SV_SCALE,
-                        DialogVals::setSatShift, DialogVals::getSatShift,
+                        DialogVals::setSatScale, DialogVals::getSatScale,
                         svfToSlider, svfFromSlider, svfFormat,
-                        "x" + "X".repeat(20));
-        mb.addAll(satLabel, s.decButton, s.incButton, s.slider, s.value);
+                        "x" + "X".repeat(20)).getAll()),
+                satShift = new MenuElementGrouping(
+                        IncrementalRangeElements.makeForInt(satLabel,
+                                satLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                                satLabel.getY(),
+                                1, Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                                DialogVals::setSatShift, DialogVals::getSatShift,
+                                i -> i, i -> i, String::valueOf, "XXXX").getAll());
 
-        final IncrementalRangeElements<Double> v =
+        final ThinkingMenuElement satManager = new ThinkingMenuElement(
+                () -> DialogVals.isShiftingSat() ? satShift : satScale);
+
+        mb.addAll(satLabel, satManager);
+
+        final MenuElementGrouping valueScale = new MenuElementGrouping(
                 IncrementalRangeElements.makeForDouble(valueLabel,
                         valueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
                         valueLabel.getY(), valueDecrement, valueIncrement,
                         Constants.MIN_SV_SCALE, Constants.MAX_SV_SCALE,
-                        DialogVals::setValueShift, DialogVals::getValueShift,
+                        DialogVals::setValueScale, DialogVals::getValueScale,
                         svfToSlider, svfFromSlider, svfFormat,
-                        "x" + "X".repeat(20));
-        mb.addAll(valueLabel, v.decButton, v.incButton, v.slider, v.value);
+                        "x" + "X".repeat(20)).getAll()),
+                valueShift = new MenuElementGrouping(
+                        IncrementalRangeElements.makeForInt(valueLabel,
+                                valueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                                valueLabel.getY(),
+                                1, Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                                DialogVals::setValueShift, DialogVals::getValueShift,
+                                i -> i, i -> i, String::valueOf, "XXXX").getAll());
+
+        final ThinkingMenuElement valueManager = new ThinkingMenuElement(
+                () -> DialogVals.isShiftingValue() ? valueShift : valueScale);
+
+        mb.addAll(valueLabel, valueManager);
+
+        final String RESET = "Reset";
+        final Coord2D firstResetPos = getDialogRightContentPositionForRow(3)
+                .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
 
         final SimpleMenuButton resetHue =
-                GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(3),
+                GraphicsUtils.makeStandardTextButton(RESET, firstResetPos,
                         () -> DialogVals.setHueShift(0)),
-                resetSat = GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(4),
-                        () -> DialogVals.setSatShift(1d)),
-                resetValue = GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(5),
-                        () -> DialogVals.setValueShift(1d));
+                resetSat = GraphicsUtils.makeStandardTextButton(RESET,
+                        firstResetPos.displace(0, Layout.DIALOG_CONTENT_INC_Y),
+                        () -> {
+                            DialogVals.setSatScale(1d);
+                            DialogVals.setSatShift(0);
+                        }),
+                resetValue = GraphicsUtils.makeStandardTextButton(RESET,
+                        firstResetPos.displace(0, Layout.DIALOG_CONTENT_INC_Y * 2),
+                        () -> {
+                            DialogVals.setValueScale(1d);
+                            DialogVals.setValueShift(0);
+                        });
 
-        mb.addAll(resetHue, resetSat, resetValue);
+        final String[] toggleTexts = new String[] { "Scale", "Shift" };
+        final Runnable[] toggleActions = new Runnable[] { () -> {}, () -> {} };
+        final TextToggleButton
+                toggleSat = TextToggleButton.make(
+                        getDialogContentToRightOfContent(resetSat),
+                        toggleTexts, toggleActions,
+                        () -> DialogVals.isShiftingSat() ? 1 : 0,
+                        DialogVals::toggleShiftingSat),
+                toggleValue = TextToggleButton.make(
+                        getDialogContentToRightOfContent(resetValue),
+                        toggleTexts, toggleActions,
+                        () -> DialogVals.isShiftingValue() ? 1 : 0,
+                        DialogVals::toggleShiftingValue);
+
+        mb.addAll(resetHue, resetSat, resetValue, toggleSat, toggleValue);
 
         setDialog(assembleDialog("Shift color levels...",
                 new MenuElementGrouping(mb.build().getMenuElements()),
@@ -1772,7 +1813,8 @@ public class DialogAssembly {
 
         final SimpleMenuButton resetDuration =
                 GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(0),
+                        getDialogRightContentPositionForRow(0)
+                                .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
                         () -> DialogVals.setFrameDuration(
                                 Constants.DEFAULT_FRAME_DURATION));
 
@@ -2146,14 +2188,6 @@ public class DialogAssembly {
 
                     return folderPathName.toString();
                 });
-    }
-
-    private static GameImage[] makeToggleButtonSet(
-            final String... buttonTexts) {
-        return Arrays.stream(buttonTexts)
-                .map(t -> GraphicsUtils.drawTextButton(
-                        Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE, t, false))
-                .toArray(GameImage[]::new);
     }
 
     private static DynamicTextbox makeDialogPixelDynamicTextbox(
