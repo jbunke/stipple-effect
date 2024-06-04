@@ -772,7 +772,7 @@ public class DialogAssembly {
         final TextLabel stateHeader = makeDialogLeftLabel(0, "RELATIVE POSITION"),
                 causeHeader = TextLabel.make(
                         stateHeader.getPosition().displace(thirdDisp),
-                        "CAUSE");
+                        "PRECEDING OPERATION");
 
         mb.addAll(stateHeader, causeHeader);
 
@@ -813,7 +813,7 @@ public class DialogAssembly {
                             state.getOperation().toString());
             final SelectStateButton selectButton = SelectStateButton.make(
                     getDialogLeftContentPositionForRow(ci + 1)
-                            .displace(thirdDisp.x * 2, 0),
+                            .displace(thirdDisp.x * 2, -Layout.TEXT_Y_OFFSET),
                     () -> i.set(checkpoint), () -> i.get() != checkpoint);
 
             smb.addAll(stateLabel, causeLabel, selectButton);
@@ -1255,7 +1255,7 @@ public class DialogAssembly {
                         i -> i, i -> i, String::valueOf, "-XXX");
         mb.addAll(hueLabel, h.decButton, h.incButton, h.slider, h.value);
 
-        final double MIN = Constants.MIN_SV_SHIFT, MAX = Constants.MAX_SV_SHIFT;
+        final double MIN = Constants.MIN_SV_SCALE, MAX = Constants.MAX_SV_SCALE;
         final int STEPS = 5;
         final double[] bounds = new double[] { MIN, 1d, 2d, 5d, 10d, MAX },
                 increments = new double[] { 0.05, 0.1, 0.25, 0.5, 2.5 };
@@ -1353,7 +1353,7 @@ public class DialogAssembly {
                 IncrementalRangeElements.makeForDouble(satLabel,
                         satLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
                         satLabel.getY(), satDecrement, satIncrement,
-                        Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                        Constants.MIN_SV_SCALE, Constants.MAX_SV_SCALE,
                         DialogVals::setSatShift, DialogVals::getSatShift,
                         svfToSlider, svfFromSlider, svfFormat,
                         "x" + "X".repeat(20));
@@ -1363,7 +1363,7 @@ public class DialogAssembly {
                 IncrementalRangeElements.makeForDouble(valueLabel,
                         valueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
                         valueLabel.getY(), valueDecrement, valueIncrement,
-                        Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                        Constants.MIN_SV_SCALE, Constants.MAX_SV_SCALE,
                         DialogVals::setValueShift, DialogVals::getValueShift,
                         svfToSlider, svfFromSlider, svfFormat,
                         "x" + "X".repeat(20));
@@ -1736,6 +1736,54 @@ public class DialogAssembly {
             c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
             c.changeLayerName(DialogVals.getLayerName(), index);
         }, true));
+    }
+
+    public static void setDialogToFrameProperties(final int index) {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        DialogVals.setFrameDuration(c.getState().getFrameDurations().get(index));
+
+        final TextLabel durationLabel = makeDialogLeftLabel(0, "Frame duration:");
+
+        final double STEP = 0.1, DIV = 10d,
+                MIN = Constants.MIN_FRAME_DURATION,
+                MAX = Constants.MAX_FRAME_DURATION;
+        final Runnable fDecrement = () -> {
+            final double was = DialogVals.getFrameDuration(),
+                    v = Math.max(MIN, was - STEP);
+
+            DialogVals.setFrameDuration(Math.round(v * DIV) / DIV);
+        }, fIncrement = () -> {
+            final double was = DialogVals.getFrameDuration(),
+                    v = Math.min(MAX, was + STEP);
+
+            DialogVals.setFrameDuration(Math.round(v * DIV) / DIV);
+        };
+        final IncrementalRangeElements<Double> duration =
+                IncrementalRangeElements.makeForDouble(durationLabel,
+                        durationLabel.getY() +
+                                Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        durationLabel.getY(), fDecrement, fIncrement,
+                        MIN, MAX, DialogVals::setFrameDuration,
+                        DialogVals::getFrameDuration,
+                        o -> (int)(o * DIV), sv -> sv / DIV,
+                        o -> o + "x", "XXXx");
+
+        final SimpleMenuButton resetDuration =
+                GraphicsUtils.makeStandardTextButton("Reset",
+                        getDialogRightContentPositionForRow(0),
+                        () -> DialogVals.setFrameDuration(
+                                Constants.DEFAULT_FRAME_DURATION));
+
+        mb.addAll(durationLabel, duration.decButton, duration.incButton,
+                duration.slider, duration.value, resetDuration);
+
+        setDialog(assembleDialog("Frame " + (index + 1) + " | Properties",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                () -> true, Constants.GENERIC_APPROVAL_TEXT,
+                () -> c.changeFrameDuration(DialogVals.getFrameDuration(), index),
+                true));
     }
 
     public static void setDialogToSplashScreen() {

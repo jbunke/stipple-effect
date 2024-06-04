@@ -143,7 +143,11 @@ public class PlaybackInfo {
         millisPerFrame = Constants.MILLIS_IN_SECOND / fps;
     }
 
-    public boolean checkIfNextFrameDue(final double deltaTime) {
+    public boolean checkIfNextFrameDue(
+            final double deltaTime, final double frameDuration
+    ) {
+        final int millisForThisFrame = (int)(millisPerFrame * frameDuration);
+
         nanosAccumulated += deltaTime;
 
         while (nanosAccumulated >= NANOS_IN_MILLI) {
@@ -151,8 +155,8 @@ public class PlaybackInfo {
             millisAccumulated++;
         }
 
-        if (millisAccumulated >= millisPerFrame) {
-            millisAccumulated -= millisPerFrame;
+        if (millisAccumulated >= millisForThisFrame) {
+            millisAccumulated -= millisForThisFrame;
             return true;
         }
 

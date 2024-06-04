@@ -48,21 +48,21 @@ public final class HSVShiftNode extends ProjectStatementNode {
                                 Constants.MIN_HUE_SHIFT + "<= h_shift <= " +
                                 Constants.MAX_HUE_SHIFT + ")",
                         arguments.args()[2].getPosition());
-            else if (sShift < Constants.MIN_SV_SHIFT ||
-                    sShift > Constants.MAX_SV_SHIFT)
+            else if (sShift < Constants.MIN_SV_SCALE ||
+                    sShift > Constants.MAX_SV_SCALE)
                 StatusUpdates.scriptActionNotPermitted(attempt,
                         "the saturation shift (" + sShift +
                                 ") is out of bounds (" +
-                                Constants.MIN_SV_SHIFT + "<= s_shift <= " +
-                                Constants.MAX_SV_SHIFT + ")",
+                                Constants.MIN_SV_SCALE + "<= s_shift <= " +
+                                Constants.MAX_SV_SCALE + ")",
                         arguments.args()[3].getPosition());
-            else if (vShift < Constants.MIN_SV_SHIFT ||
-                    vShift > Constants.MAX_SV_SHIFT)
+            else if (vShift < Constants.MIN_SV_SCALE ||
+                    vShift > Constants.MAX_SV_SCALE)
                 StatusUpdates.scriptActionNotPermitted(attempt,
                         "the value shift (" + vShift +
                                 ") is out of bounds (" +
-                                Constants.MIN_SV_SHIFT + "<= v_shift <= " +
-                                Constants.MAX_SV_SHIFT + ")",
+                                Constants.MIN_SV_SCALE + "<= v_shift <= " +
+                                Constants.MAX_SV_SCALE + ")",
                         arguments.args()[3].getPosition());
             else {
                 final DialogVals.Scope scope =

@@ -162,6 +162,7 @@ public class ParserSerializer {
             }
         }
 
+        // TODO - add frame durations and add to static constructor signature
         return ProjectState.makeFromNativeFile(w, h, layers, frameCount);
     }
 

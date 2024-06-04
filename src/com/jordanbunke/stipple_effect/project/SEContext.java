@@ -204,11 +204,15 @@ public class SEContext {
     }
 
     public void animate(final double deltaTime) {
+        final ProjectState s = getState();
+
         if (playbackInfo.isPlaying()) {
-            final boolean nextFrameDue = playbackInfo.checkIfNextFrameDue(deltaTime);
+            final boolean nextFrameDue =
+                    playbackInfo.checkIfNextFrameDue(deltaTime,
+                            s.getFrameDurations().get(s.getFrameIndex()));
 
             if (nextFrameDue)
-                playbackInfo.executeAnimation(getState());
+                playbackInfo.executeAnimation(s);
         }
     }
 
@@ -522,6 +526,9 @@ public class SEContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
                     () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex()));
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    () -> DialogAssembly.setDialogToFrameProperties(getState().getFrameIndex()));
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
                     () -> outlineSelection(Outliner.getSingleOutlineMask()));
@@ -1742,6 +1749,19 @@ public class SEContext {
     }
 
     // FRAME MANIPULATION
+    // change frame duration
+    public void changeFrameDuration(
+            final double duration, final int frameIndex
+    ) {
+        final List<Double> frameDurations =
+                new ArrayList<>(getState().getFrameDurations());
+        frameDurations.set(frameIndex, duration);
+
+        final ProjectState result =
+                getState().changeFrameDurations(frameDurations);
+        stateManager.performAction(result, Operation.CHANGE_FRAME_DURATION);
+    }
+
     // move frame forward
     public void moveFrameForward() {
         final int frameIndex = getState().getFrameIndex(),
@@ -1754,8 +1774,13 @@ public class SEContext {
 
             layers.replaceAll(l -> l.returnFrameMovedForward(frameIndex));
 
-            final ProjectState result = getState().changeFrames(layers,
-                    toIndex, frameCount);
+            final List<Double> frameDurations =
+                    new ArrayList<>(getState().getFrameDurations());
+            final double movedDuration = frameDurations.remove(frameIndex);
+            frameDurations.add(toIndex, movedDuration);
+
+            final ProjectState result = getState().changeFrames(
+                    layers, toIndex, frameCount, frameDurations);
             stateManager.performAction(result, Operation.MOVE_FRAME_FORWARD);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         } else if (!Layout.isFramesPanelShowing()) {
@@ -1775,8 +1800,13 @@ public class SEContext {
 
             layers.replaceAll(l -> l.returnFrameMovedBack(frameIndex));
 
-            final ProjectState result = getState().changeFrames(layers,
-                    toIndex, frameCount);
+            final List<Double> frameDurations =
+                    new ArrayList<>(getState().getFrameDurations());
+            final double movedDuration = frameDurations.remove(frameIndex);
+            frameDurations.add(toIndex, movedDuration);
+
+            final ProjectState result = getState().changeFrames(
+                    layers, toIndex, frameCount, frameDurations);
             stateManager.performAction(result, Operation.MOVE_FRAME_BACK);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         } else if (!Layout.isFramesPanelShowing()) {
@@ -1796,8 +1826,12 @@ public class SEContext {
                     frameCount = getState().getFrameCount() + 1;
             layers.replaceAll(l -> l.returnAddedFrame(addIndex, w, h));
 
-            final ProjectState result = getState().changeFrames(layers,
-                    addIndex, frameCount);
+            final List<Double> frameDurations =
+                    new ArrayList<>(getState().getFrameDurations());
+            frameDurations.add(addIndex, Constants.DEFAULT_FRAME_DURATION);
+
+            final ProjectState result = getState().changeFrames(
+                    layers, addIndex, frameCount, frameDurations);
             stateManager.performAction(result, Operation.ADD_FRAME);
 
             if (!Layout.isFramesPanelShowing())
@@ -1818,8 +1852,12 @@ public class SEContext {
 
             layers.replaceAll(l -> l.returnDuplicatedFrame(frameIndex));
 
+            final List<Double> frameDurations =
+                    new ArrayList<>(getState().getFrameDurations());
+            frameDurations.add(frameIndex + 1, frameDurations.get(frameIndex));
+
             final ProjectState result = getState().changeFrames(
-                    layers, frameIndex + 1, frameCount);
+                    layers, frameIndex + 1, frameCount, frameDurations);
             stateManager.performAction(result, Operation.DUPLICATE_FRAME);
 
             if (!Layout.isFramesPanelShowing())
@@ -1840,8 +1878,12 @@ public class SEContext {
 
             layers.replaceAll(l -> l.returnRemovedFrame(frameIndex));
 
-            final ProjectState result = getState().changeFrames(layers,
-                    frameIndex - 1, frameCount);
+            final List<Double> frameDurations =
+                    new ArrayList<>(getState().getFrameDurations());
+            frameDurations.remove(frameIndex);
+
+            final ProjectState result = getState().changeFrames(
+                    layers, frameIndex - 1, frameCount, frameDurations);
             stateManager.performAction(result, Operation.REMOVE_FRAME);
 
             if (!Layout.isFramesPanelShowing())

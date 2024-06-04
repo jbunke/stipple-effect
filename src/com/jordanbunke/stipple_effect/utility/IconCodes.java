@@ -23,6 +23,7 @@ public class IconCodes {
             REMOVE_FRAME = "remove_frame",
             MOVE_FRAME_FORWARD = "move_frame_forward",
             MOVE_FRAME_BACK = "move_frame_back",
+            FRAME_PROPERTIES = "frame_properties",
             TO_FIRST_FRAME = "to_first_frame",
             PREVIOUS = "previous",
             NEXT = "next",

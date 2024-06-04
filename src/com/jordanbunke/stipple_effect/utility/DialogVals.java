@@ -31,6 +31,7 @@ public class DialogVals {
             hueShift = 0;
     private static double
             layerOpacity = Constants.OPAQUE,
+            frameDuration = Constants.DEFAULT_FRAME_DURATION,
             resizeScale = 1d,
             satShift = 1d, valueShift = 1d,
             resizeScaleX = resizeScale, resizeScaleY = resizeScale;
@@ -213,6 +214,10 @@ public class DialogVals {
 
     public static void setLayerOpacity(final double layerOpacity) {
         DialogVals.layerOpacity = layerOpacity;
+    }
+
+    public static void setFrameDuration(final double frameDuration) {
+        DialogVals.frameDuration = frameDuration;
     }
 
     public static void setResizeScale(final double resizeScale) {
@@ -637,6 +642,10 @@ public class DialogVals {
 
     public static double getLayerOpacity() {
         return layerOpacity;
+    }
+
+    public static double getFrameDuration() {
+        return frameDuration;
     }
 
     public static double getResizeScale() {

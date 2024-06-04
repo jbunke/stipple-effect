@@ -1,0 +1,3 @@
+Shortcut: {Shift + F}
+
+Displays a dialog where the frame's properties can be modified
