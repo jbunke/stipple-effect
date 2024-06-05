@@ -815,40 +815,56 @@ public class SEContext {
         }
     }
 
-    private Coord2D getMouseOffsetInWorkspace(final InputEventLogger eventLogger) {
-        final Coord2D
-                m = eventLogger.getAdjustedMousePosition(),
-                wp = Layout.getWorkspacePosition();
-        return new Coord2D(m.x - wp.x, m.y - wp.y);
+    private Coord2D getMouseOffsetInWorkspace(final Coord2D mousePosition) {
+        final Coord2D wp = Layout.getWorkspacePosition();
+        return new Coord2D(mousePosition.x - wp.x, mousePosition.y - wp.y);
     }
 
     private void setInWorkspaceBounds(final InputEventLogger eventLogger) {
-        final Coord2D workspaceM = getMouseOffsetInWorkspace(eventLogger);
+        final Coord2D workspaceM = getMouseOffsetInWorkspace(
+                eventLogger.getAdjustedMousePosition());
         inWorkspaceBounds =  workspaceM.x > 0 &&
                 workspaceM.x < Layout.getWorkspaceWidth() &&
                 workspaceM.y > 0 && workspaceM.y < Layout.getWorkspaceHeight();
     }
 
+    public Coord2D pixelFromMousePos(final Coord2D mousePosition) {
+        final Coord2D workspaceM = getMouseOffsetInWorkspace(mousePosition);
+
+        final int w = getState().getImageWidth(),
+                h = getState().getImageHeight();
+        final float zoomFactor = renderInfo.getZoomFactor();
+        final Coord2D render = getImageRenderPositionInWorkspace(),
+                bottomRight = new Coord2D(render.x + (int)(zoomFactor * w),
+                        render.y + (int)(zoomFactor * h));
+        final int targetX = (int)(((workspaceM.x - render.x) /
+                (double)(bottomRight.x - render.x)) * w) -
+                (workspaceM.x < render.x ? 1 : 0),
+                targetY = (int)(((workspaceM.y - render.y) /
+                        (double)(bottomRight.y - render.y)) * h) -
+                        (workspaceM.y < render.y ? 1 : 0);
+
+        return new Coord2D(targetX, targetY);
+    }
+
+    public Coord2D modelMousePosForPixel(
+            final Coord2D pixel
+    ) {
+        if (pixel.equals(Constants.NO_VALID_TARGET))
+            return pixel;
+
+        final float zoomFactor = renderInfo.getZoomFactor();
+        final Coord2D wp = Layout.getWorkspacePosition(),
+                render = wp.displace(getImageRenderPositionInWorkspace());
+
+        return render.displace((int)(zoomFactor * pixel.x),
+                (int)(zoomFactor * pixel.y));
+    }
+
     private void setTargetPixel(final InputEventLogger eventLogger) {
-        final Coord2D workspaceM = getMouseOffsetInWorkspace(eventLogger);
-
-        if (inWorkspaceBounds) {
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
-            final float zoomFactor = renderInfo.getZoomFactor();
-            final Coord2D render = getImageRenderPositionInWorkspace(),
-                    bottomRight = new Coord2D(render.x + (int)(zoomFactor * w),
-                            render.y + (int)(zoomFactor * h));
-            final int targetX = (int)(((workspaceM.x - render.x) /
-                    (double)(bottomRight.x - render.x)) * w) -
-                    (workspaceM.x < render.x ? 1 : 0),
-                    targetY = (int)(((workspaceM.y - render.y) /
-                            (double)(bottomRight.y - render.y)) * h) -
-                            (workspaceM.y < render.y ? 1 : 0);
-
-            targetPixel = new Coord2D(targetX, targetY);
-        } else
-            targetPixel = Constants.NO_VALID_TARGET;
+        targetPixel = inWorkspaceBounds
+                ? pixelFromMousePos(eventLogger.getAdjustedMousePosition())
+                : Constants.NO_VALID_TARGET;
     }
 
     private Coord2D getImageRenderPositionInWorkspace() {

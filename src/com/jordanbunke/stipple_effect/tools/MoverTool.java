@@ -86,7 +86,7 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
     }
 
     public TransformType determineTransformType(
-            final SEContext context
+            final SEContext context, final Coord2D mp
     ) {
         if (!context.getState().hasSelection())
             return TransformType.NONE;
@@ -96,18 +96,15 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
             startTopLeft = SelectionUtils.topLeft(selection);
             startBottomRight = SelectionUtils.bottomRight(selection);
 
-            final Coord2D tp = context.getTargetPixel();
+            final Coord2D tlmp = context.modelMousePosForPixel(startTopLeft),
+                    brmp = context.modelMousePosForPixel(startBottomRight);
 
-            if (tp.equals(Constants.NO_VALID_TARGET))
-                return TransformType.MOVE;
-
-            final int left = startTopLeft.x, right = startBottomRight.x,
-                    top = startTopLeft.y, bottom = startBottomRight.y;
-
-            final int leftProx = Math.abs(left - tp.x),
-                    rightProx = Math.abs(right - tp.x),
-                    topProx = Math.abs(top - tp.y),
-                    bottomProx = Math.abs(bottom - tp.y);
+            final int left = tlmp.x, right = brmp.x,
+                    top = tlmp.y, bottom = brmp.y,
+                    leftProx = Math.abs(left - mp.x),
+                    rightProx = Math.abs(right - mp.x),
+                    topProx = Math.abs(top - mp.y),
+                    bottomProx = Math.abs(bottom - mp.y);
 
             boolean atLeft = leftProx <= Constants.STRETCH_PX_THRESHOLD,
                     atRight = rightProx <= Constants.STRETCH_PX_THRESHOLD,
@@ -121,7 +118,7 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                 } else if (atBottom) {
                     direction = Direction.BL;
                     return TransformType.STRETCH;
-                } else if (tp.y > top && tp.y < bottom) {
+                } else if (mp.y > top && mp.y < bottom) {
                     direction = Direction.L;
                     return TransformType.STRETCH;
                 }
@@ -132,27 +129,27 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                 } else if (atBottom) {
                     direction = Direction.BR;
                     return TransformType.STRETCH;
-                } else if (tp.y > top && tp.y < bottom) {
+                } else if (mp.y > top && mp.y < bottom) {
                     direction = Direction.R;
                     return TransformType.STRETCH;
                 }
-            } else if (atTop && tp.x > left && tp.x < right) {
+            } else if (atTop && mp.x > left && mp.x < right) {
                 direction = Direction.T;
                 return TransformType.STRETCH;
-            } else if (atBottom && tp.x > left && tp.x < right) {
+            } else if (atBottom && mp.x > left && mp.x < right) {
                 direction = Direction.B;
                 return TransformType.STRETCH;
             }
 
-            atLeft = tp.x < left && leftProx <= Constants.ROTATE_PX_THRESHOLD;
-            atRight = tp.x > right && rightProx <= Constants.ROTATE_PX_THRESHOLD;
-            atTop = tp.y < top && topProx <= Constants.ROTATE_PX_THRESHOLD;
-            atBottom = tp.y > bottom && bottomProx <= Constants.ROTATE_PX_THRESHOLD;
+            atLeft = mp.x < left && leftProx <= Constants.ROTATE_PX_THRESHOLD;
+            atRight = mp.x > right && rightProx <= Constants.ROTATE_PX_THRESHOLD;
+            atTop = mp.y < top && topProx <= Constants.ROTATE_PX_THRESHOLD;
+            atBottom = mp.y > bottom && bottomProx <= Constants.ROTATE_PX_THRESHOLD;
 
             final int middleX = left + ((right - left) / 2),
                     middleY = top + ((bottom - top) / 2);
-            final boolean atMiddleX = Math.abs(tp.x - middleX) < Constants.ROTATE_PX_THRESHOLD,
-                    atMiddleY = Math.abs(tp.y - middleY) < Constants.ROTATE_PX_THRESHOLD;
+            final boolean atMiddleX = Math.abs(mp.x - middleX) < Constants.ROTATE_PX_THRESHOLD,
+                    atMiddleY = Math.abs(mp.y - middleY) < Constants.ROTATE_PX_THRESHOLD;
 
             if (atLeft || atRight) {
                 if (atTop) {
@@ -209,7 +206,7 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        transformType = determineTransformType(context);
+        transformType = determineTransformType(context, me.mousePosition);
         prospectiveType = TransformType.NONE;
 
         if (canBeMoved(context)) {
@@ -235,7 +232,8 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
             transformType = TransformType.NONE;
 
         switch (transformType) {
-            case NONE -> prospectiveType = determineTransformType(context);
+            case NONE -> prospectiveType =
+                    determineTransformType(context, mousePosition);
             case MOVE -> {
                 final Set<Coord2D> selection = context.getState().getSelection();
                 final Coord2D topLeft = SelectionUtils.topLeft(selection);
