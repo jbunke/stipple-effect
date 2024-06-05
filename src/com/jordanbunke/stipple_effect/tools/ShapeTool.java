@@ -122,7 +122,7 @@ public final class ShapeTool extends GeometryTool implements SnappableTool {
 
         // shape label
         final TextLabel shapeLabel = TextLabel.make(
-                new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
+                new Coord2D(getAfterBreadthTextX(), Layout.optionsBarTextY()),
                 "Shape");
 
         // shape dropdown

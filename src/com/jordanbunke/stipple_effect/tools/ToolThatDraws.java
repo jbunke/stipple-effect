@@ -228,7 +228,7 @@ public abstract class ToolThatDraws extends Tool {
 
         // bias label
         final TextLabel biasLabel = TextLabel.make(
-                new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
+                new Coord2D(getAfterBreadthTextX(), Layout.optionsBarTextY()),
                 "Combination mode bias");
 
         // bias content
@@ -254,9 +254,8 @@ public abstract class ToolThatDraws extends Tool {
         return new MenuElementGrouping(
                 super.buildToolOptionsBar(), biasLabel,
                 biasElems.decButton, biasElems.incButton,
-                biasElems.slider, biasElems.value
-        );
+                biasElems.slider, biasElems.value);
     }
 
-    abstract int getDitherTextX();
+    abstract int getAfterBreadthTextX();
 }

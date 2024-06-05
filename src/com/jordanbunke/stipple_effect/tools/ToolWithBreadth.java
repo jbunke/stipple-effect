@@ -16,18 +16,19 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import java.awt.*;
 import java.util.Arrays;
 
-public sealed abstract class ToolWithBreadth extends ToolThatDraws implements BreadthTool
-        permits Brush, Eraser, BrushSelect, ShadeBrush, GeometryTool, GradientTool {
+public sealed abstract class ToolWithBreadth
+        extends ToolThatDraws implements BreadthTool
+        permits AbstractBrush, Eraser, BrushSelect, GeometryTool, GradientTool {
     private int breadth;
     private GameImage overlay;
 
     // formatting only
-    private int ditherTextX;
+    private int afterBreadthTextX;
 
     ToolWithBreadth() {
         breadth = Settings.getDefaultToolBreadth();
 
-        ditherTextX = 0;
+        afterBreadthTextX = 0;
     }
 
     public static void redrawToolOverlays() {
@@ -98,7 +99,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
                                 Math.pow(sv, 3))) / SLIDER_MULT,
                         b -> b + " px", Constants.MAX_BREADTH + " px");
 
-        ditherTextX = Layout.optionsBarNextElementX(breadth.value, true);
+        afterBreadthTextX = Layout.optionsBarNextElementX(breadth.value, true);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 breadthLabel, breadth.decButton, breadth.incButton,
@@ -106,7 +107,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     }
 
     @Override
-    int getDitherTextX() {
-        return ditherTextX;
+    int getAfterBreadthTextX() {
+        return afterBreadthTextX;
     }
 }

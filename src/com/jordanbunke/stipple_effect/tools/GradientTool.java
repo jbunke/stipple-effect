@@ -404,7 +404,7 @@ public final class GradientTool extends ToolWithBreadth
 
         // dithered label
         final TextLabel ditheredLabel = TextLabel.make(
-                new Coord2D(getDitherTextX(), Layout.optionsBarTextY()),
+                new Coord2D(getAfterBreadthTextX(), Layout.optionsBarTextY()),
                 "Dithered");
 
         // dithered checkbox
