@@ -7,6 +7,7 @@ public enum Operation {
     // frame operations
     ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
     MOVE_FRAME_BACK, MOVE_FRAME_FORWARD,
+    CHANGE_FRAME_DURATION,
     // layer operations
     ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
     MOVE_LAYER_DOWN, MOVE_LAYER_UP,

@@ -48,7 +48,6 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
         }
     }
 
-    // TODO - update
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();

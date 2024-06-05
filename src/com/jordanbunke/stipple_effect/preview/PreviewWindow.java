@@ -314,8 +314,13 @@ public class PreviewWindow implements ProgramContext {
     }
 
     private void animate(final double deltaTime) {
+        final double duration = script == null
+                ? context.getState().getFrameDurations().get(frameIndex)
+                : Constants.DEFAULT_FRAME_DURATION;
+
         if (playbackInfo.isPlaying()) {
-            final boolean nextFrameDue = playbackInfo.checkIfNextFrameDue(deltaTime);
+            final boolean nextFrameDue =
+                    playbackInfo.checkIfNextFrameDue(deltaTime, duration);
 
             if (nextFrameDue)
                 frameIndex = playbackInfo.nextAnimationFrameForPreview(

@@ -194,6 +194,9 @@ public class MenuAssembly {
                         IconCodes.MOVE_FRAME_FORWARD,
                         // gap between frame operations and navigation/playback
                         Constants.ICON_ID_GAP_CODE,
+                        IconCodes.FRAME_PROPERTIES,
+                        // gap between frame operations and navigation/playback
+                        Constants.ICON_ID_GAP_CODE,
                         IconCodes.TO_FIRST_FRAME,
                         IconCodes.PREVIOUS,
                         // gap for play/stop button
@@ -209,6 +212,8 @@ public class MenuAssembly {
                         () -> c.getState().canMoveFrameForward(),
                         () -> false, // placeholder
                         () -> true,
+                        () -> false, // placeholder
+                        () -> true,
                         () -> true,
                         () -> false, // placeholder
                         () -> true,
@@ -219,6 +224,9 @@ public class MenuAssembly {
                         c::removeFrame,
                         c::moveFrameBack,
                         c::moveFrameForward,
+                        () -> {}, // placeholder
+                        () -> DialogAssembly.setDialogToFrameProperties(
+                                c.getState().getFrameIndex()),
                         () -> {}, // placeholder
                         () -> c.getState().setFrameIndex(0),
                         () -> c.getState().previousFrame(),
@@ -232,9 +240,9 @@ public class MenuAssembly {
                         .displace(Layout.getFramesWidth(), 0),
                 () -> Layout.setFramesPanelShowing(false));
 
-        final int PLAY_STOP_INDEX = 8,
-                PLAYBACK_MODE_INDEX = 11,
-                AFTER_PLAYBACK_MODE = 13;
+        final int PLAY_STOP_INDEX = 10,
+                PLAYBACK_MODE_INDEX = 13,
+                AFTER_PLAYBACK_MODE = 15;
 
         // play/stop as toggle
         final Coord2D playStopTogglePos = Layout.getFramesPosition().displace(

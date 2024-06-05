@@ -28,11 +28,12 @@ public class DialogVals {
             frameHeight = Constants.DEFAULT_CANVAS_H,
             splitColumns = 1, splitRows = 1,
             globalOutline = 0,
-            hueShift = 0;
+            hueShift = 0, satShift = 0, valueShift = 0;
     private static double
             layerOpacity = Constants.OPAQUE,
+            frameDuration = Constants.DEFAULT_FRAME_DURATION,
             resizeScale = 1d,
-            satShift = 1d, valueShift = 1d,
+            satScale = 1d, valueScale = 1d,
             resizeScaleX = resizeScale, resizeScaleY = resizeScale;
     private static boolean
             hasLatinEx = false,
@@ -42,7 +43,9 @@ public class DialogVals {
             resizePreserveAspectRatio = false,
             sortPaletteBackwards = false,
             includeDisabledLayers = false,
-            colorScriptValid = false;
+            colorScriptValid = false,
+            shiftingSat = false,
+            shiftingValue = false;
     private static int[] outlineSideMask = Outliner.getSingleOutlineMask();
     private static String
             layerName = "",
@@ -168,6 +171,14 @@ public class DialogVals {
                 .validateColorScript(DialogVals.colorScript);
     }
 
+    public static void toggleShiftingSat() {
+        shiftingSat = !shiftingSat;
+    }
+
+    public static void toggleShiftingValue() {
+        shiftingValue = !shiftingValue;
+    }
+
     public static void setPaletteFolder(final Path paletteFolder) {
         DialogVals.paletteFolder = paletteFolder;
     }
@@ -215,6 +226,10 @@ public class DialogVals {
         DialogVals.layerOpacity = layerOpacity;
     }
 
+    public static void setFrameDuration(final double frameDuration) {
+        DialogVals.frameDuration = frameDuration;
+    }
+
     public static void setResizeScale(final double resizeScale) {
         DialogVals.resizeScale = resizeScale;
     }
@@ -231,12 +246,20 @@ public class DialogVals {
         DialogVals.hueShift = hueShift;
     }
 
-    public static void setSatShift(final double satShift) {
+    public static void setSatShift(final int satShift) {
         DialogVals.satShift = satShift;
     }
 
-    public static void setValueShift(final double valueShift) {
+    public static void setValueShift(final int valueShift) {
         DialogVals.valueShift = valueShift;
+    }
+
+    public static void setSatScale(final double satScale) {
+        DialogVals.satScale = satScale;
+    }
+
+    public static void setValueScale(final double valueScale) {
+        DialogVals.valueScale = valueScale;
     }
 
     public static void setNewProjectHeight(final int newProjectHeight) {
@@ -561,16 +584,32 @@ public class DialogVals {
         return scope;
     }
 
+    public static boolean isShiftingSat() {
+        return shiftingSat;
+    }
+
+    public static boolean isShiftingValue() {
+        return shiftingValue;
+    }
+
     public static int getHueShift() {
         return hueShift;
     }
 
-    public static double getSatShift() {
+    public static int getSatShift() {
         return satShift;
     }
 
-    public static double getValueShift() {
+    public static int getValueShift() {
         return valueShift;
+    }
+
+    public static double getSatScale() {
+        return satScale;
+    }
+
+    public static double getValueScale() {
+        return valueScale;
     }
 
     public static int getImportFrameHeight() {
@@ -637,6 +676,10 @@ public class DialogVals {
 
     public static double getLayerOpacity() {
         return layerOpacity;
+    }
+
+    public static double getFrameDuration() {
+        return frameDuration;
     }
 
     public static double getResizeScale() {

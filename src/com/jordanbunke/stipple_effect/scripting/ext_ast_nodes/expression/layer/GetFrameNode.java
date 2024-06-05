@@ -34,7 +34,7 @@ public final class GetFrameNode extends LayerExpressionNode {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
                     arguments.args()[0].getPosition(),
                     "The frame index (" + frameIndex + ") is negative");
-        else if (frameIndex >= layer.project().getState().getFrameCount())
+        else if (frameIndex >= fc)
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
                     arguments.args()[0].getPosition(),
                     "The frame index (" + frameIndex + ") is " +

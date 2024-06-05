@@ -138,4 +138,8 @@ public class IncrementalRangeElements<R extends Number> {
                 setter, getter, toSliderConversion, fromSliderConversion,
                 valueFormatter, widestTextCase);
     }
+
+    public MenuElement[] getAll() {
+        return new MenuElement[] { decButton, incButton, slider, value };
+    }
 }

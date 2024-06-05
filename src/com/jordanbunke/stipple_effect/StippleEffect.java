@@ -517,7 +517,7 @@ public class StippleEffect implements ProgramContext {
                                     getSelectedPalette());
                     });
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
+                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
                     () -> {
                         if (tool.equals(TextTool.get()))
                             DialogAssembly.setDialogToNewFont();
