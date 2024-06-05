@@ -61,7 +61,7 @@ public final class SetFrameNode extends LayerStatementNode {
             StatusUpdates.scriptActionNotPermitted(attempt,
                     "the frame index (" + frameIndex + ") is negative",
                     arguments.args()[0].getPosition());
-        else if (frameIndex >= layer.project().getState().getFrameCount())
+        else if (frameIndex >= fc)
             StatusUpdates.scriptActionNotPermitted(attempt,
                     "the frame index (" + frameIndex + ") is " +
                             (frameIndex == fc ? "greater than " : "equal to ") +
