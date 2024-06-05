@@ -278,17 +278,12 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                 }, transformType, context, displacement);
             }
             case STRETCH -> {
-                final Coord2D delta = new Coord2D(
-                        (int)((mousePosition.x - startMousePosition.x) / zoomFactor),
-                        (int)((mousePosition.y - startMousePosition.y) / zoomFactor)
-                );
-
-                final Coord2D change = switch (direction) {
-                    case NA -> new Coord2D();
-                    case B, T -> new Coord2D(0, delta.y);
-                    case L, R -> new Coord2D(delta.x, 0);
-                    default -> new Coord2D(delta.x, delta.y);
-                };
+                final Coord2D change = snapStretchToClosestGridPosition(context,
+                        new Coord2D((int)((mousePosition.x -
+                                startMousePosition.x) / zoomFactor),
+                                (int)((mousePosition.y -
+                                        startMousePosition.y) / zoomFactor)),
+                        direction);
 
                 handler = ToolTaskHandler.update(handler, () -> {
                     transformation = stretch(context,
@@ -362,6 +357,60 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
     @Override
     public GameImage getToolContentPreview() {
         return toolContentPreview;
+    }
+
+    private Coord2D snapStretchToClosestGridPosition(
+            final SEContext context, final Coord2D delta,
+            final Direction direction
+    ) {
+        if (!(isSnap() && canSnapToGrid(context)))
+            return switch (direction) {
+                case NA -> new Coord2D();
+                case B, T -> new Coord2D(0, delta.y);
+                case L, R -> new Coord2D(delta.x, 0);
+                default -> delta;
+            };
+
+        final int pgX = Settings.getPixelGridXPixels(),
+                pgY = Settings.getPixelGridYPixels();
+
+        final int tlx = startTopLeft.x + switch (direction) {
+            case L, TL, BL -> delta.x;
+            default -> 0;
+        }, tly = startTopLeft.y + switch (direction) {
+            case T, TL, TR -> delta.y;
+            default -> 0;
+        }, brx = startBottomRight.x + switch (direction) {
+            case R, TR, BR -> delta.x;
+            default -> 0;
+        }, bry = startBottomRight.y + switch (direction) {
+            case B, BL, BR -> delta.y;
+            default -> 0;
+        }, tlGridX = (int)(tlx / (double) pgX),
+                tlGridY = (int)(tly / (double) pgY),
+                brGridX = (int)(brx / (double) pgX) + (brx % pgX == 0 ? 0 : 1),
+                brGridY = (int)(bry / (double) pgY) + (bry % pgY == 0 ? 0 : 1),
+                tlxSnapped = tlGridX * pgX, tlySnapped = tlGridY * pgY,
+                brxSnapped = brGridX * pgX, brySnapped = brGridY * pgY;
+
+        final Coord2D tlDelta = new Coord2D(
+                tlxSnapped - startTopLeft.x,
+                tlySnapped - startTopLeft.y),
+                brDelta = new Coord2D(
+                        brxSnapped - startBottomRight.x,
+                        brySnapped - startBottomRight.y);
+
+        return switch (direction) {
+            case NA -> new Coord2D();
+            case TL -> tlDelta;
+            case T -> new Coord2D(0, tlDelta.y);
+            case TR -> new Coord2D(brDelta.x, tlDelta.y);
+            case L -> new Coord2D(tlDelta.x, 0);
+            case R -> new Coord2D(brDelta.x, 0);
+            case BR -> brDelta;
+            case B -> new Coord2D(0, brDelta.y);
+            case BL -> new Coord2D(tlDelta.x, brDelta.y);
+        };
     }
 
     private boolean canSnapToGrid(final SEContext context) {

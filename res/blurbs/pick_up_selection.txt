@@ -8,6 +8,7 @@ Move: {Click & Drag} or {Arrow Keys}
 * Only works with {Click & Drag}, not with {Arrow Keys}
 
 Stretch: {Click & Drag} on one of the transform nodes
+If the pixel grid is on, hold {Shift} to snap the stretch operation to the pixel grid.
 
 Rotate: {Click & Drag} around one of the transform nodes
 Modify the rotation operation to snap to the nearest 45-degree angle by holding {Shift}.

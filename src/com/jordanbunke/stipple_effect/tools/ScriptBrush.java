@@ -20,11 +20,12 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import java.awt.*;
 import java.util.function.Function;
 
-public final class ScriptBrush extends AbstractBrush {
+public final class ScriptBrush extends AbstractBrush
+        implements SnappableTool, ToggleModeTool {
     private static final ScriptBrush INSTANCE;
 
     private Function<Color, Color> c;
-    private boolean valid, ignoreTransparent;
+    private boolean valid, ignoreTransparent, fromSystem, secondary;
 
     static {
         INSTANCE = new ScriptBrush();
@@ -34,6 +35,8 @@ public final class ScriptBrush extends AbstractBrush {
         c = null;
         valid = false;
         ignoreTransparent = false;
+        fromSystem = false;
+        secondary = false;
     }
 
     public static ScriptBrush get() {
@@ -63,7 +66,7 @@ public final class ScriptBrush extends AbstractBrush {
 
     @Override
     void setColorGetter(final SEContext context, final GameMouseEvent me) {
-        ignoreTransparent = me.button == GameMouseEvent.Button.RIGHT;
+        secondary = me.button == GameMouseEvent.Button.RIGHT;
     }
 
     @Override
@@ -73,7 +76,10 @@ public final class ScriptBrush extends AbstractBrush {
 
     @Override
     Color getColor(final Color existing, final int x, final int y) {
-        return c.apply(existing);
+        return c.apply(fromSystem ? (secondary
+                ? StippleEffect.get().getSecondary()
+                : StippleEffect.get().getPrimary())
+                : existing);
     }
 
     @Override
@@ -104,5 +110,20 @@ public final class ScriptBrush extends AbstractBrush {
 
         return new MenuElementGrouping(inherited,
                 scriptLabel, scriptButton, scriptFeedback);
+    }
+
+    @Override
+    public void setSnap(final boolean is) {
+        fromSystem = is;
+    }
+
+    @Override
+    public boolean isSnap() {
+        return fromSystem;
+    }
+
+    @Override
+    public void setMode(final boolean is) {
+        ignoreTransparent = is;
     }
 }
