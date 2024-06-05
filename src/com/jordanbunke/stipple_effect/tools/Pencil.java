@@ -92,7 +92,7 @@ public final class Pencil extends ToolThatDraws {
     }
 
     @Override
-    int getDitherTextX() {
+    int getAfterBreadthTextX() {
         return getFirstOptionLabelPosition().x;
     }
 }

@@ -1,6 +1,6 @@
 Shortcut: {D}
 
-Works like the regular {brush} tool, but shifts the color of a pixel that is {drawn over} to one of
+Works like the regular {Brush} tool, but shifts the color of a pixel that is {painted over} to one of
 the colors next to it in the current palette {if the pixel's initial color is in the palette}.
 
 Replace with left-adjacent color in palette: {Left Click & Drag}

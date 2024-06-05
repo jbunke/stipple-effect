@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class SECursor {
-    public static final String MAIN_CURSOR = "main", RETICLE = "reticle",
+    public static final String MAIN_CURSOR = "main",
+            RETICLE = "reticle", NO_SCRIPT = "no_script",
             HAND_OPEN = "hand_open", HAND_GRAB = "hand_grab";
     private static final String
             BRUSH = "brush", ERASER = "eraser",
@@ -64,7 +65,7 @@ public class SECursor {
             ZOOM = "zoom";
 
     private static final Set<String> CURSOR_CODES = Set.of(
-            MAIN_CURSOR, RETICLE, HAND_GRAB, HAND_OPEN,
+            MAIN_CURSOR, RETICLE, NO_SCRIPT, HAND_GRAB, HAND_OPEN,
             BRUSH, ERASER, PENCIL, STIPPLE_PENCIL,
             COLOR_PICKER, LINE_TOOL, TEXT_TOOL, TEXT_TOOL_TYPING,
             MOVE_SELECTION, MOVE_SELECTION_VERT,

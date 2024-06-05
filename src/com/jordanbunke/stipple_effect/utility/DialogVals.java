@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.tools.ScriptBrush;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 
 import java.nio.file.Path;
@@ -167,8 +168,9 @@ public class DialogVals {
 
     public static void setColorScript(final HeadFuncNode colorScript) {
         DialogVals.colorScript = colorScript;
-        DialogVals.colorScriptValid = SEInterpreter
-                .validateColorScript(DialogVals.colorScript);
+        colorScriptValid = SEInterpreter.validateColorScript(DialogVals.colorScript);
+
+        ScriptBrush.get().updateScript(colorScriptValid, colorScript);
     }
 
     public static void toggleShiftingSat() {

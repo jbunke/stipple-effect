@@ -1,0 +1,8 @@
+Shortcut: {Q}
+
+The script brush paints applies a color script transformation to the pixel that it paints over.
+
+Paint over all: {Left Click & Drag}
+Paint over all but transparent pixels: {Right Click & Drag}
+
+Increment/decrement brush width: {Arrow Keys} or {Shift + Scroll Wheel}
