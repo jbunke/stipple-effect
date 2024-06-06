@@ -1013,7 +1013,7 @@ public class SEContext {
         if (getState().hasSelection()) {
             SEClipboard.get().sendSelectionToClipboard(getState());
             StatusUpdates.sendToClipboard(true,
-                    SEClipboard.get().getContents().getPixels());
+                    getState().getSelection().size());
         } else
             StatusUpdates.clipboardSendFailed(true);
     }
@@ -1399,20 +1399,20 @@ public class SEContext {
     public void cut() {
         if (getState().hasSelection()) {
             SEClipboard.get().sendSelectionToClipboard(getState());
+            final int pixelCount = getState().getSelection().size();
             deleteSelectionContents(true);
-            StatusUpdates.sendToClipboard(false,
-                    SEClipboard.get().getContents().getPixels());
+            StatusUpdates.sendToClipboard(false, pixelCount);
         } else
             StatusUpdates.clipboardSendFailed(false);
     }
 
     // paste
     public void paste(final boolean newLayer) {
-        if (SEClipboard.get().hasContents()) {
+        if (SEClipboard.get().hasContent()) {
             if (getState().hasSelectionContents())
                 dropContentsToLayer(false, true);
 
-            final SelectionContents toPaste = SEClipboard.get().getContents();
+            final SelectionContents toPaste = SEClipboard.get().getContent();
 
             if (newLayer)
                 addLayer();

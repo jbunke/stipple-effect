@@ -2,14 +2,12 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 
 import java.awt.*;
 import java.nio.file.Path;
-import java.util.Set;
 
 public class StatusUpdates {
     private static void send(final String update) {
@@ -351,11 +349,10 @@ public class StatusUpdates {
     }
 
     public static void sendToClipboard(
-            final boolean copied, final Set<Coord2D> selection
+            final boolean copied, final int pixelCount
     ) {
-        send((copied ? "Copied" : "Cut") + " " + selection.size() +
-                " pixels " + (copied ? "" : "from the canvas ") +
-                "to " + StippleEffect.PROGRAM_NAME + "'s clipboard");
+        send((copied ? "Copied" : "Cut") + " " + pixelCount + " pixels " +
+                (copied ? "" : "from the canvas ") + "to the clipboard");
     }
 
     public static void clipboardSendFailed(
