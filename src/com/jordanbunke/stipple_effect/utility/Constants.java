@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.ZoomLevel;
 
 import java.nio.file.Path;
 
@@ -76,9 +77,12 @@ public class Constants {
 
     public static final long DUMP_STATES_MEM_THRESHOLD = 0x6400000L; // 100 MB
 
-    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f,
-            ZOOM_FOR_OVERLAY = 1f, ZOOM_FOR_GRID = DEF_ZOOM,
-            NO_ZOOM = 1f, ZOOM_CHANGE_LEVEL = 2f, MAX_PREVIEW_ZOOM = 12f;
+    public static final float
+            DEF_ZOOM = ZoomLevel.PLUS_3.z,
+            ZOOM_FOR_OVERLAY = ZoomLevel.NONE.z,
+            ZOOM_FOR_GRID = DEF_ZOOM,
+            NO_ZOOM = ZoomLevel.NONE.z,
+            MAX_PREVIEW_ZOOM = ZoomLevel.PLUS_8.z;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

@@ -46,7 +46,7 @@ public class SEContext {
 
     private GameImage checkerboard;
     private SelectionOverlay selectionOverlay;
-    private Map<Float, GameImage> pixelGridMap;
+    private Map<ZoomLevel, GameImage> pixelGridMap;
 
     public SEContext(
             final int imageWidth, final int imageHeight
@@ -145,8 +145,8 @@ public class SEContext {
 
             // pixel grid
             if (renderInfo.isPixelGridOn() && couldRenderPixelGrid()) {
-                final GameImage pixelGrid = pixelGridMap
-                        .getOrDefault(zoomFactor, GameImage.dummy());
+                final GameImage pixelGrid = pixelGridMap.getOrDefault(
+                        renderInfo.getZoomLevel(), GameImage.dummy());
                 final int z = (int) zoomFactor;
 
                 if (pixelGrid.getWidth() > GameImage.dummy().getWidth())
@@ -943,9 +943,8 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        for (float fZ = Constants.MIN_ZOOM; fZ <= Constants.MAX_ZOOM;
-             fZ *= Constants.ZOOM_CHANGE_LEVEL) {
-            final int z = (int) fZ, altPx = Math.max(2,
+        for (final ZoomLevel zl : ZoomLevel.values()) {
+            final int z = (int) zl.z, altPx = Math.max(2,
                     z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
             final boolean tooSmall = z == 0,
@@ -997,7 +996,7 @@ public class SEContext {
             for (int y = 0; y < h; y += pgy)
                 image.draw(horzGridLine, 0, y * z);
 
-            pixelGridMap.put(fZ, image.submit());
+            pixelGridMap.put(zl, image.submit());
         }
     }
 

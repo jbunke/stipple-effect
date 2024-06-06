@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.selection;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.project.ZoomLevel;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -30,7 +31,7 @@ public final class SelectionOverlay {
     private GameImage last;
 
     public SelectionOverlay(final Set<Coord2D> selection) {
-        lastZ = Constants.MIN_ZOOM;
+        lastZ = ZoomLevel.MIN.z;
         lastTL = new Coord2D();
         lastRender = new Coord2D();
         lastWW = 0;

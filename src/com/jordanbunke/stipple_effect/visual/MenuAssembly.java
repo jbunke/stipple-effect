@@ -19,6 +19,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.ZoomLevel;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -893,7 +894,6 @@ public class MenuAssembly {
         mb.addAll(boundsIndicator, boundsLabel);
 
         // zoom
-        final float BASE = 2f;
         final Indicator zoomIndicator = new Indicator(
                 new Coord2D(Layout.getBottomBarZoomPercentageX(),
                         bottomBarButtonY), IconCodes.IND_ZOOM);
@@ -902,10 +902,11 @@ public class MenuAssembly {
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
                         bottomBarTextY, c.renderInfo::zoomOut,
                         () -> c.renderInfo.zoomIn(Constants.NO_VALID_TARGET),
-                        Constants.MIN_ZOOM, Constants.MAX_ZOOM,
-                        c.renderInfo::setZoomFactor, c.renderInfo::getZoomFactor,
-                        f -> (int) (Math.log(f) / Math.log(BASE)),
-                        sv -> (float) Math.pow(BASE, sv),
+                        ZoomLevel.MIN.z, ZoomLevel.MAX.z,
+                        z -> c.renderInfo.setZoomLevel(ZoomLevel.fromZ(z)),
+                        c.renderInfo::getZoomFactor,
+                        z -> ZoomLevel.fromZ(z).ordinal(),
+                        sv -> ZoomLevel.values()[sv].z,
                         f -> c.renderInfo.getZoomText(), "XXX.XX%");
         mb.addAll(zoomIndicator, zoom.decButton, zoom.incButton,
                 zoom.slider, zoom.value);

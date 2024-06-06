@@ -9,40 +9,40 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 public class RenderInfo {
     private Coord2D anchor;
-    private float zoomFactor;
+    private ZoomLevel zoomLevel;
     private boolean pixelGridOn;
 
     public RenderInfo(final int imageWidth, final int imageHeight) {
         this.anchor = new Coord2D(imageWidth / 2, imageHeight / 2);
-        this.zoomFactor = Constants.DEF_ZOOM;
+        this.zoomLevel = ZoomLevel.NONE;
         this.pixelGridOn = Settings.isPixelGridOnByDefault();
     }
 
     public void zoomIn(final Coord2D targetPixel) {
-        setZoomFactor(zoomFactor * Constants.ZOOM_CHANGE_LEVEL);
+        setZoomLevel(zoomLevel.in());
         adjustAnchorFromZoom(targetPixel);
     }
 
     public void zoomOut() {
-        setZoomFactor(zoomFactor / Constants.ZOOM_CHANGE_LEVEL);
+        setZoomLevel(zoomLevel.out());
     }
 
     private void adjustAnchorFromZoom(final Coord2D targetPixel) {
         if (!targetPixel.equals(Constants.NO_VALID_TARGET)) {
-            final Coord2D adjusted = new Coord2D((anchor.x + targetPixel.x) / 2,
+            final Coord2D adjusted = new Coord2D(
+                    (anchor.x + targetPixel.x) / 2,
                     (anchor.y + targetPixel.y) / 2);
             setAnchor(adjusted);
         }
     }
 
-    public void setZoomFactor(final float zoomFactor) {
-        final float was = this.zoomFactor;
+    public void setZoomLevel(final ZoomLevel zoomLevel) {
+        final boolean redrawOverlays = this.zoomLevel != zoomLevel &&
+                zoomLevel.z > Constants.ZOOM_FOR_OVERLAY;
 
-        this.zoomFactor = Math.max(Constants.MIN_ZOOM,
-                Math.min(zoomFactor, Constants.MAX_ZOOM));
+        this.zoomLevel = zoomLevel;
 
-        if (this.zoomFactor != was &&
-                this.zoomFactor >= Constants.ZOOM_FOR_OVERLAY)
+        if (redrawOverlays)
             ToolWithBreadth.redrawToolOverlays();
     }
 
@@ -69,13 +69,15 @@ public class RenderInfo {
     }
 
     public String getZoomText() {
-        return zoomFactor >= 1 / 4f
-                ? (int)(zoomFactor * 100) + "%"
-                : (zoomFactor * 100) + "%";
+        return zoomLevel.toString();
     }
 
     public float getZoomFactor() {
-        return zoomFactor;
+        return zoomLevel.z;
+    }
+
+    public ZoomLevel getZoomLevel() {
+        return zoomLevel;
     }
 
     public Coord2D getAnchor() {
