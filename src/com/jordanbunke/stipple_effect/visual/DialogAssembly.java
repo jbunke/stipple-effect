@@ -764,10 +764,10 @@ public class DialogAssembly {
 
         final Coord2D thirdDisp = new Coord2D(Layout.getDialogWidth() / 3, 0);
 
-        final TextLabel stateHeader = makeDialogLeftLabel(0, "RELATIVE POSITION"),
+        final TextLabel stateHeader = makeDialogLeftLabel(0, "Project state stack:"),
                 causeHeader = TextLabel.make(
                         stateHeader.getPosition().displace(thirdDisp),
-                        "PRECEDING OPERATION");
+                        "Preceding operation:");
 
         mb.addAll(stateHeader, causeHeader);
 

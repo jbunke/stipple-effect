@@ -14,7 +14,7 @@ public class RenderInfo {
 
     public RenderInfo(final int imageWidth, final int imageHeight) {
         this.anchor = new Coord2D(imageWidth / 2, imageHeight / 2);
-        this.zoomLevel = ZoomLevel.NONE;
+        this.zoomLevel = ZoomLevel.fromZ(Constants.DEF_ZOOM);
         this.pixelGridOn = Settings.isPixelGridOnByDefault();
     }
 

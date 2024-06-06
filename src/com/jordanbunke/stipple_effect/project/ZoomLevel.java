@@ -1,9 +1,9 @@
 package com.jordanbunke.stipple_effect.project;
 
 public enum ZoomLevel {
-    MIN(1 / 16f),
-    MINUS_5(1 / 8f), MINUS_4(1 / 4f),
-    MINUS_3(3 / 8f), MINUS_2(1 / 2f), MINUS_1(3 / 4f),
+    MIN(0.0625f),
+    MINUS_5(0.125f), MINUS_4(0.25f),
+    MINUS_3(0.375f), MINUS_2(0.5f), MINUS_1(0.75f),
     NONE(1f),
     PLUS_1(2f), PLUS_2(3f), PLUS_3(4f),
     PLUS_4(5f), PLUS_5(6f), PLUS_6(8f),
