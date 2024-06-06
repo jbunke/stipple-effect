@@ -20,6 +20,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
@@ -805,12 +806,16 @@ public class DialogAssembly {
                     causeLabel = TextLabel.make(
                             stateLabel.getPosition().displace(thirdDisp),
                             state.getOperation().toString());
-            final SelectStateButton selectButton = SelectStateButton.make(
-                    getDialogLeftContentPositionForRow(ci + 1)
-                            .displace(thirdDisp.x * 2, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
-                    () -> i.set(checkpoint), () -> i.get() != checkpoint);
+            smb.addAll(stateLabel, causeLabel);
 
-            smb.addAll(stateLabel, causeLabel, selectButton);
+            if (relative != 0) {
+                final SelectStateButton selectButton = SelectStateButton.make(
+                        getDialogLeftContentPositionForRow(ci + 1)
+                                .displace(thirdDisp.x * 2, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
+                        () -> i.set(checkpoint), () -> i.get() != checkpoint);
+                smb.add(selectButton);
+            }
+
             bottomLabel = stateLabel;
         }
 
@@ -1543,11 +1548,88 @@ public class DialogAssembly {
             previewContent[i] = composed.submit();
         }
 
-        final AnimationMenuElement previewAnim = new AnimationMenuElement(
+        final ActionPreviewer previewer = new ActionPreviewer(
                 new Coord2D(Layout.getCanvasMiddle().x,
-                        textBelowPos(backButton, 1).y), new Bounds2D(pw, ph),
-                MenuElement.Anchor.CENTRAL_TOP, 20, previewContent);
-        mb.add(previewAnim);
+                        textBelowPos(backButton, 1).y),
+                new Bounds2D(pw, ph), previewContent,
+                preview.getFrameDurations().stream()
+                        .mapToDouble(d -> d).toArray());
+        mb.add(previewer);
+
+        final PlaybackInfo playbackInfo = previewer.getPlaybackInfo();
+
+        if (fc > 1) {
+            // frame and playback mode controls
+            final MenuElement firstFrame =
+                    GraphicsUtils.generateIconButton(IconCodes.TO_FIRST_FRAME,
+                            backButton.getPosition()
+                                    .displace(0, Layout.DIALOG_CONTENT_INC_Y),
+                            () -> true, previewer::toFirstFrame),
+                    previousFrame = GraphicsUtils.generateIconButton(
+                            IconCodes.PREVIOUS, firstFrame.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            () -> true, previewer::previousFrame),
+                    playStop = GraphicsUtils.generateIconToggleButton(
+                            previousFrame.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            new String[] { IconCodes.PLAY, IconCodes.STOP },
+                            new Runnable[] {
+                                    playbackInfo::play, playbackInfo::stop
+                            }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
+                            () -> true, IconCodes.PLAY),
+                    nextFrame = GraphicsUtils.generateIconButton(
+                            IconCodes.NEXT, playStop.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            () -> true, previewer::nextFrame),
+                    lastFrame = GraphicsUtils.generateIconButton(
+                            IconCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            () -> true, previewer::toLastFrame);
+
+            final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
+                    PlaybackInfo.Mode.FORWARDS, PlaybackInfo.Mode.BACKWARDS,
+                    PlaybackInfo.Mode.LOOP, PlaybackInfo.Mode.PONG_FORWARDS
+            };
+            final MenuElement playbackModeButton =
+                    GraphicsUtils.generateIconToggleButton(
+                            lastFrame.getRenderPosition().displace(
+                                    Layout.BUTTON_INC, 0),
+                            Arrays.stream(validModes)
+                                    .map(PlaybackInfo.Mode::getIconCode)
+                                    .toArray(String[]::new),
+                            Arrays.stream(validModes)
+                                    .map(mode -> (Runnable) () -> {})
+                                    .toArray(Runnable[]::new),
+                            () -> playbackInfo.getMode().buttonIndex(),
+                            playbackInfo::toggleMode, () -> true, IconCodes.LOOP);
+            final DynamicLabel frameTracker = makeDynamicLabel(
+                    playbackModeButton.getRenderPosition().displace(
+                            Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
+                            -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
+                    () -> "Frm. " + (previewer.getFrameIndex() + 1) +
+                            "/" + previewer.getFrameCount(),
+                    "Frm. XXX/XXX");
+
+            mb.addAll(firstFrame, previousFrame, playStop, nextFrame,
+                    lastFrame, playbackModeButton, frameTracker);
+
+            // playback speed (FPS)
+            final StaticMenuElement fpsReference = new StaticMenuElement(
+                    getRightColumnFromLeftDisplacement(
+                            firstFrame.getPosition())
+                            .displace(-(Layout.BUTTON_DIM +
+                                    Layout.CONTENT_BUFFER_PX), 0),
+                    Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
+                    GameImage.dummy());
+            final int fpsButtonY = firstFrame.getY();
+            final IncrementalRangeElements<Integer> fps =
+                    IncrementalRangeElements.makeForInt(fpsReference, fpsButtonY,
+                            (fpsButtonY - Layout.BUTTON_OFFSET) + Layout.TEXT_Y_OFFSET,
+                            1, Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                            playbackInfo::setFps, playbackInfo::getFps,
+                            i -> i, sv -> sv, sv -> sv + " FPS", "XXX FPS");
+            mb.addAll(fps.decButton, fps.incButton, fps.slider, fps.value);
+        }
 
         setDialog(assembleDialog("Preview of " + previewAppend,
                 new MenuElementGrouping(mb.build().getMenuElements()),

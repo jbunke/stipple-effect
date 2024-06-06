@@ -378,8 +378,11 @@ public class PreviewWindow implements ProgramContext {
         final int w = content[frameIndex].getWidth(),
                 h = content[frameIndex].getHeight();
 
-        if (canvasW != w || canvasH != h)
+        if (canvasW != w || canvasH != h) {
             updateWindow();
+            // refocus Stipple Effect window - only here, where resizing is implicit
+            StippleEffect.get().window.focus();
+        }
     }
 
     private void updateWindow() {
@@ -391,8 +394,6 @@ public class PreviewWindow implements ProgramContext {
         window.setOnCloseBehaviour(preview::terminateExecution);
 
         StippleEffect.get().window.getEventLogger().unpressAllKeys();
-        // refocus Stipple Effect window
-        StippleEffect.get().window.focus();
     }
 
     private GameWindow makeWindow() {
