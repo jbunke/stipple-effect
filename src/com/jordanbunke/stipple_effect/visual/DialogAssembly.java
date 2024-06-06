@@ -688,11 +688,11 @@ public class DialogAssembly {
         final int NO_CLIPBOARD = 0;
 
         final int initialW, initialH, clipboardW, clipboardH;
-        final boolean hasClipboard = SEClipboard.get().hasContents();
+        final boolean hasClipboard = SEClipboard.get().hasContent();
 
         if (hasClipboard) {
             final Set<Coord2D> clipboard = SEClipboard.get()
-                    .getContents().getPixels();
+                    .getContent().getPixels();
             final Coord2D tl = SelectionUtils.topLeft(clipboard),
                     br = SelectionUtils.bottomRight(clipboard);
 
