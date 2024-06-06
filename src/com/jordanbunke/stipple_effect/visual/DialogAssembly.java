@@ -426,25 +426,25 @@ public class DialogAssembly {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
-        DialogVals.setPadLeft(0);
-        DialogVals.setPadBottom(0);
-        DialogVals.setPadTop(0);
-        DialogVals.setPadRight(0);
+        DialogVals.setPadAll(0);
 
         final MenuBuilder mb = new MenuBuilder();
 
         // text labels
         final TextLabel
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
-                leftLabel = TextLabel.make(textBelowPos(context, 1), "Left:"),
+                allLabel = TextLabel.make(textBelowPos(context, 1), "All:"),
+                leftLabel = TextLabel.make(textBelowPos(allLabel, 1), "Left:"),
                 rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right:"),
                 topLabel = TextLabel.make(textBelowPos(rightLabel), "Top:"),
                 bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom:"),
                 explanation = makeValidDimensionsBottomLabel();
-        mb.addAll(context, explanation, leftLabel, rightLabel,
-                topLabel, bottomLabel);
+        mb.addAll(context, explanation, allLabel,
+                leftLabel, rightLabel, topLabel, bottomLabel);
 
         // pad textboxes
+        final Textbox allTextbox = makeDialogPadTextBox(allLabel,
+                i -> true, DialogVals::setPadAll, DialogVals::getPadAll);
         final Textbox leftTextbox = makeDialogPadTextBox(leftLabel, i -> {
             final int pw = i + DialogVals.getPadRight() + w;
             return pw <= Constants.MAX_CANVAS_W && pw > 0;
@@ -461,7 +461,8 @@ public class DialogAssembly {
             final int ph = i + DialogVals.getPadTop() + h;
             return ph <= Constants.MAX_CANVAS_W && ph > 0;
         }, DialogVals::setPadBottom, DialogVals::getPadBottom);
-        mb.addAll(leftTextbox, rightTextbox, topTextbox, bottomTextbox);
+        mb.addAll(allTextbox, leftTextbox, rightTextbox,
+                topTextbox, bottomTextbox);
 
         // size preview
         final String PREVIEW_PREFIX = "Preview size: ";

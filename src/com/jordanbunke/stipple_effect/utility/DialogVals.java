@@ -22,7 +22,7 @@ public class DialogVals {
             importColumns = 1, importRows = 1,
             resizeWidth = Constants.DEFAULT_CANVAS_W,
             resizeHeight = Constants.DEFAULT_CANVAS_H,
-            padLeft = 0, padRight = 0, padTop = 0, padBottom = 0,
+            padLeft = 0, padRight = 0, padTop = 0, padBottom = 0, padAll = 0,
             newFontPixelSpacing = Constants.DEFAULT_FONT_PX_SPACING,
             framesPerDim = 1,
             frameWidth = Constants.DEFAULT_CANVAS_W,
@@ -320,6 +320,15 @@ public class DialogVals {
                     (int) Math.round(ratio * importWidth));
             setImportHeight(importHeight, refWidth, refHeight, false);
         }
+    }
+
+    public static void setPadAll(final int padAll) {
+        DialogVals.padAll = padAll;
+
+        setPadLeft(padAll);
+        setPadRight(padAll);
+        setPadTop(padAll);
+        setPadBottom(padAll);
     }
 
     public static void setPadBottom(final int padBottom) {
@@ -636,6 +645,10 @@ public class DialogVals {
 
     public static int getNewProjectWidth() {
         return newProjectWidth;
+    }
+
+    public static int getPadAll() {
+        return padAll;
     }
 
     public static int getPadBottom() {
