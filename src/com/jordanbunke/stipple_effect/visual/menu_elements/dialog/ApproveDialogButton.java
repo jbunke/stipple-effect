@@ -35,7 +35,7 @@ public class ApproveDialogButton extends MenuButtonStub {
         highlighted = GraphicsUtils.drawHighlightedButton(base);
         notMet = GraphicsUtils.drawTextButton(
                 dimensions.width(), text, false,
-                Settings.getTheme().stubButtonBody.get());
+                Settings.getTheme().stubButtonBody);
 
         this.clearDialog = clearDialog;
 

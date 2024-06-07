@@ -232,7 +232,7 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
                 prospect = finishing ? first : tp;
 
         final Color border = prospect.equals(first)
-                ? t.highlightOutline.get() : t.highlightOverlay.get();
+                ? t.highlightOutline : t.highlightOverlay;
 
         toolContentPreview = new GameImage(w, h);
 
@@ -242,7 +242,7 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
                     continue;
 
                 final Color c = (x + y) % 2 == 0
-                        ? t.textLight.get() : t.textDark.get();
+                        ? t.textLight : t.textDark;
 
                 toolContentPreview.dot(c, first.x + x, first.y + y);
             }
@@ -253,7 +253,7 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
         defineLine(getLastVertex(), prospect).forEach(next ->
                 toolContentPreview.dot(border, next.x, next.y));
         vertices.forEach(v ->
-                toolContentPreview.dot(t.highlightOutline.get(), v.x, v.y));
+                toolContentPreview.dot(t.highlightOutline, v.x, v.y));
     }
 
     private void addEdge(final Coord2D v1, final Coord2D v2) {

@@ -85,7 +85,7 @@ public class IncrementalRangeElements<R extends Number> {
         return new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(slider, false),
                 textY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                Settings.getTheme().textLight,
                 () -> valueFormatter.apply(getter.get()), widestTextCase);
     }
 

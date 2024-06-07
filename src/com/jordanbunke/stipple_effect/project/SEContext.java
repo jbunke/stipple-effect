@@ -118,7 +118,7 @@ public class SEContext {
 
         // background
         workspace.fillRectangle(
-                Settings.getTheme().workspaceBackground.get(), 0, 0, ww, wh);
+                Settings.getTheme().workspaceBackground, 0, 0, ww, wh);
 
         // math
         final float zoomFactor = renderInfo.getZoomFactor();
@@ -895,7 +895,7 @@ public class SEContext {
         for (int x = 0; x < w; x += cbx) {
             for (int y = 0; y < h; y += cby) {
                 final Color c = ((x / cbx) + (y / cby)) % 2 == 0
-                        ? t.checkerboard1.get() : t.checkerboard2.get();
+                        ? t.checkerboard1 : t.checkerboard2;
 
                 image.fillRectangle(c, x, y, cbx, cby);
             }

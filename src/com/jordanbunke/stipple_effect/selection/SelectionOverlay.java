@@ -49,7 +49,7 @@ public final class SelectionOverlay {
         h = br.y - tl.y;
 
         filled = new GameImage(w, h);
-        final Color fillC = Settings.getTheme().selectionFill.get();
+        final Color fillC = Settings.getTheme().selectionFill;
         filled.setColor(fillC);
 
         selection.forEach(p -> {
@@ -115,8 +115,8 @@ public final class SelectionOverlay {
                     bounds[TRP].x, bounds[TRP].y,
                     (int)(bounds[DIM].x * z), (int)(bounds[DIM].y * z));
 
-        final Color inside = Settings.getTheme().buttonOutline.get(),
-                outside = Settings.getTheme().highlightOutline.get();
+        final Color inside = Settings.getTheme().buttonOutline,
+                outside = Settings.getTheme().highlightOutline;
 
         final int zint = (int) z;
         final Predicate<Coord2D> inBounds = p -> {

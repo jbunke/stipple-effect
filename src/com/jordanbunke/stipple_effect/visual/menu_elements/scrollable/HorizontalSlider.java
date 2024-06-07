@@ -39,7 +39,7 @@ public class HorizontalSlider extends Slider {
         slider.draw(drawSliderCore(sd, sh), Layout.SLIDER_BALL_DIM / 2, Layout.SLIDER_THINNING);
 
         // slider outline
-        slider.drawRectangle(Settings.getTheme().buttonOutline.get(),
+        slider.drawRectangle(Settings.getTheme().buttonOutline,
                 Layout.BUTTON_BORDER_PX, Layout.SLIDER_BALL_DIM / 2,
                 Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2), sd,
                 getHeight() - (Layout.BUTTON_BORDER_PX + (2 * Layout.SLIDER_THINNING)));

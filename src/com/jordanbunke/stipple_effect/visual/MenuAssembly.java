@@ -733,7 +733,7 @@ public class MenuAssembly {
                 new Bounds2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
                 MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
                 contentWidth, "No palettes", false,
-                Settings.getTheme().stubButtonBody.get())));
+                Settings.getTheme().stubButtonBody)));
 
         // palette buttons
         if (hasPaletteContents) {
@@ -866,7 +866,7 @@ public class MenuAssembly {
         final DynamicLabel toolLabel = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(toolIndicator, false),
                 bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                Settings.getTheme().textLight,
                 () -> StippleEffect.get().getTool().getBottomBarText(),
                 Layout.getBottomBarToolWidth());
         mb.addAll(toolIndicator, toolLabel);
@@ -878,7 +878,7 @@ public class MenuAssembly {
         final DynamicLabel targetLabel = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(targetIndicator, false),
                 bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                Settings.getTheme().textLight,
                 c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth());
         mb.addAll(targetIndicator, targetLabel);
 
@@ -889,7 +889,7 @@ public class MenuAssembly {
         final DynamicLabel boundsLabel = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(boundsIndicator, false),
                 bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                Settings.getTheme().textLight,
                 c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth());
         mb.addAll(boundsIndicator, boundsLabel);
 
@@ -914,7 +914,7 @@ public class MenuAssembly {
         // selection
         mb.add(new DynamicLabel(new Coord2D(Layout.width() -
                 (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
-                MenuElement.Anchor.RIGHT_TOP, Settings.getTheme().textLight.get(),
+                MenuElement.Anchor.RIGHT_TOP, Settings.getTheme().textLight,
                 c::getSelectionText, Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
 

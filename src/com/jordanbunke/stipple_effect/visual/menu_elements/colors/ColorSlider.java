@@ -48,8 +48,8 @@ public class ColorSlider extends HorizontalSlider {
     public GameImage drawSliderCore(final int w, final int h) {
         final GameImage sliderCore = new GameImage(w, h);
 
-        final Color light = Settings.getTheme().checkerboard1.get(),
-                dark = Settings.getTheme().checkerboard2.get();
+        final Color light = Settings.getTheme().checkerboard1,
+                dark = Settings.getTheme().checkerboard2;
 
         final int sectionalW = Layout.SLIDER_OFF_DIM / 4;
         final int sections = (w / sectionalW) + 1;
@@ -74,7 +74,7 @@ public class ColorSlider extends HorizontalSlider {
     @Override
     public Color getSliderBallCoreColor() {
         final GameImage core = new GameImage(1, 1);
-        core.dot(Settings.getTheme().buttonBody.get(), 0, 0);
+        core.dot(Settings.getTheme().buttonBody, 0, 0);
         core.dot(spectralFunction.apply(getValue()), 0, 0);
         core.free();
 

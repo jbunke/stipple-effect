@@ -105,7 +105,7 @@ public final class ScriptBrush extends AbstractBrush
         final DynamicLabel scriptFeedback = new DynamicLabel(new Coord2D(
                 Layout.optionsBarNextElementX(scriptButton, false),
                 Layout.optionsBarTextY()), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                Settings.getTheme().textLight,
                 DialogVals::colorScriptMessage, Layout.getToolOptionsBarWidth());
 
         return new MenuElementGrouping(inherited,

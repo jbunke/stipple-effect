@@ -1,10 +1,9 @@
 package com.jordanbunke.stipple_effect.visual.theme;
 
-import java.awt.Color;
-import java.util.function.Supplier;
+import java.awt.*;
 
 public class Theme {
-    public final Supplier<Color>
+    public final Color
             textLight, textDark,
             affixTextLight, affixTextDark,
             textMenuHeading, textShortcut,
@@ -42,36 +41,36 @@ public class Theme {
             final Color checkerboard1,
             final Color checkerboard2
     ) {
-        this.textLight = () -> textLight;
-        this.textDark = () -> textDark;
-        this.affixTextLight = () -> affixTextLight;
-        this.affixTextDark = () -> affixTextDark;
-        this.textMenuHeading = () -> textMenuHeading;
-        this.textShortcut = () -> textShortcut;
+        this.textLight = textLight;
+        this.textDark = textDark;
+        this.affixTextLight = affixTextLight;
+        this.affixTextDark = affixTextDark;
+        this.textMenuHeading = textMenuHeading;
+        this.textShortcut = textShortcut;
 
-        this.workspaceBackground = () -> workspaceBackground;
-        this.panelBackground = () -> panelBackground;
-        this.panelDivisions = () -> panelDivisions;
+        this.workspaceBackground = workspaceBackground;
+        this.panelBackground = panelBackground;
+        this.panelDivisions = panelDivisions;
 
-        this.scrollBackground = () -> scrollBackground;
-        this.dialogVeil = () -> dialogVeil;
-        this.selectionFill = () -> selectionFill;
-        this.buttonBody = () -> buttonBody;
-        this.stubButtonBody = () -> stubButtonBody;
-        this.dropdownOptionBody = () -> dropdownOptionBody;
-        this.defaultSliderCore = () -> defaultSliderCore;
-        this.defaultSliderBall = () -> defaultSliderBall;
-        this.buttonOutline = () -> buttonOutline;
+        this.scrollBackground = scrollBackground;
+        this.dialogVeil = dialogVeil;
+        this.selectionFill = selectionFill;
+        this.buttonBody = buttonBody;
+        this.stubButtonBody = stubButtonBody;
+        this.dropdownOptionBody = dropdownOptionBody;
+        this.defaultSliderCore = defaultSliderCore;
+        this.defaultSliderBall = defaultSliderBall;
+        this.buttonOutline = buttonOutline;
 
-        this.highlightOutline = () -> highlightOutline;
-        this.highlightOverlay = () -> highlightOverlay;
-        this.invalid = () -> invalid;
+        this.highlightOutline = highlightOutline;
+        this.highlightOverlay = highlightOverlay;
+        this.invalid = invalid;
 
-        this.splashText = () -> splashText;
-        this.splashFlashingText = () -> splashFlashingText;
-        this.splashBackground = () -> splashBackground;
+        this.splashText = splashText;
+        this.splashFlashingText = splashFlashingText;
+        this.splashBackground = splashBackground;
 
-        this.checkerboard1 = () -> checkerboard1;
-        this.checkerboard2 = () -> checkerboard2;
+        this.checkerboard1 = checkerboard1;
+        this.checkerboard2 = checkerboard2;
     }
 }

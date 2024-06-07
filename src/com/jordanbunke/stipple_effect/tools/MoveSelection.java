@@ -98,9 +98,9 @@ public final class MoveSelection extends MoverTool<Set<Coord2D>> {
         }).collect(Collectors.toSet());
 
         transformation.forEach(p -> toolContentPreview.dot(
-                Settings.getTheme().highlightOverlay.get(), p.x, p.y));
+                Settings.getTheme().highlightOverlay, p.x, p.y));
         frontier.forEach(p -> toolContentPreview.dot(
-                Settings.getTheme().highlightOutline.get(), p.x, p.y));
+                Settings.getTheme().highlightOutline, p.x, p.y));
 
         return toolContentPreview;
     }

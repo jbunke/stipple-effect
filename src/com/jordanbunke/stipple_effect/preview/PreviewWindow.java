@@ -238,7 +238,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                 lastButton.getRenderPosition().displace(
                         Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
                         -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
-                MenuElement.Anchor.LEFT_TOP, Settings.getTheme().textLight.get(),
+                MenuElement.Anchor.LEFT_TOP, Settings.getTheme().textLight,
                 getter, widestCase);
     }
 
@@ -431,7 +431,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
 
     @Override
     public void render(final GameImage canvas) {
-        canvas.fill(Settings.getTheme().panelBackground.get());
+        canvas.fill(Settings.getTheme().panelBackground);
 
         refreshPreviewImage();
 
@@ -447,7 +447,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
         final GameImage canvasContents = new GameImage(w + (2 * BORDER),
                 h + (2 * BORDER));
 
-        canvasContents.drawRectangle(Settings.getTheme().panelDivisions.get(), 2f, BORDER, BORDER, w, h);
+        canvasContents.drawRectangle(Settings.getTheme().panelDivisions, 2f, BORDER, BORDER, w, h);
         canvasContents.draw(context.getCheckerboard(), BORDER, BORDER, w, h);
         canvasContents.draw(content[frameIndex], BORDER, BORDER, w, h);
 

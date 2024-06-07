@@ -43,7 +43,7 @@ public class SelectStateButton extends SimpleMenuButton {
                 highlighted = GraphicsUtils.drawHighlightedButton(base),
                 stub = GraphicsUtils.drawTextButton(
                         Layout.STD_TEXT_BUTTON_W, "Selected", false,
-                        Settings.getTheme().stubButtonBody.get());
+                        Settings.getTheme().stubButtonBody);
 
         return new SelectStateButton(position, onClick,
                 selectableChecker, base, highlighted, stub);

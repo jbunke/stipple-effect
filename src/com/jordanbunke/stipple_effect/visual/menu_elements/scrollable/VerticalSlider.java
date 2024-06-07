@@ -28,7 +28,7 @@ public class VerticalSlider extends Slider {
         slider.draw(drawSliderCore(sw, sd), Layout.SLIDER_THINNING, Layout.SLIDER_BALL_DIM / 2);
 
         // slider outline
-        slider.drawRectangle(Settings.getTheme().buttonOutline.get(),
+        slider.drawRectangle(Settings.getTheme().buttonOutline,
                 Layout.BUTTON_BORDER_PX,
                 Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2),
                 Layout.SLIDER_BALL_DIM / 2,

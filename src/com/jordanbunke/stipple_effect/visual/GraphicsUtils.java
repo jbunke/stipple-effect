@@ -37,7 +37,7 @@ public class GraphicsUtils {
                     Constants.MISC_FOLDER.resolve("checkmark.png"));
 
     public static TextBuilder uiText() {
-        return uiText(Settings.getTheme().textLight.get());
+        return uiText(Settings.getTheme().textLight);
     }
 
     public static TextBuilder uiText(final Color color) {
@@ -50,8 +50,8 @@ public class GraphicsUtils {
     }
 
     public static Color buttonBorderColor(final boolean selected) {
-        return selected ? Settings.getTheme().highlightOutline.get()
-                : Settings.getTheme().buttonOutline.get();
+        return selected ? Settings.getTheme().highlightOutline
+                : Settings.getTheme().buttonOutline;
     }
 
     public static GameImage drawScrollBoxBackground(
@@ -59,7 +59,7 @@ public class GraphicsUtils {
     ) {
         final GameImage background = new GameImage(w, h);
         background.fillRectangle(
-                Settings.getTheme().scrollBackground.get(), 0, 0, w, h);
+                Settings.getTheme().scrollBackground, 0, 0, w, h);
         return background.submit();
     }
 
@@ -69,7 +69,7 @@ public class GraphicsUtils {
         final int w = Layout.ICON_DIMS.width(), h = Layout.ICON_DIMS.height();
 
         final GameImage checkbox = new GameImage(w, h);
-        checkbox.fillRectangle(Settings.getTheme().buttonBody.get(), 0, 0, w, h);
+        checkbox.fillRectangle(Settings.getTheme().buttonBody, 0, 0, w, h);
 
         if (isChecked)
             checkbox.draw(CHECKMARK);
@@ -90,8 +90,8 @@ public class GraphicsUtils {
     ) {
         final Theme t = Settings.getTheme();
 
-        final Color accent = typing ? t.highlightOutline.get() : t.buttonOutline.get(),
-                background = valid ? t.buttonBody.get() : t.invalid.get();
+        final Color accent = typing ? t.highlightOutline : t.buttonOutline,
+                background = valid ? t.buttonBody : t.invalid;
 
         return drawTextbox(dimensions.x, prefix, text, suffix,
                 cursorIndex, selectionIndex, highlighted, accent, background);
@@ -151,7 +151,7 @@ public class GraphicsUtils {
                 textPos = textPos.displace(2 * px, 0);
 
             nhi.draw(selImage, textPos.x, textPos.y);
-            nhi.fillRectangle(Settings.getTheme().highlightOverlay.get(),
+            nhi.fillRectangle(Settings.getTheme().highlightOverlay,
                     textPos.x - px, 0, selImage.getWidth() + (2 * px), height);
             textPos = textPos.displace(selImage.getWidth() + px, 0);
         }
@@ -186,7 +186,7 @@ public class GraphicsUtils {
             final boolean isSelected
     ) {
         final GameImage base = drawTextButton(width, text, isSelected,
-                Settings.getTheme().buttonBody.get(), true, true);
+                Settings.getTheme().buttonBody, true, true);
 
         final GameImage icon = GraphicsUtils.loadIcon(isSelected
                 ? IconCodes.COLLAPSE : IconCodes.EXPAND);
@@ -239,7 +239,7 @@ public class GraphicsUtils {
             final int width, final String text, final boolean selected
     ) {
         return drawTextButton(width, text, selected,
-                Settings.getTheme().buttonBody.get());
+                Settings.getTheme().buttonBody);
     }
 
     public static SimpleMenuButton makeStandardTextButton(
@@ -255,7 +255,7 @@ public class GraphicsUtils {
     public static SimpleMenuButton makeBespokeTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final int w = GraphicsUtils.uiText(Settings.getTheme().textDark.get())
+        final int w = GraphicsUtils.uiText(Settings.getTheme().textDark)
                 .addText(text).build().draw()
                 .getWidth() + Layout.CONTENT_BUFFER_PX;
 
@@ -270,10 +270,10 @@ public class GraphicsUtils {
     ) {
         return (b.getRed() + b.getGreen() + b.getBlue()) / 3 >
                 Layout.COLOR_TEXTBOX_AVG_C_THRESHOLD
-                ? (main ? Settings.getTheme().textDark.get()
-                    : Settings.getTheme().affixTextDark.get())
-                : (main ? Settings.getTheme().textLight.get()
-                    : Settings.getTheme().affixTextLight.get());
+                ? (main ? Settings.getTheme().textDark
+                    : Settings.getTheme().affixTextDark)
+                : (main ? Settings.getTheme().textLight
+                    : Settings.getTheme().affixTextLight);
     }
 
     public static GameImage drawSelectedTextBox(
@@ -292,8 +292,8 @@ public class GraphicsUtils {
     ) {
         final GameImage hi = new GameImage(nhi);
         final int w = hi.getWidth(), h = hi.getHeight();
-        hi.fillRectangle(Settings.getTheme().highlightOverlay.get(), 0, 0, w, h);
-        hi.drawRectangle(Settings.getTheme().buttonOutline.get(),
+        hi.fillRectangle(Settings.getTheme().highlightOverlay, 0, 0, w, h);
+        hi.drawRectangle(Settings.getTheme().buttonOutline,
                 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
 
         return hi.submit();
@@ -311,8 +311,8 @@ public class GraphicsUtils {
         final int w = br.x - tl.x, h = br.y - tl.y;
 
         return drawOverlay(w, h, z, adjusted,
-                Settings.getTheme().buttonOutline.get(),
-                Settings.getTheme().highlightOutline.get(),
+                Settings.getTheme().buttonOutline,
+                Settings.getTheme().highlightOutline,
                 false, false);
     }
 
@@ -348,7 +348,7 @@ public class GraphicsUtils {
                 scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
         populateOverlay(selection, zoomInc, overlay, overlay, inside, outside,
-                filled ? Settings.getTheme().selectionFill.get() : null);
+                filled ? Settings.getTheme().selectionFill : null);
 
         if (canTransform) {
             final Coord2D tl = SelectionUtils.topLeft(selection),
