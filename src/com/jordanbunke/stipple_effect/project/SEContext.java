@@ -1047,23 +1047,26 @@ public class SEContext {
 
     // contents to palette
     public void contentsToPalette(final Palette palette) {
+        dropContentsToLayer(false, false);
+
         final DialogVals.Scope scope = DialogVals.getScope();
         final List<Color> colors = new ArrayList<>();
         final ProjectState state = getState();
 
         final boolean includeDisabledLayers =
                 DialogVals.isIncludeDisabledLayers();
+        final Set<Coord2D> pixels = state.hasSelection() &&
+                !DialogVals.isIgnoreSelection() ? state.getSelection() : null;
 
         switch (scope) {
-            case SELECTION -> extractColorsFromSelection(colors);
             case LAYER_FRAME -> extractColorsFromFrame(colors, state,
-                    state.getFrameIndex(), state.getLayerEditIndex());
+                    state.getFrameIndex(), state.getLayerEditIndex(), pixels);
             case LAYER -> {
                 final int frameCount = state.getFrameCount();
 
                 for (int i = 0; i < frameCount; i++)
                     extractColorsFromFrame(colors, state,
-                            i, state.getLayerEditIndex());
+                            i, state.getLayerEditIndex(), pixels);
             }
             case FRAME -> {
                 final int layerCount = state.getLayers().size();
@@ -1072,7 +1075,7 @@ public class SEContext {
                     if (includeDisabledLayers ||
                             state.getLayers().get(i).isEnabled())
                         extractColorsFromFrame(colors, state,
-                            state.getFrameIndex(), i);
+                            state.getFrameIndex(), i, pixels);
             }
             case PROJECT -> {
                 final int frameCount = state.getFrameCount(),
@@ -1082,7 +1085,7 @@ public class SEContext {
                     for (int l = 0; l < layerCount; l++)
                         if (includeDisabledLayers ||
                                 state.getLayers().get(l).isEnabled())
-                            extractColorsFromFrame(colors, state, f, l);
+                            extractColorsFromFrame(colors, state, f, l, pixels);
             }
         }
 
@@ -1092,39 +1095,17 @@ public class SEContext {
 
     private void extractColorsFromFrame(
             final List<Color> colors, final ProjectState state,
-            final int frameIndex, final int layerIndex
+            final int frameIndex, final int layerIndex,
+            final Set<Coord2D> pixels
     ) {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
         PaletteLoader.addPaletteColorsFromImage(
-                layer.getFrame(frameIndex), colors, null);
+                layer.getFrame(frameIndex), colors, pixels);
     }
 
-    private void extractColorsFromSelection(
-            final List<Color> colors
-    ) {
-        if (getState().hasSelection()) {
-            final int w = getState().getImageWidth(),
-                    h = getState().getImageHeight();
-
-            final Set<Coord2D> selection = getState().getSelection();
-            final GameImage canvas = getState().getActiveLayerFrame(),
-                    source = switch (getState().getSelectionMode()) {
-                        case CONTENTS -> getState().getSelectionContents()
-                                .getContentForCanvas(w, h);
-                        case BOUNDS -> {
-                            final SelectionContents contents =
-                                    new SelectionContents(canvas, selection);
-                            yield contents.getContentForCanvas(w, h);
-                    }
-            };
-
-            PaletteLoader.addPaletteColorsFromImage(source, colors, selection);
-        }
-    }
-
-    // rpeviewed state changes - not state changes in and of themselves
+    // previewed state changes - not state changes in and of themselves
 
     public ProjectState prepHSVShift() {
         final ProjectState state = getState();
@@ -1155,30 +1136,34 @@ public class SEContext {
     public ProjectState runColorAlgorithm(
             final Function<Color, Color> internal
     ) {
+        dropContentsToLayer(false, false);
+
         final DialogVals.Scope scope = DialogVals.getScope();
         ProjectState state = getState();
 
         final boolean includeDisabledLayers =
                 DialogVals.isIncludeDisabledLayers();
+        final Set<Coord2D> pixels = state.hasSelection() &&
+                !DialogVals.isIgnoreSelection() ? state.getSelection() : null;
 
         final Map<Color, Color> map = new HashMap<>();
 
         try {
             return switch (scope) {
-                case SELECTION -> runCAOnSelection(internal, map);
+                // case SELECTION -> runCAOnSelection(internal, map);
                 case LAYER_FRAME -> runCAOnFrame(internal, map, state,
-                        state.getFrameIndex(), state.getLayerEditIndex());
+                        state.getFrameIndex(), state.getLayerEditIndex(), pixels);
                 case LAYER -> {
                     if (state.getEditingLayer().areFramesLinked()) {
                         yield runCAOnFrame(internal, map, state,
                                 state.getFrameIndex(),
-                                state.getLayerEditIndex());
+                                state.getLayerEditIndex(), pixels);
                     } else {
                         final int frameCount = state.getFrameCount();
 
                         for (int i = 0; i < frameCount; i++)
                             state = runCAOnFrame(internal, map, state,
-                                    i, state.getLayerEditIndex());
+                                    i, state.getLayerEditIndex(), pixels);
 
                         yield state;
                     }
@@ -1190,7 +1175,7 @@ public class SEContext {
                         if (includeDisabledLayers ||
                                 state.getLayers().get(i).isEnabled())
                             state = runCAOnFrame(internal, map, state,
-                                    state.getFrameIndex(), i);
+                                    state.getFrameIndex(), i, pixels);
 
                     yield state;
                 }
@@ -1205,10 +1190,11 @@ public class SEContext {
 
                         if (state.getLayers().get(l).areFramesLinked()) {
                             state = runCAOnFrame(internal, map, state,
-                                    state.getFrameIndex(), l);
+                                    state.getFrameIndex(), l, pixels);
                         } else {
                             for (int f = 0; f < frameCount; f++)
-                                state = runCAOnFrame(internal, map, state, f, l);
+                                state = runCAOnFrame(internal, map,
+                                        state, f, l, pixels);
                         }
                     }
 
@@ -1224,46 +1210,20 @@ public class SEContext {
             final Function<Color, Color> internal,
             final Map<Color, Color> map,
             final ProjectState state,
-            final int frameIndex, final int layerIndex
+            final int frameIndex, final int layerIndex,
+            final Set<Coord2D> pixels
     ) {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
         final GameImage source = layer.getFrame(frameIndex),
-                edit = ColorMath.algo(internal, map, source);
+                edit = ColorMath.algo(internal, map, source, pixels);
 
-        final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
+        final SELayer replacement =
+                layer.returnFrameReplaced(edit, frameIndex);
         layers.set(layerIndex, replacement);
 
         return state.changeLayers(layers).changeIsCheckpoint(false);
-    }
-
-    private ProjectState runCAOnSelection(
-            final Function<Color, Color> internal,
-            final Map<Color, Color> map
-    ) {
-        if (getState().hasSelection()) {
-            final boolean dropAndRaise = getState().getSelectionMode() ==
-                    SelectionMode.CONTENTS;
-
-            if (dropAndRaise)
-                dropContentsToLayer(false, false);
-
-            final Set<Coord2D> selection = getState().getSelection();
-            final List<SELayer> layers = new ArrayList<>(
-                    getState().getLayers());
-            final SELayer layer = getState().getEditingLayer();
-            final int frameIndex = getState().getFrameIndex();
-
-            final GameImage source = layer.getFrame(frameIndex),
-                    edit = ColorMath.algo(internal, map, source, selection);
-
-            final SELayer replacement = layer.returnFrameReplaced(edit, frameIndex);
-            layers.set(getState().getLayerEditIndex(), replacement);
-
-            return getState().changeLayers(layers);
-        } else
-            return getState();
     }
 
     // state changes - process all actions here and feed through state manager

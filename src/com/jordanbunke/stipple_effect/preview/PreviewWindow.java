@@ -4,10 +4,7 @@ import com.jordanbunke.delta_time._core.GameManager;
 import com.jordanbunke.delta_time._core.Program;
 import com.jordanbunke.delta_time._core.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.events.GameEvent;
-import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
-import com.jordanbunke.delta_time.events.GameWindowEvent;
-import com.jordanbunke.delta_time.events.WindowMovedEvent;
+import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
@@ -40,7 +37,6 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.PreviewHousingBox;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -48,7 +44,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-public class PreviewWindow implements ProgramContext {
+public class PreviewWindow implements ProgramContext, PreviewPlayback {
     public static final int BORDER = 1,
             MENU_X_ALLOTMENT_PX = Layout.BUTTON_INC * 10,
             MENU_Y_ALLOTMENT_PX = (Layout.BUTTON_INC * 4) +
@@ -268,6 +264,9 @@ public class PreviewWindow implements ProgramContext {
         menu.process(eventLogger);
         housingBox.process(eventLogger);
 
+        if (frameCount > 1)
+            processKeys(eventLogger);
+
         mousePos = eventLogger.getAdjustedMousePosition();
 
         final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
@@ -448,7 +447,7 @@ public class PreviewWindow implements ProgramContext {
         final GameImage canvasContents = new GameImage(w + (2 * BORDER),
                 h + (2 * BORDER));
 
-        canvasContents.drawRectangle(SEColors.black(), 2f, BORDER, BORDER, w, h);
+        canvasContents.drawRectangle(Settings.getTheme().panelDivisions.get(), 2f, BORDER, BORDER, w, h);
         canvasContents.draw(context.getCheckerboard(), BORDER, BORDER, w, h);
         canvasContents.draw(content[frameIndex], BORDER, BORDER, w, h);
 
@@ -507,5 +506,30 @@ public class PreviewWindow implements ProgramContext {
 
         StippleEffect.get().scheduleJob(() ->
                 StippleEffect.get().addContext(project, true));
+    }
+
+    @Override
+    public void toFirstFrame() {
+        frameIndex = 0;
+    }
+
+    @Override
+    public void toLastFrame() {
+        frameIndex = frameCount - 1;
+    }
+
+    @Override
+    public void previousFrame() {
+        frameIndex = frameIndex == 0 ? frameCount - 1 : frameIndex - 1;
+    }
+
+    @Override
+    public void nextFrame() {
+        frameIndex = (frameIndex + 1) % frameCount;
+    }
+
+    @Override
+    public PlaybackInfo getPlaybackInfo() {
+        return playbackInfo;
     }
 }

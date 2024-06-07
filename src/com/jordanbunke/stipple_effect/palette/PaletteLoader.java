@@ -52,18 +52,17 @@ public class PaletteLoader {
     ) {
         for (int y = 0; y < image.getHeight(); y++)
             for (int x = 0; x < image.getWidth(); x++) {
+                if (colors.size() >= Constants.MAX_PALETTE_SIZE)
+                    return;
+
                 final Color c = image.getColorAt(x, y);
 
                 if (c.getAlpha() == 0)
                     continue;
 
                 if (!colors.contains(c) && (pixels == null ||
-                        pixels.contains(new Coord2D(x, y)))) {
+                        pixels.contains(new Coord2D(x, y))))
                     colors.add(c);
-
-                    if (colors.size() >= Constants.MAX_PALETTE_SIZE)
-                        return;
-                }
             }
     }
 }

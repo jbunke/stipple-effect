@@ -53,7 +53,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DialogAssembly {
-    private static final int LINE_ABOVE = -2;
+    private static final int LINE_ABOVE = -2, AFTER_COMMON_COLOR_ACTION_ROW = 4;
 
     public static void setDialogToSave() {
         final SEContext c = StippleEffect.get().getContext();
@@ -1232,18 +1232,19 @@ public class DialogAssembly {
 
         makeCommonColorOperationElements(mb, c);
 
-        final TextLabel hueLabel = makeDialogLeftLabel(3, "Shift hue:");
+        final TextLabel hueLabel = makeDialogLeftLabel(
+                AFTER_COMMON_COLOR_ACTION_ROW, "Shift hue:");
 
         final String T_SHIFT = "Shift ", T_SCALE = "Scale ",
                 T_SAT = "sat:", T_VAL = "value:";
 
         final DynamicLabel satLabel = makeDynamicLabel(
-                getDialogLeftContentPositionForRow(4),
+                textBelowPos(hueLabel),
                 () -> (DialogVals.isShiftingSat()
                         ? T_SHIFT : T_SCALE) + T_SAT,
                 T_SCALE + T_SAT),
                 valueLabel = makeDynamicLabel(
-                        getDialogLeftContentPositionForRow(5),
+                        textBelowPos(satLabel),
                         () -> (DialogVals.isShiftingValue()
                                 ? T_SHIFT : T_SCALE) + T_VAL,
                         T_SCALE + T_VAL);
@@ -1394,20 +1395,21 @@ public class DialogAssembly {
         mb.addAll(valueLabel, valueManager);
 
         final String RESET = "Reset";
-        final Coord2D firstResetPos = getDialogRightContentPositionForRow(3)
-                .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
+        final Coord2D firstResetPos =
+                getDialogRightContentPositionForRow(AFTER_COMMON_COLOR_ACTION_ROW)
+                        .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
 
         final SimpleMenuButton resetHue =
                 GraphicsUtils.makeStandardTextButton(RESET, firstResetPos,
                         () -> DialogVals.setHueShift(0)),
                 resetSat = GraphicsUtils.makeStandardTextButton(RESET,
-                        firstResetPos.displace(0, Layout.DIALOG_CONTENT_INC_Y),
+                        textBelowPos(resetHue),
                         () -> {
                             DialogVals.setSatScale(1d);
                             DialogVals.setSatShift(0);
                         }),
                 resetValue = GraphicsUtils.makeStandardTextButton(RESET,
-                        firstResetPos.displace(0, Layout.DIALOG_CONTENT_INC_Y * 2),
+                        textBelowPos(resetSat),
                         () -> {
                             DialogVals.setValueScale(1d);
                             DialogVals.setValueShift(0);
@@ -1451,13 +1453,13 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel scriptLabel = makeDialogLeftLabel(
-                3, "Script file:");
+                AFTER_COMMON_COLOR_ACTION_ROW, "Script file:");
         final SimpleMenuButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(scriptLabel),
                         StippleEffect.get()::openColorScript);
         final DynamicLabel scriptConfirmation = makeDynamicLabel(
-                getDialogRightContentPositionForRow(3),
+                getDialogRightContentPositionForRow(AFTER_COMMON_COLOR_ACTION_ROW),
                 DialogVals::colorScriptMessage, "X".repeat(50));
         mb.addAll(scriptLabel, scriptButton, scriptConfirmation);
 
@@ -1974,39 +1976,48 @@ public class DialogAssembly {
     private static void makeCommonColorOperationElements(
             final MenuBuilder mb, final SEContext c
     ) {
-        final List<DialogVals.Scope> vs =
-                Arrays.stream(DialogVals.Scope.values())
-                        .filter(s -> s != DialogVals.Scope.SELECTION ||
-                                c.getState().hasSelection()).toList();
+        final DialogVals.Scope[] vs = DialogVals.Scope.values();
 
-        final DialogVals.Scope was = DialogVals.getScope();
-        final boolean hasScope = vs.contains(was);
-
-        if (!hasScope)
-            DialogVals.setScope(vs.get(0));
-
-        final int initialIndex = vs.indexOf(DialogVals.getScope());
+        final int initialIndex = DialogVals.getScope().ordinal();
+        final boolean hasSelection = c.getState().hasSelection();
 
         final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope:"),
-                flagLabel = TextLabel.make(textBelowPos(scopeLabel),
-                        "Include disabled layers?");
+                disabledLayersLabel = TextLabel.make(
+                        textBelowPos(scopeLabel),
+                        "Include disabled layers?"),
+                ignoreSelectionLabel = TextLabel.make(
+                        textBelowPos(disabledLayersLabel),
+                        "Ignore selection?");
         final Dropdown dropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(scopeLabel),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
-                vs.stream().map(DialogVals.Scope::toString)
+                Arrays.stream(vs).map(DialogVals.Scope::toString)
                         .toArray(String[]::new),
-                vs.stream().map(s -> (Runnable) () -> DialogVals.setScope(s))
+                Arrays.stream(vs).map(s -> (Runnable) () -> DialogVals.setScope(s))
                         .toArray(Runnable[]::new),
                 () -> initialIndex);
-        final Checkbox checkbox = new Checkbox(
-                getDialogContentOffsetFollowingLabel(flagLabel),
-                new ConcreteProperty<>(DialogVals::isIncludeDisabledLayers,
-                        DialogVals::setIncludeDisabledLayers));
-        final GatewayMenuElement flagGate = new GatewayMenuElement(
-                new MenuElementGrouping(flagLabel, checkbox),
-                () -> DialogVals.getScope().considersLayers());
+        final Checkbox disabledLayersCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(disabledLayersLabel),
+                new ConcreteProperty<>(
+                        DialogVals::isIncludeDisabledLayers,
+                        DialogVals::setIncludeDisabledLayers)),
+                ignoreSelectionCheckbox = new Checkbox(
+                        getDialogContentOffsetFollowingLabel(
+                                ignoreSelectionLabel),
+                        new ConcreteProperty<>(
+                                DialogVals::isIgnoreSelection,
+                                DialogVals::setIgnoreSelection));
+        final GatewayMenuElement disabledLayersGate =
+                new GatewayMenuElement(
+                        new MenuElementGrouping(
+                                disabledLayersLabel, disabledLayersCheckbox),
+                        () -> DialogVals.getScope().considersLayers()),
+                ignoreSelectionGate = new GatewayMenuElement(
+                        new MenuElementGrouping(
+                                ignoreSelectionLabel, ignoreSelectionCheckbox),
+                        () -> hasSelection);
 
-        mb.addAll(scopeLabel, dropdown, flagGate);
+        mb.addAll(scopeLabel, dropdown, disabledLayersGate, ignoreSelectionGate);
     }
 
     private static void makeStitchElementsForSaveSpriteSheet(

@@ -44,6 +44,7 @@ public class DialogVals {
             resizePreserveAspectRatio = false,
             sortPaletteBackwards = false,
             includeDisabledLayers = false,
+            ignoreSelection = false,
             colorScriptValid = false,
             shiftingSat = false,
             shiftingValue = false;
@@ -56,7 +57,7 @@ public class DialogVals {
     private static InfoScreen infoScreen = InfoScreen.ABOUT;
     private static SettingScreen settingScreen = SettingScreen.DEFAULTS;
     private static PaletteSorter paletteSorter = PaletteSorter.HUE;
-    private static Scope scope = Scope.SELECTION;
+    private static Scope scope = Scope.PROJECT;
     private static UploadStatus
             asciiStatus = UploadStatus.UNATTEMPTED,
             latinExStatus = UploadStatus.UNATTEMPTED;
@@ -151,7 +152,7 @@ public class DialogVals {
     }
 
     public enum Scope {
-        SELECTION, PROJECT, LAYER_FRAME, LAYER, FRAME;
+        PROJECT, LAYER, FRAME, LAYER_FRAME;
 
         public boolean considersLayers() {
             return this == FRAME || this == PROJECT;
@@ -449,6 +450,10 @@ public class DialogVals {
         DialogVals.includeDisabledLayers = includeDisabledLayers;
     }
 
+    public static void setIgnoreSelection(final boolean ignoreSelection) {
+        DialogVals.ignoreSelection = ignoreSelection;
+    }
+
     public static void setResizePreserveAspectRatio(
             final boolean resizePreserveAspectRatio
     ) {
@@ -739,6 +744,10 @@ public class DialogVals {
 
     public static boolean isIncludeDisabledLayers() {
         return includeDisabledLayers;
+    }
+
+    public static boolean isIgnoreSelection() {
+        return ignoreSelection;
     }
 
     public static String getFontName() {

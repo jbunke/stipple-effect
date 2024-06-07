@@ -1,19 +1,18 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.dialog;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.events.GameKeyEvent;
-import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.preview.PreviewPlayback;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.Arrays;
 
-public class ActionPreviewer extends MenuElement {
+public class ActionPreviewer extends MenuElement implements PreviewPlayback {
     private final GameImage[] frames;
     private final double[] frameDurations;
     private final PlaybackInfo playbackInfo;
@@ -44,41 +43,8 @@ public class ActionPreviewer extends MenuElement {
 
     @Override
     public void process(final InputEventLogger eventLogger) {
-        if (frameCount > 1) {
-            if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-                // CTRL + SHIFT + ?
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                        this::previousFrame);
-            } else if (eventLogger.isPressed(Key.CTRL)) {
-                // CTRL + ?
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                        this::nextFrame);
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        this::toFirstFrame);
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        this::toLastFrame);
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                        playbackInfo::toggleMode);
-            } else if (eventLogger.isPressed(Key.SHIFT)) {
-                // SHIFT + ?
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> playbackInfo.incrementFps(-Constants.PLAYBACK_FPS_INC));
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                        () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC));
-            } else {
-                // single key presses
-                eventLogger.checkForMatchingKeyStroke(
-                        GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                        playbackInfo::togglePlaying);
-            }
-        }
+        if (frameCount > 1)
+            processKeys(eventLogger);
     }
 
     @Override

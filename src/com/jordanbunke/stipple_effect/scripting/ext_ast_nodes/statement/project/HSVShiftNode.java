@@ -20,8 +20,8 @@ public final class HSVShiftNode extends ProjectStatementNode {
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
         super(position, scope, args, TypeNode.getInt(),
-                TypeNode.getBool(), TypeNode.getInt(),
-                TypeNode.getFloat(), TypeNode.getFloat());
+                TypeNode.getBool(), TypeNode.getBool(),
+                TypeNode.getInt(), TypeNode.getFloat(), TypeNode.getFloat());
     }
 
     @Override
@@ -29,9 +29,10 @@ public final class HSVShiftNode extends ProjectStatementNode {
         final SEContext project = getProject(symbolTable);
 
         final Object[] vs = arguments.getValues(symbolTable);
-        final int scopeIndex = (int) vs[0], hShift = (int) vs[2];
-        final boolean includeDisabled = (boolean) vs[1];
-        final double sShift = (double) vs[3], vShift = (double) vs[4];
+        final int scopeIndex = (int) vs[0], hShift = (int) vs[3];
+        final boolean includeDisabled = (boolean) vs[1],
+                ignoreSelection = (boolean) vs[2];
+        final double sShift = (double) vs[4], vShift = (double) vs[5];
         final String attempt = "apply an HSV level shift";
 
         if (scopeIndex < 0 || scopeIndex >= DialogVals.Scope.values().length)
@@ -47,7 +48,7 @@ public final class HSVShiftNode extends ProjectStatementNode {
                                 hShift + ") is out of bounds (" +
                                 Constants.MIN_HUE_SHIFT + "<= h_shift <= " +
                                 Constants.MAX_HUE_SHIFT + ")",
-                        arguments.args()[2].getPosition());
+                        arguments.args()[3].getPosition());
             else if (sShift < Constants.MIN_SV_SCALE ||
                     sShift > Constants.MAX_SV_SCALE)
                 StatusUpdates.scriptActionNotPermitted(attempt,
@@ -55,7 +56,7 @@ public final class HSVShiftNode extends ProjectStatementNode {
                                 ") is out of bounds (" +
                                 Constants.MIN_SV_SCALE + "<= s_shift <= " +
                                 Constants.MAX_SV_SCALE + ")",
-                        arguments.args()[3].getPosition());
+                        arguments.args()[4].getPosition());
             else if (vShift < Constants.MIN_SV_SCALE ||
                     vShift > Constants.MAX_SV_SCALE)
                 StatusUpdates.scriptActionNotPermitted(attempt,
@@ -63,16 +64,18 @@ public final class HSVShiftNode extends ProjectStatementNode {
                                 ") is out of bounds (" +
                                 Constants.MIN_SV_SCALE + "<= v_shift <= " +
                                 Constants.MAX_SV_SCALE + ")",
-                        arguments.args()[3].getPosition());
+                        arguments.args()[5].getPosition());
             else {
                 final DialogVals.Scope scope =
                         DialogVals.Scope.values()[scopeIndex];
 
                 final DialogVals.Scope scopeWas = DialogVals.getScope();
-                final boolean includeWas = DialogVals.isIncludeDisabledLayers();
+                final boolean includeWas = DialogVals.isIncludeDisabledLayers(),
+                        ignoreWas = DialogVals.isIgnoreSelection();
 
                 DialogVals.setScope(scope);
                 DialogVals.setIncludeDisabledLayers(includeDisabled);
+                DialogVals.setIgnoreSelection(ignoreSelection);
 
                 DialogVals.setHueShift(hShift);
                 DialogVals.setSatScale(sShift);
@@ -85,6 +88,7 @@ public final class HSVShiftNode extends ProjectStatementNode {
                 // reset to dialog values
                 DialogVals.setScope(scopeWas);
                 DialogVals.setIncludeDisabledLayers(includeWas);
+                DialogVals.setIgnoreSelection(ignoreWas);
             }
         }
 

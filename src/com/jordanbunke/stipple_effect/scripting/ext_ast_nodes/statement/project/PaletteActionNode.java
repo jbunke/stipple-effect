@@ -22,7 +22,7 @@ public final class PaletteActionNode extends ProjectStatementNode {
             final ExpressionNode[] args, final boolean palettize
     ) {
         super(position, scope, args, PaletteTypeNode.get(),
-                TypeNode.getInt(), TypeNode.getBool());
+                TypeNode.getInt(), TypeNode.getBool(), TypeNode.getBool());
 
         this.palettize = palettize;
     }
@@ -48,7 +48,8 @@ public final class PaletteActionNode extends ProjectStatementNode {
         final Object[] vs = arguments.getValues(symbolTable);
         final Palette palette = (Palette) vs[0];
         final int scopeIndex = (int) vs[1];
-        final boolean includeDisabled = (boolean) vs[2];
+        final boolean includeDisabled = (boolean) vs[2],
+                ignoreSelection = (boolean) vs[3];
 
         if (scopeIndex < 0 || scopeIndex >= DialogVals.Scope.values().length)
             StatusUpdates.scriptActionNotPermitted(
@@ -58,13 +59,16 @@ public final class PaletteActionNode extends ProjectStatementNode {
                             ") is not a valid index for this enumeration",
                     arguments.args()[1].getPosition());
         else {
-            final DialogVals.Scope scope = DialogVals.Scope.values()[scopeIndex];
+            final DialogVals.Scope scope =
+                    DialogVals.Scope.values()[scopeIndex];
 
             final DialogVals.Scope scopeWas = DialogVals.getScope();
-            final boolean includeWas = DialogVals.isIncludeDisabledLayers();
+            final boolean includeWas = DialogVals.isIncludeDisabledLayers(),
+                    ignoreWas = DialogVals.isIgnoreSelection();
 
             DialogVals.setScope(scope);
             DialogVals.setIncludeDisabledLayers(includeDisabled);
+            DialogVals.setIgnoreSelection(ignoreSelection);
 
             if (palettize)
                 project.palettize(palette);
@@ -81,6 +85,7 @@ public final class PaletteActionNode extends ProjectStatementNode {
             // reset to dialog values
             DialogVals.setScope(scopeWas);
             DialogVals.setIncludeDisabledLayers(includeWas);
+            DialogVals.setIgnoreSelection(ignoreWas);
         }
 
         return FuncControlFlow.cont();
