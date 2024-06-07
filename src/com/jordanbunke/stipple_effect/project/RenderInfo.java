@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.project;
 
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
@@ -19,19 +20,29 @@ public class RenderInfo {
     }
 
     public void zoomIn(final Coord2D targetPixel) {
+        final float before = zoomLevel.z;
+
         setZoomLevel(zoomLevel.in());
-        adjustAnchorFromZoom(targetPixel);
+        adjustAnchorFromZoom(targetPixel, before, zoomLevel.z);
     }
 
     public void zoomOut() {
         setZoomLevel(zoomLevel.out());
     }
 
-    private void adjustAnchorFromZoom(final Coord2D targetPixel) {
-        if (!targetPixel.equals(Constants.NO_VALID_TARGET)) {
-            final Coord2D adjusted = new Coord2D(
-                    (anchor.x + targetPixel.x) / 2,
-                    (anchor.y + targetPixel.y) / 2);
+    private void adjustAnchorFromZoom(
+            final Coord2D tp, final float before, final float after
+    ) {
+        if (!tp.equals(Constants.NO_VALID_TARGET)) {
+            final int pixelXDiff = (int)((tp.x - anchor.x) * before),
+                    pixelYDiff = (int)((tp.y - anchor.y) * before);
+
+            final Coord2D adjusted = before == after
+                    ? anchor.displace((int)Math.signum(pixelXDiff),
+                        (int)Math.signum(pixelYDiff))
+                    : new Coord2D(tp.x - Math.round(pixelXDiff / after),
+                        tp.y - Math.round(pixelYDiff / after));
+
             setAnchor(adjusted);
         }
     }
@@ -50,8 +61,9 @@ public class RenderInfo {
         final ProjectState state = StippleEffect.get().getContext().getState();
         final int w = state.getImageWidth(), h = state.getImageHeight();
 
-        this.anchor = new Coord2D(Math.max(0, Math.min(anchor.x, w)),
-                Math.max(0, Math.min(anchor.y, h)));
+        this.anchor = new Coord2D(
+                MathPlus.bounded(0, anchor.x, w),
+                MathPlus.bounded(0, anchor.y, h));
     }
 
     public void incrementAnchor(final Coord2D delta) {
