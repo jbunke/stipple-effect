@@ -6,12 +6,8 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 /**
  * This class represents a generalization of the DeltaScript {@code int} and {@code float} types
  * */
-public class NumTypeNode extends TypeNode {
+public final class NumTypeNode extends TypeNode {
     private static final NumTypeNode INSTANCE;
-
-    public NumTypeNode(final TextPosition position) {
-        super(position);
-    }
 
     private NumTypeNode() {
         super(TextPosition.N_A);

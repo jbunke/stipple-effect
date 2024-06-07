@@ -6,6 +6,8 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.NumTypeNode;
+import com.jordanbunke.stipple_effect.scripting.util.ShiftOrScale;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -21,7 +23,7 @@ public final class HSVShiftNode extends ProjectStatementNode {
     ) {
         super(position, scope, args, TypeNode.getInt(),
                 TypeNode.getBool(), TypeNode.getBool(),
-                TypeNode.getInt(), TypeNode.getFloat(), TypeNode.getFloat());
+                TypeNode.getInt(), NumTypeNode.get(), NumTypeNode.get());
     }
 
     @Override
@@ -32,7 +34,9 @@ public final class HSVShiftNode extends ProjectStatementNode {
         final int scopeIndex = (int) vs[0], hShift = (int) vs[3];
         final boolean includeDisabled = (boolean) vs[1],
                 ignoreSelection = (boolean) vs[2];
-        final double sShift = (double) vs[4], vShift = (double) vs[5];
+        final ShiftOrScale sShift = new ShiftOrScale(vs[4]),
+                vShift = new ShiftOrScale(vs[5]);
+
         final String attempt = "apply an HSV level shift";
 
         if (scopeIndex < 0 || scopeIndex >= DialogVals.Scope.values().length)
@@ -49,21 +53,11 @@ public final class HSVShiftNode extends ProjectStatementNode {
                                 Constants.MIN_HUE_SHIFT + "<= h_shift <= " +
                                 Constants.MAX_HUE_SHIFT + ")",
                         arguments.args()[3].getPosition());
-            else if (sShift < Constants.MIN_SV_SCALE ||
-                    sShift > Constants.MAX_SV_SCALE)
-                StatusUpdates.scriptActionNotPermitted(attempt,
-                        "the saturation shift (" + sShift +
-                                ") is out of bounds (" +
-                                Constants.MIN_SV_SCALE + "<= s_shift <= " +
-                                Constants.MAX_SV_SCALE + ")",
+            else if (sShift.outOfBounds())
+                sShift.oobNotification("saturation", attempt,
                         arguments.args()[4].getPosition());
-            else if (vShift < Constants.MIN_SV_SCALE ||
-                    vShift > Constants.MAX_SV_SCALE)
-                StatusUpdates.scriptActionNotPermitted(attempt,
-                        "the value shift (" + vShift +
-                                ") is out of bounds (" +
-                                Constants.MIN_SV_SCALE + "<= v_shift <= " +
-                                Constants.MAX_SV_SCALE + ")",
+            else if (vShift.outOfBounds())
+                vShift.oobNotification("value", attempt,
                         arguments.args()[5].getPosition());
             else {
                 final DialogVals.Scope scope =
@@ -78,8 +72,22 @@ public final class HSVShiftNode extends ProjectStatementNode {
                 DialogVals.setIgnoreSelection(ignoreSelection);
 
                 DialogVals.setHueShift(hShift);
-                DialogVals.setSatScale(sShift);
-                DialogVals.setValueScale(vShift);
+
+                if (sShift.isShifting != DialogVals.isShiftingSat())
+                    DialogVals.toggleShiftingSat();
+
+                if (sShift.isShifting)
+                    DialogVals.setSatShift(sShift.shift);
+                else
+                    DialogVals.setSatScale(sShift.scale);
+
+                if (vShift.isShifting != DialogVals.isShiftingValue())
+                    DialogVals.toggleShiftingValue();
+
+                if (vShift.isShifting)
+                    DialogVals.setValueShift(vShift.shift);
+                else
+                    DialogVals.setValueScale(vShift.scale);
 
                 final ProjectState res = project.prepHSVShift();
                 project.getStateManager()

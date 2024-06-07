@@ -36,8 +36,11 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
     SelectionContents move(
             final SEContext context, final Coord2D displacement
     ) {
-        return context.getState().getSelectionContents()
-                .returnDisplaced(displacement);
+        if (canBeMoved(context))
+            return context.getState().getSelectionContents()
+                    .returnDisplaced(displacement);
+
+        return null;
     }
 
     @Override
@@ -45,8 +48,11 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
             final SEContext context, final Set<Coord2D> initial,
             final Coord2D change, final Direction direction
     ) {
-        return context.getState().getSelectionContents()
-                .returnStretched(initial, change, direction);
+        if (canBeMoved(context))
+            return context.getState().getSelectionContents()
+                    .returnStretched(initial, change, direction);
+
+        return null;
     }
 
     @Override
@@ -54,8 +60,11 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
             final SEContext context, final Set<Coord2D> initial,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
-        return context.getState().getSelectionContents()
-                .returnRotated(initial, deltaR, pivot, offset);
+        if (canBeMoved(context))
+            return context.getState().getSelectionContents()
+                    .returnRotated(initial, deltaR, pivot, offset);
+
+        return null;
     }
 
     @Override
@@ -84,6 +93,9 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
     ) {
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
+
+        if (transformation == null)
+            return GameImage.dummy();
 
         return transformation.getContentForCanvas(w, h);
     }
