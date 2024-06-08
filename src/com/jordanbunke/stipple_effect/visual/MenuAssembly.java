@@ -900,7 +900,8 @@ public class MenuAssembly {
         final IncrementalRangeElements<Float> zoom =
                 IncrementalRangeElements.makeForFloat(zoomIndicator,
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
-                        bottomBarTextY, c.renderInfo::zoomOut,
+                        bottomBarTextY,
+                        () -> c.renderInfo.zoomOut(Constants.NO_VALID_TARGET),
                         () -> c.renderInfo.zoomIn(Constants.NO_VALID_TARGET),
                         ZoomLevel.MIN.z, ZoomLevel.MAX.z,
                         z -> c.renderInfo.setZoomLevel(ZoomLevel.fromZ(z)),

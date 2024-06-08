@@ -375,7 +375,7 @@ public class SEContext {
                             Settings.Code.INVERT_ZOOM_DIRECTION) < 0)
                         renderInfo.zoomIn(targetPixel);
                     else
-                        renderInfo.zoomOut();
+                        renderInfo.zoomOut(targetPixel);
                 }
             }
     }
@@ -785,7 +785,7 @@ public class SEContext {
                         () -> renderInfo.zoomIn(targetPixel));
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.DOWN_ARROW, GameKeyEvent.Action.PRESS),
-                        renderInfo::zoomOut);
+                        () -> renderInfo.zoomOut(targetPixel));
             }
         }
 

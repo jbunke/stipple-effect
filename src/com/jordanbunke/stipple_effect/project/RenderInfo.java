@@ -20,14 +20,18 @@ public class RenderInfo {
     }
 
     public void zoomIn(final Coord2D targetPixel) {
-        final float before = zoomLevel.z;
-
-        setZoomLevel(zoomLevel.in());
-        adjustAnchorFromZoom(targetPixel, before, zoomLevel.z);
+        zoom(zoomLevel.in(), targetPixel);
     }
 
-    public void zoomOut() {
-        setZoomLevel(zoomLevel.out());
+    public void zoomOut(final Coord2D targetPixel) {
+        zoom(zoomLevel.out(), targetPixel);
+    }
+
+    private void zoom(final ZoomLevel to, final Coord2D targetPixel) {
+        final float before = zoomLevel.z;
+
+        setZoomLevel(to);
+        adjustAnchorFromZoom(targetPixel, before, zoomLevel.z);
     }
 
     private void adjustAnchorFromZoom(
