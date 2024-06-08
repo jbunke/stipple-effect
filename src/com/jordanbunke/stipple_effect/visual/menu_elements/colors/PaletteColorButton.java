@@ -104,7 +104,7 @@ public class PaletteColorButton extends SelectableMenuElement {
             base.draw(GraphicsUtils.loadIcon(IconCodes.EXCLUDED_FROM_PALETTE));
 
         nh = base.submit();
-        hi = GraphicsUtils.drawHighlightedButton(nh);
+        hi = GraphicsUtils.highlightButton(nh);
     }
 
     @Override

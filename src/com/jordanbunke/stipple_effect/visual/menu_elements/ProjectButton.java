@@ -7,6 +7,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -41,7 +42,8 @@ public class ProjectButton extends SelectableListItemButton {
         final String maxText = "* " + project.projectInfo
                 .getFormattedName(false, true);
 
-        final int paddedTextWidth = GraphicsUtils.uiText()
+        // placeholder calculation
+        final int paddedTextWidth = GraphicsUtils.uiText(SEColors.black())
                 .addText(maxText).build().draw().getWidth() +
                 Layout.PROJECT_NAME_BUTTON_PADDING_W;
 
@@ -70,7 +72,7 @@ public class ProjectButton extends SelectableListItemButton {
         image = GraphicsUtils.drawTextButton(getWidth(),
                 project.projectInfo.getFormattedName(true, true),
                 isSelected());
-        highlighted = GraphicsUtils.drawHighlightedButton(image);
+        highlighted = GraphicsUtils.highlightButton(image);
     }
 
     @Override

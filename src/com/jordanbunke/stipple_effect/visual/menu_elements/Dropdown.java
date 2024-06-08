@@ -10,7 +10,6 @@ import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
@@ -93,13 +92,13 @@ public class Dropdown extends AbstractDropdownList {
 
             final GameImage nhi = GraphicsUtils.drawTextButton(
                     buttonWidth, getLabelTextFor(i), false,
-                    Settings.getTheme().dropdownOptionBody, true, false);
+                    GraphicsUtils.ButtonType.DD_OPTION);
 
             scrollables[i] = new SimpleMenuButton(
                     position.displace(0, i * Layout.STD_TEXT_BUTTON_H),
                     new Bounds2D(buttonWidth, Layout.STD_TEXT_BUTTON_H),
                     Anchor.LEFT_TOP, true, () -> select(index),
-                    nhi, GraphicsUtils.drawHighlightedButton(nhi));
+                    nhi, GraphicsUtils.highlightButton(nhi));
         }
 
         final Bounds2D dimensions = new Bounds2D(getWidth(),
@@ -117,12 +116,12 @@ public class Dropdown extends AbstractDropdownList {
         final String text = getCurrentLabelText();
 
         final GameImage[] bases = new GameImage[] {
-                GraphicsUtils.drawDropDownButton(getWidth(), text, false),
-                GraphicsUtils.drawDropDownButton(getWidth(), text, true)
+                GraphicsUtils.drawDropdownButton(getWidth(), text, false),
+                GraphicsUtils.drawDropdownButton(getWidth(), text, true)
         };
 
         final GameImage[] highlighted = Arrays.stream(bases)
-                .map(GraphicsUtils::drawHighlightedButton)
+                .map(GraphicsUtils::highlightButton)
                 .toArray(GameImage[]::new);
 
         return new SimpleToggleMenuButton(new Coord2D(getX(), getY()),

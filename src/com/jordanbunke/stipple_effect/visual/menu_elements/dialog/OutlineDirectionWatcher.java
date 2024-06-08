@@ -53,7 +53,7 @@ public final class OutlineDirectionWatcher extends MenuButtonStub {
 
         image = GraphicsUtils.loadIcon(code);
 
-        highlighted = GraphicsUtils.drawHighlightedButton(
+        highlighted = GraphicsUtils.highlightButton(
                 GraphicsUtils.loadIcon(IconCodes.NO_OUTLINE));
     }
 

@@ -292,7 +292,7 @@ public class MenuAssembly {
                     .drawTextButton(Layout.FRAME_BUTTON_W,
                             String.valueOf(i + 1), false),
                     highlightedImage = GraphicsUtils
-                            .drawHighlightedButton(baseImage),
+                            .highlightButton(baseImage),
                     selectedImage = GraphicsUtils
                             .drawTextButton(Layout.FRAME_BUTTON_W,
                                     String.valueOf(i + 1), true);
@@ -423,7 +423,7 @@ public class MenuAssembly {
             final GameImage baseImage = GraphicsUtils
                     .drawTextButton(Layout.LAYER_BUTTON_W, text, false),
                     highlightedImage = GraphicsUtils
-                            .drawHighlightedButton(baseImage),
+                            .highlightButton(baseImage),
                     selectedImage = GraphicsUtils
                             .drawTextButton(Layout.LAYER_BUTTON_W, text, true);
 
@@ -606,7 +606,7 @@ public class MenuAssembly {
                     colorTextBox.getHeight());
             final GatewayMenuElement highlight = new GatewayMenuElement(
                     new StaticMenuElement(textBoxPos, dims, MenuElement.Anchor.CENTRAL_TOP,
-                            GraphicsUtils.drawSelectedTextBox(
+                            GraphicsUtils.drawSelectedTextbox(
                                     new GameImage(dims.width(), dims.height()))),
                     () -> StippleEffect.get().getColorIndex() == index);
             mb.add(highlight);
@@ -733,7 +733,7 @@ public class MenuAssembly {
                 new Bounds2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
                 MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
                 contentWidth, "No palettes", false,
-                Settings.getTheme().stubButtonBody)));
+                GraphicsUtils.ButtonType.STUB)));
 
         // palette buttons
         if (hasPaletteContents) {

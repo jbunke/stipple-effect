@@ -1,5 +1,8 @@
 package com.jordanbunke.stipple_effect.visual.theme;
 
+import com.jordanbunke.stipple_effect.visual.theme.logic.DefaultThemeLogic;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
+
 import java.awt.*;
 
 import static com.jordanbunke.stipple_effect.visual.theme.SEColors.*;
@@ -15,6 +18,7 @@ public class ThemeBuilder {
             highlightOutline, highlightOverlay, invalid,
             splashText, splashFlashingText, splashBackground,
             checkerboard1, checkerboard2;
+    private ThemeLogic logic;
 
     private ThemeBuilder() {
         // DEFAULTS
@@ -53,6 +57,9 @@ public class ThemeBuilder {
         // checkerboard
         checkerboard1 = WHITE;
         checkerboard2 = LIGHT_GREY;
+
+        // theme logic
+        logic = new DefaultThemeLogic();
     }
 
     public Theme build() {
@@ -65,7 +72,7 @@ public class ThemeBuilder {
                 defaultSliderCore, defaultSliderBall, buttonOutline,
                 highlightOutline, highlightOverlay, invalid,
                 splashText, splashFlashingText, splashBackground,
-                checkerboard1, checkerboard2);
+                checkerboard1, checkerboard2, logic);
     }
 
     public static Theme def() {
@@ -143,6 +150,11 @@ public class ThemeBuilder {
                 .setSplashBackground(DARK_OIL)
                 .setCheckerboard1(GREY)
                 .setCheckerboard2(MID_DARK_GREY).build();
+    }
+
+    public ThemeBuilder setLogic(final ThemeLogic logic) {
+        this.logic = logic;
+        return this;
     }
 
     public ThemeBuilder setTextLight(final Color textLight) {

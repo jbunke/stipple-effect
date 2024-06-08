@@ -39,6 +39,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 import com.jordanbunke.stipple_effect.visual.theme.*;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
 import java.io.File;
@@ -1065,7 +1066,7 @@ public class DialogAssembly {
             final String actionLabel, final String consequence,
             final Runnable onApprove
     ) {
-        final GameImage warningText = GraphicsUtils.uiText()
+        final GameImage warningText = GraphicsUtils.uiText(simpleTextColor())
                 .addText(consequence).build().draw();
         final StaticMenuElement warning = new StaticMenuElement(
                 Layout.getCanvasMiddle(), new Bounds2D(warningText.getWidth(),
@@ -1778,7 +1779,7 @@ public class DialogAssembly {
         Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
             final GameImage baseSS = GraphicsUtils.drawTextButton(
                     Layout.STD_TEXT_BUTTON_W, ss.toString(), false),
-                    highlighedSS = GraphicsUtils.drawHighlightedButton(baseSS);
+                    highlighedSS = GraphicsUtils.highlightButton(baseSS);
 
             final Coord2D ssPos = Layout.getDialogPosition().displace(
                     Layout.CONTENT_BUFFER_PX + (ss.ordinal() *
@@ -1894,7 +1895,7 @@ public class DialogAssembly {
                         MIN, MAX, DialogVals::setFrameDuration,
                         DialogVals::getFrameDuration,
                         o -> (int)(o * DIV), sv -> sv / DIV,
-                        o -> o + "x", "XXXx");
+                        o -> o + "x", "XXXXx");
 
         final SimpleMenuButton resetDuration =
                 GraphicsUtils.makeStandardTextButton("Reset",
@@ -1951,7 +1952,7 @@ public class DialogAssembly {
                 ctc, GameImage.dummy()));
 
         // animation frames
-        final GameImage[] frames = SplashLoader.loadAnimationFrames();
+        final GameImage[] frames = Settings.getTheme().logic.loadSplash();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Bounds2D(frames[0].getWidth(), frames[0].getHeight()),
                 MenuElement.Anchor.CENTRAL, 5, frames));
@@ -2472,6 +2473,11 @@ public class DialogAssembly {
         }
 
         return s;
+    }
+
+    private static Color simpleTextColor() {
+        return ThemeLogic.intuitTextColor(
+                Settings.getTheme().panelBackground, true);
     }
 
     private static VerticalScrollBox assembleScroller(
@@ -3229,7 +3235,7 @@ public class DialogAssembly {
         // close button
         final GameImage baseImage = GraphicsUtils.drawTextButton(
                 Layout.STD_TEXT_BUTTON_W, "Close", false),
-                highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
+                highlightedImage = GraphicsUtils.highlightButton(baseImage);
 
         final Coord2D cancelPos = background.getRenderPosition()
                 .displace(background.getWidth(), background.getHeight())
@@ -3245,7 +3251,7 @@ public class DialogAssembly {
         Arrays.stream(DialogVals.InfoScreen.values()).forEach(is -> {
                     final GameImage baseIS = GraphicsUtils.drawTextButton(
                             Layout.STD_TEXT_BUTTON_W, is.toString(), false),
-                            highlighedIS = GraphicsUtils.drawHighlightedButton(baseIS);
+                            highlighedIS = GraphicsUtils.highlightButton(baseIS);
 
                     final Coord2D isPos = background.getRenderPosition().displace(
                             Layout.CONTENT_BUFFER_PX + (is.ordinal() *
@@ -3308,7 +3314,7 @@ public class DialogAssembly {
                 Layout.STD_TEXT_BUTTON_W, approveText.equals(
                         Constants.CLOSE_DIALOG_TEXT)
                         ? Constants.CLOSE_DIALOG_TEXT : "Cancel", false),
-                highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
+                highlightedImage = GraphicsUtils.highlightButton(baseImage);
 
         final Coord2D cancelPos = background.getRenderPosition()
                 .displace(background.getWidth(), background.getHeight())

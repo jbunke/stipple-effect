@@ -12,6 +12,7 @@ import com.jordanbunke.stipple_effect.utility.settings.types.EnumSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.IntSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
@@ -99,8 +100,10 @@ public class Settings {
         THEME(new Setting<>(
                 new EnumSettingType<>(Themes.class),
                 Themes.DEFAULT, theme -> {
-                    StippleEffect.get().getContexts()
-                            .forEach(SEContext::redrawCheckerboard);
+                    GraphicsUtils.refreshAssets();
+
+                    StippleEffect.get().getContexts().forEach(
+                            SEContext::redrawCheckerboard);
                     StippleEffect.get().rebuildAllMenus();
                 }));
 

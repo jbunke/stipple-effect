@@ -32,7 +32,7 @@ public final class TextToggleButton extends SimpleToggleMenuButton {
     ) {
         final GameImage[] bases = makeToggleButtonSet(texts),
                 highlights = Arrays.stream(bases)
-                        .map(GraphicsUtils::drawHighlightedButton)
+                        .map(GraphicsUtils::highlightButton)
                         .toArray(GameImage[]::new);
 
         return new TextToggleButton(position, bases, highlights,

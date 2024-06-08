@@ -1,5 +1,7 @@
 package com.jordanbunke.stipple_effect.visual.theme;
 
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
+
 import java.awt.*;
 
 public class Theme {
@@ -14,6 +16,8 @@ public class Theme {
             highlightOutline, highlightOverlay, invalid,
             splashText, splashFlashingText, splashBackground,
             checkerboard1, checkerboard2;
+
+    public final ThemeLogic logic;
 
     Theme(
             final Color textLight, final Color textDark,
@@ -39,7 +43,9 @@ public class Theme {
             final Color splashBackground,
 
             final Color checkerboard1,
-            final Color checkerboard2
+            final Color checkerboard2,
+
+            final ThemeLogic logic
     ) {
         this.textLight = textLight;
         this.textDark = textDark;
@@ -72,5 +78,7 @@ public class Theme {
 
         this.checkerboard1 = checkerboard1;
         this.checkerboard2 = checkerboard2;
+
+        this.logic = logic;
     }
 }

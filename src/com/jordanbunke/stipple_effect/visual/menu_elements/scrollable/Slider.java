@@ -8,7 +8,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -28,37 +28,18 @@ public abstract class Slider extends AbstractSlider {
     }
 
     @Override
-    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
-
-    }
+    public void debugRender(final GameImage canvas, final GameDebugger debugger) {}
 
     // graphical
     public GameImage[] drawSliderBalls() {
-        final int BASE = 0, HIGHLIGHTED = 1, SELECTED = 2;
-        final int sbd = Layout.SLIDER_BALL_DIM;
+        final Theme t = Settings.getTheme();
+        final Color fill = getSliderBallCoreColor();
 
-        final int sbcd = sbd - (2 * Layout.BUTTON_BORDER_PX);
-
-        final GameImage[] sliderBalls = new GameImage[] {
-                new GameImage(sbd, sbd),
-                GameImage.dummy(),
-                new GameImage(sbd, sbd)
+        return new GameImage[] {
+                t.logic.drawSliderBall(false, false, fill),
+                t.logic.drawSliderBall(false, true, fill),
+                t.logic.drawSliderBall(true, false, fill)
         };
-
-        sliderBalls[BASE].fillRectangle(
-                GraphicsUtils.buttonBorderColor(false), 0, 0, sbd, sbd);
-        sliderBalls[SELECTED].fillRectangle(
-                GraphicsUtils.buttonBorderColor(true), 0, 0, sbd, sbd);
-
-        sliderBalls[BASE].fillRectangle(getSliderBallCoreColor(),
-                Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX, sbcd, sbcd);
-        sliderBalls[SELECTED].fillRectangle(getSliderBallCoreColor(),
-                Layout.BUTTON_BORDER_PX, Layout.BUTTON_BORDER_PX, sbcd, sbcd);
-
-        sliderBalls[HIGHLIGHTED] =
-                GraphicsUtils.drawHighlightedButton(sliderBalls[BASE]);
-
-        return sliderBalls;
     }
 
     public GameImage drawSliderCore(final int w, final int h) {

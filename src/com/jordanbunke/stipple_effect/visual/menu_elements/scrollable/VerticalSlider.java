@@ -25,15 +25,11 @@ public class VerticalSlider extends Slider {
                 sw = getWidth() - (2 * Layout.SLIDER_THINNING);
 
         // slider core
-        slider.draw(drawSliderCore(sw, sd), Layout.SLIDER_THINNING, Layout.SLIDER_BALL_DIM / 2);
+        slider.draw(drawSliderCore(sw, sd),
+                Layout.SLIDER_THINNING, Layout.SLIDER_BALL_DIM / 2);
 
         // slider outline
-        slider.drawRectangle(Settings.getTheme().buttonOutline,
-                Layout.BUTTON_BORDER_PX,
-                Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2),
-                Layout.SLIDER_BALL_DIM / 2,
-                getWidth() - (Layout.BUTTON_BORDER_PX + (2 * Layout.SLIDER_THINNING)), sd
-        );
+        Settings.getTheme().logic.drawVerticalSliderOutline(slider);
     }
 
     @Override
