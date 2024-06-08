@@ -416,7 +416,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
 
         final GameWindow window = new GameWindow("Preview: " +
                 context.projectInfo.getFormattedName(false, false),
-                width, height, GraphicsUtils.loadIcon(IconCodes.PROGRAM),
+                width, height, GraphicsUtils.readIconAsset(IconCodes.PROGRAM),
                 false, false, false);
         window.hideCursor();
         window.setPosition(winX, winY);

@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 public abstract class Tool {
-    private final GameImage icon, highlightedIcon, selectedIcon;
+    private GameImage icon, highlightedIcon, selectedIcon;
 
     public static Tool[] getAll() {
         return new Tool[] {
@@ -34,11 +34,13 @@ public abstract class Tool {
     }
 
     Tool() {
+        refreshIcons();
+    }
+
+    public final void refreshIcons() {
         this.icon = fetchIcon();
 
-        this.highlightedIcon = new GameImage(GraphicsUtils.HIGHLIGHT_OVERLAY);
-        highlightedIcon.draw(icon);
-        highlightedIcon.free();
+        this.highlightedIcon = GraphicsUtils.highlightIconButton(icon);
 
         this.selectedIcon = new GameImage(GraphicsUtils.SELECT_OVERLAY);
         selectedIcon.draw(icon);

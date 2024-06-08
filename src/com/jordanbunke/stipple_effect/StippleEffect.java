@@ -316,7 +316,7 @@ public class StippleEffect implements ProgramContext {
         final GameWindow window = new GameWindow(
                 PROGRAM_NAME + " " + getVersion(),
                 size.width(), size.height(),
-                GraphicsUtils.loadIcon(IconCodes.PROGRAM),
+                GraphicsUtils.readIconAsset(IconCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
         return window;

@@ -11,6 +11,7 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
+import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -22,10 +23,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
 
 import java.awt.*;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -36,9 +34,15 @@ public class GraphicsUtils {
     private static final Map<String, GameImage> iconMap;
 
     static {
+        TRANSFORM_NODE = loadUtil("transform_node");
+        CHECKMARK = loadUtil("checkmark");
+
         iconMap = new HashMap<>();
 
-        refreshAssets();
+        final Theme theme = Settings.getTheme();
+
+        HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
+        SELECT_OVERLAY = theme.logic.selectedIconOverlay();
     }
 
     private static GameImage loadUtil(final String code) {
@@ -51,10 +55,10 @@ public class GraphicsUtils {
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
         SELECT_OVERLAY = theme.logic.selectedIconOverlay();
-        TRANSFORM_NODE = loadUtil("transform_node");
-        CHECKMARK = loadUtil("checkmark");
 
         iconMap.clear();
+
+        Arrays.stream(Tool.getAll()).forEach(Tool::refreshIcons);
     }
 
     public static TextBuilder uiText(final Color color) {

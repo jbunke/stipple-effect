@@ -6,12 +6,16 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.function.Function;
 
 public abstract class ThemeLogic {
+    protected static final Path THEMES_FOLDER = Path.of("themes");
+
     public GameImage transformIcon(final GameImage asset) {
         return contextualTransformation(asset, this::transformIconPixel);
     }
@@ -23,7 +27,8 @@ public abstract class ThemeLogic {
     }
 
     public GameImage unclickableIcon(final GameImage baseIcon) {
-        return pixelWiseTransformation(baseIcon, GraphicsUtils::greyscale);
+        return pixelWiseTransformation(baseIcon, c -> c.equals(SEColors.white())
+                ? SEColors.transparent() : GraphicsUtils.greyscale(c));
     }
 
     public abstract GameImage[] loadSplash();
@@ -247,9 +252,13 @@ public abstract class ThemeLogic {
 
     // helpers from here
     public static Color intuitTextColor(
-            final Color background, final boolean main
+            Color background, final boolean main
     ) {
         final Theme t = Settings.getTheme();
+
+        if (background.getAlpha() == 0)
+            background = t.panelBackground;
+
         final Color light = main ? t.textLight : t.affixTextLight,
                 dark = main ? t.textDark : t.affixTextDark;
 

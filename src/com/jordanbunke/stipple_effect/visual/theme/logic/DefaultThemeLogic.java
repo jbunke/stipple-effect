@@ -8,10 +8,20 @@ import java.nio.file.Path;
 
 public final class DefaultThemeLogic extends ThemeLogic {
     private static final Path SPLASH_FOLDER = Path.of("splash");
-
     private static final int SPLASH_FRAMES = 25, SPLASH_SCALE_UP = 3;
     private static final String SPLASH_FRAME_BASE = "logo_anim_";
 
+    private static final DefaultThemeLogic INSTANCE;
+
+    static {
+        INSTANCE = new DefaultThemeLogic();
+    }
+
+    private DefaultThemeLogic() {}
+
+    public static DefaultThemeLogic get() {
+        return INSTANCE;
+    }
 
     @Override
     public GameImage transformIcon(final GameImage asset) {

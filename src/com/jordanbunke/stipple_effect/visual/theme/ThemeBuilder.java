@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.visual.theme;
 
 import com.jordanbunke.stipple_effect.visual.theme.logic.DefaultThemeLogic;
+import com.jordanbunke.stipple_effect.visual.theme.logic.NeonThemeLogic;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
@@ -59,7 +60,7 @@ public class ThemeBuilder {
         checkerboard2 = LIGHT_GREY;
 
         // theme logic
-        logic = new DefaultThemeLogic();
+        logic = DefaultThemeLogic.get();
     }
 
     public Theme build() {
@@ -110,27 +111,42 @@ public class ThemeBuilder {
     }
 
     public static Theme neon() {
-        return new ThemeBuilder()
-                .setPanelBackground(BLACK)
-                .setPanelDivisions(WHITE)
-                .setTextLight(WHITE)
+        final ThemeBuilder neonTB =
+                new ThemeBuilder().setLogic(NeonThemeLogic.get());
+
+        // backgrounds
+        neonTB.setPanelBackground(BLACK)
+                .setWorkspaceBackground(DARK_GREY)
+                .setScrollBackground(BLACK)
+                .setSplashBackground(BLACK);
+
+        // text
+        neonTB.setTextLight(WHITE)
                 .setTextDark(DARK_GREY)
                 .setAffixTextDark(PURPLE)
                 .setAffixTextLight(VERDANT)
                 .setTextMenuHeading(PASTEL_BLUE)
-                .setDropdownOptionBody(RED)
-                .setDefaultSliderCore(BLACK)
-                .setDefaultSliderBall(PURPLE)
-                .setWorkspaceBackground(DARK_GREY)
-                .setScrollBackground(BLACK)
-                .setButtonOutline(WHITE)
-                .setHighlightOutline(VERDANT)
-                .setButtonBody(PURPLE)
-                .setSplashBackground(BLACK)
-                .setSplashText(WHITE)
-                .setSplashFlashingText(PURPLE)
                 .setStubButtonBody(BLACK)
-                .build();
+                .setSplashText(WHITE)
+                .setSplashFlashingText(PURPLE);
+
+        // UI element bodies
+        neonTB.setDefaultSliderCore(BLACK)
+                .setDefaultSliderBall(BLACK)
+                .setDropdownOptionBody(RED)
+                .setButtonBody(PURPLE);
+
+        // UI element outlines
+        neonTB.setButtonOutline(CHITIN)
+                .setHighlightOutline(VERDANT)
+                .setPanelDivisions(PURPLE);
+
+        // selection
+        neonTB.setHighlightOverlay(TRANSLUCENT_VERDANT_1)
+                .setSelectionFill(TRANSLUCENT_VERDANT_2)
+                .setHighlightOverlay(TRANSLUCENT_VERDANT_1);
+
+        return neonTB.build();
     }
 
     public static Theme bunkering() {
@@ -150,6 +166,14 @@ public class ThemeBuilder {
                 .setSplashBackground(DARK_OIL)
                 .setCheckerboard1(GREY)
                 .setCheckerboard2(MID_DARK_GREY).build();
+    }
+
+    public static Theme asylum() {
+        return new ThemeBuilder().build();
+    }
+
+    public static Theme ramallah() {
+        return new ThemeBuilder().build();
     }
 
     public ThemeBuilder setLogic(final ThemeLogic logic) {
