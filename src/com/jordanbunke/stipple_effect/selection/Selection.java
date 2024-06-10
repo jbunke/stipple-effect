@@ -33,6 +33,18 @@ public final class Selection {
         this(new Coord2D(), matrix);
     }
 
+    public static Selection of(final int width, final int height,
+           final boolean selected) {
+        final boolean[][] matrix = new boolean[width][height];
+
+        if (selected)
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    matrix[x][y] = true;
+
+        return new Selection(matrix);
+    }
+
     public static Selection of(final boolean[][] matrix) {
         if (matrix.length == 0 || matrix[0].length == 0)
             return null;
@@ -84,5 +96,31 @@ public final class Selection {
         }
 
         return pixels;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o instanceof Selection s && topLeft.equals(s.topLeft) &&
+                bounds.equals(s.bounds)) {
+            if (matrix.length == s.matrix.length) {
+                for (int x = 0; x < matrix.length; x++) {
+                    if (matrix[x].length != s.matrix.length)
+                        return false;
+
+                    for (int y = 0; y < matrix[x].length; y++)
+                        if (matrix[x][y] != s.matrix[x][y])
+                            return false;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return topLeft.x + topLeft.y + bounds.width() + bounds.height();
     }
 }
