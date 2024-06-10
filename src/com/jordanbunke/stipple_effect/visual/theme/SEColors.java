@@ -38,8 +38,6 @@ public class SEColors {
             VERDANT = new Color(30, 255, 15),
             TRANSLUCENT_VERDANT_1 = new Color(30, 255, 15, 100),
             TRANSLUCENT_VERDANT_2 = new Color(30, 255, 15, 50),
-            BONE = new Color(224, 210, 181),
-            CRACKED = new Color(231, 223, 212),
             SAND = new Color(216, 182, 138),
             TRANSPARENT = new Color(0, 0, 0, 0);
 
