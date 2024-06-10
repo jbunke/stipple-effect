@@ -107,6 +107,7 @@ public class ThemeBuilder {
                 .setDefaultSliderBall(HAITI_RED)
                 .setDropdownOptionBody(BLACK)
                 .setButtonBody(HAITI_RED)
+                .setInvalid(BLACK)
                 .setStubButtonBody(BOURGOGNE);
 
         // UI element outlines
@@ -148,6 +149,7 @@ public class ThemeBuilder {
                 .setDefaultSliderBall(BLACK)
                 .setDropdownOptionBody(RED)
                 .setButtonBody(PURPLE)
+                .setInvalid(BLACK)
                 .setStubButtonBody(BLACK);
 
         // UI element outlines
@@ -188,6 +190,7 @@ public class ThemeBuilder {
                 .setDefaultSliderBall(WHITE)
                 .setDropdownOptionBody(NAIJ)
                 .setStubButtonBody(RED)
+                .setInvalid(RED)
                 .setButtonBody(BLACK);
 
         // UI element outlines
@@ -230,6 +233,7 @@ public class ThemeBuilder {
                 .setDefaultSliderBall(LIGHT_GREY)
                 .setDropdownOptionBody(BLACK)
                 .setStubButtonBody(WHITE)
+                .setInvalid(WHITE)
                 .setButtonBody(MID_DARK_GREY);
 
         // UI element outlines
@@ -272,6 +276,7 @@ public class ThemeBuilder {
                 .setDefaultSliderBall(NAIJ)
                 .setDropdownOptionBody(NAIJ)
                 .setStubButtonBody(GREY)
+                .setInvalid(GREY)
                 .setButtonBody(BLACK);
 
         // UI element outlines
