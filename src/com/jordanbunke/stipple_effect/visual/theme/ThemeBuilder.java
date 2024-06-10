@@ -1,8 +1,6 @@
 package com.jordanbunke.stipple_effect.visual.theme;
 
-import com.jordanbunke.stipple_effect.visual.theme.logic.DefaultThemeLogic;
-import com.jordanbunke.stipple_effect.visual.theme.logic.NeonThemeLogic;
-import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
+import com.jordanbunke.stipple_effect.visual.theme.logic.*;
 
 import java.awt.*;
 
@@ -20,6 +18,7 @@ public class ThemeBuilder {
             splashText, splashFlashingText, splashBackground,
             checkerboard1, checkerboard2;
     private ThemeLogic logic;
+    private String subtitle;
 
     private ThemeBuilder() {
         // DEFAULTS
@@ -61,6 +60,8 @@ public class ThemeBuilder {
 
         // theme logic
         logic = DefaultThemeLogic.get();
+
+        subtitle = "For indie game developers by an indie game developer";
     }
 
     public Theme build() {
@@ -73,7 +74,7 @@ public class ThemeBuilder {
                 defaultSliderCore, defaultSliderBall, buttonOutline,
                 highlightOutline, highlightOverlay, invalid,
                 splashText, splashFlashingText, splashBackground,
-                checkerboard1, checkerboard2, logic);
+                checkerboard1, checkerboard2, logic, subtitle);
     }
 
     public static Theme def() {
@@ -81,38 +82,51 @@ public class ThemeBuilder {
     }
 
     public static Theme zo() {
-        return new ThemeBuilder()
-                .setPanelBackground(BONE)
-                .setPanelDivisions(DARK_RED)
-                .setTextLight(PURPLE)
-                .setTextDark(DARK_GOLD)
-                .setAffixTextDark(BLACK)
-                .setAffixTextLight(WHITE)
-                .setTextShortcut(RED)
-                .setTextMenuHeading(DARK_RED)
-                .setDropdownOptionBody(GOLD)
-                .setDefaultSliderCore(WHITE)
-                .setDefaultSliderBall(CREAM)
-                .setWorkspaceBackground(DARK_RED)
-                .setScrollBackground(CRACKED)
-                .setButtonOutline(DARK_RED)
-                .setHighlightOutline(RED)
-                .setButtonBody(CREAM)
-                .setSplashBackground(DARK_RED)
-                .setSplashText(RED)
-                .setSplashFlashingText(GOLD)
-                .setHighlightOverlay(TRANSLUCENT_GOLD)
-                .setDialogVeil(TRANSLUCENT_GOLD)
-                .setCheckerboard1(BONE)
-                .setCheckerboard2(CREAM)
-                .setStubButtonBody(RED)
-                .setInvalid(RED)
-                .build();
+        final ThemeBuilder zoTB = new ThemeBuilder()
+                .setLogic(ZoThemeLogic.get())
+                .setSubtitle("Honour your ancestors!");
+
+        // backgrounds
+        zoTB.setPanelBackground(BOURGOGNE)
+                .setWorkspaceBackground(DEEP_OCEAN)
+                .setScrollBackground(TRANSPARENT)
+                .setSplashBackground(HAITI_PURPLE);
+
+        // text
+        zoTB.setTextLight(GOLD)
+                .setTextDark(BLACK)
+                .setAffixTextDark(HAITI_BLUE)
+                .setAffixTextLight(HAITI_RED)
+                .setTextMenuHeading(CEU)
+                .setTextShortcut(CEU)
+                .setSplashText(HAITI_RED)
+                .setSplashFlashingText(GOLD);
+
+        // UI element bodies
+        zoTB.setDefaultSliderCore(HAITI_BLUE)
+                .setDefaultSliderBall(HAITI_RED)
+                .setDropdownOptionBody(BLACK)
+                .setButtonBody(HAITI_RED)
+                .setStubButtonBody(BOURGOGNE);
+
+        // UI element outlines
+        zoTB.setButtonOutline(BLACK)
+                .setHighlightOutline(GOLD)
+                .setPanelDivisions(HAITI_PURPLE);
+
+        // selection
+        zoTB.setSelectionFill(TRANSLUCENT_GOLD_2)
+                .setHighlightOverlay(TRANSLUCENT_GOLD_1);
+
+        zoTB.setCheckerboard1(GREY).setCheckerboard2(MID_DARK_GREY);
+
+        return zoTB.setDialogVeil(TRANSLUCENT_GOLD_1).build();
     }
 
     public static Theme neon() {
-        final ThemeBuilder neonTB =
-                new ThemeBuilder().setLogic(NeonThemeLogic.get());
+        final ThemeBuilder neonTB = new ThemeBuilder()
+                .setLogic(NeonThemeLogic.get())
+                .setSubtitle("Night owls welcome!");
 
         // backgrounds
         neonTB.setPanelBackground(BLACK)
@@ -126,58 +140,162 @@ public class ThemeBuilder {
                 .setAffixTextDark(PURPLE)
                 .setAffixTextLight(VERDANT)
                 .setTextMenuHeading(PASTEL_BLUE)
-                .setStubButtonBody(BLACK)
-                .setSplashText(WHITE)
-                .setSplashFlashingText(PURPLE);
+                .setSplashFlashingText(PURPLE)
+                .setSplashText(WHITE);
 
         // UI element bodies
         neonTB.setDefaultSliderCore(BLACK)
                 .setDefaultSliderBall(BLACK)
                 .setDropdownOptionBody(RED)
-                .setButtonBody(PURPLE);
+                .setButtonBody(PURPLE)
+                .setStubButtonBody(BLACK);
 
         // UI element outlines
         neonTB.setButtonOutline(CHITIN)
-                .setHighlightOutline(VERDANT)
-                .setPanelDivisions(PURPLE);
+                .setPanelDivisions(PURPLE)
+                .setHighlightOutline(VERDANT);
 
         // selection
-        neonTB.setHighlightOverlay(TRANSLUCENT_VERDANT_1)
-                .setSelectionFill(TRANSLUCENT_VERDANT_2)
+        neonTB.setSelectionFill(TRANSLUCENT_VERDANT_2)
                 .setHighlightOverlay(TRANSLUCENT_VERDANT_1);
 
         return neonTB.build();
     }
 
     public static Theme bunkering() {
-        return new ThemeBuilder()
-                .setTextShortcut(GOLD)
-                .setWorkspaceBackground(DARK_GOLD)
+        final ThemeBuilder bunkerTB = new ThemeBuilder()
+                .setLogic(BunkeringThemeLogic.get())
+                .setSubtitle("Save the Niger Delta!");
+
+        // backgrounds
+        bunkerTB.setSplashBackground(NAIJ)
                 .setPanelBackground(DARK_OIL)
-                .setScrollBackground(FOLIAGE)
-                .setSelectionFill(TRANSLUCENT_GOLD)
-                .setButtonBody(BLACK)
-                .setStubButtonBody(GREY)
-                .setDefaultSliderCore(FOLIAGE)
-                .setButtonOutline(DARK_GOLD)
+                .setWorkspaceBackground(FOLIAGE)
+                .setScrollBackground(TRANSPARENT);
+
+        // text
+        bunkerTB.setTextLight(GOLD)
+                .setTextDark(DARK_OIL)
+                .setAffixTextDark(BLACK)
+                .setAffixTextLight(WHITE)
+                .setTextMenuHeading(NAIJ)
+                .setTextShortcut(NAIJ)
+                .setSplashText(WHITE)
+                .setSplashFlashingText(GOLD);
+
+        // UI element bodies
+        bunkerTB.setDefaultSliderCore(NAIJ)
+                .setDefaultSliderBall(WHITE)
+                .setDropdownOptionBody(NAIJ)
+                .setStubButtonBody(RED)
+                .setButtonBody(BLACK);
+
+        // UI element outlines
+        bunkerTB.setButtonOutline(DARK_GOLD)
                 .setHighlightOutline(GOLD)
-                .setHighlightOverlay(TRANSLUCENT_GOLD)
-                .setSplashText(GOLD)
-                .setSplashBackground(DARK_OIL)
-                .setCheckerboard1(GREY)
-                .setCheckerboard2(MID_DARK_GREY).build();
+                .setPanelDivisions(GOLD);
+
+        // selection
+        bunkerTB.setHighlightOverlay(TRANSLUCENT_GOLD_1)
+                .setSelectionFill(TRANSLUCENT_GOLD_2);
+
+        bunkerTB.setCheckerboard2(MID_DARK_GREY).setCheckerboard1(GREY);
+
+        return bunkerTB.build();
     }
 
     public static Theme asylum() {
-        return new ThemeBuilder().build();
+        final ThemeBuilder asylumTB = new ThemeBuilder()
+                .setLogic(AsylumThemeLogic.get())
+                .setSubtitle("Take care of your mental health!");
+
+        // backgrounds
+        asylumTB.setSplashBackground(BLACK)
+                .setPanelBackground(WHITE)
+                .setWorkspaceBackground(LIGHT_GREY)
+                .setScrollBackground(WHITE);
+
+        // text
+        asylumTB.setTextLight(WHITE)
+                .setTextDark(BLACK)
+                .setAffixTextDark(DARK_GREY)
+                .setAffixTextLight(LIGHT_GREY)
+                .setTextMenuHeading(DARK_GREY)
+                .setTextShortcut(GREY)
+                .setSplashText(WHITE)
+                .setSplashFlashingText(WHITE);
+
+        // UI element bodies
+        asylumTB.setDefaultSliderCore(WHITE)
+                .setDefaultSliderBall(LIGHT_GREY)
+                .setDropdownOptionBody(BLACK)
+                .setStubButtonBody(WHITE)
+                .setButtonBody(MID_DARK_GREY);
+
+        // UI element outlines
+        asylumTB.setButtonOutline(BLACK)
+                .setHighlightOutline(GREY)
+                .setPanelDivisions(BLACK);
+
+        // selection
+        asylumTB.setHighlightOverlay(TRANSLUCENT_GREY_1)
+                .setSelectionFill(TRANSLUCENT_GREY_2);
+
+        asylumTB.setCheckerboard2(WHITE).setCheckerboard1(LIGHTEST_GREY);
+
+        return asylumTB.build();
     }
 
     public static Theme ramallah() {
-        return new ThemeBuilder().build();
+        final ThemeBuilder ramallahTB = new ThemeBuilder()
+                .setLogic(DefaultThemeLogic.get())
+                .setSubtitle("FTRTTS");
+
+        // backgrounds
+        ramallahTB.setSplashBackground(SAND)
+                .setPanelBackground(DARK_OIL)
+                .setWorkspaceBackground(FOLIAGE)
+                .setScrollBackground(TRANSPARENT);
+
+        // text
+        ramallahTB.setTextLight(GOLD)
+                .setTextDark(DARK_OIL)
+                .setAffixTextDark(BLACK)
+                .setAffixTextLight(WHITE)
+                .setTextMenuHeading(NAIJ)
+                .setTextShortcut(NAIJ)
+                .setSplashText(WHITE)
+                .setSplashFlashingText(GOLD);
+
+        // UI element bodies
+        ramallahTB.setDefaultSliderCore(NAIJ)
+                .setDefaultSliderBall(NAIJ)
+                .setDropdownOptionBody(NAIJ)
+                .setStubButtonBody(RED)
+                .setButtonBody(BLACK);
+
+        // UI element outlines
+        ramallahTB.setButtonOutline(DARK_GOLD)
+                .setHighlightOutline(GOLD)
+                .setPanelDivisions(GOLD);
+
+        // selection
+        ramallahTB.setHighlightOverlay(TRANSLUCENT_GOLD_1)
+                .setSelectionFill(TRANSLUCENT_GOLD_2);
+
+        ramallahTB.setCheckerboard1(GREY)
+                .setCheckerboard2(MID_DARK_GREY);
+
+        return ramallahTB.build();
     }
 
     public ThemeBuilder setLogic(final ThemeLogic logic) {
         this.logic = logic;
+        return this;
+    }
+
+    public ThemeBuilder setSubtitle(final String subtitle) {
+        this.subtitle = subtitle;
         return this;
     }
 

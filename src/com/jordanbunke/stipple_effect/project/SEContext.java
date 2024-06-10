@@ -67,6 +67,8 @@ public class SEContext {
         targetPixel = Constants.NO_VALID_TARGET;
         inWorkspaceBounds = false;
 
+        selectionOverlay = new SelectionOverlay(new HashSet<>());
+
         redrawCanvasAuxiliaries();
     }
 

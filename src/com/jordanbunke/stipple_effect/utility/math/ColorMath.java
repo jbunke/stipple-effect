@@ -22,14 +22,6 @@ public class ColorMath {
     public static GameImage algo(
             final Function<Color, Color> internal,
             final Map<Color, Color> map,
-            final GameImage source
-    ) {
-        return algo(internal, map, source, null);
-    }
-
-    public static GameImage algo(
-            final Function<Color, Color> internal,
-            final Map<Color, Color> map,
             final GameImage source, final Set<Coord2D> pixels
     ) throws RuntimeException {
         final int w = source.getWidth(), h = source.getHeight();

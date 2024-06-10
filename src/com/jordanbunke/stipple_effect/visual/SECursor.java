@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.visual;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,10 +56,10 @@ public class SECursor {
             POLYGON_SELECT_ADDITIVE = "polygon_select_additive",
             POLYGON_SELECT_SUBTRACTIVE = "polygon_select_subtractive",
             POLYGON_SELECT_SINGLE = "polygon_select_single",
-            PENCIL_SELECT_GLOBAL = "pencil_select_global",
-            PENCIL_SELECT_ADDITIVE = "pencil_select_additive",
-            PENCIL_SELECT_SUBTRACTIVE = "pencil_select_subtractive",
-            PENCIL_SELECT_SINGLE = "pencil_select_single",
+//            PENCIL_SELECT_GLOBAL = "pencil_select_global",
+//            PENCIL_SELECT_ADDITIVE = "pencil_select_additive",
+//            PENCIL_SELECT_SUBTRACTIVE = "pencil_select_subtractive",
+//            PENCIL_SELECT_SINGLE = "pencil_select_single",
             RETICLE_ADDITIVE = "reticle_additive",
             RETICLE_SUBTRACTIVE = "reticle_subtractive",
             RETICLE_SINGLE = "reticle_single",
@@ -88,20 +89,28 @@ public class SECursor {
             BOX_SELECT_SINGLE, BOX_SELECT_SUBTRACTIVE,
             POLYGON_SELECT_ADDITIVE, POLYGON_SELECT_GLOBAL,
             POLYGON_SELECT_SINGLE, POLYGON_SELECT_SUBTRACTIVE,
-            PENCIL_SELECT_ADDITIVE, PENCIL_SELECT_GLOBAL,
-            PENCIL_SELECT_SINGLE, PENCIL_SELECT_SUBTRACTIVE,
+//            PENCIL_SELECT_ADDITIVE, PENCIL_SELECT_GLOBAL,
+//            PENCIL_SELECT_SINGLE, PENCIL_SELECT_SUBTRACTIVE,
             RETICLE_ADDITIVE, RETICLE_SUBTRACTIVE, RETICLE_SINGLE,
             ZOOM);
 
     private static final Map<String, GameImage> CURSOR_MAP = new HashMap<>();
 
     static {
-        for (String code : CURSOR_CODES)
-            CURSOR_MAP.put(code, ResourceLoader.loadImageResource(
-                    Constants.CURSOR_FOLDER.resolve(code + ".png")));
+        refresh();
     }
 
     public static GameImage fetchCursor(final String cursorCode) {
         return CURSOR_MAP.getOrDefault(cursorCode, CURSOR_MAP.get(MAIN_CURSOR));
+    }
+
+    public static void refresh() {
+        for (String code : CURSOR_CODES) {
+            final GameImage asset = ResourceLoader.loadImageResource(
+                    Constants.CURSOR_FOLDER.resolve(code + ".png")),
+                    cursor = Settings.getTheme().logic.transformIcon(asset);
+
+            CURSOR_MAP.put(code, cursor);
+        }
     }
 }

@@ -26,7 +26,6 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
@@ -863,10 +862,9 @@ public class MenuAssembly {
         final Indicator toolIndicator = new Indicator(new Coord2D(
                 Layout.BUTTON_OFFSET, bottomBarButtonY),
                 IconCodes.IND_TOOL);
-        final DynamicLabel toolLabel = new DynamicLabel(new Coord2D(
+        final DynamicLabel toolLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(toolIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
+                bottomBarTextY),
                 () -> StippleEffect.get().getTool().getBottomBarText(),
                 Layout.getBottomBarToolWidth());
         mb.addAll(toolIndicator, toolLabel);
@@ -875,10 +873,9 @@ public class MenuAssembly {
         final Indicator targetIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarTargetPixelX(), bottomBarButtonY),
                 IconCodes.IND_TARGET);
-        final DynamicLabel targetLabel = new DynamicLabel(new Coord2D(
+        final DynamicLabel targetLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(targetIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
+                bottomBarTextY),
                 c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth());
         mb.addAll(targetIndicator, targetLabel);
 
@@ -886,10 +883,9 @@ public class MenuAssembly {
         final Indicator boundsIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarCanvasSizeX(), bottomBarButtonY),
                 IconCodes.IND_BOUNDS);
-        final DynamicLabel boundsLabel = new DynamicLabel(new Coord2D(
+        final DynamicLabel boundsLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(boundsIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
+                bottomBarTextY),
                 c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth());
         mb.addAll(boundsIndicator, boundsLabel);
 
@@ -913,10 +909,10 @@ public class MenuAssembly {
                 zoom.slider, zoom.value);
 
         // selection
-        mb.add(new DynamicLabel(new Coord2D(Layout.width() -
+        mb.add(DynamicLabel.make(new Coord2D(Layout.width() -
                 (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
-                MenuElement.Anchor.RIGHT_TOP, Settings.getTheme().textLight,
-                c::getSelectionText, Layout.width() -
+                MenuElement.Anchor.RIGHT_TOP, c::getSelectionText,
+                Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
 
         // help button

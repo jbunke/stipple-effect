@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
@@ -11,7 +10,6 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
@@ -102,11 +100,10 @@ public final class ScriptBrush extends AbstractBrush
                         StippleEffect.get()::openColorScript);
 
         // script feedback label
-        final DynamicLabel scriptFeedback = new DynamicLabel(new Coord2D(
+        final DynamicLabel scriptFeedback = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(scriptButton, false),
-                Layout.optionsBarTextY()), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
-                DialogVals::colorScriptMessage, Layout.getToolOptionsBarWidth());
+                Layout.optionsBarTextY()), DialogVals::colorScriptMessage,
+                Layout.getToolOptionsBarWidth());
 
         return new MenuElementGrouping(inherited,
                 scriptLabel, scriptButton, scriptFeedback);

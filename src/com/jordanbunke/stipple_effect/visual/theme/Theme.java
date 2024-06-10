@@ -18,6 +18,7 @@ public class Theme {
             checkerboard1, checkerboard2;
 
     public final ThemeLogic logic;
+    public final String subtitle;
 
     Theme(
             final Color textLight, final Color textDark,
@@ -45,7 +46,7 @@ public class Theme {
             final Color checkerboard1,
             final Color checkerboard2,
 
-            final ThemeLogic logic
+            final ThemeLogic logic, final String subtitle
     ) {
         this.textLight = textLight;
         this.textDark = textDark;
@@ -80,5 +81,6 @@ public class Theme {
         this.checkerboard2 = checkerboard2;
 
         this.logic = logic;
+        this.subtitle = subtitle;
     }
 }

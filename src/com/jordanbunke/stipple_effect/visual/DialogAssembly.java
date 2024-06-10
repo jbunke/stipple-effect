@@ -794,7 +794,8 @@ public class DialogAssembly {
                 col = SEColors.red();
                 text = abs + " state" + (abs > 1 ? "s" : "") + " behind";
             } else if (relative == 0) {
-                col = Settings.getTheme().textLight;
+                col = ThemeLogic.intuitTextColor(
+                        Settings.getTheme().panelBackground, true);
                 text = "[ CURRENT ]";
             } else {
                 col = SEColors.green();
@@ -944,10 +945,8 @@ public class DialogAssembly {
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(asciiLabel),
                         SEFonts::uploadASCIISourceFile);
-        final DynamicLabel asciiConfirmation = new DynamicLabel(
+        final DynamicLabel asciiConfirmation = DynamicLabel.make(
                 getDialogRightContentPositionForRow(lines),
-                MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
                 () -> DialogVals.getAsciiStatus().getMessage(),
                 Layout.getDialogWidth());
         mb.addAll(asciiLabel, asciiButton, asciiConfirmation);
@@ -966,10 +965,8 @@ public class DialogAssembly {
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(latinExLabel),
                         SEFonts::uploadLatinExtendedSourceFile);
-        final DynamicLabel latinExConfirmation = new DynamicLabel(
+        final DynamicLabel latinExConfirmation = DynamicLabel.make(
                 getDialogRightContentPositionForRow(lines + 1),
-                MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
                 () -> DialogVals.getLatinExStatus().getMessage(),
                 Layout.getDialogWidth());
         final MenuElementGrouping latinExContent = new MenuElementGrouping(
@@ -1952,14 +1949,14 @@ public class DialogAssembly {
                 ctc, GameImage.dummy()));
 
         // animation frames
-        final GameImage[] frames = Settings.getTheme().logic.loadSplash();
+        final GameImage[] frames = t.logic.loadSplash();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Bounds2D(frames[0].getWidth(), frames[0].getHeight()),
                 MenuElement.Anchor.CENTRAL, 5, frames));
 
         // subtitle
         final GameImage subtitle = GraphicsUtils.uiText(t.splashText)
-                .addText("Pixel art editor and animator").addLineBreak()
+                .addText(t.subtitle).addLineBreak()
                 .addText("Jordan Bunke, 2023-2024")
                 .build().draw();
 
@@ -2377,8 +2374,8 @@ public class DialogAssembly {
             final Coord2D position, final Supplier<String> getter,
             final String widestTextCase
     ) {
-        return new DynamicLabel(position, MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight, getter, widestTextCase);
+        return DynamicLabel.make(position, getter,
+                DynamicLabel.getWidth(widestTextCase));
     }
 
     private static TextLabel makeValidDimensionsBottomLabel() {
@@ -2394,10 +2391,8 @@ public class DialogAssembly {
                 .displace(0, -(Layout.DIALOG_CONTENT_INC_Y +
                         Layout.CONTENT_BUFFER_PX)).y;
 
-        return new DynamicLabel(
+        return DynamicLabel.make(
                 new Coord2D(Layout.getDialogContentInitial().x, y),
-                MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
                 getter, Layout.getDialogWidth());
     }
 
@@ -2926,7 +2921,8 @@ public class DialogAssembly {
             final TextLabel name = TextLabel.make(contentStart.displace(
                             (hasIcon ? Layout.BUTTON_INC : 0) + Layout.CONTENT_BUFFER_PX,
                             bottomY + Layout.TEXT_Y_OFFSET - Layout.BUTTON_BORDER_PX),
-                    headings[i], hasIcon ? t.textShortcut : t.affixTextLight);
+                    headings[i], hasIcon ? t.textShortcut
+                            : ThemeLogic.intuitTextColor(t.panelBackground, false));
             contentAssembler.add(name);
 
             bottomY += incY;
@@ -2942,8 +2938,9 @@ public class DialogAssembly {
                     final TextLabel segmentText = TextLabel.make(
                             contentStart.displace(indent + offsetX,
                                     bottomY + Layout.TEXT_Y_OFFSET),
-                            lineSegments[j], j % 2 == 1
-                                    ? t.textShortcut : t.textLight);
+                            lineSegments[j], j % 2 == 1 ? t.textShortcut
+                                    : ThemeLogic.intuitTextColor(
+                                            t.panelBackground, true));
 
                     contentAssembler.add(segmentText);
                     offsetX += segmentText.getWidth() + Layout.BUTTON_BORDER_PX;

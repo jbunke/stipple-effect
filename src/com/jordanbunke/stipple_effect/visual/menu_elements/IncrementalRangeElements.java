@@ -8,7 +8,6 @@ import com.jordanbunke.stipple_effect.utility.setting_group.DoubleToolSettingTyp
 import com.jordanbunke.stipple_effect.utility.setting_group.FloatToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.IntToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.ToolSettingType;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalSlider;
 
 import java.util.function.Consumer;
@@ -82,11 +81,10 @@ public class IncrementalRangeElements<R extends Number> {
             final Function<R, String> valueFormatter,
             final String widestTextCase
     ) {
-        return new DynamicLabel(new Coord2D(
+        return DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(slider, false),
-                textY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight,
-                () -> valueFormatter.apply(getter.get()), widestTextCase);
+                textY), () -> valueFormatter.apply(getter.get()),
+                DynamicLabel.getWidth(widestTextCase));
     }
 
     public static IncrementalRangeElements<Integer> makeForInt(

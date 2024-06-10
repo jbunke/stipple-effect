@@ -60,13 +60,20 @@ public class SEClipboard {
                 return null;
 
             final int w = img.getWidth(), h = img.getHeight();
+            // TODO - perfect example of how this would be more performant as
+            //  boolean[][] instead of Set<Coord>
             final Set<Coord2D> pixels = new HashSet<>();
 
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
                     pixels.add(new Coord2D(x, y));
 
-            return new SelectionContents(img, pixels);
+            // repackage clipboard contents as selection contents
+            final SelectionContents res = new SelectionContents(img, pixels);
+            ClipboardUtils.setContent(
+                    new ClipboardData(res, NATIVE_DATA_FLAVOR));
+
+            return res;
         } else if (content.isDataFlavorSupported(NATIVE_DATA_FLAVOR)) {
             try {
                 return (SelectionContents) content

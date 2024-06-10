@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.LineMath;
 import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -242,7 +243,7 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
                     continue;
 
                 final Color c = (x + y) % 2 == 0
-                        ? t.textLight : t.textDark;
+                        ? SEColors.black() : SEColors.white();
 
                 toolContentPreview.dot(c, first.x + x, first.y + y);
             }

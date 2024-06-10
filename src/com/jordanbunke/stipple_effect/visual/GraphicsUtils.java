@@ -58,6 +58,7 @@ public class GraphicsUtils {
 
         iconMap.clear();
 
+        SECursor.refresh();
         Arrays.stream(Tool.getAll()).forEach(Tool::refreshIcons);
     }
 

@@ -268,6 +268,16 @@ public abstract class ThemeLogic {
         return diffD > diffL ? dark : light;
     }
 
+    public static GameImage hueFromColorTransformation(
+            final GameImage asset, final Color ref
+    ) {
+        final double hue = ColorMath.rgbToHue(ref);
+
+        return pixelWiseTransformation(asset, c -> c.getAlpha() == 0 ? c
+                : ColorMath.fromHSV(hue, ColorMath.rgbToSat(c),
+                ColorMath.rgbToValue(c), c.getAlpha()));
+    }
+
     public static GameImage contextualTransformation(
             final GameImage input, final ColorProducer f
     ) {

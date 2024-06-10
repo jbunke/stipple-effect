@@ -41,6 +41,7 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.*;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
 import java.io.File;
@@ -693,16 +694,17 @@ public class StippleEffect implements ProgramContext {
 
     private GameImage drawToolTip() {
         final Theme t = Settings.getTheme();
+        final Color cText = ThemeLogic.intuitTextColor(t.panelBackground, true);
 
         final String[] lines = ParserUtils.getToolTip(toolTipCode);
-        final TextBuilder tb = GraphicsUtils.uiText(t.textLight);
+        final TextBuilder tb = GraphicsUtils.uiText(cText);
 
         for (int l = 0; l < lines.length; l++) {
             final String[] segments = ParserUtils.extractHighlight(lines[l]);
 
             for (int i = 0; i < segments.length; i++) {
                 if (i % 2 == 0)
-                    tb.setColor(t.textLight);
+                    tb.setColor(cText);
                 else
                     tb.setColor(t.textShortcut);
 

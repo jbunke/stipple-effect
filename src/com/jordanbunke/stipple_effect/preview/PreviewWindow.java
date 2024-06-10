@@ -234,12 +234,11 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
             final MenuElement lastButton, final Supplier<String> getter,
             final String widestCase
     ) {
-        return new DynamicLabel(
+        return DynamicLabel.make(
                 lastButton.getRenderPosition().displace(
                         Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
                         -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
-                MenuElement.Anchor.LEFT_TOP, Settings.getTheme().textLight,
-                getter, widestCase);
+                getter, DynamicLabel.getWidth(widestCase));
     }
 
     private void setZoom(final float zoom) {
