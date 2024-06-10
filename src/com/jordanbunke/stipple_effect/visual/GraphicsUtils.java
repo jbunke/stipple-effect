@@ -46,12 +46,17 @@ public class GraphicsUtils {
     }
 
     private static GameImage loadUtil(final String code) {
-        return ResourceLoader.loadImageResource(
+        final GameImage asset = ResourceLoader.loadImageResource(
                 Constants.MISC_FOLDER.resolve(code + ".png"));
+
+        return Settings.getTheme().logic.transformIcon(asset);
     }
 
     public static void refreshAssets() {
         final Theme theme = Settings.getTheme();
+
+        TRANSFORM_NODE = loadUtil("transform_node");
+        CHECKMARK = loadUtil("checkmark");
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
         SELECT_OVERLAY = theme.logic.selectedIconOverlay();

@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.scripting.util.Arguments;
 import com.jordanbunke.stipple_effect.scripting.util.Scope;
 
 public abstract class ScopedExpressionNode extends ExtExpressionNode {
-    protected Scope scope;
+    protected final Scope scope;
 
     public ScopedExpressionNode(
             final TextPosition position,
