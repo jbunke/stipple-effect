@@ -332,13 +332,6 @@ public class StatusUpdates {
                 (triedUndo ? "beginning" : "end") + " of project state stack");
     }
 
-    public static void dumpedStates(
-            final int dumped, final long kbsFreed
-    ) {
-        send("Dumped " + dumped + " state" + (dumped > 1 ? "s" : "") +
-                " due to low memory; freed " + kbsFreed + " KBs of memory");
-    }
-
     public static void setCheckAndGridToBounds(
             final int width, final int height, final boolean fromSelection
     ) {

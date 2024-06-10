@@ -287,26 +287,14 @@ public class MenuAssembly {
         int realRightX = firstPos.x;
 
         for (int i = 0; i < amount; i++) {
-            final GameImage baseImage = GraphicsUtils
-                    .drawTextButton(Layout.FRAME_BUTTON_W,
-                            String.valueOf(i + 1), false),
-                    highlightedImage = GraphicsUtils
-                            .highlightButton(baseImage),
-                    selectedImage = GraphicsUtils
-                            .drawTextButton(Layout.FRAME_BUTTON_W,
-                                    String.valueOf(i + 1), true);
-
             final Coord2D pos = firstPos.displace(
                     i * (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET), 0);
-            final Bounds2D dims = new Bounds2D(baseImage.getWidth(), baseImage.getHeight());
-
-            frameElements.add(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP,
-                    baseImage, highlightedImage, selectedImage,
+            frameElements.add(SelectableListItemButton.make(
+                    pos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1),
                     i, () -> c.getState().getFrameIndex(),
                     s -> c.getState().setFrameIndex(s)));
 
-            realRightX = pos.x + dims.width();
+            realRightX = pos.x + Layout.FRAME_BUTTON_W;
         }
 
         mb.add(new HorizontalScrollBox(firstPos,
@@ -419,21 +407,12 @@ public class MenuAssembly {
                             ? name.substring(0, Layout.LAYER_NAME_LENGTH_CUTOFF) + "..."
                             : name;
 
-            final GameImage baseImage = GraphicsUtils
-                    .drawTextButton(Layout.LAYER_BUTTON_W, text, false),
-                    highlightedImage = GraphicsUtils
-                            .highlightButton(baseImage),
-                    selectedImage = GraphicsUtils
-                            .drawTextButton(Layout.LAYER_BUTTON_W, text, true);
-
             final Coord2D pos = firstPos.displace(0,
                     (amount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
-            final Bounds2D dims = new Bounds2D(baseImage.getWidth(), baseImage.getHeight());
 
-            layerButtons.add(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP,
-                    baseImage, highlightedImage, selectedImage,
-                    i, () -> c.getState().getLayerEditIndex(),
+            layerButtons.add(SelectableListItemButton.make(
+                    pos, Layout.LAYER_BUTTON_W, text, i,
+                    () -> c.getState().getLayerEditIndex(),
                     s -> c.getState().setLayerEditIndex(s)));
 
             final int index = i;
@@ -457,7 +436,7 @@ public class MenuAssembly {
             layerButtons.add(IconButton.make(IconCodes.LAYER_SETTINGS, lsPos,
                     () -> DialogAssembly.setDialogToLayerSettings(index)));
 
-            realBottomY = pos.y + dims.height();
+            realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
         }
 
         final int initialOffsetY = layerButtonYDisplacement(amount);

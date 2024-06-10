@@ -4,7 +4,6 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -82,8 +81,7 @@ public class StateManager {
         while (states.size() > index + 1)
             states.remove(states.size() - 1);
 
-        if (Settings.isDumpStates())
-            manageMemory();
+        clearOldNonCheckpointStates();
 
         // add to state stack and set as active state
         states.add(resultantState);
@@ -92,37 +90,17 @@ public class StateManager {
         updateStateMetadataAndAssets(resultantState);
     }
 
-    private void manageMemory() {
-        final long BYTES_IN_KB = 0x400L; // 1024
-        final int GC_EVERY_X_DUMPS = 10;
+    private void clearOldNonCheckpointStates() {
+        int checkpointsReached = 0;
 
-        final Runtime r = Runtime.getRuntime();
-        final long mem = r.freeMemory();
+        for (int i = states.size() - 1; i >= 0; i--) {
+            final boolean checkpoint = states.get(i).isCheckpoint();
 
-        if (mem < Constants.DUMP_STATES_MEM_THRESHOLD &&
-                canDumpState()) {
-            final long entryMem = mem / BYTES_IN_KB;
-            int dumped = 0;
-
-            while (canDumpState() &&
-                    r.freeMemory() < Constants.DUMP_STATES_MEM_THRESHOLD *
-                            Constants.DUMP_STATES_CUSHION_FACTOR) {
-                states.remove(0);
-                dumped++;
-
-                if (dumped % GC_EVERY_X_DUMPS == 0)
-                    System.gc();
-            }
-
-            System.gc();
-            final long exitMem = r.freeMemory() / BYTES_IN_KB;
-
-            StatusUpdates.dumpedStates(dumped, exitMem - entryMem);
+            if (checkpoint)
+                checkpointsReached++;
+            else if (checkpointsReached >= Constants.CHECKPOINTS_DUMP_THRESHOLD)
+                states.remove(i);
         }
-    }
-
-    private boolean canDumpState() {
-        return states.size() > Constants.MIN_NUM_STATES && index > 0;
     }
 
     private void updateStateMetadataAndAssets(final int was) {

@@ -139,7 +139,7 @@ public class DialogVals {
     }
 
     public enum SettingScreen {
-        DEFAULTS, CONTROLS, VISUAL, ADVANCED;
+        DEFAULTS, CONTROLS, VISUAL;
 
         public String getTitle() {
             return (this == DEFAULTS ? this + " and startup" : this) + " settings";

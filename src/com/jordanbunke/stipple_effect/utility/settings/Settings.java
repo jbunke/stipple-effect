@@ -30,7 +30,6 @@ public class Settings {
         INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_FONT_SIZE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
-        DUMP_STATES(new Setting<>(BooleanSettingType.get(), true)),
 
         // int settings
         WINDOWED_W(new Setting<>(
@@ -223,10 +222,6 @@ public class Settings {
         Code.INVERT_FONT_SIZE_DIRECTION.set(invertFontSizeDirection);
     }
 
-    public static void setDumpStates(final boolean dumpStates) {
-        Code.DUMP_STATES.set(dumpStates);
-    }
-
     public static void setWindowedWidth(
             final int windowedWidth
     ) {
@@ -326,10 +321,6 @@ public class Settings {
         return (boolean) Code.INVERT_FONT_SIZE_DIRECTION.setting.check();
     }
 
-    public static boolean checkIsDumpStates() {
-        return (boolean) Code.DUMP_STATES.setting.check();
-    }
-
     public static int checkWindowedWidth() {
         return (int) Code.WINDOWED_W.setting.check();
     }
@@ -389,10 +380,6 @@ public class Settings {
 
     public static boolean isPixelGridOnByDefault() {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.get();
-    }
-
-    public static boolean isDumpStates() {
-        return (boolean) Code.DUMP_STATES.setting.get();
     }
 
     public static int getWindowedWidth() {

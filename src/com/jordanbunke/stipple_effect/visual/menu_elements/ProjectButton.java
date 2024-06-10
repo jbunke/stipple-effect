@@ -25,8 +25,7 @@ public class ProjectButton extends SelectableListItemButton {
             final Supplier<Integer> selectedIndexGetter,
             final Consumer<Integer> selectFunction
     ) {
-        super(position, dimensions, Anchor.LEFT_TOP,
-                null, null, null,
+        super(position, dimensions, null, null, null,
                 index, selectedIndexGetter, selectFunction);
 
         this.project = project;

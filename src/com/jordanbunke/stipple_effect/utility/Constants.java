@@ -63,7 +63,7 @@ public class Constants {
             MIN_FONT_SCALE = 1, MAX_FONT_SCALE = 10,
             DEFAULT_FONT_PX_SPACING = 2, MIN_FONT_PX_SPACING = 0, MAX_FONT_PX_SPACING = 10,
             MAX_NUM_LAYERS = 50, MAX_NUM_FRAMES = 300, MAX_OUTLINE_PX = 10,
-            MIN_NUM_STATES = 100, DUMP_STATES_CUSHION_FACTOR = 2,
+            CHECKPOINTS_DUMP_THRESHOLD = 5,
             MILLIS_IN_SECOND = 1000, MIN_PLAYBACK_FPS = 1, MAX_PLAYBACK_FPS = 24,
             PLAYBACK_FPS_INC = 1, DEFAULT_PLAYBACK_FPS = 10,
             TIMER_MAX_OUT = 4, MILLIS_PER_TIMER_INC = 100,
@@ -74,8 +74,6 @@ public class Constants {
             MAX_NAME_LENGTH = 40, STRETCH_PX_THRESHOLD = 10, ROTATE_PX_THRESHOLD = 25,
             MAX_HUE_SHIFT = HUE_SCALE / 2, MIN_HUE_SHIFT = -MAX_HUE_SHIFT,
             MAX_SV_SHIFT = SAT_SCALE, MIN_SV_SHIFT = -MAX_SV_SHIFT;
-
-    public static final long DUMP_STATES_MEM_THRESHOLD = 0x6400000L; // 100 MB
 
     public static final float
             DEF_ZOOM = ZoomLevel.PLUS_3.z,

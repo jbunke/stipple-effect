@@ -1774,21 +1774,17 @@ public class DialogAssembly {
         Settings.resetAssignments();
 
         Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
-            final GameImage baseSS = GraphicsUtils.drawTextButton(
-                    Layout.STD_TEXT_BUTTON_W, ss.toString(), false),
-                    highlighedSS = GraphicsUtils.highlightButton(baseSS);
-
             final Coord2D ssPos = Layout.getDialogPosition().displace(
                     Layout.CONTENT_BUFFER_PX + (ss.ordinal() *
                             (Layout.STD_TEXT_BUTTON_W + Layout.BUTTON_OFFSET)),
                     Layout.CONTENT_BUFFER_PX +
                             (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
-            mb.add(new SimpleMenuButton(ssPos,
-                    new Bounds2D(baseSS.getWidth(), baseSS.getHeight()),
-                    MenuElement.Anchor.LEFT_TOP, true,
-                    () -> DialogVals.setSettingScreen(ss),
-                    baseSS, highlighedSS));
+            mb.add(SelectableListItemButton.make(ssPos,
+                    Layout.STD_TEXT_BUTTON_W, ss.toString(), ss.ordinal(),
+                    () -> DialogVals.getSettingScreen().ordinal(),
+                    i -> DialogVals.setSettingScreen(
+                            DialogVals.SettingScreen.values()[i])));
         });
 
         // decision logic
@@ -2762,30 +2758,6 @@ public class DialogAssembly {
                 // update as new settings are added to category
                 yield pixelGridLimits2;
             }
-            case ADVANCED -> {
-                final TextLabel dumpStatesLabel = makeDialogLeftLabel(
-                        initialYIndex,
-                        "Dump old project states when memory is low?"),
-                        dsContext1 = TextLabel.make(textBelowPos(dumpStatesLabel),
-                                "This will dump previous project state iterations from"),
-                        dsContext2 = TextLabel.make(textBelowPos(dsContext1),
-                                "the state stack, making them inaccessible via undo/redo."),
-                        dsContext3 = TextLabel.make(textBelowPos(dsContext2),
-                                "Disabling this may lead the program to crash;"),
-                        dsContext4 = TextLabel.make(textBelowPos(dsContext3),
-                                "this instability will be addressed in future updates.");
-
-                final Checkbox dumpStatesCheckbox = new Checkbox(
-                        getDialogContentOffsetFollowingLabel(dumpStatesLabel),
-                        new ConcreteProperty<>(
-                                Settings::checkIsDumpStates,
-                                Settings::setDumpStates));
-
-                mb.addAll(dumpStatesLabel, dumpStatesCheckbox,
-                        dsContext1, dsContext2, dsContext3, dsContext4);
-
-                yield dsContext4;
-            }
         };
 
         // scrolling container
@@ -3247,21 +3219,18 @@ public class DialogAssembly {
 
         // contents
         Arrays.stream(DialogVals.InfoScreen.values()).forEach(is -> {
-                    final GameImage baseIS = GraphicsUtils.drawTextButton(
-                            Layout.STD_TEXT_BUTTON_W, is.toString(), false),
-                            highlighedIS = GraphicsUtils.highlightButton(baseIS);
-
                     final Coord2D isPos = background.getRenderPosition().displace(
                             Layout.CONTENT_BUFFER_PX + (is.ordinal() *
                                     (Layout.STD_TEXT_BUTTON_W + Layout.BUTTON_OFFSET)),
                             Layout.CONTENT_BUFFER_PX +
                                             (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
-                    mb.add(new SimpleMenuButton(isPos,
-                            new Bounds2D(baseIS.getWidth(), baseIS.getHeight()),
-                            MenuElement.Anchor.LEFT_TOP, true,
-                            () -> DialogVals.setInfoScreen(is),
-                            baseIS, highlighedIS));
+                    mb.add(SelectableListItemButton.make(
+                            isPos, Layout.STD_TEXT_BUTTON_W,
+                            is.toString(), is.ordinal(),
+                            () -> DialogVals.getInfoScreen().ordinal(),
+                            i -> DialogVals.setInfoScreen(
+                                    DialogVals.InfoScreen.values()[i])));
                 });
 
         final int scrollerEndY = (background.getRenderPosition().y +
