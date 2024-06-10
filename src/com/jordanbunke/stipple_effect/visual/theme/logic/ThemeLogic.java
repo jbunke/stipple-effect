@@ -33,6 +33,10 @@ public abstract class ThemeLogic {
 
     public abstract GameImage[] loadSplash();
 
+    public int ticksPerSplashFrame() {
+        return 5;
+    }
+
     public GameImage drawScrollBoxBackground(final int w, final int h) {
         final GameImage background = new GameImage(w, h);
         background.fillRectangle(

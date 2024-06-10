@@ -1952,7 +1952,8 @@ public class DialogAssembly {
         final GameImage[] frames = t.logic.loadSplash();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Bounds2D(frames[0].getWidth(), frames[0].getHeight()),
-                MenuElement.Anchor.CENTRAL, 5, frames));
+                MenuElement.Anchor.CENTRAL, t.logic.ticksPerSplashFrame(),
+                frames));
 
         // subtitle
         final GameImage subtitle = GraphicsUtils.uiText(t.splashText)

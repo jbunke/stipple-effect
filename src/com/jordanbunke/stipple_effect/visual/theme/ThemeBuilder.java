@@ -248,45 +248,45 @@ public class ThemeBuilder {
 
     public static Theme ramallah() {
         final ThemeBuilder ramallahTB = new ThemeBuilder()
-                .setLogic(DefaultThemeLogic.get())
-                .setSubtitle("FTRTTS");
+                .setLogic(RamallahThemeLogic.get())
+                .setSubtitle("Be on the right side of history!");
 
         // backgrounds
         ramallahTB.setSplashBackground(SAND)
-                .setPanelBackground(DARK_OIL)
-                .setWorkspaceBackground(FOLIAGE)
+                .setPanelBackground(WHITE)
+                .setWorkspaceBackground(DARK_RED)
                 .setScrollBackground(TRANSPARENT);
 
         // text
-        ramallahTB.setTextLight(GOLD)
-                .setTextDark(DARK_OIL)
-                .setAffixTextDark(BLACK)
-                .setAffixTextLight(WHITE)
+        ramallahTB.setTextLight(WHITE)
+                .setTextDark(BLACK)
+                .setAffixTextDark(DARK_GREY)
+                .setAffixTextLight(LIGHTEST_GREY)
                 .setTextMenuHeading(NAIJ)
-                .setTextShortcut(NAIJ)
-                .setSplashText(WHITE)
-                .setSplashFlashingText(GOLD);
+                .setTextShortcut(RED)
+                .setSplashText(BLACK)
+                .setSplashFlashingText(DARK_RED);
 
         // UI element bodies
         ramallahTB.setDefaultSliderCore(NAIJ)
                 .setDefaultSliderBall(NAIJ)
                 .setDropdownOptionBody(NAIJ)
-                .setStubButtonBody(RED)
+                .setStubButtonBody(GREY)
                 .setButtonBody(BLACK);
 
         // UI element outlines
-        ramallahTB.setButtonOutline(DARK_GOLD)
-                .setHighlightOutline(GOLD)
-                .setPanelDivisions(GOLD);
+        ramallahTB.setButtonOutline(WHITE)
+                .setHighlightOutline(RED)
+                .setPanelDivisions(BLACK);
 
         // selection
-        ramallahTB.setHighlightOverlay(TRANSLUCENT_GOLD_1)
-                .setSelectionFill(TRANSLUCENT_GOLD_2);
+        ramallahTB.setHighlightOverlay(VEIL)
+                .setSelectionFill(VEIL);
 
         ramallahTB.setCheckerboard1(GREY)
                 .setCheckerboard2(MID_DARK_GREY);
 
-        return ramallahTB.build();
+        return ramallahTB.setDialogVeil(DARK_RED).build();
     }
 
     public ThemeBuilder setLogic(final ThemeLogic logic) {
