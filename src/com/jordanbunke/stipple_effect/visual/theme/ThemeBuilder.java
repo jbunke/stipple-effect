@@ -99,7 +99,7 @@ public class ThemeBuilder {
                 .setAffixTextLight(HAITI_RED)
                 .setTextMenuHeading(CEU)
                 .setTextShortcut(CEU)
-                .setSplashText(HAITI_RED)
+                .setSplashText(GOLD)
                 .setSplashFlashingText(GOLD);
 
         // UI element bodies
