@@ -9,6 +9,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -137,9 +138,8 @@ public final class GradientTool extends ToolWithBreadth
             final SEContext context, final Coord2D tp,
             final int w, final int h
     ) {
-        final Set<Coord2D>
-                selection = context.getState().getSelection(),
-                gradientStage = new HashSet<>();
+        final Selection selection = context.getState().getSelection();
+        final Set<Coord2D> gradientStage = new HashSet<>();
 
         populateAround(gradientStage, tp, selection);
         fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
@@ -170,17 +170,18 @@ public final class GradientTool extends ToolWithBreadth
 
     private void populateAround(
             final Set<Coord2D> gradientStage, final Coord2D tp,
-            final Set<Coord2D> selection
+            final Selection selection
     ) {
         final int halfB = breadthOffset();
         final boolean[][] mask = breadthMask();
+        final boolean empty = !selection.hasSelection();
 
         for (int x = 0; x < mask.length; x++)
             for (int y = 0; y < mask[x].length; y++) {
                 final Coord2D b = new Coord2D(x + (tp.x - halfB),
                         y + (tp.y - halfB));
 
-                if (!(selection.isEmpty() || selection.contains(b)))
+                if (!(empty || selection.selected(b)))
                     continue;
 
                 if (mask[x][y])
@@ -192,13 +193,13 @@ public final class GradientTool extends ToolWithBreadth
             final Coord2D endpoint, final SEContext context,
             final int w, final int h
     ) {
-        final Set<Coord2D> selection = context.getState().getSelection();
-        final boolean hasSelection = !selection.isEmpty();
+        final Selection selection = context.getState().getSelection();
+        final boolean hasSelection = selection.hasSelection();
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 final Coord2D pos = new Coord2D(x, y);
-                if (hasSelection && !selection.contains(pos))
+                if (hasSelection && !selection.selected(pos))
                     continue;
 
                 final double c = shape.cGetter().apply(pos, endpoint);

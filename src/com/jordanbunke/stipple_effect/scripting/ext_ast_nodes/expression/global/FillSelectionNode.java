@@ -48,8 +48,9 @@ public class FillSelectionNode extends GlobalExpressionNode {
         final GameImage img = (GameImage) vs[0],
                 res = new GameImage(img.getWidth(), img.getHeight());
         final Color c = (Color) vs[1];
+        // TODO
         final Set<Coord2D> pixels = systemSelection
-                ? StippleEffect.get().getContext().getState().getSelection()
+                ? StippleEffect.get().getContext().getState().getSelection().getPixels()
                 : ScriptSelectionUtils.convertSelection(
                         (ScriptSet) vs[2], img.getWidth(), img.getHeight());
 

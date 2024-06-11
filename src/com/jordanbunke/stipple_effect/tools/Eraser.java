@@ -3,9 +3,8 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
-
-import java.util.Set;
 
 public final class Eraser extends ToolWithBreadth {
     private static final Eraser INSTANCE;
@@ -45,7 +44,7 @@ public final class Eraser extends ToolWithBreadth {
         if (erasing && !tp.equals(Constants.NO_VALID_TARGET)) {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
-            final Set<Coord2D> selection = context.getState().getSelection();
+            final Selection selection = context.getState().getSelection();
 
             if (isUnchanged(context))
                 return;
@@ -62,17 +61,18 @@ public final class Eraser extends ToolWithBreadth {
     }
 
     private void populateAround(
-            final boolean[][] eraseMask, final Coord2D tp, Set<Coord2D> selection
+            final boolean[][] eraseMask, final Coord2D tp, Selection selection
     ) {
         final int halfB = breadthOffset();
         final boolean[][] mask = breadthMask();
+        final boolean empty = !selection.hasSelection();
 
         for (int x = 0; x < mask.length; x++)
             for (int y = 0; y < mask[x].length; y++) {
                 final Coord2D e = new Coord2D(x + (tp.x - halfB),
                         y + (tp.y - halfB));
 
-                if (!(selection.isEmpty() || selection.contains(e)))
+                if (!(empty || selection.selected(e)))
                     continue;
 
                 if (mask[x][y] && e.x >= 0 && e.y >= 0 &&

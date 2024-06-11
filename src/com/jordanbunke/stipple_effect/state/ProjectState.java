@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.PickUpSelection;
@@ -31,7 +32,7 @@ public class ProjectState {
 
     // SELECTION
     private final SelectionMode selectionMode;
-    private final Set<Coord2D> selection;
+    private final Selection selection;
     private final SelectionContents selectionContents;
 
     public static ProjectState makeNew(
@@ -57,7 +58,7 @@ public class ProjectState {
     ) {
         return new ProjectState(imageWidth, imageHeight, layers, 0,
                 frameCount, frameDurations, 0,
-                SelectionMode.BOUNDS, new HashSet<>(), null, true);
+                SelectionMode.BOUNDS, Selection.EMPTY, null, true);
     }
 
     private ProjectState(
@@ -66,7 +67,7 @@ public class ProjectState {
     ) {
         this(imageWidth, imageHeight, layers, 0,
                 frameCount, defaultFrameDurations(frameCount), 0,
-                SelectionMode.BOUNDS, new HashSet<>(), null, true);
+                SelectionMode.BOUNDS, Selection.EMPTY, null, true);
     }
 
     private ProjectState(
@@ -75,7 +76,7 @@ public class ProjectState {
             final int frameCount, final List<Double> frameDurations,
             final int frameIndex,
             final SelectionMode selectionMode,
-            final Set<Coord2D> selection,
+            final Selection selection,
             final SelectionContents selectionContents
     ) {
         this(imageWidth, imageHeight, layers, layerEditIndex,
@@ -89,7 +90,7 @@ public class ProjectState {
             final int frameCount, final List<Double> frameDurations,
             final int frameIndex,
             final SelectionMode selectionMode,
-            final Set<Coord2D> selection,
+            final Selection selection,
             final SelectionContents selectionContents,
             final boolean checkpoint
     ) {
@@ -137,11 +138,11 @@ public class ProjectState {
         return new ProjectState(imageWidth, imageHeight,
                 layers, layerEditIndex,
                 frameCount, frameDurations, frameIndex,
-                SelectionMode.CONTENTS, new HashSet<>(), selectionContents);
+                SelectionMode.CONTENTS, Selection.EMPTY, selectionContents);
     }
 
     public ProjectState changeSelectionBounds(
-            final Set<Coord2D> selection
+            final Selection selection
     ) {
         return new ProjectState(imageWidth, imageHeight,
                 layers, layerEditIndex,
@@ -203,7 +204,7 @@ public class ProjectState {
         return new ProjectState(imageWidth, imageHeight,
                 layers, layerEditIndex,
                 1, defaultFrameDurations(1), 0,
-                selectionMode, new HashSet<>(selection), selectionContents);
+                selectionMode, selection, selectionContents);
     }
 
     public ProjectState split(
@@ -212,8 +213,8 @@ public class ProjectState {
     ) {
         return new ProjectState(imageWidth, imageHeight,
                 layers, layerEditIndex,
-                frameCount, defaultFrameDurations(frameCount), 0, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                frameCount, defaultFrameDurations(frameCount), 0,
+                selectionMode, selection, selectionContents);
     }
 
     public GameImage draw(
@@ -365,15 +366,15 @@ public class ProjectState {
 
     public boolean hasSelection() {
         return switch (selectionMode) {
-            case BOUNDS -> !selection.isEmpty();
+            case BOUNDS -> selection.hasSelection();
             case CONTENTS -> hasSelectionContents();
         };
     }
 
-    public Set<Coord2D> getSelection() {
+    public Selection getSelection() {
         return switch (selectionMode) {
             case BOUNDS -> selection;
-            case CONTENTS -> selectionContents.getPixels();
+            case CONTENTS -> selectionContents.getSelection();
         };
     }
 

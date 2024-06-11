@@ -69,6 +69,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         ToolThatSearches.searchDiag = searchDiag;
     }
 
+    // TODO - reimplement factoring in selection and with boolean matrix for searched
     public static Set<Coord2D> search(final GameImage image, final Coord2D target) {
         final Color initial = image.getColorAt(target.x, target.y);
 

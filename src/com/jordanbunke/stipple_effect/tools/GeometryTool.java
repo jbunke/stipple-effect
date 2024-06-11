@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
@@ -55,7 +56,7 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
         if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
-            final Set<Coord2D> selection = context.getState().getSelection();
+            final Selection selection = context.getState().getSelection();
 
             if (tp.equals(getLastTP()))
                 return;
@@ -73,7 +74,7 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
 
     abstract Coord2D snappedEndpoint(final Coord2D anchor, final Coord2D tp);
     abstract void geoDefinition(final Coord2D anchor, final Coord2D endpoint,
-                                final Set<Coord2D> selection);
+                                final Selection selection);
 
     @Override
     public void onMouseUp(final SEContext context, final GameMouseEvent me) {
@@ -88,17 +89,18 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
     }
 
     protected void populateAround(
-            final Coord2D tp, final Set<Coord2D> selection
+            final Coord2D tp, final Selection selection
     ) {
         final int halfB = breadthOffset();
         final boolean[][] mask = breadthMask();
+        final boolean empty = !selection.hasSelection();
 
         for (int x = 0; x < mask.length; x++)
             for (int y = 0; y < mask[x].length; y++) {
                 final Coord2D b = new Coord2D(x + (tp.x - halfB),
                         y + (tp.y - halfB));
 
-                if (!(selection.isEmpty() || selection.contains(b)))
+                if (!(empty || selection.selected(b)))
                     continue;
 
                 if (mask[x][y] && !included.contains(b)) {

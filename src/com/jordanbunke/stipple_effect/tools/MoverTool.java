@@ -91,10 +91,11 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         if (!context.getState().hasSelection())
             return TransformType.NONE;
         else {
-            final Set<Coord2D> selection = context.getState().getSelection();
+            final Set<Coord2D> pixels = context.getState()
+                    .getSelection().getPixels();
 
-            startTopLeft = SelectionUtils.topLeft(selection);
-            startBottomRight = SelectionUtils.bottomRight(selection);
+            startTopLeft = SelectionUtils.topLeft(pixels);
+            startBottomRight = SelectionUtils.bottomRight(pixels);
 
             final Coord2D tlmp = context.modelMousePosForPixel(startTopLeft),
                     brmp = context.modelMousePosForPixel(startBottomRight);
@@ -210,7 +211,9 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         prospectiveType = TransformType.NONE;
 
         if (canBeMoved(context)) {
-            startSelection = new HashSet<>(context.getState().getSelection());
+            // TODO
+            startSelection = new HashSet<>(context.getState()
+                    .getSelection().getPixels());
             transformation = move(context, new Coord2D());
             toolContentPreview = updateToolContentPreview(context, transformation);
 
@@ -235,7 +238,9 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
             case NONE -> prospectiveType =
                     determineTransformType(context, mousePosition);
             case MOVE -> {
-                final Set<Coord2D> selection = context.getState().getSelection();
+                // TODO
+                final Set<Coord2D> selection = context.getState()
+                        .getSelection().getPixels();
                 final Coord2D topLeft = SelectionUtils.topLeft(selection);
 
                 Coord2D displacement = new Coord2D(

@@ -7,61 +7,53 @@ import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
 import java.awt.*;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SelectionContents {
     private static final int X = 0, Y = 1;
 
     private final GameImage content;
-    private final Coord2D topLeft;
-    private final Set<Coord2D> pixels;
+    private final Selection selection;
 
     private final SelectionContents original;
 
-    public SelectionContents(
-            final GameImage canvas, final Set<Coord2D> selection
+    public static SelectionContents make(
+            final GameImage canvas, final Selection selection
     ) {
-        pixels = selection.stream().filter(s -> s.x >= 0 && s.y >= 0 &&
-                s.x < canvas.getWidth() &&
-                s.y < canvas.getHeight()).collect(Collectors.toSet());
+        final GameImage content = makeContentFromSelection(canvas, selection);
+        final SelectionContents original =
+                new SelectionContents(content, selection);
 
-        topLeft = SelectionUtils.topLeft(pixels);
-        content = makeContentFromSelection(canvas, pixels);
-
-        original = new SelectionContents(content, topLeft, pixels);
+        return new SelectionContents(content, selection, original);
     }
 
     private SelectionContents(
-            final GameImage content, final Coord2D topLeft,
-            final Set<Coord2D> pixels
+            final GameImage content, final Selection selection
     ) {
-        this(content, topLeft, pixels,
-                new SelectionContents(content, topLeft, pixels, null));
+        this(content, selection,
+                new SelectionContents(content, selection, null));
     }
 
     private SelectionContents(
-            final GameImage content, final Coord2D topLeft,
-            final Set<Coord2D> pixels, final SelectionContents original
+            final GameImage content, final Selection selection,
+            final SelectionContents original
     ) {
         this.content = content;
-        this.topLeft = topLeft;
-        this.pixels = pixels;
-
+        this.selection = selection;
         this.original = original;
     }
 
-    private GameImage makeContentFromSelection(
-            final GameImage canvas, final Set<Coord2D> pixels
+    private static GameImage makeContentFromSelection(
+            final GameImage canvas, final Selection selection
     ) {
-        final Coord2D tl = SelectionUtils.topLeft(pixels),
-                br = SelectionUtils.bottomRight(pixels);
+        final Coord2D tl = selection.topLeft;
 
-        final int w = br.x - tl.x, h = br.y - tl.y;
+        final int w = selection.bounds.width(),
+                h = selection.bounds.height();
         final GameImage content = new GameImage(w, h);
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                if (!pixels.contains(new Coord2D(tl.x + x, tl.y + y)))
+                if (!selection.selected(tl.x + x, tl.y + y))
                     continue;
 
                 final Color c = canvas.getColorAt(tl.x + x, tl.y + y);
@@ -73,11 +65,8 @@ public class SelectionContents {
     }
 
     public SelectionContents returnDisplaced(final Coord2D displacement) {
-        final Set<Coord2D> displacedPixels = pixels.stream().map(px ->
-                px.displace(displacement)).collect(Collectors.toSet());
-
         return new SelectionContents(new GameImage(content),
-                topLeft.displace(displacement), displacedPixels);
+                selection.displace(displacement));
     }
 
     public SelectionContents returnStretched(
@@ -88,8 +77,9 @@ public class SelectionContents {
                 initialSelection, change, direction);
 
         if (pixels.isEmpty())
-            return new SelectionContents(GameImage.dummy(), topLeft,
-                    pixels, original == null ? this : original);
+            return new SelectionContents(GameImage.dummy(),
+                    Selection.fromSet(pixels),
+                    original == null ? this : original);
 
         final Coord2D tl = SelectionUtils.topLeft(pixels),
                 br = SelectionUtils.bottomRight(pixels);
@@ -109,7 +99,8 @@ public class SelectionContents {
                     content.dot(sampleFrom.getColorAt(sampleX, sampleY), x, y);
                 }
 
-        return new SelectionContents(content.submit(), tl, pixels,
+        return new SelectionContents(content.submit(),
+                Selection.fromSet(pixels),
                 original == null ? this : original);
     }
 
@@ -121,8 +112,9 @@ public class SelectionContents {
                 initialSelection, deltaR, pivot, offset);
 
         if (pixels.isEmpty())
-            return new SelectionContents(GameImage.dummy(), topLeft,
-                    pixels, original == null ? this : original);
+            return new SelectionContents(GameImage.dummy(),
+                    Selection.fromSet(pixels),
+                    original == null ? this : original);
 
         final Coord2D tl = SelectionUtils.topLeft(pixels),
                 br = SelectionUtils.bottomRight(pixels);
@@ -133,7 +125,8 @@ public class SelectionContents {
         final GameImage content = new GameImage(w, h),
                 sampleFrom = original == null ? this.content : original.content;
 
-        final Coord2D sampleTL = original == null ? topLeft : original.topLeft;
+        final Coord2D sampleTL = original == null
+                ? selection.topLeft : original.selection.topLeft;
 
         final double[] realPivot = new double[] {
                 pivot.x + (offset[X] ? -0.5 : 0d),
@@ -166,7 +159,8 @@ public class SelectionContents {
                         content.dot(sampleFrom.getColorAt(sampleX, sampleY), x, y);
                 }
 
-        return new SelectionContents(content.submit(), tl, pixels,
+        return new SelectionContents(content.submit(),
+                Selection.fromSet(pixels),
                 original == null ? this : original);
     }
 
@@ -177,7 +171,8 @@ public class SelectionContents {
                 SelectionUtils.reflectedPixels(initialSelection, horizontal);
 
         if (pixels.isEmpty())
-            return new SelectionContents(GameImage.dummy(), topLeft, pixels);
+            return new SelectionContents(GameImage.dummy(),
+                    Selection.fromSet(pixels));
 
         final Coord2D tl = SelectionUtils.topLeft(pixels),
                 br = SelectionUtils.bottomRight(pixels),
@@ -203,8 +198,8 @@ public class SelectionContents {
                                             (middle.y - pixel.y) - (offset[Y] ? 1 : 0)
                             );
 
-                    final int sampleX = was.x - topLeft.x,
-                            sampleY = was.y - topLeft.y;
+                    final int sampleX = was.x - selection.topLeft.x,
+                            sampleY = was.y - selection.topLeft.y;
 
                     if (sampleX >= 0 && sampleY >= 0 &&
                             sampleX < this.content.getWidth() &&
@@ -212,16 +207,22 @@ public class SelectionContents {
                         content.dot(this.content.getColorAt(sampleX, sampleY), x, y);
                 }
 
-        return new SelectionContents(content.submit(), tl, pixels);
+        return new SelectionContents(content.submit(),
+                Selection.fromSet(pixels));
     }
 
     public GameImage getContentForCanvas(final int w, final int h) {
         final GameImage contentForCanvas = new GameImage(w, h);
-        contentForCanvas.draw(content, topLeft.x, topLeft.y);
+        contentForCanvas.draw(content, selection.topLeft.x, selection.topLeft.y);
         return contentForCanvas.submit();
     }
 
+    // TODO - look into refactoring to Selection getSelection()
+    public Selection getSelection() {
+        return selection;
+    }
+
     public Set<Coord2D> getPixels() {
-        return pixels;
+        return selection.getPixels();
     }
 }

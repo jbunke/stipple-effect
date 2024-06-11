@@ -41,7 +41,8 @@ public final class SelectionGetter extends ProjectExpressionNode {
         final SEContext project = getProject(symbolTable);
 
         return get
-                ? new ScriptSet(project.getState().getSelection().stream()
+                ? new ScriptSet(project.getState()
+                .getSelection().getPixels().stream()
                 .map(c -> ScriptArray.of(c.x, c.y)))
                 : project.getState().hasSelection();
     }

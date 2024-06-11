@@ -1,10 +1,9 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
-
-import java.util.Set;
 
 public final class LineTool extends GeometryTool implements SnappableTool {
     private static final LineTool INSTANCE;
@@ -34,7 +33,7 @@ public final class LineTool extends GeometryTool implements SnappableTool {
     @Override
     void geoDefinition(
             final Coord2D anchor, final Coord2D endpoint,
-            final Set<Coord2D> selection
+            final Selection selection
     ) {
         populateAround(anchor, selection);
         populateAround(endpoint, selection);

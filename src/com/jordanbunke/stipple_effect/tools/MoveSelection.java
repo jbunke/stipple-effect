@@ -3,16 +3,19 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
+import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public final class MoveSelection extends MoverTool<Set<Coord2D>> {
+public final class MoveSelection extends MoverTool<Selection> {
     private static final MoveSelection INSTANCE;
 
     static {
@@ -35,34 +38,33 @@ public final class MoveSelection extends MoverTool<Set<Coord2D>> {
     }
 
     @Override
-    Set<Coord2D> move(
+    Selection move(
             final SEContext context, final Coord2D displacement
     ) {
-        final Set<Coord2D> selection = context.getState().getSelection();
-
-        return selection.parallelStream().map(s ->
-                s.displace(displacement)).collect(Collectors.toSet());
+        return context.getState().getSelection().displace(displacement);
     }
 
     @Override
-    Set<Coord2D> stretch(
+    Selection stretch(
             final SEContext context, final Set<Coord2D> initial,
             final Coord2D change, final Direction direction
     ) {
-        return SelectionUtils.stretchedPixels(initial, change, direction);
+        // TODO
+        return Selection.fromSet(SelectionUtils.stretchedPixels(initial, change, direction));
     }
 
     @Override
-    Set<Coord2D> rotate(
+    Selection rotate(
             final SEContext context, final Set<Coord2D> initial,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
-        return SelectionUtils.rotatedPixels(initial, deltaR, pivot, offset);
+        // TODO
+        return Selection.fromSet(SelectionUtils.rotatedPixels(initial, deltaR, pivot, offset));
     }
 
     @Override
     void applyTransformation(
-            final SEContext context, final Set<Coord2D> selection,
+            final SEContext context, final Selection selection,
             final boolean transform
     ) {
         final ProjectState result = context.getState()
@@ -74,35 +76,38 @@ public final class MoveSelection extends MoverTool<Set<Coord2D>> {
 
     @Override
     GameImage updateToolContentPreview(
-            final SEContext context, final Set<Coord2D> transformation
+            final SEContext context, final Selection transformation
     ) {
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
 
         final GameImage toolContentPreview = new GameImage(w, h);
 
-        final Set<Coord2D> frontier = transformation.stream().filter(
-                p -> p.x >= 0 && p.x < w && p.y >= 0 && p.y < h
-        ).filter(pixel -> {
+        final Set<Coord2D> frontier = new HashSet<>();
+
+        transformation.pixelAlgorithm(w, h, (x, y) -> {
             final boolean
-                    left = !transformation.contains(pixel.displace(-1, 0)),
-                    right = !transformation.contains(pixel.displace(1, 0)),
-                    top = !transformation.contains(pixel.displace(0, -1)),
-                    bottom = !transformation.contains(pixel.displace(0, 1)),
-                    tl = !transformation.contains(pixel.displace(-1, -1)),
-                    tr = !transformation.contains(pixel.displace(1, -1)),
-                    bl = !transformation.contains(pixel.displace(-1, 1)),
-                    br = !transformation.contains(pixel.displace(1, 1));
+                    left = !transformation.selected(x - 1, y),
+                    right = !transformation.selected(x + 1, y),
+                    top = !transformation.selected(x, y - 1),
+                    bottom = !transformation.selected(x, y + 1),
+                    tl = !transformation.selected(x - 1, y - 1),
+                    tr = !transformation.selected(x + 1, y - 1),
+                    bl = !transformation.selected(x - 1, y + 1),
+                    br = !transformation.selected(x + 1, y + 1);
 
-            return left || right || top || bottom || tl || tr || bl || br;
-        }).collect(Collectors.toSet());
+            if (left || right || top || bottom || tl || tr || bl || br)
+                frontier.add(new Coord2D(x, y));
+        });
 
-        transformation.forEach(p -> toolContentPreview.dot(
-                Settings.getTheme().highlightOverlay, p.x, p.y));
-        frontier.forEach(p -> toolContentPreview.dot(
-                Settings.getTheme().highlightOutline, p.x, p.y));
+        final Theme t = Settings.getTheme();
+        final Color fill = t.highlightOverlay, outline = t.highlightOutline;
 
-        return toolContentPreview;
+        transformation.pixelAlgorithm(w, h,
+                (x, y) -> toolContentPreview.dot(fill, x, y));
+        frontier.forEach(p -> toolContentPreview.dot(outline, p.x, p.y));
+
+        return toolContentPreview.submit();
     }
 
     @Override

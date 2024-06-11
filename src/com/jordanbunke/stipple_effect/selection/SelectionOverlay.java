@@ -30,7 +30,11 @@ public final class SelectionOverlay {
     private boolean wasFilled, couldTransform;
     private GameImage last;
 
-    public SelectionOverlay(final Set<Coord2D> selection) {
+    public  SelectionOverlay() {
+        this(Selection.EMPTY);
+    }
+
+    public SelectionOverlay(final Selection selection) {
         lastZ = ZoomLevel.MIN.z;
         lastTL = new Coord2D();
         lastRender = new Coord2D();
@@ -42,31 +46,32 @@ public final class SelectionOverlay {
         top = new HashSet<>();
         bottom = new HashSet<>();
 
-        tl = SelectionUtils.topLeft(selection);
-        final Coord2D br = SelectionUtils.bottomRight(selection);
+        tl = selection.topLeft;
 
-        w = br.x - tl.x;
-        h = br.y - tl.y;
+        w = selection.bounds.width();
+        h = selection.bounds.height();
 
         filled = new GameImage(w, h);
         final Color fillC = Settings.getTheme().selectionFill;
         filled.setColor(fillC);
 
-        selection.forEach(p -> {
-            if (!selection.contains(p.displace(-1, 0))) left.add(p);
-            if (!selection.contains(p.displace(1, 0))) right.add(p);
-            if (!selection.contains(p.displace(0, -1))) top.add(p);
-            if (!selection.contains(p.displace(0, 1))) bottom.add(p);
+        selection.pixelAlgorithm(0, 0, false, (x, y) -> {
+            final Coord2D px = new Coord2D(x, y);
 
-            filled.dot(p.x - tl.x, p.y - tl.y);
+            if (!selection.selected(x - 1, y)) left.add(px);
+            if (!selection.selected(x + 1, y)) right.add(px);
+            if (!selection.selected(x, y - 1)) top.add(px);
+            if (!selection.selected(x, y + 1)) bottom.add(px);
+
+            filled.dot(x - tl.x, y - tl.y);
         });
 
         filled.free();
     }
 
-    public void updateTL(final Set<Coord2D> selection) {
+    public void updateTL(final Selection selection) {
         lastTL = tl;
-        tl = SelectionUtils.topLeft(selection);
+        tl = selection.topLeft;
 
         if (!lastTL.equals(tl)) {
             final Coord2D displacement = new Coord2D(

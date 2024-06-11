@@ -3,14 +3,11 @@ package com.jordanbunke.stipple_effect.selection;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ClipboardData;
 import com.jordanbunke.delta_time.io.ClipboardUtils;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.util.HashSet;
-import java.util.Set;
 
 public class SEClipboard {
     private static final SEClipboard INSTANCE;
@@ -34,7 +31,7 @@ public class SEClipboard {
 
     public void sendSelectionToClipboard(final ProjectState state) {
         contents = switch (state.getSelectionMode()) {
-            case BOUNDS -> new SelectionContents(
+            case BOUNDS -> SelectionContents.make(
                     state.getActiveLayerFrame(), state.getSelection());
             case CONTENTS -> state.getSelectionContents();
         };
@@ -60,16 +57,10 @@ public class SEClipboard {
                 return null;
 
             final int w = img.getWidth(), h = img.getHeight();
-            // TODO - perfect example of how this would be more performant as
-            //  boolean[][] instead of Set<Coord>
-            final Set<Coord2D> pixels = new HashSet<>();
-
-            for (int x = 0; x < w; x++)
-                for (int y = 0; y < h; y++)
-                    pixels.add(new Coord2D(x, y));
+            final Selection all = Selection.of(w, h, true);
 
             // repackage clipboard contents as selection contents
-            final SelectionContents res = new SelectionContents(img, pixels);
+            final SelectionContents res = SelectionContents.make(img, all);
             ClipboardUtils.setContent(
                     new ClipboardData(res, NATIVE_DATA_FLAVOR));
 

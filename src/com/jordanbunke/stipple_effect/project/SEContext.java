@@ -67,7 +67,7 @@ public class SEContext {
         targetPixel = Constants.NO_VALID_TARGET;
         inWorkspaceBounds = false;
 
-        selectionOverlay = new SelectionOverlay(new HashSet<>());
+        selectionOverlay = new SelectionOverlay();
 
         redrawCanvasAuxiliaries();
     }
@@ -794,9 +794,9 @@ public class SEContext {
         // special case where shifting would constitute snap and is permitted
         if (!eventLogger.isPressed(Key.CTRL) && tool instanceof MoverTool<?> mt &&
                 getState().hasSelection()) {
-            final int w = SelectionUtils.width(getState().getSelection()),
-                    h = SelectionUtils.height(getState().getSelection());
-
+            final Selection selection = getState().getSelection();
+            final int w = selection.bounds.width(),
+                    h = selection.bounds.height();
 
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.UP_ARROW, GameKeyEvent.Action.PRESS),
@@ -1024,10 +1024,10 @@ public class SEContext {
         final int w, h;
 
         if (fromSelection) {
-            final Set<Coord2D> selection = getState().getSelection();
+            final Selection selection = getState().getSelection();
 
-            w = SelectionUtils.width(selection);
-            h = SelectionUtils.height(selection);
+            w = selection.bounds.width();
+            h = selection.bounds.height();
         } else {
             w = getState().getImageWidth();
             h = getState().getImageHeight();
@@ -1057,18 +1057,18 @@ public class SEContext {
 
         final boolean includeDisabledLayers =
                 DialogVals.isIncludeDisabledLayers();
-        final Set<Coord2D> pixels = state.hasSelection() &&
+        final Selection selection = state.hasSelection() &&
                 !DialogVals.isIgnoreSelection() ? state.getSelection() : null;
 
         switch (scope) {
             case LAYER_FRAME -> extractColorsFromFrame(colors, state,
-                    state.getFrameIndex(), state.getLayerEditIndex(), pixels);
+                    state.getFrameIndex(), state.getLayerEditIndex(), selection);
             case LAYER -> {
                 final int frameCount = state.getFrameCount();
 
                 for (int i = 0; i < frameCount; i++)
                     extractColorsFromFrame(colors, state,
-                            i, state.getLayerEditIndex(), pixels);
+                            i, state.getLayerEditIndex(), selection);
             }
             case FRAME -> {
                 final int layerCount = state.getLayers().size();
@@ -1077,7 +1077,7 @@ public class SEContext {
                     if (includeDisabledLayers ||
                             state.getLayers().get(i).isEnabled())
                         extractColorsFromFrame(colors, state,
-                            state.getFrameIndex(), i, pixels);
+                            state.getFrameIndex(), i, selection);
             }
             case PROJECT -> {
                 final int frameCount = state.getFrameCount(),
@@ -1087,7 +1087,7 @@ public class SEContext {
                     for (int l = 0; l < layerCount; l++)
                         if (includeDisabledLayers ||
                                 state.getLayers().get(l).isEnabled())
-                            extractColorsFromFrame(colors, state, f, l, pixels);
+                            extractColorsFromFrame(colors, state, f, l, selection);
             }
         }
 
@@ -1098,13 +1098,13 @@ public class SEContext {
     private void extractColorsFromFrame(
             final List<Color> colors, final ProjectState state,
             final int frameIndex, final int layerIndex,
-            final Set<Coord2D> pixels
+            final Selection selection
     ) {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
         PaletteLoader.addPaletteColorsFromImage(
-                layer.getFrame(frameIndex), colors, pixels);
+                layer.getFrame(frameIndex), colors, selection);
     }
 
     // previewed state changes - not state changes in and of themselves
@@ -1145,7 +1145,7 @@ public class SEContext {
 
         final boolean includeDisabledLayers =
                 DialogVals.isIncludeDisabledLayers();
-        final Set<Coord2D> pixels = state.hasSelection() &&
+        final Selection selection = state.hasSelection() &&
                 !DialogVals.isIgnoreSelection() ? state.getSelection() : null;
 
         final Map<Color, Color> map = new HashMap<>();
@@ -1154,18 +1154,18 @@ public class SEContext {
             return switch (scope) {
                 // case SELECTION -> runCAOnSelection(internal, map);
                 case LAYER_FRAME -> runCAOnFrame(internal, map, state,
-                        state.getFrameIndex(), state.getLayerEditIndex(), pixels);
+                        state.getFrameIndex(), state.getLayerEditIndex(), selection);
                 case LAYER -> {
                     if (state.getEditingLayer().areFramesLinked()) {
                         yield runCAOnFrame(internal, map, state,
                                 state.getFrameIndex(),
-                                state.getLayerEditIndex(), pixels);
+                                state.getLayerEditIndex(), selection);
                     } else {
                         final int frameCount = state.getFrameCount();
 
                         for (int i = 0; i < frameCount; i++)
                             state = runCAOnFrame(internal, map, state,
-                                    i, state.getLayerEditIndex(), pixels);
+                                    i, state.getLayerEditIndex(), selection);
 
                         yield state;
                     }
@@ -1177,7 +1177,7 @@ public class SEContext {
                         if (includeDisabledLayers ||
                                 state.getLayers().get(i).isEnabled())
                             state = runCAOnFrame(internal, map, state,
-                                    state.getFrameIndex(), i, pixels);
+                                    state.getFrameIndex(), i, selection);
 
                     yield state;
                 }
@@ -1192,11 +1192,11 @@ public class SEContext {
 
                         if (state.getLayers().get(l).areFramesLinked()) {
                             state = runCAOnFrame(internal, map, state,
-                                    state.getFrameIndex(), l, pixels);
+                                    state.getFrameIndex(), l, selection);
                         } else {
                             for (int f = 0; f < frameCount; f++)
                                 state = runCAOnFrame(internal, map,
-                                        state, f, l, pixels);
+                                        state, f, l, selection);
                         }
                     }
 
@@ -1213,13 +1213,13 @@ public class SEContext {
             final Map<Color, Color> map,
             final ProjectState state,
             final int frameIndex, final int layerIndex,
-            final Set<Coord2D> pixels
+            final Selection selection
     ) {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
         final GameImage source = layer.getFrame(frameIndex),
-                edit = ColorMath.algo(internal, map, source, pixels);
+                edit = ColorMath.algo(internal, map, source, selection);
 
         final SELayer replacement =
                 layer.returnFrameReplaced(edit, frameIndex);
@@ -1258,8 +1258,9 @@ public class SEContext {
             ToolWithMode.setGlobal(false);
             ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
 
-            editSelection(Outliner.outline(
-                    getState().getSelection(), sideMask), true);
+            final Set<Coord2D> pixels = getState().getSelection().getPixels();
+
+            editSelection(Outliner.outline(pixels, sideMask), true);
         }
     }
 
@@ -1274,7 +1275,8 @@ public class SEContext {
 
             final SelectionContents reflected = getState()
                     .getSelectionContents().returnReflected(
-                            getState().getSelection(), horizontal);
+                            getState().getSelection().getPixels(),
+                            horizontal);
 
             final ProjectState result = getState()
                     .changeSelectionContents(reflected)
@@ -1291,10 +1293,8 @@ public class SEContext {
     public void moveSelectionBounds(final Coord2D displacement, final boolean checkpoint) {
         if (getState().hasSelection() && getState().getSelectionMode() ==
                 SelectionMode.BOUNDS) {
-            final Set<Coord2D> selection = getState().getSelection();
-
-            final Set<Coord2D> moved = selection.stream().map(s ->
-                    s.displace(displacement)).collect(Collectors.toSet());
+            final Selection moved = getState().getSelection()
+                    .displace(displacement);
 
             final ProjectState result = getState()
                     .changeSelectionBounds(moved)
@@ -1313,11 +1313,11 @@ public class SEContext {
             if (dropAndRaise)
                 dropContentsToLayer(false, false);
 
-            final Set<Coord2D> reflected = SelectionUtils
-                    .reflectedPixels(getState().getSelection(), horizontal);
+            final Set<Coord2D> reflected = SelectionUtils.reflectedPixels(
+                    getState().getSelection().getPixels(), horizontal);
 
             final ProjectState result = getState()
-                    .changeSelectionBounds(reflected)
+                    .changeSelectionBounds(Selection.fromSet(reflected))
                     .changeIsCheckpoint(!dropAndRaise);
             stateManager.performAction(result,
                     Operation.TRANSFORM_SELECTION_BOUNDS);
@@ -1336,11 +1336,11 @@ public class SEContext {
             if (drop)
                 dropContentsToLayer(false, false);
 
-            final Set<Coord2D> selection = getState().getSelection();
+            final Selection selection = getState().getSelection();
 
-            final Coord2D tl = SelectionUtils.topLeft(selection),
-                    br = SelectionUtils.bottomRight(selection);
-            final int w = br.x - tl.x, h = br.y - tl.y;
+            final Coord2D tl = selection.topLeft;
+            final int w = selection.bounds.width(),
+                    h = selection.bounds.height();
 
             final List<SELayer> layers = getState().getLayers().stream()
                     .map(layer -> layer.returnPadded(
@@ -1378,8 +1378,10 @@ public class SEContext {
             if (newLayer)
                 addLayer();
 
-            final Coord2D tl = SelectionUtils.topLeft(toPaste.getPixels()),
-                    br = SelectionUtils.bottomRight(toPaste.getPixels());
+            final Selection selection = toPaste.getSelection();
+            final Coord2D tl = selection.topLeft,
+                    br = tl.displace(selection.bounds.width(),
+                            selection.bounds.height());
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
             final int x, y;
@@ -1406,25 +1408,17 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        Set<Coord2D> selection = new HashSet<>(getState().getSelection());
+        Selection selection = getState().getSelection();
 
-        if (selection.isEmpty()) {
-            selection = new HashSet<>();
-
-            for (int x = 0; x < w; x++)
-                for (int y = 0; y < h; y++)
-                    selection.add(new Coord2D(x, y));
-        }
+        if (!selection.hasSelection())
+            selection = Selection.of(w, h, true);
 
         final GameImage canvas = getState().getActiveLayerFrame();
         final SelectionContents selectionContents =
-                new SelectionContents(canvas, selection);
+                SelectionContents.make(canvas, selection);
 
         final boolean[][] eraseMask = new boolean[w][h];
-
-        selection.stream().filter(s -> s.x >= 0 && s.y >= 0 &&
-                s.x < w && s.y < h).forEach(s -> eraseMask[s.x][s.y] = true);
-
+        selection.pixelAlgorithm(w, h, (x, y) -> eraseMask[x][y] = true);
         erase(eraseMask, false);
 
         final ProjectState result = getState()
@@ -1441,11 +1435,12 @@ public class SEContext {
 
             final SelectionContents contents = getState().getSelectionContents();
 
-            stampImage(contents.getContentForCanvas(w, h), contents.getPixels());
+            stampImage(contents.getContentForCanvas(w, h),
+                    contents.getSelection());
 
             final ProjectState result = getState()
-                    .changeSelectionBounds(deselect ? new HashSet<>()
-                            : new HashSet<>(contents.getPixels()))
+                    .changeSelectionBounds(deselect
+                            ? Selection.EMPTY : contents.getSelection())
                     .changeIsCheckpoint(checkpoint);
             stateManager.performAction(result, Operation.DROP);
         }
@@ -1454,23 +1449,19 @@ public class SEContext {
     // delete selection contents
     public void deleteSelectionContents(final boolean deselect) {
         if (getState().hasSelection()) {
-            final Set<Coord2D> selection = getState().getSelection();
+            final Selection selection = getState().getSelection();
 
-            if (!selection.isEmpty()) {
+            if (selection.hasSelection()) {
                 final int w = getState().getImageWidth(),
                         h = getState().getImageHeight();
 
                 final boolean[][] eraseMask = new boolean[w][h];
-                selection.forEach(s -> {
-                    if (s.x >= 0 && s.x < w && s.y >= 0 && s.y < h)
-                        eraseMask[s.x][s.y] = true;
-                });
-
+                selection.pixelAlgorithm(w, h, (x, y) -> eraseMask[x][y] = true);
                 erase(eraseMask, false);
             }
 
             stateManager.performAction(getState().changeSelectionBounds(
-                    new HashSet<>(deselect ? Set.of() : selection)),
+                    deselect ? Selection.EMPTY : selection),
                     Operation.DELETE_SELECTION_CONTENTS);
         }
     }
@@ -1484,18 +1475,15 @@ public class SEContext {
             if (dropAndRaise)
                 dropContentsToLayer(false, false);
 
-            final Set<Coord2D> selection = getState().getSelection();
-
             final int w = getState().getImageWidth(),
                     h = getState().getImageHeight();
 
             final GameImage edit = new GameImage(w, h);
             final int c = (secondary ? StippleEffect.get().getSecondary()
                     : StippleEffect.get().getPrimary()).getRGB();
-            selection.stream().filter(s -> s.x >= 0 && s.x < w &&
-                            s.y >= 0 && s.y < h)
-                    .forEach(s -> edit.setRGB(s.x, s.y, c));
 
+            final Selection selection = getState().getSelection();
+            selection.pixelAlgorithm(w, h, (x, y) -> edit.setRGB(x, y, c));
             stampImage(edit, selection);
 
             if (dropAndRaise)
@@ -1512,7 +1500,7 @@ public class SEContext {
                 dropContentsToLayer(checkpoint, true);
             else {
                 final ProjectState result = getState().changeSelectionBounds(
-                        new HashSet<>()).changeIsCheckpoint(checkpoint);
+                        Selection.EMPTY).changeIsCheckpoint(checkpoint);
                 stateManager.performAction(result, Operation.DESELECT);
             }
         }
@@ -1529,11 +1517,7 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final Set<Coord2D> selection = new HashSet<>();
-
-        for (int x = 0; x < w; x++)
-            for (int y = 0; y < h; y++)
-                selection.add(new Coord2D(x, y));
+        final Selection selection = Selection.of(w, h, true);
 
         final ProjectState result = getState()
                 .changeSelectionBounds(selection)
@@ -1555,16 +1539,18 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final Set<Coord2D> willBe = new HashSet<>(),
-                was = getState().getSelection();
+        final Selection was = getState().getSelection();
+        final boolean[][] invertedMatrix = new boolean[w][h];
 
         for (int x = 0; x < w; x++)
             for (int y = 0; y < h; y++)
-                if (!was.contains(new Coord2D(x, y)))
-                    willBe.add(new Coord2D(x, y));
+                if (!was.selected(x, y))
+                    invertedMatrix[x][y] = true;
+
+        final Selection selection = Selection.of(invertedMatrix);
 
         final ProjectState result = getState()
-                .changeSelectionBounds(willBe)
+                .changeSelectionBounds(selection)
                 .changeIsCheckpoint(!dropAndRaise);
         stateManager.performAction(result, Operation.SELECT);
 
@@ -1572,7 +1558,7 @@ public class SEContext {
             raiseSelectionToContents(true);
     }
 
-    // edit selection
+    // edit selection - TODO
     public void editSelection(final Set<Coord2D> edit, final boolean checkpoint) {
         final boolean drop = getState().hasSelection() &&
                 getState().getSelectionMode() == SelectionMode.CONTENTS;
@@ -1583,8 +1569,9 @@ public class SEContext {
         final Set<Coord2D> selection = new HashSet<>();
         final ToolWithMode.Mode mode = ToolWithMode.getMode();
 
-        if (mode == ToolWithMode.Mode.ADDITIVE || mode == ToolWithMode.Mode.SUBTRACTIVE)
-            selection.addAll(getState().getSelection());
+        if (mode == ToolWithMode.Mode.ADDITIVE ||
+                mode == ToolWithMode.Mode.SUBTRACTIVE)
+            selection.addAll(getState().getSelection().getPixels());
 
         if (mode == ToolWithMode.Mode.SUBTRACTIVE)
             selection.removeAll(edit);
@@ -1592,7 +1579,7 @@ public class SEContext {
             selection.addAll(edit);
 
         final ProjectState result = getState().changeSelectionBounds(
-                selection).changeIsCheckpoint(checkpoint);
+                Selection.fromSet(selection)).changeIsCheckpoint(checkpoint);
         stateManager.performAction(result, Operation.SELECT);
     }
 
@@ -1618,7 +1605,7 @@ public class SEContext {
                 .map(layer -> layer.returnPadded(left, top, w, h)).toList();
 
         final ProjectState result = getState().resize(w, h, layers)
-                .changeSelectionBounds(new HashSet<>());
+                .changeSelectionBounds(Selection.EMPTY);
         stateManager.performAction(result, Operation.PAD);
 
         snapToCenterOfImage();
@@ -1641,7 +1628,7 @@ public class SEContext {
                 .map(layer -> layer.returnResized(rw, rh)).toList();
 
         final ProjectState result = getState().resize(rw, rh, layers)
-                .changeSelectionBounds(new HashSet<>());
+                .changeSelectionBounds(Selection.EMPTY);
         stateManager.performAction(result, Operation.RESIZE);
 
         snapToCenterOfImage();
@@ -1659,7 +1646,7 @@ public class SEContext {
                         frameHeight, frameCount)).toList();
 
         final ProjectState result = getState().stitch(w, h,
-                layers).changeSelectionBounds(new HashSet<>());
+                layers).changeSelectionBounds(Selection.EMPTY);
         stateManager.performAction(result, Operation.STITCH);
 
         snapToCenterOfImage();
@@ -1675,7 +1662,7 @@ public class SEContext {
 
         final ProjectState result = getState().split(
                 DialogVals.getFrameWidth(), DialogVals.getFrameHeight(),
-                layers, frameCount).changeSelectionBounds(new HashSet<>());
+                layers, frameCount).changeSelectionBounds(Selection.EMPTY);
         stateManager.performAction(result, Operation.SPLIT);
 
         snapToCenterOfImage();
@@ -1693,9 +1680,9 @@ public class SEContext {
         stateManager.performAction(result, Operation.EDIT_IMAGE);
     }
 
-    public void stampImage(final GameImage edit, final Set<Coord2D> pixels) {
+    public void stampImage(final GameImage edit, final Selection selection) {
         editImage(f -> getState().getEditingLayer()
-                .returnStamped(edit, pixels, f), false);
+                .returnStamped(edit, selection, f), false);
     }
 
     public void paintOverImage(final GameImage edit) {
@@ -2225,13 +2212,14 @@ public class SEContext {
     }
 
     public String getSelectionText() {
-        final Set<Coord2D> selection = getState().getSelection();
-        final Coord2D tl = SelectionUtils.topLeft(selection),
-                br = SelectionUtils.bottomRight(selection);
-        final Bounds2D bounds = SelectionUtils.bounds(selection);
+        final Selection selection = getState().getSelection();
+        final Bounds2D bounds = selection.bounds;
+        final Coord2D tl = selection.topLeft,
+                br = selection.topLeft.displace(
+                        bounds.width(), bounds.height());
         final boolean multiple = selection.size() > 1;
 
-        return selection.isEmpty() ? "No selection" : "Selection: " +
+        return !selection.hasSelection() ? "No selection" : "Selection: " +
                 selection.size() + "px " + (multiple ? "from " : "at ") + tl +
                 (multiple ? (" to " + br + "; " + bounds.width() + "x" +
                         bounds.height() + " bounding box") : "");

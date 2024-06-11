@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
@@ -10,7 +10,6 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class PaletteLoader {
     // palette codes
@@ -48,7 +47,7 @@ public class PaletteLoader {
 
     public static void addPaletteColorsFromImage(
             final GameImage image, final List<Color> colors,
-            final Set<Coord2D> pixels
+            final Selection selection
     ) {
         for (int y = 0; y < image.getHeight(); y++)
             for (int x = 0; x < image.getWidth(); x++) {
@@ -60,8 +59,8 @@ public class PaletteLoader {
                 if (c.getAlpha() == 0)
                     continue;
 
-                if (!colors.contains(c) && (pixels == null ||
-                        pixels.contains(new Coord2D(x, y))))
+                if (!colors.contains(c) && (selection == null ||
+                        selection.selected(x, y)))
                     colors.add(c);
             }
     }
