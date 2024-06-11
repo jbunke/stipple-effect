@@ -165,41 +165,25 @@ public class SelectionContents {
     }
 
     public SelectionContents returnReflected(
-            final Set<Coord2D> initialSelection, final boolean horizontal
+            final Selection initialSelection, final boolean horizontal
     ) {
-        final Set<Coord2D> pixels =
+        final Selection reflected =
                 SelectionUtils.reflectedPixels(initialSelection, horizontal);
 
-        if (pixels.isEmpty())
-            return new SelectionContents(GameImage.dummy(),
-                    Selection.fromPixels(pixels));
+        if (!reflected.hasSelection())
+            return new SelectionContents(GameImage.dummy(), Selection.EMPTY);
 
-        final Coord2D tl = SelectionUtils.topLeft(pixels),
-                br = SelectionUtils.bottomRight(pixels),
-                middle = new Coord2D((tl.x + br.x) / 2, (tl.y + br.y) / 2);
-        final boolean[] offset = new boolean[] {
-                (tl.x + br.x) % 2 == 0,
-                (tl.y + br.y) % 2 == 0
-        };
-
-        final int w = Math.max(1, br.x - tl.x),
-                h = Math.max(1, br.y - tl.y);
+        final int w = reflected.bounds.width(),
+                h = reflected.bounds.height();
+        final Coord2D tl = reflected.topLeft;
 
         final GameImage content = new GameImage(w, h);
 
         for (int x = 0; x < w; x++)
             for (int y = 0; y < h; y++)
-                if (pixels.contains(tl.displace(x, y))) {
-                    final Coord2D pixel = tl.displace(x, y),
-                            was = new Coord2D(
-                                    horizontal ? middle.x + (middle.x -
-                                            pixel.x) - (offset[X] ? 1 : 0) : pixel.x,
-                                    horizontal ? pixel.y : middle.y +
-                                            (middle.y - pixel.y) - (offset[Y] ? 1 : 0)
-                            );
-
-                    final int sampleX = was.x - selection.topLeft.x,
-                            sampleY = was.y - selection.topLeft.y;
+                if (reflected.selected(tl.displace(x, y))) {
+                    final int sampleX = horizontal ? (w - 1) - x : x,
+                            sampleY = horizontal ? y : (h - 1) - y;
 
                     if (sampleX >= 0 && sampleY >= 0 &&
                             sampleX < this.content.getWidth() &&
@@ -207,8 +191,7 @@ public class SelectionContents {
                         content.dot(this.content.getColorAt(sampleX, sampleY), x, y);
                 }
 
-        return new SelectionContents(content.submit(),
-                Selection.fromPixels(pixels));
+        return new SelectionContents(content.submit(), reflected);
     }
 
     public GameImage getContentForCanvas(final int w, final int h) {

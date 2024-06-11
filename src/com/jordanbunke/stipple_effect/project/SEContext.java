@@ -1275,8 +1275,7 @@ public class SEContext {
 
             final SelectionContents reflected = getState()
                     .getSelectionContents().returnReflected(
-                            getState().getSelection().getPixels(),
-                            horizontal);
+                            getState().getSelection(), horizontal);
 
             final ProjectState result = getState()
                     .changeSelectionContents(reflected)
@@ -1313,11 +1312,11 @@ public class SEContext {
             if (dropAndRaise)
                 dropContentsToLayer(false, false);
 
-            final Set<Coord2D> reflected = SelectionUtils.reflectedPixels(
-                    getState().getSelection().getPixels(), horizontal);
+            final Selection reflected = SelectionUtils.reflectedPixels(
+                    getState().getSelection(), horizontal);
 
             final ProjectState result = getState()
-                    .changeSelectionBounds(Selection.fromPixels(reflected))
+                    .changeSelectionBounds(reflected)
                     .changeIsCheckpoint(!dropAndRaise);
             stateManager.performAction(result,
                     Operation.TRANSFORM_SELECTION_BOUNDS);
