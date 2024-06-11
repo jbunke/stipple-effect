@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.Selection;
@@ -10,9 +9,9 @@ import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.PickUpSelection;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectState {
@@ -249,12 +248,11 @@ public class ProjectState {
                                 PickUpSelection.get().isMoving());
 
                 if (previewCondition) {
-                    final Set<Coord2D> pixels = selectionContents.getPixels();
+                    final Selection selection = selectionContents.getSelection();
+                    final int rgb = SEColors.transparent().getRGB();
 
-                    pixels.stream().filter(px -> px.x >= 0 && px.y >= 0 &&
-                                    px.x < imageWidth && px.y < imageHeight
-                    ).forEach(px -> layerImage.setRGB(px.x, px.y,
-                            new Color(0, 0, 0, 0).getRGB()));
+                    selection.pixelAlgorithm(imageWidth, imageHeight,
+                            (x, y) -> layerImage.setRGB(x, y, rgb));
                 }
 
                 image.draw(layerImage.submit());

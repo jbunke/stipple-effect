@@ -57,7 +57,7 @@ public class SEClipboard {
                 return null;
 
             final int w = img.getWidth(), h = img.getHeight();
-            final Selection all = Selection.of(w, h, true);
+            final Selection all = Selection.allInBounds(w, h);
 
             // repackage clipboard contents as selection contents
             final SelectionContents res = SelectionContents.make(img, all);

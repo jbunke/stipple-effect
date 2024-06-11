@@ -72,7 +72,7 @@ public final class SetFrameNode extends LayerStatementNode {
         else {
             final int w = layer.project().getState().getImageWidth(),
                     h = layer.project().getState().getImageHeight();
-            final Selection selection = Selection.of(w, h, true);
+            final Selection selection = Selection.allInBounds(w, h);
 
             final SELayer old = evalLayer(symbolTable),
                     replacement = set

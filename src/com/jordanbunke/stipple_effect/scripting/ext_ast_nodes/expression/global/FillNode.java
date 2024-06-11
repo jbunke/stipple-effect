@@ -6,10 +6,9 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.selection.Selection;
 
 import java.awt.*;
-import java.util.Set;
 
 public final class FillNode extends SearchNode {
     public static final String NAME = "fill";
@@ -31,11 +30,12 @@ public final class FillNode extends SearchNode {
         final double tol = (double) vs[4];
         final boolean global = (boolean) vs[5], diag = (boolean) vs[6];
 
-        final Set<Coord2D> pixels = search(img, x, y, tol, global, diag);
+        final Selection selection = search(img, x, y, tol, global, diag);
         final GameImage filled = new GameImage(img);
+        final int w = filled.getWidth(), h = filled.getHeight();
 
-        for (Coord2D pixel : pixels)
-            filled.setRGB(pixel.x, pixel.y, color.getRGB());
+        selection.pixelAlgorithm(w, h,
+                (px, py) -> filled.setRGB(px, py, color.getRGB()));
 
         return filled;
     }

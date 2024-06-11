@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -16,7 +17,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
     private static final BrushSelect INSTANCE;
 
     private boolean selecting;
-    private Set<Coord2D> selection;
+    private Set<Coord2D> pixels;
     private GameImage selectionOverlay;
 
     static {
@@ -25,7 +26,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
 
     private BrushSelect() {
         selecting = false;
-        selection = new HashSet<>();
+        pixels = new HashSet<>();
         selectionOverlay = GameImage.dummy();
     }
 
@@ -46,14 +47,14 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
 
     private void drawSelection(final SEContext context) {
         selectionOverlay = GraphicsUtils.drawSelectionOverlay(
-                context.renderInfo.getZoomFactor(), selection);
+                context.renderInfo.getZoomFactor(), pixels);
     }
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET)) {
             selecting = true;
-            selection = new HashSet<>();
+            pixels = new HashSet<>();
 
             if (ToolWithMode.getMode() == ToolWithMode.Mode.SINGLE)
                 context.deselect(false);
@@ -93,7 +94,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
                         y + (tp.y - halfB));
 
                 if (mask[x][y])
-                    selection.add(b);
+                    pixels.add(b);
             }
     }
 
@@ -107,17 +108,17 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
 
-            final Set<Coord2D> bounded = selection.stream()
+            final Set<Coord2D> bounded = pixels.stream()
                     .filter(p -> p.x >= 0 && p.y >= 0 && p.x < w && p.y < h)
                     .collect(Collectors.toSet());
 
-            context.editSelection(bounded, true);
+            context.editSelection(Selection.fromPixels(bounded), true);
         }
     }
 
     @Override
     public Coord2D getTopLeft() {
-        return SelectionUtils.topLeft(selection);
+        return SelectionUtils.topLeft(pixels);
     }
 
     @Override

@@ -1258,9 +1258,9 @@ public class SEContext {
             ToolWithMode.setGlobal(false);
             ToolWithMode.setMode(ToolWithMode.Mode.SINGLE);
 
-            final Set<Coord2D> pixels = getState().getSelection().getPixels();
+            final Selection selection = getState().getSelection();
 
-            editSelection(Outliner.outline(pixels, sideMask), true);
+            editSelection(Outliner.outline(selection, sideMask), true);
         }
     }
 
@@ -1317,7 +1317,7 @@ public class SEContext {
                     getState().getSelection().getPixels(), horizontal);
 
             final ProjectState result = getState()
-                    .changeSelectionBounds(Selection.fromSet(reflected))
+                    .changeSelectionBounds(Selection.fromPixels(reflected))
                     .changeIsCheckpoint(!dropAndRaise);
             stateManager.performAction(result,
                     Operation.TRANSFORM_SELECTION_BOUNDS);
@@ -1411,7 +1411,7 @@ public class SEContext {
         Selection selection = getState().getSelection();
 
         if (!selection.hasSelection())
-            selection = Selection.of(w, h, true);
+            selection = Selection.allInBounds(w, h);
 
         final GameImage canvas = getState().getActiveLayerFrame();
         final SelectionContents selectionContents =
@@ -1517,7 +1517,7 @@ public class SEContext {
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
 
-        final Selection selection = Selection.of(w, h, true);
+        final Selection selection = Selection.allInBounds(w, h);
 
         final ProjectState result = getState()
                 .changeSelectionBounds(selection)
@@ -1558,28 +1558,27 @@ public class SEContext {
             raiseSelectionToContents(true);
     }
 
-    // edit selection - TODO
-    public void editSelection(final Set<Coord2D> edit, final boolean checkpoint) {
+    // edit selection
+    public void editSelection(final Selection edit, final boolean checkpoint) {
         final boolean drop = getState().hasSelection() &&
                 getState().getSelectionMode() == SelectionMode.CONTENTS;
 
         if (drop)
             dropContentsToLayer(false, false);
 
-        final Set<Coord2D> selection = new HashSet<>();
         final ToolWithMode.Mode mode = ToolWithMode.getMode();
 
-        if (mode == ToolWithMode.Mode.ADDITIVE ||
-                mode == ToolWithMode.Mode.SUBTRACTIVE)
-            selection.addAll(getState().getSelection().getPixels());
+        final Selection initial, selection;
 
-        if (mode == ToolWithMode.Mode.SUBTRACTIVE)
-            selection.removeAll(edit);
-        else
-            selection.addAll(edit);
+        initial = mode.inheritSelection()
+                ? getState().getSelection() : Selection.EMPTY;
+        selection = mode == ToolWithMode.Mode.SUBTRACTIVE
+                ? Selection.difference(initial, edit)
+                : Selection.union(initial, edit);
 
-        final ProjectState result = getState().changeSelectionBounds(
-                Selection.fromSet(selection)).changeIsCheckpoint(checkpoint);
+        final ProjectState result = getState()
+                .changeSelectionBounds(selection)
+                .changeIsCheckpoint(checkpoint);
         stateManager.performAction(result, Operation.SELECT);
     }
 

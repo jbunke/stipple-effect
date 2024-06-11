@@ -8,9 +8,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
-
-import java.util.Set;
+import com.jordanbunke.stipple_effect.selection.Selection;
 
 public final class WandNode extends SearchNode {
     public static final String NAME = "wand";
@@ -31,10 +29,10 @@ public final class WandNode extends SearchNode {
         final double tol = (double) vs[3];
         final boolean global = (boolean) vs[4], diag = (boolean) vs[5];
 
-        final Set<Coord2D> pixels = search(img, x, y, tol, global, diag);
+        final Selection selection = search(img, x, y, tol, global, diag);
 
-        return new ScriptSet(pixels.stream()
-                .map(c -> ScriptArray.of(c.x, c.y)));
+        return new ScriptSet(selection.getPixels()
+                .stream().map(c -> ScriptArray.of(c.x, c.y)));
     }
 
     @Override

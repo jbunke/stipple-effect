@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGroupi
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.funke.core.ConcreteProperty;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -69,8 +70,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
         ToolThatSearches.searchDiag = searchDiag;
     }
 
-    // TODO - reimplement factoring in selection and with boolean matrix for searched
-    public static Set<Coord2D> search(final GameImage image, final Coord2D target) {
+    public static Selection search(final GameImage image, final Coord2D target) {
         final Color initial = image.getColorAt(target.x, target.y);
 
         return ToolWithMode.isGlobal()
@@ -78,20 +78,24 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
                 : contiguousSearch(image, initial, target);
     }
 
-    public static Set<Coord2D> contiguousSearch(
+    public static Selection contiguousSearch(
             final GameImage image, final Color initial, final Coord2D target
     ) {
         hasCheckedMap.clear();
 
-        final Set<Coord2D> matched = new HashSet<>(), searched = new HashSet<>();
         final int w = image.getWidth(), h = image.getHeight();
+        final boolean[][] searched = new boolean[w][h];
 
+        if (target.x < 0 || target.x >= w || target.y < 0 || target.y >= h)
+            return Selection.EMPTY;
+
+        final boolean[][] matched = new boolean[w][h];
         final Stack<Coord2D> searching = new Stack<>();
         searching.push(target);
 
         while (!searching.isEmpty()) {
             final Coord2D active = searching.pop();
-            searched.add(active);
+            searched[active.x][active.y] = true;
 
             final Color pixel = image.getColorAt(active.x, active.y);
 
@@ -100,46 +104,46 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
             hasCheckedMap.put(pixel, result);
 
             if (result) {
-                matched.add(active);
+                matched[active.x][active.y] = true;
 
                 // neighbours
-                if (active.x > 0 && !searched.contains(active.displace(-1, 0)))
+                if (active.x > 0 && !searched[active.x - 1][active.y])
                     searching.add(active.displace(-1, 0));
-                if (active.x + 1 < w && !searched.contains(active.displace(1, 0)))
+                if (active.x + 1 < w && !searched[active.x + 1][active.y])
                     searching.add(active.displace(1, 0));
-                if (active.y > 0 && !searched.contains(active.displace(0, -1)))
+                if (active.y > 0 && !searched[active.x][active.y - 1])
                     searching.add(active.displace(0, -1));
-                if (active.y + 1 < h && !searched.contains(active.displace(0, 1)))
+                if (active.y + 1 < h && !searched[active.x][active.y + 1])
                     searching.add(active.displace(0, 1));
 
                 // diagonals
                 if (searchDiag) {
                     if (active.x > 0 && active.y > 0 &&
-                            !searched.contains(active.displace(-1, -1)))
+                            !searched[active.x - 1][active.y - 1])
                         searching.add(active.displace(-1, -1));
                     if (active.x > 0 && active.y + 1 < h &&
-                            !searched.contains(active.displace(-1, 1)))
+                            !searched[active.x - 1][active.y + 1])
                         searching.add(active.displace(-1, 1));
                     if (active.x + 1 < w && active.y > 0 &&
-                            !searched.contains(active.displace(1, -1)))
+                            !searched[active.x + 1][active.y - 1])
                         searching.add(active.displace(1, -1));
                     if (active.x + 1 < w && active.y + 1 < h &&
-                            !searched.contains(active.displace(1, 1)))
+                            !searched[active.x + 1][active.y + 1])
                         searching.add(active.displace(1, 1));
                 }
             }
         }
 
-        return matched;
+        return Selection.of(matched);
     }
 
-    public static Set<Coord2D> globalSearch(
+    public static Selection globalSearch(
             final GameImage image, final Color initial
     ) {
         hasCheckedMap.clear();
 
-        final Set<Coord2D> matched = new HashSet<>();
         final int w = image.getWidth(), h = image.getHeight();
+        final boolean[][] matched = new boolean[w][h];
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
@@ -150,11 +154,11 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
                 hasCheckedMap.put(pixel, result);
 
                 if (result)
-                    matched.add(new Coord2D(x, y));
+                    matched[x][y] = true;
             }
         }
 
-        return matched;
+        return Selection.of(matched);
     }
 
     public static boolean pixelMatchesToleranceCondition(

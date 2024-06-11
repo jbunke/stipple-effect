@@ -50,7 +50,7 @@ public final class MoveSelection extends MoverTool<Selection> {
             final Coord2D change, final Direction direction
     ) {
         // TODO
-        return Selection.fromSet(SelectionUtils.stretchedPixels(initial, change, direction));
+        return Selection.fromPixels(SelectionUtils.stretchedPixels(initial, change, direction));
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class MoveSelection extends MoverTool<Selection> {
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
         // TODO
-        return Selection.fromSet(SelectionUtils.rotatedPixels(initial, deltaR, pivot, offset));
+        return Selection.fromPixels(SelectionUtils.rotatedPixels(initial, deltaR, pivot, offset));
     }
 
     @Override

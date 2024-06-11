@@ -5,6 +5,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Outliner {
     public static final int NUM_DIRS = Direction.values().length,
@@ -53,8 +54,8 @@ public class Outliner {
         return new int[] { 1, 1, 1, 1, 1, 1, 1, 1 };
     }
 
-    public static Set<Coord2D> outline(
-            final Set<Coord2D> selection, final int[] sideMask
+    public static Selection outline(
+            final Selection selection, final int[] sideMask
     ) {
         if (sideMask.length != NUM_DIRS)
             return selection;
@@ -89,7 +90,7 @@ public class Outliner {
                     continue;
 
                 for (int s = 0; s < bound &&
-                        selection.contains(shifted) == internal; s++) {
+                        selection.selected(shifted) == internal; s++) {
                     outline.add(shifted);
                     shifted = shifted.displace(shift);
                 }
@@ -123,18 +124,18 @@ public class Outliner {
                     }
 
                 final Function<Coord2D, Boolean> pass =
-                        c -> internal == selection.contains(c);
+                        c -> internal == selection.selected(c);
                 shiftCands.stream().filter(cand -> (int) Math.round(
                         Coord2D.unitDistanceBetween(pixel, cand)) <= (end - 1) &&
                         pass.apply(cand)).forEach(outline::add);
             }
         }
 
-        return outline;
+        return Selection.fromPixels(outline);
     }
 
     private static Map<Direction, Set<Coord2D>> calculateFrontier(
-            final Set<Coord2D> selection, final int[] sideMask
+            final Selection selection, final int[] sideMask
     ) {
         final Map<Direction, Set<Coord2D>> frontier = new HashMap<>();
 
@@ -144,20 +145,27 @@ public class Outliner {
                     internal = sideMask[dir.ordinal()] < 0;
             final Coord2D rc = dir.relativeCoordinate();
 
-            selection.stream().filter(px -> {
-                if (selection.contains(px.displace(rc)))
+            final Predicate<Coord2D> check = px -> {
+                if (selection.selected(px.displace(rc)))
                     return false;
 
                 if (diag) {
                     final boolean
-                            compX = selection.contains(px.displace(rc.x, 0)),
-                            compY = selection.contains(px.displace(0, rc.y));
+                            compX = selection.selected(px.displace(rc.x, 0)),
+                            compY = selection.selected(px.displace(0, rc.y));
 
                     return internal ? compX && compY : !(compX || compY);
                 }
 
                 return true;
-            }).forEach(dirFrontier::add);
+            };
+
+            selection.pixelAlgorithm(0, 0, false, (x, y) -> {
+                final Coord2D px = new Coord2D(x, y);
+
+                if (check.test(px))
+                    dirFrontier.add(px);
+            });
 
             frontier.put(dir, dirFrontier);
         }

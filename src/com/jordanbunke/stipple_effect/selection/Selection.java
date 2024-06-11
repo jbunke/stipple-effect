@@ -26,7 +26,7 @@ public final class Selection {
     private Set<Coord2D> pixels;
     private int size;
 
-    public Selection(final Coord2D topLeft,
+    private Selection(final Coord2D topLeft,
             final Bounds2D bounds, final boolean[][] matrix) {
         this.topLeft = topLeft;
         this.bounds = bounds;
@@ -44,34 +44,32 @@ public final class Selection {
         this(new Coord2D(), matrix);
     }
 
-    public static Selection of(final int width, final int height,
-           final boolean selected) {
+    public static Selection allInBounds(final int width, final int height) {
         final boolean[][] matrix = new boolean[width][height];
 
-        if (selected)
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    matrix[x][y] = true;
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                matrix[x][y] = true;
 
         return new Selection(matrix);
     }
 
     public static Selection of(final boolean[][] matrix) {
         if (matrix.length == 0 || matrix[0].length == 0)
-            return null;
+            return EMPTY;
 
-        return new Selection(matrix);
+        return new Selection(matrix).crop();
     }
 
     public static Selection atOf(final Coord2D topLeft,
              final boolean[][] matrix) {
         if (matrix.length == 0 || matrix[0].length == 0)
-            return null;
+            return EMPTY;
 
         return new Selection(topLeft, matrix);
     }
 
-    public static Selection fromSet(final Set<Coord2D> pixels) {
+    public static Selection fromPixels(final Set<Coord2D> pixels) {
         if (pixels == null || pixels.isEmpty())
             return EMPTY;
 
@@ -89,6 +87,119 @@ public final class Selection {
         selection.size = selection.pixels.size();
 
         return selection;
+    }
+
+    public static Selection union(final Selection a, final Selection b) {
+        if (!a.hasSelection())
+            return b;
+
+        if (!b.hasSelection())
+            return a;
+
+        final Coord2D topLeft = new Coord2D(
+                Math.min(a.topLeft.x, b.topLeft.x),
+                Math.min(a.topLeft.y, b.topLeft.y)
+        ), bottomRight = new Coord2D(
+                Math.max(a.bottomRight().x, b.bottomRight().x),
+                Math.max(a.bottomRight().y, b.bottomRight().y)
+        );
+
+        final int w = bottomRight.x - topLeft.x,
+                h = bottomRight.y - topLeft.y;
+
+        final boolean[][] res = new boolean[w][h];
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++) {
+                final Coord2D px = new Coord2D(topLeft.x + x, topLeft.y + y);
+
+                res[x][y] = a.selected(px) || b.selected(px);
+            }
+
+        return new Selection(topLeft, new Bounds2D(w, h), res).crop();
+    }
+
+    public static Selection intersection(final Selection a, final Selection b) {
+        final Coord2D topLeft = new Coord2D(
+                Math.max(a.topLeft.x, b.topLeft.x),
+                Math.max(a.topLeft.y, b.topLeft.y)
+        ), bottomRight = new Coord2D(
+                Math.min(a.bottomRight().x, b.bottomRight().x),
+                Math.min(a.bottomRight().y, b.bottomRight().y)
+        );
+
+        final int w = bottomRight.x - topLeft.x,
+                h = bottomRight.y - topLeft.y;
+
+        final boolean[][] res = new boolean[w][h];
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++) {
+                final Coord2D px = new Coord2D(topLeft.x + x, topLeft.y + y);
+
+                res[x][y] = a.selected(px) && b.selected(px);
+            }
+
+        return new Selection(topLeft, new Bounds2D(w, h), res).crop();
+    }
+
+    public static Selection difference(final Selection a, final Selection b) {
+        final boolean[][] res =
+                new boolean[a.bounds.width()][a.bounds.height()];
+
+        for (int x = 0; x < a.matrix.length; x++)
+            for (int y = 0; y < a.matrix[x].length; y++)
+                res[x][y] = a.matrix[x][y] &&
+                        !b.selected(a.topLeft.x + x, a.topLeft.y + y);
+
+        return new Selection(a.topLeft, a.bounds, res).crop();
+    }
+
+    private Coord2D bottomRight() {
+        return topLeft.displace(bounds.width(), bounds.height());
+    }
+
+    private Selection crop() {
+        if (!hasSelection())
+            return EMPTY;
+
+        final Coord2D cropTL = cropTL(), cropBR = cropBR();
+        final int w = bounds.width() - (cropTL.x + cropBR.x),
+                h = bounds.height() - (cropTL.y + cropBR.y);
+        final boolean[][] res = new boolean[w][h];
+
+        for (int x = 0; x < w; x++)
+            System.arraycopy(matrix[x + cropTL.x], cropTL.y, res[x], 0, h);
+
+        return new Selection(topLeft.displace(cropTL), res);
+    }
+
+    private Coord2D cropTL() {
+        final int w = bounds.width();
+        int leftmost = w, highest = bounds.height();
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < highest; y++)
+                if (matrix[x][y]) {
+                    leftmost = Math.min(leftmost, x);
+                    highest = y;
+                }
+
+        return new Coord2D(leftmost, highest);
+    }
+
+    private Coord2D cropBR() {
+        final int w = bounds.width(), h = bounds.height();
+        int rightmost = 0, lowest = 0;
+
+        for (int x = w - 1; x >= 0; x--)
+            for (int y = h - 1; y >= lowest; y--)
+                if (matrix[x][y]) {
+                    rightmost = Math.max(rightmost, x);
+                    lowest = y;
+                }
+
+        return new Coord2D((w - 1) - rightmost, (h - 1) - lowest);
     }
 
     public Selection displace(final Coord2D displacement) {

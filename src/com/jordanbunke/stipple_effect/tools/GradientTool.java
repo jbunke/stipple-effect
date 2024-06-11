@@ -37,7 +37,7 @@ public final class GradientTool extends ToolWithBreadth
     private Coord2D anchor;
     private List<Set<Coord2D>> gradientStages;
     private Shape shape;
-    private Set<Coord2D> accessible;
+    private Selection accessible;
 
     public enum Shape {
         LINEAR, RADIAL, SPIRAL;
@@ -67,7 +67,7 @@ public final class GradientTool extends ToolWithBreadth
 
         shape = Shape.LINEAR;
 
-        accessible = new HashSet<>();
+        accessible = Selection.EMPTY;
 
         toolContentPreview = GameImage.dummy();
 
@@ -109,7 +109,8 @@ public final class GradientTool extends ToolWithBreadth
         final Color maskColor = masked && anchorInBounds(w, h)
                 ? frame.getColorAt(anchor.x, anchor.y)
                 : null;
-        accessible = maskColor != null ? search(frame, maskColor) : new HashSet<>();
+        accessible = maskColor != null
+                ? search(frame, maskColor) : Selection.EMPTY;
     }
 
     @Override
@@ -205,8 +206,7 @@ public final class GradientTool extends ToolWithBreadth
                 final double c = shape.cGetter().apply(pos, endpoint);
 
                 final boolean satisfiesMask = !masked ||
-                        (anchorInBounds(w, h) &&
-                                accessible.contains(new Coord2D(x, y))),
+                        (anchorInBounds(w, h) && accessible.selected(x, y)),
                         satisfiesScope = isCValid(c),
                         replacePixel = satisfiesMask && satisfiesScope;
 
@@ -273,7 +273,7 @@ public final class GradientTool extends ToolWithBreadth
                 anchor.y >= 0 && anchor.y < h;
     }
 
-    private Set<Coord2D> search(
+    private Selection search(
             final GameImage frame, final Color maskColor
     ) {
         return contiguous

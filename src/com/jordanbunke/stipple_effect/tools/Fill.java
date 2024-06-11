@@ -8,8 +8,6 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
 
 import java.awt.*;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class Fill extends ToolThatSearches {
     private static final Fill INSTANCE;
@@ -44,20 +42,20 @@ public final class Fill extends ToolThatSearches {
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();
 
-            // search - TODO
-            final Set<Coord2D> selection = context.getState().getSelection().getPixels(),
-                    matched = search(image, tp).stream()
-                            .filter(m -> selection.isEmpty() || selection.contains(m))
-                            .collect(Collectors.toSet());
+            // search
+            final Selection selection = context.getState().getSelection(),
+                    matched = search(image, tp),
+                    filtered = selection.hasSelection()
+                            ? Selection.intersection(selection, matched)
+                            : matched;
 
             // assemble edit mask
             final GameImage edit = new GameImage(w, h);
             final int rgb = fillColor.getRGB();
 
-            matched.forEach(m -> edit.setRGB(m.x, m.y, rgb));
+            filtered.pixelAlgorithm(w, h, (x, y) -> edit.setRGB(x, y, rgb));
 
-            // TODO
-            context.stampImage(edit.submit(), Selection.fromSet(matched));
+            context.stampImage(edit.submit(), filtered);
             context.getState().markAsCheckpoint(true);
         }
     }

@@ -36,6 +36,7 @@ public class SEColors {
             CHITIN = new Color(144, 79, 161),
             NAIJ = new Color(34, 94, 34),
             VERDANT = new Color(30, 255, 15),
+            RADAR = new Color(61, 39, 73),
             TRANSLUCENT_VERDANT_1 = new Color(30, 255, 15, 100),
             TRANSLUCENT_VERDANT_2 = new Color(30, 255, 15, 50),
             SAND = new Color(216, 182, 138),

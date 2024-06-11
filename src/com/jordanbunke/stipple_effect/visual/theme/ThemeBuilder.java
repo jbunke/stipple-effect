@@ -131,7 +131,7 @@ public class ThemeBuilder {
 
         // backgrounds
         neonTB.setPanelBackground(BLACK)
-                .setWorkspaceBackground(DARK_GREY)
+                .setWorkspaceBackground(RADAR)
                 .setScrollBackground(BLACK)
                 .setSplashBackground(BLACK);
 
@@ -160,6 +160,9 @@ public class ThemeBuilder {
         // selection
         neonTB.setSelectionFill(TRANSLUCENT_VERDANT_2)
                 .setHighlightOverlay(TRANSLUCENT_VERDANT_1);
+
+        neonTB.setCheckerboard1(MID_DARK_GREY)
+                .setCheckerboard2(DARK_GREY);
 
         return neonTB.build();
     }

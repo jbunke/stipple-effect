@@ -78,7 +78,7 @@ public class SelectionContents {
 
         if (pixels.isEmpty())
             return new SelectionContents(GameImage.dummy(),
-                    Selection.fromSet(pixels),
+                    Selection.fromPixels(pixels),
                     original == null ? this : original);
 
         final Coord2D tl = SelectionUtils.topLeft(pixels),
@@ -100,7 +100,7 @@ public class SelectionContents {
                 }
 
         return new SelectionContents(content.submit(),
-                Selection.fromSet(pixels),
+                Selection.fromPixels(pixels),
                 original == null ? this : original);
     }
 
@@ -113,7 +113,7 @@ public class SelectionContents {
 
         if (pixels.isEmpty())
             return new SelectionContents(GameImage.dummy(),
-                    Selection.fromSet(pixels),
+                    Selection.fromPixels(pixels),
                     original == null ? this : original);
 
         final Coord2D tl = SelectionUtils.topLeft(pixels),
@@ -160,7 +160,7 @@ public class SelectionContents {
                 }
 
         return new SelectionContents(content.submit(),
-                Selection.fromSet(pixels),
+                Selection.fromPixels(pixels),
                 original == null ? this : original);
     }
 
@@ -172,7 +172,7 @@ public class SelectionContents {
 
         if (pixels.isEmpty())
             return new SelectionContents(GameImage.dummy(),
-                    Selection.fromSet(pixels));
+                    Selection.fromPixels(pixels));
 
         final Coord2D tl = SelectionUtils.topLeft(pixels),
                 br = SelectionUtils.bottomRight(pixels),
@@ -208,7 +208,7 @@ public class SelectionContents {
                 }
 
         return new SelectionContents(content.submit(),
-                Selection.fromSet(pixels));
+                Selection.fromPixels(pixels));
     }
 
     public GameImage getContentForCanvas(final int w, final int h) {
@@ -217,7 +217,6 @@ public class SelectionContents {
         return contentForCanvas.submit();
     }
 
-    // TODO - look into refactoring to Selection getSelection()
     public Selection getSelection() {
         return selection;
     }

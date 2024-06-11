@@ -8,12 +8,10 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
-
-import java.util.Set;
 
 public final class PresetOutlineNode extends GlobalExpressionNode {
     public static final String SINGLE = "single_outline",
@@ -47,7 +45,7 @@ public final class PresetOutlineNode extends GlobalExpressionNode {
     @Override
     public Object evaluate(final SymbolTable symbolTable) {
         final Object[] vs = arguments.getValues(symbolTable);
-        final Set<Coord2D> selection =
+        final Selection selection =
                 ScriptSelectionUtils.convertSelection((ScriptSet) vs[0]);
 
         final int side = (int) vs[1], MAX = Constants.MAX_OUTLINE_PX;
@@ -63,7 +61,7 @@ public final class PresetOutlineNode extends GlobalExpressionNode {
         final int[] sideMask = new int[]
                 { side, side, side, side, side, side, side, side };
 
-        return new ScriptSet(Outliner.outline(selection, sideMask)
+        return new ScriptSet(Outliner.outline(selection, sideMask).getPixels()
                 .stream().map(c -> ScriptArray.of(c.x, c.y)));
     }
 
