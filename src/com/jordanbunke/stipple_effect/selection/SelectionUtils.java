@@ -1,6 +1,5 @@
 package com.jordanbunke.stipple_effect.selection;
 
-import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
@@ -33,20 +32,6 @@ public class SelectionUtils {
         return new Coord2D(lowestX, lowestY);
     }
 
-    public static int height(final Set<Coord2D> pixels) {
-        return bounds(pixels).height();
-    }
-
-    public static int width(final Set<Coord2D> pixels) {
-        return bounds(pixels).width();
-    }
-
-    public static Bounds2D bounds(final Set<Coord2D> pixels) {
-        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
-
-        return new Bounds2D(br.x - tl.x, br.y - tl.y);
-    }
-
     public static Selection stretchedPixels(
             final Selection oldPixels, final Coord2D change,
             final MoverTool.Direction direction
@@ -71,6 +56,9 @@ public class SelectionUtils {
         };
 
         final int w = br.x - tl.x, h = br.y - tl.y;
+
+        if (w < 1 || h < 1)
+            return Selection.EMPTY;
 
         final boolean[][] matrix = new boolean[w][h];
 
@@ -97,7 +85,7 @@ public class SelectionUtils {
         };
         final Set<Coord2D> pixels = new HashSet<>();
 
-        initialSelection.pixelAlgorithm(0, 0, false, (x, y) -> {
+        initialSelection.unboundedPixelAlgorithm((x, y) -> {
             final double distance = Math.sqrt(
                     Math.pow(realPivot[X] - x, 2) +
                             Math.pow(realPivot[Y] - y, 2)),

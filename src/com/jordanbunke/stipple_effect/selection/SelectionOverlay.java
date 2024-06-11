@@ -55,7 +55,7 @@ public final class SelectionOverlay {
         final Color fillC = Settings.getTheme().selectionFill;
         filled.setColor(fillC);
 
-        selection.pixelAlgorithm(0, 0, false, (x, y) -> {
+        selection.unboundedPixelAlgorithm((x, y) -> {
             final Coord2D px = new Coord2D(x, y);
 
             if (!selection.selected(x - 1, y)) left.add(px);

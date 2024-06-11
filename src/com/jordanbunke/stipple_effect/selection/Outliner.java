@@ -160,7 +160,7 @@ public class Outliner {
                 return true;
             };
 
-            selection.pixelAlgorithm(0, 0, false, (x, y) -> {
+            selection.unboundedPixelAlgorithm((x, y) -> {
                 final Coord2D px = new Coord2D(x, y);
 
                 if (check.test(px))

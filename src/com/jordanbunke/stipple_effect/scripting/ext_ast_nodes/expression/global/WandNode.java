@@ -10,6 +10,9 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.selection.Selection;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class WandNode extends SearchNode {
     public static final String NAME = "wand";
 
@@ -31,8 +34,11 @@ public final class WandNode extends SearchNode {
 
         final Selection selection = search(img, x, y, tol, global, diag);
 
-        return new ScriptSet(selection.getPixels()
-                .stream().map(c -> ScriptArray.of(c.x, c.y)));
+        final Set<ScriptArray> pixels = new HashSet<>();
+        selection.unboundedPixelAlgorithm(
+                (px, py) -> pixels.add(ScriptArray.of(px, py)));
+
+        return new ScriptSet(pixels.stream().map(c -> c));
     }
 
     @Override

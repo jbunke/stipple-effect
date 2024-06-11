@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.selection;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -23,7 +22,6 @@ public final class Selection {
     public final Bounds2D bounds;
     private final boolean[][] matrix;
 
-    private Set<Coord2D> pixels;
     private int size;
 
     private Selection(final Coord2D topLeft,
@@ -32,7 +30,6 @@ public final class Selection {
         this.bounds = bounds;
         this.matrix = matrix;
 
-        pixels = null;
         size = UNKNOWN;
     }
 
@@ -51,7 +48,10 @@ public final class Selection {
             for (int y = 0; y < height; y++)
                 matrix[x][y] = true;
 
-        return new Selection(matrix);
+        final Selection selection = new Selection(matrix);
+        selection.size = width * height;
+
+        return selection;
     }
 
     public static Selection of(final boolean[][] matrix) {
@@ -83,8 +83,7 @@ public final class Selection {
             matrix[pixel.x - topLeft.x][pixel.y - topLeft.y] = true;
 
         final Selection selection = new Selection(topLeft, bounds, matrix);
-        selection.pixels = new HashSet<>(pixels);
-        selection.size = selection.pixels.size();
+        selection.size = pixels.size();
 
         return selection;
     }
@@ -246,15 +245,17 @@ public final class Selection {
         pixelAlgorithm(w, h, true, algorithm);
     }
 
-    public void pixelAlgorithm(
+    public void unboundedPixelAlgorithm(
+            final BiConsumer<Integer, Integer> algorithm
+    ) {
+        pixelAlgorithm(0, 0, false, algorithm);
+    }
+
+    private void pixelAlgorithm(
             final int w, final int h, final boolean bounded,
             final BiConsumer<Integer, Integer> algorithm
     ) {
-        if (pixels != null)
-            pixels.stream().filter(s -> !bounded ||
-                            (s.x >= 0 && s.y >= 0 && s.x < w && s.y < h))
-                    .forEach(s -> algorithm.accept(s.x, s.y));
-        else if (bounded) {
+        if (bounded) {
             final int initX = Math.max(0, topLeft.x),
                     initY = Math.max(0, topLeft.y),
                     endX = Math.min(w, topLeft.x + bounds.width()),
@@ -273,28 +274,20 @@ public final class Selection {
 
     public int size() {
         if (size == UNKNOWN)
-            calculate();
+            count();
 
         return size;
     }
 
-    // TODO - remove function and pixels field
-    public Set<Coord2D> getPixels() {
-        if (pixels == null)
-            calculate();
-
-        return pixels;
-    }
-
-    private void calculate() {
-        pixels = new HashSet<>();
+    private void count() {
+        int count = 0;
 
         for (int x = 0; x < bounds.width(); x++)
             for (int y = 0; y < bounds.height(); y++)
                 if (matrix[x][y])
-                    pixels.add(new Coord2D(topLeft.x + x, topLeft.y + y));
+                    count++;
 
-        size = pixels.size();
+        size = count;
     }
 
     @Override

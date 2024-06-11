@@ -8,6 +8,9 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class SelectionGetter extends ProjectExpressionNode {
     public static final String GET = "get_selection", HAS = "has_selection";
 
@@ -40,10 +43,12 @@ public final class SelectionGetter extends ProjectExpressionNode {
     public Object evaluate(final SymbolTable symbolTable) {
         final SEContext project = getProject(symbolTable);
 
-        return get ? new ScriptSet(
-                project.getState().getSelection().getPixels().stream()
-                        .map(c -> ScriptArray.of(c.x, c.y))
-        ) : project.getState().hasSelection();
+        final Set<ScriptArray> pixels = new HashSet<>();
+        project.getState().getSelection().unboundedPixelAlgorithm(
+                (x, y) -> pixels.add(ScriptArray.of(x, y)));
+
+        return get ? new ScriptSet(pixels.stream().map(c -> c))
+                : project.getState().hasSelection();
     }
 
     @Override

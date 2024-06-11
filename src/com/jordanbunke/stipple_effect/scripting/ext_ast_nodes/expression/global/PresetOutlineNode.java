@@ -13,6 +13,9 @@ import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class PresetOutlineNode extends GlobalExpressionNode {
     public static final String SINGLE = "single_outline",
             DOUBLE = "double_outline";
@@ -61,8 +64,13 @@ public final class PresetOutlineNode extends GlobalExpressionNode {
         final int[] sideMask = new int[]
                 { side, side, side, side, side, side, side, side };
 
-        return new ScriptSet(Outliner.outline(selection, sideMask).getPixels()
-                .stream().map(c -> ScriptArray.of(c.x, c.y)));
+        final Selection outlined = Outliner.outline(selection, sideMask);
+        final Set<ScriptArray> pixels = new HashSet<>();
+
+        outlined.unboundedPixelAlgorithm(
+                (x, y) -> pixels.add(ScriptArray.of(x, y)));
+
+        return new ScriptSet(pixels.stream().map(c -> c));
     }
 
     @Override

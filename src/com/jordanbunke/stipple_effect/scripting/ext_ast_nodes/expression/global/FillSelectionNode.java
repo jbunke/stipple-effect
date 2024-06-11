@@ -52,7 +52,7 @@ public class FillSelectionNode extends GlobalExpressionNode {
                 : ScriptSelectionUtils.convertSelection(
                         (ScriptSet) vs[2], img.getWidth(), img.getHeight());
 
-        selection.pixelAlgorithm(0, 0, false,
+        selection.unboundedPixelAlgorithm(
                 (x, y) -> res.setRGB(x, y, c.getRGB()));
 
         return res;
