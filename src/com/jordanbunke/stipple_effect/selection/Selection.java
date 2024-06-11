@@ -278,6 +278,7 @@ public final class Selection {
         return size;
     }
 
+    // TODO - remove function and pixels field
     public Set<Coord2D> getPixels() {
         if (pixels == null)
             calculate();

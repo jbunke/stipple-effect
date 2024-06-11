@@ -6,7 +6,6 @@ import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
 import java.awt.*;
-import java.util.Set;
 
 public class SelectionContents {
     private static final int X = 0, Y = 1;
@@ -70,57 +69,54 @@ public class SelectionContents {
     }
 
     public SelectionContents returnStretched(
-            final Set<Coord2D> initialSelection, final Coord2D change,
+            final Selection initialSelection, final Coord2D change,
             final MoverTool.Direction direction
     ) {
-        final Set<Coord2D> pixels = SelectionUtils.stretchedPixels(
+        final Selection stretched = SelectionUtils.stretchedPixels(
                 initialSelection, change, direction);
 
-        if (pixels.isEmpty())
+        if (!stretched.hasSelection())
             return new SelectionContents(GameImage.dummy(),
-                    Selection.fromPixels(pixels),
-                    original == null ? this : original);
+                    Selection.EMPTY, original == null ? this : original);
 
-        final Coord2D tl = SelectionUtils.topLeft(pixels),
-                br = SelectionUtils.bottomRight(pixels);
-
-        final int w = Math.max(1, br.x - tl.x),
-                h = Math.max(1, br.y - tl.y);
+        final int w = stretched.bounds.width(),
+                h = stretched.bounds.height();
+        final Coord2D tl = stretched.topLeft;
 
         final GameImage content = new GameImage(w, h),
                 sampleFrom = original == null ? this.content : original.content;
 
+        final int sw = sampleFrom.getWidth(), sh = sampleFrom.getHeight();
+
         for (int x = 0; x < w; x++)
             for (int y = 0; y < h; y++)
-                if (pixels.contains(tl.displace(x, y))) {
-                    final int sampleX = (int)((x / (double) w) * sampleFrom.getWidth()),
-                            sampleY = (int)((y / (double) h) * sampleFrom.getHeight());
+                if (stretched.selected(tl.displace(x, y))) {
+                    final int sampleX = Math.min(sw - 1,
+                            (int)Math.round((x / (double) w) * sw)),
+                            sampleY = Math.min(sh - 1,
+                                    (int)Math.round((y / (double) h) * sh));
 
                     content.dot(sampleFrom.getColorAt(sampleX, sampleY), x, y);
                 }
 
         return new SelectionContents(content.submit(),
-                Selection.fromPixels(pixels),
-                original == null ? this : original);
+                stretched, original == null ? this : original);
     }
 
     public SelectionContents returnRotated(
-            final Set<Coord2D> initialSelection,
+            final Selection initialSelection,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
-        final Set<Coord2D> pixels = SelectionUtils.rotatedPixels(
+        final Selection rotated = SelectionUtils.rotatedPixels(
                 initialSelection, deltaR, pivot, offset);
 
-        if (pixels.isEmpty())
+        if (!rotated.hasSelection())
             return new SelectionContents(GameImage.dummy(),
-                    Selection.fromPixels(pixels),
-                    original == null ? this : original);
+                    Selection.EMPTY, original == null ? this : original);
 
-        final Coord2D tl = SelectionUtils.topLeft(pixels),
-                br = SelectionUtils.bottomRight(pixels);
-
-        final int w = Math.max(1, br.x - tl.x),
-                h = Math.max(1, br.y - tl.y);
+        final int w = rotated.bounds.width(),
+                h = rotated.bounds.height();
+        final Coord2D tl = rotated.topLeft;
 
         final GameImage content = new GameImage(w, h),
                 sampleFrom = original == null ? this.content : original.content;
@@ -135,7 +131,7 @@ public class SelectionContents {
 
         for (int x = 0; x < w; x++)
             for (int y = 0; y < h; y++)
-                if (pixels.contains(tl.displace(x, y))) {
+                if (rotated.selected(tl.displace(x, y))) {
                     final int gx = tl.x + x, gy = tl.y + y;
 
                     final double distance = Math.sqrt(
@@ -160,8 +156,7 @@ public class SelectionContents {
                 }
 
         return new SelectionContents(content.submit(),
-                Selection.fromPixels(pixels),
-                original == null ? this : original);
+                rotated, original == null ? this : original);
     }
 
     public SelectionContents returnReflected(

@@ -46,20 +46,18 @@ public final class MoveSelection extends MoverTool<Selection> {
 
     @Override
     Selection stretch(
-            final SEContext context, final Set<Coord2D> initial,
+            final SEContext context, final Selection initial,
             final Coord2D change, final Direction direction
     ) {
-        // TODO
-        return Selection.fromPixels(SelectionUtils.stretchedPixels(initial, change, direction));
+        return SelectionUtils.stretchedPixels(initial, change, direction);
     }
 
     @Override
     Selection rotate(
-            final SEContext context, final Set<Coord2D> initial,
+            final SEContext context, final Selection initial,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
-        // TODO
-        return Selection.fromPixels(SelectionUtils.rotatedPixels(initial, deltaR, pivot, offset));
+        return SelectionUtils.rotatedPixels(initial, deltaR, pivot, offset);
     }
 
     @Override

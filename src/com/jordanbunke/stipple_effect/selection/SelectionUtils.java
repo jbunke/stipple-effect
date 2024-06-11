@@ -47,15 +47,14 @@ public class SelectionUtils {
         return new Bounds2D(br.x - tl.x, br.y - tl.y);
     }
 
-    public static Set<Coord2D> stretchedPixels(
-            final Set<Coord2D> oldPixels, final Coord2D change,
+    public static Selection stretchedPixels(
+            final Selection oldPixels, final Coord2D change,
             final MoverTool.Direction direction
     ) {
-        final Coord2D oldTL = SelectionUtils.topLeft(oldPixels),
-                oldBR = SelectionUtils.bottomRight(oldPixels);
-
-        final int oldW = oldBR.x - oldTL.x,
-                oldH = oldBR.y - oldTL.y;
+        final int oldW = oldPixels.bounds.width(),
+                oldH = oldPixels.bounds.height();
+        final Coord2D oldTL = oldPixels.topLeft,
+                oldBR = oldTL.displace(oldW, oldH);
 
         final Coord2D tl = switch (direction) {
             case TL, T, L -> oldTL.displace(change);
@@ -73,23 +72,23 @@ public class SelectionUtils {
 
         final int w = br.x - tl.x, h = br.y - tl.y;
 
-        final Set<Coord2D> pixels = new HashSet<>();
+        final boolean[][] matrix = new boolean[w][h];
 
         for (int x = 0; x < w; x++)
-            for (int y = 0; y < h; y++){
+            for (int y = 0; y < h; y++) {
                 final Coord2D oldPixel = oldTL.displace(
                         (int)((x / (double) w) * oldW),
                         (int)((y / (double) h) * oldH));
 
-                if (oldPixels.contains(oldPixel))
-                    pixels.add(tl.displace(x, y));
+                matrix[x][y] = oldPixels.selected(oldPixel);
             }
 
-        return pixels;
+        return Selection.atOf(tl, matrix);
     }
 
-    public static Set<Coord2D> rotatedPixels(
-            final Set<Coord2D> initialSelection,
+    // TODO - refactor to not use Set
+    public static Selection rotatedPixels(
+            final Selection initialSelection,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
         final double[] realPivot = new double[] {
@@ -98,11 +97,11 @@ public class SelectionUtils {
         };
         final Set<Coord2D> pixels = new HashSet<>();
 
-        initialSelection.forEach(i -> {
+        initialSelection.pixelAlgorithm(0, 0, false, (x, y) -> {
             final double distance = Math.sqrt(
-                    Math.pow(realPivot[X] - i.x, 2) +
-                            Math.pow(realPivot[Y] - i.y, 2)),
-                    angle = Geometry.calculateAngleInRad(i.x, i.y,
+                    Math.pow(realPivot[X] - x, 2) +
+                            Math.pow(realPivot[Y] - y, 2)),
+                    angle = Geometry.calculateAngleInRad(x, y,
                             realPivot[X], realPivot[Y]),
                     newAngle = angle + deltaR;
 
@@ -138,12 +137,12 @@ public class SelectionUtils {
                         (int)Math.round(realPivot[Y] + deltaY)
                 );
 
-                if (initialSelection.contains(oldPixel))
+                if (initialSelection.selected(oldPixel))
                     pixels.add(new Coord2D(x, y));
             }
         }
 
-        return pixels;
+        return Selection.fromPixels(pixels);
     }
 
     public static Selection reflectedPixels(

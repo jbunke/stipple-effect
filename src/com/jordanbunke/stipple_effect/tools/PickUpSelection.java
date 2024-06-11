@@ -3,12 +3,11 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
-
-import java.util.Set;
 
 public final class PickUpSelection extends MoverTool<SelectionContents> {
     private static final PickUpSelection INSTANCE;
@@ -45,7 +44,7 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
 
     @Override
     SelectionContents stretch(
-            final SEContext context, final Set<Coord2D> initial,
+            final SEContext context, final Selection initial,
             final Coord2D change, final Direction direction
     ) {
         if (canBeMoved(context))
@@ -57,7 +56,7 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
 
     @Override
     SelectionContents rotate(
-            final SEContext context, final Set<Coord2D> initial,
+            final SEContext context, final Selection initial,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
         if (canBeMoved(context))
