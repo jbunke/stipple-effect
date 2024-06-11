@@ -226,8 +226,8 @@ public final class Selection {
         if (equals(EMPTY))
             return false;
 
-        if (calculated())
-            return !pixels.isEmpty();
+        if (size != UNKNOWN)
+            return size > 0;
 
         final int w = bounds.width(), h = bounds.height();
 
@@ -250,9 +250,8 @@ public final class Selection {
             final int w, final int h, final boolean bounded,
             final BiConsumer<Integer, Integer> algorithm
     ) {
-        if (calculated())
-            getPixels().stream()
-                    .filter(s -> !bounded ||
+        if (pixels != null)
+            pixels.stream().filter(s -> !bounded ||
                             (s.x >= 0 && s.y >= 0 && s.x < w && s.y < h))
                     .forEach(s -> algorithm.accept(s.x, s.y));
         else if (bounded) {
@@ -273,21 +272,17 @@ public final class Selection {
     }
 
     public int size() {
-        if (!calculated())
+        if (size == UNKNOWN)
             calculate();
 
         return size;
     }
 
     public Set<Coord2D> getPixels() {
-        if (!calculated())
+        if (pixels == null)
             calculate();
 
         return pixels;
-    }
-
-    public boolean calculated() {
-        return pixels != null && size != UNKNOWN;
     }
 
     private void calculate() {

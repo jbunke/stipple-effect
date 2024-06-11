@@ -203,8 +203,4 @@ public class SelectionContents {
     public Selection getSelection() {
         return selection;
     }
-
-    public Set<Coord2D> getPixels() {
-        return selection.getPixels();
-    }
 }

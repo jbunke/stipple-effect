@@ -10,8 +10,12 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.*;
-import com.jordanbunke.delta_time.menu.menu_elements.visual.*;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.PlaceholderMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.TimedMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.AnimationMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -25,7 +29,7 @@ import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
-import com.jordanbunke.stipple_effect.selection.SelectionUtils;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -34,11 +38,13 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
-import com.jordanbunke.stipple_effect.visual.theme.*;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Themes;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
@@ -693,13 +699,11 @@ public class DialogAssembly {
         final boolean hasClipboard = SEClipboard.get().hasContent();
 
         if (hasClipboard) {
-            final Set<Coord2D> clipboard = SEClipboard.get()
-                    .getContent().getPixels();
-            final Coord2D tl = SelectionUtils.topLeft(clipboard),
-                    br = SelectionUtils.bottomRight(clipboard);
+            final Selection clipboard = SEClipboard.get()
+                    .getContent().getSelection();
 
-            clipboardW = br.x - tl.x;
-            clipboardH = br.y - tl.y;
+            clipboardW = clipboard.bounds.width();
+            clipboardH = clipboard.bounds.height();
 
             initialW = clipboardW;
             initialH = clipboardH;
