@@ -1,6 +1,12 @@
 # Changelog
 
-## **0.5.0** - 2024-06-12
+## **0.5.1** - 2024-06-12
+
+### Fixed:
+* Bug: Attempting to pick up a selection with pixels off the grid is causing the program to crash
+
+
+## **0.5.0** - The Performance Update - 2024-06-12
 
 ### Added:
 * Added tools

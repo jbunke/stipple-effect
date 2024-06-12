@@ -5,8 +5,6 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
-import java.awt.*;
-
 public class SelectionContents {
     private static final int X = 0, Y = 1;
 
@@ -52,11 +50,16 @@ public class SelectionContents {
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                if (!selection.selected(tl.x + x, tl.y + y))
+                final int px = tl.x + x, py = tl.y + y;
+                final boolean outOfBounds =
+                        px < 0 || px >= canvas.getWidth() ||
+                        py < 0 || py >= canvas.getHeight();
+
+                if (!selection.selected(px, py) || outOfBounds)
                     continue;
 
-                final Color c = canvas.getColorAt(tl.x + x, tl.y + y);
-                content.dot(c, x, y);
+                final int c = canvas.getColorAt(px, py).getRGB();
+                content.setRGB(x, y, c);
             }
         }
 
