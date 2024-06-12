@@ -1,10 +1,11 @@
 package com.jordanbunke.stipple_effect.visual.theme;
 
-import java.awt.Color;
-import java.util.function.Supplier;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
+
+import java.awt.*;
 
 public class Theme {
-    public final Supplier<Color>
+    public final Color
             textLight, textDark,
             affixTextLight, affixTextDark,
             textMenuHeading, textShortcut,
@@ -15,6 +16,9 @@ public class Theme {
             highlightOutline, highlightOverlay, invalid,
             splashText, splashFlashingText, splashBackground,
             checkerboard1, checkerboard2;
+
+    public final ThemeLogic logic;
+    public final String subtitle;
 
     Theme(
             final Color textLight, final Color textDark,
@@ -40,38 +44,43 @@ public class Theme {
             final Color splashBackground,
 
             final Color checkerboard1,
-            final Color checkerboard2
+            final Color checkerboard2,
+
+            final ThemeLogic logic, final String subtitle
     ) {
-        this.textLight = () -> textLight;
-        this.textDark = () -> textDark;
-        this.affixTextLight = () -> affixTextLight;
-        this.affixTextDark = () -> affixTextDark;
-        this.textMenuHeading = () -> textMenuHeading;
-        this.textShortcut = () -> textShortcut;
+        this.textLight = textLight;
+        this.textDark = textDark;
+        this.affixTextLight = affixTextLight;
+        this.affixTextDark = affixTextDark;
+        this.textMenuHeading = textMenuHeading;
+        this.textShortcut = textShortcut;
 
-        this.workspaceBackground = () -> workspaceBackground;
-        this.panelBackground = () -> panelBackground;
-        this.panelDivisions = () -> panelDivisions;
+        this.workspaceBackground = workspaceBackground;
+        this.panelBackground = panelBackground;
+        this.panelDivisions = panelDivisions;
 
-        this.scrollBackground = () -> scrollBackground;
-        this.dialogVeil = () -> dialogVeil;
-        this.selectionFill = () -> selectionFill;
-        this.buttonBody = () -> buttonBody;
-        this.stubButtonBody = () -> stubButtonBody;
-        this.dropdownOptionBody = () -> dropdownOptionBody;
-        this.defaultSliderCore = () -> defaultSliderCore;
-        this.defaultSliderBall = () -> defaultSliderBall;
-        this.buttonOutline = () -> buttonOutline;
+        this.scrollBackground = scrollBackground;
+        this.dialogVeil = dialogVeil;
+        this.selectionFill = selectionFill;
+        this.buttonBody = buttonBody;
+        this.stubButtonBody = stubButtonBody;
+        this.dropdownOptionBody = dropdownOptionBody;
+        this.defaultSliderCore = defaultSliderCore;
+        this.defaultSliderBall = defaultSliderBall;
+        this.buttonOutline = buttonOutline;
 
-        this.highlightOutline = () -> highlightOutline;
-        this.highlightOverlay = () -> highlightOverlay;
-        this.invalid = () -> invalid;
+        this.highlightOutline = highlightOutline;
+        this.highlightOverlay = highlightOverlay;
+        this.invalid = invalid;
 
-        this.splashText = () -> splashText;
-        this.splashFlashingText = () -> splashFlashingText;
-        this.splashBackground = () -> splashBackground;
+        this.splashText = splashText;
+        this.splashFlashingText = splashFlashingText;
+        this.splashBackground = splashBackground;
 
-        this.checkerboard1 = () -> checkerboard1;
-        this.checkerboard2 = () -> checkerboard2;
+        this.checkerboard1 = checkerboard1;
+        this.checkerboard2 = checkerboard2;
+
+        this.logic = logic;
+        this.subtitle = subtitle;
     }
 }

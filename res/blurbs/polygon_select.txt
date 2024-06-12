@@ -5,6 +5,7 @@ the bounds of the selection. To close the polygon, place a vertex down on the sa
 the shape began.
 
 Place vertex: {Left Click}
+Close polygon: {Shift + Left Click}
 Remove previous vertex: {Right Click}
 Reset: {Middle Click}
 

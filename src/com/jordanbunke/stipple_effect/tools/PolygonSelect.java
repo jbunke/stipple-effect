@@ -5,11 +5,13 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.LineMath;
 import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -18,10 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class PolygonSelect extends ToolWithMode {
+public final class PolygonSelect extends ToolWithMode implements SnappableTool {
     private static final PolygonSelect INSTANCE;
 
-    private boolean selecting;
+    private boolean selecting, finishing, wasFinishing;
     private Coord2D lastTP;
     private List<Coord2D> vertices;
     private Set<Coord2D> edges;
@@ -33,6 +35,8 @@ public final class PolygonSelect extends ToolWithMode {
 
     private PolygonSelect() {
         selecting = false;
+        finishing = false;
+        wasFinishing = false;
         lastTP = Constants.NO_VALID_TARGET;
         vertices = new ArrayList<>();
         edges = new HashSet<>();
@@ -76,11 +80,19 @@ public final class PolygonSelect extends ToolWithMode {
 
             if (selecting) {
                 // add to selection
-                addEdge(getLastVertex(), tp);
-                vertices.add(tp);
+                if (finishing) {
+                    final Coord2D first = vertices.get(0);
+                    addEdge(getLastVertex(), first);
+                    vertices.add(first);
 
-                if (tp.equals(vertices.get(0)))
                     finish(context);
+                } else {
+                    addEdge(getLastVertex(), tp);
+                    vertices.add(tp);
+
+                    if (tp.equals(vertices.get(0)))
+                        finish(context);
+                }
             } else if (tp.x >= 0 && tp.x < w && tp.y >= 0 && tp.y < h) {
                 // Start selection
                 // bounds check only necessary for first vertex
@@ -98,29 +110,31 @@ public final class PolygonSelect extends ToolWithMode {
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();
 
-        if (!selecting || tp.equals(Constants.NO_VALID_TARGET) || tp.equals(lastTP))
+        if (!selecting || tp.equals(Constants.NO_VALID_TARGET) ||
+                (tp.equals(lastTP) && finishing == wasFinishing))
             return;
 
         updateToolContentPreview(context);
 
         lastTP = tp;
+        wasFinishing = finishing;
     }
 
     private void finish(final SEContext context) {
         // define bounding box
-        final Coord2D tl = SelectionUtils.topLeft(
-                new HashSet<>(vertices)).displace(-1, -1),
-                br = SelectionUtils.bottomRight(
-                        new HashSet<>(vertices)).displace(1, 1);
+        final Coord2D tl = SelectionUtils.topLeft(vertices)
+                .displace(-1, -1),
+                br = SelectionUtils.bottomRight(vertices)
+                        .displace(1, 1);
 
         // define selection and populate
-        final Set<Coord2D> selection = new HashSet<>(edges),
+        final Set<Coord2D> pixels = new HashSet<>(edges),
                 removalCandidates = new HashSet<>();
 
         for (int x = tl.x; x < br.x; x++) {
             for (int y = tl.y; y < br.y; y++) {
                 final Coord2D pixel = new Coord2D(x, y);
-                if (selection.contains(pixel))
+                if (pixels.contains(pixel))
                     continue;
 
                 final LineSegment raycast = new LineSegment(pixel, tl);
@@ -187,7 +201,7 @@ public final class PolygonSelect extends ToolWithMode {
                 edgeEncounters -= (2 * doubleBackVertices.size());
 
                 if (edgeEncounters % 2 == 1)
-                    selection.add(pixel);
+                    pixels.add(pixel);
             }
         }
 
@@ -196,17 +210,17 @@ public final class PolygonSelect extends ToolWithMode {
         final Set<Coord2D> toRemove = new HashSet<>();
 
         for (Coord2D pixel : removalCandidates)
-            if (selection.contains(pixel) && !(
-                    selection.contains(pixel.displace(-1, 0)) &&
-                    selection.contains(pixel.displace(1, 0)) &&
-                    selection.contains(pixel.displace(0, -1)) &&
-                    selection.contains(pixel.displace(0, 1))))
+            if (pixels.contains(pixel) && !(
+                    pixels.contains(pixel.displace(-1, 0)) &&
+                    pixels.contains(pixel.displace(1, 0)) &&
+                    pixels.contains(pixel.displace(0, -1)) &&
+                    pixels.contains(pixel.displace(0, 1))))
                 toRemove.add(pixel);
 
-        selection.removeAll(toRemove);
+        pixels.removeAll(toRemove);
 
         // edit selection
-        context.editSelection(selection, true);
+        context.editSelection(Selection.fromPixels(pixels), true);
         reset();
     }
 
@@ -215,10 +229,12 @@ public final class PolygonSelect extends ToolWithMode {
 
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
-        final Coord2D tp = context.getTargetPixel(), first = vertices.get(0);
+        final Coord2D tp = context.getTargetPixel(),
+                first = vertices.get(0),
+                prospect = finishing ? first : tp;
 
-        final Color border = tp.equals(first)
-                ? t.highlightOutline.get() : t.highlightOverlay.get();
+        final Color border = prospect.equals(first)
+                ? t.highlightOutline : t.highlightOverlay;
 
         toolContentPreview = new GameImage(w, h);
 
@@ -228,7 +244,7 @@ public final class PolygonSelect extends ToolWithMode {
                     continue;
 
                 final Color c = (x + y) % 2 == 0
-                        ? t.textLight.get() : t.textDark.get();
+                        ? SEColors.black() : SEColors.white();
 
                 toolContentPreview.dot(c, first.x + x, first.y + y);
             }
@@ -236,10 +252,10 @@ public final class PolygonSelect extends ToolWithMode {
 
         edges.forEach(e ->
                 toolContentPreview.dot(border, e.x, e.y));
-        defineLine(getLastVertex(), tp).forEach(next ->
+        defineLine(getLastVertex(), prospect).forEach(next ->
                 toolContentPreview.dot(border, next.x, next.y));
         vertices.forEach(v ->
-                toolContentPreview.dot(t.highlightOutline.get(), v.x, v.y));
+                toolContentPreview.dot(t.highlightOutline, v.x, v.y));
     }
 
     private void addEdge(final Coord2D v1, final Coord2D v2) {
@@ -293,5 +309,15 @@ public final class PolygonSelect extends ToolWithMode {
     @Override
     public GameImage getToolContentPreview() {
         return toolContentPreview;
+    }
+
+    @Override
+    public void setSnap(final boolean finishing) {
+        this.finishing = finishing;
+    }
+
+    @Override
+    public boolean isSnap() {
+        return finishing;
     }
 }

@@ -139,6 +139,10 @@ public final class SENodeDelegator {
                     PaletteColorSetGetterNode.colors(position, scope, args);
             case PaletteColorSetGetterNode.INCLUDED ->
                     PaletteColorSetGetterNode.included(position, scope, args);
+            case GetFrameDurationNode.NAME ->
+                    new GetFrameDurationNode(position, scope, args);
+            case GetFrameDurationsNode.NAME ->
+                    new GetFrameDurationsNode(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -234,6 +238,8 @@ public final class SENodeDelegator {
                     MutablePaletteColorOpNode.moveLeft(position, scope, args);
             case MutablePaletteColorOpNode.MOVE_RIGHT ->
                     MutablePaletteColorOpNode.moveRight(position, scope, args);
+            case SetFrameDurationNode.NAME ->
+                    new SetFrameDurationNode(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +

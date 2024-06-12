@@ -1,19 +1,18 @@
 package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
+import com.jordanbunke.stipple_effect.tools.PickUpSelection;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ProjectState {
     private boolean checkpoint;
@@ -23,6 +22,7 @@ public class ProjectState {
 
     // FRAME
     private final int frameCount;
+    private final List<Double> frameDurations;
     private int frameIndex;
 
     // LAYER
@@ -31,7 +31,7 @@ public class ProjectState {
 
     // SELECTION
     private final SelectionMode selectionMode;
-    private final Set<Coord2D> selection;
+    private final Selection selection;
     private final SelectionContents selectionContents;
 
     public static ProjectState makeNew(
@@ -52,37 +52,44 @@ public class ProjectState {
 
     public static ProjectState makeFromNativeFile(
             final int imageWidth, final int imageHeight,
-            final List<SELayer> layers, final int frameCount
+            final List<SELayer> layers,
+            final int frameCount, final List<Double> frameDurations
     ) {
-        return new ProjectState(imageWidth, imageHeight, layers, frameCount);
+        return new ProjectState(imageWidth, imageHeight, layers, 0,
+                frameCount, frameDurations, 0,
+                SelectionMode.BOUNDS, Selection.EMPTY, null, true);
     }
 
     private ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int frameCount
     ) {
-        this(imageWidth, imageHeight, layers, 0, frameCount, 0,
-                SelectionMode.BOUNDS, new HashSet<>(), null, true);
+        this(imageWidth, imageHeight, layers, 0,
+                frameCount, defaultFrameDurations(frameCount), 0,
+                SelectionMode.BOUNDS, Selection.EMPTY, null, true);
     }
 
     private ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex,
-            final int frameCount, final int frameIndex,
+            final int frameCount, final List<Double> frameDurations,
+            final int frameIndex,
             final SelectionMode selectionMode,
-            final Set<Coord2D> selection,
+            final Selection selection,
             final SelectionContents selectionContents
     ) {
-        this(imageWidth, imageHeight, layers, layerEditIndex, frameCount,
-                frameIndex, selectionMode, selection, selectionContents, true);
+        this(imageWidth, imageHeight, layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents, true);
     }
 
     private ProjectState(
             final int imageWidth, final int imageHeight,
             final List<SELayer> layers, final int layerEditIndex,
-            final int frameCount, final int frameIndex,
+            final int frameCount, final List<Double> frameDurations,
+            final int frameIndex,
             final SelectionMode selectionMode,
-            final Set<Coord2D> selection,
+            final Selection selection,
             final SelectionContents selectionContents,
             final boolean checkpoint
     ) {
@@ -93,6 +100,8 @@ public class ProjectState {
         this.layerEditIndex = layerEditIndex;
 
         this.frameCount = frameCount;
+        this.frameDurations = frameDurations.size() == frameCount
+                ? frameDurations : defaultFrameDurations(frameCount);
         this.frameIndex = Math.max(0, Math.min(frameIndex, frameCount - 1));
 
         this.selectionMode = selectionMode;
@@ -103,13 +112,22 @@ public class ProjectState {
         this.operation = Operation.NONE;
     }
 
+    public static List<Double> defaultFrameDurations(final int frameCount) {
+        final List<Double> frameDurations = new ArrayList<>();
+
+        while (frameDurations.size() < frameCount)
+            frameDurations.add(Constants.DEFAULT_FRAME_DURATION);
+
+        return frameDurations;
+    }
+
     public ProjectState changeIsCheckpoint(
             final boolean checkpoint
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, selectionMode,
-                new HashSet<>(selection), selectionContents,
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents,
                 checkpoint);
     }
 
@@ -117,18 +135,18 @@ public class ProjectState {
             final SelectionContents selectionContents
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, SelectionMode.CONTENTS,
-                new HashSet<>(), selectionContents);
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                SelectionMode.CONTENTS, Selection.EMPTY, selectionContents);
     }
 
     public ProjectState changeSelectionBounds(
-            final Set<Coord2D> selection
+            final Selection selection
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, SelectionMode.BOUNDS,
-                selection, null);
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                SelectionMode.BOUNDS, selection, null);
     }
 
     public ProjectState changeLayers(
@@ -136,27 +154,36 @@ public class ProjectState {
     ) {
         return new ProjectState(imageWidth, imageHeight,
                 new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents);
     }
 
     public ProjectState changeLayers(
             final List<SELayer> layers, final int layerEditIndex
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents);
     }
 
     public ProjectState changeFrames(
             final List<SELayer> layers, final int frameIndex,
-            final int frameCount
+            final int frameCount, final List<Double> frameDurations
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents);
+    }
+
+    public ProjectState changeFrameDurations(
+            final List<Double> frameDurations
+    ) {
+        return new ProjectState(imageWidth, imageHeight,
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents);
     }
 
     public ProjectState resize(
@@ -164,9 +191,9 @@ public class ProjectState {
             final List<SELayer> layers
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, frameIndex, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                layers, layerEditIndex,
+                frameCount, frameDurations, frameIndex,
+                selectionMode, selection, selectionContents);
     }
 
     public ProjectState stitch(
@@ -174,9 +201,9 @@ public class ProjectState {
             final List<SELayer> layers
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                1, 0, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                layers, layerEditIndex,
+                1, defaultFrameDurations(1), 0,
+                selectionMode, selection, selectionContents);
     }
 
     public ProjectState split(
@@ -184,9 +211,9 @@ public class ProjectState {
             final List<SELayer> layers, final int frameCount
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
-                frameCount, 0, selectionMode,
-                new HashSet<>(selection), selectionContents);
+                layers, layerEditIndex,
+                frameCount, defaultFrameDurations(frameCount), 0,
+                selectionMode, selection, selectionContents);
     }
 
     public GameImage draw(
@@ -216,15 +243,16 @@ public class ProjectState {
                 // is being moved
                 final boolean previewCondition = inProjectRender &&
                         layer.equals(getEditingLayer()) && hasSelection() &&
-                        selectionMode == SelectionMode.CONTENTS;
+                        selectionMode == SelectionMode.CONTENTS &&
+                        !(tool.equals(PickUpSelection.get()) &&
+                                PickUpSelection.get().isMoving());
 
                 if (previewCondition) {
-                    final Set<Coord2D> pixels = selectionContents.getPixels();
+                    final Selection selection = selectionContents.getSelection();
+                    final int rgb = SEColors.transparent().getRGB();
 
-                    pixels.stream().filter(px -> px.x >= 0 && px.y >= 0 &&
-                                    px.x < imageWidth && px.y < imageHeight
-                    ).forEach(px -> layerImage.setRGB(px.x, px.y,
-                            new Color(0, 0, 0, 0).getRGB()));
+                    selection.pixelAlgorithm(imageWidth, imageHeight,
+                            (x, y) -> layerImage.setRGB(x, y, rgb));
                 }
 
                 image.draw(layerImage.submit());
@@ -336,15 +364,15 @@ public class ProjectState {
 
     public boolean hasSelection() {
         return switch (selectionMode) {
-            case BOUNDS -> !selection.isEmpty();
+            case BOUNDS -> selection.hasSelection();
             case CONTENTS -> hasSelectionContents();
         };
     }
 
-    public Set<Coord2D> getSelection() {
+    public Selection getSelection() {
         return switch (selectionMode) {
             case BOUNDS -> selection;
-            case CONTENTS -> selectionContents.getPixels();
+            case CONTENTS -> selectionContents.getSelection();
         };
     }
 
@@ -365,7 +393,7 @@ public class ProjectState {
     }
 
     public GameImage getActiveLayerFrame() {
-        return layers.get(layerEditIndex).getFrame(frameIndex);
+        return getEditingLayer().getFrame(frameIndex);
     }
 
     public int getLayerEditIndex() {
@@ -382,6 +410,10 @@ public class ProjectState {
 
     public int getFrameIndex() {
         return frameIndex;
+    }
+
+    public List<Double> getFrameDurations() {
+        return frameDurations;
     }
 
     public int getImageWidth() {

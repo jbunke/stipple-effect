@@ -19,13 +19,13 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.ZoomLevel;
 import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
@@ -62,7 +62,8 @@ public class MenuAssembly {
                         IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
                         IconCodes.AUTOMATION_SCRIPT,
                         IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
-                        IconCodes.GRANULAR_REDO, IconCodes.REDO
+                        IconCodes.GRANULAR_REDO, IconCodes.REDO,
+                        IconCodes.HISTORY
                 },
                 getPreconditions(
                         () -> true,
@@ -78,7 +79,8 @@ public class MenuAssembly {
                         () -> c.getStateManager().canUndo(),
                         () -> c.getStateManager().canUndo(),
                         () -> c.getStateManager().canRedo(),
-                        () -> c.getStateManager().canRedo()),
+                        () -> c.getStateManager().canRedo(),
+                        () -> true),
                 new Runnable[] {
                         DialogAssembly::setDialogToProgramSettings,
                         DialogAssembly::setDialogToNewProject,
@@ -93,7 +95,8 @@ public class MenuAssembly {
                         () -> c.getStateManager().undoToCheckpoint(),
                         () -> c.getStateManager().undo(true),
                         () -> c.getStateManager().redo(true),
-                        () -> c.getStateManager().redoToCheckpoint()
+                        () -> c.getStateManager().redoToCheckpoint(),
+                        DialogAssembly::setDialogToHistory
                 }, Layout.getProjectsPosition());
 
         // exit program button
@@ -191,6 +194,9 @@ public class MenuAssembly {
                         IconCodes.MOVE_FRAME_FORWARD,
                         // gap between frame operations and navigation/playback
                         Constants.ICON_ID_GAP_CODE,
+                        IconCodes.FRAME_PROPERTIES,
+                        // gap between frame operations and navigation/playback
+                        Constants.ICON_ID_GAP_CODE,
                         IconCodes.TO_FIRST_FRAME,
                         IconCodes.PREVIOUS,
                         // gap for play/stop button
@@ -206,6 +212,8 @@ public class MenuAssembly {
                         () -> c.getState().canMoveFrameForward(),
                         () -> false, // placeholder
                         () -> true,
+                        () -> false, // placeholder
+                        () -> true,
                         () -> true,
                         () -> false, // placeholder
                         () -> true,
@@ -216,6 +224,9 @@ public class MenuAssembly {
                         c::removeFrame,
                         c::moveFrameBack,
                         c::moveFrameForward,
+                        () -> {}, // placeholder
+                        () -> DialogAssembly.setDialogToFrameProperties(
+                                c.getState().getFrameIndex()),
                         () -> {}, // placeholder
                         () -> c.getState().setFrameIndex(0),
                         () -> c.getState().previousFrame(),
@@ -229,9 +240,9 @@ public class MenuAssembly {
                         .displace(Layout.getFramesWidth(), 0),
                 () -> Layout.setFramesPanelShowing(false));
 
-        final int PLAY_STOP_INDEX = 8,
-                PLAYBACK_MODE_INDEX = 11,
-                AFTER_PLAYBACK_MODE = 13;
+        final int PLAY_STOP_INDEX = 10,
+                PLAYBACK_MODE_INDEX = 13,
+                AFTER_PLAYBACK_MODE = 15;
 
         // play/stop as toggle
         final Coord2D playStopTogglePos = Layout.getFramesPosition().displace(
@@ -259,8 +270,8 @@ public class MenuAssembly {
                         Layout.ICON_BUTTON_OFFSET_Y, Layout.TEXT_Y_OFFSET, 1,
                         Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
                         c.playbackInfo::setFps, c.playbackInfo::getFps,
-                        fps -> fps, fps -> fps, fps -> fps + " fps",
-                        "XXX fps");
+                        fps -> fps, fps -> fps, fps -> fps + " FPS",
+                        "XXX FPS");
         mb.addAll(playbackLabel, playback.decButton, playback.incButton,
                 playback.slider, playback.value);
 
@@ -276,26 +287,14 @@ public class MenuAssembly {
         int realRightX = firstPos.x;
 
         for (int i = 0; i < amount; i++) {
-            final GameImage baseImage = GraphicsUtils
-                    .drawTextButton(Layout.FRAME_BUTTON_W,
-                            String.valueOf(i + 1), false),
-                    highlightedImage = GraphicsUtils
-                            .drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils
-                            .drawTextButton(Layout.FRAME_BUTTON_W,
-                                    String.valueOf(i + 1), true);
-
             final Coord2D pos = firstPos.displace(
                     i * (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET), 0);
-            final Bounds2D dims = new Bounds2D(baseImage.getWidth(), baseImage.getHeight());
-
-            frameElements.add(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP,
-                    baseImage, highlightedImage, selectedImage,
+            frameElements.add(SelectableListItemButton.make(
+                    pos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1),
                     i, () -> c.getState().getFrameIndex(),
                     s -> c.getState().setFrameIndex(s)));
 
-            realRightX = pos.x + dims.width();
+            realRightX = pos.x + Layout.FRAME_BUTTON_W;
         }
 
         mb.add(new HorizontalScrollBox(firstPos,
@@ -408,21 +407,12 @@ public class MenuAssembly {
                             ? name.substring(0, Layout.LAYER_NAME_LENGTH_CUTOFF) + "..."
                             : name;
 
-            final GameImage baseImage = GraphicsUtils
-                    .drawTextButton(Layout.LAYER_BUTTON_W, text, false),
-                    highlightedImage = GraphicsUtils
-                            .drawHighlightedButton(baseImage),
-                    selectedImage = GraphicsUtils
-                            .drawTextButton(Layout.LAYER_BUTTON_W, text, true);
-
             final Coord2D pos = firstPos.displace(0,
                     (amount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
-            final Bounds2D dims = new Bounds2D(baseImage.getWidth(), baseImage.getHeight());
 
-            layerButtons.add(new SelectableListItemButton(pos, dims,
-                    MenuElement.Anchor.LEFT_TOP,
-                    baseImage, highlightedImage, selectedImage,
-                    i, () -> c.getState().getLayerEditIndex(),
+            layerButtons.add(SelectableListItemButton.make(
+                    pos, Layout.LAYER_BUTTON_W, text, i,
+                    () -> c.getState().getLayerEditIndex(),
                     s -> c.getState().setLayerEditIndex(s)));
 
             final int index = i;
@@ -446,7 +436,7 @@ public class MenuAssembly {
             layerButtons.add(IconButton.make(IconCodes.LAYER_SETTINGS, lsPos,
                     () -> DialogAssembly.setDialogToLayerSettings(index)));
 
-            realBottomY = pos.y + dims.height();
+            realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
         }
 
         final int initialOffsetY = layerButtonYDisplacement(amount);
@@ -594,7 +584,7 @@ public class MenuAssembly {
                     colorTextBox.getHeight());
             final GatewayMenuElement highlight = new GatewayMenuElement(
                     new StaticMenuElement(textBoxPos, dims, MenuElement.Anchor.CENTRAL_TOP,
-                            GraphicsUtils.drawSelectedTextBox(
+                            GraphicsUtils.drawSelectedTextbox(
                                     new GameImage(dims.width(), dims.height()))),
                     () -> StippleEffect.get().getColorIndex() == index);
             mb.add(highlight);
@@ -721,7 +711,7 @@ public class MenuAssembly {
                 new Bounds2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
                 MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
                 contentWidth, "No palettes", false,
-                Settings.getTheme().stubButtonBody.get())));
+                GraphicsUtils.ButtonType.STUB)));
 
         // palette buttons
         if (hasPaletteContents) {
@@ -851,10 +841,9 @@ public class MenuAssembly {
         final Indicator toolIndicator = new Indicator(new Coord2D(
                 Layout.BUTTON_OFFSET, bottomBarButtonY),
                 IconCodes.IND_TOOL);
-        final DynamicLabel toolLabel = new DynamicLabel(new Coord2D(
+        final DynamicLabel toolLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(toolIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                bottomBarTextY),
                 () -> StippleEffect.get().getTool().getBottomBarText(),
                 Layout.getBottomBarToolWidth());
         mb.addAll(toolIndicator, toolLabel);
@@ -863,10 +852,9 @@ public class MenuAssembly {
         final Indicator targetIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarTargetPixelX(), bottomBarButtonY),
                 IconCodes.IND_TARGET);
-        final DynamicLabel targetLabel = new DynamicLabel(new Coord2D(
+        final DynamicLabel targetLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(targetIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                bottomBarTextY),
                 c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth());
         mb.addAll(targetIndicator, targetLabel);
 
@@ -874,36 +862,36 @@ public class MenuAssembly {
         final Indicator boundsIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarCanvasSizeX(), bottomBarButtonY),
                 IconCodes.IND_BOUNDS);
-        final DynamicLabel boundsLabel = new DynamicLabel(new Coord2D(
+        final DynamicLabel boundsLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(boundsIndicator, false),
-                bottomBarTextY), MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
+                bottomBarTextY),
                 c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth());
         mb.addAll(boundsIndicator, boundsLabel);
 
         // zoom
-        final float BASE = 2f;
         final Indicator zoomIndicator = new Indicator(
                 new Coord2D(Layout.getBottomBarZoomPercentageX(),
                         bottomBarButtonY), IconCodes.IND_ZOOM);
         final IncrementalRangeElements<Float> zoom =
                 IncrementalRangeElements.makeForFloat(zoomIndicator,
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
-                        bottomBarTextY, c.renderInfo::zoomOut,
+                        bottomBarTextY,
+                        () -> c.renderInfo.zoomOut(Constants.NO_VALID_TARGET),
                         () -> c.renderInfo.zoomIn(Constants.NO_VALID_TARGET),
-                        Constants.MIN_ZOOM, Constants.MAX_ZOOM,
-                        c.renderInfo::setZoomFactor, c.renderInfo::getZoomFactor,
-                        f -> (int) (Math.log(f) / Math.log(BASE)),
-                        sv -> (float) Math.pow(BASE, sv),
+                        ZoomLevel.MIN.z, ZoomLevel.MAX.z,
+                        z -> c.renderInfo.setZoomLevel(ZoomLevel.fromZ(z)),
+                        c.renderInfo::getZoomFactor,
+                        z -> ZoomLevel.fromZ(z).ordinal(),
+                        sv -> ZoomLevel.values()[sv].z,
                         f -> c.renderInfo.getZoomText(), "XXX.XX%");
         mb.addAll(zoomIndicator, zoom.decButton, zoom.incButton,
                 zoom.slider, zoom.value);
 
         // selection
-        mb.add(new DynamicLabel(new Coord2D(Layout.width() -
+        mb.add(DynamicLabel.make(new Coord2D(Layout.width() -
                 (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
-                MenuElement.Anchor.RIGHT_TOP, Settings.getTheme().textLight.get(),
-                c::getSelectionText, Layout.width() -
+                MenuElement.Anchor.RIGHT_TOP, c::getSelectionText,
+                Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
 
         // help button

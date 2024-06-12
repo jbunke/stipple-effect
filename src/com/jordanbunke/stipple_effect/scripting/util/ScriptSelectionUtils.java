@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.util.HashSet;
@@ -13,20 +14,20 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 
 public class ScriptSelectionUtils {
-    public static Set<Coord2D> convertSelection(
+    public static Selection convertSelection(
             final ScriptSet input, final int w, final int h
     ) {
         return convertSelection(input, (x, y) ->
                 x >= 0 && x < w && y >= 0 && y < h);
     }
 
-    public static Set<Coord2D> convertSelection(
+    public static Selection convertSelection(
             final ScriptSet input
     ) {
         return convertSelection(input, (x, y) -> true);
     }
 
-    private static Set<Coord2D> convertSelection(
+    private static Selection convertSelection(
             final ScriptSet input, BiPredicate<Integer, Integer> coordCondition
     ) {
         final Set<Coord2D> pixels = new HashSet<>();
@@ -38,7 +39,7 @@ public class ScriptSelectionUtils {
                 pixels.add(new Coord2D(x, y));
         });
 
-        return pixels;
+        return Selection.fromPixels(pixels);
     }
 
     public static boolean invalidSideMask(

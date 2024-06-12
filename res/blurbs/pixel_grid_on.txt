@@ -1,7 +1,1 @@
 Toggle pixel grid on/off: {Ctrl + G}
-
-The pixel grid can only be displayed at a minimum zoom level of {400%}. The amount of pixels between
-each grid along the X and Y axes can be set in the program settings.
-
-Due to performance considerations, the pixel grid can currently only be turned on for projects with
-a maximum canvas size of {128x128 pixels}.

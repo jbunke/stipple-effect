@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.ZoomLevel;
 
 import java.nio.file.Path;
 
@@ -53,16 +54,16 @@ public class Constants {
             GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";
 
     public static final int DEFAULT_CANVAS_W = 32, DEFAULT_CANVAS_H = 32,
-            MIN_CANVAS_W = 1, MIN_CANVAS_H = 1, MAX_CANVAS_W = 800, MAX_CANVAS_H = 800,
+            MIN_CANVAS_W = 1, MIN_CANVAS_H = 1, MAX_CANVAS_W = 1920, MAX_CANVAS_H = 1080,
             OVERLAY_BORDER_PX = 6, SPLASH_TIMEOUT_SECS = 1800, NO_SELECTION = -1,
             MAX_PALETTE_SIZE = 300;
 
-    public static final int DEFAULT_BRUSH_BREADTH = 3,
+    public static final int DEFAULT_BRUSH_BREADTH = 1,
             MIN_BREADTH = 1, MAX_BREADTH = 100, BREADTH_INC = 5,
             MIN_FONT_SCALE = 1, MAX_FONT_SCALE = 10,
-            DEFAULT_FONT_PX_SPACING = 2, MIN_FONT_PX_SPACING = 0, MAX_FONT_PX_SPACING = 10,
-            MAX_NUM_LAYERS = 100, MAX_NUM_FRAMES = 100, MAX_OUTLINE_PX = 10,
-            MIN_NUM_STATES = 100, DUMP_STATES_CUSHION_FACTOR = 2,
+            DEFAULT_FONT_PX_SPACING = 2, MIN_FONT_PX_SPACING = -10, MAX_FONT_PX_SPACING = 50,
+            MAX_NUM_LAYERS = 50, MAX_NUM_FRAMES = 300, MAX_OUTLINE_PX = 10,
+            CHECKPOINTS_DUMP_THRESHOLD = 5,
             MILLIS_IN_SECOND = 1000, MIN_PLAYBACK_FPS = 1, MAX_PLAYBACK_FPS = 24,
             PLAYBACK_FPS_INC = 1, DEFAULT_PLAYBACK_FPS = 10,
             TIMER_MAX_OUT = 4, MILLIS_PER_TIMER_INC = 100,
@@ -70,18 +71,22 @@ public class Constants {
             HUE_SCALE = 360, SAT_SCALE = RGBA_SCALE, VALUE_SCALE = RGBA_SCALE,
             STATUS_UPDATE_DURATION_MILLIS = 5000, TOOL_TIP_MILLIS_THRESHOLD = 500,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
-            MAX_NAME_LENGTH = 40, STRETCH_PX_THRESHOLD = 2, ROTATE_PX_THRESHOLD = 5,
-            MIN_HUE_SHIFT = -180, MAX_HUE_SHIFT = 180;
+            MAX_NAME_LENGTH = 40, STRETCH_PX_THRESHOLD = 10, ROTATE_PX_THRESHOLD = 25,
+            MAX_HUE_SHIFT = HUE_SCALE / 2, MIN_HUE_SHIFT = -MAX_HUE_SHIFT,
+            MAX_SV_SHIFT = SAT_SCALE, MIN_SV_SHIFT = -MAX_SV_SHIFT;
 
-    public static final long DUMP_STATES_MEM_THRESHOLD = 0x6400000L; // 100 MB
-
-    public static final float MIN_ZOOM = 1 / 16f, MAX_ZOOM = 64f, DEF_ZOOM = 4f,
-            ZOOM_FOR_OVERLAY = 1f, ZOOM_FOR_GRID = DEF_ZOOM,
-            NO_ZOOM = 1f, ZOOM_CHANGE_LEVEL = 2f, MAX_PREVIEW_ZOOM = 8f;
+    public static final float
+            DEF_ZOOM = ZoomLevel.PLUS_3.z,
+            ZOOM_FOR_OVERLAY = ZoomLevel.NONE.z,
+            ZOOM_FOR_GRID = DEF_ZOOM,
+            NO_ZOOM = ZoomLevel.NONE.z,
+            MAX_PREVIEW_ZOOM = ZoomLevel.PLUS_8.z;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
             SMALL_TOLERANCE_INC = 0.01, BIG_TOLERANCE_INC = SMALL_TOLERANCE_INC * 10,
             UNBIASED = 0.5d, MIN_BIAS = 0d, MAX_BIAS = 1d, BIAS_INC = 0.01,
-            MIN_SV_SHIFT = 0d, MAX_SV_SHIFT = 50d;
+            MIN_SV_SCALE = 0d, MAX_SV_SCALE = 50d,
+            DEFAULT_FRAME_DURATION = 1d,
+            MIN_FRAME_DURATION = 0.1, MAX_FRAME_DURATION = 20d;
 }

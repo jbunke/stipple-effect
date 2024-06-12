@@ -5,7 +5,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
 public class VerticalScrollBox extends AbstractVerticalScrollBox {
     public VerticalScrollBox(
@@ -14,7 +14,7 @@ public class VerticalScrollBox extends AbstractVerticalScrollBox {
             final int realBottomY, final int initialOffsetY
     ) {
         super(position, dimensions, menuElements,
-                GraphicsUtils::drawScrollBoxBackground,
+                Settings.getTheme().logic::drawScrollBoxBackground,
                 Layout.PX_PER_SCROLL, realBottomY, initialOffsetY);
     }
 

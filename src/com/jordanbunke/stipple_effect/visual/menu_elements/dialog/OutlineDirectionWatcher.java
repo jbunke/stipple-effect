@@ -1,9 +1,8 @@
-package com.jordanbunke.stipple_effect.visual.menu_elements;
+package com.jordanbunke.stipple_effect.visual.menu_elements.dialog;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.button.MenuButtonStub;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
@@ -11,11 +10,11 @@ import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
-public class OutlineDirectionWatcher extends MenuElement {
+public final class OutlineDirectionWatcher extends MenuButtonStub {
     private final Outliner.Direction direction;
 
     private int lastValue;
-    private GameImage image;
+    private GameImage image, highlighted;
 
     public OutlineDirectionWatcher(
             final Coord2D position, final Outliner.Direction direction
@@ -24,11 +23,14 @@ public class OutlineDirectionWatcher extends MenuElement {
 
         this.direction = direction;
         lastValue = DialogVals.getThisOutlineSide(this.direction.ordinal());
-        image = updateImage();
+
+        updateImage();
     }
 
     @Override
-    public void process(final InputEventLogger eventLogger) {}
+    public void execute() {
+        DialogVals.setThisOutlineSide(direction.ordinal(), 0);
+    }
 
     @Override
     public void update(final double deltaTime) {
@@ -36,11 +38,12 @@ public class OutlineDirectionWatcher extends MenuElement {
 
         if (value != lastValue) {
             lastValue = value;
-            image = updateImage();
+
+            updateImage();
         }
     }
 
-    private GameImage updateImage() {
+    private void updateImage() {
         final String code = lastValue == 0 ? IconCodes.NO_OUTLINE
                 : (lastValue > 0
                         ? IconCodes.OUTLINE_PREFIX +
@@ -48,12 +51,15 @@ public class OutlineDirectionWatcher extends MenuElement {
                         : IconCodes.OUTLINE_PREFIX +
                             direction.opposite().name().toLowerCase());
 
-        return GraphicsUtils.loadIcon(code);
+        image = GraphicsUtils.loadIcon(code);
+
+        highlighted = GraphicsUtils.highlightButton(
+                GraphicsUtils.loadIcon(IconCodes.NO_OUTLINE));
     }
 
     @Override
     public void render(final GameImage canvas) {
-        draw(image, canvas);
+        draw(isHighlighted() ? highlighted : image, canvas);
     }
 
     @Override

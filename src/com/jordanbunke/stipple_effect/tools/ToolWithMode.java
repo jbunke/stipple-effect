@@ -6,7 +6,11 @@ public abstract class ToolWithMode extends Tool {
     private static boolean global = false;
 
     public enum Mode {
-        SINGLE, ADDITIVE, SUBTRACTIVE
+        SINGLE, ADDITIVE, SUBTRACTIVE;
+
+        public boolean inheritSelection() {
+            return this != SINGLE;
+        }
     }
 
     @Override

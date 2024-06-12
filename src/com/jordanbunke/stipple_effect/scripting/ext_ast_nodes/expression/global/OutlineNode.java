@@ -7,10 +7,11 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
 import com.jordanbunke.stipple_effect.selection.Outliner;
+import com.jordanbunke.stipple_effect.selection.Selection;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public final class OutlineNode extends GlobalExpressionNode {
@@ -27,7 +28,7 @@ public final class OutlineNode extends GlobalExpressionNode {
     @Override
     public ScriptSet evaluate(final SymbolTable symbolTable) {
         final Object[] vs = arguments.getValues(symbolTable);
-        final Set<Coord2D> selection =
+        final Selection selection =
                 ScriptSelectionUtils.convertSelection((ScriptSet) vs[0]);
         final int[] sideMask = ((ScriptArray) vs[1]).stream()
                 .mapToInt(s -> (int) s).toArray();
@@ -36,8 +37,12 @@ public final class OutlineNode extends GlobalExpressionNode {
                 sideMask, arguments.args()[1]))
             return null;
 
-        return new ScriptSet(Outliner.outline(selection, sideMask)
-                .stream().map(c -> ScriptArray.of(c.x, c.y)));
+        final Selection outlined = Outliner.outline(selection, sideMask);
+        final Set<ScriptArray> pixels = new HashSet<>();
+        outlined.unboundedPixelAlgorithm(
+                (x, y) -> pixels.add(ScriptArray.of(x, y)));
+
+        return new ScriptSet(pixels.stream().map(c -> c));
     }
 
     @Override

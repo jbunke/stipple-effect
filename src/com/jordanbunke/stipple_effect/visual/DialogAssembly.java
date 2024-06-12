@@ -8,7 +8,6 @@ import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
@@ -25,11 +24,12 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
+import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
-import com.jordanbunke.stipple_effect.selection.SelectionUtils;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -40,13 +40,12 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.ApproveDialogButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.DynamicTextbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.OutlineTextbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
 import java.io.File;
@@ -54,13 +53,14 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DialogAssembly {
-    private static final int LINE_ABOVE = -2;
+    private static final int LINE_ABOVE = -2, AFTER_COMMON_COLOR_ACTION_ROW = 4;
 
     public static void setDialogToSave() {
         final SEContext c = StippleEffect.get().getContext();
@@ -222,7 +222,7 @@ public class DialogAssembly {
                         fpsLabel.getY(), 1, Constants.MIN_PLAYBACK_FPS,
                         Constants.MAX_PLAYBACK_FPS,
                         c.projectInfo::setFps, c.projectInfo::getFps,
-                        i -> i, sv -> sv, i -> i + " fps", "XXX fps");
+                        i -> i, sv -> sv, i -> i + " FPS", "XXX FPS");
 
         // GIF and MP4 contents
         final MenuElementGrouping gifContents = new MenuElementGrouping(
@@ -383,14 +383,14 @@ public class DialogAssembly {
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         rw -> DialogVals.setResizeWidth(rw, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getResizeWidth, 3),
+                        DialogVals::getResizeWidth, 4),
                 heightTextbox = makeDialogPixelDynamicTextbox(
                         heightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                         rh -> DialogVals.setResizeHeight(rh, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getResizeHeight, 3);
+                        DialogVals::getResizeHeight, 4);
 
         final ThinkingMenuElement resizeDecider = new ThinkingMenuElement(() -> {
             if (DialogVals.getResizeBy() == DialogVals.ResizeBy.PIXELS)
@@ -434,25 +434,25 @@ public class DialogAssembly {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
-        DialogVals.setPadLeft(0);
-        DialogVals.setPadBottom(0);
-        DialogVals.setPadTop(0);
-        DialogVals.setPadRight(0);
+        DialogVals.setPadAll(0);
 
         final MenuBuilder mb = new MenuBuilder();
 
         // text labels
         final TextLabel
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
-                leftLabel = TextLabel.make(textBelowPos(context, 1), "Left:"),
+                allLabel = TextLabel.make(textBelowPos(context, 1), "All:"),
+                leftLabel = TextLabel.make(textBelowPos(allLabel, 1), "Left:"),
                 rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right:"),
                 topLabel = TextLabel.make(textBelowPos(rightLabel), "Top:"),
                 bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom:"),
                 explanation = makeValidDimensionsBottomLabel();
-        mb.addAll(context, explanation, leftLabel, rightLabel,
-                topLabel, bottomLabel);
+        mb.addAll(context, explanation, allLabel,
+                leftLabel, rightLabel, topLabel, bottomLabel);
 
         // pad textboxes
+        final Textbox allTextbox = makeDialogPadTextBox(allLabel,
+                i -> true, DialogVals::setPadAll, DialogVals::getPadAll);
         final Textbox leftTextbox = makeDialogPadTextBox(leftLabel, i -> {
             final int pw = i + DialogVals.getPadRight() + w;
             return pw <= Constants.MAX_CANVAS_W && pw > 0;
@@ -469,7 +469,8 @@ public class DialogAssembly {
             final int ph = i + DialogVals.getPadTop() + h;
             return ph <= Constants.MAX_CANVAS_W && ph > 0;
         }, DialogVals::setPadBottom, DialogVals::getPadBottom);
-        mb.addAll(leftTextbox, rightTextbox, topTextbox, bottomTextbox);
+        mb.addAll(allTextbox, leftTextbox, rightTextbox,
+                topTextbox, bottomTextbox);
 
         // size preview
         final String PREVIEW_PREFIX = "Preview size: ";
@@ -695,16 +696,14 @@ public class DialogAssembly {
         final int NO_CLIPBOARD = 0;
 
         final int initialW, initialH, clipboardW, clipboardH;
-        final boolean hasClipboard = SEClipboard.get().hasContents();
+        final boolean hasClipboard = SEClipboard.get().hasContent();
 
         if (hasClipboard) {
-            final Set<Coord2D> clipboard = SEClipboard.get()
-                    .getContents().getPixels();
-            final Coord2D tl = SelectionUtils.topLeft(clipboard),
-                    br = SelectionUtils.bottomRight(clipboard);
+            final Selection clipboard = SEClipboard.get()
+                    .getContent().getSelection();
 
-            clipboardW = br.x - tl.x;
-            clipboardH = br.y - tl.y;
+            clipboardW = clipboard.bounds.width();
+            clipboardH = clipboard.bounds.height();
 
             initialW = clipboardW;
             initialH = clipboardH;
@@ -748,12 +747,12 @@ public class DialogAssembly {
                 widthLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_CANVAS_W, initialW, Constants.MAX_CANVAS_W, "px",
                 DialogVals::setNewProjectWidth,
-                DialogVals::getNewProjectWidth, 3);
+                DialogVals::getNewProjectWidth, 4);
         final DynamicTextbox heightTextbox = makeDialogDynamicTextbox(
                 heightLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_CANVAS_H, initialW, Constants.MAX_CANVAS_H, "px",
                 DialogVals::setNewProjectHeight,
-                DialogVals::getNewProjectHeight, 3);
+                DialogVals::getNewProjectHeight, 4);
 
         final MenuElementGrouping contents = new MenuElementGrouping(
                 presetLabel, defaultPreset, clipboardPreset,
@@ -762,6 +761,123 @@ public class DialogAssembly {
         setDialog(assembleDialog("New project...", contents,
                 () -> widthTextbox.isValid() && heightTextbox.isValid(),
                 "Create", () -> StippleEffect.get().newProject(), true));
+    }
+
+    public static void setDialogToHistory() {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        final Coord2D thirdDisp = new Coord2D(Layout.getDialogWidth() / 3, 0);
+
+        final TextLabel stateHeader = makeDialogLeftLabel(0, "Project state stack:"),
+                causeHeader = TextLabel.make(
+                        stateHeader.getPosition().displace(thirdDisp),
+                        "Preceding operation:");
+
+        mb.addAll(stateHeader, causeHeader);
+
+        AtomicInteger i = new AtomicInteger(-1);
+        final List<Integer> checkpoints = c.getStateManager().getCheckpoints();
+        final int size = checkpoints.size();
+
+        final MenuBuilder smb = new MenuBuilder();
+        MenuElement bottomLabel = new PlaceholderMenuElement();
+
+        for (int ci = 0; ci < size; ci++) {
+            final int checkpoint = checkpoints.get((size - 1) - ci);
+
+            final ProjectState state = c.getStateManager().getState(checkpoint);
+
+            final int relative = c.getStateManager().relativePosition(checkpoint),
+                    abs = Math.abs(relative);
+
+            final Color col;
+            final String text;
+
+            if (relative < 0) {
+                col = SEColors.red();
+                text = abs + " state" + (abs > 1 ? "s" : "") + " behind";
+            } else if (relative == 0) {
+                col = ThemeLogic.intuitTextColor(
+                        Settings.getTheme().panelBackground, true);
+                text = "[ CURRENT ]";
+            } else {
+                col = SEColors.green();
+                text = abs + " state" + (abs > 1 ? "s" : "") + " ahead";
+            }
+
+            final TextLabel stateLabel =
+                    TextLabel.make(getDialogLeftContentPositionForRow(ci + 1),
+                    text, col),
+                    causeLabel = TextLabel.make(
+                            stateLabel.getPosition().displace(thirdDisp),
+                            state.getOperation().toString());
+            smb.addAll(stateLabel, causeLabel);
+
+            if (relative != 0) {
+                final SelectStateButton selectButton = SelectStateButton.make(
+                        getDialogLeftContentPositionForRow(ci + 1)
+                                .displace(thirdDisp.x * 2, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
+                        () -> i.set(checkpoint), () -> i.get() != checkpoint);
+                smb.add(selectButton);
+            }
+
+            bottomLabel = stateLabel;
+        }
+
+        final int scrollerEndY = (Layout.getCanvasMiddle().y +
+                Layout.getDialogHeight() / 2) - ((2 * Layout.CONTENT_BUFFER_PX) +
+                Layout.STD_TEXT_BUTTON_H);
+
+        final Coord2D scrollerPos = Layout.getDialogPosition().displace(0,
+                (int)(3.5 * Layout.STD_TEXT_BUTTON_INC) +
+                        Layout.TEXT_Y_OFFSET - Layout.BUTTON_DIM);
+        final Bounds2D scrollerDims = new Bounds2D(Layout.getDialogWidth(),
+                scrollerEndY - scrollerPos.y);
+
+        final int realBottomY = bottomLabel.getRenderPosition().y +
+                bottomLabel.getHeight() + Layout.STD_TEXT_BUTTON_H;
+
+        mb.add(new VerticalScrollBox(scrollerPos, scrollerDims,
+                Arrays.stream(smb.build().getMenuElements())
+                        .map(Scrollable::new).toArray(Scrollable[]::new),
+                realBottomY, 0));
+
+        final Supplier<Boolean> precondition = () -> i.get() >= 0;
+
+        final DynamicLabel selectedLabel =
+                makeDialogLeftDynamicLabelAtBottom(() -> {
+                    if (precondition.get()) {
+                        final int relative = c.getStateManager().relativePosition(i.get()),
+                                abs = Math.abs(relative);
+
+                        final String before = "Selected state ",
+                                after = "the current state", middle;
+
+                        if (relative < 0)
+                            middle = abs + " state" +
+                                    (abs > 1 ? "s" : "") + " behind ";
+                        else if (relative == 0)
+                            middle = "";
+                        else
+                            middle = abs + " state" +
+                                    (abs > 1 ? "s" : "") + " ahead of ";
+
+                        return before + middle + after;
+                    } else
+                        return "No selection";
+                });
+        mb.add(selectedLabel);
+
+        setDialog(assembleDialog("History of " +
+                        c.projectInfo.getFormattedName(false, false) + "...",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                precondition, "Revert...",
+                () -> setDialogToPreviewAction(
+                        c.getStateManager().getState(i.get()),
+                        () -> c.getStateManager().setState(i.get(), c),
+                        DialogAssembly::setDialogToHistory,
+                        "project state reversion"), false));
     }
 
     public static void setDialogToNewFont() {
@@ -813,7 +929,7 @@ public class DialogAssembly {
                 spacingLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
                 DialogVals::setNewFontPixelSpacing,
-                DialogVals::getNewFontPixelSpacing, 2);
+                DialogVals::getNewFontPixelSpacing, 3);
         mb.addAll(spacingLabel, spacingTextbox);
         // character-specific
         final TextLabel charSpecificLabel =
@@ -833,10 +949,8 @@ public class DialogAssembly {
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(asciiLabel),
                         SEFonts::uploadASCIISourceFile);
-        final DynamicLabel asciiConfirmation = new DynamicLabel(
+        final DynamicLabel asciiConfirmation = DynamicLabel.make(
                 getDialogRightContentPositionForRow(lines),
-                MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
                 () -> DialogVals.getAsciiStatus().getMessage(),
                 Layout.getDialogWidth());
         mb.addAll(asciiLabel, asciiButton, asciiConfirmation);
@@ -855,10 +969,8 @@ public class DialogAssembly {
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(latinExLabel),
                         SEFonts::uploadLatinExtendedSourceFile);
-        final DynamicLabel latinExConfirmation = new DynamicLabel(
+        final DynamicLabel latinExConfirmation = DynamicLabel.make(
                 getDialogRightContentPositionForRow(lines + 1),
-                MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
                 () -> DialogVals.getLatinExStatus().getMessage(),
                 Layout.getDialogWidth());
         final MenuElementGrouping latinExContent = new MenuElementGrouping(
@@ -955,7 +1067,7 @@ public class DialogAssembly {
             final String actionLabel, final String consequence,
             final Runnable onApprove
     ) {
-        final GameImage warningText = GraphicsUtils.uiText()
+        final GameImage warningText = GraphicsUtils.uiText(simpleTextColor())
                 .addText(consequence).build().draw();
         final StaticMenuElement warning = new StaticMenuElement(
                 Layout.getCanvasMiddle(), new Bounds2D(warningText.getWidth(),
@@ -1091,18 +1203,9 @@ public class DialogAssembly {
                     retrievalFunctionMap.get(labelTexts[i]);
 
             if (isProject) {
-                final String[] toggleText =
-                        new String[] { "Expanded", "Collapsed" };
-                final GameImage[] bases = makeToggleButtonSet(toggleText);
-
-                final SimpleToggleMenuButton toggle = new SimpleToggleMenuButton(
+                final TextToggleButton toggle = TextToggleButton.make(
                         getDialogContentOffsetFollowingLabel(label),
-                        new Bounds2D(Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                                Layout.STD_TEXT_BUTTON_H),
-                        MenuElement.Anchor.LEFT_TOP, true, bases,
-                        Arrays.stream(bases)
-                                .map(GraphicsUtils::drawHighlightedButton)
-                                .toArray(GameImage[]::new),
+                        new String[] { "Expanded", "Collapsed" },
                         new Runnable[] {
                                 () -> adj.accept(false),
                                 () -> adj.accept(true)
@@ -1131,9 +1234,22 @@ public class DialogAssembly {
 
         makeCommonColorOperationElements(mb, c);
 
-        final TextLabel hueLabel = makeDialogLeftLabel(3, "Shift hue:"),
-                satLabel = makeDialogLeftLabel(4, "Shift sat.:"),
-                valueLabel = makeDialogLeftLabel(5, "Shift value:");
+        final TextLabel hueLabel = makeDialogLeftLabel(
+                AFTER_COMMON_COLOR_ACTION_ROW, "Shift hue:");
+
+        final String T_SHIFT = "Shift ", T_SCALE = "Scale ",
+                T_SAT = "sat:", T_VAL = "value:";
+
+        final DynamicLabel satLabel = makeDynamicLabel(
+                textBelowPos(hueLabel),
+                () -> (DialogVals.isShiftingSat()
+                        ? T_SHIFT : T_SCALE) + T_SAT,
+                T_SCALE + T_SAT),
+                valueLabel = makeDynamicLabel(
+                        textBelowPos(satLabel),
+                        () -> (DialogVals.isShiftingValue()
+                                ? T_SHIFT : T_SCALE) + T_VAL,
+                        T_SCALE + T_VAL);
 
         final IncrementalRangeElements<Integer> h =
                 IncrementalRangeElements.makeForInt(hueLabel,
@@ -1144,7 +1260,7 @@ public class DialogAssembly {
                         i -> i, i -> i, String::valueOf, "-XXX");
         mb.addAll(hueLabel, h.decButton, h.incButton, h.slider, h.value);
 
-        final double MIN = Constants.MIN_SV_SHIFT, MAX = Constants.MAX_SV_SHIFT;
+        final double MIN = Constants.MIN_SV_SCALE, MAX = Constants.MAX_SV_SCALE;
         final int STEPS = 5;
         final double[] bounds = new double[] { MIN, 1d, 2d, 5d, 10d, MAX },
                 increments = new double[] { 0.05, 0.1, 0.25, 0.5, 2.5 };
@@ -1161,36 +1277,36 @@ public class DialogAssembly {
         }
 
         final Runnable satDecrement = () -> {
-            final double was = DialogVals.getSatShift();
+            final double was = DialogVals.getSatScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was <= bounds[i + 1]) {
-                    DialogVals.setSatShift(Math.max(was - increments[i], MIN));
+                    DialogVals.setSatScale(Math.max(was - increments[i], MIN));
                     break;
                 }
         }, satIncrement = () -> {
-            final double was = DialogVals.getSatShift();
+            final double was = DialogVals.getSatScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was < bounds[i + 1]) {
-                    DialogVals.setSatShift(Math.min(was + increments[i], MAX));
+                    DialogVals.setSatScale(Math.min(was + increments[i], MAX));
                     break;
                 }
         }, valueDecrement = () -> {
-            final double was = DialogVals.getValueShift();
+            final double was = DialogVals.getValueScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was <= bounds[i + 1]) {
-                    DialogVals.setValueShift(
+                    DialogVals.setValueScale(
                             Math.max(was - increments[i], MIN));
                     break;
                 }
         }, valueIncrement = () -> {
-            final double was = DialogVals.getValueShift();
+            final double was = DialogVals.getValueScale();
 
             for (int i = 0; i < STEPS; i++)
                 if (was < bounds[i + 1]) {
-                    DialogVals.setValueShift(
+                    DialogVals.setValueScale(
                             Math.min(was + increments[i], MAX));
                     break;
                 }
@@ -1235,41 +1351,87 @@ public class DialogAssembly {
         Function<Double, String> svfFormat = d -> {
             final int _20x = (int) Math.round(d * 20);
 
-            return "x" + (_20x / 20d);
+            return (_20x / 20d) + "x";
         };
 
-        final IncrementalRangeElements<Double> s =
+        final MenuElementGrouping satScale = new MenuElementGrouping(
                 IncrementalRangeElements.makeForDouble(satLabel,
                         satLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
                         satLabel.getY(), satDecrement, satIncrement,
-                        Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
-                        DialogVals::setSatShift, DialogVals::getSatShift,
+                        Constants.MIN_SV_SCALE, Constants.MAX_SV_SCALE,
+                        DialogVals::setSatScale, DialogVals::getSatScale,
                         svfToSlider, svfFromSlider, svfFormat,
-                        "x" + "X".repeat(20));
-        mb.addAll(satLabel, s.decButton, s.incButton, s.slider, s.value);
+                        "x" + "X".repeat(20)).getAll()),
+                satShift = new MenuElementGrouping(
+                        IncrementalRangeElements.makeForInt(satLabel,
+                                satLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                                satLabel.getY(),
+                                1, Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                                DialogVals::setSatShift, DialogVals::getSatShift,
+                                i -> i, i -> i, String::valueOf, "XXXX").getAll());
 
-        final IncrementalRangeElements<Double> v =
+        final ThinkingMenuElement satManager = new ThinkingMenuElement(
+                () -> DialogVals.isShiftingSat() ? satShift : satScale);
+
+        mb.addAll(satLabel, satManager);
+
+        final MenuElementGrouping valueScale = new MenuElementGrouping(
                 IncrementalRangeElements.makeForDouble(valueLabel,
                         valueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
                         valueLabel.getY(), valueDecrement, valueIncrement,
-                        Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
-                        DialogVals::setValueShift, DialogVals::getValueShift,
+                        Constants.MIN_SV_SCALE, Constants.MAX_SV_SCALE,
+                        DialogVals::setValueScale, DialogVals::getValueScale,
                         svfToSlider, svfFromSlider, svfFormat,
-                        "x" + "X".repeat(20));
-        mb.addAll(valueLabel, v.decButton, v.incButton, v.slider, v.value);
+                        "x" + "X".repeat(20)).getAll()),
+                valueShift = new MenuElementGrouping(
+                        IncrementalRangeElements.makeForInt(valueLabel,
+                                valueLabel.getY() + Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                                valueLabel.getY(),
+                                1, Constants.MIN_SV_SHIFT, Constants.MAX_SV_SHIFT,
+                                DialogVals::setValueShift, DialogVals::getValueShift,
+                                i -> i, i -> i, String::valueOf, "XXXX").getAll());
+
+        final ThinkingMenuElement valueManager = new ThinkingMenuElement(
+                () -> DialogVals.isShiftingValue() ? valueShift : valueScale);
+
+        mb.addAll(valueLabel, valueManager);
+
+        final String RESET = "Reset";
+        final Coord2D firstResetPos =
+                getDialogRightContentPositionForRow(AFTER_COMMON_COLOR_ACTION_ROW)
+                        .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
 
         final SimpleMenuButton resetHue =
-                GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(3),
+                GraphicsUtils.makeStandardTextButton(RESET, firstResetPos,
                         () -> DialogVals.setHueShift(0)),
-                resetSat = GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(4),
-                        () -> DialogVals.setSatShift(1d)),
-                resetValue = GraphicsUtils.makeStandardTextButton("Reset",
-                        getDialogRightContentPositionForRow(5),
-                        () -> DialogVals.setValueShift(1d));
+                resetSat = GraphicsUtils.makeStandardTextButton(RESET,
+                        textBelowPos(resetHue),
+                        () -> {
+                            DialogVals.setSatScale(1d);
+                            DialogVals.setSatShift(0);
+                        }),
+                resetValue = GraphicsUtils.makeStandardTextButton(RESET,
+                        textBelowPos(resetSat),
+                        () -> {
+                            DialogVals.setValueScale(1d);
+                            DialogVals.setValueShift(0);
+                        });
 
-        mb.addAll(resetHue, resetSat, resetValue);
+        final String[] toggleTexts = new String[] { "Scale", "Shift" };
+        final Runnable[] toggleActions = new Runnable[] { () -> {}, () -> {} };
+        final TextToggleButton
+                toggleSat = TextToggleButton.make(
+                        getDialogContentToRightOfContent(resetSat),
+                        toggleTexts, toggleActions,
+                        () -> DialogVals.isShiftingSat() ? 1 : 0,
+                        DialogVals::toggleShiftingSat),
+                toggleValue = TextToggleButton.make(
+                        getDialogContentToRightOfContent(resetValue),
+                        toggleTexts, toggleActions,
+                        () -> DialogVals.isShiftingValue() ? 1 : 0,
+                        DialogVals::toggleShiftingValue);
+
+        mb.addAll(resetHue, resetSat, resetValue, toggleSat, toggleValue);
 
         setDialog(assembleDialog("Shift color levels...",
                 new MenuElementGrouping(mb.build().getMenuElements()),
@@ -1293,13 +1455,13 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel scriptLabel = makeDialogLeftLabel(
-                3, "Script file:");
+                AFTER_COMMON_COLOR_ACTION_ROW, "Script file:");
         final SimpleMenuButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(scriptLabel),
                         StippleEffect.get()::openColorScript);
         final DynamicLabel scriptConfirmation = makeDynamicLabel(
-                getDialogRightContentPositionForRow(3),
+                getDialogRightContentPositionForRow(AFTER_COMMON_COLOR_ACTION_ROW),
                 DialogVals::colorScriptMessage, "X".repeat(50));
         mb.addAll(scriptLabel, scriptButton, scriptConfirmation);
 
@@ -1315,6 +1477,20 @@ public class DialogAssembly {
     private static void setDialogToPreviewAction(
             final ProjectState preview, final Runnable backButtonAction,
             final String previewAppend
+    ) {
+
+        final SEContext c = StippleEffect.get().getContext();
+
+        setDialogToPreviewAction(preview, () -> {
+                    preview.markAsCheckpoint(false);
+                    c.getStateManager()
+                            .performAction(preview, Operation.EDIT_IMAGE);
+                }, backButtonAction, "preview of " + previewAppend);
+    }
+
+    private static void setDialogToPreviewAction(
+            final ProjectState preview, final Runnable onApproval,
+            final Runnable backButtonAction, final String previewAppend
     ) {
         if (preview == null) {
             setDialogToScriptErrors();
@@ -1376,19 +1552,92 @@ public class DialogAssembly {
             previewContent[i] = composed.submit();
         }
 
-        final AnimationMenuElement previewAnim = new AnimationMenuElement(
+        final ActionPreviewer previewer = new ActionPreviewer(
                 new Coord2D(Layout.getCanvasMiddle().x,
-                        textBelowPos(backButton, 1).y), new Bounds2D(pw, ph),
-                MenuElement.Anchor.CENTRAL_TOP, 20, previewContent);
-        mb.add(previewAnim);
+                        textBelowPos(backButton, 1).y),
+                new Bounds2D(pw, ph), previewContent,
+                preview.getFrameDurations().stream()
+                        .mapToDouble(d -> d).toArray());
+        mb.add(previewer);
+
+        final PlaybackInfo playbackInfo = previewer.getPlaybackInfo();
+
+        if (fc > 1) {
+            // frame and playback mode controls
+            final MenuElement firstFrame =
+                    GraphicsUtils.generateIconButton(IconCodes.TO_FIRST_FRAME,
+                            backButton.getPosition()
+                                    .displace(0, Layout.DIALOG_CONTENT_INC_Y),
+                            () -> true, previewer::toFirstFrame),
+                    previousFrame = GraphicsUtils.generateIconButton(
+                            IconCodes.PREVIOUS, firstFrame.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            () -> true, previewer::previousFrame),
+                    playStop = GraphicsUtils.generateIconToggleButton(
+                            previousFrame.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            new String[] { IconCodes.PLAY, IconCodes.STOP },
+                            new Runnable[] {
+                                    playbackInfo::play, playbackInfo::stop
+                            }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
+                            () -> true, IconCodes.PLAY),
+                    nextFrame = GraphicsUtils.generateIconButton(
+                            IconCodes.NEXT, playStop.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            () -> true, previewer::nextFrame),
+                    lastFrame = GraphicsUtils.generateIconButton(
+                            IconCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
+                                    .displace(Layout.BUTTON_INC, 0),
+                            () -> true, previewer::toLastFrame);
+
+            final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
+                    PlaybackInfo.Mode.FORWARDS, PlaybackInfo.Mode.BACKWARDS,
+                    PlaybackInfo.Mode.LOOP, PlaybackInfo.Mode.PONG_FORWARDS
+            };
+            final MenuElement playbackModeButton =
+                    GraphicsUtils.generateIconToggleButton(
+                            lastFrame.getRenderPosition().displace(
+                                    Layout.BUTTON_INC, 0),
+                            Arrays.stream(validModes)
+                                    .map(PlaybackInfo.Mode::getIconCode)
+                                    .toArray(String[]::new),
+                            Arrays.stream(validModes)
+                                    .map(mode -> (Runnable) () -> {})
+                                    .toArray(Runnable[]::new),
+                            () -> playbackInfo.getMode().buttonIndex(),
+                            playbackInfo::toggleMode, () -> true, IconCodes.LOOP);
+            final DynamicLabel frameTracker = makeDynamicLabel(
+                    playbackModeButton.getRenderPosition().displace(
+                            Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
+                            -Layout.BUTTON_OFFSET + Layout.TEXT_Y_OFFSET),
+                    () -> "Frm. " + (previewer.getFrameIndex() + 1) +
+                            "/" + previewer.getFrameCount(),
+                    "Frm. XXX/XXX");
+
+            mb.addAll(firstFrame, previousFrame, playStop, nextFrame,
+                    lastFrame, playbackModeButton, frameTracker);
+
+            // playback speed (FPS)
+            final StaticMenuElement fpsReference = new StaticMenuElement(
+                    getRightColumnFromLeftDisplacement(
+                            firstFrame.getPosition())
+                            .displace(-(Layout.BUTTON_DIM +
+                                    Layout.CONTENT_BUFFER_PX), 0),
+                    Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
+                    GameImage.dummy());
+            final int fpsButtonY = firstFrame.getY();
+            final IncrementalRangeElements<Integer> fps =
+                    IncrementalRangeElements.makeForInt(fpsReference, fpsButtonY,
+                            (fpsButtonY - Layout.BUTTON_OFFSET) + Layout.TEXT_Y_OFFSET,
+                            1, Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                            playbackInfo::setFps, playbackInfo::getFps,
+                            i -> i, sv -> sv, sv -> sv + " FPS", "XXX FPS");
+            mb.addAll(fps.decButton, fps.incButton, fps.slider, fps.value);
+        }
 
         setDialog(assembleDialog("Preview of " + previewAppend,
                 new MenuElementGrouping(mb.build().getMenuElements()),
-                () -> true, "Apply", () -> {
-                    preview.markAsCheckpoint(false);
-                    c.getStateManager()
-                            .performAction(preview, Operation.EDIT_IMAGE);
-                }, true));
+                () -> true, "Apply", onApproval, true));
     }
 
     public static void setDialogToSavePalette(final Palette palette) {
@@ -1529,21 +1778,17 @@ public class DialogAssembly {
         Settings.resetAssignments();
 
         Arrays.stream(DialogVals.SettingScreen.values()).forEach(ss -> {
-            final GameImage baseSS = GraphicsUtils.drawTextButton(
-                    Layout.STD_TEXT_BUTTON_W, ss.toString(), false),
-                    highlighedSS = GraphicsUtils.drawHighlightedButton(baseSS);
-
             final Coord2D ssPos = Layout.getDialogPosition().displace(
                     Layout.CONTENT_BUFFER_PX + (ss.ordinal() *
                             (Layout.STD_TEXT_BUTTON_W + Layout.BUTTON_OFFSET)),
                     Layout.CONTENT_BUFFER_PX +
                             (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
-            mb.add(new SimpleMenuButton(ssPos,
-                    new Bounds2D(baseSS.getWidth(), baseSS.getHeight()),
-                    MenuElement.Anchor.LEFT_TOP, true,
-                    () -> DialogVals.setSettingScreen(ss),
-                    baseSS, highlighedSS));
+            mb.add(SelectableListItemButton.make(ssPos,
+                    Layout.STD_TEXT_BUTTON_W, ss.toString(), ss.ordinal(),
+                    () -> DialogVals.getSettingScreen().ordinal(),
+                    i -> DialogVals.setSettingScreen(
+                            DialogVals.SettingScreen.values()[i])));
         });
 
         // decision logic
@@ -1617,6 +1862,55 @@ public class DialogAssembly {
         }, true));
     }
 
+    public static void setDialogToFrameProperties(final int index) {
+        final SEContext c = StippleEffect.get().getContext();
+        final MenuBuilder mb = new MenuBuilder();
+
+        DialogVals.setFrameDuration(c.getState().getFrameDurations().get(index));
+
+        final TextLabel durationLabel = makeDialogLeftLabel(0, "Frame duration:");
+
+        final double STEP = 0.1, DIV = 10d,
+                MIN = Constants.MIN_FRAME_DURATION,
+                MAX = Constants.MAX_FRAME_DURATION;
+        final Runnable fDecrement = () -> {
+            final double was = DialogVals.getFrameDuration(),
+                    v = Math.max(MIN, was - STEP);
+
+            DialogVals.setFrameDuration(Math.round(v * DIV) / DIV);
+        }, fIncrement = () -> {
+            final double was = DialogVals.getFrameDuration(),
+                    v = Math.min(MAX, was + STEP);
+
+            DialogVals.setFrameDuration(Math.round(v * DIV) / DIV);
+        };
+        final IncrementalRangeElements<Double> duration =
+                IncrementalRangeElements.makeForDouble(durationLabel,
+                        durationLabel.getY() +
+                                Layout.DIALOG_CONTENT_COMP_OFFSET_Y,
+                        durationLabel.getY(), fDecrement, fIncrement,
+                        MIN, MAX, DialogVals::setFrameDuration,
+                        DialogVals::getFrameDuration,
+                        o -> (int)(o * DIV), sv -> sv / DIV,
+                        o -> o + "x", "XXXXx");
+
+        final SimpleMenuButton resetDuration =
+                GraphicsUtils.makeStandardTextButton("Reset",
+                        getDialogRightContentPositionForRow(0)
+                                .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
+                        () -> DialogVals.setFrameDuration(
+                                Constants.DEFAULT_FRAME_DURATION));
+
+        mb.addAll(durationLabel, duration.decButton, duration.incButton,
+                duration.slider, duration.value, resetDuration);
+
+        setDialog(assembleDialog("Frame " + (index + 1) + " | Properties",
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                () -> true, Constants.GENERIC_APPROVAL_TEXT,
+                () -> c.changeFrameDuration(DialogVals.getFrameDuration(), index),
+                true));
+    }
+
     public static void setDialogToSplashScreen() {
         final MenuBuilder mb = new MenuBuilder();
         final Theme t = Settings.getTheme();
@@ -1632,13 +1926,13 @@ public class DialogAssembly {
         final GameImage background = new GameImage(w, h);
         background.free();
 
-        background.fillRectangle(t.splashBackground.get(), 0, 0, w, h);
+        background.fillRectangle(t.splashBackground, 0, 0, w, h);
         mb.add(new SimpleMenuButton(new Coord2D(), new Bounds2D(w, h),
                 MenuElement.Anchor.LEFT_TOP, true,
                 () -> StippleEffect.get().clearDialog(), background, background));
 
         // version
-        final GameImage version = GraphicsUtils.uiText(t.splashText.get())
+        final GameImage version = GraphicsUtils.uiText(t.splashText)
                 .addText(StippleEffect.getVersion()).build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h),
@@ -1646,7 +1940,7 @@ public class DialogAssembly {
                 MenuElement.Anchor.CENTRAL_BOTTOM, version));
 
         // gateway
-        final GameImage ctc = GraphicsUtils.uiText(t.splashFlashingText.get())
+        final GameImage ctc = GraphicsUtils.uiText(t.splashFlashingText)
                 .addText("Click anywhere to continue").build().draw();
 
         mb.add(new AnimationMenuElement(new Coord2D(w - Layout.CONTENT_BUFFER_PX, h),
@@ -1655,14 +1949,15 @@ public class DialogAssembly {
                 ctc, GameImage.dummy()));
 
         // animation frames
-        final GameImage[] frames = SplashLoader.loadAnimationFrames();
+        final GameImage[] frames = t.logic.loadSplash();
         mb.add(new AnimationMenuElement(Layout.getCanvasMiddle(),
                 new Bounds2D(frames[0].getWidth(), frames[0].getHeight()),
-                MenuElement.Anchor.CENTRAL, 5, frames));
+                MenuElement.Anchor.CENTRAL, t.logic.ticksPerSplashFrame(),
+                frames));
 
         // subtitle
-        final GameImage subtitle = GraphicsUtils.uiText(t.splashText.get())
-                .addText("Pixel art editor and animator").addLineBreak()
+        final GameImage subtitle = GraphicsUtils.uiText(t.splashText)
+                .addText(t.subtitle).addLineBreak()
                 .addText("Jordan Bunke, 2023-2024")
                 .build().draw();
 
@@ -1680,39 +1975,48 @@ public class DialogAssembly {
     private static void makeCommonColorOperationElements(
             final MenuBuilder mb, final SEContext c
     ) {
-        final List<DialogVals.Scope> vs =
-                Arrays.stream(DialogVals.Scope.values())
-                        .filter(s -> s != DialogVals.Scope.SELECTION ||
-                                c.getState().hasSelection()).toList();
+        final DialogVals.Scope[] vs = DialogVals.Scope.values();
 
-        final DialogVals.Scope was = DialogVals.getScope();
-        final boolean hasScope = vs.contains(was);
-
-        if (!hasScope)
-            DialogVals.setScope(vs.get(0));
-
-        final int initialIndex = vs.indexOf(DialogVals.getScope());
+        final int initialIndex = DialogVals.getScope().ordinal();
+        final boolean hasSelection = c.getState().hasSelection();
 
         final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope:"),
-                flagLabel = TextLabel.make(textBelowPos(scopeLabel),
-                        "Include disabled layers?");
+                disabledLayersLabel = TextLabel.make(
+                        textBelowPos(scopeLabel),
+                        "Include disabled layers?"),
+                ignoreSelectionLabel = TextLabel.make(
+                        textBelowPos(disabledLayersLabel),
+                        "Ignore selection?");
         final Dropdown dropdown = Dropdown.forDialog(
                 getDialogContentOffsetFollowingLabel(scopeLabel),
                 Layout.DIALOG_CONTENT_BIG_W_ALLOWANCE,
-                vs.stream().map(DialogVals.Scope::toString)
+                Arrays.stream(vs).map(DialogVals.Scope::toString)
                         .toArray(String[]::new),
-                vs.stream().map(s -> (Runnable) () -> DialogVals.setScope(s))
+                Arrays.stream(vs).map(s -> (Runnable) () -> DialogVals.setScope(s))
                         .toArray(Runnable[]::new),
                 () -> initialIndex);
-        final Checkbox checkbox = new Checkbox(
-                getDialogContentOffsetFollowingLabel(flagLabel),
-                new ConcreteProperty<>(DialogVals::isIncludeDisabledLayers,
-                        DialogVals::setIncludeDisabledLayers));
-        final GatewayMenuElement flagGate = new GatewayMenuElement(
-                new MenuElementGrouping(flagLabel, checkbox),
-                () -> DialogVals.getScope().considersLayers());
+        final Checkbox disabledLayersCheckbox = new Checkbox(
+                getDialogContentOffsetFollowingLabel(disabledLayersLabel),
+                new ConcreteProperty<>(
+                        DialogVals::isIncludeDisabledLayers,
+                        DialogVals::setIncludeDisabledLayers)),
+                ignoreSelectionCheckbox = new Checkbox(
+                        getDialogContentOffsetFollowingLabel(
+                                ignoreSelectionLabel),
+                        new ConcreteProperty<>(
+                                DialogVals::isIgnoreSelection,
+                                DialogVals::setIgnoreSelection));
+        final GatewayMenuElement disabledLayersGate =
+                new GatewayMenuElement(
+                        new MenuElementGrouping(
+                                disabledLayersLabel, disabledLayersCheckbox),
+                        () -> DialogVals.getScope().considersLayers()),
+                ignoreSelectionGate = new GatewayMenuElement(
+                        new MenuElementGrouping(
+                                ignoreSelectionLabel, ignoreSelectionCheckbox),
+                        () -> hasSelection);
 
-        mb.addAll(scopeLabel, dropdown, flagGate);
+        mb.addAll(scopeLabel, dropdown, disabledLayersGate, ignoreSelectionGate);
     }
 
     private static void makeStitchElementsForSaveSpriteSheet(
@@ -1979,14 +2283,6 @@ public class DialogAssembly {
                 });
     }
 
-    private static GameImage[] makeToggleButtonSet(
-            final String... buttonTexts) {
-        return Arrays.stream(buttonTexts)
-                .map(t -> GraphicsUtils.drawTextButton(
-                        Layout.DIALOG_CONTENT_SMALL_W_ALLOWANCE, t, false))
-                .toArray(GameImage[]::new);
-    }
-
     private static DynamicTextbox makeDialogPixelDynamicTextbox(
             final MenuElement label,
             final Function<MenuElement, Coord2D> offsetFunction,
@@ -2079,8 +2375,8 @@ public class DialogAssembly {
             final Coord2D position, final Supplier<String> getter,
             final String widestTextCase
     ) {
-        return new DynamicLabel(position, MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(), getter, widestTextCase);
+        return DynamicLabel.make(position, getter,
+                DynamicLabel.getWidth(widestTextCase));
     }
 
     private static TextLabel makeValidDimensionsBottomLabel() {
@@ -2096,10 +2392,8 @@ public class DialogAssembly {
                 .displace(0, -(Layout.DIALOG_CONTENT_INC_Y +
                         Layout.CONTENT_BUFFER_PX)).y;
 
-        return new DynamicLabel(
+        return DynamicLabel.make(
                 new Coord2D(Layout.getDialogContentInitial().x, y),
-                MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().textLight.get(),
                 getter, Layout.getDialogWidth());
     }
 
@@ -2177,6 +2471,11 @@ public class DialogAssembly {
         return s;
     }
 
+    private static Color simpleTextColor() {
+        return ThemeLogic.intuitTextColor(
+                Settings.getTheme().panelBackground, true);
+    }
+
     private static VerticalScrollBox assembleScroller(
             final DialogVals.SettingScreen settingScreen
     ) {
@@ -2188,7 +2487,7 @@ public class DialogAssembly {
                 Layout.CONTENT_BUFFER_PX + Layout.BUTTON_BORDER_PX,
                 (int)(3.5 * Layout.STD_TEXT_BUTTON_INC));
         mb.add(TextLabel.make(titlePosition, settingScreen.getTitle(),
-                t.textMenuHeading.get(), 2d));
+                t.textMenuHeading, 2d));
         final int initialYIndex = 4;
 
         // initialize in every execution path
@@ -2208,8 +2507,11 @@ public class DialogAssembly {
                                 "Width:"),
                         newProjectHeightLabel = makeDialogRightLabel(
                                 newProjectWidthLabel, "Height:"),
-                        frameAffixLabel = TextLabel.make(
+                        defaultToolBreadthLabel = TextLabel.make(
                                 textBelowPos(newProjectWidthLabel, 1),
+                                "Default tool breadth:"),
+                        frameAffixLabel = TextLabel.make(
+                                textBelowPos(defaultToolBreadthLabel, 1),
                                 "Default separate PNGs frame affixes"),
                         prefixLabel = TextLabel.make(
                                 textBelowPos(frameAffixLabel),
@@ -2234,13 +2536,19 @@ public class DialogAssembly {
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         Settings::setDefaultCanvasWPixels,
-                        Settings::checkDefaultCanvasWPixels, 3),
+                        Settings::checkDefaultCanvasWPixels, 4),
                         heightTextbox = makeDialogPixelDynamicTextbox(
                                 newProjectHeightLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                                 Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                                 Settings::setDefaultCanvasHPixels,
-                                Settings::checkDefaultCanvasHPixels, 3);
+                                Settings::checkDefaultCanvasHPixels, 4),
+                        toolBreadthTextbox = makeDialogPixelDynamicTextbox(
+                                defaultToolBreadthLabel,
+                                DialogAssembly::getDialogContentOffsetFollowingLabel,
+                                Constants.MIN_BREADTH, Constants.MAX_BREADTH,
+                                Settings::setDefaultToolBreadth,
+                                Settings::checkDefaultToolBreadth, 3);
 
                 final String FA_EXAMPLE = "Example: base_name", FA_MAX_VALUE = "WWWWW";
                 final DynamicLabel frameAffixExample = makeDynamicLabel(
@@ -2261,9 +2569,10 @@ public class DialogAssembly {
                         pixelGridDefaultLabel, pixelGridCheckbox,
                         defaultNewProjectSizeLabel,
                         newProjectWidthLabel, widthTextbox,
-                        newProjectHeightLabel, heightTextbox)
-                        .addAll(frameAffixLabel, prefixLabel, suffixLabel,
-                                frameAffixExample, prefixTextbox, suffixTextbox);
+                        newProjectHeightLabel, heightTextbox,
+                        defaultToolBreadthLabel, toolBreadthTextbox,
+                        frameAffixLabel, prefixLabel, suffixLabel,
+                        frameAffixExample, prefixTextbox, suffixTextbox);
 
                 // update as new settings are added to category
                 yield frameAffixExample;
@@ -2324,7 +2633,7 @@ public class DialogAssembly {
                                 "Theme:"),
                         windowedSizeLabel = TextLabel.make(
                                 textBelowPos(fontLabel, 1),
-                                "Program size when windowed"),
+                                "Windowed program size"),
                         windowedWidthLabel = TextLabel.make(
                                 textBelowPos(windowedSizeLabel),
                                 "Window width:"),
@@ -2453,30 +2762,6 @@ public class DialogAssembly {
                 // update as new settings are added to category
                 yield pixelGridLimits2;
             }
-            case ADVANCED -> {
-                final TextLabel dumpStatesLabel = makeDialogLeftLabel(
-                        initialYIndex,
-                        "Dump old project states when memory is low?"),
-                        dsContext1 = TextLabel.make(textBelowPos(dumpStatesLabel),
-                                "This will dump previous project state iterations from"),
-                        dsContext2 = TextLabel.make(textBelowPos(dsContext1),
-                                "the state stack, making them inaccessible via undo/redo."),
-                        dsContext3 = TextLabel.make(textBelowPos(dsContext2),
-                                "Disabling this may lead the program to crash;"),
-                        dsContext4 = TextLabel.make(textBelowPos(dsContext3),
-                                "this instability will be addressed in future updates.");
-
-                final Checkbox dumpStatesCheckbox = new Checkbox(
-                        getDialogContentOffsetFollowingLabel(dumpStatesLabel),
-                        new ConcreteProperty<>(
-                                Settings::checkIsDumpStates,
-                                Settings::setDumpStates));
-
-                mb.addAll(dumpStatesLabel, dumpStatesCheckbox,
-                        dsContext1, dsContext2, dsContext3, dsContext4);
-
-                yield dsContext4;
-            }
         };
 
         // scrolling container
@@ -2515,7 +2800,7 @@ public class DialogAssembly {
         final double titleSize = 2d;
         final TextLabel headingLabel = TextLabel.make(contentStart.displace(
                 0, initialbottomY), infoScreen.getTitle(),
-                Settings.getTheme().textMenuHeading.get(), titleSize);
+                Settings.getTheme().textMenuHeading, titleSize);
         initialbottomY += (int)(incY * titleSize) + Layout.BUTTON_INC;
 
         contentAssembler.add(headingLabel);
@@ -2613,7 +2898,8 @@ public class DialogAssembly {
             final TextLabel name = TextLabel.make(contentStart.displace(
                             (hasIcon ? Layout.BUTTON_INC : 0) + Layout.CONTENT_BUFFER_PX,
                             bottomY + Layout.TEXT_Y_OFFSET - Layout.BUTTON_BORDER_PX),
-                    headings[i], hasIcon ? t.textShortcut.get() : t.affixTextLight.get());
+                    headings[i], hasIcon ? t.textShortcut
+                            : ThemeLogic.intuitTextColor(t.panelBackground, false));
             contentAssembler.add(name);
 
             bottomY += incY;
@@ -2629,8 +2915,9 @@ public class DialogAssembly {
                     final TextLabel segmentText = TextLabel.make(
                             contentStart.displace(indent + offsetX,
                                     bottomY + Layout.TEXT_Y_OFFSET),
-                            lineSegments[j], j % 2 == 1
-                                    ? t.textShortcut.get() : t.textLight.get());
+                            lineSegments[j], j % 2 == 1 ? t.textShortcut
+                                    : ThemeLogic.intuitTextColor(
+                                            t.panelBackground, true));
 
                     contentAssembler.add(segmentText);
                     offsetX += segmentText.getWidth() + Layout.BUTTON_BORDER_PX;
@@ -2773,14 +3060,16 @@ public class DialogAssembly {
                         IconCodes.UNDO,
                         IconCodes.GRANULAR_UNDO,
                         IconCodes.GRANULAR_REDO,
-                        IconCodes.REDO
+                        IconCodes.REDO,
+                        IconCodes.HISTORY
                 },
                 new String[] {
                         "Info", "Open panel manager", "Program Settings",
                         "New Project", "Import", "Save", "Save As...",
                         "Resize", "Pad", "Stitch or split frames", "Preview",
                         "Automation script",
-                        "Undo", "Granular Undo", "Granular Redo", "Redo"
+                        "Undo", "Granular Undo", "Granular Redo", "Redo",
+                        "History"
                 }, contentAssembler, contentStart, initialBottomY
         );
     }
@@ -2846,6 +3135,7 @@ public class DialogAssembly {
                         IconCodes.REMOVE_FRAME,
                         IconCodes.MOVE_FRAME_FORWARD,
                         IconCodes.MOVE_FRAME_BACK,
+                        IconCodes.FRAME_PROPERTIES,
                         IconCodes.TO_FIRST_FRAME,
                         IconCodes.PREVIOUS,
                         IconCodes.NEXT,
@@ -2863,6 +3153,7 @@ public class DialogAssembly {
                         "Remove frame",
                         "Move frame forward",
                         "Move frame back",
+                        "Frame properties",
                         "Navigate to first frame",
                         "To previous frame",
                         "To next frame",
@@ -2897,9 +3188,9 @@ public class DialogAssembly {
         // background
         final GameImage backgroundImage = new GameImage(dialogW,
                 Layout.height() - (2 * Layout.BUTTON_DIM));
-        backgroundImage.fillRectangle(Settings.getTheme().panelBackground.get(),
+        backgroundImage.fillRectangle(Settings.getTheme().panelBackground,
                 0, 0, backgroundImage.getWidth(), backgroundImage.getHeight());
-        backgroundImage.drawRectangle(Settings.getTheme().buttonOutline.get(),
+        backgroundImage.drawRectangle(Settings.getTheme().buttonOutline,
                 2f * Layout.BUTTON_BORDER_PX, 0, 0,
                 backgroundImage.getWidth(), backgroundImage.getHeight());
 
@@ -2918,7 +3209,7 @@ public class DialogAssembly {
         // close button
         final GameImage baseImage = GraphicsUtils.drawTextButton(
                 Layout.STD_TEXT_BUTTON_W, "Close", false),
-                highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
+                highlightedImage = GraphicsUtils.highlightButton(baseImage);
 
         final Coord2D cancelPos = background.getRenderPosition()
                 .displace(background.getWidth(), background.getHeight())
@@ -2932,21 +3223,18 @@ public class DialogAssembly {
 
         // contents
         Arrays.stream(DialogVals.InfoScreen.values()).forEach(is -> {
-                    final GameImage baseIS = GraphicsUtils.drawTextButton(
-                            Layout.STD_TEXT_BUTTON_W, is.toString(), false),
-                            highlighedIS = GraphicsUtils.drawHighlightedButton(baseIS);
-
                     final Coord2D isPos = background.getRenderPosition().displace(
                             Layout.CONTENT_BUFFER_PX + (is.ordinal() *
                                     (Layout.STD_TEXT_BUTTON_W + Layout.BUTTON_OFFSET)),
                             Layout.CONTENT_BUFFER_PX +
                                             (int)(1.5 * Layout.STD_TEXT_BUTTON_INC));
 
-                    mb.add(new SimpleMenuButton(isPos,
-                            new Bounds2D(baseIS.getWidth(), baseIS.getHeight()),
-                            MenuElement.Anchor.LEFT_TOP, true,
-                            () -> DialogVals.setInfoScreen(is),
-                            baseIS, highlighedIS));
+                    mb.add(SelectableListItemButton.make(
+                            isPos, Layout.STD_TEXT_BUTTON_W,
+                            is.toString(), is.ordinal(),
+                            () -> DialogVals.getInfoScreen().ordinal(),
+                            i -> DialogVals.setInfoScreen(
+                                    DialogVals.InfoScreen.values()[i])));
                 });
 
         final int scrollerEndY = (background.getRenderPosition().y +
@@ -2977,7 +3265,7 @@ public class DialogAssembly {
         // background
         final GameImage backgroundImage = new GameImage(
                 Layout.getDialogWidth(), Layout.getDialogHeight());
-        backgroundImage.fillRectangle(Settings.getTheme().panelBackground.get(),
+        backgroundImage.fillRectangle(Settings.getTheme().panelBackground,
                 0, 0, Layout.getDialogWidth(), Layout.getDialogHeight());
 
         final StaticMenuElement background =
@@ -2997,7 +3285,7 @@ public class DialogAssembly {
                 Layout.STD_TEXT_BUTTON_W, approveText.equals(
                         Constants.CLOSE_DIALOG_TEXT)
                         ? Constants.CLOSE_DIALOG_TEXT : "Cancel", false),
-                highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
+                highlightedImage = GraphicsUtils.highlightButton(baseImage);
 
         final Coord2D cancelPos = background.getRenderPosition()
                 .displace(background.getWidth(), background.getHeight())
@@ -3026,7 +3314,7 @@ public class DialogAssembly {
         // border
         final GameImage borderImage = new GameImage(
                 Layout.getDialogWidth(), Layout.getDialogHeight());
-        borderImage.drawRectangle(Settings.getTheme().buttonOutline.get(),
+        borderImage.drawRectangle(Settings.getTheme().buttonOutline,
                 2f * Layout.BUTTON_BORDER_PX, 0, 0,
                 Layout.getDialogWidth(), Layout.getDialogHeight());
 

@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
 
@@ -18,7 +19,8 @@ public class TextLabel extends StaticMenuElement {
     public static TextLabel make(
             final Coord2D position, final String text
     ) {
-        return make(position, text, Settings.getTheme().textLight.get());
+        return make(position, text, ThemeLogic.intuitTextColor(
+                Settings.getTheme().panelBackground, true));
     }
 
     public static TextLabel make(
@@ -31,7 +33,8 @@ public class TextLabel extends StaticMenuElement {
             final Coord2D position, final String text,
             final Color c, final double textSize
     ) {
-        final GameImage label = GraphicsUtils.uiText(c, textSize).addText(text).build().draw();
+        final GameImage label = GraphicsUtils.uiText(c, textSize)
+                .addText(text).build().draw();
         return new TextLabel(position, label);
     }
 }

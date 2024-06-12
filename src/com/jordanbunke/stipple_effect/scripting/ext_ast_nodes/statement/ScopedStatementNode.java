@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.scripting.util.Arguments;
 import com.jordanbunke.stipple_effect.scripting.util.Scope;
 
 public abstract class ScopedStatementNode extends ExtStatementNode {
-    protected Scope scope;
+    protected final Scope scope;
 
     public ScopedStatementNode(
             final TextPosition position,

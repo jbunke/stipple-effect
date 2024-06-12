@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
@@ -15,18 +16,19 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import java.awt.*;
 import java.util.Arrays;
 
-public sealed abstract class ToolWithBreadth extends ToolThatDraws implements BreadthTool
-        permits Brush, Eraser, BrushSelect, ShadeBrush, LineTool, GradientTool {
+public sealed abstract class ToolWithBreadth
+        extends ToolThatDraws implements BreadthTool
+        permits AbstractBrush, Eraser, BrushSelect, GeometryTool, GradientTool {
     private int breadth;
     private GameImage overlay;
 
     // formatting only
-    private int ditherTextX;
+    private int afterBreadthTextX;
 
     ToolWithBreadth() {
-        breadth = Constants.DEFAULT_BRUSH_BREADTH;
+        breadth = Settings.getDefaultToolBreadth();
 
-        ditherTextX = 0;
+        afterBreadthTextX = 0;
     }
 
     public static void redrawToolOverlays() {
@@ -42,7 +44,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
 
         this.overlay = GraphicsUtils.drawOverlay(mask.length, mask[0].length,
                 StippleEffect.get().getContext().renderInfo.getZoomFactor(),
-                (x, y) -> mask[x][y], inside, outside, false, false);
+                mask, inside, outside);
     }
 
     @Override
@@ -97,7 +99,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
                                 Math.pow(sv, 3))) / SLIDER_MULT,
                         b -> b + " px", Constants.MAX_BREADTH + " px");
 
-        ditherTextX = Layout.optionsBarNextElementX(breadth.value, true);
+        afterBreadthTextX = Layout.optionsBarNextElementX(breadth.value, true);
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 breadthLabel, breadth.decButton, breadth.incButton,
@@ -105,7 +107,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws implements Br
     }
 
     @Override
-    int getDitherTextX() {
-        return ditherTextX;
+    int getAfterBreadthTextX() {
+        return afterBreadthTextX;
     }
 }

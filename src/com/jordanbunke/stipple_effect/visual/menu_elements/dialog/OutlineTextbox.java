@@ -5,7 +5,6 @@ import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.menu_elements.OutlineDirectionWatcher;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

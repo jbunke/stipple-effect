@@ -36,7 +36,7 @@ public record Arguments(ExpressionNode[] args, TypeNode... expectedArgTypes) {
         for (int i = 0; i < expectedArgTypes.length; i++) {
             final TypeNode expected = expectedArgTypes[i], argType = argTypes[i];
 
-            if (!argType.equals(expected))
+            if (!expected.equals(argType))
                 ScriptErrorLog.fireError(ScriptErrorLog.Message.ARG_NOT_TYPE,
                         args[i].getPosition(), "function",
                         expected.toString(), argType.toString());

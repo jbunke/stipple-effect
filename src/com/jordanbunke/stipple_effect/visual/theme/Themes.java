@@ -6,7 +6,9 @@ public enum Themes {
     DEFAULT(ThemeBuilder.def()),
     ZO(ThemeBuilder.zo()),
     NEON(ThemeBuilder.neon()),
-    BUNKERING(ThemeBuilder.bunkering());
+    BUNKERING(ThemeBuilder.bunkering()),
+    ASYLUM(ThemeBuilder.asylum()),
+    RAMALLAH(ThemeBuilder.ramallah());
 
     private final Theme theme;
 

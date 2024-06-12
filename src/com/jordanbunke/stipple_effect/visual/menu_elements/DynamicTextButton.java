@@ -52,6 +52,6 @@ public class DynamicTextButton extends MenuButton {
 
     private void updateAssets() {
         baseImage = GraphicsUtils.drawTextButton(getWidth(), text, false);
-        highlightedImage = GraphicsUtils.drawHighlightedButton(baseImage);
+        highlightedImage = GraphicsUtils.highlightButton(baseImage);
     }
 }

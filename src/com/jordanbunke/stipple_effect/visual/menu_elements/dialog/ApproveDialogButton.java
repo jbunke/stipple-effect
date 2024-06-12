@@ -10,7 +10,6 @@ import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Permissions;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.function.Supplier;
@@ -32,10 +31,10 @@ public class ApproveDialogButton extends MenuButtonStub {
         super(position, dimensions, anchor, true);
 
         base = GraphicsUtils.drawTextButton(dimensions.width(), text, false);
-        highlighted = GraphicsUtils.drawHighlightedButton(base);
+        highlighted = GraphicsUtils.highlightButton(base);
         notMet = GraphicsUtils.drawTextButton(
                 dimensions.width(), text, false,
-                Settings.getTheme().stubButtonBody.get());
+                GraphicsUtils.ButtonType.STUB);
 
         this.clearDialog = clearDialog;
 

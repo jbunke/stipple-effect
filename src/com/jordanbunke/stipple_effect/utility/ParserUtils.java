@@ -8,7 +8,9 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
+import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,16 +20,19 @@ public class ParserUtils {
 
     public static GameImage generateStatusEffectText(final String message) {
         final Theme t = Settings.getTheme();
-        final TextBuilder tb = GraphicsUtils.uiText(t.textLight.get());
+        final Color main = ThemeLogic.intuitTextColor(t.panelBackground, true),
+                accent = ThemeLogic.intuitTextColor(t.panelBackground, false);
+
+        final TextBuilder tb = GraphicsUtils.uiText(t.textLight);
 
         final String[] segments = extractHighlight(message,
                 Constants.OPEN_COLOR, Constants.CLOSE_COLOR);
 
         for (int i = 0; i < segments.length; i++) {
             if (i % 2 == 0)
-                tb.setColor(t.textLight.get());
+                tb.setColor(main);
             else {
-                tb.setColor(t.affixTextLight.get());
+                tb.setColor(accent);
                 tb.addText("#");
                 tb.setColor(ParserSerializer.deserializeColor(segments[i]));
             }

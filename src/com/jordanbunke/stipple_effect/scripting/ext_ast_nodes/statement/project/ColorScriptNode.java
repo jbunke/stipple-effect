@@ -25,7 +25,7 @@ public final class ColorScriptNode extends ProjectStatementNode {
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
         super(position, scope, args, TypeNode.getInt(),
-                TypeNode.getBool(), TypeNode.getString());
+                TypeNode.getBool(), TypeNode.getBool(), TypeNode.getString());
     }
 
     @Override
@@ -34,8 +34,9 @@ public final class ColorScriptNode extends ProjectStatementNode {
 
         final Object[] vs = arguments.getValues(symbolTable);
         final int scopeIndex = (int) vs[0];
-        final boolean includeDisabled = (boolean) vs[1];
-        final String scriptFP = (String) vs[2],
+        final boolean includeDisabled = (boolean) vs[1],
+                ignoreSelection = (boolean) vs[2];
+        final String scriptFP = (String) vs[3],
                 attempt = "run the color script at \"" + scriptFP + "\"";
 
         if (scopeIndex < 0 || scopeIndex >= DialogVals.Scope.values().length)
@@ -54,16 +55,18 @@ public final class ColorScriptNode extends ProjectStatementNode {
             if (!SEInterpreter.validateColorScript(colorScript))
                 StatusUpdates.scriptActionNotPermitted(attempt,
                         "the script is not a valid color script",
-                        arguments.args()[2].getPosition());
+                        arguments.args()[3].getPosition());
             else {
                 final DialogVals.Scope scope =
                         DialogVals.Scope.values()[scopeIndex];
 
                 final DialogVals.Scope scopeWas = DialogVals.getScope();
-                final boolean includeWas = DialogVals.isIncludeDisabledLayers();
+                final boolean includeWas = DialogVals.isIncludeDisabledLayers(),
+                        ignoreWas = DialogVals.isIgnoreSelection();
 
                 DialogVals.setScope(scope);
                 DialogVals.setIncludeDisabledLayers(includeDisabled);
+                DialogVals.setIgnoreSelection(ignoreSelection);
 
                 final ProjectState res = project.prepColorScript(colorScript);
                 project.getStateManager()
@@ -72,6 +75,7 @@ public final class ColorScriptNode extends ProjectStatementNode {
                 // reset to dialog values
                 DialogVals.setScope(scopeWas);
                 DialogVals.setIncludeDisabledLayers(includeWas);
+                DialogVals.setIgnoreSelection(ignoreWas);
             }
         }
 

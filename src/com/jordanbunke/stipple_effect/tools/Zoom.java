@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
 public final class Zoom extends Tool {
@@ -28,9 +29,11 @@ public final class Zoom extends Tool {
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
+        final Coord2D tp = context.getTargetPixel();
+
         switch (me.button) {
-            case LEFT -> context.renderInfo.zoomIn(context.getTargetPixel());
-            case RIGHT -> context.renderInfo.zoomOut();
+            case LEFT -> context.renderInfo.zoomIn(tp);
+            case RIGHT -> context.renderInfo.zoomOut(tp);
         }
     }
 }

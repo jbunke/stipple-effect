@@ -12,6 +12,7 @@ import com.jordanbunke.stipple_effect.utility.settings.types.EnumSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.IntSettingType;
 import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
@@ -29,7 +30,6 @@ public class Settings {
         INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_FONT_SIZE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
-        DUMP_STATES(new Setting<>(BooleanSettingType.get(), true)),
 
         // int settings
         WINDOWED_W(new Setting<>(
@@ -74,6 +74,8 @@ public class Settings {
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_W)),
         DEFAULT_CANVAS_H_PX(new Setting<>(
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_H)),
+        DEFAULT_TOOL_BREADTH(new Setting<>(
+                IntSettingType.get(), Constants.DEFAULT_BRUSH_BREADTH)),
 
         // string settings
         DEFAULT_INDEX_PREFIX(new Setting<>(
@@ -97,8 +99,10 @@ public class Settings {
         THEME(new Setting<>(
                 new EnumSettingType<>(Themes.class),
                 Themes.DEFAULT, theme -> {
-                    StippleEffect.get().getContexts()
-                            .forEach(SEContext::redrawCheckerboard);
+                    GraphicsUtils.refreshAssets();
+
+                    StippleEffect.get().getContexts().forEach(
+                            SEContext::redrawCheckerboard);
                     StippleEffect.get().rebuildAllMenus();
                 }));
 
@@ -111,14 +115,12 @@ public class Settings {
         public String toString() {
             final String name = name();
 
-            return name.toLowerCase().replace("default", "def");
+            return name.toLowerCase();
         }
 
         public static Code fromString(final String code) {
             try {
-                final String formattedCode = code
-                        .replace("def_", "default_").toUpperCase();
-                return Code.valueOf(formattedCode);
+                return Code.valueOf(code.toUpperCase());
             } catch (IllegalArgumentException e) {
                 return null;
             }
@@ -220,10 +222,6 @@ public class Settings {
         Code.INVERT_FONT_SIZE_DIRECTION.set(invertFontSizeDirection);
     }
 
-    public static void setDumpStates(final boolean dumpStates) {
-        Code.DUMP_STATES.set(dumpStates);
-    }
-
     public static void setWindowedWidth(
             final int windowedWidth
     ) {
@@ -272,6 +270,12 @@ public class Settings {
         Code.DEFAULT_CANVAS_H_PX.set(defaultCanvasHPixels);
     }
 
+    public static void setDefaultToolBreadth(
+            final int defaultToolBreadth
+    ) {
+        Code.DEFAULT_TOOL_BREADTH.set(defaultToolBreadth);
+    }
+
     public static void setDefaultIndexPrefix(
             final String defIndexPrefix
     ) {
@@ -317,10 +321,6 @@ public class Settings {
         return (boolean) Code.INVERT_FONT_SIZE_DIRECTION.setting.check();
     }
 
-    public static boolean checkIsDumpStates() {
-        return (boolean) Code.DUMP_STATES.setting.check();
-    }
-
     public static int checkWindowedWidth() {
         return (int) Code.WINDOWED_W.setting.check();
     }
@@ -353,6 +353,10 @@ public class Settings {
         return (int) Code.DEFAULT_CANVAS_H_PX.setting.check();
     }
 
+    public static int checkDefaultToolBreadth() {
+        return (int) Code.DEFAULT_TOOL_BREADTH.setting.check();
+    }
+
     public static String checkDefaultIndexPrefix() {
         return (String) Code.DEFAULT_INDEX_PREFIX.setting.check();
     }
@@ -376,10 +380,6 @@ public class Settings {
 
     public static boolean isPixelGridOnByDefault() {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.get();
-    }
-
-    public static boolean isDumpStates() {
-        return (boolean) Code.DUMP_STATES.setting.get();
     }
 
     public static int getWindowedWidth() {
@@ -412,6 +412,10 @@ public class Settings {
 
     public static int getDefaultCanvasHPixels() {
         return (int) Code.DEFAULT_CANVAS_H_PX.setting.get();
+    }
+
+    public static int getDefaultToolBreadth() {
+        return (int) Code.DEFAULT_TOOL_BREADTH.setting.get();
     }
 
     public static String getDefaultIndexPrefix() {

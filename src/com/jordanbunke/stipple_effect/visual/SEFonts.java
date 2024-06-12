@@ -121,7 +121,7 @@ public class SEFonts {
         final String[] previewText = ParserUtils.getBlurb(
                 IconCodes.FONT_EXAMPLE_TEXT);
         final TextBuilder tb = new TextBuilder(1d, Text.Orientation.LEFT,
-                Settings.getTheme().textLight.get(), buildNewFont());
+                Settings.getTheme().textLight, buildNewFont());
         Arrays.stream(previewText).forEach(line -> {
             tb.addText(line);
             tb.addLineBreak();

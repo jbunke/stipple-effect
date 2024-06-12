@@ -4,14 +4,14 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SelectionUtils {
     private static final int X = 0, Y = 1;
 
-    public static Coord2D topLeft(final Set<Coord2D> pixels) {
+    public static Coord2D topLeft(final Collection<Coord2D> pixels) {
         int lowestX = Integer.MAX_VALUE, lowestY = Integer.MAX_VALUE;
 
         for (Coord2D pixel : pixels) {
@@ -22,7 +22,7 @@ public class SelectionUtils {
         return new Coord2D(lowestX, lowestY);
     }
 
-    public static Coord2D bottomRight(final Set<Coord2D> pixels) {
+    public static Coord2D bottomRight(final Collection<Coord2D> pixels) {
         int lowestX = Integer.MIN_VALUE, lowestY = Integer.MIN_VALUE;
 
         for (Coord2D pixel : pixels) {
@@ -33,29 +33,14 @@ public class SelectionUtils {
         return new Coord2D(lowestX, lowestY);
     }
 
-    public static int height(final Set<Coord2D> pixels) {
-        return bounds(pixels).y;
-    }
-
-    public static int width(final Set<Coord2D> pixels) {
-        return bounds(pixels).x;
-    }
-
-    public static Coord2D bounds(final Set<Coord2D> pixels) {
-        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
-
-        return new Coord2D(br.x - tl.x, br.y - tl.y);
-    }
-
-    public static Set<Coord2D> stretchedPixels(
-            final Set<Coord2D> oldPixels, final Coord2D change,
+    public static Selection stretchedPixels(
+            final Selection oldPixels, final Coord2D change,
             final MoverTool.Direction direction
     ) {
-        final Coord2D oldTL = SelectionUtils.topLeft(oldPixels),
-                oldBR = SelectionUtils.bottomRight(oldPixels);
-
-        final int oldW = oldBR.x - oldTL.x,
-                oldH = oldBR.y - oldTL.y;
+        final int oldW = oldPixels.bounds.width(),
+                oldH = oldPixels.bounds.height();
+        final Coord2D oldTL = oldPixels.topLeft,
+                oldBR = oldTL.displace(oldW, oldH);
 
         final Coord2D tl = switch (direction) {
             case TL, T, L -> oldTL.displace(change);
@@ -73,36 +58,47 @@ public class SelectionUtils {
 
         final int w = br.x - tl.x, h = br.y - tl.y;
 
-        final Set<Coord2D> pixels = new HashSet<>();
+        if (w < 1 || h < 1)
+            return Selection.EMPTY;
+
+        final boolean[][] matrix = new boolean[w][h];
 
         for (int x = 0; x < w; x++)
-            for (int y = 0; y < h; y++){
+            for (int y = 0; y < h; y++) {
                 final Coord2D oldPixel = oldTL.displace(
                         (int)((x / (double) w) * oldW),
                         (int)((y / (double) h) * oldH));
 
-                if (oldPixels.contains(oldPixel))
-                    pixels.add(tl.displace(x, y));
+                matrix[x][y] = oldPixels.selected(oldPixel);
             }
 
-        return pixels;
+        return Selection.atOf(tl, matrix);
     }
 
-    public static Set<Coord2D> rotatedPixels(
-            final Set<Coord2D> initialSelection,
+    public static Selection rotatedPixels(
+            final Selection initialSelection,
             final double deltaR, final Coord2D pivot, final boolean[] offset
     ) {
         final double[] realPivot = new double[] {
                 pivot.x + (offset[X] ? -0.5 : 0d),
                 pivot.y + (offset[Y] ? -0.5 : 0d)
         };
-        final Set<Coord2D> pixels = new HashSet<>();
 
-        initialSelection.forEach(i -> {
+        final int initW = initialSelection.bounds.width(),
+                initH = initialSelection.bounds.height();
+        final Coord2D initTL = initialSelection.topLeft,
+                initBR = initTL.displace(initW, initH),
+                initTR = new Coord2D(initBR.x, initTL.y),
+                initBL = new Coord2D(initTL.x, initBR.y);
+
+        final Set<Coord2D> initCorners = Set.of(initTL, initBR, initTR, initBL),
+                rotatedCorners = new HashSet<>();
+
+        initCorners.forEach(c -> {
             final double distance = Math.sqrt(
-                    Math.pow(realPivot[X] - i.x, 2) +
-                            Math.pow(realPivot[Y] - i.y, 2)),
-                    angle = Geometry.calculateAngleInRad(i.x, i.y,
+                    Math.pow(realPivot[X] - c.x, 2) +
+                            Math.pow(realPivot[Y] - c.y, 2)),
+                    angle = Geometry.calculateAngleInRad(c.x, c.y,
                             realPivot[X], realPivot[Y]),
                     newAngle = angle + deltaR;
 
@@ -113,16 +109,18 @@ public class SelectionUtils {
                     (int)Math.round(realPivot[X] + deltaX),
                     (int)Math.round(realPivot[Y] + deltaY)
             );
-            pixels.add(newPixel);
+
+            rotatedCorners.add(newPixel);
         });
 
-        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
+        final Coord2D tl = topLeft(rotatedCorners),
+                br = bottomRight(rotatedCorners);
+        final int w = br.x - tl.x, h = br.y - tl.y;
+
+        final boolean[][] matrix = new boolean[w][h];
 
         for (int x = tl.x; x < br.x; x++) {
             for (int y = tl.y; y < br.y; y++) {
-                if (pixels.contains(new Coord2D(x, y)))
-                    continue;
-
                 final double distance = Math.sqrt(
                         Math.pow(realPivot[X] - x, 2) +
                                 Math.pow(realPivot[Y] - y, 2)),
@@ -138,31 +136,33 @@ public class SelectionUtils {
                         (int)Math.round(realPivot[Y] + deltaY)
                 );
 
-                if (initialSelection.contains(oldPixel))
-                    pixels.add(new Coord2D(x, y));
+                if (initialSelection.selected(oldPixel))
+                    matrix[x - tl.x][y - tl.y] = true;
             }
         }
 
-        return pixels;
+        return Selection.forRotation(tl, matrix);
     }
 
-    public static Set<Coord2D> reflectedPixels(
-            final Set<Coord2D> initialSelection, final boolean horizontal
+    public static Selection reflectedPixels(
+            final Selection initialSelection, final boolean horizontal
     ) {
-        final Coord2D tl = topLeft(initialSelection),
-                br = bottomRight(initialSelection),
-                middle = new Coord2D((tl.x + br.x) / 2,
-                        (tl.y + br.y) / 2);
-        final boolean[] offset = new boolean[] {
-                (tl.x + br.x) % 2 == 0,
-                (tl.y + br.y) % 2 == 0
-        };
+        final int w = initialSelection.bounds.width(),
+                h = initialSelection.bounds.height();
+        final Coord2D tl = initialSelection.topLeft;
 
-        return initialSelection.stream().map(i -> new Coord2D(
-                horizontal ? middle.x + (middle.x - i.x) -
-                        (offset[X] ? 1 : 0) : i.x,
-                horizontal ? i.y : middle.y +
-                        (middle.y - i.y) - (offset[Y] ? 1 : 0)
-        )).collect(Collectors.toSet());
+        final boolean[][] matrix = new boolean[w][h];
+
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++) {
+                final boolean was = initialSelection
+                        .selected(tl.displace(x, y));
+
+                final int refX = horizontal ? (w - 1) - x : x,
+                        refY = horizontal ? y : (h - 1) - y;
+                matrix[refX][refY] = was;
+            }
+
+        return Selection.atOf(tl, matrix);
     }
 }
