@@ -5,7 +5,6 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
 public final class IsSelectedNode extends ProjectExpressionNode {
@@ -25,7 +24,7 @@ public final class IsSelectedNode extends ProjectExpressionNode {
         final SEContext project = getProject(symbolTable);
         final int x = (int) vs[0], y = (int) vs[1];
 
-        return project.getState().getSelection().contains(new Coord2D(x, y));
+        return project.getState().getSelection().selected(x, y);
     }
 
     @Override

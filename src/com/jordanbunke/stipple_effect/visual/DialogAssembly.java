@@ -10,8 +10,12 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.*;
-import com.jordanbunke.delta_time.menu.menu_elements.visual.*;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.PlaceholderMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.TimedMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.AnimationMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -25,7 +29,7 @@ import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
-import com.jordanbunke.stipple_effect.selection.SelectionUtils;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -34,11 +38,13 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
-import com.jordanbunke.stipple_effect.visual.theme.*;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.theme.Themes;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
@@ -377,14 +383,14 @@ public class DialogAssembly {
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         rw -> DialogVals.setResizeWidth(rw, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getResizeWidth, 3),
+                        DialogVals::getResizeWidth, 4),
                 heightTextbox = makeDialogPixelDynamicTextbox(
                         heightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                         rh -> DialogVals.setResizeHeight(rh, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getResizeHeight, 3);
+                        DialogVals::getResizeHeight, 4);
 
         final ThinkingMenuElement resizeDecider = new ThinkingMenuElement(() -> {
             if (DialogVals.getResizeBy() == DialogVals.ResizeBy.PIXELS)
@@ -693,13 +699,11 @@ public class DialogAssembly {
         final boolean hasClipboard = SEClipboard.get().hasContent();
 
         if (hasClipboard) {
-            final Set<Coord2D> clipboard = SEClipboard.get()
-                    .getContent().getPixels();
-            final Coord2D tl = SelectionUtils.topLeft(clipboard),
-                    br = SelectionUtils.bottomRight(clipboard);
+            final Selection clipboard = SEClipboard.get()
+                    .getContent().getSelection();
 
-            clipboardW = br.x - tl.x;
-            clipboardH = br.y - tl.y;
+            clipboardW = clipboard.bounds.width();
+            clipboardH = clipboard.bounds.height();
 
             initialW = clipboardW;
             initialH = clipboardH;
@@ -743,12 +747,12 @@ public class DialogAssembly {
                 widthLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_CANVAS_W, initialW, Constants.MAX_CANVAS_W, "px",
                 DialogVals::setNewProjectWidth,
-                DialogVals::getNewProjectWidth, 3);
+                DialogVals::getNewProjectWidth, 4);
         final DynamicTextbox heightTextbox = makeDialogDynamicTextbox(
                 heightLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_CANVAS_H, initialW, Constants.MAX_CANVAS_H, "px",
                 DialogVals::setNewProjectHeight,
-                DialogVals::getNewProjectHeight, 3);
+                DialogVals::getNewProjectHeight, 4);
 
         final MenuElementGrouping contents = new MenuElementGrouping(
                 presetLabel, defaultPreset, clipboardPreset,
@@ -925,7 +929,7 @@ public class DialogAssembly {
                 spacingLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
                 DialogVals::setNewFontPixelSpacing,
-                DialogVals::getNewFontPixelSpacing, 2);
+                DialogVals::getNewFontPixelSpacing, 3);
         mb.addAll(spacingLabel, spacingTextbox);
         // character-specific
         final TextLabel charSpecificLabel =
@@ -2532,13 +2536,13 @@ public class DialogAssembly {
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         Settings::setDefaultCanvasWPixels,
-                        Settings::checkDefaultCanvasWPixels, 3),
+                        Settings::checkDefaultCanvasWPixels, 4),
                         heightTextbox = makeDialogPixelDynamicTextbox(
                                 newProjectHeightLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                                 Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                                 Settings::setDefaultCanvasHPixels,
-                                Settings::checkDefaultCanvasHPixels, 3),
+                                Settings::checkDefaultCanvasHPixels, 4),
                         toolBreadthTextbox = makeDialogPixelDynamicTextbox(
                                 defaultToolBreadthLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,

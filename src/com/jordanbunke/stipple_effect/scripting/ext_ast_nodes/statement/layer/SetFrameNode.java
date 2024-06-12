@@ -5,13 +5,10 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public final class SetFrameNode extends LayerStatementNode {
     public static final String SET_NAME = "set_frame",
@@ -73,17 +70,13 @@ public final class SetFrameNode extends LayerStatementNode {
                             ") do not match the project canvas bounds (" +
                             ew + "x" + eh + ")", arguments.args()[1].getPosition());
         else {
-            final Set<Coord2D> pixels = new HashSet<>();
             final int w = layer.project().getState().getImageWidth(),
                     h = layer.project().getState().getImageHeight();
-
-            for (int x = 0; x < w; x++)
-                for (int y = 0; y < h; y++)
-                    pixels.add(new Coord2D(x, y));
+            final Selection selection = Selection.allInBounds(w, h);
 
             final SELayer old = evalLayer(symbolTable),
                     replacement = set
-                            ? old.returnStamped(content, pixels, frameIndex)
+                            ? old.returnStamped(content, selection, frameIndex)
                             : old.returnPaintedOver(content, frameIndex);
 
             layer.project().setLayerFromScript(replacement, layer.index());

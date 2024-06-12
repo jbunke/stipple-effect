@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
@@ -42,7 +43,7 @@ public final class ShapeTool extends GeometryTool implements SnappableTool {
     @Override
     void geoDefinition(
             final Coord2D anchor, final Coord2D endpoint,
-            final Set<Coord2D> selection
+            final Selection selection
     ) {
         if (ellipse) {
             final Set<Coord2D> points = new HashSet<>();

@@ -44,7 +44,7 @@ public sealed abstract class ToolWithBreadth
 
         this.overlay = GraphicsUtils.drawOverlay(mask.length, mask[0].length,
                 StippleEffect.get().getContext().renderInfo.getZoomFactor(),
-                (x, y) -> mask[x][y], inside, outside, false, false);
+                mask, inside, outside);
     }
 
     @Override

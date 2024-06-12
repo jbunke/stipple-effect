@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -72,12 +73,10 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
             if (ToolWithMode.getMode() == Mode.SINGLE)
                 context.deselect(false);
 
-            final Set<Coord2D> bounds = new HashSet<>(Set.of(tp));
-
             pivotTP = tp;
             endTP = tp;
             topLeft = tp;
-            bottomRight = SelectionUtils.bottomRight(bounds);
+            bottomRight = tp.displace(1, 1);
 
             updateToolContentPreview(context);
         }
@@ -107,11 +106,6 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
             bottomRight = snapToClosestGridPosition(context,
                     SelectionUtils.bottomRight(bounds), false);
 
-            bounds.clear();
-            for (int x = topLeft.x; x < bottomRight.x; x++)
-                for (int y = topLeft.y; y < bottomRight.y; y++)
-                    bounds.add(new Coord2D(x, y));
-
             updateToolContentPreview(context);
         }
     }
@@ -125,13 +119,19 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
 
-            final Set<Coord2D> box = new HashSet<>();
+            final int mw = bottomRight.x - topLeft.x,
+                    mh = bottomRight.y - topLeft.y;
+            final boolean[][] matrix = new boolean[mw][mh];
 
-            for (int x = topLeft.x; x < bottomRight.x; x++)
-                for (int y = topLeft.y; y < bottomRight.y; y++)
-                    if (x >= 0 && x < w && y >= 0 && y < h)
-                        box.add(new Coord2D(x, y));
+            for (int x = 0; x < mw; x++)
+                for (int y = 0; y < mh; y++) {
+                    final int px = topLeft.x + x, py = topLeft.y + y;
 
+                    if (px >= 0 && px < w && py >= 0 && py < h)
+                        matrix[x][y] = true;
+                }
+
+            final Selection box = Selection.atOf(topLeft, matrix);
             context.editSelection(box, true);
         }
     }

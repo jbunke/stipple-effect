@@ -6,12 +6,11 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
+import com.jordanbunke.stipple_effect.selection.Selection;
 
 import java.awt.*;
-import java.util.Set;
 
 public class FillSelectionNode extends GlobalExpressionNode {
     public static final String NAME = "fill_selection";
@@ -48,13 +47,13 @@ public class FillSelectionNode extends GlobalExpressionNode {
         final GameImage img = (GameImage) vs[0],
                 res = new GameImage(img.getWidth(), img.getHeight());
         final Color c = (Color) vs[1];
-        final Set<Coord2D> pixels = systemSelection
+        final Selection selection = systemSelection
                 ? StippleEffect.get().getContext().getState().getSelection()
                 : ScriptSelectionUtils.convertSelection(
                         (ScriptSet) vs[2], img.getWidth(), img.getHeight());
 
-        for (Coord2D pixel : pixels)
-            res.setRGB(pixel.x, pixel.y, c.getRGB());
+        selection.unboundedPixelAlgorithm(
+                (x, y) -> res.setRGB(x, y, c.getRGB()));
 
         return res;
     }

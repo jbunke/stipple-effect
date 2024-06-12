@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.LineMath;
@@ -121,19 +122,19 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
 
     private void finish(final SEContext context) {
         // define bounding box
-        final Coord2D tl = SelectionUtils.topLeft(
-                new HashSet<>(vertices)).displace(-1, -1),
-                br = SelectionUtils.bottomRight(
-                        new HashSet<>(vertices)).displace(1, 1);
+        final Coord2D tl = SelectionUtils.topLeft(vertices)
+                .displace(-1, -1),
+                br = SelectionUtils.bottomRight(vertices)
+                        .displace(1, 1);
 
         // define selection and populate
-        final Set<Coord2D> selection = new HashSet<>(edges),
+        final Set<Coord2D> pixels = new HashSet<>(edges),
                 removalCandidates = new HashSet<>();
 
         for (int x = tl.x; x < br.x; x++) {
             for (int y = tl.y; y < br.y; y++) {
                 final Coord2D pixel = new Coord2D(x, y);
-                if (selection.contains(pixel))
+                if (pixels.contains(pixel))
                     continue;
 
                 final LineSegment raycast = new LineSegment(pixel, tl);
@@ -200,7 +201,7 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
                 edgeEncounters -= (2 * doubleBackVertices.size());
 
                 if (edgeEncounters % 2 == 1)
-                    selection.add(pixel);
+                    pixels.add(pixel);
             }
         }
 
@@ -209,17 +210,17 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
         final Set<Coord2D> toRemove = new HashSet<>();
 
         for (Coord2D pixel : removalCandidates)
-            if (selection.contains(pixel) && !(
-                    selection.contains(pixel.displace(-1, 0)) &&
-                    selection.contains(pixel.displace(1, 0)) &&
-                    selection.contains(pixel.displace(0, -1)) &&
-                    selection.contains(pixel.displace(0, 1))))
+            if (pixels.contains(pixel) && !(
+                    pixels.contains(pixel.displace(-1, 0)) &&
+                    pixels.contains(pixel.displace(1, 0)) &&
+                    pixels.contains(pixel.displace(0, -1)) &&
+                    pixels.contains(pixel.displace(0, 1))))
                 toRemove.add(pixel);
 
-        selection.removeAll(toRemove);
+        pixels.removeAll(toRemove);
 
         // edit selection
-        context.editSelection(selection, true);
+        context.editSelection(Selection.fromPixels(pixels), true);
         reset();
     }
 

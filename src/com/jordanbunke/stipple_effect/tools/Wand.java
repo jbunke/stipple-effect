@@ -5,8 +5,6 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 
-import java.util.Set;
-
 public final class Wand extends ToolThatSearches {
     private static final Wand INSTANCE;
 
@@ -35,9 +33,7 @@ public final class Wand extends ToolThatSearches {
             final GameImage image = context.getState().getActiveLayerFrame();
 
             // search
-            final Set<Coord2D> matched = search(image, tp);
-
-            context.editSelection(matched, true);
+            context.editSelection(search(image, tp), true);
         }
     }
 }

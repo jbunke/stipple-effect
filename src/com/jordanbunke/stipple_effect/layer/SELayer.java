@@ -2,8 +2,8 @@ package com.jordanbunke.stipple_effect.layer;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BinaryOperator;
 
 public final class SELayer {
@@ -113,7 +112,7 @@ public final class SELayer {
     }
 
     public SELayer returnStamped(
-            final GameImage edit, final Set<Coord2D> pixels, final int frameIndex
+            final GameImage edit, final Selection selection, final int frameIndex
     ) {
         final List<GameImage> frames = new ArrayList<>(this.frames);
         final GameImage content = getFrame(frameIndex);
@@ -121,10 +120,9 @@ public final class SELayer {
         final GameImage composed = new GameImage(content);
         final int w = composed.getWidth(), h = composed.getHeight();
 
-        pixels.stream().filter(p -> p.x >= 0 && p.x < w &&
-                p.y >= 0 && p.y < h).forEach(p -> {
-            final Color c = edit.getColorAt(p.x, p.y);
-            composed.setRGB(p.x, p.y, c.getRGB());
+        selection.pixelAlgorithm(w, h, (x, y) -> {
+            final Color c = edit.getColorAt(x, y);
+            composed.setRGB(x, y, c.getRGB());
         });
 
         composed.free();

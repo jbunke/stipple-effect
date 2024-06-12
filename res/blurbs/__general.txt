@@ -1,6 +1,7 @@
 Window / layout:
 Toggle fullscreen / windowed mode: {Escape}
 Recenter canvas in workspace: {Enter}
+Center the canvas around the target pixel: {Shift + Enter}
 Toggle show all UI / minimal UI mode: {Ctrl + Shift + A}
 Set checkerboard and pixel grid cell dimensions to project/selection bounds: {Ctrl + B}
 

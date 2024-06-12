@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.awt.*;
@@ -45,7 +46,7 @@ public sealed abstract class AbstractBrush
         if (painting && !tp.equals(Constants.NO_VALID_TARGET)) {
             final int w = context.getState().getImageWidth(),
                     h = context.getState().getImageHeight();
-            final Set<Coord2D> selection = context.getState().getSelection();
+            final Selection selection = context.getState().getSelection();
 
             if (isUnchanged(context))
                 return;
@@ -67,11 +68,12 @@ public sealed abstract class AbstractBrush
 
     private void populateAround(
             final GameImage edit, final GameImage current,
-            final Coord2D tp, final Set<Coord2D> selection,
+            final Coord2D tp, final Selection selection,
             final int w, final int h
     ) {
         final int halfB = breadthOffset();
         final boolean[][] mask = breadthMask();
+        final boolean empty = !selection.hasSelection();
 
         for (int x = 0; x < mask.length; x++)
             for (int y = 0; y < mask[x].length; y++) {
@@ -81,7 +83,7 @@ public sealed abstract class AbstractBrush
                 if (b.x < 0 || b.x >= w || b.y < 0 || b.y >= h)
                     continue;
 
-                if (!(selection.isEmpty() || selection.contains(b)))
+                if (!(empty || selection.selected(b)))
                     continue;
 
                 final Color existing = current.getColorAt(b.x, b.y);

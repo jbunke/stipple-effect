@@ -1,14 +1,13 @@
 package com.jordanbunke.stipple_effect.utility.math;
 
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
+import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 
 import java.awt.*;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 public class ColorMath {
@@ -22,7 +21,7 @@ public class ColorMath {
     public static GameImage algo(
             final Function<Color, Color> internal,
             final Map<Color, Color> map,
-            final GameImage source, final Set<Coord2D> pixels
+            final GameImage source, final Selection selection
     ) throws RuntimeException {
         final int w = source.getWidth(), h = source.getHeight();
         final GameImage res = new GameImage(w, h);
@@ -47,7 +46,7 @@ public class ColorMath {
                     map.put(c, cp);
                 }
 
-                if (pixels != null && !pixels.contains(new Coord2D(x, y)))
+                if (selection != null && !selection.selected(x, y))
                     res.setRGB(x, y, c.getRGB());
                 else if (cp != null)
                     res.setRGB(x, y, cp.getRGB());
