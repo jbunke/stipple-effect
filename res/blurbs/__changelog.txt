@@ -1,27 +1,60 @@
-{0.5.0} - The Performance Update - 2024-06-??
+{0.5.0} - The Performance Update - 2024-06-12
 
 Added:
+> Added tools
+  > Shape tool (hotkey {R})
+  > Script brush (hotkey {Q})
 > Polygon Select now has a "close polygon" shortcut ({Shift + Left Click})
+> Images can now be pasted from the system clipboard
+> Added themes:
+  > Asylum
+  > Ramallah
+> Added "snap to target pixel" behaviour ({Shift + Enter})
+> Stretch operation can now be snapped to the pixel grid by holding {Shift}
+> Added relative frame durations so some frames can be displayed for more or less time than others
+> Added history dialog ({Shift + Y}) where users can browse all cached project states and revert
+    to any of them
+> Added playback controls to preview dialogs
+> Added keyboard controls to the preview window's playback controls
 
 Changed:
 > Optimized selection overlays
+> Optimized selection logic
+> Optimized search algorithm (Wand and Fill tools)
+> Now discards intermediate (granular) project states after five new checkpoint project states
+> Updated themes:
+  > Zo
+  > Neon
+  > Bunkering
 > Move selection and pick up selection action previews are rendered in a different style
 > Changed frame limit from 100 to 300 and layer limit from 100 to 50
+> Increased maximum canvas bounds to 1920 x 1080 pixels
+> Improved selection transform node manipulation
 
 Fixed:
 > Bug: PIXEL_GRID_ON_BY_DEFAULT setting flag is not persistent
 
-{TODO}
-Add:
-> Paste images from the system clipboard
-> Shape tool
+API Changes:
+  Added:
+  > {project} frame duration functions:
+    > P.{get_frame_duration}(int i) -> float
+    > P.{get_frame_durations}() -> float[]
+    > P.{set_frame_duration}(int i, float frame_duration);
 
-Change:
-> Implement massive performance optimizations to make the program faster and less demanding
-    on the machine
+  Changed:
+  > Separated selection from scope in color actions
+    > Modified {scope} enumeration:
+        {0: PROJECT}
+        {1: LAYER}
+        {2: FRAME}
+        {3: LAYER_FRAME}
 
-Fix:
-> Memory issues and related crashes
+    > Changed {project} color action function signatures:
+      > P.{palettize}(palette pal, int scope, bool include_disabled, bool ignore_selection);
+      > P.{extract_to_pal}(palette pal, int scope, bool include_disabled, bool ignore_selection);
+      > P.{hsv_shift}(int scope, bool include_disabled, bool ignore_selection,
+          int h_shift, N s_shift, N v_shift);
+      > P.{color_script}(int scope, bool include_disabled, bool ignore_selection, string script_path);
 
 {0.4.2} - 2024-05-26
 
@@ -66,9 +99,9 @@ Added:
 > Added HSV level shifting
 > Added "Flatten project" layer action
 > Added themes
-    > Added "Zo" theme inspired by Haiti
+    > Added "Zo" theme inspired by Haitian culture and African diasporic religions
     > Added "Neon" theme
-    > Added "Bunkering" theme inspired by the environmental degradation the Niger Delta
+    > Added "Bunkering" theme inspired by the environmental degradation of the Niger Delta
 > Added transparency checkerboard to the color slider core
 > Dialog menus can now be closed by pressing {Enter} if the precondition is passing
 > Added settings for windowed program size
