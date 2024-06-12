@@ -1,11 +1,11 @@
-# ![Stipple Effect](https://i.imgur.com/sDn5Bz5.gif)
+# ![Stipple Effect](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/logo-anim.gif)
 
-[![Download](https://i.imgur.com/Ry12ica.png)](https://flinkerflitzer.itch.io/stipple-effect)
-[![Changelog](https://i.imgur.com/83bOHrf.png)](changelog.md)
-[![Roadmap](https://i.imgur.com/7CECQB6.png)](roadmap.md)
+[![Download](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/buttons/download.png)](https://flinkerflitzer.itch.io/stipple-effect)
+[![Changelog](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/buttons/changelog.png)](changelog.md)
+[![Roadmap](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/buttons/roadmap.png)](roadmap.md)
 
 ## About
-_Stipple Effect_ is an image editor designed for creating and animating pixel art. It is designed to facilitate a variety of workflows and to encourage rapid, iterative creation of pixel art.
+_Stipple Effect_ is a pixel art editor that supports animation and scripting. It is designed to facilitate a variety of workflows and to encourage rapid, iterative creation of video game art assets and other types of artwork.
 
 SE was made by a solo indie game developer with the needs and skill sets of other indie devs in mind. It is lightweight and simple to learn and use, yet allows for considerable depth and complexity. SE has a feature-rich scripting API that can be harnessed for the automation of otherwise tedious and repetitive tasks.
 
@@ -47,10 +47,5 @@ _Stipple Effect_ supports scripting for three different use cases: **automation*
 
 ## External Dependencies
 * [Delta Time](https://github.com/jbunke/delta-time) - my lightweight graphics library that handles GUI and execution loop boilerplate
-  * Core module
-  * Fonts module
-  * Menu extension module
-  * Script module
-  * Sprite module
 * [ANTLR v4](https://github.com/antlr/antlr4) - lexing and parsing library that powers the _DeltaScript_ interpreter
-* Animation Encoder - my wrapper for Square's [gifencoder](https://github.com/square/gifencoder) and for [jcodec](https://github.com/jcodec/jcodec) (currently closed-source)
+* [Animation Encoder](https://github.com/jbunke/animation-encoder) - my wrapper for Square's [gifencoder](https://github.com/square/gifencoder) and for [jcodec](https://github.com/jcodec/jcodec)
