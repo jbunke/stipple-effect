@@ -74,7 +74,6 @@ public class SelectionUtils {
         return Selection.atOf(tl, matrix);
     }
 
-    // TODO - refactor to not use Set
     public static Selection rotatedPixels(
             final Selection initialSelection,
             final double deltaR, final Coord2D pivot, final boolean[] offset
@@ -83,13 +82,22 @@ public class SelectionUtils {
                 pivot.x + (offset[X] ? -0.5 : 0d),
                 pivot.y + (offset[Y] ? -0.5 : 0d)
         };
-        final Set<Coord2D> pixels = new HashSet<>();
 
-        initialSelection.unboundedPixelAlgorithm((x, y) -> {
+        final int initW = initialSelection.bounds.width(),
+                initH = initialSelection.bounds.height();
+        final Coord2D initTL = initialSelection.topLeft,
+                initBR = initTL.displace(initW, initH),
+                initTR = new Coord2D(initBR.x, initTL.y),
+                initBL = new Coord2D(initTL.x, initBR.y);
+
+        final Set<Coord2D> initCorners = Set.of(initTL, initBR, initTR, initBL),
+                rotatedCorners = new HashSet<>();
+
+        initCorners.forEach(c -> {
             final double distance = Math.sqrt(
-                    Math.pow(realPivot[X] - x, 2) +
-                            Math.pow(realPivot[Y] - y, 2)),
-                    angle = Geometry.calculateAngleInRad(x, y,
+                    Math.pow(realPivot[X] - c.x, 2) +
+                            Math.pow(realPivot[Y] - c.y, 2)),
+                    angle = Geometry.calculateAngleInRad(c.x, c.y,
                             realPivot[X], realPivot[Y]),
                     newAngle = angle + deltaR;
 
@@ -100,16 +108,18 @@ public class SelectionUtils {
                     (int)Math.round(realPivot[X] + deltaX),
                     (int)Math.round(realPivot[Y] + deltaY)
             );
-            pixels.add(newPixel);
+
+            rotatedCorners.add(newPixel);
         });
 
-        final Coord2D tl = topLeft(pixels), br = bottomRight(pixels);
+        final Coord2D tl = topLeft(rotatedCorners),
+                br = bottomRight(rotatedCorners);
+        final int w = br.x - tl.x, h = br.y - tl.y;
+
+        final boolean[][] matrix = new boolean[w][h];
 
         for (int x = tl.x; x < br.x; x++) {
             for (int y = tl.y; y < br.y; y++) {
-                if (pixels.contains(new Coord2D(x, y)))
-                    continue;
-
                 final double distance = Math.sqrt(
                         Math.pow(realPivot[X] - x, 2) +
                                 Math.pow(realPivot[Y] - y, 2)),
@@ -126,11 +136,11 @@ public class SelectionUtils {
                 );
 
                 if (initialSelection.selected(oldPixel))
-                    pixels.add(new Coord2D(x, y));
+                    matrix[x - tl.x][y - tl.y] = true;
             }
         }
 
-        return Selection.fromPixels(pixels);
+        return Selection.forRotation(tl, matrix);
     }
 
     public static Selection reflectedPixels(

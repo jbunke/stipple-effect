@@ -69,6 +69,11 @@ public final class Selection {
         return new Selection(topLeft, matrix);
     }
 
+    public static Selection forRotation(final Coord2D topLeft,
+            final boolean[][] matrix) {
+        return new Selection(topLeft, matrix).crop();
+    }
+
     public static Selection fromPixels(final Set<Coord2D> pixels) {
         if (pixels == null || pixels.isEmpty())
             return EMPTY;
