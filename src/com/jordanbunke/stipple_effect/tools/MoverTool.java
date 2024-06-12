@@ -29,6 +29,9 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         }
     }
 
+    private static final double CONVERSION = 180 / Math.PI, PRECISION = 1e2,
+            CIRCLE_DEG = 360d, SEMI_CIRCLE_DEG = CIRCLE_DEG / 2;
+
     private ToolTaskHandler handler;
 
     private boolean snap = false, snapToggled = false;
@@ -39,6 +42,10 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
     private T transformation;
     private Coord2D startMousePosition, lastMousePosition,
             startTopLeft, startBottomRight, startTP, lastTP;
+
+    private Coord2D cachedDisp;
+    private double cachedAngle;
+
     private GameImage toolContentPreview;
 
     public MoverTool() {
@@ -57,6 +64,9 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         lastTP = Constants.NO_VALID_TARGET;
         startTopLeft = Constants.NO_VALID_TARGET;
         startBottomRight = Constants.NO_VALID_TARGET;
+
+        cachedDisp = Constants.NO_VALID_TARGET;
+        cachedAngle = 0d;
 
         toolContentPreview = GameImage.dummy();
     }
@@ -217,6 +227,11 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
             lastMousePosition = me.mousePosition;
             startTP = context.getTargetPixel();
             lastTP = startTP;
+
+            switch (transformType) {
+                case MOVE -> cachedDisp = new Coord2D();
+                case ROTATE -> cachedAngle = 0d;
+            }
         }
     }
 
@@ -273,6 +288,8 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                     toolContentPreview =
                             updateToolContentPreview(context, transformation);
                 }, transformType, context, displacement);
+
+                cachedDisp = disp;
             }
             case STRETCH -> {
                 final Coord2D change = snapStretchToClosestGridPosition(context,
@@ -324,6 +341,7 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                     }, transformType, context, startSelection, deltaR, pivot, offset);
 
                     lastTP = tp;
+                    cachedAngle = deltaR;
                 }
             }
         }
@@ -427,5 +445,38 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
     @Override
     public boolean isSnap() {
         return snap;
+    }
+
+    @Override
+    public String getBottomBarText() {
+        return switch (transformType) {
+            case MOVE -> {
+                final boolean movementX = cachedDisp.x != 0,
+                        movementY = cachedDisp.y != 0;
+
+                if (!(movementX || movementY))
+                    yield "No movement";
+
+                final int x = Math.abs(cachedDisp.x),
+                        y = Math.abs(cachedDisp.y);
+
+                final String px = "px ",
+                        dirX = px + (cachedDisp.x > 0 ? "right" : "left"),
+                        dirY = px + (cachedDisp.y > 0 ? "down" : "up");
+
+                yield "Moved " + (movementX ? x + dirX : "") +
+                        (movementX && movementY ? ", " : "") +
+                        (movementY ? y + dirY : "");
+            }
+            case ROTATE -> {
+                final double degrees = cachedAngle * CONVERSION,
+                        closest = degrees > SEMI_CIRCLE_DEG
+                                ? -(CIRCLE_DEG - degrees) : degrees,
+                        rounded = (int)(closest * PRECISION) / PRECISION;
+
+                yield "Rotated " + rounded + " deg";
+            }
+            default -> super.getBottomBarText();
+        };
     }
 }
