@@ -514,6 +514,9 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
                     () -> fillSelection(true));
             eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
+                    this::snapToTargetPixel);
+            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
                     () -> {
                         PreviewWindow.set(this);
@@ -1004,6 +1007,11 @@ public class SEContext {
         renderInfo.setAnchor(new Coord2D(
                 getState().getImageWidth() / 2,
                 getState().getImageHeight() / 2));
+    }
+
+    public void snapToTargetPixel() {
+        if (isTargetingPixelOnCanvas())
+            renderInfo.setAnchor(targetPixel);
     }
 
     // copy - (not a state change unlike cut and paste)

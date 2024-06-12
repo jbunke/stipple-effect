@@ -383,14 +383,14 @@ public class DialogAssembly {
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         rw -> DialogVals.setResizeWidth(rw, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getResizeWidth, 3),
+                        DialogVals::getResizeWidth, 4),
                 heightTextbox = makeDialogPixelDynamicTextbox(
                         heightLabel,
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                         rh -> DialogVals.setResizeHeight(rh, w, h,
                                 DialogVals.isResizePreserveAspectRatio()),
-                        DialogVals::getResizeHeight, 3);
+                        DialogVals::getResizeHeight, 4);
 
         final ThinkingMenuElement resizeDecider = new ThinkingMenuElement(() -> {
             if (DialogVals.getResizeBy() == DialogVals.ResizeBy.PIXELS)
@@ -747,12 +747,12 @@ public class DialogAssembly {
                 widthLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_CANVAS_W, initialW, Constants.MAX_CANVAS_W, "px",
                 DialogVals::setNewProjectWidth,
-                DialogVals::getNewProjectWidth, 3);
+                DialogVals::getNewProjectWidth, 4);
         final DynamicTextbox heightTextbox = makeDialogDynamicTextbox(
                 heightLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_CANVAS_H, initialW, Constants.MAX_CANVAS_H, "px",
                 DialogVals::setNewProjectHeight,
-                DialogVals::getNewProjectHeight, 3);
+                DialogVals::getNewProjectHeight, 4);
 
         final MenuElementGrouping contents = new MenuElementGrouping(
                 presetLabel, defaultPreset, clipboardPreset,
@@ -929,7 +929,7 @@ public class DialogAssembly {
                 spacingLabel, DialogAssembly::getDialogContentOffsetFollowingLabel,
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
                 DialogVals::setNewFontPixelSpacing,
-                DialogVals::getNewFontPixelSpacing, 2);
+                DialogVals::getNewFontPixelSpacing, 3);
         mb.addAll(spacingLabel, spacingTextbox);
         // character-specific
         final TextLabel charSpecificLabel =
@@ -2536,13 +2536,13 @@ public class DialogAssembly {
                         DialogAssembly::getDialogContentOffsetFollowingLabel,
                         Constants.MIN_CANVAS_W, Constants.MAX_CANVAS_W,
                         Settings::setDefaultCanvasWPixels,
-                        Settings::checkDefaultCanvasWPixels, 3),
+                        Settings::checkDefaultCanvasWPixels, 4),
                         heightTextbox = makeDialogPixelDynamicTextbox(
                                 newProjectHeightLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
                                 Constants.MIN_CANVAS_H, Constants.MAX_CANVAS_H,
                                 Settings::setDefaultCanvasHPixels,
-                                Settings::checkDefaultCanvasHPixels, 3),
+                                Settings::checkDefaultCanvasHPixels, 4),
                         toolBreadthTextbox = makeDialogPixelDynamicTextbox(
                                 defaultToolBreadthLabel,
                                 DialogAssembly::getDialogContentOffsetFollowingLabel,
