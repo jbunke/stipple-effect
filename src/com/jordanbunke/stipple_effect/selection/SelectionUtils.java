@@ -4,13 +4,14 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.MoverTool;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class SelectionUtils {
     private static final int X = 0, Y = 1;
 
-    public static Coord2D topLeft(final Set<Coord2D> pixels) {
+    public static Coord2D topLeft(final Collection<Coord2D> pixels) {
         int lowestX = Integer.MAX_VALUE, lowestY = Integer.MAX_VALUE;
 
         for (Coord2D pixel : pixels) {
@@ -21,7 +22,7 @@ public class SelectionUtils {
         return new Coord2D(lowestX, lowestY);
     }
 
-    public static Coord2D bottomRight(final Set<Coord2D> pixels) {
+    public static Coord2D bottomRight(final Collection<Coord2D> pixels) {
         int lowestX = Integer.MIN_VALUE, lowestY = Integer.MIN_VALUE;
 
         for (Coord2D pixel : pixels) {

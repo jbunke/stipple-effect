@@ -73,12 +73,10 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
             if (ToolWithMode.getMode() == Mode.SINGLE)
                 context.deselect(false);
 
-            final Set<Coord2D> bounds = new HashSet<>(Set.of(tp));
-
             pivotTP = tp;
             endTP = tp;
             topLeft = tp;
-            bottomRight = SelectionUtils.bottomRight(bounds);
+            bottomRight = tp.displace(1, 1);
 
             updateToolContentPreview(context);
         }
@@ -107,11 +105,6 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
                     SelectionUtils.topLeft(bounds), true);
             bottomRight = snapToClosestGridPosition(context,
                     SelectionUtils.bottomRight(bounds), false);
-
-            bounds.clear();
-            for (int x = topLeft.x; x < bottomRight.x; x++)
-                for (int y = topLeft.y; y < bottomRight.y; y++)
-                    bounds.add(new Coord2D(x, y));
 
             updateToolContentPreview(context);
         }

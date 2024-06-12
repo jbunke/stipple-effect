@@ -122,10 +122,10 @@ public final class PolygonSelect extends ToolWithMode implements SnappableTool {
 
     private void finish(final SEContext context) {
         // define bounding box
-        final Coord2D tl = SelectionUtils.topLeft(
-                new HashSet<>(vertices)).displace(-1, -1),
-                br = SelectionUtils.bottomRight(
-                        new HashSet<>(vertices)).displace(1, 1);
+        final Coord2D tl = SelectionUtils.topLeft(vertices)
+                .displace(-1, -1),
+                br = SelectionUtils.bottomRight(vertices)
+                        .displace(1, 1);
 
         // define selection and populate
         final Set<Coord2D> pixels = new HashSet<>(edges),

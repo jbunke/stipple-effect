@@ -178,14 +178,11 @@ public class SEContext {
             // selection overlay - drawing box
             if (tool instanceof OverlayTool overlayTool &&
                     overlayTool.isDrawing()) {
-                final Coord2D tl = overlayTool.getTopLeft();
                 final GameImage overlay = overlayTool.getSelectionOverlay();
 
                 workspace.draw(overlay,
-                        (render.x + (int)(tl.x * zoomFactor))
-                                - Constants.OVERLAY_BORDER_PX,
-                        (render.y + (int)(tl.y * zoomFactor))
-                                - Constants.OVERLAY_BORDER_PX);
+                        render.x - Constants.OVERLAY_BORDER_PX,
+                        render.y - Constants.OVERLAY_BORDER_PX);
             }
 
             // persistent selection overlay

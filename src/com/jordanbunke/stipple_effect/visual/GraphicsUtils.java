@@ -10,23 +10,22 @@ import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
-import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class GraphicsUtils {
     public static GameImage HIGHLIGHT_OVERLAY,
@@ -169,44 +168,18 @@ public class GraphicsUtils {
     }
 
     public static GameImage drawSelectionOverlay(
-            final double z, final Set<Coord2D> selection
+            final int w, final int h,
+            final double z, final boolean[][] mask
     ) {
-        final Coord2D tl = SelectionUtils.topLeft(selection),
-                br = SelectionUtils.bottomRight(selection);
-
-        final Set<Coord2D> adjusted = selection.stream()
-                .map(p -> p.displace(-tl.x, -tl.y))
-                .collect(Collectors.toSet());
-        final int w = br.x - tl.x, h = br.y - tl.y;
-
-        return drawOverlay(w, h, z, adjusted,
+        return drawOverlay(w, h, z, mask,
                 Settings.getTheme().buttonOutline,
-                Settings.getTheme().highlightOutline,
-                false, false);
+                Settings.getTheme().highlightOutline);
     }
 
     public static GameImage drawOverlay(
             final int w, final int h, final double z,
-            final BiFunction<Integer, Integer, Boolean> maskValidator,
-            final Color inside, final Color outside,
-            final boolean filled, final boolean canTransform
-    ) {
-        final Set<Coord2D> mask = new HashSet<>();
-
-        for (int x = 0; x < w; x++)
-            for (int y = 0; y < h; y++)
-                if (maskValidator.apply(x, y))
-                    mask.add(new Coord2D(x, y));
-
-        return drawOverlay(w, h, z, mask, inside, outside,
-                filled, canTransform);
-    }
-
-    private static GameImage drawOverlay(
-            final int w, final int h, final double z,
-            final Set<Coord2D> selection,
-            final Color inside, final Color outside,
-            final boolean filled, final boolean canTransform
+            final boolean[][] mask,
+            final Color inside, final Color outside
     ) {
         final int zoomInc = (int)Math.max(Constants.ZOOM_FOR_OVERLAY, z),
                 scaleUpW = Math.max(1, w * zoomInc),
@@ -216,69 +189,47 @@ public class GraphicsUtils {
                 scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
                 scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
-        populateOverlay(selection, zoomInc, overlay, overlay, inside, outside,
-                filled ? Settings.getTheme().selectionFill : null);
-
-        if (canTransform) {
-            final Coord2D tl = SelectionUtils.topLeft(selection),
-                    br = SelectionUtils.bottomRight(selection);
-
-            final int BEG = 0, MID = 1, END = 2;
-            final int[] xs = new int[] {
-                    tl.x * zoomInc,
-                    (int)(((tl.x + br.x) / 2d) * zoomInc),
-                    br.x * zoomInc
-            }, ys = new int[] {
-                    tl.y * zoomInc,
-                    (int)(((tl.y + br.y) / 2d) * zoomInc),
-                    br.y * zoomInc
-            };
-
-            for (int x = BEG; x <= END; x++)
-                for (int y = BEG; y <= END; y++)
-                    if (x != MID || y != MID)
-                        overlay.draw(TRANSFORM_NODE, xs[x], ys[y]);
-        }
+        populateOverlay(mask, zoomInc, overlay, inside, outside);
 
         return overlay.submit();
     }
 
-    public static void populateOverlay(
-            final Set<Coord2D> selection, final int zoomInc,
-            final GameImage frontier, final GameImage filled,
-            final Color inside, final Color outside, final Color fill
+    private static void populateOverlay(
+            final boolean[][] mask, final int zoomInc,
+            final GameImage frontier,
+            final Color inside, final Color outside
     ) {
-        selection.forEach(pixel -> {
-            final boolean
-                    left = !selection.contains(pixel.displace(-1, 0)),
-                    right = !selection.contains(pixel.displace(1, 0)),
-                    top = !selection.contains(pixel.displace(0, -1)),
-                    bottom = !selection.contains(pixel.displace(0, 1));
+        for (int x = 0; x < mask.length; x++)
+            for (int y = 0; y < mask[x].length; y++) {
+                if (!mask[x][y])
+                    continue;
 
-            final Coord2D o = new Coord2D(
-                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.x),
-                    Constants.OVERLAY_BORDER_PX + (zoomInc * pixel.y));
+                final boolean left = x == 0 || !mask[x - 1][y],
+                        right = x == mask.length - 1 || !mask[x + 1][y],
+                        top = y == 0 || !mask[x][y - 1],
+                        bottom = y == mask[x].length - 1 || !mask[x][y + 1];
 
-            if (fill != null)
-                filled.fillRectangle(fill, o.x, o.y, zoomInc, zoomInc);
+                final Coord2D o = new Coord2D(
+                        Constants.OVERLAY_BORDER_PX + (zoomInc * x),
+                        Constants.OVERLAY_BORDER_PX + (zoomInc * y));
 
-            if (left) {
-                frontier.fillRectangle(inside, o.x, o.y, 1, zoomInc);
-                frontier.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
+                if (left) {
+                    frontier.fillRectangle(inside, o.x, o.y, 1, zoomInc);
+                    frontier.fillRectangle(outside, o.x - 1, o.y, 1, zoomInc);
+                }
+                if (right) {
+                    frontier.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
+                    frontier.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
+                }
+                if (top) {
+                    frontier.fillRectangle(inside, o.x, o.y, zoomInc, 1);
+                    frontier.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
+                }
+                if (bottom) {
+                    frontier.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
+                    frontier.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
+                }
             }
-            if (right) {
-                frontier.fillRectangle(inside, (o.x + zoomInc) - 1, o.y, 1, zoomInc);
-                frontier.fillRectangle(outside, o.x + zoomInc, o.y, 1, zoomInc);
-            }
-            if (top) {
-                frontier.fillRectangle(inside, o.x, o.y, zoomInc, 1);
-                frontier.fillRectangle(outside, o.x, o.y - 1, zoomInc, 1);
-            }
-            if (bottom) {
-                frontier.fillRectangle(inside, o.x, (o.y + zoomInc) - 1, zoomInc, 1);
-                frontier.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
-            }
-        });
     }
 
     public static GameImage loadIcon(final String code) {

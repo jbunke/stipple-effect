@@ -5,19 +5,14 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
-import com.jordanbunke.stipple_effect.selection.SelectionUtils;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
     private static final BrushSelect INSTANCE;
 
     private boolean selecting;
-    private Set<Coord2D> pixels;
+    private boolean[][] pixels;
     private GameImage selectionOverlay;
 
     static {
@@ -26,7 +21,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
 
     private BrushSelect() {
         selecting = false;
-        pixels = new HashSet<>();
+        pixels = new boolean[0][];
         selectionOverlay = GameImage.dummy();
     }
 
@@ -47,20 +42,23 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
 
     private void drawSelection(final SEContext context) {
         selectionOverlay = GraphicsUtils.drawSelectionOverlay(
+                pixels.length, pixels.length == 0 ? 0 : pixels[0].length,
                 context.renderInfo.getZoomFactor(), pixels);
     }
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
         if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET)) {
+            final int w = context.getState().getImageWidth(),
+                    h = context.getState().getImageHeight();
+
             selecting = true;
-            pixels = new HashSet<>();
+            pixels = new boolean[w][h];
 
             if (ToolWithMode.getMode() == ToolWithMode.Mode.SINGLE)
                 context.deselect(false);
 
             reset();
-            context.getState().markAsCheckpoint(false);
         }
 
         selectionOverlay = GameImage.dummy();
@@ -89,13 +87,17 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
         final boolean[][] mask = breadthMask();
 
         for (int x = 0; x < mask.length; x++)
-            for (int y = 0; y < mask[x].length; y++) {
-                final Coord2D b = new Coord2D(x + (tp.x - halfB),
-                        y + (tp.y - halfB));
+            for (int y = 0; y < mask[x].length; y++)
+                if (mask[x][y]) {
+                    final int px = x + (tp.x - halfB),
+                            py = y + (tp.y - halfB);
 
-                if (mask[x][y])
-                    pixels.add(b);
-            }
+                    if (inBounds(px, py)) pixels[px][py] = true;
+                }
+    }
+
+    private boolean inBounds(final int x, final int y) {
+        return x >= 0 && y >= 0 && x < pixels.length && y < pixels[x].length;
     }
 
     @Override
@@ -104,21 +106,8 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
             selecting = false;
             me.markAsProcessed();
 
-            // filter selection by image bounds
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
-
-            final Set<Coord2D> bounded = pixels.stream()
-                    .filter(p -> p.x >= 0 && p.y >= 0 && p.x < w && p.y < h)
-                    .collect(Collectors.toSet());
-
-            context.editSelection(Selection.fromPixels(bounded), true);
+            context.editSelection(Selection.of(pixels), true);
         }
-    }
-
-    @Override
-    public Coord2D getTopLeft() {
-        return SelectionUtils.topLeft(pixels);
     }
 
     @Override
