@@ -52,7 +52,7 @@ _Stipple Effect_ supports scripting for three different use cases: **automation*
 
 ## License
 
-*Stipple Effect* is distributed under an end-user license agreement (EULA). Read it [here](LICENSE).
+*Stipple Effect* is distributed under an end-user license agreement (EULA). Read it [here](LICENSE) to understand your rights and responsibilities as a user.
 
 ## Compile from source instructions
 
