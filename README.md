@@ -49,3 +49,26 @@ _Stipple Effect_ supports scripting for three different use cases: **automation*
 * [Delta Time](https://github.com/jbunke/delta-time) - my lightweight graphics library that handles GUI and execution loop boilerplate
 * [ANTLR v4](https://github.com/antlr/antlr4) - lexing and parsing library that powers the _DeltaScript_ interpreter
 * [Animation Encoder](https://github.com/jbunke/animation-encoder) - my wrapper for Square's [gifencoder](https://github.com/square/gifencoder) and for [jcodec](https://github.com/jcodec/jcodec)
+
+## License
+
+*Stipple Effect* is distributed under an end-user license agreement (EULA). Read it [here](LICENSE) to understand your rights and responsibilities as a user.
+
+## Compile from source instructions
+
+For those who do not have the means to buy *Stipple Effect*, the program can be compiled from source for free:
+
+### Instructions
+
+1. Clone this repository
+2. Download and configure external dependencies in your development environment
+   1. **Delta Time**: [download JAR - instructions in README](https://github.com/jbunke/delta-time)
+   2. **Animation Encoder**: [download JAR - instructions in README](https://github.com/jbunke/animation-encoder)
+   3. **ANTLR v4**: *Stipple Effect* uses version 4.13.1 of the ANTLR 4 Runtime. You can download the library from the Maven Repository or configure it manually. Find the artifact's dependency information [here](https://mvnrepository.com/artifact/org.antlr/antlr4-runtime/4.13.1).
+3. Set up the project and run configuration with the following details:
+   1. **JRE / JDK / Language level**: Java 17 or later
+   2. **Main class**: `com.jordanbunke.stipple_effect.StippleEffect`
+4. Build and run in the Java development environment of your choice!
+
+### Note:
+*Please keep in mind that you are liable to the terms of the EULA whether you buy the program or compile it from source.*

@@ -1958,7 +1958,7 @@ public class DialogAssembly {
         // subtitle
         final GameImage subtitle = GraphicsUtils.uiText(t.splashText)
                 .addText(t.subtitle).addLineBreak()
-                .addText("Jordan Bunke, 2023-2024")
+                .addText("Copyright (c) 2023-2024 Jordan Bunke")
                 .build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h - (version.getHeight() * 2)),

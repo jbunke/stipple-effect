@@ -1,3 +1,13 @@
+{1.0.0} - Official Release - 2024-06-13
+
+Changed:
+> Optimized Move Selection tool preview overlay
+> Optimized selection overlay rendering
+> Updated program logo
+
+Fixed:
+> Bug: Breadth tool overlays are not redrawn at a zoom level of 100%
+
 {0.5.1} - 2024-06-12
 
 Fixed:

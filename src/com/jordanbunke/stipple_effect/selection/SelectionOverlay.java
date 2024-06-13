@@ -8,17 +8,13 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public final class SelectionOverlay {
     private static final int TL = 0, BR = 1, DIM = 2, TRP = 3, BOUNDS = 4;
+    private static final short INIT = 1,
+            L_PRM = 3, R_PRM = 5, T_PRM = 7, B_PRM = 11;
 
-    // directional frontiers
-    private final Set<Coord2D> left, right, top, bottom;
+    private final short[][] frontier;
     private final GameImage filled;
     private Coord2D tl;
     private final int w, h;
@@ -41,30 +37,34 @@ public final class SelectionOverlay {
         lastWW = 0;
         lastWH = 0;
 
-        left = new HashSet<>();
-        right = new HashSet<>();
-        top = new HashSet<>();
-        bottom = new HashSet<>();
-
         tl = selection.topLeft;
 
         w = selection.bounds.width();
         h = selection.bounds.height();
 
+        final int fillC = Settings.getTheme().selectionFill.getRGB();
         filled = new GameImage(w, h);
-        final Color fillC = Settings.getTheme().selectionFill;
-        filled.setColor(fillC);
+        frontier = new short[w][h];
 
-        selection.unboundedPixelAlgorithm((x, y) -> {
-            final Coord2D px = new Coord2D(x, y);
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++) {
+                frontier[x][y] = INIT;
 
-            if (!selection.selected(x - 1, y)) left.add(px);
-            if (!selection.selected(x + 1, y)) right.add(px);
-            if (!selection.selected(x, y - 1)) top.add(px);
-            if (!selection.selected(x, y + 1)) bottom.add(px);
+                final int px = tl.x + x, py = tl.y + y;
 
-            filled.dot(x - tl.x, y - tl.y);
-        });
+                if (selection.selected(px, py)) {
+                    filled.setRGB(x, y, fillC);
+
+                    if (!selection.selected(px - 1, py))
+                        frontier[x][y] *= L_PRM;
+                    if (!selection.selected(px + 1, py))
+                        frontier[x][y] *= R_PRM;
+                    if (!selection.selected(px, py - 1))
+                        frontier[x][y] *= T_PRM;
+                    if (!selection.selected(px, py + 1))
+                        frontier[x][y] *= B_PRM;
+                }
+            }
 
         filled.free();
     }
@@ -72,20 +72,6 @@ public final class SelectionOverlay {
     public void updateTL(final Selection selection) {
         lastTL = tl;
         tl = selection.topLeft;
-
-        if (!lastTL.equals(tl)) {
-            final Coord2D displacement = new Coord2D(
-                    tl.x - lastTL.x, tl.y - lastTL.y);
-
-            final List<Set<Coord2D>> dirs = List.of(left, right, top, bottom);
-
-            for (Set<Coord2D> dir : dirs) {
-                final Set<Coord2D> bank = new HashSet<>(dir);
-                dir.clear();
-
-                bank.forEach(p -> dir.add(p.displace(displacement)));
-            }
-        }
     }
 
     public GameImage draw(
@@ -124,39 +110,32 @@ public final class SelectionOverlay {
                 outside = Settings.getTheme().highlightOutline;
 
         final int zint = (int) z;
-        final Predicate<Coord2D> inBounds = p -> {
-            final Coord2D adj = p.displace(-tl.x, -tl.y);
 
-            return adj.x >= bounds[TL].x && adj.y >= bounds[TL].y &&
-                    adj.x <= bounds[BR].x && adj.y <= bounds[BR].y;
-        };
-        final Function<Coord2D, Coord2D> renderCoord = c ->
-                render.displace(c.x * zint, c.y * zint);
+        for (int x = bounds[TL].x; x < bounds[BR].x; x++) {
+            for (int y = bounds[TL].y; y < bounds[BR].y; y++) {
+                final int px = tl.x + x, py = tl.y + y;
+                final Coord2D c = render.displace(px * zint, py * zint);
 
-        left.stream().filter(inBounds).forEach(p -> {
-            final Coord2D c = renderCoord.apply(p);
+                final short fp = frontier[x][y];
 
-            overlay.fillRectangle(inside, c.x, c.y, 1, zint);
-            overlay.fillRectangle(outside, c.x - 1, c.y, 1, zint);
-        });
-        right.stream().filter(inBounds).forEach(p -> {
-            final Coord2D c = renderCoord.apply(p).displace(zint, 0);
-
-            overlay.fillRectangle(inside, c.x - 1, c.y, 1, zint);
-            overlay.fillRectangle(outside, c.x, c.y, 1, zint);
-        });
-        top.stream().filter(inBounds).forEach(p -> {
-            final Coord2D c = renderCoord.apply(p);
-
-            overlay.fillRectangle(inside, c.x, c.y, zint, 1);
-            overlay.fillRectangle(outside, c.x, c.y - 1, zint, 1);
-        });
-        bottom.stream().filter(inBounds).forEach(p -> {
-            final Coord2D c = renderCoord.apply(p).displace(0, zint);
-
-            overlay.fillRectangle(inside, c.x, c.y - 1, zint, 1);
-            overlay.fillRectangle(outside, c.x, c.y, zint, 1);
-        });
+                if (fp % L_PRM == 0) {
+                    overlay.fillRectangle(inside, c.x, c.y, 1, zint);
+                    overlay.fillRectangle(outside, c.x - 1, c.y, 1, zint);
+                }
+                if (fp % R_PRM == 0) {
+                    overlay.fillRectangle(inside, c.x + zint - 1, c.y, 1, zint);
+                    overlay.fillRectangle(outside, c.x + zint, c.y, 1, zint);
+                }
+                if (fp % T_PRM == 0) {
+                    overlay.fillRectangle(inside, c.x, c.y, zint, 1);
+                    overlay.fillRectangle(outside, c.x, c.y - 1, zint, 1);
+                }
+                if (fp % B_PRM == 0) {
+                    overlay.fillRectangle(inside, c.x, c.y + zint - 1, zint, 1);
+                    overlay.fillRectangle(outside, c.x, c.y + zint, zint, 1);
+                }
+            }
+        }
 
         if (canTransform) {
             final GameImage NODE = GraphicsUtils.TRANSFORM_NODE;
