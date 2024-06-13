@@ -1,6 +1,6 @@
 Shortcut: {Q}
 
-The script brush paints applies a color script transformation to the pixel that it paints over.
+The script brush applies a color script transformation to the pixel that it paints over.
 
 Use existing color as input: {Click & Drag}
 

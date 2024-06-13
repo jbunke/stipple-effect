@@ -1,5 +1,10 @@
 # Changelog
 
+## **1.0.0** - Official Release - 2024-06-13
+
+### Changed:
+* Updated menus
+
 ## **0.5.1** - 2024-06-12
 
 ### Fixed:
