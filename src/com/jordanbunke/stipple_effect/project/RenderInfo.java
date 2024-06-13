@@ -53,7 +53,7 @@ public class RenderInfo {
 
     public void setZoomLevel(final ZoomLevel zoomLevel) {
         final boolean redrawOverlays = this.zoomLevel != zoomLevel &&
-                zoomLevel.z > Constants.ZOOM_FOR_OVERLAY;
+                zoomLevel.z >= Constants.ZOOM_FOR_OVERLAY;
 
         this.zoomLevel = zoomLevel;
 

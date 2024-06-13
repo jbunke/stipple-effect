@@ -2,6 +2,10 @@
 
 Changed:
 > Optimized Move Selection tool preview overlay
+> Optimized selection overlay rendering
+
+Fixed:
+> Bug: Breadth tool overlays are not redrawn at a zoom level of 100%
 
 {0.5.1} - 2024-06-12
 
