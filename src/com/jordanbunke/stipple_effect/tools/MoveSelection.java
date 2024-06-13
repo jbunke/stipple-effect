@@ -12,8 +12,6 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 public final class MoveSelection extends MoverTool<Selection> {
     private static final MoveSelection INSTANCE;
@@ -81,7 +79,8 @@ public final class MoveSelection extends MoverTool<Selection> {
 
         final GameImage toolContentPreview = new GameImage(w, h);
 
-        final Set<Coord2D> frontier = new HashSet<>();
+        final Theme t = Settings.getTheme();
+        final Color fill = t.highlightOverlay, outline = t.highlightOutline;
 
         transformation.pixelAlgorithm(w, h, (x, y) -> {
             final boolean
@@ -94,16 +93,11 @@ public final class MoveSelection extends MoverTool<Selection> {
                     bl = !transformation.selected(x - 1, y + 1),
                     br = !transformation.selected(x + 1, y + 1);
 
-            if (left || right || top || bottom || tl || tr || bl || br)
-                frontier.add(new Coord2D(x, y));
+            final boolean frontier = left || right || top || bottom ||
+                    tl || tr || bl || br;
+
+            toolContentPreview.setRGB(x, y, (frontier ? outline : fill).getRGB());
         });
-
-        final Theme t = Settings.getTheme();
-        final Color fill = t.highlightOverlay, outline = t.highlightOutline;
-
-        transformation.pixelAlgorithm(w, h,
-                (x, y) -> toolContentPreview.dot(fill, x, y));
-        frontier.forEach(p -> toolContentPreview.dot(outline, p.x, p.y));
 
         return toolContentPreview.submit();
     }
