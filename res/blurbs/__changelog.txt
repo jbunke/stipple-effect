@@ -3,6 +3,7 @@
 Changed:
 > Optimized Move Selection tool preview overlay
 > Optimized selection overlay rendering
+> Updated program logo
 
 Fixed:
 > Bug: Breadth tool overlays are not redrawn at a zoom level of 100%
