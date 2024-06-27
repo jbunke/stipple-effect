@@ -1,3 +1,15 @@
+{1.0.1} - 2024-07-??
+
+TODO
+Add:
+> Here
+
+Change:
+> Here
+
+Fix:
+> Crashes due to OutOfMemoryError
+
 {1.0.0} - Official Release - 2024-06-13
 
 Changed:
