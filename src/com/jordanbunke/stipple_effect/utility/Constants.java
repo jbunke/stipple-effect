@@ -76,7 +76,7 @@ public class Constants {
             MAX_SV_SHIFT = SAT_SCALE, MIN_SV_SHIFT = -MAX_SV_SHIFT;
 
     public static final float
-            DEF_ZOOM = ZoomLevel.PLUS_3.z,
+            DEF_ZOOM = ZoomLevel.PLUS_6.z,
             ZOOM_FOR_OVERLAY = ZoomLevel.NONE.z,
             ZOOM_FOR_GRID = DEF_ZOOM,
             NO_ZOOM = ZoomLevel.NONE.z,
