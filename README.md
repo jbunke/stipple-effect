@@ -45,6 +45,8 @@ _Stipple Effect_ supports scripting for three different use cases: **automation*
 * [API](https://github.com/jbunke/stipple-effect/wiki/Scripting-API)
 * [Example scripts](https://github.com/jbunke/se-script-examples)
 
+I have created [a VS Code extension](https://marketplace.visualstudio.com/items?itemName=jordanbunke.deltascript-for-stipple-effect) that provides syntax highlighting for *Stipple Effect* scripts.
+
 ## External Dependencies
 * [Delta Time](https://github.com/jbunke/delta-time) - my lightweight graphics library that handles GUI and execution loop boilerplate
 * [ANTLR v4](https://github.com/antlr/antlr4) - lexing and parsing library that powers the _DeltaScript_ interpreter
