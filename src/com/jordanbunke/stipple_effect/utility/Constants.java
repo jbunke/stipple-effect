@@ -34,7 +34,7 @@ public class Constants {
 
     public static final Coord2D NO_VALID_TARGET = new Coord2D(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
-    public static final double TICK_HZ = 100d, FPS = 30d;
+    public static final double TICK_HZ = 100d, FPS = 60d;
 
     public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5,
             CIRCLE = Math.PI * 2, _45_SNAP_INC = CIRCLE / 8d,
@@ -69,7 +69,7 @@ public class Constants {
             TIMER_MAX_OUT = 4, MILLIS_PER_TIMER_INC = 100,
             RGBA_SCALE = 255, COLOR_SET_RGBA_INC = 5,
             HUE_SCALE = 360, SAT_SCALE = RGBA_SCALE, VALUE_SCALE = RGBA_SCALE,
-            STATUS_UPDATE_DURATION_MILLIS = 5000, TOOL_TIP_MILLIS_THRESHOLD = 500,
+            STATUS_UPDATE_DURATION_MILLIS = 5000, TOOL_TIP_MILLIS_THRESHOLD = 250,
             MIN_SCALE_UP = 1, MAX_SCALE_UP = 20, DEFAULT_SAVE_SCALE_UP = MIN_SCALE_UP,
             MAX_NAME_LENGTH = 40, STRETCH_PX_THRESHOLD = 10, ROTATE_PX_THRESHOLD = 25,
             MAX_HUE_SHIFT = HUE_SCALE / 2, MIN_HUE_SHIFT = -MAX_HUE_SHIFT,
