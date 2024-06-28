@@ -80,7 +80,7 @@ public class Constants {
             ZOOM_FOR_OVERLAY = ZoomLevel.NONE.z,
             ZOOM_FOR_GRID = DEF_ZOOM,
             NO_ZOOM = ZoomLevel.NONE.z,
-            MAX_PREVIEW_ZOOM = ZoomLevel.PLUS_8.z;
+            MAX_PREVIEW_ZOOM = ZoomLevel.PLUS_11.z;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,
