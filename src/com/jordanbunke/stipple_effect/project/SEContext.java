@@ -149,12 +149,13 @@ public class SEContext {
             if (renderInfo.isPixelGridOn() && couldRenderPixelGrid()) {
                 final GameImage pixelGrid = pixelGridMap.getOrDefault(
                         renderInfo.getZoomLevel(), GameImage.dummy());
-                final int z = (int) zoomFactor;
 
                 if (pixelGrid.getWidth() > GameImage.dummy().getWidth())
                     workspace.draw(pixelGrid.section(
-                                    bounds[TL].x * z, bounds[TL].y * z,
-                                    bounds[BR].x * z, bounds[BR].y * z),
+                                    (int)(bounds[TL].x * zoomFactor),
+                                    (int)(bounds[TL].y * zoomFactor),
+                                    (int)(bounds[BR].x * zoomFactor),
+                                    (int)(bounds[BR].y * zoomFactor)),
                             bounds[TRP].x, bounds[TRP].y);
             }
         }
@@ -946,8 +947,8 @@ public class SEContext {
                 h = getState().getImageHeight();
 
         for (final ZoomLevel zl : ZoomLevel.values()) {
-            final int z = (int) zl.z, altPx = Math.max(2,
-                    z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
+            final int z = (int) Math.ceil(zl.z),
+                    altPx = Math.max(2, z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
             final boolean tooSmall = z == 0,
                     tooLarge = Math.max(w, h) * z >
@@ -956,13 +957,14 @@ public class SEContext {
             if (tooSmall || tooLarge)
                 continue;
 
-            final GameImage image = new GameImage(w * z, h * z);
+            final GameImage image =
+                    new GameImage((int)(w * zl.z), (int)(h * zl.z));
 
             final int pgx = Settings.getPixelGridXPixels(),
                     pgy = Settings.getPixelGridYPixels();
 
-            final GameImage vertGridLine = new GameImage(1, h * z),
-                    horzGridLine = new GameImage(w * z, 1),
+            final GameImage vertGridLine = new GameImage(1, (int)(h * zl.z)),
+                    horzGridLine = new GameImage((int)(w * zl.z), 1),
                     vertPixel = new GameImage(1, z),
                     horzPixel = new GameImage(z, 1);
 
@@ -980,23 +982,23 @@ public class SEContext {
 
             // vertical
             for (int y = 0; y < h; y++)
-                vertGridLine.draw(vertPixel, 0, y * z);
+                vertGridLine.draw(vertPixel, 0, (int)(y * zl.z));
 
             vertGridLine.free();
 
             // horizontal
             for (int x = 0; x < w; x++)
-                horzGridLine.draw(horzPixel, x * z, 0);
+                horzGridLine.draw(horzPixel, (int)(x * zl.z), 0);
 
             horzGridLine.free();
 
             // vertical grid
             for (int x = 0; x < w; x += pgx)
-                image.draw(vertGridLine, x * z, 0);
+                image.draw(vertGridLine, (int)(x * zl.z), 0);
 
             // horizontal grid
             for (int y = 0; y < h; y += pgy)
-                image.draw(horzGridLine, 0, y * z);
+                image.draw(horzGridLine, 0, (int)(y * zl.z));
 
             pixelGridMap.put(zl, image.submit());
         }
