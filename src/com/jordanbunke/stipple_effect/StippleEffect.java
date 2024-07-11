@@ -398,6 +398,11 @@ public class StippleEffect implements ProgramContext {
             getContext().process(eventLogger);
         } else {
             dialog.process(eventLogger);
+
+            // close dialog on ESC press
+            eventLogger.checkForMatchingKeyStroke(
+                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
+                    this::clearDialog);
         }
     }
 

@@ -7,6 +7,7 @@ Fix:
 
 Added:
 > Zoom levels 125%, 150%, and 175% for smoother zooming
+> Pressing {Esc} while a dialog menu is open will clear the dialog; equivalent of "Cancel" button
 
 Changed:
 > 2x the program frame rate to 60 FPS
