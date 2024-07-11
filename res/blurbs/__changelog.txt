@@ -14,6 +14,7 @@ Changed:
 
 Fixed:
 > Bug: Script calls to .keys() not being handled correctly
+> Bug: Box select tool does not select off-canvas pixels inside the selection bounds
 
 {1.0.0} - Official Release - 2024-06-13
 
