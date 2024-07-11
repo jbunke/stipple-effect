@@ -181,21 +181,20 @@ public class GraphicsUtils {
             final boolean[][] mask,
             final Color inside, final Color outside
     ) {
-        final int zoomInc = (int)Math.max(Constants.ZOOM_FOR_OVERLAY, z),
-                scaleUpW = Math.max(1, w * zoomInc),
-                scaleUpH = Math.max(1, h * zoomInc);
+        final int scaleUpW = Math.max(1, (int)(w * z)),
+                scaleUpH = Math.max(1, (int)(h * z));
 
         final GameImage overlay = new GameImage(
                 scaleUpW + (2 * Constants.OVERLAY_BORDER_PX),
                 scaleUpH + (2 * Constants.OVERLAY_BORDER_PX));
 
-        populateOverlay(mask, zoomInc, overlay, inside, outside);
+        populateOverlay(mask, z, overlay, inside, outside);
 
         return overlay.submit();
     }
 
     private static void populateOverlay(
-            final boolean[][] mask, final int zoomInc,
+            final boolean[][] mask, final double z,
             final GameImage frontier,
             final Color inside, final Color outside
     ) {
@@ -210,8 +209,11 @@ public class GraphicsUtils {
                         bottom = y == mask[x].length - 1 || !mask[x][y + 1];
 
                 final Coord2D o = new Coord2D(
-                        Constants.OVERLAY_BORDER_PX + (zoomInc * x),
-                        Constants.OVERLAY_BORDER_PX + (zoomInc * y));
+                        Constants.OVERLAY_BORDER_PX + (int)(z * x),
+                        Constants.OVERLAY_BORDER_PX + (int)(z * y));
+
+                final int zoomInc = (int)Math.ceil(Math.max(
+                        Constants.ZOOM_FOR_OVERLAY, z));
 
                 if (left) {
                     frontier.fillRectangle(inside, o.x, o.y, 1, zoomInc);

@@ -1,5 +1,20 @@
 # Changelog
 
+## **1.0.1** - 2024-07-11
+
+### Added:
+* Zoom levels 125%, 150%, and 175% for smoother zooming
+* Pressing *Esc* while a dialog menu is open will clear the dialog; equivalent of "Cancel" button
+
+### Changed:
+* 2x the program frame rate to 60 FPS
+* Tool tips display after hovering over a button for 0.25 seconds, twice as fast as before
+
+### Fixed:
+* Bug: Script calls to .keys() not being handled correctly
+* Bug: Box select tool does not select off-canvas pixels inside the selection bounds
+* Bug: Reimporting a scripted preview inherits layer name from its source project
+
 ## **1.0.0** - Official Release - 2024-06-13
 
 ### Changed:

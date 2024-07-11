@@ -109,12 +109,12 @@ public final class SelectionOverlay {
         final Color inside = Settings.getTheme().buttonOutline,
                 outside = Settings.getTheme().highlightOutline;
 
-        final int zint = (int) z;
+        final int zint = (int) Math.ceil(z);
 
         for (int x = bounds[TL].x; x < bounds[BR].x; x++) {
             for (int y = bounds[TL].y; y < bounds[BR].y; y++) {
                 final int px = tl.x + x, py = tl.y + y;
-                final Coord2D c = render.displace(px * zint, py * zint);
+                final Coord2D c = render.displace((int)(px * z), (int)(py * z));
 
                 final short fp = frontier[x][y];
 
@@ -146,8 +146,8 @@ public final class SelectionOverlay {
             xs[BEG] = fillRender.x - (NODE.getWidth() / 2);
             ys[BEG] = fillRender.y - (NODE.getWidth() / 2);
 
-            xs[END] = xs[BEG] + (w * zint);
-            ys[END] = ys[BEG] + (h * zint);
+            xs[END] = xs[BEG] + (int)(w * z);
+            ys[END] = ys[BEG] + (int)(h * z);
 
             xs[MID] = (xs[BEG] + xs[END]) / 2;
             ys[MID] = (ys[BEG] + ys[END]) / 2;

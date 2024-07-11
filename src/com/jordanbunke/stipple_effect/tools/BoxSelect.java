@@ -116,20 +116,13 @@ public final class BoxSelect extends ToolWithMode implements SnappableTool {
             drawing = false;
             me.markAsProcessed();
 
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
-
             final int mw = bottomRight.x - topLeft.x,
                     mh = bottomRight.y - topLeft.y;
             final boolean[][] matrix = new boolean[mw][mh];
 
             for (int x = 0; x < mw; x++)
-                for (int y = 0; y < mh; y++) {
-                    final int px = topLeft.x + x, py = topLeft.y + y;
-
-                    if (px >= 0 && px < w && py >= 0 && py < h)
-                        matrix[x][y] = true;
-                }
+                for (int y = 0; y < mh; y++)
+                    matrix[x][y] = true;
 
             final Selection box = Selection.atOf(topLeft, matrix);
             context.editSelection(box, true);
