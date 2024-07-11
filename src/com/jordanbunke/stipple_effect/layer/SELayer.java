@@ -29,7 +29,7 @@ public final class SELayer {
         final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
 
         return new SELayer(frames, content[0], Constants.OPAQUE,
-                true, false, OnionSkinMode.NONE, giveLayerDefaultName());
+                true, false, OnionSkinMode.NONE, Constants.FROM_PREVIEW_LAYER_NAME);
     }
 
     public static SELayer newLayer(
@@ -95,7 +95,7 @@ public final class SELayer {
 
     private static String giveLayerDefaultName() {
         final int size = StippleEffect.get().getContext().getState().getLayers().size();
-        return Constants.SUBSEQUENT_LAYER_PREFIX + (size + 1);
+        return Constants.STD_LAYER_PREFIX + (size + 1);
     }
 
     public SELayer duplicate() {

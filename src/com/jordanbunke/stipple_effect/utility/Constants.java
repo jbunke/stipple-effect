@@ -40,8 +40,9 @@ public class Constants {
             CIRCLE = Math.PI * 2, _45_SNAP_INC = CIRCLE / 8d,
             _15_SNAP_INC = _45_SNAP_INC / 3d;
 
-    public static final String BASE_LAYER_NAME = "Background",
-            SUBSEQUENT_LAYER_PREFIX = "Layer ", FLATTENED_LAYER_NAME = "Flattened",
+    public static final String
+            BASE_LAYER_NAME = "Background", STD_LAYER_PREFIX = "Layer ",
+            FLATTENED_LAYER_NAME = "Flattened", FROM_PREVIEW_LAYER_NAME = "From script",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
             SCRIPT_FILE_SUFFIX = "ses", SCRIPT_GLOBAL_NAMESPACE = "SE",
