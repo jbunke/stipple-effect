@@ -4,7 +4,6 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 public final class SaveNode extends ProjectStatementNode {
@@ -19,14 +18,9 @@ public final class SaveNode extends ProjectStatementNode {
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        final SEContext project = getProject(symbolTable);
-
-        if (project.projectInfo.hasSaveAssociation())
-            project.projectInfo.save();
-        else
-            StatusUpdates.scriptActionNotPermitted("save the project",
-                    "the project does not have a valid save association",
-                    scope.caller().getPosition());
+        StatusUpdates.scriptActionNotPermitted("save the project",
+                "the demo does not permit saving",
+                scope.caller().getPosition());
 
         return FuncControlFlow.cont();
     }

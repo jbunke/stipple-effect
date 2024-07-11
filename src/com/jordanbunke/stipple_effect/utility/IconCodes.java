@@ -6,8 +6,6 @@ public class IconCodes {
             NEW_PROJECT = "new_project",
             OPEN_FILE = "open_file",
             CLOSE_PROJECT = "close_project",
-            SAVE = "save",
-            SAVE_AS = "save_as",
             RESIZE = "resize",
             PAD = "pad",
             STITCH_SPLIT_FRAMES = "stitch_split_frames",
@@ -99,6 +97,7 @@ public class IconCodes {
 
     public static final String
             ABOUT = NO_ICON_PREFIX + "about",
+            DEMO = NO_ICON_PREFIX + "demo",
             CHANGELOG = NO_ICON_PREFIX + "changelog",
             ROADMAP = NO_ICON_PREFIX + "roadmap",
             SCRIPTING = NO_ICON_PREFIX + "scripting",

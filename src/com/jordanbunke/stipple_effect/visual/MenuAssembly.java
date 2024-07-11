@@ -57,7 +57,6 @@ public class MenuAssembly {
                 new String[] {
                         IconCodes.SETTINGS,
                         IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
-                        IconCodes.SAVE, IconCodes.SAVE_AS,
                         IconCodes.RESIZE, IconCodes.PAD,
                         IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
                         IconCodes.AUTOMATION_SCRIPT,
@@ -66,8 +65,6 @@ public class MenuAssembly {
                         IconCodes.HISTORY
                 },
                 getPreconditions(
-                        () -> true,
-                        () -> true,
                         () -> true,
                         () -> true,
                         () -> true,
@@ -85,8 +82,6 @@ public class MenuAssembly {
                         DialogAssembly::setDialogToProgramSettings,
                         DialogAssembly::setDialogToNewProject,
                         () -> StippleEffect.get().openProject(),
-                        c.projectInfo::save,
-                        DialogAssembly::setDialogToSave,
                         DialogAssembly::setDialogToResize,
                         DialogAssembly::setDialogToPad,
                         () -> StippleEffect.get().stitchOrSplit(),

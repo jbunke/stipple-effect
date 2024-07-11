@@ -410,9 +410,6 @@ public class StippleEffect implements ProgramContext {
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             // Ctrl + Shift + ?
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToSave);
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToPad);
             eventLogger.checkForMatchingKeyStroke(

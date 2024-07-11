@@ -390,9 +390,6 @@ public class SEContext {
                     GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
                     stateManager::redoToCheckpoint);
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    projectInfo::save);
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
                     this::selectAll);
             eventLogger.checkForMatchingKeyStroke(
