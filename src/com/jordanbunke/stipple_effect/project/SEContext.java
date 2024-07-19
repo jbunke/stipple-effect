@@ -165,7 +165,8 @@ public class SEContext {
             final Tool tool = StippleEffect.get().getTool();
 
             // brush / eraser overlay
-            if (inWorkspaceBounds && tool instanceof ToolWithBreadth twb) {
+            if (inWorkspaceBounds && Permissions.isCursorFree() &&
+                    tool instanceof ToolWithBreadth twb) {
                 final GameImage overlay = twb.getOverlay();
                 final int offset = twb.breadthOffset();
 
@@ -263,18 +264,20 @@ public class SEContext {
         if (tool instanceof MoverTool<?> mt)
             mt.setSnapToggled(eventLogger.isPressed(Key.CTRL));
 
-        for (GameEvent e : eventLogger.getUnprocessedEvents()) {
-            if (e instanceof GameMouseEvent me) {
-                if (me.matchesAction(GameMouseEvent.Action.DOWN) &&
-                        inWorkspaceBounds) {
-                    tool.onMouseDown(this, me);
-                    me.markAsProcessed();
-                } else if (me.matchesAction(GameMouseEvent.Action.CLICK) &&
-                        inWorkspaceBounds) {
-                    tool.onClick(this, me);
-                    me.markAsProcessed();
-                } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
-                    tool.onMouseUp(this, me);
+        if (Permissions.isCursorFree()) {
+            for (GameEvent e : eventLogger.getUnprocessedEvents()) {
+                if (e instanceof GameMouseEvent me) {
+                    if (me.matchesAction(GameMouseEvent.Action.DOWN) &&
+                            inWorkspaceBounds) {
+                        tool.onMouseDown(this, me);
+                        me.markAsProcessed();
+                    } else if (me.matchesAction(GameMouseEvent.Action.CLICK) &&
+                            inWorkspaceBounds) {
+                        tool.onClick(this, me);
+                        me.markAsProcessed();
+                    } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
+                        tool.onMouseUp(this, me);
+                    }
                 }
             }
         }

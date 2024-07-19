@@ -1,12 +1,15 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractDropdownList;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.AbstractVerticalScrollBox;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -14,6 +17,7 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Dropdown extends AbstractDropdownList {
@@ -34,6 +38,20 @@ public class Dropdown extends AbstractDropdownList {
         this.dropdownAllowanceY = dropdownAllowanceY;
 
         make();
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
+        final Optional<?> scope = DeltaTimeGlobal.getStatusOf(
+                DeltaTimeGlobal.SC_CURSOR_CAPTURED);
+        final AbstractVerticalScrollBox container = getContainer();
+
+        if (scope.isEmpty() && container.mouseIsWithinBounds(
+                eventLogger.getAdjustedMousePosition()))
+            DeltaTimeGlobal.setStatus(DeltaTimeGlobal.SC_CURSOR_CAPTURED,
+                    container);
+
+        super.process(eventLogger);
     }
 
     private static SimpleItem[] composeItems(

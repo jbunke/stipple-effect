@@ -11,7 +11,7 @@
 * Tool tips display after hovering over a button for 0.25 seconds, twice as fast as before
 
 ### Fixed:
-* Bug: Script calls to .keys() not being handled correctly
+* Bug: Script calls to `.keys()` not being handled correctly
 * Bug: Box select tool does not select off-canvas pixels inside the selection bounds
 * Bug: Reimporting a scripted preview inherits layer name from its source project
 

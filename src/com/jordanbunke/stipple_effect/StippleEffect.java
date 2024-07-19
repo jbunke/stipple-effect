@@ -18,6 +18,7 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.text.TextBuilder;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.Version;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -376,6 +377,7 @@ public class StippleEffect implements ProgramContext {
     @Override
     public void process(final InputEventLogger eventLogger) {
         mousePos = eventLogger.getAdjustedMousePosition();
+        DeltaTimeGlobal.setStatus(DeltaTimeGlobal.SC_CURSOR_CAPTURED, null);
 
         if (dialog == null) {
             if (!Permissions.isTyping())
@@ -827,7 +829,8 @@ public class StippleEffect implements ProgramContext {
 
         // cursor
         final GameImage cursor = SECursor.fetchCursor(
-                getContext().isInWorkspaceBounds() && dialog == null
+                getContext().isInWorkspaceBounds() &&
+                        dialog == null && Permissions.isCursorFree()
                         ? tool.getCursorCode() : SECursor.MAIN_CURSOR);
         canvas.draw(cursor, mousePos.x - (Layout.CURSOR_DIM / 2),
                 mousePos.y - (Layout.CURSOR_DIM / 2));

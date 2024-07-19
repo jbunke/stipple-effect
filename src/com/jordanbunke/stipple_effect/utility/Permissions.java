@@ -7,4 +7,9 @@ public class Permissions {
         return DeltaTimeGlobal.getStatusOf(Constants.TYPING_CODE)
                 .orElse(false) instanceof Boolean b && b;
     }
+
+    public static boolean isCursorFree() {
+        return DeltaTimeGlobal.getStatusOf(
+                DeltaTimeGlobal.SC_CURSOR_CAPTURED).isEmpty();
+    }
 }
