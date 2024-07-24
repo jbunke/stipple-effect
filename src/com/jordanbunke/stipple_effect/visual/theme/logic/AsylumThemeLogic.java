@@ -6,6 +6,8 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -55,11 +57,9 @@ public final class AsylumThemeLogic extends ThemeLogic {
     }
 
     @Override
-    public GameImage drawTextButton(
-            final int width, final String text, final boolean selected,
-            final GraphicsUtils.ButtonType type
-    ) {
+    public GameImage drawTextButton(final TextButton tb) {
         final Theme t = Settings.getTheme();
+        final ButtonType type = tb.getButtonType();
 
         final Color backgroundColor = switch (type) {
             case DD_OPTION -> t.dropdownOptionBody;
@@ -68,13 +68,13 @@ public final class AsylumThemeLogic extends ThemeLogic {
         };
 
         final boolean leftAligned = type.isDropdown();
-        final boolean drawBorder = type != GraphicsUtils.ButtonType.DD_OPTION;
+        final boolean drawBorder = type != ButtonType.DD_OPTION;
 
         final Color textColor = intuitTextColor(backgroundColor, true);
         final GameImage textImage = GraphicsUtils.uiText(textColor)
-                .addText(text).build().draw();
+                .addText(tb.getLabel()).build().draw();
 
-        final int w = Math.max(width, textImage.getWidth() +
+        final int w = Math.max(tb.getWidth(), textImage.getWidth() +
                 (4 * Layout.BUTTON_BORDER_PX)),
                 h = Layout.STD_TEXT_BUTTON_H;
 
@@ -85,7 +85,7 @@ public final class AsylumThemeLogic extends ThemeLogic {
                 ? (2 * Layout.BUTTON_BORDER_PX)
                 : (w - textImage.getWidth()) / 2;
 
-        if (selected) {
+        if (tb.isSelected()) {
             final int INC = Layout.BUTTON_BORDER_PX;
             final Color c = t.highlightOutline;
 
@@ -98,7 +98,7 @@ public final class AsylumThemeLogic extends ThemeLogic {
         nhi.draw(textImage, textX, Layout.BUTTON_TEXT_OFFSET_Y);
 
         if (drawBorder) {
-            final Color frame = buttonBorderColor(selected);
+            final Color frame = buttonBorderColor(tb.isSelected());
             nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
         }
 

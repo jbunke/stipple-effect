@@ -745,57 +745,31 @@ public class StippleEffect implements ProgramContext {
                 fp = Layout.getFramesPosition(),
                 bbp = Layout.getBottomBarPosition();
 
+        // panel backgrounds
+
+        canvas.draw(drawBottomBar(), bbp.x, bbp.y);
+
+        if (Layout.isToolbarShowing()) {
+            canvas.draw(drawTools(), tp.x, tp.y);
+
+            if (tool.hasToolOptionsBar())
+                canvas.draw(drawToolOptionsBar(), tobp.x, tobp.y);
+        }
+
+        if (Layout.isLayersPanelShowing())
+            canvas.draw(drawLayers(), lp.x, lp.y);
+
+        if (Layout.isColorsPanelShowing())
+            canvas.draw(drawColorsSegment(), cp.x, cp.y);
+
+        canvas.draw(drawProjects(), pp.x, pp.y);
+
+        if (Layout.isFramesPanelShowing())
+            canvas.draw(drawFrames(), fp.x, fp.y);
+
         // workspace
         final GameImage workspace = getContext().drawWorkspace();
         canvas.draw(workspace, wp.x, wp.y);
-
-        if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
-            canvas.draw(statusUpdate, wp.x, wp.y);
-
-        // segment backgrounds
-
-        // bottom bar - zoom, animation
-        final GameImage bottomBar = drawBottomBar();
-        canvas.draw(bottomBar, bbp.x, bbp.y);
-        bottomBarMenu.render(canvas);
-
-        // tools
-        if (Layout.isToolbarShowing()) {
-            final GameImage tools = drawTools();
-            canvas.draw(tools, tp.x, tp.y);
-
-            if (tool.hasToolOptionsBar()) {
-                final GameImage toolOptionsBar = drawToolOptionsBar();
-                canvas.draw(toolOptionsBar, tobp.x, tobp.y);
-            }
-        }
-        toolButtonMenu.render(canvas);
-
-        // layers
-        if (Layout.isLayersPanelShowing()) {
-            final GameImage layers = drawLayers();
-            canvas.draw(layers, lp.x, lp.y);
-        }
-        layersMenu.render(canvas);
-
-        // colors
-        if (Layout.isColorsPanelShowing()) {
-            final GameImage colors = drawColorsSegment();
-            canvas.draw(colors, cp.x, cp.y);
-        }
-        colorsMenu.render(canvas);
-
-        // projects / contexts
-        final GameImage projects = drawProjects();
-        canvas.draw(projects, pp.x, pp.y);
-        projectsMenu.render(canvas);
-
-        // frames
-        if (Layout.isFramesPanelShowing()) {
-            final GameImage frames = drawFrames();
-            canvas.draw(frames, fp.x, fp.y);
-        }
-        framesMenu.render(canvas);
 
         // borders
         final float strokeWidth = 2f;
@@ -808,6 +782,27 @@ public class StippleEffect implements ProgramContext {
         canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
         canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace/option bar and right segments separation
+
+        if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
+            canvas.draw(statusUpdate, wp.x, wp.y);
+
+        // bottom bar - zoom, animation
+        bottomBarMenu.render(canvas);
+
+        // tools
+        toolButtonMenu.render(canvas);
+
+        // layers
+        layersMenu.render(canvas);
+
+        // colors
+        colorsMenu.render(canvas);
+
+        // projects / contexts
+        projectsMenu.render(canvas);
+
+        // frames
+        framesMenu.render(canvas);
 
         if (dialog != null) {
             canvas.fillRectangle(Settings.getTheme().dialogVeil,

@@ -8,6 +8,7 @@ import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 public final class OutlineDirectionWatcher extends MenuButtonStub {
@@ -53,7 +54,7 @@ public final class OutlineDirectionWatcher extends MenuButtonStub {
 
         image = GraphicsUtils.loadIcon(code);
 
-        highlighted = GraphicsUtils.highlightButton(
+        highlighted = Settings.getTheme().logic.highlightButton(
                 GraphicsUtils.loadIcon(IconCodes.NO_OUTLINE));
     }
 

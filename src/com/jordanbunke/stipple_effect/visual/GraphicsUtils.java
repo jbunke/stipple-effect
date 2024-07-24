@@ -3,20 +3,20 @@ package com.jordanbunke.stipple_effect.visual;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.*;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -102,56 +102,53 @@ public class GraphicsUtils {
                 highlighted, accentColor, backgroundColor);
     }
 
-    public static GameImage drawDropdownButton(
-            final int width, final String text, final boolean selected
-    ) {
-        final GameImage base = drawTextButton(
-                width, text, selected, ButtonType.DD_HEAD);
-
-        final GameImage icon = loadIcon(
-                selected ? IconCodes.COLLAPSE : IconCodes.EXPAND);
-
-        base.draw(icon, base.getWidth() - (Layout.BUTTON_INC),
-                Layout.BUTTON_BORDER_PX);
-
-        return base.submit();
-    }
-
-    public static GameImage drawTextButton(
-            final int width, final String text,
-            final boolean selected, final ButtonType type
-    ) {
-        return Settings.getTheme().logic
-                .drawTextButton(width, text, selected, type);
-    }
-
-    public static GameImage drawTextButton(
-            final int width, final String text, final boolean selected
-    ) {
-        return drawTextButton(width, text, selected, ButtonType.STANDARD);
-    }
-
-    public static SimpleMenuButton makeStandardTextButton(
+    public static StaticTextButton makeStandardTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final GameImage base =
-                drawTextButton(Layout.STD_TEXT_BUTTON_W, text, false);
-        return new SimpleMenuButton(pos, new Bounds2D(Layout.STD_TEXT_BUTTON_W,
-                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
-                true, onClick, base, highlightButton(base));
+        return new StaticTextButton(pos, text,
+                Layout.STD_TEXT_BUTTON_W, onClick,
+                Alignment.CENTER, ButtonType.STANDARD);
     }
 
-    public static SimpleMenuButton makeBespokeTextButton(
+    public static StaticTextButton makeBespokeTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final int w = uiText(SEColors.def())
+        final int w = bespokeTextMenuElementWidth(text);
+
+        return new StaticTextButton(pos, text, w, onClick,
+                Alignment.CENTER, ButtonType.STANDARD);
+    }
+
+    public static int bespokeTextMenuElementWidth(final String text) {
+        return uiText(SEColors.def())
                 .addText(text).build().draw()
                 .getWidth() + Layout.CONTENT_BUFFER_PX;
+    }
 
-        final GameImage base = drawTextButton(w, text, false);
-        return new SimpleMenuButton(pos, new Bounds2D(w,
-                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
-                true, onClick, base, highlightButton(base));
+    public static int dropdownMenuHeaderWidth(final String text) {
+        return bespokeTextMenuElementWidth(text) +
+                Layout.DD_MENU_HEADER_RIGHT_BUFFER;
+    }
+
+    public static int dropdownMenuLeafWidth(final String code) {
+        final int FAIL = 1;
+        final String[] lines = ParserUtils.getToolTip(code);
+
+        if (lines.length != 1)
+            return FAIL;
+
+        final String[] segments = ParserUtils.extractHighlight(lines[0]);
+
+        if (segments.length != 2 || !segments[0].trim().endsWith("|"))
+            return FAIL;
+
+        final String action = segments[0].trim(),
+                shortcut = segments[1].trim();
+
+        return Layout.BUTTON_INC +
+                bespokeTextMenuElementWidth(action) +
+                Layout.DD_MENU_LEAF_MIDDLE_BUFFER +
+                bespokeTextMenuElementWidth(shortcut);
     }
 
     public static GameImage drawSelectedTextbox(final GameImage bounds) {
@@ -161,10 +158,6 @@ public class GraphicsUtils {
                 w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
-    }
-
-    public static GameImage highlightButton(final GameImage nhi) {
-        return Settings.getTheme().logic.highlightButton(nhi);
     }
 
     public static GameImage drawSelectionOverlay(
@@ -292,16 +285,5 @@ public class GraphicsUtils {
 
         final int avg = (orig.getRed() + orig.getGreen() + orig.getBlue()) / 3;
         return new Color(avg, avg, avg, orig.getAlpha());
-    }
-
-    public enum ButtonType {
-        STANDARD, STUB, DD_HEAD, DD_OPTION;
-
-        public boolean isDropdown() {
-            return switch (this) {
-                case DD_HEAD, DD_OPTION -> true;
-                default -> false;
-            };
-        }
     }
 }
