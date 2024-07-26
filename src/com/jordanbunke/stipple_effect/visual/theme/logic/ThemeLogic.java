@@ -165,31 +165,63 @@ public abstract class ThemeLogic {
         return button.submit();
     }
 
-    public GameImage drawTextButton(final TextButton tb) {
+    protected Color getTextButtonBackgroundColor(final TextButton tb) {
         final Theme t = Settings.getTheme();
+
+        return switch (tb.getButtonType()) {
+            case DD_OPTION -> t.dropdownOptionBody;
+            case STUB -> t.stubButtonBody;
+            default -> t.buttonBody;
+        };
+    }
+
+    protected Color getTextButtonTextColor(
+            final TextButton tb, final Color backgroundColor
+    ) {
+        return intuitTextColor(backgroundColor, true);
+    }
+
+    protected void drawTextButtonBackground(
+            final GameImage img, final TextButton tb, final Color backgroundColor
+    ) {
+        img.fill(backgroundColor);
+    }
+
+    protected void drawTextButtonForeground(
+            final GameImage img, final TextButton tb
+    ) {
+        final boolean drawBorder = tb.getButtonType() != ButtonType.DD_OPTION;
+
+        if (drawBorder) {
+            final Color frame = buttonBorderColor(tb.isSelected());
+            final int w = img.getWidth(), h = img.getHeight();
+
+            img.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+        }
+    }
+
+    protected GameImage textButtonPostprocessing(
+            final GameImage img, final TextButton tb
+    ) {
+        img.free();
+        return tb.isHighlighted() ? highlightButton(img) : img;
+    }
+
+    public final GameImage drawTextButton(final TextButton tb) {
         final ButtonType type = tb.getButtonType();
 
         if (type == ButtonType.DD_MENU_LEAF)
             return drawDropdownMenuLeaf(tb, true);
 
-        final Color backgroundColor = switch (type) {
-            case DD_OPTION -> t.dropdownOptionBody;
-            case STUB -> t.stubButtonBody;
-            default -> t.buttonBody;
-        };
-
-        final boolean drawBorder = type != ButtonType.DD_OPTION;
-
-        final Color textColor = intuitTextColor(backgroundColor, true);
+        final Color backgroundColor = getTextButtonBackgroundColor(tb),
+                textColor = getTextButtonTextColor(tb, backgroundColor);
         final GameImage textImage = GraphicsUtils.uiText(textColor)
                 .addText(tb.getLabel()).build().draw();
 
-        final int w = Math.max(tb.getWidth(), textImage.getWidth() +
-                (4 * Layout.BUTTON_BORDER_PX)),
-                h = Layout.STD_TEXT_BUTTON_H;
+        final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H;
+        final GameImage img = new GameImage(w, h);
 
-        final GameImage nhi = new GameImage(w, h);
-        nhi.fill(backgroundColor);
+        drawTextButtonBackground(img, tb, backgroundColor);
 
         final int x = switch (tb.getAlignment()) {
             case LEFT -> (2 * Layout.BUTTON_BORDER_PX);
@@ -197,22 +229,18 @@ public abstract class ThemeLogic {
             case RIGHT -> w - (textImage.getWidth() + (2 * Layout.BUTTON_BORDER_PX));
         };
 
-        nhi.draw(textImage, x, Layout.TEXT_Y_OFFSET);
+        img.draw(textImage, x, Layout.TEXT_Y_OFFSET);
 
         // dropdown list button
         if (type == ButtonType.DD_HEAD) {
             final GameImage icon = GraphicsUtils.loadIcon(
                     tb.isSelected() ? IconCodes.COLLAPSE : IconCodes.EXPAND);
 
-            nhi.draw(icon, w - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
+            img.draw(icon, w - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
         }
 
-        if (drawBorder) {
-            final Color frame = buttonBorderColor(tb.isSelected());
-            nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
-        }
-
-        return tb.isHighlighted() ? highlightButton(nhi.submit()) : nhi.submit();
+        drawTextButtonForeground(img, tb);
+        return textButtonPostprocessing(img, tb);
     }
 
     public GameImage drawDropdownHeader(
@@ -249,8 +277,10 @@ public abstract class ThemeLogic {
                     Layout.CONTENT_BUFFER_PX), textY);
         }
 
-        if (ddh.isSelected())
-            button.drawRectangle(t.dropdownOptionBody, 4f, 0, 0, w, h);
+        if (ddh.isSelected()) {
+            button.drawLine(t.dropdownOptionBody, 2f, 1, 0, 1, h);
+            button.drawLine(t.dropdownOptionBody, 2f, w - 1, 0, w - 1, h);
+        }
 
         return button.submit();
     }
