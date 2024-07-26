@@ -90,10 +90,13 @@ public class StippleEffect implements ProgramContext {
     private Menu colorsMenu;
 
     // layers
-    private Menu layersMenu;
+    private Menu layersMenu; // TODO: remove
 
     // frames
-    private Menu framesMenu;
+    private Menu framesMenu; // TODO: remove
+
+    // flipbook
+    private Menu flipbookMenu;
 
     // bottom bar
     private Menu bottomBarMenu;
@@ -236,6 +239,7 @@ public class StippleEffect implements ProgramContext {
         colorsMenu = MenuAssembly.stub();
         layersMenu = MenuAssembly.stub();
         framesMenu = MenuAssembly.stub();
+        flipbookMenu = MenuAssembly.stub();
         projectsMenu = MenuAssembly.stub();
 
         dialog = null;
@@ -342,6 +346,7 @@ public class StippleEffect implements ProgramContext {
     public void rebuildStateDependentMenus() {
         rebuildLayersMenu();
         rebuildFramesMenu();
+        rebuildFlipbookMenu();
         rebuildProjectsMenu();
         rebuildBottomBarMenu();
     }
@@ -370,6 +375,11 @@ public class StippleEffect implements ProgramContext {
                 ? MenuAssembly.buildFramesMenu() : MenuAssembly.stub();
     }
 
+    public void rebuildFlipbookMenu() {
+        flipbookMenu = Layout.isFlipbookPanelShowing()
+                ? MenuAssembly.buildFlipbookMenu() : MenuAssembly.stub();
+    }
+
     public void rebuildProjectsMenu() {
         projectsMenu = MenuAssembly.buildProjectsMenu();
     }
@@ -391,10 +401,12 @@ public class StippleEffect implements ProgramContext {
             colorsMenu.process(eventLogger);
             // layers
             layersMenu.process(eventLogger);
-            // frames
-            framesMenu.process(eventLogger);
             // projects
             projectsMenu.process(eventLogger);
+            // frames
+            framesMenu.process(eventLogger);
+            // flipbook
+            flipbookMenu.process(eventLogger);
 
             // workspace
             getContext().process(eventLogger);
@@ -673,10 +685,12 @@ public class StippleEffect implements ProgramContext {
             colorsMenu.update(deltaTime);
             // layers
             layersMenu.update(deltaTime);
-            // frames
-            framesMenu.update(deltaTime);
             // projects
             projectsMenu.update(deltaTime);
+            // frames
+            framesMenu.update(deltaTime);
+            // flipbook
+            flipbookMenu.update(deltaTime);
         } else {
             dialog.update(deltaTime);
         }
@@ -743,6 +757,7 @@ public class StippleEffect implements ProgramContext {
                 cp = Layout.getColorsPosition(),
                 pp = Layout.getProjectsPosition(),
                 fp = Layout.getFramesPosition(),
+                fbp = Layout.getFlipbookPosition(),
                 bbp = Layout.getBottomBarPosition();
 
         // panel backgrounds
@@ -756,6 +771,7 @@ public class StippleEffect implements ProgramContext {
                 canvas.draw(drawToolOptionsBar(), tobp.x, tobp.y);
         }
 
+        // TODO
         if (Layout.isLayersPanelShowing())
             canvas.draw(drawLayers(), lp.x, lp.y);
 
@@ -764,8 +780,12 @@ public class StippleEffect implements ProgramContext {
 
         canvas.draw(drawProjects(), pp.x, pp.y);
 
+        // TODO
         if (Layout.isFramesPanelShowing())
             canvas.draw(drawFrames(), fp.x, fp.y);
+
+        if (Layout.isFlipbookPanelShowing())
+            canvas.draw(drawFlipbook(), fbp.x, fbp.y);
 
         // workspace
         final GameImage workspace = getContext().drawWorkspace();
@@ -775,19 +795,23 @@ public class StippleEffect implements ProgramContext {
         final float strokeWidth = 2f;
 
         canvas.setColor(Settings.getTheme().panelDivisions);
-        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation
+        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation - TODO: remove
         canvas.drawLine(strokeWidth, pp.x, tobp.y, Layout.width(), tobp.y); // top segments and middle separation
-        canvas.drawLine(strokeWidth, tp.x, wp.y, lp.x, wp.y); // tool options bar and tools/workspace separation
+        canvas.drawLine(strokeWidth, tp.x, wp.y, cp.x, wp.y); // tool options bar and tools/workspace separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
-        canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
+        canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation - TODO: remove
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
-        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace/option bar and right segments separation
+        canvas.drawLine(strokeWidth, wp.x, fbp.y, cp.x, fbp.y); // workspace and flipbook separation
+        canvas.drawLine(strokeWidth, cp.x, lp.y, cp.x, bbp.y); // workspace/option bar and right segments separation - TODO: adapt to colors from layers
 
         if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
             canvas.draw(statusUpdate, wp.x, wp.y);
 
         // bottom bar - zoom, animation
         bottomBarMenu.render(canvas);
+
+        // flipbook
+        flipbookMenu.render(canvas);
 
         // tools
         toolButtonMenu.render(canvas);
@@ -798,11 +822,11 @@ public class StippleEffect implements ProgramContext {
         // colors
         colorsMenu.render(canvas);
 
-        // projects / contexts
-        projectsMenu.render(canvas);
-
         // frames
         framesMenu.render(canvas);
+
+        // projects / contexts
+        projectsMenu.render(canvas);
 
         if (dialog != null) {
             canvas.fillRectangle(Settings.getTheme().dialogVeil,
@@ -837,72 +861,49 @@ public class StippleEffect implements ProgramContext {
     }
 
     private GameImage drawColorsSegment() {
-        final GameImage colors = new GameImage(Layout.getColorsWidth(),
+        return drawPanel(Layout.getColorsWidth(),
                 Layout.getColorsHeight());
-        colors.fillRectangle(Settings.getTheme().panelBackground, 0, 0,
-                Layout.getColorsWidth(), Layout.getColorsHeight());
-
-        return colors.submit();
     }
 
     private GameImage drawTools() {
-        final GameImage tools = new GameImage(Layout.getToolsWidth(),
+        return drawPanel(Layout.getToolsWidth(),
                 Layout.getToolsHeight());
-        tools.fillRectangle(Settings.getTheme().panelBackground, 0, 0,
-                Layout.getToolsWidth(), Layout.getToolsHeight());
-
-        return tools.submit();
     }
 
     private GameImage drawToolOptionsBar() {
-        final GameImage toolOptionsBar = new GameImage(
-                Layout.getToolOptionsBarWidth(),
+        return drawPanel(Layout.getToolOptionsBarWidth(),
                 Layout.TOOL_OPTIONS_BAR_H);
-        toolOptionsBar.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getToolOptionsBarWidth(), Layout.TOOL_OPTIONS_BAR_H);
-
-        return toolOptionsBar.submit();
     }
 
     private GameImage drawLayers() {
-        final GameImage layers = new GameImage(Layout.getLayersWidth(),
+        return drawPanel(Layout.getLayersWidth(),
                 Layout.getLayersHeight());
-        layers.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getLayersWidth(), Layout.getLayersHeight());
-
-        return layers.submit();
     }
 
     private GameImage drawProjects() {
-        final GameImage projects = new GameImage(Layout.getProjectsWidth(),
+        return drawPanel(Layout.getProjectsWidth(),
                 Layout.getTopPanelHeight());
-        projects.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getProjectsWidth(), Layout.getTopPanelHeight());
-
-        return projects.submit();
     }
 
     private GameImage drawFrames() {
-        final GameImage frames = new GameImage(Layout.getFramesWidth(),
+        return drawPanel(Layout.getFramesWidth(),
                 Layout.getTopPanelHeight());
-        frames.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getFramesWidth(), Layout.getTopPanelHeight());
+    }
 
-        return frames.submit();
+    private GameImage drawFlipbook() {
+        return drawPanel(Layout.getFlipbookWidth(),
+                Layout.getFlipbookHeight());
     }
 
     private GameImage drawBottomBar() {
-        final GameImage bottomBar =
-                new GameImage(Layout.width(), Layout.BOTTOM_BAR_H);
-        bottomBar.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.width(), Layout.BOTTOM_BAR_H);
+        return drawPanel(Layout.width(), Layout.BOTTOM_BAR_H);
+    }
 
-        return bottomBar.submit();
+    private GameImage drawPanel(final int w, final int h) {
+        final GameImage panel = new GameImage(w, h);
+        panel.fill(Settings.getTheme().panelBackground);
+
+        return panel.submit();
     }
 
     public void stitchOrSplit() {

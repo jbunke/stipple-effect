@@ -10,14 +10,14 @@ import java.awt.*;
 
 public final class Layout {
     // panel variables
-    private static boolean framesPanelShowing, layersPanelShowing,
+    private static boolean framesPanelShowing, layersPanelShowing, flipbookPanelShowing,
             colorsPanelShowing, toolbarShowing, projectsExpanded;
 
     // layout constants
     private static final double
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
-            CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
+            CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27, FLIPBOOK_H = 286; // TODO: tinker
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
@@ -36,7 +36,7 @@ public final class Layout {
             PIXEL_GRID_ZOOM_DIM_MAX = 19200,
             CURSOR_DIM = 40, BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
-            SEGMENT_TITLE_BUTTON_OFFSET_X = 84, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
+            PANEL_TITLE_BUTTON_OFFSET_X = 84, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
             LAYER_BUTTON_W = 158, LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 12,
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
             PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
@@ -71,6 +71,7 @@ public final class Layout {
         projectsExpanded = true;
         framesPanelShowing = true;
         layersPanelShowing = true;
+        flipbookPanelShowing = true;
         colorsPanelShowing = true;
         toolbarShowing = true;
     }
@@ -80,12 +81,17 @@ public final class Layout {
         return projectsExpanded;
     }
 
+    // TODO - remove all references to Frames and Layers panels and adjust calculations for Projects and Colors
     public static boolean isFramesPanelShowing() {
         return framesPanelShowing;
     }
 
     public static boolean isLayersPanelShowing() {
         return layersPanelShowing;
+    }
+
+    public static boolean isFlipbookPanelShowing() {
+        return flipbookPanelShowing;
     }
 
     public static boolean isColorsPanelShowing() {
@@ -99,7 +105,7 @@ public final class Layout {
     public static boolean areAllPanelsShowing() {
         return isProjectsExpanded() && isFramesPanelShowing() &&
                 isToolbarShowing() && isLayersPanelShowing() &&
-                isColorsPanelShowing();
+                isColorsPanelShowing() && isFlipbookPanelShowing();
     }
 
     public static void setProjectsExpanded(final boolean projectsExpanded) {
@@ -116,6 +122,10 @@ public final class Layout {
 
     public static void setLayersPanelShowing(final boolean layersPanelShowing) {
         Layout.layersPanelShowing = layersPanelShowing;
+    }
+
+    public static void setFlipbookPanelShowing(final boolean flipbookPanelShowing) {
+        Layout.flipbookPanelShowing = flipbookPanelShowing;
     }
 
     public static void setColorsPanelShowing(final boolean colorsPanelShowing) {
@@ -147,6 +157,7 @@ public final class Layout {
             setColorsPanelShowing(showing);
             setToolbarShowing(showing);
             setFramesPanelShowing(showing);
+            setFlipbookPanelShowing(showing);
             setProjectsExpanded(showing);
         });
     }
@@ -260,6 +271,12 @@ public final class Layout {
     public static int getWorkspaceWidth() {
         return width() - (getToolsWidth() + Math.max(getLayersWidth(),
                 getColorsWidth()));
+
+        // TODO: width() - (getToolsWidth() + getColorsWidth())
+    }
+
+    public static int getFlipbookWidth() {
+        return isFlipbookPanelShowing() ? getWorkspaceWidth() : 0;
     }
 
     public static int getToolOptionsBarWidth() {
@@ -282,6 +299,10 @@ public final class Layout {
         return isProjectsExpanded() ? CONTEXTS_H : COLLAPSED_CONTEXTS_H;
     }
 
+    public static int getFlipbookHeight() {
+        return isFlipbookPanelShowing() ? FLIPBOOK_H : 0;
+    }
+
     public static int getToolOptionsBarHeight() {
         return isToolbarShowing() && StippleEffect.get().getTool()
                 .hasToolOptionsBar() ? TOOL_OPTIONS_BAR_H : 0;
@@ -293,7 +314,7 @@ public final class Layout {
     }
 
     public static int getWorkspaceHeight() {
-        return getToolsHeight();
+        return getToolsHeight() - getFlipbookHeight();
     }
 
     public static int getLayersHeight() {
@@ -338,8 +359,14 @@ public final class Layout {
         return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
     }
 
+    public static Coord2D getFlipbookPosition() {
+        return getWorkspacePosition().displace(0, getWorkspaceHeight());
+    }
+
     public static Coord2D getColorsPosition() {
         return getLayersPosition().displace(0, getLayersHeight());
+
+        // TODO: getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
     }
 
     public static Coord2D getBottomBarPosition() {

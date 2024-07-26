@@ -104,55 +104,9 @@ public class MenuAssembly {
                         new SimpleItem(IconCodes.PANEL_MANAGER,
                                         DialogAssembly::setDialogToPanelManager))));
 
-//        populateButtonsIntoBuilder(mb,
-//                new String[] {
-//                        IconCodes.SETTINGS,
-//                        IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
-//                        IconCodes.SAVE, IconCodes.SAVE_AS,
-//                        IconCodes.RESIZE, IconCodes.PAD,
-//                        IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
-//                        IconCodes.AUTOMATION_SCRIPT,
-//                        IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
-//                        IconCodes.GRANULAR_REDO, IconCodes.REDO,
-//                        IconCodes.HISTORY
-//                },
-//                getPreconditions(
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> true,
-//                        () -> c.getStateManager().canUndo(),
-//                        () -> c.getStateManager().canUndo(),
-//                        () -> c.getStateManager().canRedo(),
-//                        () -> c.getStateManager().canRedo(),
-//                        () -> true),
-//                new Runnable[] {
-//                        DialogAssembly::setDialogToProgramSettings,
-//                        DialogAssembly::setDialogToNewProject,
-//                        () -> StippleEffect.get().openProject(),
-//                        c.projectInfo::save,
-//                        DialogAssembly::setDialogToSave,
-//                        DialogAssembly::setDialogToResize,
-//                        DialogAssembly::setDialogToPad,
-//                        () -> StippleEffect.get().stitchOrSplit(),
-//                        () -> PreviewWindow.set(c),
-//                        () -> StippleEffect.get().openAutomationScript(),
-//                        () -> c.getStateManager().undoToCheckpoint(),
-//                        () -> c.getStateManager().undo(true),
-//                        () -> c.getStateManager().redo(true),
-//                        () -> c.getStateManager().redoToCheckpoint(),
-//                        DialogAssembly::setDialogToHistory
-//                }, Layout.getProjectsPosition());
-
         // panel expand / collapse
         final Coord2D panelIconPos = Layout.getProjectsPosition().displace(
-                Layout.getProjectsWidth() - (Layout.CONTENT_BUFFER_PX + Layout.BUTTON_DIM),
+                Layout.getProjectsWidth() - Layout.BUTTON_INC,
                 Layout.ICON_BUTTON_OFFSET_Y);
 
         if (!Layout.isProjectsExpanded())
@@ -219,6 +173,103 @@ public class MenuAssembly {
                         .map(Scrollable::new)
                         .toArray(Scrollable[]::new),
                 realRightX, initialOffsetX));
+
+        return mb.build();
+    }
+
+    public static Menu buildFlipbookMenu() {
+        final MenuBuilder mb = new MenuBuilder();
+        final SEContext c = StippleEffect.get().getContext();
+        final Coord2D panelPos = Layout.getFlipbookPosition();
+
+        mb.add(TextLabel.make(panelPos.displace(
+                        Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
+                "Flipbook"));
+
+        addHidePanelToMenuBuilder(mb,
+                panelPos.displace(Layout.getFlipbookWidth(), 0),
+                () -> Layout.setFlipbookPanelShowing(false));
+
+        // layer controls
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.NEW_LAYER,
+                        IconCodes.DUPLICATE_LAYER,
+                        IconCodes.REMOVE_LAYER,
+                        IconCodes.MOVE_LAYER_UP,
+                        IconCodes.MOVE_LAYER_DOWN,
+                        IconCodes.MERGE_WITH_LAYER_BELOW,
+                        IconCodes.FLATTEN
+                },
+                getPreconditions(
+                        c.getState()::canAddLayer,
+                        c.getState()::canAddLayer,
+                        c.getState()::canRemoveLayer,
+                        c.getState()::canMoveLayerUp,
+                        c.getState()::canMoveLayerDown,
+                        c.getState()::canMoveLayerDown,
+                        c.getState()::canRemoveLayer),
+                new Runnable[] {
+                        c::addLayer,
+                        c::duplicateLayer,
+                        c::removeLayer,
+                        c::moveLayerUp,
+                        c::moveLayerDown,
+                        c::mergeWithLayerBelow,
+                        c::flatten
+                }, panelPos, true);
+
+        // frame controls
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.NEW_FRAME,
+                        IconCodes.DUPLICATE_FRAME,
+                        IconCodes.REMOVE_FRAME,
+                        IconCodes.MOVE_FRAME_BACK,
+                        IconCodes.MOVE_FRAME_FORWARD,
+                        // gap between frame operations and navigation/playback
+                        Constants.ICON_ID_GAP_CODE,
+                        IconCodes.FRAME_PROPERTIES,
+                        // gap between frame operations and navigation/playback
+                        Constants.ICON_ID_GAP_CODE,
+                        IconCodes.TO_FIRST_FRAME,
+                        IconCodes.PREVIOUS,
+                        // gap for play/stop button
+                        Constants.ICON_ID_GAP_CODE,
+                        IconCodes.NEXT,
+                        IconCodes.TO_LAST_FRAME
+                },
+                getPreconditions(
+                        c.getState()::canAddFrame,
+                        c.getState()::canAddFrame,
+                        c.getState()::canRemoveFrame,
+                        c.getState()::canMoveFrameBack,
+                        c.getState()::canMoveFrameForward,
+                        () -> false, // placeholder
+                        () -> true,
+                        () -> false, // placeholder
+                        () -> true,
+                        () -> true,
+                        () -> false, // placeholder
+                        () -> true,
+                        () -> true),
+                new Runnable[] {
+                        c::addFrame,
+                        c::duplicateFrame,
+                        c::removeFrame,
+                        c::moveFrameBack,
+                        c::moveFrameForward,
+                        () -> {}, // placeholder
+                        () -> DialogAssembly.setDialogToFrameProperties(
+                                c.getState().getFrameIndex()),
+                        () -> {}, // placeholder
+                        () -> c.getState().setFrameIndex(0),
+                        c.getState()::previousFrame,
+                        () -> {}, // placeholder
+                        c.getState()::nextFrame,
+                        () -> c.getState().setFrameIndex(
+                                c.getState().getFrameCount() - 1)
+                }, panelPos);
 
         return mb.build();
     }
@@ -292,21 +343,21 @@ public class MenuAssembly {
 
         // play/stop as toggle
         final Coord2D playStopTogglePos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X +
+                Layout.PANEL_TITLE_BUTTON_OFFSET_X +
                         (PLAY_STOP_INDEX * Layout.BUTTON_INC),
                 Layout.ICON_BUTTON_OFFSET_Y);
         mb.add(generatePlayStopToggle(playStopTogglePos));
 
         // playback mode toggle button
         final Coord2D playbackModeTogglePos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X +
+                Layout.PANEL_TITLE_BUTTON_OFFSET_X +
                         (PLAYBACK_MODE_INDEX * Layout.BUTTON_INC),
                 Layout.ICON_BUTTON_OFFSET_Y);
         mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
 
         // playback
         final Coord2D labelPos = Layout.getFramesPosition().displace(
-                Layout.SEGMENT_TITLE_BUTTON_OFFSET_X +
+                Layout.PANEL_TITLE_BUTTON_OFFSET_X +
                         (AFTER_PLAYBACK_MODE * Layout.BUTTON_INC),
                 Layout.TEXT_Y_OFFSET);
 
@@ -546,7 +597,16 @@ public class MenuAssembly {
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
             final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
-            final Coord2D segmentPosition
+            final Coord2D panelPos
+    ) {
+        populateButtonsIntoBuilder(mb, iconIDs,
+                preconditions, behaviours, panelPos, false);
+    }
+
+    private static void populateButtonsIntoBuilder(
+            final MenuBuilder mb, final String[] iconIDs,
+            final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
+            final Coord2D panelPos, final boolean vertical
     ) {
         if (iconIDs.length != preconditions.length || iconIDs.length != behaviours.length) {
             GameError.send("Lengths of button assembly argument arrays did not match; " +
@@ -554,16 +614,21 @@ public class MenuAssembly {
             return;
         }
 
-        for (int i = 0; i < iconIDs.length; i++) {
-            if (iconIDs[i].equals(Constants.ICON_ID_GAP_CODE))
-                continue;
+        final Coord2D displacement = vertical
+                ? new Coord2D(0, Layout.BUTTON_INC)
+                : new Coord2D(Layout.BUTTON_INC, 0);
+        Coord2D pos = panelPos.displace(
+                vertical ? Layout.CONTENT_BUFFER_PX
+                        : Layout.PANEL_TITLE_BUTTON_OFFSET_X,
+                Layout.ICON_BUTTON_OFFSET_Y +
+                        (vertical ? displacement.y * 2 : 0));
 
-            final Coord2D pos = segmentPosition
-                    .displace(Layout.SEGMENT_TITLE_BUTTON_OFFSET_X,
-                            Layout.ICON_BUTTON_OFFSET_Y)
-                    .displace(i * Layout.BUTTON_INC, 0);
-            mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
-                    pos, preconditions[i], behaviours[i]));
+        for (int i = 0; i < iconIDs.length; i++) {
+            if (!iconIDs[i].equals(Constants.ICON_ID_GAP_CODE))
+                mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
+                        pos, preconditions[i], behaviours[i]));
+
+            pos = pos.displace(displacement);
         }
     }
 
