@@ -190,6 +190,26 @@ public class MenuAssembly {
                 panelPos.displace(Layout.getFlipbookWidth(), 0),
                 () -> Layout.setFlipbookPanelShowing(false));
 
+        final int lbLeftBuffer = (2 * Layout.BUTTON_INC) - Layout.CONTENT_BUFFER_PX,
+                lbTopBuffer = 3 * Layout.STD_TEXT_BUTTON_INC,
+                fbOffsetFromLB = lbLeftBuffer + Layout.VERT_SCROLL_WINDOW_W +
+                        Layout.CONTENT_BUFFER_PX;
+
+        // playback
+        final Coord2D labelPos = panelPos.displace(0, lbTopBuffer / 2);
+
+        final TextLabel playbackLabel = TextLabel.make(labelPos, "");
+        final IncrementalRangeElements<Integer> playback =
+                IncrementalRangeElements.makeForInt(playbackLabel,
+                        labelPos.y + Layout.ICON_BUTTON_OFFSET_Y,
+                        labelPos.y + Layout.TEXT_Y_OFFSET, 1,
+                        Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                        c.playbackInfo::setFps, c.playbackInfo::getFps,
+                        fps -> fps, fps -> fps, fps -> fps + " FPS",
+                        "XXX FPS");
+        mb.addAll(playbackLabel, playback.decButton, playback.incButton,
+                playback.slider, playback.value);
+
         // layer controls
         populateButtonsIntoBuilder(mb,
                 new String[] {
@@ -217,9 +237,12 @@ public class MenuAssembly {
                         c::moveLayerDown,
                         c::mergeWithLayerBelow,
                         c::flatten
-                }, panelPos, true);
+                },
+                panelPos.displace(Layout.CONTENT_BUFFER_PX,
+                        lbTopBuffer + Layout.BUTTON_OFFSET), true);
 
         // frame controls
+        final Coord2D frameControlPos = panelPos.displace(fbOffsetFromLB, 0);
         populateButtonsIntoBuilder(mb,
                 new String[] {
                         IconCodes.NEW_FRAME,
@@ -269,17 +292,15 @@ public class MenuAssembly {
                         c.getState()::nextFrame,
                         () -> c.getState().setFrameIndex(
                                 c.getState().getFrameCount() - 1)
-                }, panelPos);
+                }, frameControlPos.displace(0, Layout.ICON_BUTTON_OFFSET_Y));
 
         final int PLAY_STOP_INDEX = 10,
-                PLAYBACK_MODE_INDEX = 13,
-                AFTER_PLAYBACK_MODE = 15;
+                PLAYBACK_MODE_INDEX = 13;
 
         // play/stop as toggle
         final Coord2D disp = new Coord2D(Layout.BUTTON_INC, 0),
-                playStopTogglePos = panelPos.displace(
-                        Layout.PANEL_TITLE_BUTTON_OFFSET_X +
-                                (PLAY_STOP_INDEX * Layout.BUTTON_INC),
+                playStopTogglePos = frameControlPos.displace(
+                        PLAY_STOP_INDEX * Layout.BUTTON_INC,
                         Layout.ICON_BUTTON_OFFSET_Y);
         mb.add(generatePlayStopToggle(playStopTogglePos));
 
@@ -288,30 +309,75 @@ public class MenuAssembly {
                 disp.scale(PLAYBACK_MODE_INDEX - PLAY_STOP_INDEX));
         mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
 
-        // playback
-        final Coord2D labelPos = playbackModeTogglePos.displace(
-                disp.scale(AFTER_PLAYBACK_MODE - PLAYBACK_MODE_INDEX));
+        // layer buttons
+        final List<SELayer> layers = c.getState().getLayers();
+        final int layerCount = layers.size();
+        final Scrollable[] layerButtons = new Scrollable[layerCount];
 
-        final TextLabel playbackLabel = TextLabel.make(labelPos, "");
-        final IncrementalRangeElements<Integer> playback =
-                IncrementalRangeElements.makeForInt(playbackLabel,
-                        panelPos.y + Layout.ICON_BUTTON_OFFSET_Y,
-                        panelPos.y + Layout.TEXT_Y_OFFSET, 1,
-                        Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
-                        c.playbackInfo::setFps, c.playbackInfo::getFps,
-                        fps -> fps, fps -> fps, fps -> fps + " FPS",
-                        "XXX FPS");
-        mb.addAll(playbackLabel, playback.decButton, playback.incButton,
-                playback.slider, playback.value);
+        final MenuBuilder layerElements = new MenuBuilder();
 
-        // TODO: layer buttons
+        final Coord2D firstLBPos = panelPos.displace(lbLeftBuffer, lbTopBuffer);
+        int realBottomY = firstLBPos.y;
+
+        for (int i = layerCount - 1; i >= 0; i--) {
+            final SELayer layer = layers.get(i);
+
+            final String name = layer.getName(),
+                    text = name.length() > Layout.LAYER_NAME_LENGTH_CUTOFF
+                            ? name.substring(0, Layout.LAYER_NAME_LENGTH_CUTOFF) + "..."
+                            : name;
+
+            final Coord2D pos = firstLBPos.displace(0,
+                    (layerCount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
+
+            layerButtons[i] = new Scrollable(SelectableListItemButton.make(
+                    pos, Layout.LAYER_BUTTON_W, text, i,
+                    c.getState()::getLayerEditIndex,
+                    c.getState()::setLayerEditIndex));
+            layerElements.add(layerButtons[i]);
+
+            // visibility toggle
+            final Coord2D vtPos = pos.displace(
+                    Layout.LAYER_BUTTON_W + Layout.BUTTON_OFFSET,
+                    (Layout.STD_TEXT_BUTTON_H / 2)  - (Layout.BUTTON_DIM / 2));
+            layerElements.add(new LayerVisibilityButton(vtPos, i));
+
+            // frames linked toggle
+            final Coord2D flPos = vtPos.displace(Layout.BUTTON_INC, 0);
+            layerElements.add(generateFramesLinkedToggle(i, flPos));
+
+            // onion skin toggle
+            final Coord2D onionPos = vtPos.displace(Layout.BUTTON_INC * 2, 0);
+            layerElements.add(generateOnionSkinToggle(i, onionPos));
+
+            // layer settings
+            final int index = i;
+            final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
+            layerElements.add(IconButton.make(IconCodes.LAYER_SETTINGS, lsPos,
+                    () -> DialogAssembly.setDialogToLayerSettings(index)));
+
+            realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
+        }
+
+        final int panelHeight = Layout.getFlipbookHeight(),
+                boxInPanelY = firstLBPos.y - panelPos.y,
+                lbBoxHeight = panelHeight -
+                        (boxInPanelY + Layout.CONTENT_BUFFER_PX);
+        final VerticalScrollBox lbBox = new VerticalScrollBox(firstLBPos,
+                new Bounds2D(Layout.VERT_SCROLL_WINDOW_W, lbBoxHeight),
+                Arrays.stream(layerElements.build().getMenuElements())
+                        .map(m -> m instanceof Scrollable
+                                ? (Scrollable) m
+                                : new Scrollable(m))
+                        .toArray(Scrollable[]::new),
+                realBottomY, layerButtonYDisplacement(c, layerCount));
 
         // frame buttons
         final int frameCount = c.getState().getFrameCount();
         final Scrollable[] frameButtons = new Scrollable[frameCount];
 
-        // TODO - offset by layer buttons
-        final Coord2D firstFBPos = panelPos.displace(Layout.getPanelContentDisplacement());
+        final Coord2D firstFBPos = panelPos.displace(fbOffsetFromLB,
+                        Layout.PANEL_TITLE_CONTENT_OFFSET_Y);
         Coord2D fbPos = firstFBPos;
 
         for (int i = 0; i < frameCount; i++) {
@@ -324,11 +390,14 @@ public class MenuAssembly {
                     (i + 1 < frameCount ? Layout.BUTTON_OFFSET : 0), 0);
         }
 
+        final int panelWidth = Layout.getFlipbookWidth(),
+                boxInPanelX = firstFBPos.x - panelPos.x,
+                fbBoxWidth = panelWidth -
+                        (boxInPanelX + Layout.CONTENT_BUFFER_PX);
         final HorizontalScrollBox fbBox = new HorizontalScrollBox(firstFBPos,
-                new Bounds2D(Layout.getFrameButtonScrollWindowWidth(),
-                        Layout.TOP_PANEL_SCROLL_WINDOW_H),
+                new Bounds2D(fbBoxWidth, Layout.TOP_PANEL_SCROLL_WINDOW_H),
                 frameButtons, fbPos.x, frameButtonXDisplacement(c));
-        mb.add(fbBox);
+        mb.addAll(lbBox, fbBox);
 
         // TODO: cel buttons
 
@@ -597,7 +666,7 @@ public class MenuAssembly {
             realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
         }
 
-        final int initialOffsetY = layerButtonYDisplacement(amount);
+        final int initialOffsetY = layerButtonYDisplacement(c, amount);
 
         mb.add(new VerticalScrollBox(firstPos,
                 new Bounds2D(Layout.VERT_SCROLL_WINDOW_W,
@@ -650,24 +719,27 @@ public class MenuAssembly {
                 () -> {});
     }
 
-    private static int layerButtonYDisplacement(final int amount) {
-        return (amount - ((StippleEffect.get().getContext().getState().getLayerEditIndex() +
-                Layout.LAYERS_ABOVE_TO_DISPLAY) + 1)) * Layout.STD_TEXT_BUTTON_INC;
+    private static int layerButtonYDisplacement(
+            final SEContext c, final int amount
+    ) {
+        return (amount - ((c.getState().getLayerEditIndex() +
+                Layout.LAYERS_ABOVE_TO_DISPLAY) + 1)) *
+                Layout.STD_TEXT_BUTTON_INC;
     }
 
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
-            final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
-            final Coord2D panelPos
+            final Supplier<Boolean>[] preconditions,
+            final Runnable[] behaviours, final Coord2D pos
     ) {
         populateButtonsIntoBuilder(mb, iconIDs,
-                preconditions, behaviours, panelPos, false);
+                preconditions, behaviours, pos, false);
     }
 
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
             final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
-            final Coord2D panelPos, final boolean vertical
+            final Coord2D firstPos, final boolean vertical
     ) {
         if (iconIDs.length != preconditions.length || iconIDs.length != behaviours.length) {
             GameError.send("Lengths of button assembly argument arrays did not match; " +
@@ -678,11 +750,7 @@ public class MenuAssembly {
         final Coord2D displacement = vertical
                 ? new Coord2D(0, Layout.BUTTON_INC)
                 : new Coord2D(Layout.BUTTON_INC, 0);
-        Coord2D pos = panelPos.displace(
-                vertical ? Layout.CONTENT_BUFFER_PX
-                        : Layout.PANEL_TITLE_BUTTON_OFFSET_X,
-                Layout.ICON_BUTTON_OFFSET_Y +
-                        (vertical ? displacement.y * 2 : 0));
+        Coord2D pos = firstPos;
 
         for (int i = 0; i < iconIDs.length; i++) {
             if (!iconIDs[i].equals(Constants.ICON_ID_GAP_CODE))

@@ -17,7 +17,7 @@ public final class Layout {
     private static final double
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
-            CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27, FLIPBOOK_H = 286; // TODO: tinker
+            CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27, FLIPBOOK_H = 249;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
@@ -36,7 +36,7 @@ public final class Layout {
             PIXEL_GRID_ZOOM_DIM_MAX = 19200,
             CURSOR_DIM = 40, BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
-            PANEL_TITLE_BUTTON_OFFSET_X = 84, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
+            PANEL_TITLE_BUTTON_OFFSET_X = 84, PANEL_TITLE_CONTENT_OFFSET_Y = 30,
             LAYER_BUTTON_W = 158, LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 12,
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
             PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
@@ -374,7 +374,7 @@ public final class Layout {
     }
 
     public static Coord2D getPanelContentDisplacement() {
-        return new Coord2D(CONTENT_BUFFER_PX, SEGMENT_TITLE_CONTENT_OFFSET_Y);
+        return new Coord2D(CONTENT_BUFFER_PX, PANEL_TITLE_CONTENT_OFFSET_Y);
     }
 
     public static Coord2D getCanvasMiddle() {
@@ -387,17 +387,12 @@ public final class Layout {
     }
 
     public static int getVertScrollWindowHeight() {
-        return getLayersHeight() - (CONTENT_BUFFER_PX + SEGMENT_TITLE_CONTENT_OFFSET_Y);
+        return getLayersHeight() - (CONTENT_BUFFER_PX + PANEL_TITLE_CONTENT_OFFSET_Y);
     }
 
     // TODO - remove
     public static int getFrameScrollWindowWidth() {
         return getFramesWidth() - (2 * CONTENT_BUFFER_PX);
-    }
-
-    public static int getFrameButtonScrollWindowWidth() {
-        // TODO: factor in layers offset
-        return getFlipbookWidth() - (2 * CONTENT_BUFFER_PX);
     }
 
     public static int getProjectScrollWindowWidth() {
