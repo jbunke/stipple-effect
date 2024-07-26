@@ -271,6 +271,39 @@ public class MenuAssembly {
                                 c.getState().getFrameCount() - 1)
                 }, panelPos);
 
+        final int PLAY_STOP_INDEX = 10,
+                PLAYBACK_MODE_INDEX = 13,
+                AFTER_PLAYBACK_MODE = 15;
+
+        // play/stop as toggle
+        final Coord2D disp = new Coord2D(Layout.BUTTON_INC, 0),
+                playStopTogglePos = panelPos.displace(
+                        Layout.PANEL_TITLE_BUTTON_OFFSET_X +
+                                (PLAY_STOP_INDEX * Layout.BUTTON_INC),
+                        Layout.ICON_BUTTON_OFFSET_Y);
+        mb.add(generatePlayStopToggle(playStopTogglePos));
+
+        // playback mode toggle button
+        final Coord2D playbackModeTogglePos = playStopTogglePos.displace(
+                disp.scale(PLAYBACK_MODE_INDEX - PLAY_STOP_INDEX));
+        mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
+
+        // playback
+        final Coord2D labelPos = playbackModeTogglePos.displace(
+                disp.scale(AFTER_PLAYBACK_MODE - PLAYBACK_MODE_INDEX));
+
+        final TextLabel playbackLabel = TextLabel.make(labelPos, "");
+        final IncrementalRangeElements<Integer> playback =
+                IncrementalRangeElements.makeForInt(playbackLabel,
+                        panelPos.y + Layout.ICON_BUTTON_OFFSET_Y,
+                        panelPos.y + Layout.TEXT_Y_OFFSET, 1,
+                        Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
+                        c.playbackInfo::setFps, c.playbackInfo::getFps,
+                        fps -> fps, fps -> fps, fps -> fps + " FPS",
+                        "XXX FPS");
+        mb.addAll(playbackLabel, playback.decButton, playback.incButton,
+                playback.slider, playback.value);
+
         return mb.build();
     }
 
