@@ -115,8 +115,7 @@ public abstract class ThemeLogic {
         final Theme t = Settings.getTheme();
         final String code = tb.getLabel();
 
-        final GameImage baseIcon = GraphicsUtils.loadIcon(code),
-                icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
+        final boolean hasIcon = IconCodes.hasIcon(code);
         final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
                 textY = Layout.TEXT_Y_OFFSET;
 
@@ -127,7 +126,11 @@ public abstract class ThemeLogic {
                 shortcutCol = intuitTextColor(backgroundColor, false);
         button.fill(backgroundColor);
 
-        button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+        if (hasIcon) {
+            final GameImage baseIcon = GraphicsUtils.loadIcon(code),
+                    icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
+            button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+        }
 
         final String[] lines = ParserUtils.getToolTip(code);
 
@@ -152,7 +155,8 @@ public abstract class ThemeLogic {
                 default -> GameImage.dummy();
             };
 
-            final int actionTextX = Layout.CONTENT_BUFFER_PX + Layout.BUTTON_INC;
+            final int actionTextX = Layout.CONTENT_BUFFER_PX +
+                    (hasIcon ? Layout.BUTTON_INC : 0);
             button.draw(actionImage, actionTextX, textY);
 
             if (tb.isHighlighted()) {

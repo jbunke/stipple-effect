@@ -10,8 +10,8 @@ import java.awt.*;
 
 public final class Layout {
     // panel variables
-    private static boolean framesPanelShowing, layersPanelShowing, flipbookPanelShowing,
-            colorsPanelShowing, toolbarShowing, projectsExpanded;
+    private static boolean flipbookPanelShowing, colorsPanelShowing,
+            toolbarShowing, projectsExpanded;
 
     // layout constants
     private static final double
@@ -36,7 +36,7 @@ public final class Layout {
             PIXEL_GRID_ZOOM_DIM_MAX = 19200,
             CURSOR_DIM = 40, BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
-            PANEL_TITLE_BUTTON_OFFSET_X = 84, PANEL_TITLE_CONTENT_OFFSET_Y = 30,
+            PANEL_TITLE_CONTENT_OFFSET_Y = 30,
             LAYER_BUTTON_W = 158, LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 12,
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
             PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
@@ -69,8 +69,6 @@ public final class Layout {
                 Toolkit.getDefaultToolkit().getScreenSize().height);
 
         projectsExpanded = true;
-        framesPanelShowing = true;
-        layersPanelShowing = true;
         flipbookPanelShowing = true;
         colorsPanelShowing = true;
         toolbarShowing = true;
@@ -79,15 +77,6 @@ public final class Layout {
     // panel display
     public static boolean isProjectsExpanded() {
         return projectsExpanded;
-    }
-
-    // TODO - remove all references to Frames and Layers panels and adjust calculations for Projects and Colors
-    public static boolean isFramesPanelShowing() {
-        return framesPanelShowing;
-    }
-
-    public static boolean isLayersPanelShowing() {
-        return layersPanelShowing;
     }
 
     public static boolean isFlipbookPanelShowing() {
@@ -103,25 +92,12 @@ public final class Layout {
     }
 
     public static boolean areAllPanelsShowing() {
-        return isProjectsExpanded() && isFramesPanelShowing() &&
-                isToolbarShowing() && isLayersPanelShowing() &&
+        return isProjectsExpanded() && isToolbarShowing() &&
                 isColorsPanelShowing() && isFlipbookPanelShowing();
     }
 
     public static void setProjectsExpanded(final boolean projectsExpanded) {
-        if (!(projectsExpanded || isFramesPanelShowing()) || projectsExpanded)
-            Layout.projectsExpanded = projectsExpanded;
-    }
-
-    public static void setFramesPanelShowing(final boolean framesPanelShowing) {
-        if (framesPanelShowing)
-            setProjectsExpanded(true);
-
-        Layout.framesPanelShowing = framesPanelShowing;
-    }
-
-    public static void setLayersPanelShowing(final boolean layersPanelShowing) {
-        Layout.layersPanelShowing = layersPanelShowing;
+        Layout.projectsExpanded = projectsExpanded;
     }
 
     public static void setFlipbookPanelShowing(final boolean flipbookPanelShowing) {
@@ -153,10 +129,8 @@ public final class Layout {
 
     public static void setAllPanels(final boolean showing) {
         adjustPanels(() -> {
-            setLayersPanelShowing(showing);
             setColorsPanelShowing(showing);
             setToolbarShowing(showing);
-            setFramesPanelShowing(showing);
             setFlipbookPanelShowing(showing);
             setProjectsExpanded(showing);
         });
@@ -260,19 +234,11 @@ public final class Layout {
 
     // segments layout
     public static int getProjectsWidth() {
-        final int w = width();
-        return isFramesPanelShowing() ? w / 2 : w;
-    }
-
-    public static int getFramesWidth() {
-        return width() - getProjectsWidth();
+        return width();
     }
 
     public static int getWorkspaceWidth() {
-        return width() - (getToolsWidth() + Math.max(getLayersWidth(),
-                getColorsWidth()));
-
-        // TODO: width() - (getToolsWidth() + getColorsWidth())
+        return width() - (getToolsWidth() + getColorsWidth());
     }
 
     public static int getFlipbookWidth() {
@@ -285,10 +251,6 @@ public final class Layout {
 
     public static int getToolsWidth() {
         return isToolbarShowing() ? TOOLS_W : 0;
-    }
-
-    public static int getLayersWidth() {
-        return isLayersPanelShowing() ? RIGHT_PANEL_W : 0;
     }
 
     public static int getColorsWidth() {
@@ -317,30 +279,15 @@ public final class Layout {
         return getToolsHeight() - getFlipbookHeight();
     }
 
-    public static int getLayersHeight() {
-        if (!isLayersPanelShowing())
-            return 0;
-
-        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
-
-        return isColorsPanelShowing() ? middleH / 2 : middleH;
-    }
-
     public static int getColorsHeight() {
         if (!isColorsPanelShowing())
             return 0;
 
-        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
-
-        return middleH - getLayersHeight();
+        return getToolsHeight() + getToolOptionsBarHeight();
     }
 
     public static Coord2D getProjectsPosition() {
         return new Coord2D();
-    }
-
-    public static Coord2D getFramesPosition() {
-        return getProjectsPosition().displace(getProjectsWidth(), 0);
     }
 
     public static Coord2D getToolsPosition() {
@@ -355,18 +302,12 @@ public final class Layout {
         return getToolsPosition().displace(getToolsWidth(), 0);
     }
 
-    public static Coord2D getLayersPosition() {
-        return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
-    }
-
     public static Coord2D getFlipbookPosition() {
         return getWorkspacePosition().displace(0, getWorkspaceHeight());
     }
 
     public static Coord2D getColorsPosition() {
-        return getLayersPosition().displace(0, getLayersHeight());
-
-        // TODO: getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
+        return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
     }
 
     public static Coord2D getBottomBarPosition() {
@@ -384,15 +325,6 @@ public final class Layout {
     // misc. layout
     public static int getColorSelectorIncY() {
         return (int)(getColorsHeight() / 6.5);
-    }
-
-    public static int getVertScrollWindowHeight() {
-        return getLayersHeight() - (CONTENT_BUFFER_PX + PANEL_TITLE_CONTENT_OFFSET_Y);
-    }
-
-    // TODO - remove
-    public static int getFrameScrollWindowWidth() {
-        return getFramesWidth() - (2 * CONTENT_BUFFER_PX);
     }
 
     public static int getProjectScrollWindowWidth() {

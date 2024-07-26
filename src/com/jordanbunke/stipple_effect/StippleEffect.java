@@ -89,12 +89,6 @@ public class StippleEffect implements ProgramContext {
     private int paletteIndex;
     private Menu colorsMenu;
 
-    // layers
-    private Menu layersMenu; // TODO: remove
-
-    // frames
-    private Menu framesMenu; // TODO: remove
-
     // flipbook
     private Menu flipbookMenu;
 
@@ -237,8 +231,6 @@ public class StippleEffect implements ProgramContext {
         toolButtonMenu = MenuAssembly.stub();
         bottomBarMenu = MenuAssembly.stub();
         colorsMenu = MenuAssembly.stub();
-        layersMenu = MenuAssembly.stub();
-        framesMenu = MenuAssembly.stub();
         flipbookMenu = MenuAssembly.stub();
         projectsMenu = MenuAssembly.stub();
 
@@ -344,8 +336,6 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void rebuildStateDependentMenus() {
-        rebuildLayersMenu();
-        rebuildFramesMenu();
         rebuildFlipbookMenu();
         rebuildProjectsMenu();
         rebuildBottomBarMenu();
@@ -363,16 +353,6 @@ public class StippleEffect implements ProgramContext {
 
     public void rebuildBottomBarMenu() {
         bottomBarMenu = MenuAssembly.buildBottomBarMenu();
-    }
-
-    public void rebuildLayersMenu() {
-        layersMenu = Layout.isLayersPanelShowing()
-                ? MenuAssembly.buildLayersMenu() : MenuAssembly.stub();
-    }
-
-    public void rebuildFramesMenu() {
-        framesMenu = Layout.isFramesPanelShowing()
-                ? MenuAssembly.buildFramesMenu() : MenuAssembly.stub();
     }
 
     public void rebuildFlipbookMenu() {
@@ -399,12 +379,8 @@ public class StippleEffect implements ProgramContext {
             toolButtonMenu.process(eventLogger);
             // colors
             colorsMenu.process(eventLogger);
-            // layers
-            layersMenu.process(eventLogger);
             // projects
             projectsMenu.process(eventLogger);
-            // frames
-            framesMenu.process(eventLogger);
             // flipbook
             flipbookMenu.process(eventLogger);
 
@@ -683,12 +659,8 @@ public class StippleEffect implements ProgramContext {
             toolButtonMenu.update(deltaTime);
             // colors
             colorsMenu.update(deltaTime);
-            // layers
-            layersMenu.update(deltaTime);
             // projects
             projectsMenu.update(deltaTime);
-            // frames
-            framesMenu.update(deltaTime);
             // flipbook
             flipbookMenu.update(deltaTime);
         } else {
@@ -753,10 +725,8 @@ public class StippleEffect implements ProgramContext {
         final Coord2D wp = Layout.getWorkspacePosition(),
                 tp = Layout.getToolsPosition(),
                 tobp = Layout.getToolOptionsBarPosition(),
-                lp = Layout.getLayersPosition(),
                 cp = Layout.getColorsPosition(),
                 pp = Layout.getProjectsPosition(),
-                fp = Layout.getFramesPosition(),
                 fbp = Layout.getFlipbookPosition(),
                 bbp = Layout.getBottomBarPosition();
 
@@ -771,18 +741,10 @@ public class StippleEffect implements ProgramContext {
                 canvas.draw(drawToolOptionsBar(), tobp.x, tobp.y);
         }
 
-        // TODO
-        if (Layout.isLayersPanelShowing())
-            canvas.draw(drawLayers(), lp.x, lp.y);
-
         if (Layout.isColorsPanelShowing())
             canvas.draw(drawColorsSegment(), cp.x, cp.y);
 
         canvas.draw(drawProjects(), pp.x, pp.y);
-
-        // TODO
-        if (Layout.isFramesPanelShowing())
-            canvas.draw(drawFrames(), fp.x, fp.y);
 
         if (Layout.isFlipbookPanelShowing())
             canvas.draw(drawFlipbook(), fbp.x, fbp.y);
@@ -795,14 +757,12 @@ public class StippleEffect implements ProgramContext {
         final float strokeWidth = 2f;
 
         canvas.setColor(Settings.getTheme().panelDivisions);
-        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation - TODO: remove
         canvas.drawLine(strokeWidth, pp.x, tobp.y, Layout.width(), tobp.y); // top segments and middle separation
         canvas.drawLine(strokeWidth, tp.x, wp.y, cp.x, wp.y); // tool options bar and tools/workspace separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
-        canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation - TODO: remove
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
         canvas.drawLine(strokeWidth, wp.x, fbp.y, cp.x, fbp.y); // workspace and flipbook separation
-        canvas.drawLine(strokeWidth, cp.x, lp.y, cp.x, bbp.y); // workspace/option bar and right segments separation - TODO: adapt to colors from layers
+        canvas.drawLine(strokeWidth, cp.x, cp.y, cp.x, bbp.y); // workspace/option bar and right segments separation
 
         if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
             canvas.draw(statusUpdate, wp.x, wp.y);
@@ -816,14 +776,8 @@ public class StippleEffect implements ProgramContext {
         // tools
         toolButtonMenu.render(canvas);
 
-        // layers
-        layersMenu.render(canvas);
-
         // colors
         colorsMenu.render(canvas);
-
-        // frames
-        framesMenu.render(canvas);
 
         // projects / contexts
         projectsMenu.render(canvas);
@@ -875,18 +829,8 @@ public class StippleEffect implements ProgramContext {
                 Layout.TOOL_OPTIONS_BAR_H);
     }
 
-    private GameImage drawLayers() {
-        return drawPanel(Layout.getLayersWidth(),
-                Layout.getLayersHeight());
-    }
-
     private GameImage drawProjects() {
         return drawPanel(Layout.getProjectsWidth(),
-                Layout.getTopPanelHeight());
-    }
-
-    private GameImage drawFrames() {
-        return drawPanel(Layout.getFramesWidth(),
                 Layout.getTopPanelHeight());
     }
 

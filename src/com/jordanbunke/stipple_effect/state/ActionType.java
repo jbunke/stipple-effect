@@ -8,15 +8,7 @@ public enum ActionType {
     public void consequence() {
         switch (this) {
             case MAJOR -> StippleEffect.get().rebuildStateDependentMenus();
-            case LAYER -> {
-                StippleEffect.get().rebuildLayersMenu();
-                StippleEffect.get().rebuildFlipbookMenu();
-            }
-            case FRAME -> {
-                StippleEffect.get().rebuildFramesMenu();
-                StippleEffect.get().rebuildFlipbookMenu();
-            }
-            // TODO: LAYER, FRAME -> StippleEffect.get().rebuildFlipbookMenu();
+            case LAYER, FRAME -> StippleEffect.get().rebuildFlipbookMenu();
         }
     }
 }

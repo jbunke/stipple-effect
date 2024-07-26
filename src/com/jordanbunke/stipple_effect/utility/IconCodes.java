@@ -121,4 +121,8 @@ public class IconCodes {
             IND_BOUNDS = INDICATOR_PREFIX + "bounds";
 
     public static final String NO_TOOLTIP = "no_tooltip";
+
+    public static boolean hasIcon(final String code) {
+        return !code.startsWith(NO_ICON_PREFIX);
+    }
 }
