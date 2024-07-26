@@ -3,10 +3,8 @@ package com.jordanbunke.stipple_effect.visual.theme.logic;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.ResourceLoader;
-import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.theme.Theme;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 
 import java.awt.*;
 import java.nio.file.Path;
@@ -46,45 +44,11 @@ public final class ZoThemeLogic extends ThemeLogic {
     }
 
     @Override
-    public GameImage drawTextButton(
-            final int width, final String text, final boolean selected,
-            final GraphicsUtils.ButtonType type
+    protected Color getTextButtonTextColor(
+            final TextButton tb, final Color backgroundColor
     ) {
-        final Theme t = Settings.getTheme();
-
-        final Color backgroundColor = switch (type) {
-            case DD_OPTION -> t.dropdownOptionBody;
-            case STUB -> t.stubButtonBody;
-            default -> t.buttonBody;
-        };
-
-        final boolean leftAligned = type.isDropdown();
-        final boolean drawBorder = type != GraphicsUtils.ButtonType.DD_OPTION;
-
-        final Color textColor = selected ? t.highlightOutline
-                : intuitTextColor(backgroundColor, true);
-        final GameImage textImage = GraphicsUtils.uiText(textColor)
-                .addText(text).build().draw();
-
-        final int w = Math.max(width, textImage.getWidth() +
-                (4 * Layout.BUTTON_BORDER_PX)),
-                h = Layout.STD_TEXT_BUTTON_H;
-
-        final GameImage nhi = new GameImage(w, h);
-        nhi.fillRectangle(backgroundColor, 0, 0, w, h);
-
-        final int x = leftAligned
-                ? (2 * Layout.BUTTON_BORDER_PX)
-                : (w - textImage.getWidth()) / 2;
-
-        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
-
-        if (drawBorder) {
-            final Color frame = buttonBorderColor(selected);
-            nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
-        }
-
-        return nhi.submit();
+        return tb.isSelected() ? Settings.getTheme().highlightOutline
+                :  super.getTextButtonTextColor(tb, backgroundColor);
     }
 
     @Override

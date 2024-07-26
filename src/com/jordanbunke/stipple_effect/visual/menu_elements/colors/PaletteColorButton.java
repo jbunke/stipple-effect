@@ -14,6 +14,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.awt.*;
@@ -104,7 +105,7 @@ public class PaletteColorButton extends SelectableMenuElement {
             base.draw(GraphicsUtils.loadIcon(IconCodes.EXCLUDED_FROM_PALETTE));
 
         nh = base.submit();
-        hi = GraphicsUtils.highlightButton(nh);
+        hi = Settings.getTheme().logic.highlightButton(nh);
     }
 
     @Override

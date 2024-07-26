@@ -7,6 +7,9 @@ import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.LogicItem;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.NestedItem;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
@@ -26,12 +29,17 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -49,65 +57,103 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        mb.add(TextLabel.make(Layout.getProjectsPosition().displace(
-                        Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
-                "Projects"));
+        mb.add(new Navbar(
+                new NestedItem("Program",
+                        new SimpleItem(IconCodes.SETTINGS,
+                                DialogAssembly::setDialogToProgramSettings),
+                        new SimpleItem(IconCodes.INFO,
+                                DialogAssembly::setDialogToInfo),
+                        new SimpleItem(IconCodes.AUTOMATION_SCRIPT,
+                                StippleEffect.get()::openAutomationScript),
+                        new SimpleItem(IconCodes.EXIT_PROGRAM,
+                                DialogAssembly::setDialogToExitProgramAYS)),
+                new NestedItem("File",
+                        new SimpleItem(IconCodes.NEW_PROJECT,
+                                DialogAssembly::setDialogToNewProject),
+                        new SimpleItem(IconCodes.OPEN_FILE,
+                                StippleEffect.get()::openProject),
+                        new SimpleItem(IconCodes.SAVE, c.projectInfo::save),
+                        new SimpleItem(IconCodes.SAVE_AS,
+                                DialogAssembly::setDialogToSave)),
+                new NestedItem("Edit",
+                        new NestedItem("State control",
+                                new LogicItem(IconCodes.UNDO,
+                                        c.getStateManager()::canUndo,
+                                        c.getStateManager()::undoToCheckpoint),
+                                new LogicItem(IconCodes.GRANULAR_UNDO,
+                                        c.getStateManager()::canUndo,
+                                        () -> c.getStateManager().undo(true)),
+                                new LogicItem(IconCodes.REDO,
+                                        c.getStateManager()::canRedo,
+                                        c.getStateManager()::redoToCheckpoint),
+                                new LogicItem(IconCodes.GRANULAR_REDO,
+                                        c.getStateManager()::canRedo,
+                                        () -> c.getStateManager().redo(true)),
+                                new SimpleItem(IconCodes.HISTORY,
+                                        DialogAssembly::setDialogToHistory)),
+                        new NestedItem("Sizing",
+                                new SimpleItem(IconCodes.RESIZE,
+                                        DialogAssembly::setDialogToResize),
+                                new SimpleItem(IconCodes.PAD,
+                                        DialogAssembly::setDialogToPad),
+                                new SimpleItem(IconCodes.STITCH_SPLIT_FRAMES,
+                                        DialogAssembly::setDialogToStitchFramesTogether))),
+                new NestedItem("View",
+                        new SimpleItem(IconCodes.PREVIEW,
+                                () -> PreviewWindow.set(c)),
+                        new SimpleItem(IconCodes.PANEL_MANAGER,
+                                        DialogAssembly::setDialogToPanelManager))));
 
-        populateButtonsIntoBuilder(mb,
-                new String[] {
-                        IconCodes.SETTINGS,
-                        IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
-                        IconCodes.SAVE, IconCodes.SAVE_AS,
-                        IconCodes.RESIZE, IconCodes.PAD,
-                        IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
-                        IconCodes.AUTOMATION_SCRIPT,
-                        IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
-                        IconCodes.GRANULAR_REDO, IconCodes.REDO,
-                        IconCodes.HISTORY
-                },
-                getPreconditions(
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> true,
-                        () -> c.getStateManager().canUndo(),
-                        () -> c.getStateManager().canUndo(),
-                        () -> c.getStateManager().canRedo(),
-                        () -> c.getStateManager().canRedo(),
-                        () -> true),
-                new Runnable[] {
-                        DialogAssembly::setDialogToProgramSettings,
-                        DialogAssembly::setDialogToNewProject,
-                        () -> StippleEffect.get().openProject(),
-                        c.projectInfo::save,
-                        DialogAssembly::setDialogToSave,
-                        DialogAssembly::setDialogToResize,
-                        DialogAssembly::setDialogToPad,
-                        () -> StippleEffect.get().stitchOrSplit(),
-                        () -> PreviewWindow.set(c),
-                        () -> StippleEffect.get().openAutomationScript(),
-                        () -> c.getStateManager().undoToCheckpoint(),
-                        () -> c.getStateManager().undo(true),
-                        () -> c.getStateManager().redo(true),
-                        () -> c.getStateManager().redoToCheckpoint(),
-                        DialogAssembly::setDialogToHistory
-                }, Layout.getProjectsPosition());
-
-        // exit program button
-        final Coord2D exitProgPos = Layout.getProjectsPosition().displace(
-                Layout.getProjectsWidth() - (Layout.CONTENT_BUFFER_PX + Layout.BUTTON_DIM),
-                Layout.ICON_BUTTON_OFFSET_Y);
-        mb.add(IconButton.make(IconCodes.EXIT_PROGRAM, exitProgPos,
-                DialogAssembly::setDialogToExitProgramAYS));
+//        populateButtonsIntoBuilder(mb,
+//                new String[] {
+//                        IconCodes.SETTINGS,
+//                        IconCodes.NEW_PROJECT, IconCodes.OPEN_FILE,
+//                        IconCodes.SAVE, IconCodes.SAVE_AS,
+//                        IconCodes.RESIZE, IconCodes.PAD,
+//                        IconCodes.STITCH_SPLIT_FRAMES, IconCodes.PREVIEW,
+//                        IconCodes.AUTOMATION_SCRIPT,
+//                        IconCodes.UNDO, IconCodes.GRANULAR_UNDO,
+//                        IconCodes.GRANULAR_REDO, IconCodes.REDO,
+//                        IconCodes.HISTORY
+//                },
+//                getPreconditions(
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> true,
+//                        () -> c.getStateManager().canUndo(),
+//                        () -> c.getStateManager().canUndo(),
+//                        () -> c.getStateManager().canRedo(),
+//                        () -> c.getStateManager().canRedo(),
+//                        () -> true),
+//                new Runnable[] {
+//                        DialogAssembly::setDialogToProgramSettings,
+//                        DialogAssembly::setDialogToNewProject,
+//                        () -> StippleEffect.get().openProject(),
+//                        c.projectInfo::save,
+//                        DialogAssembly::setDialogToSave,
+//                        DialogAssembly::setDialogToResize,
+//                        DialogAssembly::setDialogToPad,
+//                        () -> StippleEffect.get().stitchOrSplit(),
+//                        () -> PreviewWindow.set(c),
+//                        () -> StippleEffect.get().openAutomationScript(),
+//                        () -> c.getStateManager().undoToCheckpoint(),
+//                        () -> c.getStateManager().undo(true),
+//                        () -> c.getStateManager().redo(true),
+//                        () -> c.getStateManager().redoToCheckpoint(),
+//                        DialogAssembly::setDialogToHistory
+//                }, Layout.getProjectsPosition());
 
         // panel expand / collapse
-        final Coord2D panelIconPos = exitProgPos.displace(-Layout.BUTTON_INC, 0);
+        final Coord2D panelIconPos = Layout.getProjectsPosition().displace(
+                Layout.getProjectsWidth() - (Layout.CONTENT_BUFFER_PX + Layout.BUTTON_DIM),
+                Layout.ICON_BUTTON_OFFSET_Y);
 
         if (!Layout.isProjectsExpanded())
             mb.add(IconButton.make(IconCodes.EXPAND_PANEL, panelIconPos,
@@ -709,9 +755,10 @@ public class MenuAssembly {
                 behaviours.toArray(Runnable[]::new), () -> index)
                 : new StaticMenuElement(dropdownPos,
                 new Bounds2D(contentWidth, Layout.STD_TEXT_BUTTON_H),
-                MenuElement.Anchor.LEFT_TOP, GraphicsUtils.drawTextButton(
-                contentWidth, "No palettes", false,
-                GraphicsUtils.ButtonType.STUB)));
+                MenuElement.Anchor.LEFT_TOP,
+                Settings.getTheme().logic.drawTextButton(
+                        TextButton.of("No palettes", contentWidth,
+                                Alignment.CENTER, ButtonType.STUB))));
 
         // palette buttons
         if (hasPaletteContents) {
@@ -889,21 +936,10 @@ public class MenuAssembly {
 
         // selection
         mb.add(DynamicLabel.make(new Coord2D(Layout.width() -
-                (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
+                Layout.CONTENT_BUFFER_PX, bottomBarTextY),
                 MenuElement.Anchor.RIGHT_TOP, c::getSelectionText,
                 Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
-
-        // help button
-        final Coord2D helpButtonPos = Layout.getBottomBarPosition().displace(
-                Layout.width() - Layout.BUTTON_DIM, Layout.BUTTON_OFFSET);
-        mb.add(IconButton.make(IconCodes.INFO, helpButtonPos,
-                DialogAssembly::setDialogToInfo));
-
-        // panel manager button
-        mb.add(IconButton.make(IconCodes.PANEL_MANAGER,
-                helpButtonPos.displace(-Layout.BUTTON_INC, 0),
-                DialogAssembly::setDialogToPanelManager));
 
         return mb.build();
     }

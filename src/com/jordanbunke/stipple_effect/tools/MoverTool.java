@@ -88,6 +88,8 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
             final SEContext context, final T transformation
     );
 
+    abstract Selection getTransformationSelection(final T transformation);
+
     public final void applyMove(final SEContext context, final Coord2D displacement) {
         applyTransformation(context, move(context, displacement), false);
     }
@@ -467,6 +469,13 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                 yield "Moved " + (movementX ? x + dirX : "") +
                         (movementX && movementY ? ", " : "") +
                         (movementY ? y + dirY : "");
+            }
+            case STRETCH -> {
+                final Selection selection =
+                        getTransformationSelection(transformation);
+
+                yield "Stretched: " + selection.bounds.width() +
+                        "x" + selection.bounds.height() + " px";
             }
             case ROTATE -> {
                 final double degrees = cachedAngle * CONVERSION,

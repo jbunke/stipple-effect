@@ -9,8 +9,13 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.MenuButtonStub;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.util.function.Supplier;
 
@@ -24,17 +29,21 @@ public class ApproveDialogButton extends MenuButtonStub {
     private boolean met;
 
     public ApproveDialogButton(
-            final Coord2D position, final Bounds2D dimensions, final Anchor anchor,
+            final Coord2D position,
             final Runnable onApproval, final boolean clearDialog,
             final Supplier<Boolean> precondition, final String text
     ) {
-        super(position, dimensions, anchor, true);
+        super(position, new Bounds2D(
+                Layout.STD_TEXT_BUTTON_W, Layout.STD_TEXT_BUTTON_H
+        ), Anchor.LEFT_TOP, true);
 
-        base = GraphicsUtils.drawTextButton(dimensions.width(), text, false);
-        highlighted = GraphicsUtils.highlightButton(base);
-        notMet = GraphicsUtils.drawTextButton(
-                dimensions.width(), text, false,
-                GraphicsUtils.ButtonType.STUB);
+        final ThemeLogic tl = Settings.getTheme().logic;
+        final TextButton tmpl = TextButton.of(text, Layout.STD_TEXT_BUTTON_W);
+
+        base = tl.drawTextButton(tmpl);
+        highlighted = tl.drawTextButton(tmpl.sim(false, true));
+        notMet = tl.drawTextButton(TextButton.of(text,
+                Layout.STD_TEXT_BUTTON_W, Alignment.CENTER, ButtonType.STUB));
 
         this.clearDialog = clearDialog;
 

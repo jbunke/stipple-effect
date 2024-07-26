@@ -5,7 +5,9 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButt
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -30,19 +32,18 @@ public final class TextToggleButton extends SimpleToggleMenuButton {
             final Supplier<Integer> updateIndexLogic,
             final Runnable globalBehaviour
     ) {
-        final GameImage[] bases = makeToggleButtonSet(texts),
-                highlights = Arrays.stream(bases)
-                        .map(GraphicsUtils::highlightButton)
-                        .toArray(GameImage[]::new);
+        final ThemeLogic tl = Settings.getTheme().logic;
+        final int width = Layout.STD_TEXT_BUTTON_W;
+
+        final GameImage[] bases = Arrays.stream(texts)
+                .map(t -> tl.drawTextButton(TextButton.of(t, width)))
+                .toArray(GameImage[]::new);
+        final GameImage[] highlights = Arrays.stream(texts)
+                .map(t -> tl.drawTextButton(TextButton.of(t, width)
+                        .sim(false, true)))
+                .toArray(GameImage[]::new);
 
         return new TextToggleButton(position, bases, highlights,
                 chosenBehaviours, updateIndexLogic, globalBehaviour);
-    }
-
-    private static GameImage[] makeToggleButtonSet(final String... buttonTexts) {
-        return Arrays.stream(buttonTexts)
-                .map(t -> GraphicsUtils.drawTextButton(
-                        Layout.STD_TEXT_BUTTON_W, t, false))
-                .toArray(GameImage[]::new);
     }
 }

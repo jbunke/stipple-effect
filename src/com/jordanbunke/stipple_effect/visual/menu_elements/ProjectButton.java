@@ -6,8 +6,11 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -68,10 +71,15 @@ public class ProjectButton extends SelectableListItemButton {
     }
 
     private void updateImages() {
-        image = GraphicsUtils.drawTextButton(getWidth(),
-                project.projectInfo.getFormattedName(true, true),
-                isSelected());
-        highlighted = GraphicsUtils.highlightButton(image);
+        final ThemeLogic tl = Settings.getTheme().logic;
+
+        final int width = getWidth();
+        final String text = project.projectInfo.
+                getFormattedName(true, true);
+        final TextButton base = TextButton.of(text, width);
+
+        image = tl.drawTextButton(base.sim(isSelected(), false));
+        highlighted = tl.drawTextButton(base.sim(isSelected(), true));
     }
 
     @Override

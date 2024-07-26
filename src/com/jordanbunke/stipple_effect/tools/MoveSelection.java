@@ -103,6 +103,11 @@ public final class MoveSelection extends MoverTool<Selection> {
     }
 
     @Override
+    Selection getTransformationSelection(final Selection transformation) {
+        return transformation;
+    }
+
+    @Override
     public boolean previewScopeIsGlobal() {
         return true;
     }

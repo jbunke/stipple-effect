@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -55,54 +56,23 @@ public final class AsylumThemeLogic extends ThemeLogic {
     }
 
     @Override
-    public GameImage drawTextButton(
-            final int width, final String text, final boolean selected,
-            final GraphicsUtils.ButtonType type
+    protected void drawTextButtonBackground(
+            final GameImage img, final TextButton tb, final Color backgroundColor
     ) {
         final Theme t = Settings.getTheme();
+        final int w = img.getWidth(), h = img.getHeight();
 
-        final Color backgroundColor = switch (type) {
-            case DD_OPTION -> t.dropdownOptionBody;
-            case STUB -> t.stubButtonBody;
-            default -> t.buttonBody;
-        };
+        img.fill(backgroundColor);
 
-        final boolean leftAligned = type.isDropdown();
-        final boolean drawBorder = type != GraphicsUtils.ButtonType.DD_OPTION;
-
-        final Color textColor = intuitTextColor(backgroundColor, true);
-        final GameImage textImage = GraphicsUtils.uiText(textColor)
-                .addText(text).build().draw();
-
-        final int w = Math.max(width, textImage.getWidth() +
-                (4 * Layout.BUTTON_BORDER_PX)),
-                h = Layout.STD_TEXT_BUTTON_H;
-
-        final GameImage nhi = new GameImage(w, h);
-        nhi.fillRectangle(backgroundColor, 0, 0, w, h);
-
-        final int textX = leftAligned
-                ? (2 * Layout.BUTTON_BORDER_PX)
-                : (w - textImage.getWidth()) / 2;
-
-        if (selected) {
+        if (tb.isSelected()) {
             final int INC = Layout.BUTTON_BORDER_PX;
             final Color c = t.highlightOutline;
 
             for (int x = INC; x < w - INC; x += INC)
                 for (int y = INC; y < h - INC; y += INC)
                     if (((x / INC) + (y / INC)) % 2 == 0)
-                        nhi.fillRectangle(c, x, y, INC, INC);
+                        img.fillRectangle(c, x, y, INC, INC);
         }
-
-        nhi.draw(textImage, textX, Layout.BUTTON_TEXT_OFFSET_Y);
-
-        if (drawBorder) {
-            final Color frame = buttonBorderColor(selected);
-            nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
-        }
-
-        return nhi.submit();
     }
 
     @Override

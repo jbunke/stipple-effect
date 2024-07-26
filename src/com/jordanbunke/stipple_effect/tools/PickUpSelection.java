@@ -98,4 +98,9 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
 
         return transformation.getContentForCanvas(w, h);
     }
+
+    @Override
+    Selection getTransformationSelection(final SelectionContents transformation) {
+        return transformation.getSelection();
+    }
 }

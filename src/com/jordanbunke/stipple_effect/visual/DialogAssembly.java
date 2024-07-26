@@ -42,6 +42,8 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DynamicTextButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.StaticTextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
@@ -728,7 +730,7 @@ public class DialogAssembly {
                 explanation = makeValidDimensionsBottomLabel();
 
         // preset buttons
-        final SimpleMenuButton defaultPreset =
+        final StaticTextButton defaultPreset =
                 GraphicsUtils.makeBespokeTextButton("From default",
                         getDialogContentOffsetFollowingLabel(presetLabel),
                         () -> {
@@ -905,7 +907,7 @@ public class DialogAssembly {
         // import font templates
         final TextLabel importTemplatesLabel = makeDialogLeftLabel(
                 lines, "You can use these font templates as references:");
-        final SimpleMenuButton importTemplatesButton =
+        final StaticTextButton importTemplatesButton =
                 GraphicsUtils.makeStandardTextButton("Import",
                         getDialogContentOffsetFollowingLabel(importTemplatesLabel),
                         () -> StippleEffect.get().openFontTemplateProjects());
@@ -945,7 +947,7 @@ public class DialogAssembly {
         // ASCII
         final TextLabel asciiLabel = makeDialogLeftLabel(
                 lines, "ASCII source file:");
-        final SimpleMenuButton asciiButton =
+        final StaticTextButton asciiButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(asciiLabel),
                         SEFonts::uploadASCIISourceFile);
@@ -965,7 +967,7 @@ public class DialogAssembly {
                         DialogVals::hasLatinEx, DialogVals::setHasLatinEx));
         final TextLabel latinExLabel = makeDialogLeftLabel(
                 lines + 1, "Latin Extended source file:");
-        final SimpleMenuButton latinExButton =
+        final StaticTextButton latinExButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(latinExLabel),
                         SEFonts::uploadLatinExtendedSourceFile);
@@ -1096,7 +1098,7 @@ public class DialogAssembly {
             mb.add(makeDialogLeftLabelAtBottom("Cannot outline; nothing is selected"));
 
         // buttons for setting presets
-        final SimpleMenuButton singlePreset =
+        final StaticTextButton singlePreset =
                 GraphicsUtils.makeStandardTextButton("Single",
                 getDialogContentOffsetFollowingLabel(presets),
                         () -> DialogVals.setOutlineSideMask(
@@ -1150,7 +1152,7 @@ public class DialogAssembly {
         mb.add(presets);
 
         // buttons for panel arrangement presets
-        final SimpleMenuButton showAllPreset =
+        final StaticTextButton showAllPreset =
                 GraphicsUtils.makeStandardTextButton("All",
                         getDialogContentOffsetFollowingLabel(presets),
                         Layout::showAllPanels),
@@ -1401,7 +1403,7 @@ public class DialogAssembly {
                 getDialogRightContentPositionForRow(AFTER_COMMON_COLOR_ACTION_ROW)
                         .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
 
-        final SimpleMenuButton resetHue =
+        final StaticTextButton resetHue =
                 GraphicsUtils.makeStandardTextButton(RESET, firstResetPos,
                         () -> DialogVals.setHueShift(0)),
                 resetSat = GraphicsUtils.makeStandardTextButton(RESET,
@@ -1456,7 +1458,7 @@ public class DialogAssembly {
 
         final TextLabel scriptLabel = makeDialogLeftLabel(
                 AFTER_COMMON_COLOR_ACTION_ROW, "Script file:");
-        final SimpleMenuButton scriptButton =
+        final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         getDialogContentOffsetFollowingLabel(scriptLabel),
                         StippleEffect.get()::openColorScript);
@@ -1500,7 +1502,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        final SimpleMenuButton backButton =
+        final StaticTextButton backButton =
                 GraphicsUtils.makeStandardTextButton(
                         "< Back",
                         Layout.getDialogContentInitial(), backButtonAction);
@@ -1894,7 +1896,7 @@ public class DialogAssembly {
                         o -> (int)(o * DIV), sv -> sv / DIV,
                         o -> o + "x", "XXXXx");
 
-        final SimpleMenuButton resetDuration =
+        final StaticTextButton resetDuration =
                 GraphicsUtils.makeStandardTextButton("Reset",
                         getDialogRightContentPositionForRow(0)
                                 .displace(0, Layout.DIALOG_CONTENT_COMP_OFFSET_Y),
@@ -2234,7 +2236,6 @@ public class DialogAssembly {
         return new DynamicTextButton(
                 getDialogContentOffsetFollowingLabel(label),
                 Layout.LONG_NAME_TEXTBOX_W,
-                MenuElement.Anchor.LEFT_TOP,
                 () -> {
                     FileIO.setDialogToFoldersOnly();
                     final Optional<File> opened = FileIO.openFileFromSystem();
@@ -2950,7 +2951,7 @@ public class DialogAssembly {
                 "Sponsor me on GitHub: "),
                 patreonLabel = TextLabel.make(textBelowPos(sponsorLabel),
                         "Become a patron on Patreon: ");
-        final SimpleMenuButton storePageButton =
+        final StaticTextButton storePageButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         getDialogContentOffsetFollowingLabel(storePageLabel),
                         () -> visitSite(Constants.DONATE_LINK)),
@@ -2983,7 +2984,7 @@ public class DialogAssembly {
         final TextLabel scriptLabel = TextLabel.make(
                 contentStart.displace(indent, bottomY + Layout.TEXT_Y_OFFSET),
                 "For a more thorough breakdown of scripting and the scripting API: ");
-        final SimpleMenuButton scriptButton =
+        final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         getDialogContentOffsetFollowingLabel(scriptLabel),
                         () -> visitSite(Constants.SCRIPT_WIKI_LINK));
@@ -3207,19 +3208,13 @@ public class DialogAssembly {
                         "  |  Help & Information"));
 
         // close button
-        final GameImage baseImage = GraphicsUtils.drawTextButton(
-                Layout.STD_TEXT_BUTTON_W, "Close", false),
-                highlightedImage = GraphicsUtils.highlightButton(baseImage);
-
         final Coord2D cancelPos = background.getRenderPosition()
                 .displace(background.getWidth(), background.getHeight())
-                .displace(-Layout.CONTENT_BUFFER_PX, -Layout.CONTENT_BUFFER_PX);
+                .displace(-(Layout.CONTENT_BUFFER_PX + Layout.STD_TEXT_BUTTON_W),
+                        -(Layout.CONTENT_BUFFER_PX + Layout.STD_TEXT_BUTTON_H));
 
-        mb.add(new SimpleMenuButton(cancelPos,
-                new Bounds2D(baseImage.getWidth(), baseImage.getHeight()),
-                MenuElement.Anchor.RIGHT_BOTTOM, true,
-                () -> StippleEffect.get().clearDialog(),
-                baseImage, highlightedImage));
+        mb.add(GraphicsUtils.makeStandardTextButton("Close",
+                cancelPos, StippleEffect.get()::clearDialog));
 
         // contents
         Arrays.stream(DialogVals.InfoScreen.values()).forEach(is -> {
@@ -3239,7 +3234,7 @@ public class DialogAssembly {
 
         final int scrollerEndY = (background.getRenderPosition().y +
                 background.getHeight()) - ((2 * Layout.CONTENT_BUFFER_PX) +
-                baseImage.getHeight());
+                Layout.STD_TEXT_BUTTON_H);
 
         final Map<DialogVals.InfoScreen, VerticalScrollBox>
                 infoScreens = new HashMap<>();
@@ -3281,31 +3276,25 @@ public class DialogAssembly {
                 title));
 
         // cancel button
-        final GameImage baseImage = GraphicsUtils.drawTextButton(
-                Layout.STD_TEXT_BUTTON_W, approveText.equals(
-                        Constants.CLOSE_DIALOG_TEXT)
-                        ? Constants.CLOSE_DIALOG_TEXT : "Cancel", false),
-                highlightedImage = GraphicsUtils.highlightButton(baseImage);
-
         final Coord2D cancelPos = background.getRenderPosition()
                 .displace(background.getWidth(), background.getHeight())
-                .displace(-Layout.CONTENT_BUFFER_PX, -Layout.CONTENT_BUFFER_PX);
+                .displace(-(Layout.CONTENT_BUFFER_PX + Layout.STD_TEXT_BUTTON_W),
+                        -(Layout.CONTENT_BUFFER_PX + Layout.STD_TEXT_BUTTON_H));
 
-        mb.add(new SimpleMenuButton(cancelPos,
-                new Bounds2D(baseImage.getWidth(), baseImage.getHeight()),
-                MenuElement.Anchor.RIGHT_BOTTOM, true,
-                () -> StippleEffect.get().clearDialog(),
-                baseImage, highlightedImage));
+        mb.add(GraphicsUtils.makeStandardTextButton(
+                approveText.equals(
+                        Constants.CLOSE_DIALOG_TEXT)
+                        ? Constants.CLOSE_DIALOG_TEXT : "Cancel",
+                cancelPos, StippleEffect.get()::clearDialog));
 
         // approve button
         if (!approveText.equals(Constants.CLOSE_DIALOG_TEXT)) {
-            final Coord2D approvePos = cancelPos.displace(-(baseImage.getWidth() +
+            final Coord2D approvePos = cancelPos.displace(
+                    -(Layout.STD_TEXT_BUTTON_W +
                     Layout.BUTTON_OFFSET), 0);
 
             mb.add(new ApproveDialogButton(approvePos,
-                    new Bounds2D(baseImage.getWidth(), baseImage.getHeight()),
-                    MenuElement.Anchor.RIGHT_BOTTOM, onApproval, clearDialog,
-                    precondition, approveText));
+                    onApproval, clearDialog, precondition, approveText));
         }
 
         // contents come before border to ensure proper rendering
