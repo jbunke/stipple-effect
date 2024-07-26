@@ -22,8 +22,9 @@ public final class Submenu extends SEDropdownMenu {
             final Coord2D position, final NestedItem contents,
             final Navbar navbar
     ) {
-        super(position, GraphicsUtils.bespokeTextMenuElementWidth(contents.label),
-                Layout.NAV_RENDER_ORDER, navbar, contents.getItems());
+        super(position, GraphicsUtils.bespokeTextMenuElementWidth(contents.label) +
+                        Layout.CONTENT_BUFFER_PX, Layout.NAV_RENDER_ORDER,
+                navbar, contents.getItems());
 
         this.title = contents.label;
         this.navbar = navbar;
@@ -88,6 +89,6 @@ public final class Submenu extends SEDropdownMenu {
         };
 
         return new DropdownHeader(getPosition(), title,
-                getWidth(), onClick, DropdownExpansion.DOWN);
+                getWidth(), onClick, this, DropdownExpansion.DOWN);
     }
 }

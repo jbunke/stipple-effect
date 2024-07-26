@@ -95,7 +95,7 @@ public final class AsylumThemeLogic extends ThemeLogic {
                         nhi.fillRectangle(c, x, y, INC, INC);
         }
 
-        nhi.draw(textImage, textX, Layout.BUTTON_TEXT_OFFSET_Y);
+        nhi.draw(textImage, textX, Layout.TEXT_Y_OFFSET);
 
         if (drawBorder) {
             final Color frame = buttonBorderColor(tb.isSelected());

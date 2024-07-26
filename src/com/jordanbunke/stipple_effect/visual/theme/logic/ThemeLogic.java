@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -106,9 +107,62 @@ public abstract class ThemeLogic {
                         (2 * Layout.SLIDER_THINNING)), sd);
     }
 
-    protected GameImage drawDropdownMenuLeaf(final TextButton tb) {
-        // TODO
-        return GameImage.dummy();
+    public final GameImage drawDropdownMenuLeafStub(final TextButton tb) {
+        return drawDropdownMenuLeaf(tb, false);
+    }
+
+    protected GameImage drawDropdownMenuLeaf(final TextButton tb, final boolean conditionPassed) {
+        final Theme t = Settings.getTheme();
+        final String code = tb.getLabel();
+
+        final GameImage baseIcon = GraphicsUtils.loadIcon(code),
+                icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
+        final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
+                textY = Layout.TEXT_Y_OFFSET;
+
+        final GameImage button = new GameImage(w, h);
+
+        final Color backgroundColor = t.dropdownOptionBody;
+        final Color actionCol = intuitTextColor(backgroundColor, conditionPassed),
+                shortcutCol = intuitTextColor(backgroundColor, false);
+        button.fill(backgroundColor);
+
+        button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+
+        final String[] lines = ParserUtils.getToolTip(code);
+
+        if (lines.length >= 1) {
+            final String[] segments = ParserUtils.extractHighlight(lines[0]);
+
+            final GameImage actionImage = switch (segments.length) {
+                case 2 -> {
+                    final String action = segments[0].replace("|", "").trim(),
+                            shortcut = segments[1].trim();
+
+                    final GameImage shortcutImage = GraphicsUtils.uiText(shortcutCol)
+                            .addText(shortcut).build().draw();
+                    button.draw(shortcutImage, w - (shortcutImage.getWidth() +
+                            Layout.CONTENT_BUFFER_PX), textY);
+
+                    yield GraphicsUtils.uiText(actionCol)
+                            .addText(action).build().draw();
+                }
+                case 1 -> GraphicsUtils.uiText(actionCol)
+                        .addText(segments[0]).build().draw();
+                default -> GameImage.dummy();
+            };
+
+            final int actionTextX = Layout.CONTENT_BUFFER_PX + Layout.BUTTON_INC;
+            button.draw(actionImage, actionTextX, textY);
+
+            if (tb.isHighlighted()) {
+                final int underlineY = Layout.STD_TEXT_BUTTON_H - 4;
+                button.drawLine(actionCol, 1f, actionTextX, underlineY,
+                        actionTextX + actionImage.getWidth(), underlineY);
+            }
+        }
+
+        return button.submit();
     }
 
     public GameImage drawTextButton(final TextButton tb) {
@@ -116,7 +170,7 @@ public abstract class ThemeLogic {
         final ButtonType type = tb.getButtonType();
 
         if (type == ButtonType.DD_MENU_LEAF)
-            return drawDropdownMenuLeaf(tb);
+            return drawDropdownMenuLeaf(tb, true);
 
         final Color backgroundColor = switch (type) {
             case DD_OPTION -> t.dropdownOptionBody;
@@ -135,7 +189,7 @@ public abstract class ThemeLogic {
                 h = Layout.STD_TEXT_BUTTON_H;
 
         final GameImage nhi = new GameImage(w, h);
-        nhi.fillRectangle(backgroundColor, 0, 0, w, h);
+        nhi.fill(backgroundColor);
 
         final int x = switch (tb.getAlignment()) {
             case LEFT -> (2 * Layout.BUTTON_BORDER_PX);
@@ -143,7 +197,7 @@ public abstract class ThemeLogic {
             case RIGHT -> w - (textImage.getWidth() + (2 * Layout.BUTTON_BORDER_PX));
         };
 
-        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
+        nhi.draw(textImage, x, Layout.TEXT_Y_OFFSET);
 
         // dropdown list button
         if (type == ButtonType.DD_HEAD) {
@@ -164,25 +218,39 @@ public abstract class ThemeLogic {
     public GameImage drawDropdownHeader(
             final TextButton ddh, final DropdownExpansion expansion
     ) {
-        // TODO
-        final GameImage button = drawTextButton(ddh);
+        final Theme t = Settings.getTheme();
+
+        final int w = ddh.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
+                textY = Layout.TEXT_Y_OFFSET,
+                underlineY = Layout.STD_TEXT_BUTTON_H - 4;
+
+        final GameImage button = new GameImage(w, h);
+
+        final Color backgroundColor = ddh.isSelected() ? t.buttonBody
+                : (expansion == DropdownExpansion.DOWN
+                ? t.panelBackground : t.dropdownOptionBody);
+        final Color textColor = intuitTextColor(backgroundColor, true);
+        button.fill(backgroundColor);
+
+        final GameImage text = GraphicsUtils.uiText(textColor)
+                .addText(ddh.getLabel()).build().draw();
+        button.draw(text, Layout.CONTENT_BUFFER_PX, textY);
+
+        if (ddh.isHighlighted() && !ddh.isSelected())
+            button.drawLine(textColor, 1f, Layout.CONTENT_BUFFER_PX,
+                    underlineY, Layout.CONTENT_BUFFER_PX + text.getWidth(),
+                    underlineY);
 
         if (expansion == DropdownExpansion.RIGHT) {
-            final Theme t = Settings.getTheme();
-
-            final Color backgroundColor = switch (ddh.getButtonType()) {
-                case DD_OPTION -> t.dropdownOptionBody;
-                case STUB -> t.stubButtonBody;
-                default -> t.buttonBody;
-            };
-            final Color textColor = intuitTextColor(backgroundColor, true);
-
-            final GameImage arrow = GraphicsUtils.uiText(textColor)
-                    .addText(ddh.isSelected() ? "<" : ">").build().draw();
-            button.draw(arrow, (button.getWidth() - arrow.getWidth()) +
-                            Layout.BUTTON_TEXT_OFFSET_Y,
-                    Layout.TEXT_Y_OFFSET);
+            final String expText = ddh.isSelected() ? "<" : ">";
+            final GameImage exp = GraphicsUtils.uiText(textColor)
+                    .addText(expText).build().draw();
+            button.draw(exp, w - (exp.getWidth() +
+                    Layout.CONTENT_BUFFER_PX), textY);
         }
+
+        if (ddh.isSelected())
+            button.drawRectangle(t.dropdownOptionBody, 4f, 0, 0, w, h);
 
         return button.submit();
     }
@@ -245,7 +313,7 @@ public abstract class ThemeLogic {
                 postSelImage = GraphicsUtils.uiText(mainTextC)
                         .addText(postSel).build().draw();
 
-        Coord2D textPos = new Coord2D(2 * px, Layout.BUTTON_TEXT_OFFSET_Y);
+        Coord2D textPos = new Coord2D(2 * px, Layout.TEXT_Y_OFFSET);
 
         // possible prefix
         nhi.draw(prefixImage, textPos.x, textPos.y);

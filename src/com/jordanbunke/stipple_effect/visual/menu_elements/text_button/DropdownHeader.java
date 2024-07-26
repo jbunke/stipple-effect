@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.text_button;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.button.MenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractDropdown;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -15,9 +16,13 @@ public final class DropdownHeader extends MenuButton implements TextButton {
     private final DropdownExpansion expansion;
     private final GameImage[][] imageMatrix;
 
+    private final AbstractDropdown dropdown;
+    private boolean expanded;
+
     public DropdownHeader(
             final Coord2D position, final String label,
             final int width, final Runnable onClick,
+            final AbstractDropdown dropdown,
             final DropdownExpansion expansion
     ) {
         super(position, new Bounds2D(width, Layout.STD_TEXT_BUTTON_H),
@@ -25,6 +30,9 @@ public final class DropdownHeader extends MenuButton implements TextButton {
 
         this.label = label;
         this.expansion = expansion;
+
+        this.dropdown = dropdown;
+        expanded = dropdown.isDroppedDown();
 
         imageMatrix = populateMatrix();
     }
@@ -39,14 +47,22 @@ public final class DropdownHeader extends MenuButton implements TextButton {
                 imageMatrix[selected][highlighted] =
                         Settings.getTheme().logic.drawDropdownHeader(
                                 sim(ImageMatrix.valueFromInt(selected),
-                                        ImageMatrix.valueFromInt(highlighted)), expansion);
+                                        ImageMatrix.valueFromInt(highlighted)),
+                                expansion);
 
         return imageMatrix;
     }
 
     @Override
     public void update(final double deltaTime) {
+        expanded = dropdown.isDroppedDown();
 
+        if (expanded != isSelected()) {
+            if (expanded)
+                select();
+            else
+                deselect();
+        }
     }
 
     @Override

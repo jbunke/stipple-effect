@@ -936,21 +936,10 @@ public class MenuAssembly {
 
         // selection
         mb.add(DynamicLabel.make(new Coord2D(Layout.width() -
-                (Layout.CONTENT_BUFFER_PX + (2 * Layout.BUTTON_INC)), bottomBarTextY),
+                Layout.CONTENT_BUFFER_PX, bottomBarTextY),
                 MenuElement.Anchor.RIGHT_TOP, c::getSelectionText,
                 Layout.width() -
                 (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
-
-        // help button
-        final Coord2D helpButtonPos = Layout.getBottomBarPosition().displace(
-                Layout.width() - Layout.BUTTON_DIM, Layout.BUTTON_OFFSET);
-        mb.add(IconButton.make(IconCodes.INFO, helpButtonPos,
-                DialogAssembly::setDialogToInfo));
-
-        // panel manager button
-        mb.add(IconButton.make(IconCodes.PANEL_MANAGER,
-                helpButtonPos.displace(-Layout.BUTTON_INC, 0),
-                DialogAssembly::setDialogToPanelManager));
 
         return mb.build();
     }

@@ -77,7 +77,7 @@ public final class ZoThemeLogic extends ThemeLogic {
                 ? (2 * Layout.BUTTON_BORDER_PX)
                 : (w - textImage.getWidth()) / 2;
 
-        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
+        nhi.draw(textImage, x, Layout.TEXT_Y_OFFSET);
 
         if (drawBorder) {
             final Color frame = buttonBorderColor(tb.isSelected());
