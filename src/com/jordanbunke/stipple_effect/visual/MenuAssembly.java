@@ -130,7 +130,7 @@ public class MenuAssembly {
         final MenuBuilder toScroll = new MenuBuilder();
 
         final Coord2D firstPos = Layout.getProjectsPosition()
-                .displace(Layout.getSegmentContentDisplacement());
+                .displace(Layout.getPanelContentDisplacement());
         int realRightX = firstPos.x, cumulativeWidth = 0, initialOffsetX = 0;
 
         for (int i = 0; i < amount; i++) {
@@ -304,6 +304,34 @@ public class MenuAssembly {
         mb.addAll(playbackLabel, playback.decButton, playback.incButton,
                 playback.slider, playback.value);
 
+        // TODO: layer buttons
+
+        // frame buttons
+        final int frameCount = c.getState().getFrameCount();
+        final Scrollable[] frameButtons = new Scrollable[frameCount];
+
+        // TODO - offset by layer buttons
+        final Coord2D firstFBPos = panelPos.displace(Layout.getPanelContentDisplacement());
+        Coord2D fbPos = firstFBPos;
+
+        for (int i = 0; i < frameCount; i++) {
+            frameButtons[i] = new Scrollable(SelectableListItemButton.make(
+                    fbPos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1), i,
+                    c.getState()::getFrameIndex, c.getState()::setFrameIndex
+            ));
+
+            fbPos = fbPos.displace(Layout.FRAME_BUTTON_W +
+                    (i + 1 < frameCount ? Layout.BUTTON_OFFSET : 0), 0);
+        }
+
+        final HorizontalScrollBox fbBox = new HorizontalScrollBox(firstFBPos,
+                new Bounds2D(Layout.getFrameButtonScrollWindowWidth(),
+                        Layout.TOP_PANEL_SCROLL_WINDOW_H),
+                frameButtons, fbPos.x, frameButtonXDisplacement(c));
+        mb.add(fbBox);
+
+        // TODO: cel buttons
+
         return mb.build();
     }
 
@@ -412,7 +440,7 @@ public class MenuAssembly {
         final MenuBuilder frameElements = new MenuBuilder();
 
         final Coord2D firstPos = Layout.getFramesPosition()
-                .displace(Layout.getSegmentContentDisplacement());
+                .displace(Layout.getPanelContentDisplacement());
 
         int realRightX = firstPos.x;
 
@@ -433,7 +461,7 @@ public class MenuAssembly {
                 Arrays.stream(frameElements.build().getMenuElements())
                         .map(Scrollable::new)
                         .toArray(Scrollable[]::new),
-                realRightX, frameButtonXDisplacement()));
+                realRightX, frameButtonXDisplacement(c)));
 
         return mb.build();
     }
@@ -472,8 +500,8 @@ public class MenuAssembly {
                         .playbackInfo.isPlaying() ? 0 : 1, () -> {});
     }
 
-    private static int frameButtonXDisplacement() {
-        return (StippleEffect.get().getContext().getState().getFrameIndex() -
+    private static int frameButtonXDisplacement(final SEContext c) {
+        return (c.getState().getFrameIndex() -
                 Layout.FRAMES_BEFORE_TO_DISPLAY) *
                 (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET);
     }
@@ -526,7 +554,7 @@ public class MenuAssembly {
         final MenuBuilder layerButtons = new MenuBuilder();
 
         final Coord2D firstPos = Layout.getLayersPosition()
-                .displace(Layout.getSegmentContentDisplacement());
+                .displace(Layout.getPanelContentDisplacement());
         int realBottomY = firstPos.y;
 
         for (int i = amount - 1; i >= 0; i--) {
@@ -706,9 +734,9 @@ public class MenuAssembly {
         final int NUM_COLORS = 2;
 
         for (int i = 0; i < NUM_COLORS; i++) {
-            final int offsetY = Layout.getSegmentContentDisplacement().y * 2;
+            final int offsetY = Layout.getPanelContentDisplacement().y * 2;
             final Coord2D labelPos = Layout.getColorsPosition().displace(
-                    Layout.getSegmentContentDisplacement()).displace(
+                    Layout.getPanelContentDisplacement()).displace(
                             i * (Layout.getColorsWidth() / 2), 0),
                     textBoxPos = Layout.getColorsPosition().displace(
                             (Layout.getColorsWidth() / 4) + (i *
@@ -842,7 +870,7 @@ public class MenuAssembly {
         }
 
         final Coord2D dropdownPos = startingPos.displace(0,
-                Layout.getSegmentContentDisplacement().y + Layout.BUTTON_INC);
+                Layout.getPanelContentDisplacement().y + Layout.BUTTON_INC);
         final int dropDownHAllowance = Layout.getColorsHeight() / 3;
 
         mb.add(hasPaletteContents

@@ -28,4 +28,8 @@ public class HorizontalScrollBox extends AbstractHorizontalScrollBox {
         slider.updateAssets();
         return slider;
     }
+
+    public boolean renderingChild(final Scrollable child) {
+        return renderAndProcessChild(child);
+    }
 }

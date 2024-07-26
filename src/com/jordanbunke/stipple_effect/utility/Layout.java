@@ -373,7 +373,7 @@ public final class Layout {
         return getToolsPosition().displace(0, getToolsHeight());
     }
 
-    public static Coord2D getSegmentContentDisplacement() {
+    public static Coord2D getPanelContentDisplacement() {
         return new Coord2D(CONTENT_BUFFER_PX, SEGMENT_TITLE_CONTENT_OFFSET_Y);
     }
 
@@ -390,8 +390,14 @@ public final class Layout {
         return getLayersHeight() - (CONTENT_BUFFER_PX + SEGMENT_TITLE_CONTENT_OFFSET_Y);
     }
 
+    // TODO - remove
     public static int getFrameScrollWindowWidth() {
         return getFramesWidth() - (2 * CONTENT_BUFFER_PX);
+    }
+
+    public static int getFrameButtonScrollWindowWidth() {
+        // TODO: factor in layers offset
+        return getFlipbookWidth() - (2 * CONTENT_BUFFER_PX);
     }
 
     public static int getProjectScrollWindowWidth() {
