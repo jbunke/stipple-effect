@@ -1,1 +1,1 @@
-Pad canvas | {Ctrl + Shift + R}
+Pad canvas... | {Ctrl + Shift + R}

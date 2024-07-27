@@ -140,11 +140,11 @@ public class Dropdown extends AbstractDropdownList {
 
         final GameImage[] bases = new GameImage[] {
                 tl.drawTextButton(base),
-                tl.drawTextButton(base.sim(false, true))
+                tl.drawTextButton(base.sim(true, false))
         };
 
         final GameImage[] highlighted = new GameImage[] {
-                tl.drawTextButton(base.sim(true, false)),
+                tl.drawTextButton(base.sim(false, true)),
                 tl.drawTextButton(base.sim(true, true))
         };
 

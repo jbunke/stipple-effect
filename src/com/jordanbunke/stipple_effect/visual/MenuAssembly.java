@@ -55,10 +55,11 @@ public class MenuAssembly {
 
     public static Menu buildProjectsMenu() {
         final MenuBuilder mb = new MenuBuilder();
-        final SEContext c = StippleEffect.get().getContext();
+        final StippleEffect s = StippleEffect.get();
+        final SEContext c = s.getContext();
 
         mb.add(new Navbar(
-                new NestedItem("Program",
+                new NestedItem(StippleEffect.PROGRAM_NAME,
                         new SimpleItem(IconCodes.SETTINGS,
                                 DialogAssembly::setDialogToProgramSettings),
                         new SimpleItem(IconCodes.INFO,
@@ -102,7 +103,42 @@ public class MenuAssembly {
                         new SimpleItem(IconCodes.PREVIEW,
                                 () -> PreviewWindow.set(c)),
                         new SimpleItem(IconCodes.PANEL_MANAGER,
-                                        DialogAssembly::setDialogToPanelManager))));
+                                        DialogAssembly::setDialogToPanelManager)),
+                new NestedItem("Actions",
+                        new SimpleItem(IconCodes.HSV_SHIFT,
+                                DialogAssembly::setDialogToHSVShift),
+                        new SimpleItem(IconCodes.COLOR_SCRIPT,
+                                DialogAssembly::setDialogToColorScript),
+                        new LogicItem(IconCodes.CONTENTS_TO_PALETTE,
+                                () -> s.hasPaletteContents() &&
+                                        s.getSelectedPalette().isMutable(),
+                                () -> DialogAssembly.setDialogToAddContentsToPalette(
+                                        s.getSelectedPalette())),
+                        new LogicItem(IconCodes.PALETTIZE,
+                                s::hasPaletteContents,
+                                () -> DialogAssembly.setDialogToPalettize(
+                                        s.getSelectedPalette()))),
+                new NestedItem("Palette",
+                        new SimpleItem(IconCodes.NEW_PALETTE,
+                                s::newPalette),
+                        new SimpleItem(IconCodes.IMPORT_PALETTE,
+                                s::openPalette),
+                        new LogicItem(IconCodes.DELETE_PALETTE,
+                                s::hasPaletteContents, s::deletePalette),
+                        new LogicItem(IconCodes.SAVE_PALETTE,
+                                () -> s.hasPaletteContents() &&
+                                        s.getSelectedPalette().isMutable(),
+                                () -> DialogAssembly.setDialogToSavePalette(
+                                        s.getSelectedPalette())),
+                        new LogicItem(IconCodes.SORT_PALETTE,
+                                s::hasPaletteContents,
+                                () -> DialogAssembly.setDialogToSortPalette(
+                                        s.getSelectedPalette())),
+                        new LogicItem(IconCodes.PALETTE_SETTINGS,
+                                () -> s.hasPaletteContents() &&
+                                        s.getSelectedPalette().isMutable(),
+                                () -> DialogAssembly.setDialogToPaletteSettings(
+                                        s.getSelectedPalette())))));
 
         // panel expand / collapse
         final Coord2D panelIconPos = Layout.getProjectsPosition().displace(
@@ -180,21 +216,33 @@ public class MenuAssembly {
         final SEContext c = StippleEffect.get().getContext();
         final Coord2D panelPos = Layout.getFlipbookPosition();
 
-        mb.add(TextLabel.make(panelPos.displace(
-                        Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
-                "Flipbook"));
-
         addHidePanelToMenuBuilder(mb,
                 panelPos.displace(Layout.getFlipbookWidth(), 0),
                 () -> Layout.setFlipbookPanelShowing(false));
 
-        final int lbLeftBuffer = (2 * Layout.BUTTON_INC) - Layout.CONTENT_BUFFER_PX,
+        final int panelHeight = Layout.getFlipbookHeight(),
+                panelWidth = Layout.getFlipbookWidth(),
+                lbLeftBuffer = (2 * Layout.BUTTON_INC) - Layout.CONTENT_BUFFER_PX,
                 lbTopBuffer = 3 * Layout.STD_TEXT_BUTTON_INC,
                 fbOffsetFromLB = lbLeftBuffer + Layout.VERT_SCROLL_WINDOW_W +
                         Layout.CONTENT_BUFFER_PX;
 
+        final Coord2D firstFBPos = panelPos.displace(fbOffsetFromLB,
+                Layout.PANEL_TITLE_CONTENT_OFFSET_Y),
+                firstLBPos = panelPos.displace(lbLeftBuffer, lbTopBuffer);
+
+        // aesthetic box
+        final int abX = firstLBPos.x, abY = firstFBPos.y,
+                abInPanelX = abX - panelPos.x, abInPanelY = abY - panelPos.y,
+                abWidth = panelWidth - (abInPanelX + Layout.CONTENT_BUFFER_PX),
+                abHeight = panelHeight - (abInPanelY + Layout.CONTENT_BUFFER_PX);
+        mb.add(new VerticalScrollBox(
+                new Coord2D(abX, abY), new Bounds2D(abWidth, abHeight),
+                new Scrollable[0], abY + abHeight, 0));
+
         // playback
-        final Coord2D labelPos = panelPos.displace(0, lbTopBuffer / 2);
+        final Coord2D labelPos = panelPos.displace(0,
+                Layout.PANEL_TITLE_CONTENT_OFFSET_Y);
 
         final TextLabel playbackLabel = TextLabel.make(labelPos, "");
         final IncrementalRangeElements<Integer> playback =
@@ -220,13 +268,13 @@ public class MenuAssembly {
                         IconCodes.FLATTEN
                 },
                 getPreconditions(
-                        c.getState()::canAddLayer,
-                        c.getState()::canAddLayer,
-                        c.getState()::canRemoveLayer,
-                        c.getState()::canMoveLayerUp,
-                        c.getState()::canMoveLayerDown,
-                        c.getState()::canMoveLayerDown,
-                        c.getState()::canRemoveLayer),
+                        () -> c.getState().canAddLayer(),
+                        () -> c.getState().canAddLayer(),
+                        () -> c.getState().canRemoveLayer(),
+                        () -> c.getState().canMoveLayerUp(),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> c.getState().canMoveLayerDown(),
+                        () -> c.getState().canRemoveLayer()),
                 new Runnable[] {
                         c::addLayer,
                         c::duplicateLayer,
@@ -239,6 +287,48 @@ public class MenuAssembly {
                 panelPos.displace(Layout.CONTENT_BUFFER_PX,
                         lbTopBuffer + Layout.BUTTON_OFFSET), true);
 
+        // playback controls
+        populateButtonsIntoBuilder(mb,
+                new String[] {
+                        IconCodes.TO_FIRST_FRAME,
+                        IconCodes.PREVIOUS,
+                        // gap for play/stop button
+                        Constants.ICON_ID_GAP_CODE,
+                        IconCodes.NEXT,
+                        IconCodes.TO_LAST_FRAME
+                },
+                getPreconditions(
+                        () -> true,
+                        () -> true,
+                        () -> false, // placeholder
+                        () -> true,
+                        () -> true),
+                new Runnable[] {
+                        () -> c.getState().setFrameIndex(0),
+                        () -> c.getState().previousFrame(),
+                        () -> {}, // placeholder
+                        () -> c.getState().nextFrame(),
+                        () -> c.getState().setFrameIndex(
+                                c.getState().getFrameCount() - 1)
+                }, panelPos.displace(Layout.CONTENT_BUFFER_PX,
+                        Layout.ICON_BUTTON_OFFSET_Y));
+
+        final int PLAY_STOP_INDEX = 2,
+                PLAYBACK_MODE_INDEX = 5;
+
+        // play/stop as toggle
+        final Coord2D disp = new Coord2D(Layout.BUTTON_INC, 0),
+                playStopTogglePos =
+                        panelPos.displace(Layout.CONTENT_BUFFER_PX +
+                                        (PLAY_STOP_INDEX * Layout.BUTTON_INC),
+                                Layout.ICON_BUTTON_OFFSET_Y);
+        mb.add(generatePlayStopToggle(playStopTogglePos));
+
+        // playback mode toggle button
+        final Coord2D playbackModeTogglePos = playStopTogglePos.displace(
+                disp.scale(PLAYBACK_MODE_INDEX - PLAY_STOP_INDEX));
+        mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
+
         // frame controls
         final Coord2D frameControlPos = panelPos.displace(fbOffsetFromLB, 0);
         populateButtonsIntoBuilder(mb,
@@ -250,29 +340,15 @@ public class MenuAssembly {
                         IconCodes.MOVE_FRAME_FORWARD,
                         // gap between frame operations and navigation/playback
                         Constants.ICON_ID_GAP_CODE,
-                        IconCodes.FRAME_PROPERTIES,
-                        // gap between frame operations and navigation/playback
-                        Constants.ICON_ID_GAP_CODE,
-                        IconCodes.TO_FIRST_FRAME,
-                        IconCodes.PREVIOUS,
-                        // gap for play/stop button
-                        Constants.ICON_ID_GAP_CODE,
-                        IconCodes.NEXT,
-                        IconCodes.TO_LAST_FRAME
+                        IconCodes.FRAME_PROPERTIES
                 },
                 getPreconditions(
-                        c.getState()::canAddFrame,
-                        c.getState()::canAddFrame,
-                        c.getState()::canRemoveFrame,
-                        c.getState()::canMoveFrameBack,
-                        c.getState()::canMoveFrameForward,
+                        () -> c.getState().canAddFrame(),
+                        () -> c.getState().canAddFrame(),
+                        () -> c.getState().canRemoveFrame(),
+                        () -> c.getState().canMoveFrameBack(),
+                        () -> c.getState().canMoveFrameForward(),
                         () -> false, // placeholder
-                        () -> true,
-                        () -> false, // placeholder
-                        () -> true,
-                        () -> true,
-                        () -> false, // placeholder
-                        () -> true,
                         () -> true),
                 new Runnable[] {
                         c::addFrame,
@@ -282,30 +358,8 @@ public class MenuAssembly {
                         c::moveFrameForward,
                         () -> {}, // placeholder
                         () -> DialogAssembly.setDialogToFrameProperties(
-                                c.getState().getFrameIndex()),
-                        () -> {}, // placeholder
-                        () -> c.getState().setFrameIndex(0),
-                        c.getState()::previousFrame,
-                        () -> {}, // placeholder
-                        c.getState()::nextFrame,
-                        () -> c.getState().setFrameIndex(
-                                c.getState().getFrameCount() - 1)
+                                c.getState().getFrameIndex())
                 }, frameControlPos.displace(0, Layout.ICON_BUTTON_OFFSET_Y));
-
-        final int PLAY_STOP_INDEX = 10,
-                PLAYBACK_MODE_INDEX = 13;
-
-        // play/stop as toggle
-        final Coord2D disp = new Coord2D(Layout.BUTTON_INC, 0),
-                playStopTogglePos = frameControlPos.displace(
-                        PLAY_STOP_INDEX * Layout.BUTTON_INC,
-                        Layout.ICON_BUTTON_OFFSET_Y);
-        mb.add(generatePlayStopToggle(playStopTogglePos));
-
-        // playback mode toggle button
-        final Coord2D playbackModeTogglePos = playStopTogglePos.displace(
-                disp.scale(PLAYBACK_MODE_INDEX - PLAY_STOP_INDEX));
-        mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
 
         // layer buttons
         final List<SELayer> layers = c.getState().getLayers();
@@ -314,7 +368,6 @@ public class MenuAssembly {
 
         final MenuBuilder layerElements = new MenuBuilder();
 
-        final Coord2D firstLBPos = panelPos.displace(lbLeftBuffer, lbTopBuffer);
         int realBottomY = firstLBPos.y;
 
         for (int i = layerCount - 1; i >= 0; i--) {
@@ -330,8 +383,8 @@ public class MenuAssembly {
 
             layerButtons[i] = new Scrollable(SelectableListItemButton.make(
                     pos, Layout.LAYER_BUTTON_W, text, i,
-                    c.getState()::getLayerEditIndex,
-                    c.getState()::setLayerEditIndex));
+                    () -> c.getState().getLayerEditIndex(),
+                    l -> c.getState().setLayerEditIndex(l)));
             layerElements.add(layerButtons[i]);
 
             // visibility toggle
@@ -357,8 +410,7 @@ public class MenuAssembly {
             realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
         }
 
-        final int panelHeight = Layout.getFlipbookHeight(),
-                boxInPanelY = firstLBPos.y - panelPos.y,
+        final int boxInPanelY = firstLBPos.y - panelPos.y,
                 lbBoxHeight = panelHeight -
                         (boxInPanelY + Layout.CONTENT_BUFFER_PX);
         final VerticalScrollBox lbBox = new VerticalScrollBox(firstLBPos,
@@ -367,37 +419,39 @@ public class MenuAssembly {
                         .map(m -> m instanceof Scrollable
                                 ? (Scrollable) m
                                 : new Scrollable(m))
-                        .toArray(Scrollable[]::new),
-                realBottomY, layerButtonYDisplacement(c, layerCount));
+                        .toArray(Scrollable[]::new), realBottomY,
+                layerButtonYDisplacement(c, layerCount), GameImage::new);
 
         // frame buttons
         final int frameCount = c.getState().getFrameCount();
         final Scrollable[] frameButtons = new Scrollable[frameCount];
 
-        final Coord2D firstFBPos = panelPos.displace(fbOffsetFromLB,
-                        Layout.PANEL_TITLE_CONTENT_OFFSET_Y);
         Coord2D fbPos = firstFBPos;
 
         for (int i = 0; i < frameCount; i++) {
             frameButtons[i] = new Scrollable(SelectableListItemButton.make(
-                    fbPos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1), i,
-                    c.getState()::getFrameIndex, c.getState()::setFrameIndex
-            ));
+                    fbPos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1),
+                    i, () -> c.getState().getFrameIndex(),
+                    f -> c.getState().setFrameIndex(f)));
 
             fbPos = fbPos.displace(Layout.FRAME_BUTTON_W +
                     (i + 1 < frameCount ? Layout.BUTTON_OFFSET : 0), 0);
         }
 
-        final int panelWidth = Layout.getFlipbookWidth(),
-                boxInPanelX = firstFBPos.x - panelPos.x,
+        final int boxInPanelX = firstFBPos.x - panelPos.x,
                 fbBoxWidth = panelWidth -
                         (boxInPanelX + Layout.CONTENT_BUFFER_PX);
         final HorizontalScrollBox fbBox = new HorizontalScrollBox(firstFBPos,
                 new Bounds2D(fbBoxWidth, Layout.TOP_PANEL_SCROLL_WINDOW_H),
-                frameButtons, fbPos.x, frameButtonXDisplacement(c));
+                frameButtons, fbPos.x, frameButtonXDisplacement(c),
+                GameImage::new);
         mb.addAll(lbBox, fbBox);
 
-        // TODO: cel buttons
+        // cel buttons
+        for (int l = 0; l < layerCount; l++)
+            for (int f = 0; f < frameCount; f++)
+                mb.add(new CelButton(c, l, f,
+                        layerButtons[l], frameButtons[f], lbBox, fbBox));
 
         return mb.build();
     }
@@ -540,21 +594,15 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(
                 mb, new String[] {
                         IconCodes.SWAP_COLORS,
-                        IconCodes.COLOR_MENU_MODE,
-                        IconCodes.HSV_SHIFT,
-                        IconCodes.COLOR_SCRIPT
+                        IconCodes.COLOR_MENU_MODE
                 },
                 getPreconditions(
-                        () -> true,
-                        () -> true,
                         () -> true,
                         () -> true
                 ),
                 new Runnable[] {
-                        () -> StippleEffect.get().swapColors(),
-                        () -> StippleEffect.get().toggleColorMenuMode(),
-                        DialogAssembly::setDialogToHSVShift,
-                        DialogAssembly::setDialogToColorScript
+                        StippleEffect.get()::swapColors,
+                        StippleEffect.get()::toggleColorMenuMode
                 },
                 Layout.getColorsPosition()
         );

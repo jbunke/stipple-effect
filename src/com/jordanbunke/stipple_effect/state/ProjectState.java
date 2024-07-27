@@ -34,6 +34,9 @@ public class ProjectState {
     private final Selection selection;
     private final SelectionContents selectionContents;
 
+    // POPULATED
+    private final boolean[][] populated;
+
     public static ProjectState makeNew(
             final int imageWidth, final int imageHeight
     ) {
@@ -110,6 +113,8 @@ public class ProjectState {
 
         this.checkpoint = checkpoint;
         this.operation = Operation.NONE;
+
+        this.populated = determinePopulatedCels();
     }
 
     public static List<Double> defaultFrameDurations(final int frameCount) {
@@ -290,10 +295,8 @@ public class ProjectState {
 
     public void setLayerEditIndex(final int layerEditIndex) {
         if (this.layerEditIndex != layerEditIndex &&
-                layerEditIndex >= 0 && layerEditIndex < layers.size()) {
+                layerEditIndex >= 0 && layerEditIndex < layers.size())
             this.layerEditIndex = layerEditIndex;
-            // StippleEffect.get().rebuildLayersMenu();
-        }
     }
 
     public void editLayerBelow() {
@@ -445,5 +448,33 @@ public class ProjectState {
 
         if (frameIndex < 0)
             frameIndex = frameCount - 1;
+    }
+
+    private boolean[][] determinePopulatedCels() {
+        final int layerCount = layers.size();
+        final boolean[][] populated = new boolean[layerCount][frameCount];
+
+        for (int l = 0; l < layerCount; l++)
+            for (int f = 0; f < frameCount; f++) {
+                final GameImage cel = layers.get(l).getFrame(f);
+
+                pixels:
+                for (int x = 0; x < cel.getWidth(); x++)
+                    for (int y = 0; y < cel.getHeight(); y++)
+                        if (cel.getColorAt(x, y).getAlpha() > 0) {
+                            populated[l][f] = true;
+                            break pixels;
+                        }
+            }
+
+        return populated;
+    }
+
+    public boolean isCelPopulated(final int layerIndex, final int frameIndex) {
+        if (layerIndex < 0 || layerIndex >= populated.length ||
+                frameIndex < 0 || frameIndex >= populated[layerIndex].length)
+            return false;
+
+        return populated[layerIndex][frameIndex];
     }
 }

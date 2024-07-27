@@ -373,16 +373,16 @@ public class StippleEffect implements ProgramContext {
             if (!Permissions.isTyping())
                 processNonStateKeyPresses(eventLogger);
 
-            // bottom bar
-            bottomBarMenu.process(eventLogger);
-            // tools
-            toolButtonMenu.process(eventLogger);
-            // colors
-            colorsMenu.process(eventLogger);
             // projects
             projectsMenu.process(eventLogger);
+            // colors
+            colorsMenu.process(eventLogger);
+            // tools
+            toolButtonMenu.process(eventLogger);
             // flipbook
             flipbookMenu.process(eventLogger);
+            // bottom bar
+            bottomBarMenu.process(eventLogger);
 
             // workspace
             getContext().process(eventLogger);

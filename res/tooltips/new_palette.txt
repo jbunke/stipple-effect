@@ -1,1 +1,1 @@
-Create new palette... | {Shift + N}
+New palette | {Shift + N}
