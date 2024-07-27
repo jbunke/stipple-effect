@@ -243,6 +243,13 @@ public class GraphicsUtils {
             }
     }
 
+    public static GameImage loadNumkeyIcon(final int num) {
+        if (num < 1 || num > 9)
+            return GameImage.dummy();
+
+        return loadIcon(IconCodes.NUMKEY_PREFIX + num);
+    }
+
     public static GameImage loadIcon(final String code) {
         if (iconMap.containsKey(code))
             return new GameImage(iconMap.get(code));

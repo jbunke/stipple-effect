@@ -11,13 +11,14 @@ import java.awt.*;
 public final class Layout {
     // panel variables
     private static boolean flipbookPanelShowing, colorsPanelShowing,
-            toolbarShowing, projectsExpanded;
+            toolbarShowing, projectsExpanded, projectsRequiresScrolling;
 
     // layout constants
     private static final double
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
-            CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27, FLIPBOOK_H = 249;
+            PROJECTS_H = 84, NON_SCROLLING_SUB = 20,
+            COLLAPSED_PROJECTS_H = 27, FLIPBOOK_H = 249;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
@@ -43,7 +44,6 @@ public final class Layout {
             PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8,
             PROJECTS_BEFORE_TO_DISPLAY = 1, DIALOG_CONTENT_INC_Y = 32,
             VERT_SCROLL_WINDOW_W = RIGHT_PANEL_W - (2 * CONTENT_BUFFER_PX),
-            TOP_PANEL_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
             DIALOG_CONTENT_COMP_OFFSET_Y = 5,
             DIALOG_CONTENT_OFFSET_X = 150, LONG_NAME_TEXTBOX_W = 400,
             DIALOG_CONTENT_SMALL_W_ALLOWANCE = 120,
@@ -52,6 +52,7 @@ public final class Layout {
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET,
             COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
+            TOP_PANEL_SCROLL_WINDOW_H = STD_TEXT_BUTTON_H + SLIDER_BALL_DIM,
             FULL_COLOR_SLIDER_W = RIGHT_PANEL_W - (SLIDER_BALL_DIM + 10),
             HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
             COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
@@ -72,11 +73,17 @@ public final class Layout {
         flipbookPanelShowing = true;
         colorsPanelShowing = true;
         toolbarShowing = true;
+
+        projectsRequiresScrolling = false;
     }
 
     // panel display
     public static boolean isProjectsExpanded() {
         return projectsExpanded;
+    }
+
+    public static boolean doesProjectsRequireScrolling() {
+        return projectsRequiresScrolling;
     }
 
     public static boolean isFlipbookPanelShowing() {
@@ -94,6 +101,10 @@ public final class Layout {
     public static boolean areAllPanelsShowing() {
         return isProjectsExpanded() && isToolbarShowing() &&
                 isColorsPanelShowing() && isFlipbookPanelShowing();
+    }
+
+    public static void setProjectsRequiresScrolling(final boolean projectsRequiresScrolling) {
+        Layout.projectsRequiresScrolling = projectsRequiresScrolling;
     }
 
     public static void setProjectsExpanded(final boolean projectsExpanded) {
@@ -258,7 +269,9 @@ public final class Layout {
     }
 
     public static int getTopPanelHeight() {
-        return isProjectsExpanded() ? CONTEXTS_H : COLLAPSED_CONTEXTS_H;
+        return isProjectsExpanded() ? PROJECTS_H -
+                (doesProjectsRequireScrolling() ? 0 : NON_SCROLLING_SUB)
+                : COLLAPSED_PROJECTS_H;
     }
 
     public static int getFlipbookHeight() {

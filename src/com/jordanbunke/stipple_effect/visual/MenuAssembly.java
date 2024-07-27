@@ -177,7 +177,6 @@ public class MenuAssembly {
             offsetX += projectButton.getWidth() + Layout.BUTTON_OFFSET;
 
             // close project button
-
             final Coord2D cpPos = pos.displace(offsetX,
                     (Layout.STD_TEXT_BUTTON_H - Layout.BUTTON_DIM) / 2);
 
@@ -200,9 +199,14 @@ public class MenuAssembly {
                 initialOffsetX = pos.x - firstPos.x;
         }
 
+        final int scrollBoxW = Layout.getProjectScrollWindowWidth();
+        final boolean requiresScrolling = realRightX > firstPos.x + scrollBoxW;
+        final int scrollBoxH = Layout.TOP_PANEL_SCROLL_WINDOW_H -
+                (requiresScrolling ? 0 : Layout.SLIDER_BALL_DIM);
+        Layout.setProjectsRequiresScrolling(requiresScrolling);
+
         mb.add(new HorizontalScrollBox(firstPos,
-                new Bounds2D(Layout.getProjectScrollWindowWidth(),
-                        Layout.TOP_PANEL_SCROLL_WINDOW_H),
+                new Bounds2D(scrollBoxW, scrollBoxH),
                 Arrays.stream(toScroll.build().getMenuElements())
                         .map(Scrollable::new)
                         .toArray(Scrollable[]::new),
