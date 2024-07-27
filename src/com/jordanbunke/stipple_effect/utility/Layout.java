@@ -13,12 +13,14 @@ public final class Layout {
     private static boolean flipbookPanelShowing, colorsPanelShowing,
             toolbarShowing, projectsExpanded, projectsRequiresScrolling;
 
+    private static int flipbookHeight;
+
     // layout constants
     private static final double
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             PROJECTS_H = 84, NON_SCROLLING_SUB = 20,
-            COLLAPSED_PROJECTS_H = 27, FLIPBOOK_H = 249;
+            COLLAPSED_PROJECTS_H = 27, MIN_FLIPBOOK_H = 249, MAX_FLIPBOOK_H = 411;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
@@ -75,15 +77,13 @@ public final class Layout {
         toolbarShowing = true;
 
         projectsRequiresScrolling = false;
+
+        flipbookHeight = MIN_FLIPBOOK_H;
     }
 
     // panel display
     public static boolean isProjectsExpanded() {
         return projectsExpanded;
-    }
-
-    public static boolean doesProjectsRequireScrolling() {
-        return projectsRequiresScrolling;
     }
 
     public static boolean isFlipbookPanelShowing() {
@@ -275,7 +275,7 @@ public final class Layout {
     }
 
     public static int getFlipbookHeight() {
-        return isFlipbookPanelShowing() ? FLIPBOOK_H : 0;
+        return isFlipbookPanelShowing() ? flipbookHeight : 0;
     }
 
     public static int getToolOptionsBarHeight() {
@@ -363,5 +363,21 @@ public final class Layout {
                 CONTENT_BUFFER_PX + BUTTON_BORDER_PX,
                 TEXT_Y_OFFSET + BUTTON_BORDER_PX +
                         (int)(1.5 * STD_TEXT_BUTTON_INC));
+    }
+
+    public static boolean doesProjectsRequireScrolling() {
+        return projectsRequiresScrolling;
+    }
+
+    public static int getFlipbookUpLeeway() {
+        return MAX_FLIPBOOK_H - flipbookHeight;
+    }
+
+    public static int getFlipbookDownLeeway() {
+        return flipbookHeight - MIN_FLIPBOOK_H;
+    }
+
+    public static void changeFlipbookHeight(final int deltaHeight) {
+        flipbookHeight += deltaHeight;
     }
 }

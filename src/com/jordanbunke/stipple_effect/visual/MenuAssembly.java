@@ -34,6 +34,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
@@ -220,16 +221,16 @@ public class MenuAssembly {
         final SEContext c = StippleEffect.get().getContext();
         final Coord2D panelPos = Layout.getFlipbookPosition();
 
-        addHidePanelToMenuBuilder(mb,
-                panelPos.displace(Layout.getFlipbookWidth(), 0),
-                () -> Layout.setFlipbookPanelShowing(false));
-
         final int panelHeight = Layout.getFlipbookHeight(),
                 panelWidth = Layout.getFlipbookWidth(),
                 lbLeftBuffer = (2 * Layout.BUTTON_INC) - Layout.CONTENT_BUFFER_PX,
                 lbTopBuffer = 3 * Layout.STD_TEXT_BUTTON_INC,
                 fbOffsetFromLB = lbLeftBuffer + Layout.VERT_SCROLL_WINDOW_W +
                         Layout.CONTENT_BUFFER_PX;
+
+        addHidePanelToMenuBuilder(mb,
+                panelPos.displace(panelWidth, 0),
+                () -> Layout.setFlipbookPanelShowing(false));
 
         final Coord2D firstFBPos = panelPos.displace(fbOffsetFromLB,
                 Layout.PANEL_TITLE_CONTENT_OFFSET_Y),
@@ -456,6 +457,14 @@ public class MenuAssembly {
             for (int f = 0; f < frameCount; f++)
                 mb.add(new CelButton(c, l, f,
                         layerButtons[l], frameButtons[f], lbBox, fbBox));
+
+        // panel adjuster
+        mb.add(new VerticalPanelAdjuster(panelPos, panelWidth,
+                Layout.getFlipbookUpLeeway(),
+                Layout.getFlipbookDownLeeway(), dh -> {
+            Layout.changeFlipbookHeight(dh);
+            StippleEffect.get().rebuildAllMenus();
+        }));
 
         return mb.build();
     }

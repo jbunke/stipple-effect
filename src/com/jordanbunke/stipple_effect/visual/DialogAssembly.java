@@ -1420,7 +1420,7 @@ public class DialogAssembly {
 
         mb.addAll(resetHue, resetSat, resetValue, toggleSat, toggleValue);
 
-        setDialog(assembleDialog("Shift color levels...",
+        setDialog(assembleDialog("Adjust HSV color levels...",
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 () -> true, "Preview",
                 () -> DialogAssembly.setDialogToPreviewAction(
@@ -3006,7 +3006,7 @@ public class DialogAssembly {
                 new String[] {
                         "Swap primary and secondary color",
                         "Toggle between palettes and RGBA-HSV color selection",
-                        "Shift color levels",
+                        "Adjust HSV color levels",
                         "Run a color script",
                         "Create a new palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +

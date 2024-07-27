@@ -368,6 +368,7 @@ public class StippleEffect implements ProgramContext {
     public void process(final InputEventLogger eventLogger) {
         mousePos = eventLogger.getAdjustedMousePosition();
         DeltaTimeGlobal.setStatus(DeltaTimeGlobal.SC_CURSOR_CAPTURED, null);
+        SECursor.resetCursorCode();
 
         if (dialog == null) {
             if (!Permissions.isTyping())
@@ -801,10 +802,12 @@ public class StippleEffect implements ProgramContext {
         }
 
         // cursor
+        final String cursorCode = SECursor.systemCursorCode();
         final GameImage cursor = SECursor.fetchCursor(
-                getContext().isInWorkspaceBounds() &&
-                        dialog == null && Permissions.isCursorFree()
-                        ? tool.getCursorCode() : SECursor.MAIN_CURSOR);
+                getContext().isInWorkspaceBounds() && dialog == null &&
+                        Permissions.isCursorFree() &&
+                        cursorCode.equals(SECursor.MAIN_CURSOR)
+                        ? tool.getCursorCode() : cursorCode);
         canvas.draw(cursor, mousePos.x - (Layout.CURSOR_DIM / 2),
                 mousePos.y - (Layout.CURSOR_DIM / 2));
     }
