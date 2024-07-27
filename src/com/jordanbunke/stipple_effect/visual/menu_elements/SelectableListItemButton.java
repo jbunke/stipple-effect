@@ -17,7 +17,7 @@ public class SelectableListItemButton extends MenuButton {
 
     private final Supplier<Integer> selectedIndexGetter;
 
-    private final int index;
+    protected final int index;
 
     private boolean selected = false;
 

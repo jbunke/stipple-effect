@@ -95,7 +95,8 @@ public class IconCodes {
             PANEL_MANAGER = "panel_manager",
             INFO = "info";
 
-    public static final String NO_ICON_PREFIX = "__", OUTLINE_PREFIX = "outline_";
+    public static final String NO_ICON_PREFIX = "__",
+            OUTLINE_PREFIX = "outline_", NUMKEY_PREFIX = "numkey_";
 
     public static final String
             ABOUT = NO_ICON_PREFIX + "about",
@@ -121,4 +122,8 @@ public class IconCodes {
             IND_BOUNDS = INDICATOR_PREFIX + "bounds";
 
     public static final String NO_TOOLTIP = "no_tooltip";
+
+    public static boolean hasIcon(final String code) {
+        return !code.startsWith(NO_ICON_PREFIX);
+    }
 }

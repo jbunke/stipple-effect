@@ -1,1 +1,1 @@
-Resize | {Ctrl + R}
+Resize canvas... | {Ctrl + R}

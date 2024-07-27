@@ -10,14 +10,17 @@ import java.awt.*;
 
 public final class Layout {
     // panel variables
-    private static boolean framesPanelShowing, layersPanelShowing,
-            colorsPanelShowing, toolbarShowing, projectsExpanded;
+    private static boolean flipbookPanelShowing, colorsPanelShowing,
+            toolbarShowing, projectsExpanded, projectsRequiresScrolling;
+
+    private static int flipbookHeight;
 
     // layout constants
     private static final double
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
-            CONTEXTS_H = 84, COLLAPSED_CONTEXTS_H = 27;
+            PROJECTS_H = 84, NON_SCROLLING_SUB = 20,
+            COLLAPSED_PROJECTS_H = 27, MIN_FLIPBOOK_H = 249, MAX_FLIPBOOK_H = 411;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
@@ -36,14 +39,13 @@ public final class Layout {
             PIXEL_GRID_ZOOM_DIM_MAX = 19200,
             CURSOR_DIM = 40, BUTTON_DIM = 20, BUTTON_OFFSET = 2, ICON_BUTTON_OFFSET_Y = 3,
             BUTTON_INC = BUTTON_DIM + BUTTON_OFFSET, BUTTON_BORDER_PX = 2,
-            SEGMENT_TITLE_BUTTON_OFFSET_X = 84, SEGMENT_TITLE_CONTENT_OFFSET_Y = 30,
+            PANEL_TITLE_CONTENT_OFFSET_Y = 30,
             LAYER_BUTTON_W = 158, LAYERS_ABOVE_TO_DISPLAY = 2, LAYER_NAME_LENGTH_CUTOFF = 12,
             FRAME_BUTTON_W = 40, FRAMES_BEFORE_TO_DISPLAY = 5,
             PX_PER_SCROLL = FRAME_BUTTON_W + BUTTON_OFFSET,
             PROJECT_NAME_BUTTON_PADDING_W = 20, SPACE_BETWEEN_PROJECT_BUTTONS_X = 8,
             PROJECTS_BEFORE_TO_DISPLAY = 1, DIALOG_CONTENT_INC_Y = 32,
             VERT_SCROLL_WINDOW_W = RIGHT_PANEL_W - (2 * CONTENT_BUFFER_PX),
-            TOP_PANEL_SCROLL_WINDOW_H = (int)(CONTEXTS_H * 0.56),
             DIALOG_CONTENT_COMP_OFFSET_Y = 5,
             DIALOG_CONTENT_OFFSET_X = 150, LONG_NAME_TEXTBOX_W = 400,
             DIALOG_CONTENT_SMALL_W_ALLOWANCE = 120,
@@ -52,6 +54,7 @@ public final class Layout {
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET,
             COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
+            TOP_PANEL_SCROLL_WINDOW_H = STD_TEXT_BUTTON_H + SLIDER_BALL_DIM,
             FULL_COLOR_SLIDER_W = RIGHT_PANEL_W - (SLIDER_BALL_DIM + 10),
             HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
             COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
@@ -69,10 +72,13 @@ public final class Layout {
                 Toolkit.getDefaultToolkit().getScreenSize().height);
 
         projectsExpanded = true;
-        framesPanelShowing = true;
-        layersPanelShowing = true;
+        flipbookPanelShowing = true;
         colorsPanelShowing = true;
         toolbarShowing = true;
+
+        projectsRequiresScrolling = false;
+
+        flipbookHeight = MIN_FLIPBOOK_H;
     }
 
     // panel display
@@ -80,12 +86,8 @@ public final class Layout {
         return projectsExpanded;
     }
 
-    public static boolean isFramesPanelShowing() {
-        return framesPanelShowing;
-    }
-
-    public static boolean isLayersPanelShowing() {
-        return layersPanelShowing;
+    public static boolean isFlipbookPanelShowing() {
+        return flipbookPanelShowing;
     }
 
     public static boolean isColorsPanelShowing() {
@@ -97,25 +99,20 @@ public final class Layout {
     }
 
     public static boolean areAllPanelsShowing() {
-        return isProjectsExpanded() && isFramesPanelShowing() &&
-                isToolbarShowing() && isLayersPanelShowing() &&
-                isColorsPanelShowing();
+        return isProjectsExpanded() && isToolbarShowing() &&
+                isColorsPanelShowing() && isFlipbookPanelShowing();
+    }
+
+    public static void setProjectsRequiresScrolling(final boolean projectsRequiresScrolling) {
+        Layout.projectsRequiresScrolling = projectsRequiresScrolling;
     }
 
     public static void setProjectsExpanded(final boolean projectsExpanded) {
-        if (!(projectsExpanded || isFramesPanelShowing()) || projectsExpanded)
-            Layout.projectsExpanded = projectsExpanded;
+        Layout.projectsExpanded = projectsExpanded;
     }
 
-    public static void setFramesPanelShowing(final boolean framesPanelShowing) {
-        if (framesPanelShowing)
-            setProjectsExpanded(true);
-
-        Layout.framesPanelShowing = framesPanelShowing;
-    }
-
-    public static void setLayersPanelShowing(final boolean layersPanelShowing) {
-        Layout.layersPanelShowing = layersPanelShowing;
+    public static void setFlipbookPanelShowing(final boolean flipbookPanelShowing) {
+        Layout.flipbookPanelShowing = flipbookPanelShowing;
     }
 
     public static void setColorsPanelShowing(final boolean colorsPanelShowing) {
@@ -143,10 +140,9 @@ public final class Layout {
 
     public static void setAllPanels(final boolean showing) {
         adjustPanels(() -> {
-            setLayersPanelShowing(showing);
             setColorsPanelShowing(showing);
             setToolbarShowing(showing);
-            setFramesPanelShowing(showing);
+            setFlipbookPanelShowing(showing);
             setProjectsExpanded(showing);
         });
     }
@@ -249,17 +245,15 @@ public final class Layout {
 
     // segments layout
     public static int getProjectsWidth() {
-        final int w = width();
-        return isFramesPanelShowing() ? w / 2 : w;
-    }
-
-    public static int getFramesWidth() {
-        return width() - getProjectsWidth();
+        return width();
     }
 
     public static int getWorkspaceWidth() {
-        return width() - (getToolsWidth() + Math.max(getLayersWidth(),
-                getColorsWidth()));
+        return width() - (getToolsWidth() + getColorsWidth());
+    }
+
+    public static int getFlipbookWidth() {
+        return isFlipbookPanelShowing() ? getWorkspaceWidth() : 0;
     }
 
     public static int getToolOptionsBarWidth() {
@@ -270,16 +264,18 @@ public final class Layout {
         return isToolbarShowing() ? TOOLS_W : 0;
     }
 
-    public static int getLayersWidth() {
-        return isLayersPanelShowing() ? RIGHT_PANEL_W : 0;
-    }
-
     public static int getColorsWidth() {
         return isColorsPanelShowing() ? RIGHT_PANEL_W : 0;
     }
 
     public static int getTopPanelHeight() {
-        return isProjectsExpanded() ? CONTEXTS_H : COLLAPSED_CONTEXTS_H;
+        return isProjectsExpanded() ? PROJECTS_H -
+                (doesProjectsRequireScrolling() ? 0 : NON_SCROLLING_SUB)
+                : COLLAPSED_PROJECTS_H;
+    }
+
+    public static int getFlipbookHeight() {
+        return isFlipbookPanelShowing() ? flipbookHeight : 0;
     }
 
     public static int getToolOptionsBarHeight() {
@@ -293,33 +289,18 @@ public final class Layout {
     }
 
     public static int getWorkspaceHeight() {
-        return getToolsHeight();
-    }
-
-    public static int getLayersHeight() {
-        if (!isLayersPanelShowing())
-            return 0;
-
-        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
-
-        return isColorsPanelShowing() ? middleH / 2 : middleH;
+        return getToolsHeight() - getFlipbookHeight();
     }
 
     public static int getColorsHeight() {
         if (!isColorsPanelShowing())
             return 0;
 
-        final int middleH = getToolsHeight() + getToolOptionsBarHeight();
-
-        return middleH - getLayersHeight();
+        return getToolsHeight() + getToolOptionsBarHeight();
     }
 
     public static Coord2D getProjectsPosition() {
         return new Coord2D();
-    }
-
-    public static Coord2D getFramesPosition() {
-        return getProjectsPosition().displace(getProjectsWidth(), 0);
     }
 
     public static Coord2D getToolsPosition() {
@@ -334,20 +315,20 @@ public final class Layout {
         return getToolsPosition().displace(getToolsWidth(), 0);
     }
 
-    public static Coord2D getLayersPosition() {
-        return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
+    public static Coord2D getFlipbookPosition() {
+        return getWorkspacePosition().displace(0, getWorkspaceHeight());
     }
 
     public static Coord2D getColorsPosition() {
-        return getLayersPosition().displace(0, getLayersHeight());
+        return getToolOptionsBarPosition().displace(getToolOptionsBarWidth(), 0);
     }
 
     public static Coord2D getBottomBarPosition() {
         return getToolsPosition().displace(0, getToolsHeight());
     }
 
-    public static Coord2D getSegmentContentDisplacement() {
-        return new Coord2D(CONTENT_BUFFER_PX, SEGMENT_TITLE_CONTENT_OFFSET_Y);
+    public static Coord2D getPanelContentDisplacement() {
+        return new Coord2D(CONTENT_BUFFER_PX, PANEL_TITLE_CONTENT_OFFSET_Y);
     }
 
     public static Coord2D getCanvasMiddle() {
@@ -357,14 +338,6 @@ public final class Layout {
     // misc. layout
     public static int getColorSelectorIncY() {
         return (int)(getColorsHeight() / 6.5);
-    }
-
-    public static int getVertScrollWindowHeight() {
-        return getLayersHeight() - (CONTENT_BUFFER_PX + SEGMENT_TITLE_CONTENT_OFFSET_Y);
-    }
-
-    public static int getFrameScrollWindowWidth() {
-        return getFramesWidth() - (2 * CONTENT_BUFFER_PX);
     }
 
     public static int getProjectScrollWindowWidth() {
@@ -390,5 +363,21 @@ public final class Layout {
                 CONTENT_BUFFER_PX + BUTTON_BORDER_PX,
                 TEXT_Y_OFFSET + BUTTON_BORDER_PX +
                         (int)(1.5 * STD_TEXT_BUTTON_INC));
+    }
+
+    public static boolean doesProjectsRequireScrolling() {
+        return projectsRequiresScrolling;
+    }
+
+    public static int getFlipbookUpLeeway() {
+        return MAX_FLIPBOOK_H - flipbookHeight;
+    }
+
+    public static int getFlipbookDownLeeway() {
+        return flipbookHeight - MIN_FLIPBOOK_H;
+    }
+
+    public static void changeFlipbookHeight(final int deltaHeight) {
+        flipbookHeight += deltaHeight;
     }
 }

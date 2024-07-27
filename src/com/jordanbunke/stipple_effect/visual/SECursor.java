@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.visual;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
@@ -10,9 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class SECursor {
+    private static final String DT_CURSOR_CODE = "dt-se:cursor_code";
+
     public static final String MAIN_CURSOR = "main",
             RETICLE = "reticle", NO_SCRIPT = "no_script",
-            HAND_OPEN = "hand_open", HAND_GRAB = "hand_grab";
+            HAND_OPEN = "hand_open", HAND_GRAB = "hand_grab",
+            SLIDE_VERT = "slide_vert", SLIDE_HORZ = "slide_horz";
     private static final String
             BRUSH = "brush", ERASER = "eraser",
             COLOR_PICKER = "color_picker", LINE_TOOL = "line_tool",
@@ -56,10 +60,6 @@ public class SECursor {
             POLYGON_SELECT_ADDITIVE = "polygon_select_additive",
             POLYGON_SELECT_SUBTRACTIVE = "polygon_select_subtractive",
             POLYGON_SELECT_SINGLE = "polygon_select_single",
-//            PENCIL_SELECT_GLOBAL = "pencil_select_global",
-//            PENCIL_SELECT_ADDITIVE = "pencil_select_additive",
-//            PENCIL_SELECT_SUBTRACTIVE = "pencil_select_subtractive",
-//            PENCIL_SELECT_SINGLE = "pencil_select_single",
             RETICLE_ADDITIVE = "reticle_additive",
             RETICLE_SUBTRACTIVE = "reticle_subtractive",
             RETICLE_SINGLE = "reticle_single",
@@ -67,6 +67,7 @@ public class SECursor {
 
     private static final Set<String> CURSOR_CODES = Set.of(
             MAIN_CURSOR, RETICLE, NO_SCRIPT, HAND_GRAB, HAND_OPEN,
+            SLIDE_VERT, SLIDE_HORZ,
             BRUSH, ERASER, PENCIL, STIPPLE_PENCIL,
             COLOR_PICKER, LINE_TOOL, TEXT_TOOL, TEXT_TOOL_TYPING,
             MOVE_SELECTION, MOVE_SELECTION_VERT,
@@ -89,8 +90,6 @@ public class SECursor {
             BOX_SELECT_SINGLE, BOX_SELECT_SUBTRACTIVE,
             POLYGON_SELECT_ADDITIVE, POLYGON_SELECT_GLOBAL,
             POLYGON_SELECT_SINGLE, POLYGON_SELECT_SUBTRACTIVE,
-//            PENCIL_SELECT_ADDITIVE, PENCIL_SELECT_GLOBAL,
-//            PENCIL_SELECT_SINGLE, PENCIL_SELECT_SUBTRACTIVE,
             RETICLE_ADDITIVE, RETICLE_SUBTRACTIVE, RETICLE_SINGLE,
             ZOOM);
 
@@ -102,6 +101,19 @@ public class SECursor {
 
     public static GameImage fetchCursor(final String cursorCode) {
         return CURSOR_MAP.getOrDefault(cursorCode, CURSOR_MAP.get(MAIN_CURSOR));
+    }
+
+    public static String systemCursorCode() {
+        return (String) DeltaTimeGlobal.getStatusOf(DT_CURSOR_CODE)
+                .orElse(SECursor.MAIN_CURSOR);
+    }
+
+    public static void setCursorCode(final String code) {
+        DeltaTimeGlobal.setStatus(DT_CURSOR_CODE, code);
+    }
+
+    public static void resetCursorCode() {
+        setCursorCode(null);
     }
 
     public static void refresh() {

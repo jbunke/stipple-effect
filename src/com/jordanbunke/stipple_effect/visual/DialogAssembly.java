@@ -1158,35 +1158,24 @@ public class DialogAssembly {
                         Layout::showAllPanels),
                 minimalUIPreset = GraphicsUtils.makeStandardTextButton("Minimal",
                         getDialogContentToRightOfContent(showAllPreset),
-                        Layout::minimalUI),
-                noAnimationPreset = GraphicsUtils.makeStandardTextButton(
-                        "No Anim", getDialogContentToRightOfContent(minimalUIPreset),
-                        () -> Layout.adjustPanels(() -> {
-                            Layout.setToolbarShowing(true);
-                            Layout.setColorsPanelShowing(true);
-                            Layout.setLayersPanelShowing(true);
-                            Layout.setFramesPanelShowing(false);
-                            Layout.setProjectsExpanded(false);
-                        }));
-        mb.addAll(showAllPreset, minimalUIPreset, noAnimationPreset);
+                        Layout::minimalUI);
+        mb.addAll(showAllPreset, minimalUIPreset);
 
         // vars
-        final String TOOLBAR = "Toolbar", LAYERS = "Layers",
-                COLORS = "Colors", FRAMES = "Frames", PROJECTS = "Projects";
-        final String[] labelTexts = new String[] { TOOLBAR,
-                FRAMES, LAYERS, COLORS, PROJECTS };
+        final String TOOLBAR = "Toolbar", FLIPBOOK = "Flipbook",
+                COLORS = "Colors", PROJECTS = "Projects";
+        final String[] labelTexts = new String[]
+                { TOOLBAR, FLIPBOOK, COLORS, PROJECTS };
         final Map<String, Consumer<Boolean>> adjustmentFunctionMap =
                 Map.ofEntries(
                         Map.entry(TOOLBAR, Layout::setToolbarShowing),
-                        Map.entry(FRAMES, Layout::setFramesPanelShowing),
-                        Map.entry(LAYERS, Layout::setLayersPanelShowing),
+                        Map.entry(FLIPBOOK, Layout::setFlipbookPanelShowing),
                         Map.entry(COLORS, Layout::setColorsPanelShowing),
                         Map.entry(PROJECTS, Layout::setProjectsExpanded));
         final Map<String, Supplier<Boolean>> retrievalFunctionMap =
                 Map.ofEntries(
                         Map.entry(TOOLBAR, Layout::isToolbarShowing),
-                        Map.entry(FRAMES, Layout::isFramesPanelShowing),
-                        Map.entry(LAYERS, Layout::isLayersPanelShowing),
+                        Map.entry(FLIPBOOK, Layout::isFlipbookPanelShowing),
                         Map.entry(COLORS, Layout::isColorsPanelShowing),
                         Map.entry(PROJECTS, Layout::isProjectsExpanded));
 
@@ -1208,14 +1197,10 @@ public class DialogAssembly {
                 final TextToggleButton toggle = TextToggleButton.make(
                         getDialogContentOffsetFollowingLabel(label),
                         new String[] { "Expanded", "Collapsed" },
-                        new Runnable[] {
-                                () -> adj.accept(false),
-                                () -> adj.accept(true)
-                        }, () -> ret.get() ? 0 : 1, () -> {});
-
-                mb.add(new GatewayMenuElement(
-                        new MenuElementGrouping(label, toggle),
-                        () -> !Layout.isFramesPanelShowing()));
+                        new Runnable[] { () -> {}, () -> {} },
+                        () -> ret.get() ? 0 : 1,
+                        () -> adj.accept(!ret.get()));
+                mb.addAll(label, toggle);
             } else {
                 final Checkbox panelCheckbox = new Checkbox(
                         getDialogContentOffsetFollowingLabel(label),
@@ -1435,7 +1420,7 @@ public class DialogAssembly {
 
         mb.addAll(resetHue, resetSat, resetValue, toggleSat, toggleValue);
 
-        setDialog(assembleDialog("Shift color levels...",
+        setDialog(assembleDialog("Adjust HSV color levels...",
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 () -> true, "Preview",
                 () -> DialogAssembly.setDialogToPreviewAction(
@@ -2887,7 +2872,7 @@ public class DialogAssembly {
 
         for (int i = 0; i < iconAndBlurbCodes.length; i++) {
             final String code = iconAndBlurbCodes[i];
-            final boolean hasIcon = !code.startsWith(IconCodes.NO_ICON_PREFIX);
+            final boolean hasIcon = IconCodes.hasIcon(code);
 
             if (hasIcon) {
                 final StaticMenuElement icon = new StaticMenuElement(
@@ -3021,7 +3006,7 @@ public class DialogAssembly {
                 new String[] {
                         "Swap primary and secondary color",
                         "Toggle between palettes and RGBA-HSV color selection",
-                        "Shift color levels",
+                        "Adjust HSV color levels",
                         "Run a color script",
                         "Create a new palette",
                         "Import a " + StippleEffect.PROGRAM_NAME + " palette file (." +

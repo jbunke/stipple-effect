@@ -1,1 +1,1 @@
-Add contents to palette... | {Shift + D}
+Extract canvas colors to current palette... | {Shift + D}

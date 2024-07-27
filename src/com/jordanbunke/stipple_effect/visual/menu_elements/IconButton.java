@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 public class IconButton extends SimpleMenuButton {
@@ -42,7 +43,8 @@ public class IconButton extends SimpleMenuButton {
 
     @Override
     public void update(final double deltaTime) {
-        if (isHighlighted() && !code.equals(IconCodes.NO_TOOLTIP))
+        if (isHighlighted() && Permissions.isCursorFree() &&
+                !code.equals(IconCodes.NO_TOOLTIP))
             StippleEffect.get().sendToolTipUpdate(code);
     }
 }

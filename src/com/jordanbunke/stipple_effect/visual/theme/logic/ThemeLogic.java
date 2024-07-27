@@ -8,6 +8,7 @@ import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DropdownExpansion;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
@@ -115,8 +116,7 @@ public abstract class ThemeLogic {
         final Theme t = Settings.getTheme();
         final String code = tb.getLabel();
 
-        final GameImage baseIcon = GraphicsUtils.loadIcon(code),
-                icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
+        final boolean hasIcon = IconCodes.hasIcon(code);
         final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
                 textY = Layout.TEXT_Y_OFFSET;
 
@@ -127,7 +127,11 @@ public abstract class ThemeLogic {
                 shortcutCol = intuitTextColor(backgroundColor, false);
         button.fill(backgroundColor);
 
-        button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+        if (hasIcon) {
+            final GameImage baseIcon = GraphicsUtils.loadIcon(code),
+                    icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
+            button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+        }
 
         final String[] lines = ParserUtils.getToolTip(code);
 
@@ -152,7 +156,8 @@ public abstract class ThemeLogic {
                 default -> GameImage.dummy();
             };
 
-            final int actionTextX = Layout.CONTENT_BUFFER_PX + Layout.BUTTON_INC;
+            final int actionTextX = Layout.CONTENT_BUFFER_PX +
+                    (hasIcon ? Layout.BUTTON_INC : 0);
             button.draw(actionImage, actionTextX, textY);
 
             if (tb.isHighlighted()) {
@@ -283,6 +288,36 @@ public abstract class ThemeLogic {
         }
 
         return button.submit();
+    }
+
+    public GameImage drawCelButton(
+            final boolean selected, final boolean highlighted,
+            final CelButton.Status status, final boolean enabled
+    ) {
+        final Theme t = Settings.getTheme();
+        final int w = Layout.FRAME_BUTTON_W, h = Layout.STD_TEXT_BUTTON_H;
+        final GameImage img = new GameImage(w, h);
+
+        final TextButton representation =
+                TextButton.of("", w).sim(selected, highlighted);
+
+        final Color backgroundColor = t.buttonBody,
+                stencilColor = intuitTextColor(backgroundColor, enabled);
+
+        drawTextButtonBackground(img, representation, backgroundColor);
+
+        final GameImage stencil = GraphicsUtils.loadStencil(status);
+        stencil.setColor(stencilColor);
+
+        for (int x = 0; x < stencil.getWidth(); x++)
+            for (int y = 0; y < stencil.getHeight(); y++)
+                if (stencil.getColorAt(x, y).getAlpha() > 0)
+                    stencil.dot(x, y);
+
+        img.draw(stencil.submit(), 0, 0);
+
+        drawTextButtonForeground(img, representation);
+        return textButtonPostprocessing(img, representation);
     }
 
     public GameImage highlightSliderBall(final GameImage baseSliderBall) {

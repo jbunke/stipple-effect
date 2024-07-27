@@ -409,7 +409,7 @@ public class SEContext {
                     () -> {
                         getState().nextFrame();
 
-                        if (!Layout.isFramesPanelShowing())
+                        if (!Layout.isFlipbookPanelShowing())
                             StatusUpdates.frameNavigation(
                                     getState().getFrameIndex(),
                                     getState().getFrameCount());
@@ -422,7 +422,7 @@ public class SEContext {
                     () -> {
                         getState().setFrameIndex(0);
 
-                        if (!Layout.isFramesPanelShowing())
+                        if (!Layout.isFlipbookPanelShowing())
                             StatusUpdates.frameNavigation(
                                     getState().getFrameIndex(),
                                     getState().getFrameCount());
@@ -432,7 +432,7 @@ public class SEContext {
                     () -> {
                         getState().setFrameIndex(getState().getFrameCount() - 1);
 
-                        if (!Layout.isFramesPanelShowing())
+                        if (!Layout.isFlipbookPanelShowing())
                             StatusUpdates.frameNavigation(
                                     getState().getFrameIndex(),
                                     getState().getFrameCount());
@@ -442,7 +442,7 @@ public class SEContext {
                     () -> {
                         getState().editLayerAbove();
 
-                        if (!Layout.isLayersPanelShowing())
+                        if (!Layout.isFlipbookPanelShowing())
                             StatusUpdates.layerNavigation(
                                     getState().getEditingLayer().getName(),
                                     getState().getLayerEditIndex(),
@@ -453,7 +453,7 @@ public class SEContext {
                     () -> {
                         getState().editLayerBelow();
 
-                        if (!Layout.isLayersPanelShowing())
+                        if (!Layout.isFlipbookPanelShowing())
                             StatusUpdates.layerNavigation(
                                     getState().getEditingLayer().getName(),
                                     getState().getLayerEditIndex(),
@@ -636,7 +636,7 @@ public class SEContext {
                     () -> {
                         getState().previousFrame();
 
-                        if (!Layout.isFramesPanelShowing())
+                        if (!Layout.isFlipbookPanelShowing())
                             StatusUpdates.frameNavigation(
                                     getState().getFrameIndex(),
                                     getState().getFrameCount());
@@ -1755,7 +1755,7 @@ public class SEContext {
                     layers, toIndex, frameCount, frameDurations);
             stateManager.performAction(result, Operation.MOVE_FRAME_FORWARD);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
-        } else if (!Layout.isFramesPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveFrame(frameIndex, true);
         }
     }
@@ -1781,7 +1781,7 @@ public class SEContext {
                     layers, toIndex, frameCount, frameDurations);
             stateManager.performAction(result, Operation.MOVE_FRAME_BACK);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
-        } else if (!Layout.isFramesPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveFrame(frameIndex, false);
         }
     }
@@ -1806,10 +1806,10 @@ public class SEContext {
                     layers, addIndex, frameCount, frameDurations);
             stateManager.performAction(result, Operation.ADD_FRAME);
 
-            if (!Layout.isFramesPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.addedFrame(false, addIndex - 1,
                         addIndex, frameCount);
-        } else if (!Layout.isFramesPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotAddFrame();
         }
     }
@@ -1832,10 +1832,10 @@ public class SEContext {
                     layers, frameIndex + 1, frameCount, frameDurations);
             stateManager.performAction(result, Operation.DUPLICATE_FRAME);
 
-            if (!Layout.isFramesPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.addedFrame(true, frameIndex,
                         frameIndex + 1, frameCount);
-        } else if (!Layout.isFramesPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotAddFrame();
         }
     }
@@ -1858,10 +1858,10 @@ public class SEContext {
                     layers, frameIndex - 1, frameCount, frameDurations);
             stateManager.performAction(result, Operation.REMOVE_FRAME);
 
-            if (!Layout.isFramesPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.removedFrame(frameIndex,
                         Math.max(0, frameIndex - 1), frameCount);
-        } else if (!Layout.isFramesPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotRemoveFrame();
         }
     }
@@ -1925,7 +1925,7 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, Operation.LAYER_LINKING_CHANGE);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.changedLayerLinkedStatus(false,
                         layer.getName(), layerIndex, layers.size());
         }
@@ -1946,7 +1946,7 @@ public class SEContext {
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, Operation.LAYER_LINKING_CHANGE);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.changedLayerLinkedStatus(true,
                         layer.getName(), layerIndex, layers.size());
         }
@@ -1966,7 +1966,7 @@ public class SEContext {
             stateManager.performAction(result,
                     Operation.LAYER_VISIBILITY_CHANGE);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.changedLayerVisibilityStatus(false,
                         layer.getName(), layerIndex, layers.size());
         }
@@ -1986,7 +1986,7 @@ public class SEContext {
             stateManager.performAction(result,
                     Operation.LAYER_VISIBILITY_CHANGE);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.changedLayerVisibilityStatus(true,
                         layer.getName(), layerIndex, layers.size());
         }
@@ -2039,9 +2039,9 @@ public class SEContext {
                     .changeLayers(layers, addIndex);
             stateManager.performAction(result, Operation.ADD_LAYER);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.addedLayer(added.getName(), addIndex, layers.size());
-        } else if (!Layout.isLayersPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotAddLayer();
         }
     }
@@ -2060,10 +2060,10 @@ public class SEContext {
                     .changeLayers(layers, addIndex);
             stateManager.performAction(result, Operation.DUPLICATE_LAYER);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.duplicatedLayer(old.getName(),
                         duplicated.getName(), addIndex, layers.size());
-        } else if (!Layout.isLayersPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotAddLayer();
         }
     }
@@ -2082,10 +2082,10 @@ public class SEContext {
                     layers, setIndex);
             stateManager.performAction(result, Operation.REMOVE_LAYER);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.removedLayer(toRemove.getName(),
                         setIndex, layers.size());
-        } else if (!Layout.isLayersPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotRemoveLayer(
                     getState().getEditingLayer().getName());
         }
@@ -2108,7 +2108,7 @@ public class SEContext {
             stateManager.performAction(result, Operation.MOVE_LAYER_DOWN);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
-        } else if (!Layout.isLayersPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveLayer(
                     getState().getEditingLayer().getName(), false);
         }
@@ -2131,7 +2131,7 @@ public class SEContext {
             stateManager.performAction(result, Operation.MOVE_LAYER_UP);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
-        } else if (!Layout.isLayersPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveLayer(
                     getState().getEditingLayer().getName(), true);
         }
@@ -2158,10 +2158,10 @@ public class SEContext {
             stateManager.performAction(result,
                     Operation.MERGE_WITH_LAYER_BELOW);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.mergedWithLayerBelow(above.getName(),
                         below.getName(), belowIndex, layers.size());
-        } else if (!Layout.isLayersPanelShowing()) {
+        } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMergeWithLayerBelow(
                     getState().getEditingLayer().getName());
         }
@@ -2190,9 +2190,9 @@ public class SEContext {
                     new ArrayList<>(List.of(flattened)), 0);
             stateManager.performAction(result, Operation.FLATTEN);
 
-            if (!Layout.isLayersPanelShowing())
+            if (!Layout.isFlipbookPanelShowing())
                 StatusUpdates.flattened();
-        } else if (!Layout.isLayersPanelShowing())
+        } else if (!Layout.isFlipbookPanelShowing())
             StatusUpdates.cannotFlatten();
     }
 

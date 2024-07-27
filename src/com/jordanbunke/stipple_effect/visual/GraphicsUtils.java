@@ -14,6 +14,7 @@ import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.*;
@@ -30,6 +31,7 @@ import java.util.function.Supplier;
 public class GraphicsUtils {
     public static GameImage HIGHLIGHT_OVERLAY,
             SELECT_OVERLAY, TRANSFORM_NODE, CHECKMARK;
+    private static final Map<CelButton.Status, GameImage> stencilMap;
     private static final Map<String, GameImage> iconMap;
 
     static {
@@ -38,10 +40,17 @@ public class GraphicsUtils {
 
         iconMap = new HashMap<>();
 
+        stencilMap = new HashMap<>();
+        fetchStencils();
+
         final Theme theme = Settings.getTheme();
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
         SELECT_OVERLAY = theme.logic.selectedIconOverlay();
+    }
+
+    public static GameImage loadStencil(final CelButton.Status status) {
+        return stencilMap.get(status);
     }
 
     private static GameImage loadUtil(final String code) {
@@ -64,6 +73,13 @@ public class GraphicsUtils {
 
         SECursor.refresh();
         Arrays.stream(Tool.getAll()).forEach(Tool::refreshIcons);
+    }
+
+    private static void fetchStencils() {
+        for (CelButton.Status status : CelButton.Status.values())
+            stencilMap.put(status, ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve(
+                            status.name().toLowerCase() + "_stencil.png")));
     }
 
     public static TextBuilder uiText(final Color color) {
@@ -225,6 +241,13 @@ public class GraphicsUtils {
                     frontier.fillRectangle(outside, o.x, o.y + zoomInc, zoomInc, 1);
                 }
             }
+    }
+
+    public static GameImage loadNumkeyIcon(final int num) {
+        if (num < 1 || num > 9)
+            return GameImage.dummy();
+
+        return loadIcon(IconCodes.NUMKEY_PREFIX + num);
     }
 
     public static GameImage loadIcon(final String code) {

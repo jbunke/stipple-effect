@@ -1,1 +1,1 @@
-Open preview window | {Shift + Space}
+Show preview | {Shift + Space}

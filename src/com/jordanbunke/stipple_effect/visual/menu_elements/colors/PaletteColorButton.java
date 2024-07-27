@@ -13,6 +13,7 @@ import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -69,7 +70,7 @@ public class PaletteColorButton extends SelectableMenuElement {
 
     @Override
     public void update(double deltaTime) {
-        if (highlighted)
+        if (highlighted && Permissions.isCursorFree())
             StippleEffect.get().sendToolTipUpdate(
                     Constants.COLOR_TOOL_TIP_PREFIX + colorText());
 

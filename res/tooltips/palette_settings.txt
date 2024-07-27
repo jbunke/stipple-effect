@@ -1,1 +1,1 @@
-Palette settings... | {Shift + E}
+Palette settings | {Shift + E}

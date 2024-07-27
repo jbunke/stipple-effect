@@ -27,8 +27,9 @@ public abstract class SEDropdownMenu extends AbstractNestedDropdownMenu {
                 DeltaTimeGlobal.SC_CURSOR_CAPTURED);
         final AbstractVerticalScrollBox container = getContainer();
 
-        if (scope.isEmpty() && container.mouseIsWithinBounds(
-                eventLogger.getAdjustedMousePosition()))
+        if (scope.isEmpty() && isDroppedDown() &&
+                container.mouseIsWithinBounds(
+                        eventLogger.getAdjustedMousePosition()))
             DeltaTimeGlobal.setStatus(DeltaTimeGlobal.SC_CURSOR_CAPTURED,
                     container);
 
