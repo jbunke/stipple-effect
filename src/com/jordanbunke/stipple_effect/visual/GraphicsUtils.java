@@ -8,11 +8,13 @@ import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
@@ -170,7 +172,7 @@ public class GraphicsUtils {
     public static GameImage drawSelectedTextbox(final GameImage bounds) {
         final GameImage selected = new GameImage(bounds);
         final int w = selected.getWidth();
-        selected.draw(loadIcon(IconCodes.BULLET_POINT),
+        selected.draw(loadIcon(ActionCodes.BULLET_POINT),
                 w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
@@ -247,7 +249,7 @@ public class GraphicsUtils {
         if (num < 1 || num > 9)
             return GameImage.dummy();
 
-        return loadIcon(IconCodes.NUMKEY_PREFIX + num);
+        return loadIcon(ActionCodes.NUMKEY_PREFIX + num);
     }
 
     public static GameImage loadIcon(final String code) {
@@ -276,13 +278,24 @@ public class GraphicsUtils {
     }
 
     public static MenuElement generateIconButton(
-            final String iconID, final Coord2D position,
+            final Coord2D position, final SEAction action, final SEContext c
+    ) {
+        final Supplier<Boolean> precondition = action.precondition == null
+                ? () -> true : () -> action.precondition.test(c);
+
+        return generateIconButton(action.code,
+                position, precondition,
+                () -> action.behaviour.accept(c));
+    }
+
+    public static MenuElement generateIconButton(
+            final String code, final Coord2D position,
             final Supplier<Boolean> precondition, final Runnable behaviour
     ) {
-        final IconButton icon = IconButton.make(iconID, position, behaviour);
+        final IconButton icon = IconButton.make(code, position, behaviour);
         final StaticMenuElement stub = new StaticMenuElement(position,
                 Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().logic.unclickableIcon(loadIcon(iconID)));
+                Settings.getTheme().logic.unclickableIcon(loadIcon(code)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
     }

@@ -50,6 +50,11 @@ public class StatusUpdates {
                 "the pixel grid cannot be rendered for this project's current dimensions and/or zoom level");
     }
 
+    public static void cannotCropToSelection() {
+        actionNotPermitted("crop the canvas to the selection",
+                "nothing is selected");
+    }
+
     public static void cannotFlatten() {
         actionNotPermitted("flatten the project",
                 "it only has a single layer");
@@ -351,13 +356,13 @@ public class StatusUpdates {
     public static void clipboardSendFailed(
             final boolean triedCopy
     ) {
-        send("Cannot " + (triedCopy ? "copy" : "cut") +
-                "; there is nothing selected");
+        actionNotPermitted(triedCopy ? "copy" : "cut",
+                "there is nothing selected");
     }
 
     public static void pasteFailed() {
-        send("Cannot paste; the " + StippleEffect.PROGRAM_NAME +
-                " clipboard is empty");
+        actionNotPermitted("paste",
+                "the " + StippleEffect.PROGRAM_NAME + " clipboard is empty");
     }
 
     public static void saving() {

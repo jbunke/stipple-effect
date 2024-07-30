@@ -7,9 +7,8 @@ import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.LogicItem;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.NestedItem;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
@@ -19,7 +18,6 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.project.ZoomLevel;
@@ -27,8 +25,9 @@ import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
@@ -36,6 +35,8 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
+import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.GatewayActionItem;
+import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.ThinkingActionItem;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
@@ -47,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public class MenuAssembly {
 
@@ -61,85 +64,83 @@ public class MenuAssembly {
 
         mb.add(new Navbar(
                 new NestedItem(StippleEffect.PROGRAM_NAME,
-                        new SimpleItem(IconCodes.SETTINGS,
-                                DialogAssembly::setDialogToProgramSettings),
-                        new SimpleItem(IconCodes.INFO,
-                                DialogAssembly::setDialogToInfo),
-                        new SimpleItem(IconCodes.AUTOMATION_SCRIPT,
-                                StippleEffect.get()::openAutomationScript),
-                        new SimpleItem(IconCodes.EXIT_PROGRAM,
-                                DialogAssembly::setDialogToExitProgramAYS)),
+                        SETTINGS.toItem(c),
+                        INFO.toItem(c),
+                        AUTOMATION_SCRIPT.toItem(c),
+                        EXIT_PROGRAM.toItem(c)),
                 new NestedItem("File",
-                        new SimpleItem(IconCodes.NEW_PROJECT,
-                                DialogAssembly::setDialogToNewProject),
-                        new SimpleItem(IconCodes.OPEN_FILE,
-                                StippleEffect.get()::openProject),
-                        new SimpleItem(IconCodes.SAVE, c.projectInfo::save),
-                        new SimpleItem(IconCodes.SAVE_AS,
-                                DialogAssembly::setDialogToSave)),
+                        NEW_PROJECT.toItem(c),
+                        OPEN_FILE.toItem(c),
+                        SAVE.toItem(c),
+                        SAVE_AS.toItem(c)),
                 new NestedItem("Edit",
                         new NestedItem("State control",
-                                new LogicItem(IconCodes.UNDO,
-                                        c.getStateManager()::canUndo,
-                                        c.getStateManager()::undoToCheckpoint),
-                                new LogicItem(IconCodes.GRANULAR_UNDO,
-                                        c.getStateManager()::canUndo,
-                                        () -> c.getStateManager().undo(true)),
-                                new LogicItem(IconCodes.REDO,
-                                        c.getStateManager()::canRedo,
-                                        c.getStateManager()::redoToCheckpoint),
-                                new LogicItem(IconCodes.GRANULAR_REDO,
-                                        c.getStateManager()::canRedo,
-                                        () -> c.getStateManager().redo(true)),
-                                new SimpleItem(IconCodes.HISTORY,
-                                        DialogAssembly::setDialogToHistory)),
+                                UNDO.toItem(c),
+                                GRANULAR_UNDO.toItem(c),
+                                REDO.toItem(c),
+                                GRANULAR_REDO.toItem(c),
+                                HISTORY.toItem(c)),
                         new NestedItem("Sizing",
-                                new SimpleItem(IconCodes.RESIZE,
-                                        DialogAssembly::setDialogToResize),
-                                new SimpleItem(IconCodes.PAD,
-                                        DialogAssembly::setDialogToPad),
-                                new SimpleItem(IconCodes.STITCH_SPLIT_FRAMES,
-                                        DialogAssembly::setDialogToStitchFramesTogether))),
+                                RESIZE.toItem(c),
+                                PAD.toItem(c),
+                                STITCH_SPLIT.toItem(c),
+                                CROP_TO_SELECTION.toItem(c)),
+                        new NestedItem("Clipboard",
+                                Arrays.stream(clipboardActions())
+                                        .map(a -> a.toItem(c))
+                                        .toArray(DropdownItem[]::new))),
+                new NestedItem("Layers", Arrays.stream(layerActions())
+                        .map(a -> a.toItem(c))
+                        .toArray(DropdownItem[]::new)),
+                new NestedItem("Frames", Arrays.stream(frameActions())
+                        .map(a -> a.toItem(c))
+                        .toArray(DropdownItem[]::new)),
+                // TODO: new NestedItem("Playback", ),
+//                new NestedItem("Selection",
+//                        new NestedItem("Modify...", here),
+//                        new NestedItem("Selection operations",
+//                                new SimpleItem(IconCodes.FILL_PRIMARY, here),
+//                                new SimpleItem(IconCodes.FILL_SECONDARY, here),
+//                                new SimpleItem(IconCodes.DELETE_SELECTION_CONTENTS, here)),
+//                        new NestedItem("Reflect...",
+//                                new SimpleItem(IconCodes.HORZ_BOUNDS_REFLECTION, here),
+//                                new SimpleItem(IconCodes.VERT_BOUNDS_REFLECTION, here),
+//                                new SimpleItem(IconCodes.HORZ_CONTENTS_REFLECTION, here),
+//                                new SimpleItem(IconCodes.VERT_CONTENTS_REFLECTION, here)),
+//                        new SimpleItem(IconCodes.OUTLINE, DialogAssembly::setDialogToOutline)),
                 new NestedItem("View",
-                        new SimpleItem(IconCodes.PREVIEW,
-                                () -> PreviewWindow.set(c)),
-                        new SimpleItem(IconCodes.PANEL_MANAGER,
-                                        DialogAssembly::setDialogToPanelManager)),
-                new NestedItem("Actions",
-                        new SimpleItem(IconCodes.HSV_SHIFT,
-                                DialogAssembly::setDialogToHSVShift),
-                        new SimpleItem(IconCodes.COLOR_SCRIPT,
-                                DialogAssembly::setDialogToColorScript),
-                        new LogicItem(IconCodes.CONTENTS_TO_PALETTE,
-                                () -> s.hasPaletteContents() &&
-                                        s.getSelectedPalette().isMutable(),
-                                () -> DialogAssembly.setDialogToAddContentsToPalette(
-                                        s.getSelectedPalette())),
-                        new LogicItem(IconCodes.PALETTIZE,
-                                s::hasPaletteContents,
-                                () -> DialogAssembly.setDialogToPalettize(
-                                        s.getSelectedPalette()))),
+                        PREVIEW.toItem(c),
+                        new ThinkingActionItem(c,
+                                anon -> anon.renderInfo.isPixelGridOn()
+                                        ? HIDE_PIXEL_GRID : SHOW_PIXEL_GRID,
+                                SHOW_PIXEL_GRID, HIDE_PIXEL_GRID),
+                        new NestedItem("Layout",
+                                PANEL_MANAGER.toItem(c),
+                                new ThinkingActionItem(c,
+                                        na -> Layout.areAllPanelsShowing()
+                                                ? MINIMAL_UI : ALL_UI,
+                                        ALL_UI, MINIMAL_UI))),
+                new NestedItem("Actions", Arrays.stream(actionsMenuActions())
+                        .map(a -> a.toItem(c))
+                        .toArray(DropdownItem[]::new)),
                 new NestedItem("Palette",
-                        new SimpleItem(IconCodes.NEW_PALETTE,
-                                s::newPalette),
-                        new SimpleItem(IconCodes.IMPORT_PALETTE,
-                                s::openPalette),
-                        new LogicItem(IconCodes.DELETE_PALETTE,
-                                s::hasPaletteContents, s::deletePalette),
-                        new LogicItem(IconCodes.SAVE_PALETTE,
+                        NEW_PALETTE.toItem(c),
+                        IMPORT_PALETTE.toItem(c),
+                        DELETE_PALETTE.toItem(c),
+                        new GatewayActionItem(ActionCodes.SAVE_PALETTE,
                                 () -> s.hasPaletteContents() &&
                                         s.getSelectedPalette().isMutable(),
                                 () -> DialogAssembly.setDialogToSavePalette(
-                                        s.getSelectedPalette())),
-                        new LogicItem(IconCodes.SORT_PALETTE,
+                                        s.getSelectedPalette()), true),
+                        new GatewayActionItem(ActionCodes.SORT_PALETTE,
                                 s::hasPaletteContents,
                                 () -> DialogAssembly.setDialogToSortPalette(
-                                        s.getSelectedPalette())),
-                        new LogicItem(IconCodes.PALETTE_SETTINGS,
+                                        s.getSelectedPalette()), true),
+                        new GatewayActionItem(ActionCodes.PALETTE_SETTINGS,
                                 () -> s.hasPaletteContents() &&
                                         s.getSelectedPalette().isMutable(),
                                 () -> DialogAssembly.setDialogToPaletteSettings(
-                                        s.getSelectedPalette())))));
+                                        s.getSelectedPalette()), true))));
 
         // panel expand / collapse
         final Coord2D panelIconPos = Layout.getProjectsPosition().displace(
@@ -147,10 +148,10 @@ public class MenuAssembly {
                 Layout.ICON_BUTTON_OFFSET_Y);
 
         if (!Layout.isProjectsExpanded())
-            mb.add(IconButton.make(IconCodes.EXPAND_PANEL, panelIconPos,
+            mb.add(IconButton.make(ActionCodes.EXPAND_PANEL, panelIconPos,
                     () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(true))));
         else
-            mb.add(IconButton.make(IconCodes.COLLAPSE_PANEL, panelIconPos,
+            mb.add(IconButton.make(ActionCodes.COLLAPSE_PANEL, panelIconPos,
                     () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(false))));
 
         // early break if collapsed
@@ -191,7 +192,7 @@ public class MenuAssembly {
                     StippleEffect.get().removeContext(index);
             };
 
-            toScroll.add(IconButton.make(IconCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
+            toScroll.add(IconButton.make(ActionCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
 
             cumulativeWidth += offsetX;
             realRightX = cpPos.x + Layout.BUTTON_DIM;
@@ -262,61 +263,18 @@ public class MenuAssembly {
                 playback.slider, playback.value);
 
         // layer controls
-        populateButtonsIntoBuilder(mb,
-                new String[] {
-                        IconCodes.NEW_LAYER,
-                        IconCodes.DUPLICATE_LAYER,
-                        IconCodes.REMOVE_LAYER,
-                        IconCodes.MOVE_LAYER_UP,
-                        IconCodes.MOVE_LAYER_DOWN,
-                        IconCodes.MERGE_WITH_LAYER_BELOW,
-                        IconCodes.FLATTEN
-                },
-                getPreconditions(
-                        () -> c.getState().canAddLayer(),
-                        () -> c.getState().canAddLayer(),
-                        () -> c.getState().canRemoveLayer(),
-                        () -> c.getState().canMoveLayerUp(),
-                        () -> c.getState().canMoveLayerDown(),
-                        () -> c.getState().canMoveLayerDown(),
-                        () -> c.getState().canRemoveLayer()),
-                new Runnable[] {
-                        c::addLayer,
-                        c::duplicateLayer,
-                        c::removeLayer,
-                        c::moveLayerUp,
-                        c::moveLayerDown,
-                        c::mergeWithLayerBelow,
-                        c::flatten
-                },
-                panelPos.displace(Layout.CONTENT_BUFFER_PX,
-                        lbTopBuffer + Layout.BUTTON_OFFSET), true);
+        populateButtonsIntoBuilder(mb, new SEAction[] {
+                NEW_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
+                MOVE_LAYER_UP, MOVE_LAYER_DOWN, MERGE_WITH_LAYER_BELOW
+        }, c, panelPos.displace(Layout.CONTENT_BUFFER_PX,
+                lbTopBuffer + Layout.BUTTON_OFFSET), true);
 
         // playback controls
-        populateButtonsIntoBuilder(mb,
-                new String[] {
-                        IconCodes.TO_FIRST_FRAME,
-                        IconCodes.PREVIOUS,
-                        // gap for play/stop button
-                        Constants.ICON_ID_GAP_CODE,
-                        IconCodes.NEXT,
-                        IconCodes.TO_LAST_FRAME
-                },
-                getPreconditions(
-                        () -> true,
-                        () -> true,
-                        () -> false, // placeholder
-                        () -> true,
-                        () -> true),
-                new Runnable[] {
-                        () -> c.getState().setFrameIndex(0),
-                        () -> c.getState().previousFrame(),
-                        () -> {}, // placeholder
-                        () -> c.getState().nextFrame(),
-                        () -> c.getState().setFrameIndex(
-                                c.getState().getFrameCount() - 1)
-                }, panelPos.displace(Layout.CONTENT_BUFFER_PX,
-                        Layout.ICON_BUTTON_OFFSET_Y));
+        populateButtonsIntoBuilder(mb, new SEAction[] {
+                TO_FIRST_FRAME, PREVIOUS_FRAME, DUMMY,
+                NEXT_FRAME, TO_LAST_FRAME
+        }, c, panelPos.displace(Layout.CONTENT_BUFFER_PX,
+                Layout.ICON_BUTTON_OFFSET_Y), false);
 
         final int PLAY_STOP_INDEX = 2,
                 PLAYBACK_MODE_INDEX = 5;
@@ -327,44 +285,20 @@ public class MenuAssembly {
                         panelPos.displace(Layout.CONTENT_BUFFER_PX +
                                         (PLAY_STOP_INDEX * Layout.BUTTON_INC),
                                 Layout.ICON_BUTTON_OFFSET_Y);
-        mb.add(generatePlayStopToggle(playStopTogglePos));
+        mb.add(generatePlayStopToggle(c, playStopTogglePos));
 
         // playback mode toggle button
         final Coord2D playbackModeTogglePos = playStopTogglePos.displace(
                 disp.scale(PLAYBACK_MODE_INDEX - PLAY_STOP_INDEX));
-        mb.add(generatePlaybackModeToggle(playbackModeTogglePos));
+        mb.add(generatePlaybackModeToggle(c, playbackModeTogglePos));
 
         // frame controls
         final Coord2D frameControlPos = panelPos.displace(fbOffsetFromLB, 0);
-        populateButtonsIntoBuilder(mb,
-                new String[] {
-                        IconCodes.NEW_FRAME,
-                        IconCodes.DUPLICATE_FRAME,
-                        IconCodes.REMOVE_FRAME,
-                        IconCodes.MOVE_FRAME_BACK,
-                        IconCodes.MOVE_FRAME_FORWARD,
-                        // gap between frame operations and navigation/playback
-                        Constants.ICON_ID_GAP_CODE,
-                        IconCodes.FRAME_PROPERTIES
-                },
-                getPreconditions(
-                        () -> c.getState().canAddFrame(),
-                        () -> c.getState().canAddFrame(),
-                        () -> c.getState().canRemoveFrame(),
-                        () -> c.getState().canMoveFrameBack(),
-                        () -> c.getState().canMoveFrameForward(),
-                        () -> false, // placeholder
-                        () -> true),
-                new Runnable[] {
-                        c::addFrame,
-                        c::duplicateFrame,
-                        c::removeFrame,
-                        c::moveFrameBack,
-                        c::moveFrameForward,
-                        () -> {}, // placeholder
-                        () -> DialogAssembly.setDialogToFrameProperties(
-                                c.getState().getFrameIndex())
-                }, frameControlPos.displace(0, Layout.ICON_BUTTON_OFFSET_Y));
+        populateButtonsIntoBuilder(mb, new SEAction[] {
+                NEW_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
+                MOVE_FRAME_BACK, MOVE_FRAME_FORWARD, DUMMY,
+                FRAME_PROPERTIES
+        }, c, frameControlPos.displace(0, Layout.ICON_BUTTON_OFFSET_Y), false);
 
         // layer buttons
         final List<SELayer> layers = c.getState().getLayers();
@@ -409,7 +343,7 @@ public class MenuAssembly {
             // layer settings
             final int index = i;
             final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
-            layerElements.add(IconButton.make(IconCodes.LAYER_SETTINGS, lsPos,
+            layerElements.add(IconButton.make(ActionCodes.LAYER_SETTINGS, lsPos,
                     () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
@@ -469,7 +403,9 @@ public class MenuAssembly {
         return mb.build();
     }
 
-    private static SimpleToggleMenuButton generatePlaybackModeToggle(final Coord2D pos) {
+    private static SimpleToggleMenuButton generatePlaybackModeToggle(
+            final SEContext c, final Coord2D pos
+    ) {
         final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
                 PlaybackInfo.Mode.FORWARDS,
                 PlaybackInfo.Mode.BACKWARDS,
@@ -483,24 +419,20 @@ public class MenuAssembly {
         return IconToggleButton.make(pos, codes,
                 Arrays.stream(validModes).map(mode ->
                         (Runnable) () -> {}).toArray(Runnable[]::new),
-                () -> StippleEffect.get().getContext().playbackInfo
-                        .getMode().buttonIndex(),
-                () -> StippleEffect.get().getContext().playbackInfo.toggleMode());
+                () -> c.playbackInfo.getMode().buttonIndex(),
+                c.playbackInfo::toggleMode);
     }
 
-    private static SimpleToggleMenuButton generatePlayStopToggle(final Coord2D pos) {
+    private static SimpleToggleMenuButton generatePlayStopToggle(
+            final SEContext c, final Coord2D pos
+    ) {
         // 0: is playing, button click should STOP; 1: vice-versa
-        final String[] codes = new String[] { IconCodes.STOP, IconCodes.PLAY };
+        final String[] codes = new String[]
+                { ActionCodes.STOP, ActionCodes.PLAY };
 
-        return IconToggleButton.make(pos, codes,
-                new Runnable[] {
-                        () -> StippleEffect.get().getContext()
-                                .playbackInfo.stop(),
-                        () -> StippleEffect.get().getContext()
-                                .playbackInfo.play()
-                },
-                () -> StippleEffect.get().getContext()
-                        .playbackInfo.isPlaying() ? 0 : 1, () -> {});
+        return IconToggleButton.make(pos, codes, new Runnable[] {
+                c.playbackInfo::stop, c.playbackInfo::play
+        }, () -> c.playbackInfo.isPlaying() ? 0 : 1, () -> {});
     }
 
     private static int frameButtonXDisplacement(final SEContext c) {
@@ -536,8 +468,8 @@ public class MenuAssembly {
     ) {
         // 0: is unlinked, button click should LINK; 1: vice-versa
         final String[] codes = new String[] {
-                IconCodes.FRAMES_UNLINKED,
-                IconCodes.FRAMES_LINKED
+                ActionCodes.FRAMES_UNLINKED,
+                ActionCodes.FRAMES_LINKED
         };
 
         return IconToggleButton.make(pos, codes,
@@ -559,6 +491,24 @@ public class MenuAssembly {
     }
 
     private static void populateButtonsIntoBuilder(
+            final MenuBuilder mb, final SEAction[] actions,
+            final SEContext c, final Coord2D firstPos, final boolean vertical
+    ) {
+        final Coord2D displacement = vertical
+                ? new Coord2D(0, Layout.BUTTON_INC)
+                : new Coord2D(Layout.BUTTON_INC, 0);
+        Coord2D pos = firstPos;
+
+        for (SEAction action : actions) {
+            if (!action.code.equals(ActionCodes.NONE))
+                mb.add(GraphicsUtils.generateIconButton(pos, action, c));
+
+            pos = pos.displace(displacement);
+        }
+    }
+
+    // TODO - remove
+    private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
             final Supplier<Boolean>[] preconditions,
             final Runnable[] behaviours, final Coord2D pos
@@ -567,6 +517,7 @@ public class MenuAssembly {
                 preconditions, behaviours, pos, false);
     }
 
+    // TODO - remove
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final String[] iconIDs,
             final Supplier<Boolean>[] preconditions, final Runnable[] behaviours,
@@ -584,7 +535,7 @@ public class MenuAssembly {
         Coord2D pos = firstPos;
 
         for (int i = 0; i < iconIDs.length; i++) {
-            if (!iconIDs[i].equals(Constants.ICON_ID_GAP_CODE))
+            if (!iconIDs[i].equals(ActionCodes.NONE))
                 mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
                         pos, preconditions[i], behaviours[i]));
 
@@ -593,7 +544,9 @@ public class MenuAssembly {
     }
 
     @SafeVarargs
-    private static Supplier<Boolean>[] getPreconditions(final Supplier<Boolean>... preconditions) {
+    private static Supplier<Boolean>[] getPreconditions(
+            final Supplier<Boolean>... preconditions
+    ) {
         return preconditions;
     }
 
@@ -604,10 +557,11 @@ public class MenuAssembly {
                 Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Colors"));
 
+        // TODO: remove
         populateButtonsIntoBuilder(
                 mb, new String[] {
-                        IconCodes.SWAP_COLORS,
-                        IconCodes.COLOR_MENU_MODE
+                        ActionCodes.SWAP_COLORS,
+                        ActionCodes.COLOR_MENU_MODE
                 },
                 getPreconditions(
                         () -> true,
@@ -669,7 +623,7 @@ public class MenuAssembly {
     ) {
         final Coord2D pos = topRight.displace(-Layout.BUTTON_INC,
                 Layout.ICON_BUTTON_OFFSET_Y);
-        mb.add(IconButton.make(IconCodes.HIDE_PANEL, pos,
+        mb.add(IconButton.make(ActionCodes.HIDE_PANEL, pos,
                 () -> Layout.adjustPanels(onClick)));
     }
 
@@ -695,14 +649,14 @@ public class MenuAssembly {
         // palette options
         populateButtonsIntoBuilder(
                 mb, new String[] {
-                        IconCodes.NEW_PALETTE,
-                        IconCodes.IMPORT_PALETTE,
-                        IconCodes.CONTENTS_TO_PALETTE,
-                        IconCodes.DELETE_PALETTE,
-                        IconCodes.SAVE_PALETTE,
-                        IconCodes.SORT_PALETTE,
-                        IconCodes.PALETTIZE,
-                        IconCodes.PALETTE_SETTINGS
+                        ActionCodes.NEW_PALETTE,
+                        ActionCodes.IMPORT_PALETTE,
+                        ActionCodes.CONTENTS_TO_PALETTE,
+                        ActionCodes.DELETE_PALETTE,
+                        ActionCodes.SAVE_PALETTE,
+                        ActionCodes.SORT_PALETTE,
+                        ActionCodes.PALETTIZE,
+                        ActionCodes.PALETTE_SETTINGS
                 },
                 getPreconditions(
                         () -> true,
@@ -721,23 +675,23 @@ public class MenuAssembly {
                         s::newPalette,
                         s::openPalette,
                         () -> DialogAssembly.setDialogToAddContentsToPalette(
-                                s.getSelectedPalette()),
+                                s.getContext(), s.getSelectedPalette()),
                         s::deletePalette,
                         () -> DialogAssembly.setDialogToSavePalette(
                                 s.getSelectedPalette()),
                         () -> DialogAssembly.setDialogToSortPalette(
                                 s.getSelectedPalette()),
                         () -> DialogAssembly.setDialogToPalettize(
-                                s.getSelectedPalette()),
+                                s.getContext(), s.getSelectedPalette()),
                         () -> DialogAssembly.setDialogToPaletteSettings(
                                 s.getSelectedPalette())
                 }, paletteOptionsRef);
         populateButtonsIntoBuilder(
                 mb, new String[] {
-                        IconCodes.ADD_TO_PALETTE,
-                        IconCodes.REMOVE_FROM_PALETTE,
-                        IconCodes.MOVE_LEFT_IN_PALETTE,
-                        IconCodes.MOVE_RIGHT_IN_PALETTE
+                        ActionCodes.ADD_TO_PALETTE,
+                        ActionCodes.REMOVE_FROM_PALETTE,
+                        ActionCodes.MOVE_LEFT_IN_PALETTE,
+                        ActionCodes.MOVE_RIGHT_IN_PALETTE
                 },
                 getPreconditions(
                         () -> hasPaletteContents && s.getSelectedPalette().isMutable(),
@@ -829,13 +783,13 @@ public class MenuAssembly {
                         Layout.getToolsHeight() - Layout.BUTTON_INC);
 
         final MenuElement outlineButton = GraphicsUtils.
-                generateIconButton(IconCodes.OUTLINE, outlinePos,
+                generateIconButton(ActionCodes.OUTLINE, outlinePos,
                         () -> true, DialogAssembly::setDialogToOutline);
         mb.add(outlineButton);
 
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
-                generateIconButton(IconCodes.VERTICAL_REFLECTION,
+                generateIconButton(ActionCodes.VERTICAL_REFLECTION,
                         outlinePos.displace(0, -Layout.BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
@@ -846,7 +800,7 @@ public class MenuAssembly {
                 );
         mb.add(verticalReflectionButton);
         final MenuElement horizontalReflectionButton = GraphicsUtils.
-                generateIconButton(IconCodes.HORIZONTAL_REFLECTION,
+                generateIconButton(ActionCodes.HORIZONTAL_REFLECTION,
                         outlinePos.displace(0, -2 * Layout.BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
@@ -861,15 +815,15 @@ public class MenuAssembly {
                 .generateIconToggleButton(
                         outlinePos.displace(0, -3 * Layout.BUTTON_INC),
                         new String[] {
-                                IconCodes.PIXEL_GRID_OFF,
-                                IconCodes.PIXEL_GRID_ON
+                                ActionCodes.PIXEL_GRID_OFF,
+                                ActionCodes.PIXEL_GRID_ON
                         },
                         new Runnable[] {
                                 () -> c.renderInfo.setPixelGrid(true),
                                 () -> c.renderInfo.setPixelGrid(false)
                         },
                         () -> c.renderInfo.isPixelGridOn() ? 1 : 0, () -> {},
-                        c::couldRenderPixelGrid, IconCodes.PIXEL_GRID_OFF);
+                        c::couldRenderPixelGrid, ActionCodes.PIXEL_GRID_OFF);
         mb.add(pixelGridToggleButton);
 
         final Tool tool = StippleEffect.get().getTool();
@@ -906,7 +860,7 @@ public class MenuAssembly {
         // active tool
         final Indicator toolIndicator = new Indicator(new Coord2D(
                 Layout.BUTTON_OFFSET, bottomBarButtonY),
-                IconCodes.IND_TOOL);
+                ActionCodes.IND_TOOL);
         final DynamicLabel toolLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(toolIndicator, false),
                 bottomBarTextY),
@@ -917,7 +871,7 @@ public class MenuAssembly {
         // target pixel
         final Indicator targetIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarTargetPixelX(), bottomBarButtonY),
-                IconCodes.IND_TARGET);
+                ActionCodes.IND_TARGET);
         final DynamicLabel targetLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(targetIndicator, false),
                 bottomBarTextY),
@@ -927,7 +881,7 @@ public class MenuAssembly {
         // canvas size
         final Indicator boundsIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarCanvasSizeX(), bottomBarButtonY),
-                IconCodes.IND_BOUNDS);
+                ActionCodes.IND_BOUNDS);
         final DynamicLabel boundsLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(boundsIndicator, false),
                 bottomBarTextY),
@@ -937,7 +891,7 @@ public class MenuAssembly {
         // zoom
         final Indicator zoomIndicator = new Indicator(
                 new Coord2D(Layout.getBottomBarZoomPercentageX(),
-                        bottomBarButtonY), IconCodes.IND_ZOOM);
+                        bottomBarButtonY), ActionCodes.IND_ZOOM);
         final IncrementalRangeElements<Float> zoom =
                 IncrementalRangeElements.makeForFloat(zoomIndicator,
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,

@@ -17,11 +17,15 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.*;
-import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
+import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
+import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
-import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -421,14 +425,13 @@ public final class TextTool extends Tool {
                         .toArray(Runnable[]::new), () -> fontIndex);
 
         // upload font button
-        final IconButton newFontButton = IconButton.make(IconCodes.NEW_FONT,
+        final MenuElement newFontButton = GraphicsUtils.generateIconButton(
                 new Coord2D(Layout.optionsBarNextButtonX(fontDropdown),
-                        Layout.optionsBarButtonY()),
-                DialogAssembly::setDialogToNewFont);
+                        Layout.optionsBarButtonY()), SEAction.NEW_FONT, null);
 
         // delete font button
         final MenuElement deleteFontButton = GraphicsUtils
-                .generateIconButton(IconCodes.DELETE_FONT, new Coord2D(
+                .generateIconButton(ActionCodes.DELETE_FONT, new Coord2D(
                         Layout.optionsBarNextButtonX(newFontButton),
                                 Layout.optionsBarButtonY()),
                         () -> fontIndex >= SEFonts.Code.values().length,

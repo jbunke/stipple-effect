@@ -1,11 +1,11 @@
 RGB(A)-HSV slider adjustments:
-Adjust red slider: {Shift + R + Scroll wheel} or {Shift + R + Left/Right Arrow Keys}
-Adjust green slider: {Shift + G + Scroll wheel} or {Shift + G + Left/Right Arrow Keys}
-Adjust blue slider: {Shift + B + Scroll wheel} or {Shift + B + Left/Right Arrow Keys}
-Adjust hue slider: {Shift + H + Scroll wheel} or {Shift + H + Left/Right Arrow Keys}
-Adjust saturation slider: {Shift + S + Scroll wheel} or {Shift + S + Left/Right Arrow Keys}
-Adjust value slider: {Shift + V + Scroll wheel} or {Shift + V + Left/Right Arrow Keys}
-Adjust alpha (opacity) slider: {Shift + A + Scroll wheel} or {Shift + A + Left/Right Arrow Keys}
+Adjust red slider: {Shift + R + Scroll wheel} or {Shift + R + Left/Right Arrow}
+Adjust green slider: {Shift + G + Scroll wheel} or {Shift + G + Left/Right Arrow}
+Adjust blue slider: {Shift + B + Scroll wheel} or {Shift + B + Left/Right Arrow}
+Adjust hue slider: {Shift + H + Scroll wheel} or {Shift + H + Left/Right Arrow}
+Adjust saturation slider: {Shift + S + Scroll wheel} or {Shift + S + Left/Right Arrow}
+Adjust value slider: {Shift + V + Scroll wheel} or {Shift + V + Left/Right Arrow}
+Adjust alpha (opacity) slider: {Shift + A + Scroll wheel} or {Shift + A + Left/Right Arrow}
 
 Advanced palette shortcuts:
 Select next included palette color to the left: {Ctrl + ,}

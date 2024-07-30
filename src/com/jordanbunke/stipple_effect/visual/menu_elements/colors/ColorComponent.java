@@ -8,7 +8,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementContainer;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
@@ -64,9 +64,9 @@ public class ColorComponent extends MenuElementContainer {
                 Layout.DYNAMIC_LABEL_W_ALLOWANCE));
 
         // increment and decrement buttons
-        final GameImage baseDec = GraphicsUtils.loadIcon(IconCodes.DECREMENT),
+        final GameImage baseDec = GraphicsUtils.loadIcon(ActionCodes.DECREMENT),
                 highlightDec = GraphicsUtils.highlightIconButton(baseDec),
-                baseInc = GraphicsUtils.loadIcon(IconCodes.INCREMENT),
+                baseInc = GraphicsUtils.loadIcon(ActionCodes.INCREMENT),
                 highlightInc = GraphicsUtils.highlightIconButton(baseInc);
 
         elements.add(new SimpleMenuButton(startingPos.displace((width / 2) -

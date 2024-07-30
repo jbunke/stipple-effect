@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -31,7 +31,7 @@ public class Indicator extends StaticMenuElement {
     @Override
     public void update(final double deltaTime) {
         if (highlighted && Permissions.isCursorFree() &&
-                !iconCode.equals(IconCodes.NO_TOOLTIP))
+                !iconCode.equals(ActionCodes.NO_TOOLTIP))
             StippleEffect.get().sendToolTipUpdate(iconCode);
     }
 }

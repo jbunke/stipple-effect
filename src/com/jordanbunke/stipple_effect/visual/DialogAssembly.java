@@ -36,6 +36,8 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.TextTool;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
@@ -64,9 +66,7 @@ import java.util.function.Supplier;
 public class DialogAssembly {
     private static final int LINE_ABOVE = -2, AFTER_COMMON_COLOR_ACTION_ROW = 4;
 
-    public static void setDialogToSave() {
-        final SEContext c = StippleEffect.get().getContext();
-
+    public static void setDialogToSave(final SEContext c) {
         // preprocessing logic
         // ensure frame bounds validity
         c.projectInfo.setLowerBound(
@@ -299,9 +299,7 @@ public class DialogAssembly {
                 "Save", c.projectInfo::save, true));
     }
 
-    public static void setDialogToResize() {
-        final SEContext c = StippleEffect.get().getContext();
-
+    public static void setDialogToResize(final SEContext c) {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
@@ -430,9 +428,7 @@ public class DialogAssembly {
                 }, Constants.GENERIC_APPROVAL_TEXT, c::resize, true));
     }
 
-    public static void setDialogToPad() {
-        final SEContext c = StippleEffect.get().getContext();
-
+    public static void setDialogToPad(final SEContext c) {
         final int w = c.getState().getImageWidth(),
                 h = c.getState().getImageHeight();
 
@@ -765,8 +761,7 @@ public class DialogAssembly {
                 "Create", () -> StippleEffect.get().newProject(), true));
     }
 
-    public static void setDialogToHistory() {
-        final SEContext c = StippleEffect.get().getContext();
+    public static void setDialogToHistory(final SEContext c) {
         final MenuBuilder mb = new MenuBuilder();
 
         final Coord2D thirdDisp = new Coord2D(Layout.getDialogWidth() / 3, 0);
@@ -779,7 +774,7 @@ public class DialogAssembly {
         mb.addAll(stateHeader, causeHeader);
 
         AtomicInteger i = new AtomicInteger(-1);
-        final List<Integer> checkpoints = c.getStateManager().getCheckpoints();
+        final List<Integer> checkpoints = c.stateManager.getCheckpoints();
         final int size = checkpoints.size();
 
         final MenuBuilder smb = new MenuBuilder();
@@ -788,9 +783,9 @@ public class DialogAssembly {
         for (int ci = 0; ci < size; ci++) {
             final int checkpoint = checkpoints.get((size - 1) - ci);
 
-            final ProjectState state = c.getStateManager().getState(checkpoint);
+            final ProjectState state = c.stateManager.getState(checkpoint);
 
-            final int relative = c.getStateManager().relativePosition(checkpoint),
+            final int relative = c.stateManager.relativePosition(checkpoint),
                     abs = Math.abs(relative);
 
             final Color col;
@@ -850,7 +845,7 @@ public class DialogAssembly {
         final DynamicLabel selectedLabel =
                 makeDialogLeftDynamicLabelAtBottom(() -> {
                     if (precondition.get()) {
-                        final int relative = c.getStateManager().relativePosition(i.get()),
+                        final int relative = c.stateManager.relativePosition(i.get()),
                                 abs = Math.abs(relative);
 
                         final String before = "Selected state ",
@@ -871,14 +866,14 @@ public class DialogAssembly {
                 });
         mb.add(selectedLabel);
 
-        setDialog(assembleDialog("History of " +
-                        c.projectInfo.getFormattedName(false, false) + "...",
+        setDialog(assembleDialog("History of \"" +
+                        c.projectInfo.getFormattedName(false, false) + "\"",
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 precondition, "Revert...",
                 () -> setDialogToPreviewAction(
-                        c.getStateManager().getState(i.get()),
-                        () -> c.getStateManager().setState(i.get(), c),
-                        DialogAssembly::setDialogToHistory,
+                        c.stateManager.getState(i.get()),
+                        () -> c.stateManager.setState(i.get(), c),
+                        () -> SEAction.HISTORY.behaviour.accept(c),
                         "project state reversion"), false));
     }
 
@@ -1121,7 +1116,7 @@ public class DialogAssembly {
 
         mb.add(new StaticMenuElement(buttonPos, Layout.OUTLINE_BUTTON_DIMS,
                 MenuElement.Anchor.CENTRAL,
-                GraphicsUtils.loadIcon(IconCodes.SELECTION_REPRESENTATION)));
+                GraphicsUtils.loadIcon(ActionCodes.SELECTION_REPRESENTATION)));
 
         Arrays.stream(Outliner.Direction.values()).forEach(direction -> {
             final Coord2D rc = direction.relativeCoordinate();
@@ -1215,9 +1210,8 @@ public class DialogAssembly {
                 Constants.CLOSE_DIALOG_TEXT, () -> {}, true));
     }
 
-    public static void setDialogToHSVShift() {
+    public static void setDialogToHSVShift(final SEContext c) {
         final MenuBuilder mb = new MenuBuilder();
-        final SEContext c = StippleEffect.get().getContext();
 
         makeCommonColorOperationElements(mb, c);
 
@@ -1424,7 +1418,8 @@ public class DialogAssembly {
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 () -> true, "Preview",
                 () -> DialogAssembly.setDialogToPreviewAction(
-                        c.prepHSVShift(), DialogAssembly::setDialogToHSVShift,
+                        c.prepHSVShift(),
+                        () -> DialogAssembly.setDialogToHSVShift(c),
                         "shifted color levels"), false));
     }
 
@@ -1435,9 +1430,8 @@ public class DialogAssembly {
         return (int) ((upperBound - lowerBound) / increment);
     }
 
-    public static void setDialogToColorScript() {
+    public static void setDialogToColorScript(final SEContext c) {
         final MenuBuilder mb = new MenuBuilder();
-        final SEContext c = StippleEffect.get().getContext();
 
         makeCommonColorOperationElements(mb, c);
 
@@ -1457,7 +1451,7 @@ public class DialogAssembly {
                 DialogVals::isColorScriptValid, "Preview",
                 () -> DialogAssembly.setDialogToPreviewAction(
                         c.prepColorScript(DialogVals.getColorScript()),
-                        DialogAssembly::setDialogToColorScript,
+                        () -> DialogAssembly.setDialogToColorScript(c),
                         "executed color script"), false));
     }
 
@@ -1470,8 +1464,7 @@ public class DialogAssembly {
 
         setDialogToPreviewAction(preview, () -> {
                     preview.markAsCheckpoint(false);
-                    c.getStateManager()
-                            .performAction(preview, Operation.EDIT_IMAGE);
+                    c.stateManager.performAction(preview, Operation.EDIT_IMAGE);
                 }, backButtonAction, "preview of " + previewAppend);
     }
 
@@ -1552,28 +1545,28 @@ public class DialogAssembly {
         if (fc > 1) {
             // frame and playback mode controls
             final MenuElement firstFrame =
-                    GraphicsUtils.generateIconButton(IconCodes.TO_FIRST_FRAME,
+                    GraphicsUtils.generateIconButton(ActionCodes.TO_FIRST_FRAME,
                             backButton.getPosition()
                                     .displace(0, Layout.DIALOG_CONTENT_INC_Y),
                             () -> true, previewer::toFirstFrame),
                     previousFrame = GraphicsUtils.generateIconButton(
-                            IconCodes.PREVIOUS, firstFrame.getRenderPosition()
+                            ActionCodes.PREVIOUS, firstFrame.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
                             () -> true, previewer::previousFrame),
                     playStop = GraphicsUtils.generateIconToggleButton(
                             previousFrame.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
-                            new String[] { IconCodes.PLAY, IconCodes.STOP },
+                            new String[] { ActionCodes.PLAY, ActionCodes.STOP },
                             new Runnable[] {
                                     playbackInfo::play, playbackInfo::stop
                             }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
-                            () -> true, IconCodes.PLAY),
+                            () -> true, ActionCodes.PLAY),
                     nextFrame = GraphicsUtils.generateIconButton(
-                            IconCodes.NEXT, playStop.getRenderPosition()
+                            ActionCodes.NEXT, playStop.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
                             () -> true, previewer::nextFrame),
                     lastFrame = GraphicsUtils.generateIconButton(
-                            IconCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
+                            ActionCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
                             () -> true, previewer::toLastFrame);
 
@@ -1592,7 +1585,7 @@ public class DialogAssembly {
                                     .map(mode -> (Runnable) () -> {})
                                     .toArray(Runnable[]::new),
                             () -> playbackInfo.getMode().buttonIndex(),
-                            playbackInfo::toggleMode, () -> true, IconCodes.LOOP);
+                            playbackInfo::toggleMode, () -> true, ActionCodes.LOOP);
             final DynamicLabel frameTracker = makeDynamicLabel(
                     playbackModeButton.getRenderPosition().displace(
                             Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
@@ -1700,9 +1693,10 @@ public class DialogAssembly {
                 }, true));
     }
 
-    public static void setDialogToAddContentsToPalette(final Palette palette) {
+    public static void setDialogToAddContentsToPalette(
+            final SEContext c, final Palette palette
+    ) {
         final MenuBuilder mb = new MenuBuilder();
-        final SEContext c = StippleEffect.get().getContext();
 
         makeCommonColorOperationElements(mb, c);
 
@@ -1715,9 +1709,10 @@ public class DialogAssembly {
                 }, true));
     }
 
-    public static void setDialogToPalettize(final Palette palette) {
+    public static void setDialogToPalettize(
+            final SEContext c, final Palette palette
+    ) {
         final MenuBuilder mb = new MenuBuilder();
-        final SEContext c = StippleEffect.get().getContext();
 
         makeCommonColorOperationElements(mb, c);
 
@@ -2806,14 +2801,14 @@ public class DialogAssembly {
                     contentStart, initialbottomY);
             case MORE -> assembleInfoScreenContents(
                     new String[] {
-                            IconCodes.HORIZONTAL_REFLECTION,
-                            IconCodes.VERTICAL_REFLECTION,
-                            IconCodes.OUTLINE,
-                            IconCodes.PIXEL_GRID_ON,
-                            IconCodes.GENERAL,
-                            IconCodes.CLIPBOARD_SHORTCUTS,
-                            IconCodes.SELECTION_SHORTCUTS,
-                            IconCodes.COLOR_SHORTCUTS
+                            ActionCodes.HORIZONTAL_REFLECTION,
+                            ActionCodes.VERTICAL_REFLECTION,
+                            ActionCodes.OUTLINE,
+                            ActionCodes.PIXEL_GRID_ON,
+                            ActionCodes.GENERAL,
+                            ActionCodes.CLIPBOARD_SHORTCUTS,
+                            ActionCodes.SELECTION_SHORTCUTS,
+                            ActionCodes.COLOR_SHORTCUTS
                     },
                     new String[] {
                             "Horizontal reflection",
@@ -2829,11 +2824,11 @@ public class DialogAssembly {
             case SCRIPTS -> assembleScriptingInfoScreen(contentAssembler,
                     contentStart, initialbottomY);
             case CHANGES -> assembleInfoScreenContents(
-                    new String[] { IconCodes.CHANGELOG },
+                    new String[] { ActionCodes.CHANGELOG },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
             case ROADMAP -> assembleInfoScreenContents(
-                    new String[] { IconCodes.ROADMAP },
+                    new String[] { ActionCodes.ROADMAP },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
         };
@@ -2872,7 +2867,7 @@ public class DialogAssembly {
 
         for (int i = 0; i < iconAndBlurbCodes.length; i++) {
             final String code = iconAndBlurbCodes[i];
-            final boolean hasIcon = IconCodes.hasIcon(code);
+            final boolean hasIcon = ActionCodes.hasIcon(code);
 
             if (hasIcon) {
                 final StaticMenuElement icon = new StaticMenuElement(
@@ -2926,7 +2921,7 @@ public class DialogAssembly {
                 incY = Layout.DIALOG_CONTENT_INC_Y;
 
         int bottomY = initialBottomY + assembleInfoScreenContents(
-                new String[] { IconCodes.ABOUT }, new String[] { "" },
+                new String[] { ActionCodes.ABOUT }, new String[] { "" },
                 contentAssembler, contentStart, initialBottomY);
 
         final TextLabel storePageLabel = TextLabel.make(
@@ -2963,7 +2958,7 @@ public class DialogAssembly {
                 incY = Layout.DIALOG_CONTENT_INC_Y;
 
         int bottomY = initialBottomY + assembleInfoScreenContents(
-                new String[] { IconCodes.SCRIPTING }, new String[] { "" },
+                new String[] { ActionCodes.SCRIPTING }, new String[] { "" },
                 contentAssembler, contentStart, initialBottomY);
 
         final TextLabel scriptLabel = TextLabel.make(
@@ -2986,22 +2981,22 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        IconCodes.SWAP_COLORS,
-                        IconCodes.COLOR_MENU_MODE,
-                        IconCodes.HSV_SHIFT,
-                        IconCodes.COLOR_SCRIPT,
-                        IconCodes.NEW_PALETTE,
-                        IconCodes.IMPORT_PALETTE,
-                        IconCodes.CONTENTS_TO_PALETTE,
-                        IconCodes.DELETE_PALETTE,
-                        IconCodes.SAVE_PALETTE,
-                        IconCodes.SORT_PALETTE,
-                        IconCodes.PALETTIZE,
-                        IconCodes.PALETTE_SETTINGS,
-                        IconCodes.ADD_TO_PALETTE,
-                        IconCodes.REMOVE_FROM_PALETTE,
-                        IconCodes.MOVE_LEFT_IN_PALETTE,
-                        IconCodes.MOVE_RIGHT_IN_PALETTE
+                        ActionCodes.SWAP_COLORS,
+                        ActionCodes.COLOR_MENU_MODE,
+                        ActionCodes.HSV_SHIFT,
+                        ActionCodes.COLOR_SCRIPT,
+                        ActionCodes.NEW_PALETTE,
+                        ActionCodes.IMPORT_PALETTE,
+                        ActionCodes.CONTENTS_TO_PALETTE,
+                        ActionCodes.DELETE_PALETTE,
+                        ActionCodes.SAVE_PALETTE,
+                        ActionCodes.SORT_PALETTE,
+                        ActionCodes.PALETTIZE,
+                        ActionCodes.PALETTE_SETTINGS,
+                        ActionCodes.ADD_TO_PALETTE,
+                        ActionCodes.REMOVE_FROM_PALETTE,
+                        ActionCodes.MOVE_LEFT_IN_PALETTE,
+                        ActionCodes.MOVE_RIGHT_IN_PALETTE
                 },
                 new String[] {
                         "Swap primary and secondary color",
@@ -3031,23 +3026,23 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        IconCodes.INFO,
-                        IconCodes.PANEL_MANAGER,
-                        IconCodes.SETTINGS,
-                        IconCodes.NEW_PROJECT,
-                        IconCodes.OPEN_FILE,
-                        IconCodes.SAVE,
-                        IconCodes.SAVE_AS,
-                        IconCodes.RESIZE,
-                        IconCodes.PAD,
-                        IconCodes.STITCH_SPLIT_FRAMES,
-                        IconCodes.PREVIEW,
-                        IconCodes.AUTOMATION_SCRIPT,
-                        IconCodes.UNDO,
-                        IconCodes.GRANULAR_UNDO,
-                        IconCodes.GRANULAR_REDO,
-                        IconCodes.REDO,
-                        IconCodes.HISTORY
+                        ActionCodes.INFO,
+                        ActionCodes.PANEL_MANAGER,
+                        ActionCodes.SETTINGS,
+                        ActionCodes.NEW_PROJECT,
+                        ActionCodes.OPEN_FILE,
+                        ActionCodes.SAVE,
+                        ActionCodes.SAVE_AS,
+                        ActionCodes.RESIZE,
+                        ActionCodes.PAD,
+                        ActionCodes.STITCH_SPLIT_FRAMES,
+                        ActionCodes.PREVIEW,
+                        ActionCodes.AUTOMATION_SCRIPT,
+                        ActionCodes.UNDO,
+                        ActionCodes.GRANULAR_UNDO,
+                        ActionCodes.GRANULAR_REDO,
+                        ActionCodes.REDO,
+                        ActionCodes.HISTORY
                 },
                 new String[] {
                         "Info", "Open panel manager", "Program Settings",
@@ -3066,25 +3061,25 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        IconCodes.NEW_LAYER,
-                        IconCodes.DUPLICATE_LAYER,
-                        IconCodes.REMOVE_LAYER,
-                        IconCodes.MOVE_LAYER_UP,
-                        IconCodes.MOVE_LAYER_DOWN,
-                        IconCodes.MERGE_WITH_LAYER_BELOW,
-                        IconCodes.FLATTEN,
-                        IconCodes.LAYER_VISIBILITY,
-                        IconCodes.LAYER_ENABLED,
-                        IconCodes.LAYER_DISABLED,
-                        IconCodes.ONION_SKIN,
-                        IconCodes.ONION_SKIN_NONE,
-                        IconCodes.ONION_SKIN_PREVIOUS,
-                        IconCodes.ONION_SKIN_NEXT,
-                        IconCodes.ONION_SKIN_BOTH,
-                        IconCodes.FRAME_LOCKING,
-                        IconCodes.FRAMES_LINKED,
-                        IconCodes.FRAMES_UNLINKED,
-                        IconCodes.LAYER_SETTINGS
+                        ActionCodes.NEW_LAYER,
+                        ActionCodes.DUPLICATE_LAYER,
+                        ActionCodes.REMOVE_LAYER,
+                        ActionCodes.MOVE_LAYER_UP,
+                        ActionCodes.MOVE_LAYER_DOWN,
+                        ActionCodes.MERGE_WITH_LAYER_BELOW,
+                        ActionCodes.FLATTEN,
+                        ActionCodes.LAYER_VISIBILITY,
+                        ActionCodes.LAYER_ENABLED,
+                        ActionCodes.LAYER_DISABLED,
+                        ActionCodes.ONION_SKIN,
+                        ActionCodes.ONION_SKIN_NONE,
+                        ActionCodes.ONION_SKIN_PREVIOUS,
+                        ActionCodes.ONION_SKIN_NEXT,
+                        ActionCodes.ONION_SKIN_BOTH,
+                        ActionCodes.FRAME_LOCKING,
+                        ActionCodes.FRAMES_LINKED,
+                        ActionCodes.FRAMES_UNLINKED,
+                        ActionCodes.LAYER_SETTINGS
                 },
                 new String[] {
                         "New layer",
@@ -3116,22 +3111,22 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        IconCodes.NEW_FRAME,
-                        IconCodes.DUPLICATE_FRAME,
-                        IconCodes.REMOVE_FRAME,
-                        IconCodes.MOVE_FRAME_FORWARD,
-                        IconCodes.MOVE_FRAME_BACK,
-                        IconCodes.FRAME_PROPERTIES,
-                        IconCodes.TO_FIRST_FRAME,
-                        IconCodes.PREVIOUS,
-                        IconCodes.NEXT,
-                        IconCodes.TO_LAST_FRAME,
-                        IconCodes.PLAY,
-                        IconCodes.PLAYBACK_MODES,
-                        IconCodes.FORWARDS,
-                        IconCodes.BACKWARDS,
-                        IconCodes.LOOP,
-                        IconCodes.PONG
+                        ActionCodes.NEW_FRAME,
+                        ActionCodes.DUPLICATE_FRAME,
+                        ActionCodes.REMOVE_FRAME,
+                        ActionCodes.MOVE_FRAME_FORWARD,
+                        ActionCodes.MOVE_FRAME_BACK,
+                        ActionCodes.FRAME_PROPERTIES,
+                        ActionCodes.TO_FIRST_FRAME,
+                        ActionCodes.PREVIOUS,
+                        ActionCodes.NEXT,
+                        ActionCodes.TO_LAST_FRAME,
+                        ActionCodes.PLAY,
+                        ActionCodes.PLAYBACK_MODES,
+                        ActionCodes.FORWARDS,
+                        ActionCodes.BACKWARDS,
+                        ActionCodes.LOOP,
+                        ActionCodes.PONG
                 },
                 new String[] {
                         "New frame",

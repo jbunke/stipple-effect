@@ -9,5 +9,5 @@ Projects:
 Quick select one of the first nine projects: {1} - {9}
 
 Layers:
-Navigate to layer above: {Ctrl + Up Arrow Key}
-Navigate to layer below: {Ctrl + Down Arrow Key}
+Navigate to layer above: {Ctrl + Up Arrow}
+Navigate to layer below: {Ctrl + Down Arrow}

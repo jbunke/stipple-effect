@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.layer;
 
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 
 public enum OnionSkinMode {
     NONE, PREVIOUS, NEXT, BOTH;
@@ -15,10 +15,10 @@ public enum OnionSkinMode {
 
     public String getIconCode() {
         return switch (this) {
-            case NONE -> IconCodes.ONION_SKIN_NONE;
-            case PREVIOUS -> IconCodes.ONION_SKIN_PREVIOUS;
-            case NEXT -> IconCodes.ONION_SKIN_NEXT;
-            case BOTH -> IconCodes.ONION_SKIN_BOTH;
+            case NONE -> ActionCodes.ONION_SKIN_NONE;
+            case PREVIOUS -> ActionCodes.ONION_SKIN_PREVIOUS;
+            case NEXT -> ActionCodes.ONION_SKIN_NEXT;
+            case BOTH -> ActionCodes.ONION_SKIN_BOTH;
         };
     }
 }

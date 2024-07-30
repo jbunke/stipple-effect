@@ -1,0 +1,1 @@
+Crop canvas to selection | {Ctrl + Shift + X}

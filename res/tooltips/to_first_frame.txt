@@ -1,1 +1,1 @@
-To first frame | {Ctrl + Left Arrow Key}
+To first frame | {Ctrl + Left Arrow}

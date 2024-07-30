@@ -1,6 +1,6 @@
-package com.jordanbunke.stipple_effect.utility;
+package com.jordanbunke.stipple_effect.utility.action;
 
-public class IconCodes {
+public final class ActionCodes {
     public static final String
             PROGRAM = "program_icon",
             NEW_PROJECT = "new_project",
@@ -95,7 +95,7 @@ public class IconCodes {
             PANEL_MANAGER = "panel_manager",
             INFO = "info";
 
-    public static final String NO_ICON_PREFIX = "__",
+    public static final String NO_ICON_PREFIX = "__", NONE = "",
             OUTLINE_PREFIX = "outline_", NUMKEY_PREFIX = "numkey_";
 
     public static final String
@@ -105,6 +105,13 @@ public class IconCodes {
             SCRIPTING = NO_ICON_PREFIX + "scripting",
             GENERAL = NO_ICON_PREFIX + "general",
             CLIPBOARD_SHORTCUTS = NO_ICON_PREFIX + "clipboard_shortcuts",
+            COPY = NO_ICON_PREFIX + "copy",
+            CUT = NO_ICON_PREFIX + "cut",
+            PASTE = NO_ICON_PREFIX + "paste",
+            PASTE_NEW_LAYER = NO_ICON_PREFIX + "paste_new_layer",
+            CROP_TO_SELECTION = NO_ICON_PREFIX + "crop_to_selection",
+            ALL_UI = NO_ICON_PREFIX + "all_ui",
+            MINIMAL_UI = NO_ICON_PREFIX + "minimal_ui",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",
             COLOR_SHORTCUTS = NO_ICON_PREFIX + "color_shortcuts",
             PLAYBACK_MODES = NO_ICON_PREFIX + "playback",
@@ -124,6 +131,6 @@ public class IconCodes {
     public static final String NO_TOOLTIP = "no_tooltip";
 
     public static boolean hasIcon(final String code) {
-        return !code.startsWith(NO_ICON_PREFIX);
+        return !(code.startsWith(NO_ICON_PREFIX) || code.equals(NONE));
     }
 }

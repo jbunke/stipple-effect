@@ -20,7 +20,7 @@ public final class Layout {
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             PROJECTS_H = 84, NON_SCROLLING_SUB = 20,
-            COLLAPSED_PROJECTS_H = 27, MIN_FLIPBOOK_H = 249, MAX_FLIPBOOK_H = 411;
+            COLLAPSED_PROJECTS_H = 27, MIN_FLIPBOOK_H = 222, MAX_FLIPBOOK_H = 411;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
@@ -124,10 +124,7 @@ public final class Layout {
     }
 
     public static void togglePanels() {
-        if (areAllPanelsShowing())
-            minimalUI();
-        else
-            showAllPanels();
+        setAllPanels(!areAllPanelsShowing());
     }
 
     public static void minimalUI() {
@@ -138,7 +135,7 @@ public final class Layout {
         setAllPanels(true);
     }
 
-    public static void setAllPanels(final boolean showing) {
+    private static void setAllPanels(final boolean showing) {
         adjustPanels(() -> {
             setColorsPanelShowing(showing);
             setToolbarShowing(showing);

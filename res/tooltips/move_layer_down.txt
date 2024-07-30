@@ -1,1 +1,1 @@
-Move layer down | {Ctrl + Shift + Down}
+Move layer down | {Ctrl + Shift + Down Arrow}

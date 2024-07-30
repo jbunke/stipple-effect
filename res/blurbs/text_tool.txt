@@ -7,8 +7,8 @@ the text to be written.
 
 Start typing: {Click}
 
-Increment/decrement font scale factor: {Down/Up Arrow Keys} or {Shift + Scroll Wheel}
-Navigate to previous/next font: {Left/Right Arrow Keys}
+Increment/decrement font scale factor: {Down/Up Arrow} or {Shift + Scroll Wheel}
+Navigate to previous/next font: {Left/Right Arrow}
 Toggle text alignment: {Ctrl + K}
 Upload new font: {Shift + T}
 

@@ -4,9 +4,9 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 public class IconButton extends SimpleMenuButton {
@@ -37,14 +37,14 @@ public class IconButton extends SimpleMenuButton {
     ) {
         final GameImage icon = GraphicsUtils.loadIcon(code);
 
-        return new IconButton(IconCodes.NO_TOOLTIP, position, onClick,
+        return new IconButton(ActionCodes.NO_TOOLTIP, position, onClick,
                 icon, GraphicsUtils.highlightIconButton(icon));
     }
 
     @Override
     public void update(final double deltaTime) {
         if (isHighlighted() && Permissions.isCursorFree() &&
-                !code.equals(IconCodes.NO_TOOLTIP))
+                !code.equals(ActionCodes.NO_TOOLTIP))
             StippleEffect.get().sendToolTipUpdate(code);
     }
 }

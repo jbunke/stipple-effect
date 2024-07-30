@@ -1,1 +1,1 @@
-To last frame | {Ctrl + Right Arrow Key}
+To last frame | {Ctrl + Right Arrow}
