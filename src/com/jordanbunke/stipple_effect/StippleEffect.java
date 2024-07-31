@@ -410,6 +410,9 @@ public class StippleEffect implements ProgramContext {
         OPEN_FILE.doForMatchingKeyStroke(eventLogger, null);
 
         NEW_PALETTE.doForMatchingKeyStroke(eventLogger, null);
+        SAVE_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
+        SORT_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
+        PALETTE_SETTINGS.tryForMatchingKeyStroke(eventLogger, null);
 
         TOGGLE_PANELS.doForMatchingKeyStroke(eventLogger, null);
 
@@ -434,13 +437,6 @@ public class StippleEffect implements ProgramContext {
         } else if (eventLogger.isPressed(Key.CTRL)) {
             // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents() &&
-                                getSelectedPalette().isMutable())
-                            DialogAssembly.setDialogToSavePalette(getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
                     this::selectPaletteColorToTheLeft);
             eventLogger.checkForMatchingKeyStroke(
@@ -448,9 +444,6 @@ public class StippleEffect implements ProgramContext {
                     this::selectPaletteColorToTheRight);
         } else if (eventLogger.isPressed(Key.SHIFT)) {
             // Shift + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToOutline);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
                     this::addColorToPalette);
@@ -460,21 +453,6 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
                     DialogAssembly::setDialogToPanelManager);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents())
-                            DialogAssembly.setDialogToSortPalette(
-                                    getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents() &&
-                                getSelectedPalette().isMutable())
-                            DialogAssembly.setDialogToPaletteSettings(
-                                    getSelectedPalette());
-                    });
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
                     this::moveColorLeftInPalette);

@@ -35,7 +35,6 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
-import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.GatewayActionItem;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.ThinkingActionItem;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.HorizontalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
@@ -89,31 +88,43 @@ public class MenuAssembly {
                                 Arrays.stream(clipboardActions())
                                         .map(a -> a.toItem(c))
                                         .toArray(DropdownItem[]::new))),
-                new NestedItem("Layers", Arrays.stream(layerActions())
+                new NestedItem("Layer", Arrays.stream(layerActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new)),
-                new NestedItem("Frames", Arrays.stream(frameActions())
+                new NestedItem("Frame", Arrays.stream(frameActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new)),
-                // TODO: new NestedItem("Playback", ),
-//                new NestedItem("Selection",
-//                        new NestedItem("Modify...", here),
-//                        new NestedItem("Selection operations",
-//                                new SimpleItem(IconCodes.FILL_PRIMARY, here),
-//                                new SimpleItem(IconCodes.FILL_SECONDARY, here),
-//                                new SimpleItem(IconCodes.DELETE_SELECTION_CONTENTS, here)),
-//                        new NestedItem("Reflect...",
-//                                new SimpleItem(IconCodes.HORZ_BOUNDS_REFLECTION, here),
-//                                new SimpleItem(IconCodes.VERT_BOUNDS_REFLECTION, here),
-//                                new SimpleItem(IconCodes.HORZ_CONTENTS_REFLECTION, here),
-//                                new SimpleItem(IconCodes.VERT_CONTENTS_REFLECTION, here)),
-//                        new SimpleItem(IconCodes.OUTLINE, DialogAssembly::setDialogToOutline)),
+                new NestedItem("Selection",
+                        new NestedItem("Modify selection",
+                                Arrays.stream(selectionModificationActions())
+                                        .map(a -> a.toItem(c))
+                                        .toArray(DropdownItem[]::new)),
+                        new NestedItem("Operate on selection",
+                                FILL_PRIMARY.toItem(c),
+                                FILL_SECONDARY.toItem(c),
+                                DELETE_SELECTION_CONTENTS.toItem(c)),
+                        new NestedItem("Reflection",
+                                Arrays.stream(reflectionActions())
+                                        .map(a -> a.toItem(c))
+                                        .toArray(DropdownItem[]::new)),
+                        new NestedItem("Outline",
+                                CONFIGURE_OUTLINE.toItem(c),
+                                LAST_OUTLINE.toItem(c),
+                                SINGLE_OUTLINE.toItem(c),
+                                DOUBLE_OUTLINE.toItem(c))),
                 new NestedItem("View",
                         PREVIEW.toItem(c),
-                        new ThinkingActionItem(c,
-                                anon -> anon.renderInfo.isPixelGridOn()
-                                        ? HIDE_PIXEL_GRID : SHOW_PIXEL_GRID,
-                                SHOW_PIXEL_GRID, HIDE_PIXEL_GRID),
+                        new NestedItem("Grid and checkerboard",
+                                new ThinkingActionItem(c,
+                                        anon -> anon.renderInfo.isPixelGridOn()
+                                                ? HIDE_PIXEL_GRID : SHOW_PIXEL_GRID,
+                                        SHOW_PIXEL_GRID, HIDE_PIXEL_GRID),
+                                new ThinkingActionItem(c,
+                                        anon -> anon.getState().hasSelection()
+                                                ? SET_PIXEL_GRID_SELECTION
+                                                : SET_PIXEL_GRID_CANVAS,
+                                        SET_PIXEL_GRID_SELECTION,
+                                        SET_PIXEL_GRID_CANVAS)),
                         new NestedItem("Layout",
                                 PANEL_MANAGER.toItem(c),
                                 new ThinkingActionItem(c,
@@ -127,20 +138,9 @@ public class MenuAssembly {
                         NEW_PALETTE.toItem(c),
                         IMPORT_PALETTE.toItem(c),
                         DELETE_PALETTE.toItem(c),
-                        new GatewayActionItem(ActionCodes.SAVE_PALETTE,
-                                () -> s.hasPaletteContents() &&
-                                        s.getSelectedPalette().isMutable(),
-                                () -> DialogAssembly.setDialogToSavePalette(
-                                        s.getSelectedPalette()), true),
-                        new GatewayActionItem(ActionCodes.SORT_PALETTE,
-                                s::hasPaletteContents,
-                                () -> DialogAssembly.setDialogToSortPalette(
-                                        s.getSelectedPalette()), true),
-                        new GatewayActionItem(ActionCodes.PALETTE_SETTINGS,
-                                () -> s.hasPaletteContents() &&
-                                        s.getSelectedPalette().isMutable(),
-                                () -> DialogAssembly.setDialogToPaletteSettings(
-                                        s.getSelectedPalette()), true))));
+                        SAVE_PALETTE.toItem(c),
+                        SORT_PALETTE.toItem(c),
+                        PALETTE_SETTINGS.toItem(c))));
 
         // panel expand / collapse
         final Coord2D panelIconPos = Layout.getProjectsPosition().displace(
@@ -783,19 +783,19 @@ public class MenuAssembly {
                         Layout.getToolsHeight() - Layout.BUTTON_INC);
 
         final MenuElement outlineButton = GraphicsUtils.
-                generateIconButton(ActionCodes.OUTLINE, outlinePos,
-                        () -> true, DialogAssembly::setDialogToOutline);
+                generateIconButton(outlinePos, CONFIGURE_OUTLINE, c);
         mb.add(outlineButton);
 
+        // TODO: use thinking elements to update icons
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
                 generateIconButton(ActionCodes.VERTICAL_REFLECTION,
                         outlinePos.displace(0, -Layout.BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
-                                c.reflectSelection(false);
+                                VERT_BOUNDS_REFLECTION.behaviour.accept(c);
                             else
-                                c.reflectSelectionContents(false);
+                                VERT_CONTENTS_REFLECTION.behaviour.accept(c);
                         }
                 );
         mb.add(verticalReflectionButton);
@@ -804,9 +804,9 @@ public class MenuAssembly {
                         outlinePos.displace(0, -2 * Layout.BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
-                                c.reflectSelection(true);
+                                HORZ_BOUNDS_REFLECTION.behaviour.accept(c);
                             else
-                                c.reflectSelectionContents(true);
+                                HORZ_CONTENTS_REFLECTION.behaviour.accept(c);
                         });
         mb.add(horizontalReflectionButton);
 

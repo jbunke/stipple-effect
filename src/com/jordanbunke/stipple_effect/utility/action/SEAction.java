@@ -3,10 +3,15 @@ package com.jordanbunke.stipple_effect.utility.action;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.*;
+import com.jordanbunke.stipple_effect.utility.DialogVals;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
@@ -52,6 +57,16 @@ public enum SEAction {
         } else
             StatusUpdates.cannotSetPixelGrid();
     }, new KeyShortcut(true, false, G)),
+    SET_PIXEL_GRID_SELECTION(ActionCodes.SET_PIXEL_GRID_SELECTION,
+            SEContext::setPixelGridAndCheckerboard,
+            new KeyShortcut(true, false, B)),
+    SET_PIXEL_GRID_CANVAS(ActionCodes.SET_PIXEL_GRID_CANVAS,
+            SEContext::setPixelGridAndCheckerboard,
+            new KeyShortcut(true, false, B)),
+    SNAP_TO_CENTER(ActionCodes.NONE, SEContext::snapToCenterOfImage,
+            KeyShortcut.single(ENTER)),
+    SNAP_TO_TP(ActionCodes.NONE, SEContext::snapToTargetPixel,
+            new KeyShortcut(false, true, ENTER)),
     TOGGLE_ALIGNMENT(ActionCodes.NONE,
             condFromSE(s -> s.getTool().equals(TextTool.get())),
             plain(TextTool.get()::toggleAlignment),
@@ -121,6 +136,35 @@ public enum SEAction {
             null, false),
     FLATTEN(ActionCodes.FLATTEN, c -> c.getState().canRemoveLayer(),
             SEContext::flatten, new KeyShortcut(true, false, M)),
+
+    // layer visibility
+    TOGGLE_LAYER_VISIBILITY(ActionCodes.NONE, c -> {
+        final ProjectState state = c.getState();
+        final int index = state.getLayerEditIndex();
+
+        if (state.getEditingLayer().isEnabled())
+            c.disableLayer(index);
+        else
+            c.enableLayer(index);
+    }, new KeyShortcut(false, true, _1)),
+    ISOLATE_LAYER(ActionCodes.NONE,
+            c -> c.isolateLayer(c.getState().getLayerEditIndex()),
+            new KeyShortcut(false, true, _2)),
+    ENABLE_ALL_LAYERS(ActionCodes.NONE, SEContext::enableAllLayers,
+            new KeyShortcut(false, true, _3)),
+
+    // current layer
+    LAYER_SETTINGS(ActionCodes.LAYER_SETTINGS,
+            c -> DialogAssembly.setDialogToLayerSettings(
+                    c.getState().getLayerEditIndex()),
+            new KeyShortcut(false, true, L)),
+    TOGGLE_LAYER_LINKING(ActionCodes.NONE, SEContext::toggleLayerLinking,
+            new KeyShortcut(true, false, Q)),
+    CYCLE_LAYER_ONION_SKIN_MODE(ActionCodes.NONE,
+            c -> {
+        final SELayer layer = c.getState().getEditingLayer();
+        layer.setOnionSkinMode(EnumUtils.next(layer.getOnionSkinMode()));
+    }, new KeyShortcut(true, false, _1)),
 
     // frames
     NEW_FRAME(ActionCodes.NEW_FRAME,
@@ -196,7 +240,19 @@ public enum SEAction {
     DELETE_PALETTE(ActionCodes.DELETE_PALETTE,
             condFromSE(StippleEffect::hasPaletteContents),
             fromSE(StippleEffect::deletePalette), null),
-    // TODO... remaining palette actions
+    SAVE_PALETTE(ActionCodes.SAVE_PALETTE, mutablePalette(),
+            fromSE(s -> DialogAssembly.setDialogToSavePalette(
+                    s.getSelectedPalette())),
+            new KeyShortcut(true, false, P)),
+    SORT_PALETTE(ActionCodes.SORT_PALETTE,
+            condFromSE(StippleEffect::hasPaletteContents),
+            fromSE(s -> DialogAssembly.setDialogToSortPalette(
+                    s.getSelectedPalette())),
+            new KeyShortcut(false, true, M)),
+    PALETTE_SETTINGS(ActionCodes.PALETTE_SETTINGS, mutablePalette(),
+            fromSE(s -> DialogAssembly.setDialogToPaletteSettings(
+                    s.getSelectedPalette())),
+            new KeyShortcut(false, true, E)),
 
     // state control
     UNDO(ActionCodes.UNDO, c -> c.stateManager.canUndo(),
@@ -212,7 +268,57 @@ public enum SEAction {
             c -> c.stateManager.redo(true),
             new KeyShortcut(true, true, Y), null, false),
 
-    // TODO: selection
+    // selection
+    DESELECT(ActionCodes.DESELECT, c -> c.getState().hasSelection(),
+            c -> c.deselect(true), new KeyShortcut(true, false, D)),
+    SELECT_ALL(ActionCodes.SELECT_ALL, SEContext::selectAll,
+            new KeyShortcut(true, false, A)),
+    INVERT_SELECTION(ActionCodes.INVERT_SELECTION, SEContext::invertSelection,
+            new KeyShortcut(true, false, I)),
+    FILL_PRIMARY(ActionCodes.FILL_PRIMARY,
+            c -> c.getState().hasSelection(),
+            c -> c.fillSelection(false), KeyShortcut.single(BACKSPACE)),
+    FILL_SECONDARY(ActionCodes.FILL_SECONDARY,
+            c -> c.getState().hasSelection(),
+            c -> c.fillSelection(true),
+            new KeyShortcut(false, true, BACKSPACE)),
+    DELETE_SELECTION_CONTENTS(ActionCodes.DELETE_SELECTION_CONTENTS,
+            c -> c.getState().hasSelection(),
+            c -> c.deleteSelectionContents(true),
+            KeyShortcut.single(DELETE)),
+    DELETE_SELECTION_CONTENTS_NO_DESELECT(ActionCodes.NONE,
+            c -> c.getState().hasSelection(),
+            c -> c.deleteSelectionContents(false),
+            new KeyShortcut(false, true, DELETE)),
+    HORZ_BOUNDS_REFLECTION(ActionCodes.HORZ_BOUNDS_REFLECTION,
+            c -> c.getState().hasSelection(), c -> c.reflectSelection(true),
+            new KeyShortcut(true, false, _4), null, false),
+    VERT_BOUNDS_REFLECTION(ActionCodes.VERT_BOUNDS_REFLECTION,
+            c -> c.getState().hasSelection(), c -> c.reflectSelection(false),
+            new KeyShortcut(true, false, _5), null, false),
+    HORZ_CONTENTS_REFLECTION(ActionCodes.HORZ_CONTENTS_REFLECTION,
+            c -> c.getState().hasSelection(),
+            c -> c.reflectSelectionContents(true),
+            new KeyShortcut(true, true, _4), null, false),
+    VERT_CONTENTS_REFLECTION(ActionCodes.VERT_CONTENTS_REFLECTION,
+            c -> c.getState().hasSelection(),
+            c -> c.reflectSelectionContents(false),
+            new KeyShortcut(true, true, _5), null, false),
+    CONFIGURE_OUTLINE(ActionCodes.OUTLINE,
+            DialogAssembly::setDialogToOutline,
+            new KeyShortcut(false, true, O)),
+    LAST_OUTLINE(ActionCodes.LAST_OUTLINE,
+            c -> c.getState().hasSelection(),
+            c -> c.outlineSelection(DialogVals.getOutlineSideMask()),
+            new KeyShortcut(true, false, _9), null, false),
+    SINGLE_OUTLINE(ActionCodes.SINGLE_OUTLINE,
+            c -> c.getState().hasSelection(),
+            c -> c.outlineSelection(Outliner.getSingleOutlineMask()),
+            new KeyShortcut(false, true, _9), null, false),
+    DOUBLE_OUTLINE(ActionCodes.DOUBLE_OUTLINE,
+            c -> c.getState().hasSelection(),
+            c -> c.outlineSelection(Outliner.getDoubleOutlineMask()),
+            new KeyShortcut(true, true, _9), null, false),
 
     // actions
     HSV_SHIFT(ActionCodes.HSV_SHIFT, DialogAssembly::setDialogToHSVShift,
@@ -485,6 +591,26 @@ public enum SEAction {
     public static SEAction[] actionsMenuActions() {
         return new SEAction[] {
                 HSV_SHIFT, COLOR_SCRIPT, CONTENTS_TO_PALETTE, PALETTIZE
+        };
+    }
+
+    public static SEAction[] reflectionActions() {
+        return new SEAction[] {
+                HORZ_BOUNDS_REFLECTION, VERT_BOUNDS_REFLECTION,
+                HORZ_CONTENTS_REFLECTION, VERT_CONTENTS_REFLECTION
+        };
+    }
+
+    public static SEAction[] selectionModificationActions() {
+        return new SEAction[] {
+                DESELECT, SELECT_ALL, INVERT_SELECTION
+        };
+    }
+
+    public static SEAction[] selectionOperationActions() {
+        return new SEAction[] {
+                FILL_PRIMARY, FILL_SECONDARY, DELETE_SELECTION_CONTENTS,
+                DELETE_SELECTION_CONTENTS_NO_DESELECT
         };
     }
 }

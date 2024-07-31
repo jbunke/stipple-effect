@@ -1075,8 +1075,7 @@ public class DialogAssembly {
                 Constants.GENERIC_APPROVAL_TEXT, onApprove, true));
     }
 
-    public static void setDialogToOutline() {
-        final SEContext c = StippleEffect.get().getContext();
+    public static void setDialogToOutline(final SEContext c) {
         final MenuBuilder mb = new MenuBuilder();
 
         // labels
@@ -1133,7 +1132,7 @@ public class DialogAssembly {
 
         final MenuElementGrouping contents =
                 new MenuElementGrouping(mb.build().getMenuElements());
-        setDialog(assembleDialog("Outline selection options...", contents,
+        setDialog(assembleDialog("Configure outline...", contents,
                 () -> c.getState().hasSelection(), "Outline",
                 () -> c.outlineSelection(DialogVals.getOutlineSideMask()),
                 true));

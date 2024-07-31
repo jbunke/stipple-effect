@@ -228,6 +228,7 @@ public class SEContext {
         processAdditionalMouseEvents(eventLogger);
 
         if (!Permissions.isTyping()) {
+            processActions(eventLogger);
             processSingleKeyInputs(eventLogger);
             processCompoundKeyInputs(eventLogger);
         }
@@ -387,8 +388,7 @@ public class SEContext {
             }
     }
 
-    // TODO: Remove compound and single input submethods and put all key checkers in their calling block
-    private void processCompoundKeyInputs(final InputEventLogger eventLogger) {
+    private void processActions(final InputEventLogger eventLogger) {
         for (SEAction sca : stateControlActions())
             sca.doForMatchingKeyStroke(eventLogger, this);
 
@@ -405,6 +405,16 @@ public class SEContext {
         // layer
         for (SEAction la : layerActions())
             la.doForMatchingKeyStroke(eventLogger, this);
+
+        // layer visibility
+        TOGGLE_LAYER_VISIBILITY.doForMatchingKeyStroke(eventLogger, this);
+        ISOLATE_LAYER.doForMatchingKeyStroke(eventLogger, this);
+        ENABLE_ALL_LAYERS.doForMatchingKeyStroke(eventLogger, this);
+
+        // current layer
+        LAYER_SETTINGS.doForMatchingKeyStroke(eventLogger, this);
+        TOGGLE_LAYER_LINKING.doForMatchingKeyStroke(eventLogger, this);
+        CYCLE_LAYER_ONION_SKIN_MODE.doForMatchingKeyStroke(eventLogger, this);
 
         // layer navigation
         LAYER_ABOVE.doForMatchingKeyStroke(eventLogger, this);
@@ -428,78 +438,37 @@ public class SEContext {
         CONTENTS_TO_PALETTE.tryForMatchingKeyStroke(eventLogger, this);
         PALETTIZE.tryForMatchingKeyStroke(eventLogger, this);
 
+        // modify selection
+        for (SEAction sma : selectionModificationActions())
+            sma.doForMatchingKeyStroke(eventLogger, this);
+
+        // selection operations
+        for (SEAction soa : selectionOperationActions())
+            soa.doForMatchingKeyStroke(eventLogger, this);
+
+        // reflection
+        for (SEAction ra : reflectionActions())
+            ra.doForMatchingKeyStroke(eventLogger, this);
+
+        // outline
+        CONFIGURE_OUTLINE.doForMatchingKeyStroke(eventLogger, this);
+        LAST_OUTLINE.doForMatchingKeyStroke(eventLogger, this);
+        SINGLE_OUTLINE.doForMatchingKeyStroke(eventLogger, this);
+        DOUBLE_OUTLINE.doForMatchingKeyStroke(eventLogger, this);
+
         // misc.
         SAVE.doForMatchingKeyStroke(eventLogger, this);
         PREVIEW.doForMatchingKeyStroke(eventLogger, this);
         TOGGLE_PIXEL_GRID.doForMatchingKeyStroke(eventLogger, this);
+        // call represents both canvas and selection possibilities; behaviour is identical
+        SET_PIXEL_GRID_CANVAS.doForMatchingKeyStroke(eventLogger, this);
+        SNAP_TO_CENTER.doForMatchingKeyStroke(eventLogger, this);
+        SNAP_TO_TP.doForMatchingKeyStroke(eventLogger, this);
+    }
 
-        // CTRL but not SHIFT
-        if (eventLogger.isPressed(Key.CTRL) && !eventLogger.isPressed(Key.SHIFT)) {
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    this::selectAll);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    () -> deselect(true));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.I, GameKeyEvent.Action.PRESS),
-                    this::invertSelection);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
-                    this::setPixelGridAndCheckerboard);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
-                    this::toggleLayerLinking);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
-                    () -> getState().getEditingLayer().setOnionSkinMode(
-                            EnumUtils.next(getState().getEditingLayer().getOnionSkinMode())));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(true));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelection(false));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(DialogVals.getOutlineSideMask()));
-        }
-
+    private void processCompoundKeyInputs(final InputEventLogger eventLogger) {
         // SHIFT but not CTRL
         if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    () -> fillSelection(true));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                    this::snapToTargetPixel);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
-                    () -> deleteSelectionContents(false));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> DialogAssembly.setDialogToLayerSettings(getState().getLayerEditIndex()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(Outliner.getSingleOutlineMask()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        final int index = getState().getLayerEditIndex();
-
-                        if (getState().getEditingLayer().isEnabled())
-                            disableLayer(index);
-                        else
-                            enableLayer(index);
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
-                    () -> isolateLayer(getState().getLayerEditIndex()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
-                    this::enableAllLayers);
-
-            // TODO: keep? - arrow keys only in these branches
             if (eventLogger.isPressed(Key.R)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -572,40 +541,12 @@ public class SEContext {
                         () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC));
             }
         }
-
-        // CTRL and SHIFT
-        if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelectionContents(true));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> reflectSelectionContents(false));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> outlineSelection(Outliner.getDoubleOutlineMask()));
-        }
     }
 
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
         final Tool tool = StippleEffect.get().getTool();
 
         if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
-            // TODO: remove - snap to center of image
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                    this::snapToCenterOfImage);
-
-            // TODO: remove - fill selection
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.BACKSPACE, GameKeyEvent.Action.PRESS),
-                    () -> fillSelection(false));
-
-            // TODO: remove - delete selection contents
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.DELETE, GameKeyEvent.Action.PRESS),
-                    () -> deleteSelectionContents(true));
-
             // tool modifications
             if (tool instanceof BreadthTool bt) {
                 eventLogger.checkForMatchingKeyStroke(
@@ -945,7 +886,7 @@ public class SEContext {
             StatusUpdates.clipboardSendFailed(true);
     }
 
-    private void setPixelGridAndCheckerboard() {
+    public void setPixelGridAndCheckerboard() {
         final boolean fromSelection = getState().hasSelection();
         final int w, h;
 

@@ -1,0 +1,1 @@
+Reflect selection bounds horizontally | {Ctrl + 4}

@@ -1,0 +1,1 @@
+Invert selection | {Ctrl + I}

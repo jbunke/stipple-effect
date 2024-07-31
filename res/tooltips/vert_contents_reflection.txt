@@ -1,0 +1,1 @@
+Reflect selection contents vertically | {Ctrl + Shift + 5}

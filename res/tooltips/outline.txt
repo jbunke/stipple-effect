@@ -1,5 +1,1 @@
-Outline... | {Shift + O}
-
-Outline selection with current settings: {Ctrl + 9}
-Single outline selection: {Shift + 9}
-Double outline selection: {Ctrl + Shift + 9}
+Configure outline... | {Shift + O}
