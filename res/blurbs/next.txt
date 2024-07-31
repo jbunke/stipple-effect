@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + Space}
+Shortcut: {sc:NEXT_FRAME}

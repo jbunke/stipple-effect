@@ -1,1 +1,1 @@
-Shortcut: {Shift + C}
+Shortcut: {sc:SWAP_COLORS}

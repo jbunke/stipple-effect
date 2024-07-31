@@ -1,4 +1,4 @@
-Reflect selection bounds about x-axis: {Ctrl + 5}
-Reflect selection contents about x-axis: {Ctrl + Shift + 5}
+Reflect selection bounds about x-axis: {sc:VERT_BOUNDS_REFLECTION}
+Reflect selection contents about x-axis: {sc:VERT_CONTENTS_REFLECTION}
 
 Reflect the selection about the x-axis.

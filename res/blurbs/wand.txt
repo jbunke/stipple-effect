@@ -1,4 +1,4 @@
-Shortcut: {W}
+Shortcut: {sc:SET_TOOL_WAND}
 
 Use the wand to select adjacent pixels of the same or similar color as the initial pixel that was
 clicked. Adjust the tolerance of the wand to increase or decrease the threshold of the similarity of

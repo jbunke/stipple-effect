@@ -1,4 +1,4 @@
-Shortcut: {Ctrl + Shift + Z}
+Shortcut: {sc:GRANULAR_UNDO}
 
 Return to a previous state within a single operation.
 

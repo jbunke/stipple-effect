@@ -1,4 +1,4 @@
-Copy selection: {Ctrl + C}
-Cut selection: {Ctrl + X}
-Paste clipboard: {Ctrl + V}
-Paste clipboard to new layer: {Ctrl + Shift + V}
+Copy selection: {sc:COPY}
+Cut selection: {sc:CUT}
+Paste clipboard: {sc:PASTE}
+Paste clipboard to new layer: {sc:PASTE_NEW_LAYER}

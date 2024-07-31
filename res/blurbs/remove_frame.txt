@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + Backspace}
+Shortcut: {sc:REMOVE_FRAME}

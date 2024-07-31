@@ -1,3 +1,3 @@
-Shortcut: {Shift + Y}
+Shortcut: {sc:HISTORY}
 
 Opens a dialog that lists all the retained major project states, any of which can be reverted to.

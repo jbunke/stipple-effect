@@ -1,4 +1,4 @@
-Shortcut: {O}
+Shortcut: {sc:SET_TOOL_STIPPLE_PENCIL}
 
 Use the stipple pencil to place a single pixel. The pencil must be {unclicked} to be used again.
 This tool is designed to be used for single pixel placement where mouse slippage could disrupt the

@@ -1,4 +1,4 @@
-Shortcut: {Q}
+Shortcut: {sc:SET_TOOL_SCRIPT_BRUSH}
 
 The script brush applies a color script transformation to the pixel that it paints over.
 

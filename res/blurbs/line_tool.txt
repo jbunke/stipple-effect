@@ -1,4 +1,4 @@
-Shortcut: {L}
+Shortcut: {sc:SET_TOOL_LINE}
 
 The line tool plots a continuous line of a determined pixel width.
 

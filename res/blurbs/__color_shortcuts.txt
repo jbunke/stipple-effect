@@ -8,5 +8,6 @@ Adjust value slider: {Shift + V + Scroll wheel} or {Shift + V + Left/Right Arrow
 Adjust alpha (opacity) slider: {Shift + A + Scroll wheel} or {Shift + A + Left/Right Arrow}
 
 Advanced palette shortcuts:
+TODO
 Select next included palette color to the left: {Ctrl + ,}
 Select next included palette color to the right: {Ctrl + .}

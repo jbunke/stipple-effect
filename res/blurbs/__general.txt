@@ -1,13 +1,13 @@
 Window / layout:
-Toggle fullscreen / windowed mode: {Escape}
-Recenter canvas in workspace: {Enter}
-Center the canvas around the target pixel: {Shift + Enter}
-Toggle show all UI / minimal UI mode: {Ctrl + Shift + A}
-Set checkerboard and pixel grid cell dimensions to project/selection bounds: {Ctrl + B}
+Toggle fullscreen / windowed mode: {sc:FULLSCREEN}
+Recenter canvas in workspace: {sc:SNAP_TO_CENTER}
+Center the canvas around the target pixel: {sc:SNAP_TO_TP}
+Toggle show all UI / minimal UI mode: {sc:TOGGLE_PANELS}
+Set checkerboard and pixel grid cell dimensions to project/selection bounds: {sc:SET_PIXEL_GRID_CANVAS}
 
 Projects:
-Quick select one of the first nine projects: {1} - {9}
+Quick select one of the first nine projects: {sc:PROJECT_1} - {sc:PROJECT_9}
 
 Layers:
-Navigate to layer above: {Ctrl + Up Arrow}
-Navigate to layer below: {Ctrl + Down Arrow}
+Navigate to layer above: {sc:LAYER_ABOVE}
+Navigate to layer below: {sc:LAYER_BELOW}

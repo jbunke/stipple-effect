@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + Left Arrow}
+Shortcut: {sc:TO_FIRST_FRAME}

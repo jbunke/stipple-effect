@@ -1,5 +1,5 @@
-Shortcut: {Ctrl + F}
+Shortcut: {sc:NEW_FRAME}
 
 Creates a new blank frame
 
-Contents on frame-locked layers will persist on the newly created frame.
+Contents on frame-linked layers will persist on the newly created frame.

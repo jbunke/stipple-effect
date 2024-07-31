@@ -1,3 +1,3 @@
-Toggle the visibility of the current editing layer: {Shift + 1}
-Isolate the current editing layer: {Shift + 2}
-Enable all layers: {Shift + 3}
+Toggle the visibility of the current editing layer: {sc:TOGGLE_LAYER_VISIBILITY}
+Isolate the current editing layer: {sc:ISOLATE_LAYER}
+Enable all layers: {sc:ENABLE_ALL_LAYERS}

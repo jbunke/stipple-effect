@@ -1,4 +1,4 @@
-Shortcut: {T}
+Shortcut: {sc:SET_TOOL_TEXT}
 
 The text tool is used to write text from pixel art fonts complying with the {Delta Time} font
 specification. Stipple Effect system fonts are automatically loaded in, and further fonts can be

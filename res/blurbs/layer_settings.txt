@@ -1,4 +1,4 @@
-Shortcut: {Shift + L}
+Shortcut: {sc:LAYER_SETTINGS}
 
 Displays a dialog where the layer's settings and properties can be modified
 

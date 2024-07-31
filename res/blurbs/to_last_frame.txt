@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + Right Arrow}
+Shortcut: {sc:TO_LAST_FRAME}

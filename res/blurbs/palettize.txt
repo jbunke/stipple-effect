@@ -1,4 +1,4 @@
-Shortcut: {Shift + P}
+Shortcut: {sc:PALETTIZE}
 
 Maps every non-transparent pixel from the chosen content (selection, layer-frame, layer, frame, or
 the entire project) to the nearest color in the selected palette.

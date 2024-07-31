@@ -2886,18 +2886,30 @@ public class DialogAssembly {
 
             final String[] blurb = ParserUtils.getBlurb(code);
 
+            final Color defC = ThemeLogic.intuitTextColor(
+                    t.panelBackground, true);
+
             for (String line : blurb) {
                 final String[] lineSegments = ParserUtils.extractHighlight(line);
 
                 int offsetX = 0;
 
                 for (int j = 0; j < lineSegments.length; j++) {
+                    final String text;
+                    final Color c;
+
+                    if (j % 2 == 0) {
+                        text = lineSegments[j];
+                        c = defC;
+                    } else {
+                        text = ParserUtils.getShortcut(lineSegments[j]);
+                        c = t.textShortcut;
+                    }
+
                     final TextLabel segmentText = TextLabel.make(
                             contentStart.displace(indent + offsetX,
                                     bottomY + Layout.TEXT_Y_OFFSET),
-                            lineSegments[j], j % 2 == 1 ? t.textShortcut
-                                    : ThemeLogic.intuitTextColor(
-                                            t.panelBackground, true));
+                            text, c);
 
                     contentAssembler.add(segmentText);
                     offsetX += segmentText.getWidth() + Layout.BUTTON_BORDER_PX;
