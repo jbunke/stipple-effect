@@ -47,7 +47,7 @@ public class Constants {
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
             SCRIPT_FILE_SUFFIX = "ses", SCRIPT_GLOBAL_NAMESPACE = "SE",
             ASCII_TEMPLATE = "ascii", LATIN_EXTENDED_TEMPLATE = "latin-extended",
-            COLOR_TOOL_TIP_PREFIX = "color:",
+            COLOR_TOOL_TIP_PREFIX = "color:", SHORTCUT_PREFIX = "sc:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_COLOR = "<#", CLOSE_COLOR = ">",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",

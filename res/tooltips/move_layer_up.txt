@@ -1,1 +1,1 @@
-Move layer up | {Ctrl + Shift + Up Arrow}
+Move layer up | {sc:MOVE_LAYER_UP}

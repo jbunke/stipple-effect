@@ -1,1 +1,1 @@
-Paste clipboard to new layer | {Ctrl + Shift + V}
+Paste clipboard to new layer | {sc:PASTE_NEW_LAYER}

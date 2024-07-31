@@ -1,1 +1,1 @@
-Settings | {Ctrl + E}
+Settings | {sc:SETTINGS}

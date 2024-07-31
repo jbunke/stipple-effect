@@ -1,1 +1,1 @@
-Invert selection | {Ctrl + I}
+Invert selection | {sc:INVERT_SELECTION}

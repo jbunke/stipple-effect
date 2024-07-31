@@ -1,1 +1,1 @@
-New project... | {Ctrl + N}
+New project... | {sc:NEW_RPOJECT}

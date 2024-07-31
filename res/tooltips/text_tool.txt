@@ -1,1 +1,1 @@
-Text | {T}
+Text | {sc:SET_TOOL_TEXT}

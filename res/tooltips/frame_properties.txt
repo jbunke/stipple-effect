@@ -1,1 +1,1 @@
-Frame properties... | {Shift + F}
+Frame properties... | {sc:FRAME_PROPERTIES}

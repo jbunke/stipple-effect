@@ -1,1 +1,1 @@
-Reflect selection contents vertically | {Ctrl + Shift + 5}
+Reflect selection contents vertically | {sc:VERT_CONTENTS_REFLECTION}

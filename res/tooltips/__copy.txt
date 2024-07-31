@@ -1,1 +1,1 @@
-Copy selection | {Ctrl + C}
+Copy selection | {sc:COPY}

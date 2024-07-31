@@ -1,1 +1,1 @@
-Set size to canvas bounds | {Ctrl + B}
+Set size to canvas bounds | {sc:SET_PIXEL_GRID_CANVAS}

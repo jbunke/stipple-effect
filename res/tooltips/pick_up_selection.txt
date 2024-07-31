@@ -1,1 +1,1 @@
-Pick up selection | {U}
+Pick up selection | {sc:SET_TOOL_PICK_UP_SELECTION}

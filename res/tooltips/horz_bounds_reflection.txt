@@ -1,1 +1,1 @@
-Reflect selection bounds horizontally | {Ctrl + 4}
+Reflect selection bounds horizontally | {sc:HORZ_BOUNDS_REFLECTION}

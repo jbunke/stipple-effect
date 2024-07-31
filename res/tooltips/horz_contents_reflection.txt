@@ -1,1 +1,1 @@
-Reflect selection contents horizontally | {Ctrl + Shift + 4}
+Reflect selection contents horizontally | {sc:HORZ_CONTENTS_REFLECTION}

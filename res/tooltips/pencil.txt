@@ -1,1 +1,1 @@
-Pencil | {P}
+Pencil | {sc:SET_TOOL_PENCIL}

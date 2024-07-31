@@ -1,1 +1,1 @@
-Paste clipboard | {Ctrl + V}
+Paste clipboard | {sc:PASTE}

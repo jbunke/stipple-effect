@@ -1,1 +1,1 @@
-Show all panels | {Ctrl + Shift + A}
+Show all panels | {sc:ALL_UI}

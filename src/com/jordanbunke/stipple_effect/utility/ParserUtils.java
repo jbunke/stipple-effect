@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
@@ -88,6 +89,23 @@ public class ParserUtils {
 
         return FileIO.readResource(ResourceLoader.loadResource(blurbFile),
                 "\"" + toolTipCode + "\" tooltip").split("\n");
+    }
+
+    public static String getShortcut(final String code) {
+        if (code.startsWith(Constants.SHORTCUT_PREFIX)) {
+            final String actionString =
+                    code.substring(Constants.SHORTCUT_PREFIX.length()).trim();
+
+            try {
+                final SEAction action = SEAction.valueOf(actionString);
+                return action.shortcut == null
+                        ? "" : action.shortcut.toString();
+            } catch (Exception e) {
+                return code;
+            }
+        }
+
+        return code;
     }
 
     public static String[] splitIntoCodeAndValue(final String line) {

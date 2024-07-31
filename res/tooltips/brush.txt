@@ -1,1 +1,1 @@
-Brush | {B}
+Brush | {sc:SET_TOOL_BRUSH}

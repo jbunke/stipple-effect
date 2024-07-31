@@ -1,1 +1,1 @@
-Move layer down | {Ctrl + Shift + Down Arrow}
+Move layer down | {sc:MOVE_LAYER_DOWN}

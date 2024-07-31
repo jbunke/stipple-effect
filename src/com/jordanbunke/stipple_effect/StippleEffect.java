@@ -414,11 +414,15 @@ public class StippleEffect implements ProgramContext {
         SORT_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
         PALETTE_SETTINGS.tryForMatchingKeyStroke(eventLogger, null);
 
+        PANEL_MANAGER.doForMatchingKeyStroke(eventLogger, null);
         TOGGLE_PANELS.doForMatchingKeyStroke(eventLogger, null);
 
         NEW_FONT.tryForMatchingKeyStroke(eventLogger, null);
         TOGGLE_ALIGNMENT.tryForMatchingKeyStroke(eventLogger, null);
         SWAP_COLORS.doForMatchingKeyStroke(eventLogger, null);
+
+        // represents both fullscreen and windowed as calls are identical
+        FULLSCREEN.doForMatchingKeyStroke(eventLogger, null);
 
         // quick context select
         for (SEAction qs : quickSelectActions())
@@ -428,9 +432,9 @@ public class StippleEffect implements ProgramContext {
         for (SEAction setTool : setToolActions())
             setTool.doForMatchingKeyStroke(eventLogger, null);
 
+        // TODO: remove after color panel redesign
         if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
             // Ctrl + Shift + ?
-            // TODO: remove
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
                     this::toggleColorMenuMode);
@@ -451,19 +455,11 @@ public class StippleEffect implements ProgramContext {
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
                     this::removeColorFromPalette);
             eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToPanelManager);
-            eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
                     this::moveColorLeftInPalette);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
                     this::moveColorRightInPalette);
-        } else {
-            // single key presses
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    this::toggleFullscreen);
         }
     }
 
@@ -540,12 +536,17 @@ public class StippleEffect implements ProgramContext {
             final String[] segments = ParserUtils.extractHighlight(lines[l]);
 
             for (int i = 0; i < segments.length; i++) {
-                if (i % 2 == 0)
-                    tb.setColor(cText);
-                else
-                    tb.setColor(t.textShortcut);
+                final String text;
 
-                tb.addText(segments[i]);
+                if (i % 2 == 0) {
+                    tb.setColor(cText);
+                    text = segments[i];
+                } else {
+                    tb.setColor(t.textShortcut);
+                    text = ParserUtils.getShortcut(segments[i]);
+                }
+
+                tb.addText(text);
             }
 
             if (l + 1 < lines.length)
@@ -750,6 +751,10 @@ public class StippleEffect implements ProgramContext {
 
     public boolean isTimerToggle() {
         return timerToggle;
+    }
+
+    public boolean isWindowed() {
+        return windowed;
     }
 
     public void newProject() {
@@ -1225,7 +1230,7 @@ public class StippleEffect implements ProgramContext {
         rebuildColorsMenu();
     }
 
-    private void toggleFullscreen() {
+    public void toggleFullscreen() {
         windowed = !windowed;
 
         remakeWindow();

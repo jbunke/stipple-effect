@@ -1,1 +1,1 @@
-Delete selection contents | {Delete}
+Delete selection contents | {sc:DELETE_SELECTION_CONTENTS}

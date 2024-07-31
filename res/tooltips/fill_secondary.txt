@@ -1,1 +1,1 @@
-Fill selection with secondary color | {Shift + Backspace}
+Fill selection with secondary color | {sc:FILL_SECONDARY}

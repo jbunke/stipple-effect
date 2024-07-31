@@ -1,1 +1,2 @@
+TODO
 Add selected color to palette | {Shift + A}

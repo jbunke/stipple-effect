@@ -1,1 +1,2 @@
+TODO
 Remove selected color from palette | {Shift + Z}

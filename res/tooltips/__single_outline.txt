@@ -1,1 +1,1 @@
-Single outline the selection | {Shift + 9}
+Single outline the selection | {sc:SINGLE_OUTLINE}

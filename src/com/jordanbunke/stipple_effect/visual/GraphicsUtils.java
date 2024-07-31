@@ -149,7 +149,8 @@ public class GraphicsUtils {
     }
 
     public static int dropdownMenuLeafWidth(final String code) {
-        final int FAIL = 1;
+        final int FAIL = 1, buttonWidth = ActionCodes.hasIcon(code)
+                ? Layout.BUTTON_INC : 0;
         final String[] lines = ParserUtils.getToolTip(code);
 
         if (lines.length != 1)
@@ -157,16 +158,23 @@ public class GraphicsUtils {
 
         final String[] segments = ParserUtils.extractHighlight(lines[0]);
 
-        if (segments.length != 2 || !segments[0].trim().endsWith("|"))
-            return FAIL;
+        return switch (segments.length) {
+            case 1 -> {
+                final String action = segments[0].trim();
 
-        final String action = segments[0].trim(),
-                shortcut = segments[1].trim();
+                yield buttonWidth + bespokeTextMenuElementWidth(action) +
+                        Layout.CONTENT_BUFFER_PX;
+            }
+            case 2 -> {
+                final String action = segments[0].replace("|", "").trim(),
+                        shortcut = ParserUtils.getShortcut(segments[1].trim());
 
-        return Layout.BUTTON_INC +
-                bespokeTextMenuElementWidth(action) +
-                Layout.DD_MENU_LEAF_MIDDLE_BUFFER +
-                bespokeTextMenuElementWidth(shortcut);
+                yield buttonWidth + bespokeTextMenuElementWidth(action) +
+                        Layout.DD_MENU_LEAF_MIDDLE_BUFFER +
+                        bespokeTextMenuElementWidth(shortcut);
+            }
+            default -> FAIL;
+        };
     }
 
     public static GameImage drawSelectedTextbox(final GameImage bounds) {

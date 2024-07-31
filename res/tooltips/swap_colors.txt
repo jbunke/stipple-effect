@@ -1,1 +1,1 @@
-Swap primary and secondary colors | {Shift + C}
+Swap primary and secondary colors | {sc:SWAP_COLORS}

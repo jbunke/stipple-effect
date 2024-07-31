@@ -1,1 +1,1 @@
-Line Tool | {L}
+Line Tool | {sc:SET_TOOL_LINE}

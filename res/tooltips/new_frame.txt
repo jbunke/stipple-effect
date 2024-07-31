@@ -1,1 +1,1 @@
-New frame | {Ctrl + F}
+New frame | {sc:NEW_FRAME}

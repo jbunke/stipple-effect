@@ -1,1 +1,1 @@
-To first frame | {Ctrl + Left Arrow}
+To first frame | {sc:TO_FIRST_FRAME}

@@ -102,7 +102,8 @@ public final class ActionCodes {
             PANEL_MANAGER = "panel_manager",
             INFO = "info";
 
-    public static final String NO_ICON_PREFIX = "__", NONE = "",
+    private static final String NO_ICON_PREFIX = "__";
+    public static final String NONE = "",
             OUTLINE_PREFIX = "outline_", NUMKEY_PREFIX = "numkey_";
 
     public static final String
@@ -127,6 +128,8 @@ public final class ActionCodes {
             DELETE_SELECTION_CONTENTS = NO_ICON_PREFIX + "delete_selection_contents",
             SET_PIXEL_GRID_CANVAS = NO_ICON_PREFIX + "set_pixel_grid_canvas",
             SET_PIXEL_GRID_SELECTION = NO_ICON_PREFIX + "set_pixel_grid_selection",
+            FULLSCREEN = NO_ICON_PREFIX + "fullscreen",
+            WINDOWED = NO_ICON_PREFIX + "windowed",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",
             COLOR_SHORTCUTS = NO_ICON_PREFIX + "color_shortcuts",
             PLAYBACK_MODES = NO_ICON_PREFIX + "playback",

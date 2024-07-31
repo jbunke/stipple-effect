@@ -1,1 +1,1 @@
-Set size to selection bounds | {Ctrl + B}
+Set size to selection bounds | {sc:SET_PIXEL_GRID_SELECTION}

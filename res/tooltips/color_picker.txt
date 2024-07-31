@@ -1,1 +1,1 @@
-Color Picker | {C}
+Color Picker | {sc:SET_TOOL_COLOR_PICKER}

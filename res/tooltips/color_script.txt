@@ -1,1 +1,1 @@
-Run a color script... | {Ctrl + Shift + W}
+Run a color script... | {sc:COLOR_SCRIPT}

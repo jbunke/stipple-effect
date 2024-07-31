@@ -1,1 +1,1 @@
-Save palette to file... | {Ctrl + P}
+Save palette to file... | {sc:SAVE_PALETTE}

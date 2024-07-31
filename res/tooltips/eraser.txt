@@ -1,1 +1,1 @@
-Eraser | {E}
+Eraser | {sc:SET_TOOL_ERASER}

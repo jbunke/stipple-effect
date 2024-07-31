@@ -1,1 +1,1 @@
-Extract canvas colors to current palette... | {Shift + D}
+Extract canvas colors to current palette... | {sc:CONTENTS_TO_PALETTE}

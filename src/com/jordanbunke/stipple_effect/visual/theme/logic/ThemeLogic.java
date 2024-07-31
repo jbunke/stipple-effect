@@ -141,7 +141,7 @@ public abstract class ThemeLogic {
             final GameImage actionImage = switch (segments.length) {
                 case 2 -> {
                     final String action = segments[0].replace("|", "").trim(),
-                            shortcut = segments[1].trim();
+                            shortcut = ParserUtils.getShortcut(segments[1].trim());
 
                     final GameImage shortcutImage = GraphicsUtils.uiText(shortcutCol)
                             .addText(shortcut).build().draw();

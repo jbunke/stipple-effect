@@ -88,6 +88,30 @@ public class MenuAssembly {
                                 Arrays.stream(clipboardActions())
                                         .map(a -> a.toItem(c))
                                         .toArray(DropdownItem[]::new))),
+                new NestedItem("View",
+                        new ThinkingActionItem(c,
+                                anon -> StippleEffect.get().isWindowed()
+                                        ? FULLSCREEN : WINDOWED,
+                                FULLSCREEN, WINDOWED),
+                        PREVIEW.toItem(c),
+                        new NestedItem("Grid and checkerboard",
+                                new ThinkingActionItem(c,
+                                        anon -> anon.renderInfo.isPixelGridOn()
+                                                ? HIDE_PIXEL_GRID
+                                                : SHOW_PIXEL_GRID,
+                                        SHOW_PIXEL_GRID, HIDE_PIXEL_GRID),
+                                new ThinkingActionItem(c,
+                                        anon -> anon.getState().hasSelection()
+                                                ? SET_PIXEL_GRID_SELECTION
+                                                : SET_PIXEL_GRID_CANVAS,
+                                        SET_PIXEL_GRID_SELECTION,
+                                        SET_PIXEL_GRID_CANVAS)),
+                        new NestedItem("Layout",
+                                PANEL_MANAGER.toItem(c),
+                                new ThinkingActionItem(c,
+                                        na -> Layout.areAllPanelsShowing()
+                                                ? MINIMAL_UI : ALL_UI,
+                                        ALL_UI, MINIMAL_UI))),
                 new NestedItem("Layer", Arrays.stream(layerActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new)),
@@ -112,35 +136,16 @@ public class MenuAssembly {
                                 LAST_OUTLINE.toItem(c),
                                 SINGLE_OUTLINE.toItem(c),
                                 DOUBLE_OUTLINE.toItem(c))),
-                new NestedItem("View",
-                        PREVIEW.toItem(c),
-                        new NestedItem("Grid and checkerboard",
-                                new ThinkingActionItem(c,
-                                        anon -> anon.renderInfo.isPixelGridOn()
-                                                ? HIDE_PIXEL_GRID : SHOW_PIXEL_GRID,
-                                        SHOW_PIXEL_GRID, HIDE_PIXEL_GRID),
-                                new ThinkingActionItem(c,
-                                        anon -> anon.getState().hasSelection()
-                                                ? SET_PIXEL_GRID_SELECTION
-                                                : SET_PIXEL_GRID_CANVAS,
-                                        SET_PIXEL_GRID_SELECTION,
-                                        SET_PIXEL_GRID_CANVAS)),
-                        new NestedItem("Layout",
-                                PANEL_MANAGER.toItem(c),
-                                new ThinkingActionItem(c,
-                                        na -> Layout.areAllPanelsShowing()
-                                                ? MINIMAL_UI : ALL_UI,
-                                        ALL_UI, MINIMAL_UI))),
-                new NestedItem("Actions", Arrays.stream(actionsMenuActions())
-                        .map(a -> a.toItem(c))
-                        .toArray(DropdownItem[]::new)),
                 new NestedItem("Palette",
                         NEW_PALETTE.toItem(c),
                         IMPORT_PALETTE.toItem(c),
                         DELETE_PALETTE.toItem(c),
                         SAVE_PALETTE.toItem(c),
                         SORT_PALETTE.toItem(c),
-                        PALETTE_SETTINGS.toItem(c))));
+                        PALETTE_SETTINGS.toItem(c)),
+                new NestedItem("Actions", Arrays.stream(actionsMenuActions())
+                        .map(a -> a.toItem(c))
+                        .toArray(DropdownItem[]::new))));
 
         // panel expand / collapse
         final Coord2D panelIconPos = Layout.getProjectsPosition().displace(

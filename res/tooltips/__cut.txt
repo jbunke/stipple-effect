@@ -1,1 +1,1 @@
-Cut selection | {Ctrl + X}
+Cut selection | {sc:CUT}

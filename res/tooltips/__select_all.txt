@@ -1,1 +1,1 @@
-Select all | {Ctrl + A}
+Select all | {sc:SELECT_ALL}

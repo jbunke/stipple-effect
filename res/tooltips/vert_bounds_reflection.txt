@@ -1,1 +1,1 @@
-Reflect selection bounds vertically | {Ctrl + 5}
+Reflect selection bounds vertically | {sc:VERT_BOUNDS_REFLECTION}

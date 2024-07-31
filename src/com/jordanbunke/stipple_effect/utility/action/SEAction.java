@@ -36,8 +36,10 @@ public enum SEAction {
     PREVIEW(ActionCodes.PREVIEW, null, PreviewWindow::set,
             new KeyShortcut(false, true, SPACE),
             (c, eventLogger) -> eventLogger.unpressAllKeys(), true),
-    ALL_UI(ActionCodes.ALL_UI, c -> Layout.showAllPanels(), null),
-    MINIMAL_UI(ActionCodes.MINIMAL_UI, c -> Layout.minimalUI(), null),
+    ALL_UI(ActionCodes.ALL_UI, c -> Layout.showAllPanels(),
+            new KeyShortcut(true, true, A)),
+    MINIMAL_UI(ActionCodes.MINIMAL_UI, c -> Layout.minimalUI(),
+            new KeyShortcut(true, true, A)),
     TOGGLE_PANELS(ActionCodes.NONE, c -> Layout.togglePanels(),
             new KeyShortcut(true, true, A)),
     HIDE_PIXEL_GRID(ActionCodes.PIXEL_GRID_ON,
@@ -73,6 +75,12 @@ public enum SEAction {
             new KeyShortcut(true, false, K)),
     SWAP_COLORS(ActionCodes.SWAP_COLORS, fromSE(StippleEffect::swapColors),
             new KeyShortcut(false, true, C)),
+    WINDOWED(ActionCodes.WINDOWED,
+            fromSE(StippleEffect::toggleFullscreen),
+            KeyShortcut.single(ESCAPE)),
+    FULLSCREEN(ActionCodes.FULLSCREEN,
+            fromSE(StippleEffect::toggleFullscreen),
+            KeyShortcut.single(ESCAPE)),
 
     // non-project dialogs
     SETTINGS(ActionCodes.SETTINGS,
@@ -433,7 +441,7 @@ public enum SEAction {
 
     // key press
     public final BiConsumer<SEContext, InputEventLogger> postKeyPressBehaviour;
-    private final KeyShortcut shortcut;
+    public final KeyShortcut shortcut;
 
     // dropdown menu
     private final boolean closeDropdown;

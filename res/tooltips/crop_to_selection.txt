@@ -1,1 +1,1 @@
-Crop canvas to selection | {Ctrl + Shift + X}
+Crop canvas to selection | {sc:CROP_TO_SELECTION}

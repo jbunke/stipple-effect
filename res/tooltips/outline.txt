@@ -1,1 +1,1 @@
-Configure outline... | {Shift + O}
+Configure outline... | {sc:CONFIGURE_OUTLINE}

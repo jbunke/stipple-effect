@@ -1,1 +1,1 @@
-Double outline the selection | {Ctrl + Shift + 9}
+Double outline the selection | {sc:DOUBLE_OUTLINE}
