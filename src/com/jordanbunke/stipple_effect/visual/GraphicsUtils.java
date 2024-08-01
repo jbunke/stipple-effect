@@ -8,18 +8,18 @@ import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
-import com.jordanbunke.stipple_effect.utility.action.SEAction;
+import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.StaticTextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -283,17 +283,6 @@ public class GraphicsUtils {
         highlighted.draw(icon);
 
         return highlighted.submit();
-    }
-
-    public static MenuElement generateIconButton(
-            final Coord2D position, final SEAction action, final SEContext c
-    ) {
-        final Supplier<Boolean> precondition = action.precondition == null
-                ? () -> true : () -> action.precondition.test(c);
-
-        return generateIconButton(action.code,
-                position, precondition,
-                () -> action.behaviour.accept(c));
     }
 
     public static MenuElement generateIconButton(

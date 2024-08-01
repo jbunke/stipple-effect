@@ -2428,6 +2428,7 @@ public class DialogAssembly {
                 Layout.DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 
+    // TODO: refactor - identical to Layout::contentPositionAfterLabel
     private static Coord2D getDialogContentOffsetFollowingLabel(
             final MenuElement label) {
         return label.getRenderPosition().displace(

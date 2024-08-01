@@ -21,10 +21,7 @@ import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
-import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
-import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
-import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
@@ -425,7 +422,7 @@ public final class TextTool extends Tool {
                         .toArray(Runnable[]::new), () -> fontIndex);
 
         // upload font button
-        final MenuElement newFontButton = GraphicsUtils.generateIconButton(
+        final MenuElement newFontButton = new ActionButton(
                 new Coord2D(Layout.optionsBarNextButtonX(fontDropdown),
                         Layout.optionsBarButtonY()), SEAction.NEW_FONT, null);
 

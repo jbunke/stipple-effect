@@ -26,11 +26,11 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.SamplerMode;
 import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
-import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorSelector;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
@@ -41,6 +41,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalSc
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -506,7 +507,7 @@ public class MenuAssembly {
 
         for (SEAction action : actions) {
             if (!action.code.equals(ActionCodes.NONE))
-                mb.add(GraphicsUtils.generateIconButton(pos, action, c));
+                mb.add(new ActionButton(pos, action, c));
 
             pos = pos.displace(displacement);
         }
@@ -557,52 +558,51 @@ public class MenuAssembly {
 
     public static Menu buildColorsMenu() {
         final MenuBuilder mb = new MenuBuilder();
+        final Coord2D panelPos = Layout.getColorsPosition();
+        final int pw = Layout.getColorsWidth(),
+                ph = Layout.getColorsHeight(),
+                leftMargin = panelPos.x + Layout.CONTENT_BUFFER_PX,
+                leftColumn = panelPos.x + (pw / 4),
+                middle = panelPos.x + (pw / 2),
+                rightColumn = panelPos.x + ((3 * pw) / 4);
 
-        mb.add(TextLabel.make(Layout.getColorsPosition().displace(
+        mb.add(TextLabel.make(panelPos.displace(
                 Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
                 "Colors"));
 
-        // TODO: remove
-        populateButtonsIntoBuilder(
-                mb, new String[] {
-                        ActionCodes.SWAP_COLORS,
-                        ActionCodes.COLOR_MENU_MODE
-                },
-                getPreconditions(
-                        () -> true,
-                        () -> true
-                ),
-                new Runnable[] {
-                        StippleEffect.get()::swapColors,
-                        StippleEffect.get()::toggleColorMenuMode
-                },
-                Layout.getColorsPosition()
-        );
-
-        addHidePanelToMenuBuilder(mb, Layout.getColorsPosition()
-                .displace(Layout.getColorsWidth(), 0),
+        addHidePanelToMenuBuilder(mb, panelPos.displace(pw, 0),
                 () -> Layout.setColorsPanelShowing(false));
 
-        final int NUM_COLORS = 2;
+        final int PRI = 0, SEC = 1;
 
-        for (int i = 0; i < NUM_COLORS; i++) {
-            final int offsetY = Layout.getPanelContentDisplacement().y * 2;
-            final Coord2D labelPos = Layout.getColorsPosition().displace(
-                    Layout.getPanelContentDisplacement()).displace(
-                            i * (Layout.getColorsWidth() / 2), 0),
-                    textBoxPos = Layout.getColorsPosition().displace(
-                            (Layout.getColorsWidth() / 4) + (i *
-                                    (Layout.getColorsWidth() / 2)), offsetY);
+        final int incY = Layout.PANEL_TITLE_CONTENT_OFFSET_Y,
+                colorLabelY = panelPos.y + incY,
+                colorTextboxY = colorLabelY + incY;
+        final Color labelColor = ThemeLogic.intuitTextColor(true);
 
-            mb.add(TextLabel.make(labelPos, switch (i) {
-                case 0 -> "Primary";
-                case 1 -> "Secondary";
-                default -> "Other";
-            }));
+        for (int i = 0; i <= SEC; i++) {
+            final String text;
+            final int x;
 
-            final ColorTextbox colorTextBox = ColorTextbox.make(textBoxPos, i);
+            if (i == PRI) {
+                text = "Primary";
+                x = leftColumn;
+            } else {
+                text = "Secondary";
+                x = rightColumn;
+            }
+
+            // labels
+            mb.add(TextLabel.make(new Coord2D(x, colorLabelY), text,
+                    labelColor, 1d, MenuElement.Anchor.CENTRAL_TOP));
+
+            // color textboxes
+            final Coord2D textBoxPos = new Coord2D(x, colorTextboxY);
+            final ColorTextbox colorTextBox = ColorTextbox.make(
+                    textBoxPos, MenuElement.Anchor.CENTRAL_TOP, i);
             mb.add(colorTextBox);
 
+            // selected color highlight icon
             final int index = i;
             final Bounds2D dims = new Bounds2D(colorTextBox.getWidth(),
                     colorTextBox.getHeight());
@@ -614,12 +614,44 @@ public class MenuAssembly {
             mb.add(highlight);
         }
 
-        switch (StippleEffect.get().getColorMenuMode()) {
-            case RGBA_HSV -> mb.add(new ColorSelector());
-            case PALETTE -> addPaletteMenuElements(mb);
-        }
+        // swap colors icon
+        mb.add(new ActionButton(
+                new Coord2D(middle, colorTextboxY + Layout.BUTTON_OFFSET),
+                MenuElement.Anchor.CENTRAL_TOP, SWAP_COLORS, null));
+
+        // sampler mode choice
+        final Coord2D samplerPos = new Coord2D(leftMargin,
+                colorTextboxY + (int)(incY * 1.5));
+        final TextLabel samplerLabel = TextLabel.make(samplerPos, "Sampler:");
+        final Coord2D samplerDropdownPos = Layout.contentPositionAfterLabel(samplerLabel);
+        final Dropdown samplerDropdown = new Dropdown(samplerDropdownPos,
+                contentWidthAllowance(panelPos.x, pw, samplerDropdownPos.x),
+                MenuElement.Anchor.LEFT_TOP,
+                ph / 3, Dropdown.DEFAULT_RENDER_ORDER,
+                EnumUtils.stream(SamplerMode.class)
+                        .map(SamplerMode::toString)
+                        .toArray(String[]::new),
+                EnumUtils.stream(SamplerMode.class)
+                        .map(s -> (Runnable) () -> Layout.setSamplerMode(s))
+                        .toArray(Runnable[]::new),
+                () -> Layout.getSamplerMode().ordinal());
+        mb.addAll(samplerLabel, samplerDropdown);
+
+        // TODO
+//        switch (StippleEffect.get().getColorMenuMode()) {
+//            case RGBA_HSV -> mb.add(new ColorSelector());
+//            case PALETTE -> addPaletteMenuElements(mb);
+//        }
 
         return mb.build();
+    }
+
+    private static int contentWidthAllowance(
+            final int panelX, final int panelWidth, final int x
+    ) {
+        final int BUFFER = Layout.CONTENT_BUFFER_PX, xInPanel = x - panelX;
+
+        return (panelWidth - BUFFER) - xInPanel;
     }
 
     private static void addHidePanelToMenuBuilder(
@@ -786,10 +818,7 @@ public class MenuAssembly {
         final Coord2D outlinePos = Layout.getToolsPosition()
                 .displace(Layout.BUTTON_OFFSET,
                         Layout.getToolsHeight() - Layout.BUTTON_INC);
-
-        final MenuElement outlineButton = GraphicsUtils.
-                generateIconButton(outlinePos, CONFIGURE_OUTLINE, c);
-        mb.add(outlineButton);
+        mb.add(new ActionButton(outlinePos, CONFIGURE_OUTLINE, c));
 
         // TODO: use thinking elements to update icons
         // reflection buttons
@@ -846,11 +875,13 @@ public class MenuAssembly {
                 Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET +
                         (Layout.BUTTON_INC * (index + 1)));
 
-        return new IconButton(tool.convertNameToFilename(),
-                position, () -> StippleEffect.get().setTool(tool),
-                StippleEffect.get().getTool().equals(tool)
-                        ? tool.getSelectedIcon() : tool.getIcon(),
-                tool.getHighlightedIcon());
+        final boolean selected = StippleEffect.get().getTool().equals(tool);
+        final GameImage icon = selected
+                ? tool.getSelectedIcon() : tool.getIcon();
+
+        return new IconButton(position, MenuElement.Anchor.LEFT_TOP,
+                () -> StippleEffect.get().setTool(tool),
+                tool.convertNameToFilename(), icon, tool.getHighlightedIcon());
     }
 
     public static Menu buildBottomBarMenu() {

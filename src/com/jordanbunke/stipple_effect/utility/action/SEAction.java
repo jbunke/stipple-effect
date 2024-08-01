@@ -437,7 +437,7 @@ public enum SEAction {
 
     public final String code;
     public final Consumer<SEContext> behaviour;
-    public final Predicate<SEContext> precondition;
+    private final Predicate<SEContext> precondition;
 
     // key press
     public final BiConsumer<SEContext, InputEventLogger> postKeyPressBehaviour;
@@ -507,6 +507,10 @@ public enum SEAction {
         }
 
         return false;
+    }
+
+    public Predicate<SEContext> getPrecondition() {
+        return precondition == null ? c -> true : precondition;
     }
 
     public DropdownItem toItem(final SEContext c) {

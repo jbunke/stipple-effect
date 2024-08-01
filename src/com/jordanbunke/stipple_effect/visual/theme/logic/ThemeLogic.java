@@ -452,6 +452,10 @@ public abstract class ThemeLogic {
         return diffD > diffL ? dark : light;
     }
 
+    public static Color intuitTextColor(final boolean main) {
+        return intuitTextColor(Settings.getTheme().panelBackground, main);
+    }
+
     public static GameImage hueFromColorTransformation(
             final GameImage asset, final Color ref
     ) {

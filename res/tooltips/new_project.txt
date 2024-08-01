@@ -1,1 +1,1 @@
-New project... | {sc:NEW_RPOJECT}
+New project... | {sc:NEW_PROJECT}

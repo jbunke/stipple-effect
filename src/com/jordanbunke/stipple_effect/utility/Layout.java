@@ -14,6 +14,7 @@ public final class Layout {
             toolbarShowing, projectsExpanded, projectsRequiresScrolling;
 
     private static int flipbookHeight;
+    private static SamplerMode samplerMode;
 
     // layout constants
     private static final double
@@ -79,6 +80,8 @@ public final class Layout {
         projectsRequiresScrolling = false;
 
         flipbookHeight = MIN_FLIPBOOK_H;
+
+        samplerMode = SamplerMode.RGB_SLIDERS;
     }
 
     // panel display
@@ -193,6 +196,13 @@ public final class Layout {
 
     public static int getBottomBarCanvasSizeWidth() {
         return getBottomBarZoomPercentageX() - getBottomBarCanvasSizeX();
+    }
+
+    // general layout
+    public static Coord2D contentPositionAfterLabel(final MenuElement label) {
+        return label.getRenderPosition().displace(
+                label.getWidth() + CONTENT_BUFFER_PX,
+                DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 
     // tool options bar layout
@@ -376,5 +386,13 @@ public final class Layout {
 
     public static void changeFlipbookHeight(final int deltaHeight) {
         flipbookHeight += deltaHeight;
+    }
+
+    public static SamplerMode getSamplerMode() {
+        return samplerMode;
+    }
+
+    public static void setSamplerMode(final SamplerMode samplerMode) {
+        Layout.samplerMode = samplerMode;
     }
 }
