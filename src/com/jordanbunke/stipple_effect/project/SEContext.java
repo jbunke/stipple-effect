@@ -787,7 +787,7 @@ public class SEContext {
             final int z = (int) Math.ceil(zl.z),
                     altPx = Math.max(2, z / Layout.PIXEL_GRID_COLOR_ALT_DIVS);
 
-            final boolean tooSmall = z == 0,
+            final boolean tooSmall = z == 0 || (int)(Math.min(w, h) * zl.z) == 0,
                     tooLarge = Math.max(w, h) * z >
                             Layout.PIXEL_GRID_ZOOM_DIM_MAX;
 

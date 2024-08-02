@@ -32,12 +32,13 @@ import java.util.function.Supplier;
 
 public class GraphicsUtils {
     public static GameImage HIGHLIGHT_OVERLAY,
-            SELECT_OVERLAY, TRANSFORM_NODE, CHECKMARK;
+            SELECT_OVERLAY, TRANSFORM_NODE, COLOR_NODE, CHECKMARK;
     private static final Map<CelButton.Status, GameImage> stencilMap;
     private static final Map<String, GameImage> iconMap;
 
     static {
         TRANSFORM_NODE = loadUtil("transform_node");
+        COLOR_NODE = loadUtil("color_node");
         CHECKMARK = loadUtil("checkmark");
 
         iconMap = new HashMap<>();
@@ -66,6 +67,7 @@ public class GraphicsUtils {
         final Theme theme = Settings.getTheme();
 
         TRANSFORM_NODE = loadUtil("transform_node");
+        COLOR_NODE = loadUtil("color_node");
         CHECKMARK = loadUtil("checkmark");
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();

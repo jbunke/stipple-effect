@@ -56,8 +56,6 @@ public final class Layout {
             COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             TOP_PANEL_SCROLL_WINDOW_H = STD_TEXT_BUTTON_H + SLIDER_BALL_DIM,
-            FULL_COLOR_SLIDER_W = RIGHT_PANEL_W - (SLIDER_BALL_DIM + 10),
-            HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
             COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
             MAX_ERROR_CHARS_PER_LINE = 60, CHARS_CUTOFF = MAX_ERROR_CHARS_PER_LINE - 5;
 
@@ -340,11 +338,6 @@ public final class Layout {
 
     public static Coord2D getCanvasMiddle() {
         return new Coord2D(width() / 2, height() / 2);
-    }
-
-    // misc. layout
-    public static int getColorSelectorIncY() {
-        return (int)(getColorsHeight() / 6.5);
     }
 
     public static int getProjectScrollWindowWidth() {

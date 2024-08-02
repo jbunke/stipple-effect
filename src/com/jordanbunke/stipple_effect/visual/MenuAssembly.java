@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
+import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.NestedItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
@@ -31,8 +32,7 @@ import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
-import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorTextbox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.colors.PaletteColorButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.ThinkingActionItem;
@@ -44,8 +44,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButto
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -576,6 +575,7 @@ public class MenuAssembly {
         final int PRI = 0, SEC = 1;
 
         final int incY = Layout.PANEL_TITLE_CONTENT_OFFSET_Y,
+                bigIncY = (int)(incY * 1.5), biggestIncY = incY * 2,
                 colorLabelY = panelPos.y + incY,
                 colorTextboxY = colorLabelY + incY;
         final Color labelColor = ThemeLogic.intuitTextColor(true);
@@ -620,9 +620,10 @@ public class MenuAssembly {
                 MenuElement.Anchor.CENTRAL_TOP, SWAP_COLORS, null));
 
         // sampler mode choice
-        final Coord2D samplerPos = new Coord2D(leftMargin,
-                colorTextboxY + (int)(incY * 1.5));
-        final TextLabel samplerLabel = TextLabel.make(samplerPos, "Sampler:");
+        final Coord2D samplerLabelPos = new Coord2D(leftMargin,
+                colorTextboxY + bigIncY);
+        final TextLabel samplerLabel =
+                TextLabel.make(samplerLabelPos, "Sampler:");
         final Coord2D samplerDropdownPos = Layout.contentPositionAfterLabel(samplerLabel);
         final Dropdown samplerDropdown = new Dropdown(samplerDropdownPos,
                 contentWidthAllowance(panelPos.x, pw, samplerDropdownPos.x),
@@ -636,6 +637,59 @@ public class MenuAssembly {
                         .toArray(Runnable[]::new),
                 () -> Layout.getSamplerMode().ordinal());
         mb.addAll(samplerLabel, samplerDropdown);
+
+        // sampler
+        final Coord2D samplerStartingPos = new Coord2D(leftMargin,
+                samplerLabelPos.y + bigIncY);
+        final Map<SamplerMode, MenuElement> samplerContentMap = new HashMap<>();
+
+        // basic RGB sampler content
+        final SamplerMode rgb = SamplerMode.RGB_SLIDERS;
+        final MenuBuilder rgbBuilder = new MenuBuilder();
+        Coord2D compPos = samplerStartingPos;
+
+        for (int i = 0; i < rgb.componentCount(); i++) {
+            rgbBuilder.add(rgb.getForIndex(i, compPos));
+            compPos = compPos.displace(0, biggestIncY);
+        }
+
+        // basic HSV sampler content
+        final SamplerMode hsv = SamplerMode.HSV_SLIDERS;
+        final MenuBuilder hsvBuilder = new MenuBuilder();
+        compPos = samplerStartingPos;
+
+        for (int i = 0; i < hsv.componentCount(); i++) {
+            hsvBuilder.add(hsv.getForIndex(i, compPos));
+            compPos = compPos.displace(0, biggestIncY);
+        }
+
+        // alpha slider - common to RGB and HSV samplers
+        final ColorComponent alphaSlider = ColorComponent.alpha(compPos);
+        rgbBuilder.add(alphaSlider);
+        hsvBuilder.add(alphaSlider);
+
+        samplerContentMap.put(rgb, new MenuElementGrouping(
+                rgbBuilder.build().getMenuElements()));
+        samplerContentMap.put(hsv, new MenuElementGrouping(
+                hsvBuilder.build().getMenuElements()));
+
+        // matrix sampler
+        final int matrixWidth = contentWidthAllowance(
+                panelPos.x, pw, samplerStartingPos.x);
+        final SatValMatrix matrix = new SatValMatrix(samplerStartingPos,
+                new Bounds2D(matrixWidth, biggestIncY * 2));
+
+        final Coord2D mHuePos = samplerStartingPos.displace(0, biggestIncY * 2),
+                mAlphaPos = mHuePos.displace(0, biggestIncY);
+        final ColorComponent mHue = ColorComponent.hue(mHuePos),
+                mAlpha = ColorComponent.alpha(mAlphaPos);
+
+        samplerContentMap.put(SamplerMode.SAT_VAL_MATRIX,
+                new MenuElementGrouping(matrix, mHue, mAlpha));
+
+
+        // sampler manager
+        mb.add(new SamplerManager(samplerContentMap));
 
         // TODO
 //        switch (StippleEffect.get().getColorMenuMode()) {
