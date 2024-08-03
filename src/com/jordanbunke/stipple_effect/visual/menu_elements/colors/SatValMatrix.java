@@ -14,6 +14,7 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -24,6 +25,7 @@ public final class SatValMatrix extends MenuElement {
             BUFFER_PX = BORDER_PX * 2;
 
     private Color lastC;
+    private double lastHue, lastSat, lastValue;
     private final GameImage background;
     private GameImage matrix;
     private boolean interacting;
@@ -69,9 +71,9 @@ public final class SatValMatrix extends MenuElement {
         // checkerboard background
         matrix.draw(background, BUFFER_PX, BUFFER_PX);
 
-        final double hue = ColorMath.rgbToHue(c),
-                sat = ColorMath.rgbToSat(c),
-                value = ColorMath.rgbToValue(c);
+        final double hue = ColorMath.fetchHue(c),
+                sat = ColorMath.fetchSat(c),
+                value = ColorMath.fetchValue(c);
 
         // matrix
         for (int x = BUFFER_PX; x < w - BUFFER_PX; x++) {
@@ -164,26 +166,37 @@ public final class SatValMatrix extends MenuElement {
         // adjustment logic
         if (interacting)
             updateColor(localMP);
+
+        // cursor
+        if (mouseInBounds)
+            SECursor.setCursorCode(interacting
+                    ? SECursor.NONE : SECursor.RETICLE);
     }
 
     private void updateColor(final Coord2D localMP) {
         final double sat = getSat(localMP.y), value = getVal(localMP.x);
-        final Color c = StippleEffect.get().getSelectedColor(),
-                newC = ColorMath.fromHSV(ColorMath.rgbToHue(c),
-                        sat, value, c.getAlpha());
+        final Color c = StippleEffect.get().getSelectedColor();
 
-        StippleEffect.get().setSelectedColor(newC,
-                ColorMath.LastHSVEdit.NONE);
+        StippleEffect.get().setSelectedColor(
+                ColorMath.fromSatValMatrix(sat, value, c),
+                ColorMath.LastHSVEdit.SAT_VAL);
     }
 
     @Override
     public void update(final double deltaTime) {
         final Color c = StippleEffect.get().getSelectedColor();
+        final double hue = ColorMath.fetchHue(c),
+                sat = ColorMath.fetchSat(c),
+                value = ColorMath.fetchValue(c);
 
-        if (!c.equals(lastC))
+        if (!(c.equals(lastC) && lastHue == hue &&
+                lastSat == sat && lastValue == value))
             updateAssets(c);
 
         lastC = c;
+        lastHue = hue;
+        lastSat = sat;
+        lastValue = value;
     }
 
     @Override

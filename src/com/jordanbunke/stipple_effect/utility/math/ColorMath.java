@@ -15,7 +15,7 @@ public class ColorMath {
     private static double lastHue = 0d, lastSat = 0d, lastValue = 0d;
 
     public enum LastHSVEdit {
-        HUE, SAT, VAL, NONE
+        HUE, SAT, VAL, SAT_VAL, NONE
     }
 
     public static GameImage algo(
@@ -126,7 +126,7 @@ public class ColorMath {
         return scaleUp(fetchHue(c), Constants.HUE_SCALE);
     }
 
-    private static double fetchHue(final Color c) {
+    public static double fetchHue(final Color c) {
         return lastHSVEdit == LastHSVEdit.NONE ? rgbToHue(c) : lastHue;
     }
 
@@ -134,7 +134,7 @@ public class ColorMath {
         return scaleUp(fetchSat(c), Constants.SAT_SCALE);
     }
 
-    private static double fetchSat(final Color c) {
+    public static double fetchSat(final Color c) {
         return lastHSVEdit == LastHSVEdit.NONE ? rgbToSat(c) : lastSat;
     }
 
@@ -142,7 +142,7 @@ public class ColorMath {
         return scaleUp(fetchValue(c), Constants.VALUE_SCALE);
     }
 
-    private static double fetchValue(final Color c) {
+    public static double fetchValue(final Color c) {
         return lastHSVEdit == LastHSVEdit.NONE ? rgbToValue(c) : lastValue;
     }
 
@@ -235,6 +235,17 @@ public class ColorMath {
 
         lastValue = nValue;
         return fromHSV(hue, saturation, nValue, c.getAlpha());
+    }
+
+    public static Color fromSatValMatrix(
+            final double sat, final double value, final Color c
+    ) {
+        final double hue = fetchHue(c);
+
+        lastSat = sat;
+        lastValue = value;
+
+        return fromHSV(hue, sat, value, c.getAlpha());
     }
 
     public static Color fromHSV(

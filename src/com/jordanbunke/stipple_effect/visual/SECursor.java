@@ -13,7 +13,7 @@ import java.util.Set;
 public class SECursor {
     private static final String DT_CURSOR_CODE = "dt-se:cursor_code";
 
-    public static final String MAIN_CURSOR = "main",
+    public static final String MAIN_CURSOR = "main", NONE = "none",
             RETICLE = "reticle", NO_SCRIPT = "no_script",
             HAND_OPEN = "hand_open", HAND_GRAB = "hand_grab",
             SLIDE_VERT = "slide_vert", SLIDE_HORZ = "slide_horz";
@@ -117,6 +117,8 @@ public class SECursor {
     }
 
     public static void refresh() {
+        CURSOR_MAP.clear();
+
         for (String code : CURSOR_CODES) {
             final GameImage asset = ResourceLoader.loadImageResource(
                     Constants.CURSOR_FOLDER.resolve(code + ".png")),
@@ -124,5 +126,7 @@ public class SECursor {
 
             CURSOR_MAP.put(code, cursor);
         }
+
+        CURSOR_MAP.put(NONE, GameImage.dummy());
     }
 }
