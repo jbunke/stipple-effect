@@ -44,9 +44,10 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButto
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
@@ -136,13 +137,9 @@ public class MenuAssembly {
                                 LAST_OUTLINE.toItem(c),
                                 SINGLE_OUTLINE.toItem(c),
                                 DOUBLE_OUTLINE.toItem(c))),
-                new NestedItem("Palette",
-                        NEW_PALETTE.toItem(c),
-                        IMPORT_PALETTE.toItem(c),
-                        DELETE_PALETTE.toItem(c),
-                        SAVE_PALETTE.toItem(c),
-                        SORT_PALETTE.toItem(c),
-                        PALETTE_SETTINGS.toItem(c)),
+                new NestedItem("Palette", Arrays.stream(paletteActions())
+                        .map(a -> a.toItem(c))
+                        .toArray(DropdownItem[]::new)),
                 new NestedItem("Actions", Arrays.stream(actionsMenuActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new))));
@@ -556,6 +553,7 @@ public class MenuAssembly {
     }
 
     public static Menu buildColorsMenu() {
+        final StippleEffect s = StippleEffect.get();
         final MenuBuilder mb = new MenuBuilder();
         final Coord2D panelPos = Layout.getColorsPosition();
         final int pw = Layout.getColorsWidth(),
@@ -610,7 +608,7 @@ public class MenuAssembly {
                     new StaticMenuElement(textBoxPos, dims, MenuElement.Anchor.CENTRAL_TOP,
                             GraphicsUtils.drawSelectedTextbox(
                                     new GameImage(dims.width(), dims.height()))),
-                    () -> StippleEffect.get().getColorIndex() == index);
+                    () -> s.getColorIndex() == index);
             mb.add(highlight);
         }
 
@@ -633,7 +631,7 @@ public class MenuAssembly {
                         .map(SamplerMode::toString)
                         .toArray(String[]::new),
                 EnumUtils.stream(SamplerMode.class)
-                        .map(s -> (Runnable) () -> Layout.setSamplerMode(s))
+                        .map(sm -> (Runnable) () -> Layout.setSamplerMode(sm))
                         .toArray(Runnable[]::new),
                 () -> Layout.getSamplerMode().ordinal());
         mb.addAll(samplerLabel, samplerDropdown);
@@ -707,11 +705,41 @@ public class MenuAssembly {
         // sampler manager
         mb.add(new SamplerManager(samplerContentMap));
 
-        // TODO
-//        switch (StippleEffect.get().getColorMenuMode()) {
-//            case RGBA_HSV -> mb.add(new ColorSelector());
-//            case PALETTE -> addPaletteMenuElements(mb);
-//        }
+        // TODO: palette
+        final Coord2D paletteStartingPos = wAlphaPos
+                .displace(0, incY + bigIncY);
+        final TextLabel paletteLabel =
+                TextLabel.make(paletteStartingPos, "Palette:");
+        final Coord2D paletteDropdownPos =
+                Layout.contentPositionAfterLabel(paletteLabel);
+        final int paletteDropdownH = ph - (
+                (paletteDropdownPos.y - panelPos.y) +
+                        Layout.CONTENT_BUFFER_PX + Layout.STD_TEXT_BUTTON_H),
+                paletteDropdownW = contentWidthAllowance(
+                        panelPos.x, pw, paletteDropdownPos.x);
+        final List<Palette> palettes = s.getPalettes();
+        final MenuElement paletteDropdown = s.hasPaletteContents()
+                ? new Dropdown(paletteDropdownPos,
+                paletteDropdownW, MenuElement.Anchor.LEFT_TOP,
+                paletteDropdownH, Dropdown.DEFAULT_RENDER_ORDER,
+                palettes.stream().map(Palette::getName).toArray(String[]::new),
+                IntStream.range(0, palettes.size())
+                        .mapToObj(i -> (Runnable) () -> s.setPaletteIndex(i))
+                        .toArray(Runnable[]::new), s::getPaletteIndex)
+                : new StaticMenuElement(paletteDropdownPos,
+                new Bounds2D(paletteDropdownW, Layout.STD_TEXT_BUTTON_H),
+                MenuElement.Anchor.LEFT_TOP,
+                Settings.getTheme().logic.drawTextButton(
+                        TextButton.of("No palettes", paletteDropdownW,
+                                Alignment.CENTER, ButtonType.STUB)));
+
+        mb.addAll(paletteLabel, paletteDropdown);
+
+        // palette buttons
+        final Coord2D paletteButtonPos =
+                paletteStartingPos.displace(0, bigIncY);
+        populateButtonsIntoBuilder(mb, paletteActions(),
+                null, paletteButtonPos, false);
 
         return mb.build();
     }

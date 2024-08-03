@@ -625,4 +625,11 @@ public enum SEAction {
                 DELETE_SELECTION_CONTENTS_NO_DESELECT
         };
     }
+
+    public static SEAction[] paletteActions() {
+        return new SEAction[] {
+                NEW_PALETTE, IMPORT_PALETTE, DELETE_PALETTE,
+                SAVE_PALETTE, SORT_PALETTE, PALETTE_SETTINGS
+        };
+    }
 }
