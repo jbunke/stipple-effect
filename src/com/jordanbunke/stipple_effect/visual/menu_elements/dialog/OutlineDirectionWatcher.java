@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.MenuButtonStub;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -45,17 +45,17 @@ public final class OutlineDirectionWatcher extends MenuButtonStub {
     }
 
     private void updateImage() {
-        final String code = lastValue == 0 ? ActionCodes.NO_OUTLINE
+        final String code = lastValue == 0 ? ResourceCodes.NO_OUTLINE
                 : (lastValue > 0
-                        ? ActionCodes.OUTLINE_PREFIX +
+                        ? ResourceCodes.OUTLINE_PREFIX +
                             direction.name().toLowerCase()
-                        : ActionCodes.OUTLINE_PREFIX +
+                        : ResourceCodes.OUTLINE_PREFIX +
                             direction.opposite().name().toLowerCase());
 
         image = GraphicsUtils.loadIcon(code);
 
         highlighted = Settings.getTheme().logic.highlightButton(
-                GraphicsUtils.loadIcon(ActionCodes.NO_OUTLINE));
+                GraphicsUtils.loadIcon(ResourceCodes.NO_OUTLINE));
     }
 
     @Override

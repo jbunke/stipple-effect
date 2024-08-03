@@ -11,7 +11,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
@@ -120,11 +120,11 @@ public class ColorComponent extends MenuElementContainer {
 
         // increment and decrement buttons
         final Coord2D decPos = Layout.contentPositionAfterLabel(label);
-        mb.add(IconButton.makeNoTooltip(ActionCodes.DECREMENT,
+        mb.add(IconButton.makeNoTooltip(ResourceCodes.DECREMENT,
                 decPos,
                 () -> setter.accept(spectralFunction.apply(
                         Math.max(getter.get() - 1, 0)))));
-        mb.add(IconButton.makeNoTooltip(ActionCodes.INCREMENT,
+        mb.add(IconButton.makeNoTooltip(ResourceCodes.INCREMENT,
                 decPos.displace(Layout.BUTTON_INC, 0),
                 () -> setter.accept(spectralFunction.apply(
                         Math.min(getter.get() + 1, maxValue)))));

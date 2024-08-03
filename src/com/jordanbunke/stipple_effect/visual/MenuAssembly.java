@@ -28,7 +28,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.SamplerMode;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
@@ -153,10 +153,10 @@ public class MenuAssembly {
                 Layout.ICON_BUTTON_OFFSET_Y);
 
         if (!Layout.isProjectsExpanded())
-            mb.add(IconButton.make(ActionCodes.EXPAND_PANEL, panelIconPos,
+            mb.add(IconButton.make(ResourceCodes.EXPAND_PANEL, panelIconPos,
                     () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(true))));
         else
-            mb.add(IconButton.make(ActionCodes.COLLAPSE_PANEL, panelIconPos,
+            mb.add(IconButton.make(ResourceCodes.COLLAPSE_PANEL, panelIconPos,
                     () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(false))));
 
         // early break if collapsed
@@ -197,7 +197,7 @@ public class MenuAssembly {
                     StippleEffect.get().removeContext(index);
             };
 
-            toScroll.add(IconButton.make(ActionCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
+            toScroll.add(IconButton.make(ResourceCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
 
             cumulativeWidth += offsetX;
             realRightX = cpPos.x + Layout.BUTTON_DIM;
@@ -348,7 +348,7 @@ public class MenuAssembly {
             // layer settings
             final int index = i;
             final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
-            layerElements.add(IconButton.make(ActionCodes.LAYER_SETTINGS, lsPos,
+            layerElements.add(IconButton.make(ResourceCodes.LAYER_SETTINGS, lsPos,
                     () -> DialogAssembly.setDialogToLayerSettings(index)));
 
             realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
@@ -433,7 +433,7 @@ public class MenuAssembly {
     ) {
         // 0: is playing, button click should STOP; 1: vice-versa
         final String[] codes = new String[]
-                { ActionCodes.STOP, ActionCodes.PLAY };
+                { ResourceCodes.STOP, ResourceCodes.PLAY };
 
         return IconToggleButton.make(pos, codes, new Runnable[] {
                 c.playbackInfo::stop, c.playbackInfo::play
@@ -473,8 +473,8 @@ public class MenuAssembly {
     ) {
         // 0: is unlinked, button click should LINK; 1: vice-versa
         final String[] codes = new String[] {
-                ActionCodes.FRAMES_UNLINKED,
-                ActionCodes.FRAMES_LINKED
+                ResourceCodes.FRAMES_UNLINKED,
+                ResourceCodes.FRAMES_LINKED
         };
 
         return IconToggleButton.make(pos, codes,
@@ -505,7 +505,7 @@ public class MenuAssembly {
         Coord2D pos = firstPos;
 
         for (SEAction action : actions) {
-            if (!action.code.equals(ActionCodes.NONE))
+            if (!action.code.equals(ResourceCodes.NONE))
                 mb.add(new ActionButton(pos, action, c));
 
             pos = pos.displace(displacement);
@@ -540,7 +540,7 @@ public class MenuAssembly {
         Coord2D pos = firstPos;
 
         for (int i = 0; i < iconIDs.length; i++) {
-            if (!iconIDs[i].equals(ActionCodes.NONE))
+            if (!iconIDs[i].equals(ResourceCodes.NONE))
                 mb.add(GraphicsUtils.generateIconButton(iconIDs[i],
                         pos, preconditions[i], behaviours[i]));
 
@@ -663,7 +663,7 @@ public class MenuAssembly {
             compPos = compPos.displace(0, biggestIncY);
         }
 
-        // alpha slider - common to RGB and HSV samplers
+        // alpha slider - common to all samplers
         final ColorComponent alphaSlider = ColorComponent.alpha(compPos);
         rgbBuilder.add(alphaSlider);
         hsvBuilder.add(alphaSlider);
@@ -679,13 +679,12 @@ public class MenuAssembly {
         final SatValMatrix matrix = new SatValMatrix(samplerStartingPos,
                 new Bounds2D(matrixWidth, biggestIncY * 2));
 
-        final Coord2D mHuePos = samplerStartingPos.displace(0, biggestIncY * 2),
-                mAlphaPos = mHuePos.displace(0, biggestIncY);
-        final ColorComponent mHue = ColorComponent.hue(mHuePos),
-                mAlpha = ColorComponent.alpha(mAlphaPos);
+        final Coord2D mHuePos = samplerStartingPos.displace(
+                0, biggestIncY * 2);
+        final ColorComponent mHue = ColorComponent.hue(mHuePos);
 
         samplerContentMap.put(SamplerMode.SAT_VAL_MATRIX,
-                new MenuElementGrouping(matrix, mHue, mAlpha));
+                new MenuElementGrouping(matrix, mHue, alphaSlider));
 
 
         // sampler manager
@@ -714,7 +713,7 @@ public class MenuAssembly {
     ) {
         final Coord2D pos = topRight.displace(-Layout.BUTTON_INC,
                 Layout.ICON_BUTTON_OFFSET_Y);
-        mb.add(IconButton.make(ActionCodes.HIDE_PANEL, pos,
+        mb.add(IconButton.make(ResourceCodes.HIDE_PANEL, pos,
                 () -> Layout.adjustPanels(onClick)));
     }
 
@@ -740,14 +739,14 @@ public class MenuAssembly {
         // palette options
         populateButtonsIntoBuilder(
                 mb, new String[] {
-                        ActionCodes.NEW_PALETTE,
-                        ActionCodes.IMPORT_PALETTE,
-                        ActionCodes.CONTENTS_TO_PALETTE,
-                        ActionCodes.DELETE_PALETTE,
-                        ActionCodes.SAVE_PALETTE,
-                        ActionCodes.SORT_PALETTE,
-                        ActionCodes.PALETTIZE,
-                        ActionCodes.PALETTE_SETTINGS
+                        ResourceCodes.NEW_PALETTE,
+                        ResourceCodes.IMPORT_PALETTE,
+                        ResourceCodes.CONTENTS_TO_PALETTE,
+                        ResourceCodes.DELETE_PALETTE,
+                        ResourceCodes.SAVE_PALETTE,
+                        ResourceCodes.SORT_PALETTE,
+                        ResourceCodes.PALETTIZE,
+                        ResourceCodes.PALETTE_SETTINGS
                 },
                 getPreconditions(
                         () -> true,
@@ -779,10 +778,10 @@ public class MenuAssembly {
                 }, paletteOptionsRef);
         populateButtonsIntoBuilder(
                 mb, new String[] {
-                        ActionCodes.ADD_TO_PALETTE,
-                        ActionCodes.REMOVE_FROM_PALETTE,
-                        ActionCodes.MOVE_LEFT_IN_PALETTE,
-                        ActionCodes.MOVE_RIGHT_IN_PALETTE
+                        ResourceCodes.ADD_TO_PALETTE,
+                        ResourceCodes.REMOVE_FROM_PALETTE,
+                        ResourceCodes.MOVE_LEFT_IN_PALETTE,
+                        ResourceCodes.MOVE_RIGHT_IN_PALETTE
                 },
                 getPreconditions(
                         () -> hasPaletteContents && s.getSelectedPalette().isMutable(),
@@ -877,7 +876,7 @@ public class MenuAssembly {
         // TODO: use thinking elements to update icons
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
-                generateIconButton(ActionCodes.VERTICAL_REFLECTION,
+                generateIconButton(ResourceCodes.VERTICAL_REFLECTION,
                         outlinePos.displace(0, -Layout.BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
@@ -888,7 +887,7 @@ public class MenuAssembly {
                 );
         mb.add(verticalReflectionButton);
         final MenuElement horizontalReflectionButton = GraphicsUtils.
-                generateIconButton(ActionCodes.HORIZONTAL_REFLECTION,
+                generateIconButton(ResourceCodes.HORIZONTAL_REFLECTION,
                         outlinePos.displace(0, -2 * Layout.BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
@@ -903,15 +902,15 @@ public class MenuAssembly {
                 .generateIconToggleButton(
                         outlinePos.displace(0, -3 * Layout.BUTTON_INC),
                         new String[] {
-                                ActionCodes.PIXEL_GRID_OFF,
-                                ActionCodes.PIXEL_GRID_ON
+                                ResourceCodes.PIXEL_GRID_OFF,
+                                ResourceCodes.PIXEL_GRID_ON
                         },
                         new Runnable[] {
                                 () -> c.renderInfo.setPixelGrid(true),
                                 () -> c.renderInfo.setPixelGrid(false)
                         },
                         () -> c.renderInfo.isPixelGridOn() ? 1 : 0, () -> {},
-                        c::couldRenderPixelGrid, ActionCodes.PIXEL_GRID_OFF);
+                        c::couldRenderPixelGrid, ResourceCodes.PIXEL_GRID_OFF);
         mb.add(pixelGridToggleButton);
 
         final Tool tool = StippleEffect.get().getTool();
@@ -950,7 +949,7 @@ public class MenuAssembly {
         // active tool
         final Indicator toolIndicator = new Indicator(new Coord2D(
                 Layout.BUTTON_OFFSET, bottomBarButtonY),
-                ActionCodes.IND_TOOL);
+                ResourceCodes.IND_TOOL);
         final DynamicLabel toolLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(toolIndicator, false),
                 bottomBarTextY),
@@ -961,7 +960,7 @@ public class MenuAssembly {
         // target pixel
         final Indicator targetIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarTargetPixelX(), bottomBarButtonY),
-                ActionCodes.IND_TARGET);
+                ResourceCodes.IND_TARGET);
         final DynamicLabel targetLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(targetIndicator, false),
                 bottomBarTextY),
@@ -971,7 +970,7 @@ public class MenuAssembly {
         // canvas size
         final Indicator boundsIndicator = new Indicator(new Coord2D(
                 Layout.getBottomBarCanvasSizeX(), bottomBarButtonY),
-                ActionCodes.IND_BOUNDS);
+                ResourceCodes.IND_BOUNDS);
         final DynamicLabel boundsLabel = DynamicLabel.make(new Coord2D(
                 Layout.optionsBarNextElementX(boundsIndicator, false),
                 bottomBarTextY),
@@ -981,7 +980,7 @@ public class MenuAssembly {
         // zoom
         final Indicator zoomIndicator = new Indicator(
                 new Coord2D(Layout.getBottomBarZoomPercentageX(),
-                        bottomBarButtonY), ActionCodes.IND_ZOOM);
+                        bottomBarButtonY), ResourceCodes.IND_ZOOM);
         final IncrementalRangeElements<Float> zoom =
                 IncrementalRangeElements.makeForFloat(zoomIndicator,
                         Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,

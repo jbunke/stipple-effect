@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuEleme
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
@@ -39,7 +39,7 @@ public final class ThinkingActionItem extends DropdownItem implements SEDropdown
     }
 
     private static String widestLabel(final SEContext c, final SEAction[] possibilities) {
-        return MathPlus.findBest(ActionCodes.NONE, 0,
+        return MathPlus.findBest(ResourceCodes.NONE, 0,
                 GraphicsUtils::dropdownMenuHeaderWidth,
                 (cand, pole) -> cand > pole,
                 Arrays.stream(possibilities)

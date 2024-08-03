@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.project;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 
 public class PlaybackInfo {
     private static final double NANOS_IN_MILLI = 1e6;
@@ -36,10 +36,10 @@ public class PlaybackInfo {
 
         public String getIconCode() {
             return switch (this) {
-                case PONG_FORWARDS, PONG_BACKWARDS -> ActionCodes.PONG;
-                case LOOP -> ActionCodes.LOOP;
-                case FORWARDS -> ActionCodes.FORWARDS;
-                case BACKWARDS -> ActionCodes.BACKWARDS;
+                case PONG_FORWARDS, PONG_BACKWARDS -> ResourceCodes.PONG;
+                case LOOP -> ResourceCodes.LOOP;
+                case FORWARDS -> ResourceCodes.FORWARDS;
+                case BACKWARDS -> ResourceCodes.BACKWARDS;
             };
         }
     }

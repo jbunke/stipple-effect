@@ -26,7 +26,6 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.palette.ColorMenuMode;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
@@ -36,7 +35,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
@@ -88,7 +87,6 @@ public class StippleEffect implements ProgramContext {
     // colors
     private final Color[] colors;
     private int colorIndex;
-    private ColorMenuMode colorMenuMode;
     private final List<Palette> palettes;
     private int paletteIndex;
     private Menu colorsMenu;
@@ -227,7 +225,6 @@ public class StippleEffect implements ProgramContext {
         colors[SECONDARY] = SEColors.white();
         colorIndex = PRIMARY;
 
-        colorMenuMode = ColorMenuMode.RGBA_HSV;
         palettes = PaletteLoader.loadOnStartup();
         paletteIndex = palettes.isEmpty() ? Constants.NO_SELECTION : 0;
 
@@ -252,8 +249,8 @@ public class StippleEffect implements ProgramContext {
         statusUpdate = GameImage.dummy();
 
         toolTipMillisCounter = 0;
-        provisionalToolTipCode = ActionCodes.NONE;
-        toolTipCode = ActionCodes.NONE;
+        provisionalToolTipCode = ResourceCodes.NONE;
+        toolTipCode = ResourceCodes.NONE;
         toolTip = GameImage.dummy();
 
         timerCounter = 0;
@@ -318,7 +315,7 @@ public class StippleEffect implements ProgramContext {
         final GameWindow window = new GameWindow(
                 PROGRAM_NAME + " " + getVersion(),
                 size.width(), size.height(),
-                GraphicsUtils.readIconAsset(ActionCodes.PROGRAM),
+                GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
         return window;
@@ -433,12 +430,8 @@ public class StippleEffect implements ProgramContext {
             setTool.doForMatchingKeyStroke(eventLogger, null);
 
         // TODO: remove after color panel redesign
-        if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-            // Ctrl + Shift + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    this::toggleColorMenuMode);
-        } else if (eventLogger.isPressed(Key.CTRL)) {
+        if (eventLogger.isPressed(Key.CTRL) &&
+                !eventLogger.isPressed(Key.SHIFT)) {
             // Ctrl + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
@@ -446,7 +439,8 @@ public class StippleEffect implements ProgramContext {
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
                     this::selectPaletteColorToTheRight);
-        } else if (eventLogger.isPressed(Key.SHIFT)) {
+        } else if (eventLogger.isPressed(Key.SHIFT) &&
+                !eventLogger.isPressed(Key.CTRL)) {
             // Shift + ?
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
@@ -465,7 +459,7 @@ public class StippleEffect implements ProgramContext {
 
     @Override
     public void update(final double deltaTime) {
-        provisionalToolTipCode = ActionCodes.NONE;
+        provisionalToolTipCode = ResourceCodes.NONE;
 
         while (!jobScheduler.isEmpty())
             jobScheduler.poll().run();
@@ -512,7 +506,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     private void updateToolTip() {
-        if (!provisionalToolTipCode.equals(ActionCodes.NONE) &&
+        if (!provisionalToolTipCode.equals(ResourceCodes.NONE) &&
                 provisionalToolTipCode.equals(toolTipCode)) {
             toolTipMillisCounter +=
                     (int) (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
@@ -727,10 +721,6 @@ public class StippleEffect implements ProgramContext {
 
     public Color getColorAtIndex(final int index) {
         return colors[index];
-    }
-
-    public ColorMenuMode getColorMenuMode() {
-        return colorMenuMode;
     }
 
     public int getPaletteIndex() {
@@ -1001,7 +991,6 @@ public class StippleEffect implements ProgramContext {
         if (setActive)
             setPaletteIndex(palettes.size() - 1);
 
-        colorMenuMode = ColorMenuMode.PALETTE;
         rebuildColorsMenu();
     }
 
@@ -1012,7 +1001,6 @@ public class StippleEffect implements ProgramContext {
             if (paletteIndex >= palettes.size())
                 setPaletteIndex(palettes.size() - 1);
 
-            colorMenuMode = ColorMenuMode.PALETTE;
             rebuildColorsMenu();
         }
     }
@@ -1078,7 +1066,7 @@ public class StippleEffect implements ProgramContext {
         if (hasPaletteContents() && precondition.apply(p, c)) {
             f.accept(p, c);
 
-            if (Layout.isColorsPanelShowing() && colorMenuMode == ColorMenuMode.PALETTE)
+            if (Layout.isColorsPanelShowing())
                 rebuildColorsMenu();
             else
                 statusUpdate.accept(p, c);
@@ -1214,15 +1202,6 @@ public class StippleEffect implements ProgramContext {
 
         if (!Layout.isColorsPanelShowing())
             StatusUpdates.swapColors();
-    }
-
-    public void toggleColorMenuMode() {
-        colorMenuMode = colorMenuMode.toggle();
-
-        if (Layout.isColorsPanelShowing())
-            rebuildColorsMenu();
-        else
-            Layout.adjustPanels(() -> Layout.setColorsPanelShowing(true));
     }
 
     public void setPaletteIndex(final int paletteIndex) {

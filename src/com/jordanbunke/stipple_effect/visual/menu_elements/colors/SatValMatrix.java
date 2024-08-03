@@ -1,11 +1,14 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 
 import com.jordanbunke.delta_time.debug.GameDebugger;
+import com.jordanbunke.delta_time.events.GameEvent;
+import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -14,6 +17,7 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
+import java.util.List;
 
 public final class SatValMatrix extends MenuElement {
     private static final int BORDER_PX = Layout.BUTTON_BORDER_PX,
@@ -22,10 +26,12 @@ public final class SatValMatrix extends MenuElement {
     private Color lastC;
     private final GameImage background;
     private GameImage matrix;
+    private boolean interacting;
 
     public SatValMatrix(final Coord2D position, final Bounds2D dimensions) {
         super(position, dimensions, Anchor.LEFT_TOP, true);
 
+        interacting = false;
         background = drawBackground();
         updateAssets(StippleEffect.get().getSelectedColor());
     }
@@ -66,13 +72,13 @@ public final class SatValMatrix extends MenuElement {
         final double hue = ColorMath.rgbToHue(c),
                 sat = ColorMath.rgbToSat(c),
                 value = ColorMath.rgbToValue(c);
-        final int alpha = c.getAlpha();
 
         // matrix
         for (int x = BUFFER_PX; x < w - BUFFER_PX; x++) {
             for (int y = BUFFER_PX; y < h - BUFFER_PX; y++) {
                 final double pVal = getVal(x), pSat = getSat(y);
-                final Color pixel = ColorMath.fromHSV(hue, pSat, pVal, alpha);
+                final Color pixel = ColorMath.fromHSV(
+                        hue, pSat, pVal, c.getAlpha());
                 matrix.dot(pixel, x, y);
             }
         }
@@ -99,14 +105,14 @@ public final class SatValMatrix extends MenuElement {
         final int pastBorderX = localX - BUFFER_PX,
                 effectiveW = getEffectiveWidth();
 
-        return pastBorderX / (double) effectiveW;
+        return MathPlus.bounded(0d, pastBorderX / (double) effectiveW, 1d);
     }
 
     private double getSat(final int localY) {
         final int pastBorderY = localY - BUFFER_PX,
                 effectiveH = getEffectiveHeight();
 
-        return pastBorderY / (double) effectiveH;
+        return MathPlus.bounded(0d, pastBorderY / (double) effectiveH, 1d);
     }
 
     private int getEffectiveWidth() {
@@ -119,7 +125,55 @@ public final class SatValMatrix extends MenuElement {
 
     @Override
     public void process(final InputEventLogger eventLogger) {
+        final Coord2D mp = eventLogger.getAdjustedMousePosition();
+        final boolean mouseInBounds = mouseIsWithinBounds(mp);
+        final Coord2D localMP = mp.displace(getRenderPosition().scale(-1));
 
+        if (interacting) {
+            final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
+            for (GameEvent e : unprocessed) {
+                if (e instanceof GameMouseEvent me &&
+                        me.matchesAction(GameMouseEvent.Action.UP)) {
+                    interacting = false;
+                    me.markAsProcessed();
+                    break;
+                }
+            }
+        }
+
+        if (mouseInBounds) {
+            // check for mouse down and for click
+            final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
+            for (GameEvent e : unprocessed) {
+                if (e instanceof GameMouseEvent me &&
+                        !me.matchesAction(GameMouseEvent.Action.UP)) {
+                    switch (me.action) {
+                        case DOWN -> interacting = true;
+                        case CLICK -> {
+                            updateColor(localMP);
+                            interacting = false;
+                        }
+                    }
+
+                    me.markAsProcessed();
+                    break;
+                }
+            }
+        }
+
+        // adjustment logic
+        if (interacting)
+            updateColor(localMP);
+    }
+
+    private void updateColor(final Coord2D localMP) {
+        final double sat = getSat(localMP.y), value = getVal(localMP.x);
+        final Color c = StippleEffect.get().getSelectedColor(),
+                newC = ColorMath.fromHSV(ColorMath.rgbToHue(c),
+                        sat, value, c.getAlpha());
+
+        StippleEffect.get().setSelectedColor(newC,
+                ColorMath.LastHSVEdit.NONE);
     }
 
     @Override

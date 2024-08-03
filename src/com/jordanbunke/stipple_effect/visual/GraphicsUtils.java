@@ -12,7 +12,7 @@ import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
@@ -151,7 +151,7 @@ public class GraphicsUtils {
     }
 
     public static int dropdownMenuLeafWidth(final String code) {
-        final int FAIL = 1, buttonWidth = ActionCodes.hasIcon(code)
+        final int FAIL = 1, buttonWidth = ResourceCodes.hasIcon(code)
                 ? Layout.BUTTON_INC : 0;
         final String[] lines = ParserUtils.getToolTip(code);
 
@@ -182,7 +182,7 @@ public class GraphicsUtils {
     public static GameImage drawSelectedTextbox(final GameImage bounds) {
         final GameImage selected = new GameImage(bounds);
         final int w = selected.getWidth();
-        selected.draw(loadIcon(ActionCodes.BULLET_POINT),
+        selected.draw(loadIcon(ResourceCodes.BULLET_POINT),
                 w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
@@ -259,7 +259,7 @@ public class GraphicsUtils {
         if (num < 1 || num > 9)
             return GameImage.dummy();
 
-        return loadIcon(ActionCodes.NUMKEY_PREFIX + num);
+        return loadIcon(ResourceCodes.NUMKEY_PREFIX + num);
     }
 
     public static GameImage loadIcon(final String code) {

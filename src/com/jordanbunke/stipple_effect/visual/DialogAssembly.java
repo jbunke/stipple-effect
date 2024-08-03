@@ -36,7 +36,7 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.TextTool;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.*;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -1115,7 +1115,7 @@ public class DialogAssembly {
 
         mb.add(new StaticMenuElement(buttonPos, Layout.OUTLINE_BUTTON_DIMS,
                 MenuElement.Anchor.CENTRAL,
-                GraphicsUtils.loadIcon(ActionCodes.SELECTION_REPRESENTATION)));
+                GraphicsUtils.loadIcon(ResourceCodes.SELECTION_REPRESENTATION)));
 
         Arrays.stream(Outliner.Direction.values()).forEach(direction -> {
             final Coord2D rc = direction.relativeCoordinate();
@@ -1544,28 +1544,28 @@ public class DialogAssembly {
         if (fc > 1) {
             // frame and playback mode controls
             final MenuElement firstFrame =
-                    GraphicsUtils.generateIconButton(ActionCodes.TO_FIRST_FRAME,
+                    GraphicsUtils.generateIconButton(ResourceCodes.TO_FIRST_FRAME,
                             backButton.getPosition()
                                     .displace(0, Layout.DIALOG_CONTENT_INC_Y),
                             () -> true, previewer::toFirstFrame),
                     previousFrame = GraphicsUtils.generateIconButton(
-                            ActionCodes.PREVIOUS, firstFrame.getRenderPosition()
+                            ResourceCodes.PREVIOUS, firstFrame.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
                             () -> true, previewer::previousFrame),
                     playStop = GraphicsUtils.generateIconToggleButton(
                             previousFrame.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
-                            new String[] { ActionCodes.PLAY, ActionCodes.STOP },
+                            new String[] { ResourceCodes.PLAY, ResourceCodes.STOP },
                             new Runnable[] {
                                     playbackInfo::play, playbackInfo::stop
                             }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
-                            () -> true, ActionCodes.PLAY),
+                            () -> true, ResourceCodes.PLAY),
                     nextFrame = GraphicsUtils.generateIconButton(
-                            ActionCodes.NEXT, playStop.getRenderPosition()
+                            ResourceCodes.NEXT, playStop.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
                             () -> true, previewer::nextFrame),
                     lastFrame = GraphicsUtils.generateIconButton(
-                            ActionCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
+                            ResourceCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
                                     .displace(Layout.BUTTON_INC, 0),
                             () -> true, previewer::toLastFrame);
 
@@ -1584,7 +1584,7 @@ public class DialogAssembly {
                                     .map(mode -> (Runnable) () -> {})
                                     .toArray(Runnable[]::new),
                             () -> playbackInfo.getMode().buttonIndex(),
-                            playbackInfo::toggleMode, () -> true, ActionCodes.LOOP);
+                            playbackInfo::toggleMode, () -> true, ResourceCodes.LOOP);
             final DynamicLabel frameTracker = makeDynamicLabel(
                     playbackModeButton.getRenderPosition().displace(
                             Layout.BUTTON_DIM + Layout.CONTENT_BUFFER_PX,
@@ -2801,14 +2801,14 @@ public class DialogAssembly {
                     contentStart, initialbottomY);
             case MORE -> assembleInfoScreenContents(
                     new String[] {
-                            ActionCodes.HORIZONTAL_REFLECTION,
-                            ActionCodes.VERTICAL_REFLECTION,
-                            ActionCodes.OUTLINE,
-                            ActionCodes.PIXEL_GRID_ON,
-                            ActionCodes.GENERAL,
-                            ActionCodes.CLIPBOARD_SHORTCUTS,
-                            ActionCodes.SELECTION_SHORTCUTS,
-                            ActionCodes.COLOR_SHORTCUTS
+                            ResourceCodes.HORIZONTAL_REFLECTION,
+                            ResourceCodes.VERTICAL_REFLECTION,
+                            ResourceCodes.OUTLINE,
+                            ResourceCodes.PIXEL_GRID_ON,
+                            ResourceCodes.GENERAL,
+                            ResourceCodes.CLIPBOARD_SHORTCUTS,
+                            ResourceCodes.SELECTION_SHORTCUTS,
+                            ResourceCodes.COLOR_SHORTCUTS
                     },
                     new String[] {
                             "Horizontal reflection",
@@ -2824,11 +2824,11 @@ public class DialogAssembly {
             case SCRIPTS -> assembleScriptingInfoScreen(contentAssembler,
                     contentStart, initialbottomY);
             case CHANGES -> assembleInfoScreenContents(
-                    new String[] { ActionCodes.CHANGELOG },
+                    new String[] { ResourceCodes.CHANGELOG },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
             case ROADMAP -> assembleInfoScreenContents(
-                    new String[] { ActionCodes.ROADMAP },
+                    new String[] { ResourceCodes.ROADMAP },
                     new String[] { "" },
                     contentAssembler, contentStart, initialbottomY);
         };
@@ -2867,7 +2867,7 @@ public class DialogAssembly {
 
         for (int i = 0; i < iconAndBlurbCodes.length; i++) {
             final String code = iconAndBlurbCodes[i];
-            final boolean hasIcon = ActionCodes.hasIcon(code);
+            final boolean hasIcon = ResourceCodes.hasIcon(code);
 
             if (hasIcon) {
                 final StaticMenuElement icon = new StaticMenuElement(
@@ -2933,7 +2933,7 @@ public class DialogAssembly {
                 incY = Layout.DIALOG_CONTENT_INC_Y;
 
         int bottomY = initialBottomY + assembleInfoScreenContents(
-                new String[] { ActionCodes.ABOUT }, new String[] { "" },
+                new String[] { ResourceCodes.ABOUT }, new String[] { "" },
                 contentAssembler, contentStart, initialBottomY);
 
         final TextLabel storePageLabel = TextLabel.make(
@@ -2970,7 +2970,7 @@ public class DialogAssembly {
                 incY = Layout.DIALOG_CONTENT_INC_Y;
 
         int bottomY = initialBottomY + assembleInfoScreenContents(
-                new String[] { ActionCodes.SCRIPTING }, new String[] { "" },
+                new String[] { ResourceCodes.SCRIPTING }, new String[] { "" },
                 contentAssembler, contentStart, initialBottomY);
 
         final TextLabel scriptLabel = TextLabel.make(
@@ -2993,22 +2993,22 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        ActionCodes.SWAP_COLORS,
-                        ActionCodes.COLOR_MENU_MODE,
-                        ActionCodes.HSV_SHIFT,
-                        ActionCodes.COLOR_SCRIPT,
-                        ActionCodes.NEW_PALETTE,
-                        ActionCodes.IMPORT_PALETTE,
-                        ActionCodes.CONTENTS_TO_PALETTE,
-                        ActionCodes.DELETE_PALETTE,
-                        ActionCodes.SAVE_PALETTE,
-                        ActionCodes.SORT_PALETTE,
-                        ActionCodes.PALETTIZE,
-                        ActionCodes.PALETTE_SETTINGS,
-                        ActionCodes.ADD_TO_PALETTE,
-                        ActionCodes.REMOVE_FROM_PALETTE,
-                        ActionCodes.MOVE_LEFT_IN_PALETTE,
-                        ActionCodes.MOVE_RIGHT_IN_PALETTE
+                        ResourceCodes.SWAP_COLORS,
+                        ResourceCodes.COLOR_MENU_MODE,
+                        ResourceCodes.HSV_SHIFT,
+                        ResourceCodes.COLOR_SCRIPT,
+                        ResourceCodes.NEW_PALETTE,
+                        ResourceCodes.IMPORT_PALETTE,
+                        ResourceCodes.CONTENTS_TO_PALETTE,
+                        ResourceCodes.DELETE_PALETTE,
+                        ResourceCodes.SAVE_PALETTE,
+                        ResourceCodes.SORT_PALETTE,
+                        ResourceCodes.PALETTIZE,
+                        ResourceCodes.PALETTE_SETTINGS,
+                        ResourceCodes.ADD_TO_PALETTE,
+                        ResourceCodes.REMOVE_FROM_PALETTE,
+                        ResourceCodes.MOVE_LEFT_IN_PALETTE,
+                        ResourceCodes.MOVE_RIGHT_IN_PALETTE
                 },
                 new String[] {
                         "Swap primary and secondary color",
@@ -3038,23 +3038,23 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        ActionCodes.INFO,
-                        ActionCodes.PANEL_MANAGER,
-                        ActionCodes.SETTINGS,
-                        ActionCodes.NEW_PROJECT,
-                        ActionCodes.OPEN_FILE,
-                        ActionCodes.SAVE,
-                        ActionCodes.SAVE_AS,
-                        ActionCodes.RESIZE,
-                        ActionCodes.PAD,
-                        ActionCodes.STITCH_SPLIT_FRAMES,
-                        ActionCodes.PREVIEW,
-                        ActionCodes.AUTOMATION_SCRIPT,
-                        ActionCodes.UNDO,
-                        ActionCodes.GRANULAR_UNDO,
-                        ActionCodes.GRANULAR_REDO,
-                        ActionCodes.REDO,
-                        ActionCodes.HISTORY
+                        ResourceCodes.INFO,
+                        ResourceCodes.PANEL_MANAGER,
+                        ResourceCodes.SETTINGS,
+                        ResourceCodes.NEW_PROJECT,
+                        ResourceCodes.OPEN_FILE,
+                        ResourceCodes.SAVE,
+                        ResourceCodes.SAVE_AS,
+                        ResourceCodes.RESIZE,
+                        ResourceCodes.PAD,
+                        ResourceCodes.STITCH_SPLIT_FRAMES,
+                        ResourceCodes.PREVIEW,
+                        ResourceCodes.AUTOMATION_SCRIPT,
+                        ResourceCodes.UNDO,
+                        ResourceCodes.GRANULAR_UNDO,
+                        ResourceCodes.GRANULAR_REDO,
+                        ResourceCodes.REDO,
+                        ResourceCodes.HISTORY
                 },
                 new String[] {
                         "Info", "Open panel manager", "Program Settings",
@@ -3073,25 +3073,25 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        ActionCodes.NEW_LAYER,
-                        ActionCodes.DUPLICATE_LAYER,
-                        ActionCodes.REMOVE_LAYER,
-                        ActionCodes.MOVE_LAYER_UP,
-                        ActionCodes.MOVE_LAYER_DOWN,
-                        ActionCodes.MERGE_WITH_LAYER_BELOW,
-                        ActionCodes.FLATTEN,
-                        ActionCodes.LAYER_VISIBILITY,
-                        ActionCodes.LAYER_ENABLED,
-                        ActionCodes.LAYER_DISABLED,
-                        ActionCodes.ONION_SKIN,
-                        ActionCodes.ONION_SKIN_NONE,
-                        ActionCodes.ONION_SKIN_PREVIOUS,
-                        ActionCodes.ONION_SKIN_NEXT,
-                        ActionCodes.ONION_SKIN_BOTH,
-                        ActionCodes.FRAME_LOCKING,
-                        ActionCodes.FRAMES_LINKED,
-                        ActionCodes.FRAMES_UNLINKED,
-                        ActionCodes.LAYER_SETTINGS
+                        ResourceCodes.NEW_LAYER,
+                        ResourceCodes.DUPLICATE_LAYER,
+                        ResourceCodes.REMOVE_LAYER,
+                        ResourceCodes.MOVE_LAYER_UP,
+                        ResourceCodes.MOVE_LAYER_DOWN,
+                        ResourceCodes.MERGE_WITH_LAYER_BELOW,
+                        ResourceCodes.FLATTEN,
+                        ResourceCodes.LAYER_VISIBILITY,
+                        ResourceCodes.LAYER_ENABLED,
+                        ResourceCodes.LAYER_DISABLED,
+                        ResourceCodes.ONION_SKIN,
+                        ResourceCodes.ONION_SKIN_NONE,
+                        ResourceCodes.ONION_SKIN_PREVIOUS,
+                        ResourceCodes.ONION_SKIN_NEXT,
+                        ResourceCodes.ONION_SKIN_BOTH,
+                        ResourceCodes.FRAME_LOCKING,
+                        ResourceCodes.FRAMES_LINKED,
+                        ResourceCodes.FRAMES_UNLINKED,
+                        ResourceCodes.LAYER_SETTINGS
                 },
                 new String[] {
                         "New layer",
@@ -3123,22 +3123,22 @@ public class DialogAssembly {
     ) {
         return assembleInfoScreenContents(
                 new String[] {
-                        ActionCodes.NEW_FRAME,
-                        ActionCodes.DUPLICATE_FRAME,
-                        ActionCodes.REMOVE_FRAME,
-                        ActionCodes.MOVE_FRAME_FORWARD,
-                        ActionCodes.MOVE_FRAME_BACK,
-                        ActionCodes.FRAME_PROPERTIES,
-                        ActionCodes.TO_FIRST_FRAME,
-                        ActionCodes.PREVIOUS,
-                        ActionCodes.NEXT,
-                        ActionCodes.TO_LAST_FRAME,
-                        ActionCodes.PLAY,
-                        ActionCodes.PLAYBACK_MODES,
-                        ActionCodes.FORWARDS,
-                        ActionCodes.BACKWARDS,
-                        ActionCodes.LOOP,
-                        ActionCodes.PONG
+                        ResourceCodes.NEW_FRAME,
+                        ResourceCodes.DUPLICATE_FRAME,
+                        ResourceCodes.REMOVE_FRAME,
+                        ResourceCodes.MOVE_FRAME_FORWARD,
+                        ResourceCodes.MOVE_FRAME_BACK,
+                        ResourceCodes.FRAME_PROPERTIES,
+                        ResourceCodes.TO_FIRST_FRAME,
+                        ResourceCodes.PREVIOUS,
+                        ResourceCodes.NEXT,
+                        ResourceCodes.TO_LAST_FRAME,
+                        ResourceCodes.PLAY,
+                        ResourceCodes.PLAYBACK_MODES,
+                        ResourceCodes.FORWARDS,
+                        ResourceCodes.BACKWARDS,
+                        ResourceCodes.LOOP,
+                        ResourceCodes.PONG
                 },
                 new String[] {
                         "New frame",

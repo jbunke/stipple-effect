@@ -7,7 +7,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
@@ -51,13 +51,13 @@ public class IconButton extends SimpleMenuButton {
         final GameImage icon = GraphicsUtils.loadIcon(code);
 
         return new IconButton(position, Anchor.LEFT_TOP, onClick,
-                ActionCodes.NO_TOOLTIP, icon, GraphicsUtils.highlightIconButton(icon));
+                ResourceCodes.NO_TOOLTIP, icon, GraphicsUtils.highlightIconButton(icon));
     }
 
     @Override
     public void update(final double deltaTime) {
         if (isHighlighted() && Permissions.isCursorFree() &&
-                !code.equals(ActionCodes.NO_TOOLTIP))
+                !code.equals(ResourceCodes.NO_TOOLTIP))
             StippleEffect.get().sendToolTipUpdate(code);
     }
 }

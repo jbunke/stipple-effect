@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.visual.menu_elements;
 
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.setting_group.DoubleToolSettingType;
 import com.jordanbunke.stipple_effect.utility.setting_group.FloatToolSettingType;
@@ -49,7 +49,7 @@ public class IncrementalRangeElements<R extends Number> {
             final MenuElement preceding, final int buttonY,
             final Runnable fDecrement
     ) {
-        return IconButton.makeNoTooltip(ActionCodes.DECREMENT, new Coord2D(
+        return IconButton.makeNoTooltip(ResourceCodes.DECREMENT, new Coord2D(
                 Layout.optionsBarNextElementX(preceding, false),
                 buttonY), fDecrement);
     }
@@ -57,7 +57,7 @@ public class IncrementalRangeElements<R extends Number> {
     private IconButton makeIncrement(
             final int buttonY, final Runnable fIncrement
     ) {
-        return IconButton.makeNoTooltip(ActionCodes.INCREMENT, new Coord2D(
+        return IconButton.makeNoTooltip(ResourceCodes.INCREMENT, new Coord2D(
                 Layout.optionsBarNextButtonX(decButton), buttonY),
                 fIncrement);
     }

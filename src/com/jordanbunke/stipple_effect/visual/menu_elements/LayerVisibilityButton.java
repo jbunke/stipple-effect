@@ -9,7 +9,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.SelectableMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -108,8 +108,8 @@ public class LayerVisibilityButton extends SelectableMenuElement {
 
     private String getCode() {
         return enabled
-                ? ActionCodes.LAYER_ENABLED
-                : ActionCodes.LAYER_DISABLED;
+                ? ResourceCodes.LAYER_ENABLED
+                : ResourceCodes.LAYER_DISABLED;
     }
 
     @Override

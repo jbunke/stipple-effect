@@ -1,6 +1,6 @@
 package com.jordanbunke.stipple_effect.utility.action;
 
-public final class ActionCodes {
+public final class ResourceCodes {
     public static final String
             PROGRAM = "program_icon",
             NEW_PROJECT = "new_project",

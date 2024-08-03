@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
@@ -119,7 +119,7 @@ public class SEFonts {
             return;
 
         final String[] previewText = ParserUtils.getBlurb(
-                ActionCodes.FONT_EXAMPLE_TEXT);
+                ResourceCodes.FONT_EXAMPLE_TEXT);
         final TextBuilder tb = new TextBuilder(1d, Text.Orientation.LEFT,
                 Settings.getTheme().textLight, buildNewFont());
         Arrays.stream(previewText).forEach(line -> {

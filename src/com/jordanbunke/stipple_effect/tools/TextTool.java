@@ -17,7 +17,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.*;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
@@ -428,7 +428,7 @@ public final class TextTool extends Tool {
 
         // delete font button
         final MenuElement deleteFontButton = GraphicsUtils
-                .generateIconButton(ActionCodes.DELETE_FONT, new Coord2D(
+                .generateIconButton(ResourceCodes.DELETE_FONT, new Coord2D(
                         Layout.optionsBarNextButtonX(newFontButton),
                                 Layout.optionsBarButtonY()),
                         () -> fontIndex >= SEFonts.Code.values().length,

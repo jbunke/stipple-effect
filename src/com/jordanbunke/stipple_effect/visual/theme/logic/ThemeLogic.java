@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.visual.theme.logic;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -116,7 +116,7 @@ public abstract class ThemeLogic {
         final Theme t = Settings.getTheme();
         final String code = tb.getLabel();
 
-        final boolean hasIcon = ActionCodes.hasIcon(code);
+        final boolean hasIcon = ResourceCodes.hasIcon(code);
         final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
                 textY = Layout.TEXT_Y_OFFSET;
 
@@ -239,7 +239,7 @@ public abstract class ThemeLogic {
         // dropdown list button
         if (type == ButtonType.DD_HEAD) {
             final GameImage icon = GraphicsUtils.loadIcon(
-                    tb.isSelected() ? ActionCodes.COLLAPSE : ActionCodes.EXPAND);
+                    tb.isSelected() ? ResourceCodes.COLLAPSE : ResourceCodes.EXPAND);
 
             img.draw(icon, w - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
         }

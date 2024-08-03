@@ -11,7 +11,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.action.ActionCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -37,9 +37,9 @@ public class PaletteColorButton extends SelectableMenuElement {
         GameImage getOverlay() {
             return switch (this) {
                 case PRIMARY ->
-                        GraphicsUtils.loadIcon(ActionCodes.PRIMARY_SELECTION);
+                        GraphicsUtils.loadIcon(ResourceCodes.PRIMARY_SELECTION);
                 case SECONDARY ->
-                        GraphicsUtils.loadIcon(ActionCodes.SECONDARY_SELECTION);
+                        GraphicsUtils.loadIcon(ResourceCodes.SECONDARY_SELECTION);
                 case NEITHER -> GameImage.dummy();
             };
         }
@@ -95,7 +95,7 @@ public class PaletteColorButton extends SelectableMenuElement {
 
     private void updateAssets() {
         final GameImage base = GraphicsUtils.loadIcon(
-                ActionCodes.PALETTE_BUTTON_BACKGROUND);
+                ResourceCodes.PALETTE_BUTTON_BACKGROUND);
 
         base.fillRectangle(color, 0, 0,
                 Layout.PALETTE_DIMS.width(),
@@ -103,7 +103,7 @@ public class PaletteColorButton extends SelectableMenuElement {
         base.draw(selection.getOverlay());
 
         if (!included)
-            base.draw(GraphicsUtils.loadIcon(ActionCodes.EXCLUDED_FROM_PALETTE));
+            base.draw(GraphicsUtils.loadIcon(ResourceCodes.EXCLUDED_FROM_PALETTE));
 
         nh = base.submit();
         hi = Settings.getTheme().logic.highlightButton(nh);

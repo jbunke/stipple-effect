@@ -123,18 +123,27 @@ public class ColorMath {
     }
 
     public static int hueGetter(final Color c) {
-        return scaleUp(lastHSVEdit == LastHSVEdit.NONE
-                ? rgbToHue(c) : lastHue, Constants.HUE_SCALE);
+        return scaleUp(fetchHue(c), Constants.HUE_SCALE);
+    }
+
+    private static double fetchHue(final Color c) {
+        return lastHSVEdit == LastHSVEdit.NONE ? rgbToHue(c) : lastHue;
     }
 
     public static int satGetter(final Color c) {
-        return scaleUp(lastHSVEdit == LastHSVEdit.NONE
-                ? rgbToSat(c) : lastSat, Constants.SAT_SCALE);
+        return scaleUp(fetchSat(c), Constants.SAT_SCALE);
+    }
+
+    private static double fetchSat(final Color c) {
+        return lastHSVEdit == LastHSVEdit.NONE ? rgbToSat(c) : lastSat;
     }
 
     public static int valueGetter(final Color c) {
-        return scaleUp(lastHSVEdit == LastHSVEdit.NONE
-                ? rgbToValue(c) : lastValue, Constants.VALUE_SCALE);
+        return scaleUp(fetchValue(c), Constants.VALUE_SCALE);
+    }
+
+    private static double fetchValue(final Color c) {
+        return lastHSVEdit == LastHSVEdit.NONE ? rgbToValue(c) : lastValue;
     }
 
     private static int scaleUp(final double value, final int scaleMax) {
@@ -205,8 +214,7 @@ public class ColorMath {
     }
 
     public static Color hueAdjustedColor(final int hue, final Color c) {
-        final double saturation = getHSVAttribute(ColorMath::rgbToSat, c, lastSat),
-                value = getHSVAttribute(ColorMath::rgbToValue, c, lastValue),
+        final double saturation = fetchSat(c), value = fetchValue(c),
                 nHue = scaleDown(hue, Constants.HUE_SCALE);
 
         lastHue = nHue;
@@ -214,8 +222,7 @@ public class ColorMath {
     }
 
     public static Color satAdjustedColor(final int saturation, final Color c) {
-        final double hue = getHSVAttribute(ColorMath::rgbToHue, c, lastHue),
-                value = getHSVAttribute(ColorMath::rgbToValue, c, lastValue),
+        final double hue = fetchHue(c), value = fetchValue(c),
                 nSat = scaleDown(saturation, Constants.SAT_SCALE);
 
         lastSat = nSat;
@@ -223,20 +230,11 @@ public class ColorMath {
     }
 
     public static Color valueAdjustedColor(final int value, final Color c) {
-        final double saturation = getHSVAttribute(ColorMath::rgbToSat, c, lastSat),
-                hue = getHSVAttribute(ColorMath::rgbToHue, c, lastHue),
+        final double saturation = fetchSat(c), hue = fetchHue(c),
                 nValue = scaleDown(value, Constants.VALUE_SCALE);
 
         lastValue = nValue;
         return fromHSV(hue, saturation, nValue, c.getAlpha());
-    }
-
-    private static double getHSVAttribute(
-            final Function<Color, Double> fRGBToAttribute,
-            final Color c, final double last
-    ) {
-        return lastHSVEdit == LastHSVEdit.NONE
-                ? fRGBToAttribute.apply(c) : last;
     }
 
     public static Color fromHSV(
