@@ -15,7 +15,7 @@ public class ColorMath {
     private static double lastHue = 0d, lastSat = 0d, lastValue = 0d;
 
     public enum LastHSVEdit {
-        HUE, SAT, VAL, SAT_VAL, NONE
+        HUE, SAT, VAL, SAT_VAL, WHEEL, NONE
     }
 
     public static GameImage algo(
@@ -244,6 +244,17 @@ public class ColorMath {
 
         lastSat = sat;
         lastValue = value;
+
+        return fromHSV(hue, sat, value, c.getAlpha());
+    }
+
+    public static Color fromColorWheel(
+            final double hue, double sat, final Color c
+    ) {
+        final double value = fetchValue(c);
+
+        lastHue = hue;
+        lastSat = sat;
 
         return fromHSV(hue, sat, value, c.getAlpha());
     }

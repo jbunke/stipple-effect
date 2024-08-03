@@ -1,11 +1,6 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 
-import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.events.GameEvent;
-import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
-import com.jordanbunke.delta_time.io.InputEventLogger;
-import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
@@ -13,32 +8,23 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
-import java.util.List;
 
-public final class SatValMatrix extends MenuElement {
-    private static final int BORDER_PX = Layout.BUTTON_BORDER_PX,
-            BUFFER_PX = BORDER_PX * 2;
-
-    private Color lastC;
-    private double lastHue, lastSat, lastValue;
-    private final GameImage background;
+public final class SatValMatrix extends TwoDimSampler {
     private GameImage matrix;
-    private boolean interacting;
+    private final GameImage background;
 
     public SatValMatrix(final Coord2D position, final Bounds2D dimensions) {
-        super(position, dimensions, Anchor.LEFT_TOP, true);
+        super(position, dimensions);
 
-        interacting = false;
         background = drawBackground();
         updateAssets(StippleEffect.get().getSelectedColor());
     }
 
-    private GameImage drawBackground() {
+    @Override
+    protected GameImage drawBackground() {
         final Theme t = Settings.getTheme();
         final int w = getEffectiveWidth(),
                 h = getEffectiveHeight();
@@ -59,14 +45,15 @@ public final class SatValMatrix extends MenuElement {
         return background.submit();
     }
 
-    private void updateAssets(final Color c) {
-        final int w = getWidth(), h = getHeight(),
-                ew = getEffectiveWidth(), eh = getEffectiveHeight();
+    @Override
+    protected void updateAssets(final Color c) {
+        final int w = getWidth(), h = getHeight();
         final GameImage matrix = new GameImage(w, h);
 
         // border
         matrix.drawRectangle(Settings.getTheme().buttonOutline,
-                2f * BORDER_PX, BUFFER_PX, BUFFER_PX, ew, eh);
+                2f * BORDER_PX, BUFFER_PX, BUFFER_PX,
+                getEffectiveWidth(), getEffectiveHeight());
 
         // checkerboard background
         matrix.draw(background, BUFFER_PX, BUFFER_PX);
@@ -86,11 +73,7 @@ public final class SatValMatrix extends MenuElement {
         }
 
         // pointer
-        final GameImage node = GraphicsUtils.COLOR_NODE;
-        final int px = getLocalXForVal(value),
-                py = getLocalYForSat(sat),
-                halfNode = node.getWidth() / 2;
-        matrix.draw(node, px - halfNode, py - halfNode);
+        drawNode(matrix, getLocalXForVal(value), getLocalYForSat(sat));
 
         this.matrix = matrix.submit();
     }
@@ -117,63 +100,18 @@ public final class SatValMatrix extends MenuElement {
         return MathPlus.bounded(0d, pastBorderY / (double) effectiveH, 1d);
     }
 
-    private int getEffectiveWidth() {
+    @Override
+    protected int getEffectiveWidth() {
         return getWidth() - (2 * BUFFER_PX);
     }
 
-    private int getEffectiveHeight() {
+    @Override
+    protected int getEffectiveHeight() {
         return getHeight() - (2 * BUFFER_PX);
     }
 
     @Override
-    public void process(final InputEventLogger eventLogger) {
-        final Coord2D mp = eventLogger.getAdjustedMousePosition();
-        final boolean mouseInBounds = mouseIsWithinBounds(mp);
-        final Coord2D localMP = mp.displace(getRenderPosition().scale(-1));
-
-        if (interacting) {
-            final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
-            for (GameEvent e : unprocessed) {
-                if (e instanceof GameMouseEvent me &&
-                        me.matchesAction(GameMouseEvent.Action.UP)) {
-                    interacting = false;
-                    me.markAsProcessed();
-                    break;
-                }
-            }
-        }
-
-        if (mouseInBounds) {
-            // check for mouse down and for click
-            final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
-            for (GameEvent e : unprocessed) {
-                if (e instanceof GameMouseEvent me &&
-                        !me.matchesAction(GameMouseEvent.Action.UP)) {
-                    switch (me.action) {
-                        case DOWN -> interacting = true;
-                        case CLICK -> {
-                            updateColor(localMP);
-                            interacting = false;
-                        }
-                    }
-
-                    me.markAsProcessed();
-                    break;
-                }
-            }
-        }
-
-        // adjustment logic
-        if (interacting)
-            updateColor(localMP);
-
-        // cursor
-        if (mouseInBounds)
-            SECursor.setCursorCode(interacting
-                    ? SECursor.NONE : SECursor.RETICLE);
-    }
-
-    private void updateColor(final Coord2D localMP) {
+    protected void updateColor(final Coord2D localMP) {
         final double sat = getSat(localMP.y), value = getVal(localMP.x);
         final Color c = StippleEffect.get().getSelectedColor();
 
@@ -183,29 +121,7 @@ public final class SatValMatrix extends MenuElement {
     }
 
     @Override
-    public void update(final double deltaTime) {
-        final Color c = StippleEffect.get().getSelectedColor();
-        final double hue = ColorMath.fetchHue(c),
-                sat = ColorMath.fetchSat(c),
-                value = ColorMath.fetchValue(c);
-
-        if (!(c.equals(lastC) && lastHue == hue &&
-                lastSat == sat && lastValue == value))
-            updateAssets(c);
-
-        lastC = c;
-        lastHue = hue;
-        lastSat = sat;
-        lastValue = value;
-    }
-
-    @Override
     public void render(final GameImage canvas) {
         draw(matrix, canvas);
-    }
-
-    @Override
-    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
-
     }
 }

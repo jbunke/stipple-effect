@@ -677,14 +677,31 @@ public class MenuAssembly {
         final int matrixWidth = contentWidthAllowance(
                 panelPos.x, pw, samplerStartingPos.x);
         final SatValMatrix matrix = new SatValMatrix(samplerStartingPos,
-                new Bounds2D(matrixWidth, biggestIncY * 2));
+                new Bounds2D(matrixWidth, biggestIncY * 3));
 
         final Coord2D mHuePos = samplerStartingPos.displace(
-                0, biggestIncY * 2);
-        final ColorComponent mHue = ColorComponent.hue(mHuePos);
+                0, matrix.getHeight()),
+                mAlphaPos = mHuePos.displace(0, biggestIncY);
+        final ColorComponent mHue = ColorComponent.hue(mHuePos),
+                mAlpha = ColorComponent.alpha(mAlphaPos);
 
         samplerContentMap.put(SamplerMode.SAT_VAL_MATRIX,
-                new MenuElementGrouping(matrix, mHue, alphaSlider));
+                new MenuElementGrouping(matrix, mHue, mAlpha));
+
+        // color wheel
+        final int wheelWidth = contentWidthAllowance(
+                panelPos.x, pw, samplerStartingPos.x);
+        final ColorWheel wheel = new ColorWheel(samplerStartingPos,
+                new Bounds2D(wheelWidth, biggestIncY * 3));
+
+        final Coord2D wValuePos = samplerStartingPos.displace(
+                0, wheel.getHeight()),
+                wAlphaPos = wValuePos.displace(0, biggestIncY);
+        final ColorComponent wValue = ColorComponent.value(wValuePos),
+                wAlpha = ColorComponent.alpha(wAlphaPos);
+
+        samplerContentMap.put(SamplerMode.COLOR_WHEEL,
+                new MenuElementGrouping(wheel, wValue, wAlpha));
 
 
         // sampler manager
