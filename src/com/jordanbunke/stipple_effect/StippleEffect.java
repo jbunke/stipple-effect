@@ -390,11 +390,7 @@ public class StippleEffect implements ProgramContext {
             getContext().process(eventLogger);
         } else {
             dialog.process(eventLogger);
-
-            // close dialog on ESC press
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    this::clearDialog);
+            CLEAR_DIALOG.doForMatchingKeyStroke(eventLogger, null);
         }
     }
 
@@ -410,6 +406,9 @@ public class StippleEffect implements ProgramContext {
         SAVE_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
         SORT_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
         PALETTE_SETTINGS.tryForMatchingKeyStroke(eventLogger, null);
+
+        ADD_TO_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
+        // TODO - remaining palette color
 
         PANEL_MANAGER.doForMatchingKeyStroke(eventLogger, null);
         TOGGLE_PANELS.doForMatchingKeyStroke(eventLogger, null);
@@ -442,9 +441,6 @@ public class StippleEffect implements ProgramContext {
         } else if (eventLogger.isPressed(Key.SHIFT) &&
                 !eventLogger.isPressed(Key.CTRL)) {
             // Shift + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    this::addColorToPalette);
             eventLogger.checkForMatchingKeyStroke(
                     GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
                     this::removeColorFromPalette);

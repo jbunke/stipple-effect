@@ -81,6 +81,8 @@ public enum SEAction {
     FULLSCREEN(ResourceCodes.FULLSCREEN,
             fromSE(StippleEffect::toggleFullscreen),
             KeyShortcut.single(ESCAPE)),
+    CLEAR_DIALOG(ResourceCodes.NONE, fromSE(StippleEffect::clearDialog),
+            KeyShortcut.single(ESCAPE)),
 
     // non-project dialogs
     SETTINGS(ResourceCodes.SETTINGS,
@@ -261,6 +263,11 @@ public enum SEAction {
             fromSE(s -> DialogAssembly.setDialogToPaletteSettings(
                     s.getSelectedPalette())),
             new KeyShortcut(false, true, E)),
+
+    // palette color
+    ADD_TO_PALETTE(ResourceCodes.ADD_TO_PALETTE, mutablePalette(),
+            fromSE(StippleEffect::addColorToPalette),
+            new KeyShortcut(false, true, A)),
 
     // state control
     UNDO(ResourceCodes.UNDO, c -> c.stateManager.canUndo(),

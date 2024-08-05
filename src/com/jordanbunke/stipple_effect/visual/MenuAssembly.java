@@ -703,29 +703,10 @@ public class MenuAssembly {
             final int paletteW = contentWidthAllowance(
                     panelPos.x, pw, palettePos.x),
                     paletteH = ph - ((palettePos.y - panelPos.y) +
-                            Layout.CONTENT_BUFFER_PX),
-                    fitsOnLine = (paletteW - Layout.SLIDER_OFF_DIM) /
-                            Layout.PALETTE_DIMS.width();
+                            Layout.CONTENT_BUFFER_PX);
 
-            final List<PaletteColorButton> buttons = new ArrayList<>();
-            final Color[] colors = s.getSelectedPalette().getColors();
-
-            for (int i = 0; i < colors.length; i++) {
-                final int x = i % fitsOnLine, y = i / fitsOnLine;
-                final Coord2D pos = palettePos.displace(
-                        x * Layout.PALETTE_DIMS.width(),
-                        y * Layout.PALETTE_DIMS.height());
-
-                buttons.add(new PaletteColorButton(pos, colors[i], s.getSelectedPalette()));
-            }
-
-            mb.add(new VerticalScrollBox(
-                    palettePos, new Bounds2D(paletteW, paletteH),
-                    buttons.stream().map(Scrollable::new)
-                            .toArray(Scrollable[]::new),
-                    palettePos.displace(0,
-                            (((colors.length + 1) / fitsOnLine) + 1) *
-                            Layout.PALETTE_DIMS.height()).y, 0));
+            mb.add(new PaletteContainer(palettePos,
+                    new Bounds2D(paletteW, paletteH), s.getSelectedPalette()));
         }
 
         return mb.build();
