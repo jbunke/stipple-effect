@@ -70,4 +70,36 @@ public class ActionButton extends MenuElement {
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {
         current.debugRender(canvas, debugger);
     }
+
+    @Override
+    public void incrementX(int deltaX) {
+        super.incrementX(deltaX);
+
+        stub.incrementX(deltaX);
+        button.incrementX(deltaX);
+    }
+
+    @Override
+    public void incrementY(int deltaY) {
+        super.incrementY(deltaY);
+
+        stub.incrementY(deltaY);
+        button.incrementY(deltaY);
+    }
+
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+
+        stub.setX(x);
+        button.setX(x);
+    }
+
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+
+        stub.setY(y);
+        button.setY(y);
+    }
 }

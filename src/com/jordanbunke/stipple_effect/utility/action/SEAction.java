@@ -268,6 +268,18 @@ public enum SEAction {
     ADD_TO_PALETTE(ResourceCodes.ADD_TO_PALETTE, mutablePalette(),
             fromSE(StippleEffect::addColorToPalette),
             new KeyShortcut(false, true, A)),
+    MOVE_COLOR_LEFT(ResourceCodes.MOVE_LEFT_IN_PALETTE,
+            fromSE(StippleEffect::moveColorLeftInPalette),
+            new KeyShortcut(false, true, COMMA)),
+    MOVE_COLOR_RIGHT(ResourceCodes.MOVE_RIGHT_IN_PALETTE,
+            fromSE(StippleEffect::moveColorRightInPalette),
+            new KeyShortcut(false, true, PERIOD)),
+    SELECT_COLOR_LEFT(ResourceCodes.NONE,
+            fromSE(StippleEffect::selectPaletteColorToTheLeft),
+            new KeyShortcut(true, false, COMMA)),
+    SELECT_COLOR_RIGHT(ResourceCodes.NONE,
+            fromSE(StippleEffect::selectPaletteColorToTheRight),
+            new KeyShortcut(true, false, PERIOD)),
 
     // state control
     UNDO(ResourceCodes.UNDO, c -> c.stateManager.canUndo(),
@@ -546,11 +558,8 @@ public enum SEAction {
     }
 
     private static Predicate<SEContext> mutablePalette() {
-        return c -> {
-            final StippleEffect s = StippleEffect.get();
-
-            return s.hasPaletteContents() && s.getSelectedPalette().isMutable();
-        };
+        return condFromSE(s -> s.hasPaletteContents() &&
+                s.getSelectedPalette().isMutable());
     }
 
     public static SEAction[] quickSelectActions() {

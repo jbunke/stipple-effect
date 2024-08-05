@@ -7,8 +7,6 @@ import com.jordanbunke.delta_time._core.ProgramContext;
 import com.jordanbunke.delta_time.debug.DebugChannel;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.error.GameError;
-import com.jordanbunke.delta_time.events.GameKeyEvent;
-import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
@@ -45,8 +43,6 @@ import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
-import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
-
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
@@ -56,6 +52,8 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+
+import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -408,7 +406,10 @@ public class StippleEffect implements ProgramContext {
         PALETTE_SETTINGS.tryForMatchingKeyStroke(eventLogger, null);
 
         ADD_TO_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
-        // TODO - remaining palette color
+        MOVE_COLOR_LEFT.doForMatchingKeyStroke(eventLogger, null);
+        MOVE_COLOR_RIGHT.doForMatchingKeyStroke(eventLogger, null);
+        SELECT_COLOR_LEFT.doForMatchingKeyStroke(eventLogger, null);
+        SELECT_COLOR_RIGHT.doForMatchingKeyStroke(eventLogger, null);
 
         PANEL_MANAGER.doForMatchingKeyStroke(eventLogger, null);
         TOGGLE_PANELS.doForMatchingKeyStroke(eventLogger, null);
@@ -427,30 +428,6 @@ public class StippleEffect implements ProgramContext {
         // set tools
         for (SEAction setTool : setToolActions())
             setTool.doForMatchingKeyStroke(eventLogger, null);
-
-        // TODO: remove after color panel redesign
-        if (eventLogger.isPressed(Key.CTRL) &&
-                !eventLogger.isPressed(Key.SHIFT)) {
-            // Ctrl + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
-                    this::selectPaletteColorToTheLeft);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
-                    this::selectPaletteColorToTheRight);
-        } else if (eventLogger.isPressed(Key.SHIFT) &&
-                !eventLogger.isPressed(Key.CTRL)) {
-            // Shift + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    this::removeColorFromPalette);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
-                    this::moveColorLeftInPalette);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
-                    this::moveColorRightInPalette);
-        }
     }
 
     @Override
@@ -1016,10 +993,10 @@ public class StippleEffect implements ProgramContext {
                 (p, c) -> StatusUpdates.cannotColorPalette(true, p, c));
     }
 
-    public void removeColorFromPalette() {
-        paletteSelectedColorAction(Palette::removeColor,
-                Palette::canRemove, StatusUpdates::removeColorFromPalette,
-                (p, c) -> StatusUpdates.cannotColorPalette(false, p, c));
+    public void removeColorFromPalette(final Color c) {
+        paletteColorAction(c, Palette::removeColor, Palette::canRemove,
+                StatusUpdates::removeColorFromPalette,
+                (p, col) -> StatusUpdates.cannotColorPalette(false, p, col));
     }
 
     public void moveColorLeftInPalette() {
@@ -1056,8 +1033,17 @@ public class StippleEffect implements ProgramContext {
             final BiConsumer<Palette, Color> statusUpdate,
             final BiConsumer<Palette, Color> notPermitted
     ) {
+        paletteColorAction(getSelectedColor(), f,
+                precondition, statusUpdate, notPermitted);
+    }
+
+    private void paletteColorAction(
+            final Color c, final BiConsumer<Palette, Color> f,
+            final BiFunction<Palette, Color, Boolean> precondition,
+            final BiConsumer<Palette, Color> statusUpdate,
+            final BiConsumer<Palette, Color> notPermitted
+    ) {
         final Palette p = getSelectedPalette();
-        final Color c = getSelectedColor();
 
         if (hasPaletteContents() && precondition.apply(p, c)) {
             f.accept(p, c);

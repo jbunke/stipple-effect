@@ -19,6 +19,7 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.state.StateManager;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.action.KeyShortcut;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
@@ -467,8 +468,7 @@ public class SEContext {
     }
 
     private void processCompoundKeyInputs(final InputEventLogger eventLogger) {
-        // SHIFT but not CTRL
-        if (!eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
+        if (KeyShortcut.areModKeysPressed(false, true, eventLogger)) {
             if (eventLogger.isPressed(Key.R)) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
@@ -546,7 +546,7 @@ public class SEContext {
     private void processSingleKeyInputs(final InputEventLogger eventLogger) {
         final Tool tool = StippleEffect.get().getTool();
 
-        if (!(eventLogger.isPressed(Key.CTRL) || eventLogger.isPressed(Key.SHIFT))) {
+        if (KeyShortcut.areModKeysPressed(false, false, eventLogger)) {
             // tool modifications
             if (tool instanceof BreadthTool bt) {
                 eventLogger.checkForMatchingKeyStroke(

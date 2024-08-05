@@ -26,12 +26,19 @@ public final class KeyShortcut {
         keyStroke = newKeyStroke(key, PRESS);
     }
 
+    public static boolean areModKeysPressed(
+            final boolean ctrl, final boolean shift,
+            final InputEventLogger eventLogger
+    ) {
+        return ctrl == eventLogger.isPressed(CTRL) &&
+                shift == eventLogger.isPressed(SHIFT);
+    }
+
     public void checkIfPressed(
             final InputEventLogger eventLogger,
             final Runnable behaviour
     ) {
-        if (ctrl == eventLogger.isPressed(CTRL) &&
-                shift == eventLogger.isPressed(SHIFT))
+        if (areModKeysPressed(ctrl, shift, eventLogger))
             eventLogger.checkForMatchingKeyStroke(keyStroke, behaviour);
     }
 

@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.colors;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.events.GameEvent;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.SelectableMenuElement;
@@ -11,9 +10,10 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
+import com.jordanbunke.stipple_effect.utility.action.KeyShortcut;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
@@ -65,7 +65,8 @@ public class PaletteColorButton extends SelectableMenuElement {
                 ", G: " + color.getGreen() +
                 ", B: " + color.getBlue() +
                 "\nOpacity: " + color.getAlpha() +
-                "\n{Shift + Click} to " + (included ? "ex" : "in") + "clude";
+                "\n{Shift + Click} to " + (included ? "ex" : "in") + "clude" +
+                "\n{Ctrl + Click} to remove from palette";
     }
 
     @Override
@@ -135,8 +136,10 @@ public class PaletteColorButton extends SelectableMenuElement {
                     mouseEvent.matchesAction(GameMouseEvent.Action.CLICK)) {
                 mouseEvent.markAsProcessed();
 
-                if (eventLogger.isPressed(Key.SHIFT))
+                if (KeyShortcut.areModKeysPressed(false, true, eventLogger))
                     palette.toggleInclusion(color);
+                else if (KeyShortcut.areModKeysPressed(true, false, eventLogger))
+                    StippleEffect.get().removeColorFromPalette(color);
                 else
                     setSelectedColor();
 

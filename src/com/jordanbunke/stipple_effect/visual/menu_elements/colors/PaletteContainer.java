@@ -55,7 +55,7 @@ public final class PaletteContainer extends MenuElement {
                 getPosition(), getDimensions(),
                 buttons.stream().map(Scrollable::new)
                         .toArray(Scrollable[]::new),
-                getY() + (((buttons.size() / fitsOnLine) + 1) *
+                getY() + (((colors.length / fitsOnLine) + 1) *
                         Layout.PALETTE_DIMS.height()), 0);
     }
 
