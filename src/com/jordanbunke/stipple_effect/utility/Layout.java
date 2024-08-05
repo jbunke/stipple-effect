@@ -25,7 +25,7 @@ public final class Layout {
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
-            MIN_WINDOW_H = 666,
+            MIN_WINDOW_H = 708,
             MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),
             MIN_WINDOW_W = (int)(MIN_WINDOW_H * (16 / 9.)),
             TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
@@ -53,10 +53,10 @@ public final class Layout {
             DIALOG_CONTENT_BIG_W_ALLOWANCE = LONG_NAME_TEXTBOX_W - DIALOG_CONTENT_SMALL_W_ALLOWANCE,
             SMALL_TEXT_BOX_W = 80, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET,
-            COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_W = 116,
+            COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             TOP_PANEL_SCROLL_WINDOW_H = STD_TEXT_BUTTON_H + SLIDER_BALL_DIM,
-            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
+            DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
             MAX_ERROR_CHARS_PER_LINE = 60, CHARS_CUTOFF = MAX_ERROR_CHARS_PER_LINE - 5;
 
     public static final Bounds2D
