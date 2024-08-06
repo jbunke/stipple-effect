@@ -310,18 +310,14 @@ public class MenuAssembly {
 
         int realBottomY = firstLBPos.y;
 
+        LayerButton.logic.reset();
+
         for (int i = layerCount - 1; i >= 0; i--) {
-            final SELayer layer = layers.get(i);
-
-            final String name = layer.getName(),
-                    text = name.length() > Layout.LAYER_NAME_LENGTH_CUTOFF
-                            ? name.substring(0, Layout.LAYER_NAME_LENGTH_CUTOFF) + "..."
-                            : name;
-
             final Coord2D pos = firstLBPos.displace(0,
                     (layerCount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
 
-            layerButtons[i] = new Scrollable(new LayerButton(pos, i, c, layer));
+            layerButtons[i] = new Scrollable(
+                    new LayerButton(pos, i, c, layers.get(i)));
             layerElements.add(layerButtons[i]);
 
             // visibility toggle

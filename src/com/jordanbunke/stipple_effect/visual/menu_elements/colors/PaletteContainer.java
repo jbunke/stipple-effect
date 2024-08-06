@@ -56,7 +56,7 @@ public final class PaletteContainer extends MenuElement {
         final List<MenuElement> buttons = new ArrayList<>();
         final Color[] colors = palette.getColors();
 
-        PaletteColorButton.resetColorButtons();
+        PaletteColorButton.logic.reset();
 
         for (int i = 0; i <= colors.length; i++) {
             final int x = i % buttonsPerLine, y = i / buttonsPerLine;
@@ -64,17 +64,11 @@ public final class PaletteContainer extends MenuElement {
                     x * Layout.PALETTE_DIMS.width(),
                     y * Layout.PALETTE_DIMS.height());
 
-            if (i == colors.length)
-                buttons.add(new ActionButton(pos.displace(
-                        Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET),
-                        SEAction.ADD_TO_PALETTE, null));
-            else {
-                final PaletteColorButton cb = new PaletteColorButton(
-                        pos, colors[i], palette, i);
-
-                PaletteColorButton.addColorButton(cb);
-                buttons.add(cb);
-            }
+            buttons.add(i == colors.length
+                    ? new ActionButton(pos.displace(
+                    Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET),
+                    SEAction.ADD_TO_PALETTE, null)
+                    : new PaletteColorButton(pos, colors[i], palette, i));
         }
 
         container = new VerticalScrollBox(
