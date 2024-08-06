@@ -32,6 +32,7 @@ import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.draggables.LayerButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.ThinkingActionItem;
@@ -320,10 +321,7 @@ public class MenuAssembly {
             final Coord2D pos = firstLBPos.displace(0,
                     (layerCount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
 
-            layerButtons[i] = new Scrollable(SelectableListItemButton.make(
-                    pos, Layout.LAYER_BUTTON_W, text, i,
-                    () -> c.getState().getLayerEditIndex(),
-                    l -> c.getState().setLayerEditIndex(l)));
+            layerButtons[i] = new Scrollable(new LayerButton(pos, i, c, layer));
             layerElements.add(layerButtons[i]);
 
             // visibility toggle
@@ -368,6 +366,7 @@ public class MenuAssembly {
         Coord2D fbPos = firstFBPos;
 
         for (int i = 0; i < frameCount; i++) {
+            // TODO: frame buttons
             frameButtons[i] = new Scrollable(SelectableListItemButton.make(
                     fbPos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1),
                     i, () -> c.getState().getFrameIndex(),

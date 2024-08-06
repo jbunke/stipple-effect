@@ -209,7 +209,8 @@ public abstract class ThemeLogic {
             final GameImage img, final TextButton tb
     ) {
         img.free();
-        return tb.isHighlighted() ? highlightButton(img) : img;
+        return tb.isHighlighted() && !tb.isSelected()
+                ? highlightButton(img) : img;
     }
 
     public final GameImage drawTextButton(final TextButton tb) {
