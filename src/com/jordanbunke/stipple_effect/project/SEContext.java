@@ -928,7 +928,7 @@ public class SEContext {
                 !DialogVals.isIgnoreSelection() ? state.getSelection() : null;
 
         switch (scope) {
-            case LAYER_FRAME -> extractColorsFromFrame(colors, state,
+            case CEL -> extractColorsFromFrame(colors, state,
                     state.getFrameIndex(), state.getLayerEditIndex(), selection);
             case LAYER -> {
                 final int frameCount = state.getFrameCount();
@@ -1020,7 +1020,7 @@ public class SEContext {
         try {
             return switch (scope) {
                 // case SELECTION -> runCAOnSelection(internal, map);
-                case LAYER_FRAME -> runCAOnFrame(internal, map, state,
+                case CEL -> runCAOnFrame(internal, map, state,
                         state.getFrameIndex(), state.getLayerEditIndex(), selection);
                 case LAYER -> {
                     if (state.getEditingLayer().areFramesLinked()) {

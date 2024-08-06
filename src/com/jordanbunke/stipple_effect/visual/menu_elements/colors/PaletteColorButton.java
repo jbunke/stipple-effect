@@ -27,7 +27,8 @@ public class PaletteColorButton extends SelectableMenuElement {
     private static final int INVALID = -1;
 
     private static final List<PaletteColorButton> colorButtons = new ArrayList<>();
-    private static int moving, wouldBeIndex;
+    private static boolean moving;
+    private static int movingIndex, wouldBeIndex;
     private static Coord2D onClickPos, lastMousePos;
 
     private final Color color;
@@ -43,7 +44,7 @@ public class PaletteColorButton extends SelectableMenuElement {
     private boolean highlighted;
 
     static {
-        moving = INVALID;
+        movingIndex = INVALID;
         wouldBeIndex = INVALID;
     }
 
@@ -125,7 +126,7 @@ public class PaletteColorButton extends SelectableMenuElement {
         if (!included)
             base.draw(GraphicsUtils.loadIcon(ResourceCodes.EXCLUDED_FROM_PALETTE));
 
-        if (index == moving)
+        if (moving && index == movingIndex)
             base.draw(GraphicsUtils.loadIcon(ResourceCodes.MOVING_PALETTE_COLOR));
 
         nh = base.submit();
@@ -189,6 +190,23 @@ public class PaletteColorButton extends SelectableMenuElement {
             }
 
             updatePosition();
+        } else if (movingIndex != INVALID) {
+            for (GameEvent e : eventLogger.getUnprocessedEvents()) {
+                if (e instanceof GameMouseEvent me &&
+                        me.matchesAction(GameMouseEvent.Action.UP)) {
+                    me.markAsProcessed();
+
+                    movingIndex = INVALID;
+                    wouldBeIndex = INVALID;
+
+                    return;
+                }
+            }
+
+            if (onClickPos != mousePos) {
+                moving = true;
+                colorButtons.get(movingIndex).updateAssets();
+            }
         }
     }
 
@@ -201,7 +219,7 @@ public class PaletteColorButton extends SelectableMenuElement {
                 deltaY = (int) Math.round(
                         (lastMousePos.y - onClickPos.y) / (double) DIM);
 
-        if (moving == index) {
+        if (movingIndex == index) {
             int xp = MathPlus.bounded(0, x + deltaX, bpl - 1),
                     yp = Math.max(0, y + deltaY);
 
@@ -214,7 +232,7 @@ public class PaletteColorButton extends SelectableMenuElement {
             deltaX = (xp - x) * DIM;
             deltaY = (yp - y) * DIM;
         } else {
-            final int adjustedIndex = index + (moving > index
+            final int adjustedIndex = index + (movingIndex > index
                     ? (wouldBeIndex > index ? 0 : 1)
                     : (wouldBeIndex < index ? 0 : -1));
 
@@ -229,27 +247,24 @@ public class PaletteColorButton extends SelectableMenuElement {
     }
 
     private static void releaseMovingButton() {
-        final PaletteColorButton cb = colorButtons.get(moving);
+        final PaletteColorButton cb = colorButtons.get(movingIndex);
 
-        if (wouldBeIndex != cb.index) {
-            cb.palette.moveToIndex(cb.color, wouldBeIndex);
+        final int destinationIndex = wouldBeIndex;
 
-            moving = INVALID;
-            wouldBeIndex = INVALID;
+        moving = false;
+        movingIndex = INVALID;
+        wouldBeIndex = INVALID;
 
+        if (destinationIndex != cb.index) {
+            cb.palette.moveToIndex(cb.color, destinationIndex);
             PaletteContainer.get().makeContainer(true);
-        } else {
-            moving = INVALID;
-            wouldBeIndex = INVALID;
         }
     }
 
     private void setAsMovingButton(final Coord2D mousePos) {
         onClickPos = mousePos;
-        moving = index;
+        movingIndex = index;
         wouldBeIndex = index;
-
-        updateAssets();
 
         for (final PaletteColorButton cb : colorButtons)
             cb.lockedPos = cb.getPosition();
@@ -281,7 +296,7 @@ public class PaletteColorButton extends SelectableMenuElement {
     }
 
     public static boolean isMoving() {
-        return moving != INVALID;
+        return moving && movingIndex != INVALID;
     }
 
     public static void resetColorButtons() {

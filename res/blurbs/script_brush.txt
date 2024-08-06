@@ -7,6 +7,6 @@ Use existing color as input: {Click & Drag}
 Use primary color as input: {Shift + Left Click + Drag}
 Use secondary color as input: {Shift + Right Click + Drag}
 
-Hold {Ctrl} to ignore transparent pixels of the layer-frame.
+Hold {Ctrl} to ignore transparent pixels of the cel.
 
 Increment/decrement brush width: {Arrow Keys} or {Shift + Scroll Wheel}

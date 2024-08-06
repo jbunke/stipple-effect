@@ -4,3 +4,8 @@ subject to change.
 {Q3 2024}
 > Lossless video export
 > Presets for common scriptable behaviours
+> Onion skin options:
+  > Look ahead/behind multiple frames
+  > Opacity dropoff
+  > Types of skins
+  > Settings unique to layer
