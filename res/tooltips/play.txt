@@ -1,2 +1,2 @@
 Play / Stop
-Toggle: {Space}
+Toggle: {sc:TOGGLE_PLAYING}

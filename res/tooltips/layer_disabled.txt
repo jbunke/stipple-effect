@@ -1,4 +1,4 @@
-Enable layer | {Shift + 1}
+Enable layer | {sc:TOGGLE_LAYER_VISIBILITY}
 
-{Shift + Click}: Isolate layer | {Shift + 2}
-{Ctrl + Click}: Enable all layers | {Shift + 3}
+{Shift + Click}: Isolate layer | {sc:ISOLATE_LAYER}
+{Ctrl + Click}: Enable all layers | {sc:ENABLE_ALL_LAYERS}

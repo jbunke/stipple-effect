@@ -152,7 +152,7 @@ public class DialogVals {
     }
 
     public enum Scope {
-        PROJECT, LAYER, FRAME, LAYER_FRAME;
+        PROJECT, LAYER, FRAME, CEL;
 
         public boolean considersLayers() {
             return this == FRAME || this == PROJECT;
@@ -160,9 +160,6 @@ public class DialogVals {
 
         @Override
         public String toString() {
-            if (this == LAYER_FRAME)
-                return "Layer-Frame";
-
             return EnumUtils.formattedName(this);
         }
     }

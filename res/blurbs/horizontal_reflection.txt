@@ -1,5 +1,5 @@
-Reflect selection bounds about y-axis: {Ctrl + 4}
-Reflect selection contents about y-axis: {Ctrl + Shift + 4}
+Reflect selection bounds about y-axis: {sc:HORZ_BOUNDS_REFLECTION}
+Reflect selection contents about y-axis: {sc:HORZ_CONTENTS_REFLECTION}
 
 Reflect the selection about the y-axis. Pressing the button will reflect the {bounds} or {contents}
 based on the current {selection mode}. To specify {bounds reflection}, ensure the {move selection}

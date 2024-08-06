@@ -1,7 +1,7 @@
-Shortcut: {G}
+Shortcut: {sc:SET_TOOL_GRADIENT}
 
 The gradient tool draws a gradient from the primary to the secondary color, or vice versa, either
-as a brush or as a linear spectrum that covers the entire selection or layer-frame.
+as a brush or as a linear spectrum that covers the entire selection or cel.
 
 Primary to secondary color: {Left Click & Drag}
 Secondary to primary color: {Right Click & Drag}

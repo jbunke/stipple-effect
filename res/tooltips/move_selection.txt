@@ -1,1 +1,1 @@
-Move selection | {M}
+Move selection | {sc:SET_TOOL_MOVE_SELECTION}

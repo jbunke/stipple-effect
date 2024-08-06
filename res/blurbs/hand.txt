@@ -1,4 +1,4 @@
-Shortcut: {H}
+Shortcut: {sc:SET_TOOL_HAND}
 
 Use the hand to move the image canvas around the workspace.
 

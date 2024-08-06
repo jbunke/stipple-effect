@@ -50,6 +50,11 @@ public class StatusUpdates {
                 "the pixel grid cannot be rendered for this project's current dimensions and/or zoom level");
     }
 
+    public static void cannotCropToSelection() {
+        actionNotPermitted("crop the canvas to the selection",
+                "nothing is selected");
+    }
+
     public static void cannotFlatten() {
         actionNotPermitted("flatten the project",
                 "it only has a single layer");
@@ -120,16 +125,14 @@ public class StatusUpdates {
     public static void cannotShiftColorPalette(
             final Palette p, final Color c, final boolean isLeft
     ) {
-        final boolean colorInPalette = p.canRemove(c);
+        final boolean colorInPalette = p.containsColor(c);
 
         final String dir = isLeft ? "left" : "right";
 
         actionNotPermitted("shift the selected color " + processColor(c) +
                         " to the " + dir + " in \"" + p.getName() + "\"",
-                p.isMutable() ? (colorInPalette
-                        ? ("it is already the " + dir + "most color")
-                        : "it is not in the palette")
-                        : "\"" + p.getName() + "\" is immutable");
+                colorInPalette ? ("it is already the " + dir + "most color")
+                        : "it is not in the palette");
     }
 
     public static void cannotColorPalette(
@@ -351,13 +354,13 @@ public class StatusUpdates {
     public static void clipboardSendFailed(
             final boolean triedCopy
     ) {
-        send("Cannot " + (triedCopy ? "copy" : "cut") +
-                "; there is nothing selected");
+        actionNotPermitted(triedCopy ? "copy" : "cut",
+                "there is nothing selected");
     }
 
     public static void pasteFailed() {
-        send("Cannot paste; the " + StippleEffect.PROGRAM_NAME +
-                " clipboard is empty");
+        actionNotPermitted("paste",
+                "the " + StippleEffect.PROGRAM_NAME + " clipboard is empty");
     }
 
     public static void saving() {

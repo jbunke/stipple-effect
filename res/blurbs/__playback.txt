@@ -1,1 +1,1 @@
-Shortcut to cycle through: {Ctrl + Enter}
+Shortcut to cycle through: {sc:CYCLE_PLAYBACK_MODE}

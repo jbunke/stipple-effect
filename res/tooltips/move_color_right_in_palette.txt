@@ -1,1 +1,1 @@
-Shift selected color right in palette | {Shift + .}
+Shift selected color right in palette | {sc:MOVE_COLOR_RIGHT}

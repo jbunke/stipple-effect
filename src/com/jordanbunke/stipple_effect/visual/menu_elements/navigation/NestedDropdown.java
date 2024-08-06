@@ -2,17 +2,14 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.navigation;
 
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.LogicItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.NestedItem;
-import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
-import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.SEDropdownItem;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
-import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DropdownExpansion;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DropdownHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,29 +56,8 @@ public final class NestedDropdown extends SEDropdownMenu {
 
             if (item instanceof NestedItem ni)
                 contents[i] = new NestedDropdown(contentPos, width, this, ni);
-            else if (item instanceof LogicItem li) {
-                final Runnable doAndClose = () -> {
-                    li.run();
-                    transitiveClose();
-                };
-
-                contents[i] = new ThinkingMenuElement(() -> li.get()
-                        ? new StaticTextButton(contentPos, li.label,
-                        width, doAndClose, Alignment.LEFT, ButtonType.DD_MENU_LEAF)
-                        : new StaticMenuElement(contentPos, Anchor.LEFT_TOP,
-                        Settings.getTheme().logic.drawDropdownMenuLeafStub(
-                                TextButton.of(li.label, width, Alignment.LEFT,
-                                        ButtonType.DD_MENU_LEAF))));
-            }
-            else if (item instanceof SimpleItem si) {
-                final Runnable doAndClose = () -> {
-                    si.run();
-                    transitiveClose();
-                };
-
-                contents[i] = new StaticTextButton(contentPos, si.label,
-                        width, doAndClose, Alignment.LEFT, ButtonType.DD_MENU_LEAF);
-            }
+            else if (item instanceof SEDropdownItem sedi)
+                contents[i] = sedi.make(this::transitiveClose, contentPos, width);
         }
 
         return VerticalScrollBox.forFixedDropdown(

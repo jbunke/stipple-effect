@@ -14,24 +14,25 @@ public final class Layout {
             toolbarShowing, projectsExpanded, projectsRequiresScrolling;
 
     private static int flipbookHeight;
+    private static SamplerMode samplerMode;
 
     // layout constants
     private static final double
             TOOL_OPTIONS_BAR_SECTION_DIVIDER_PROPORTION = 0.02;
     private static final int TOOLS_W = 25, RIGHT_PANEL_W = 286,
             PROJECTS_H = 84, NON_SCROLLING_SUB = 20,
-            COLLAPSED_PROJECTS_H = 27, MIN_FLIPBOOK_H = 249, MAX_FLIPBOOK_H = 411;
+            COLLAPSED_PROJECTS_H = 27, MIN_FLIPBOOK_H = 222, MAX_FLIPBOOK_H = 411;
     public static final int
             BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
-            MIN_WINDOW_H = 666,
+            MIN_WINDOW_H = 708,
             MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),
             MIN_WINDOW_W = (int)(MIN_WINDOW_H * (16 / 9.)),
             TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
             TEXT_CARET_W = 1, TEXT_CARET_H = 23,
             TEXT_CARET_Y_OFFSET = -11, TEXT_LINE_PX_H = TEXT_CARET_H + 2,
             NAV_RENDER_ORDER = 1,
-            DD_MENU_HEADER_RIGHT_BUFFER = 64, DD_MENU_LEAF_MIDDLE_BUFFER = 100,
+            DD_MENU_HEADER_RIGHT_BUFFER = 64, DD_MENU_LEAF_MIDDLE_BUFFER = 50,
             CONTENT_BUFFER_PX = 8, PREVIEW_WINDOW_BUFFER_PX = 20,
             DEFAULT_CHECKERBOARD_DIM = 4, CHECKERBOARD_MIN = 1, CHECKERBOARD_MAX = 256,
             DEFAULT_PIXEL_GRID_DIM = 1, PIXEL_GRID_MIN = 1, PIXEL_GRID_MAX = 128,
@@ -52,12 +53,10 @@ public final class Layout {
             DIALOG_CONTENT_BIG_W_ALLOWANCE = LONG_NAME_TEXTBOX_W - DIALOG_CONTENT_SMALL_W_ALLOWANCE,
             SMALL_TEXT_BOX_W = 80, STD_TEXT_BUTTON_W = 88, STD_TEXT_BUTTON_H = 25,
             STD_TEXT_BUTTON_INC = STD_TEXT_BUTTON_H + BUTTON_OFFSET,
-            COLOR_SELECTOR_OFFSET_Y = 120, COLOR_TEXTBOX_W = 116,
+            COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             TOP_PANEL_SCROLL_WINDOW_H = STD_TEXT_BUTTON_H + SLIDER_BALL_DIM,
-            FULL_COLOR_SLIDER_W = RIGHT_PANEL_W - (SLIDER_BALL_DIM + 10),
-            HALF_COLOR_SLIDER_W = (RIGHT_PANEL_W / 2) - (SLIDER_BALL_DIM + 10),
-            COLOR_LABEL_OFFSET_Y = -18, DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
+            DYNAMIC_LABEL_H = 40, DYNAMIC_LABEL_W_ALLOWANCE = 100,
             MAX_ERROR_CHARS_PER_LINE = 60, CHARS_CUTOFF = MAX_ERROR_CHARS_PER_LINE - 5;
 
     public static final Bounds2D
@@ -79,6 +78,8 @@ public final class Layout {
         projectsRequiresScrolling = false;
 
         flipbookHeight = MIN_FLIPBOOK_H;
+
+        samplerMode = SamplerMode.RGB_SLIDERS;
     }
 
     // panel display
@@ -124,10 +125,7 @@ public final class Layout {
     }
 
     public static void togglePanels() {
-        if (areAllPanelsShowing())
-            minimalUI();
-        else
-            showAllPanels();
+        setAllPanels(!areAllPanelsShowing());
     }
 
     public static void minimalUI() {
@@ -138,7 +136,7 @@ public final class Layout {
         setAllPanels(true);
     }
 
-    public static void setAllPanels(final boolean showing) {
+    private static void setAllPanels(final boolean showing) {
         adjustPanels(() -> {
             setColorsPanelShowing(showing);
             setToolbarShowing(showing);
@@ -196,6 +194,13 @@ public final class Layout {
 
     public static int getBottomBarCanvasSizeWidth() {
         return getBottomBarZoomPercentageX() - getBottomBarCanvasSizeX();
+    }
+
+    // general layout
+    public static Coord2D contentPositionAfterLabel(final MenuElement label) {
+        return label.getRenderPosition().displace(
+                label.getWidth() + CONTENT_BUFFER_PX,
+                DIALOG_CONTENT_COMP_OFFSET_Y);
     }
 
     // tool options bar layout
@@ -335,11 +340,6 @@ public final class Layout {
         return new Coord2D(width() / 2, height() / 2);
     }
 
-    // misc. layout
-    public static int getColorSelectorIncY() {
-        return (int)(getColorsHeight() / 6.5);
-    }
-
     public static int getProjectScrollWindowWidth() {
         return getProjectsWidth() - (2 * CONTENT_BUFFER_PX);
     }
@@ -379,5 +379,13 @@ public final class Layout {
 
     public static void changeFlipbookHeight(final int deltaHeight) {
         flipbookHeight += deltaHeight;
+    }
+
+    public static SamplerMode getSamplerMode() {
+        return samplerMode;
+    }
+
+    public static void setSamplerMode(final SamplerMode samplerMode) {
+        Layout.samplerMode = samplerMode;
     }
 }

@@ -1,1 +1,1 @@
-Hand | {H}
+Hand | {sc:SET_TOOL_HAND}

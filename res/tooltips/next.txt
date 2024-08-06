@@ -1,1 +1,1 @@
-Next frame | {Ctrl + Space}
+Next frame | {sc:NEXT_FRAME}

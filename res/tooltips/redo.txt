@@ -1,1 +1,1 @@
-Redo | {Ctrl + Y}
+Redo | {sc:REDO}

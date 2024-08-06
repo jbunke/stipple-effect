@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + P}
+Shortcut: {sc:SAVE_PALETTE}

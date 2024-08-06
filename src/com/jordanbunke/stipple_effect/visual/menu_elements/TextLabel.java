@@ -11,9 +11,11 @@ import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 import java.awt.*;
 
 public class TextLabel extends StaticMenuElement {
-    private TextLabel(final Coord2D position, final GameImage image) {
+    private TextLabel(
+            final Coord2D position, final GameImage image, final Anchor anchor
+    ) {
         super(position, new Bounds2D(image.getWidth(), image.getHeight()),
-                Anchor.LEFT_TOP, image);
+                anchor, image);
     }
 
     public static TextLabel make(
@@ -33,8 +35,16 @@ public class TextLabel extends StaticMenuElement {
             final Coord2D position, final String text,
             final Color c, final double textSize
     ) {
+        return make(position, text, c, textSize, Anchor.LEFT_TOP);
+    }
+
+    public static TextLabel make(
+            final Coord2D position, final String text,
+            final Color c, final double textSize,
+            final Anchor anchor
+    ) {
         final GameImage label = GraphicsUtils.uiText(c, textSize)
                 .addText(text).build().draw();
-        return new TextLabel(position, label);
+        return new TextLabel(position, label, anchor);
     }
 }

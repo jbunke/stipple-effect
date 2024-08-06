@@ -21,10 +21,11 @@ public class ColorTextbox extends Textbox {
     private final Supplier<Color> getter;
 
     private ColorTextbox(
-            final Coord2D position, final int index, final String initialText,
+            final Coord2D position, final Anchor anchor,
+            final int index, final String initialText,
             final Supplier<Color> getter, final Consumer<String> setter
     ) {
-        super(position, Layout.COLOR_TEXTBOX_W, Anchor.CENTRAL_TOP, () -> "#",
+        super(position, Layout.COLOR_TEXTBOX_W, anchor, () -> "#",
                 initialText, () -> "", ColorTextbox::validateAsHexCode,
                 setter, ColorTextbox.getFDraw(), HEX_CODE_LENGTH);
 
@@ -34,14 +35,17 @@ public class ColorTextbox extends Textbox {
         updateAssets();
     }
 
-    public static ColorTextbox make(final Coord2D position, final int index) {
+    public static ColorTextbox make(
+            final Coord2D position, final Anchor anchor, final int index
+    ) {
         final Supplier<Color> getter = () ->
                 StippleEffect.get().getColorAtIndex(index);
         final Consumer<String> setter = s ->
                 ColorTextbox.setColorFromHexCode(s, index);
         final String initialText = colorToHexCode(getter.get());
 
-        return new ColorTextbox(position, index, initialText, getter, setter);
+        return new ColorTextbox(position, anchor, index,
+                initialText, getter, setter);
     }
 
     private static TextboxDrawingFunction getFDraw() {

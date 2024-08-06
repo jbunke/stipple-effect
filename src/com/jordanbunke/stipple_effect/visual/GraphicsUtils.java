@@ -10,14 +10,16 @@ import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
-import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.StaticTextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -30,12 +32,13 @@ import java.util.function.Supplier;
 
 public class GraphicsUtils {
     public static GameImage HIGHLIGHT_OVERLAY,
-            SELECT_OVERLAY, TRANSFORM_NODE, CHECKMARK;
+            SELECT_OVERLAY, TRANSFORM_NODE, COLOR_NODE, CHECKMARK;
     private static final Map<CelButton.Status, GameImage> stencilMap;
     private static final Map<String, GameImage> iconMap;
 
     static {
         TRANSFORM_NODE = loadUtil("transform_node");
+        COLOR_NODE = loadUtil("color_node");
         CHECKMARK = loadUtil("checkmark");
 
         iconMap = new HashMap<>();
@@ -64,6 +67,7 @@ public class GraphicsUtils {
         final Theme theme = Settings.getTheme();
 
         TRANSFORM_NODE = loadUtil("transform_node");
+        COLOR_NODE = loadUtil("color_node");
         CHECKMARK = loadUtil("checkmark");
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
@@ -147,7 +151,8 @@ public class GraphicsUtils {
     }
 
     public static int dropdownMenuLeafWidth(final String code) {
-        final int FAIL = 1;
+        final int FAIL = 1, buttonWidth = ResourceCodes.hasIcon(code)
+                ? Layout.BUTTON_INC : 0;
         final String[] lines = ParserUtils.getToolTip(code);
 
         if (lines.length != 1)
@@ -155,22 +160,29 @@ public class GraphicsUtils {
 
         final String[] segments = ParserUtils.extractHighlight(lines[0]);
 
-        if (segments.length != 2 || !segments[0].trim().endsWith("|"))
-            return FAIL;
+        return switch (segments.length) {
+            case 1 -> {
+                final String action = segments[0].trim();
 
-        final String action = segments[0].trim(),
-                shortcut = segments[1].trim();
+                yield buttonWidth + bespokeTextMenuElementWidth(action) +
+                        Layout.CONTENT_BUFFER_PX;
+            }
+            case 2 -> {
+                final String action = segments[0].replace("|", "").trim(),
+                        shortcut = ParserUtils.getShortcut(segments[1].trim());
 
-        return Layout.BUTTON_INC +
-                bespokeTextMenuElementWidth(action) +
-                Layout.DD_MENU_LEAF_MIDDLE_BUFFER +
-                bespokeTextMenuElementWidth(shortcut);
+                yield buttonWidth + bespokeTextMenuElementWidth(action) +
+                        Layout.DD_MENU_LEAF_MIDDLE_BUFFER +
+                        bespokeTextMenuElementWidth(shortcut);
+            }
+            default -> FAIL;
+        };
     }
 
     public static GameImage drawSelectedTextbox(final GameImage bounds) {
         final GameImage selected = new GameImage(bounds);
         final int w = selected.getWidth();
-        selected.draw(loadIcon(IconCodes.BULLET_POINT),
+        selected.draw(loadIcon(ResourceCodes.BULLET_POINT),
                 w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
@@ -247,7 +259,7 @@ public class GraphicsUtils {
         if (num < 1 || num > 9)
             return GameImage.dummy();
 
-        return loadIcon(IconCodes.NUMKEY_PREFIX + num);
+        return loadIcon(ResourceCodes.NUMKEY_PREFIX + num);
     }
 
     public static GameImage loadIcon(final String code) {
@@ -276,13 +288,13 @@ public class GraphicsUtils {
     }
 
     public static MenuElement generateIconButton(
-            final String iconID, final Coord2D position,
+            final String code, final Coord2D position,
             final Supplier<Boolean> precondition, final Runnable behaviour
     ) {
-        final IconButton icon = IconButton.make(iconID, position, behaviour);
+        final IconButton icon = IconButton.make(code, position, behaviour);
         final StaticMenuElement stub = new StaticMenuElement(position,
                 Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().logic.unclickableIcon(loadIcon(iconID)));
+                Settings.getTheme().logic.unclickableIcon(loadIcon(code)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
     }

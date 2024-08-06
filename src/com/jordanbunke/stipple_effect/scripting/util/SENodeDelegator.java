@@ -17,6 +17,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.MutablePaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 
 public final class SENodeDelegator {
     public static StatementNode globalFunctionStatement(
@@ -215,13 +216,13 @@ public final class SENodeDelegator {
                     new SetSelectionNode(position, scope, args);
             case SelectionOpNode.INV ->
                     new SelectionOpNode(position, scope,
-                            args, SelectionOpNode.Op.INVERT_SELECTION);
+                            args, SEAction.INVERT_SELECTION);
             case SelectionOpNode.ALL ->
                     new SelectionOpNode(position, scope,
-                            args, SelectionOpNode.Op.SELECT_ALL);
+                            args, SEAction.SELECT_ALL);
             case SelectionOpNode.DESELECT ->
                     new SelectionOpNode(position, scope,
-                            args, SelectionOpNode.Op.DESELECT);
+                            args, SEAction.DESELECT);
             case PaletteActionNode.PALETTIZE ->
                     PaletteActionNode.palettize(position, scope, args);
             case PaletteActionNode.EXTRACT ->

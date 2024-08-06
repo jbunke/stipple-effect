@@ -1,4 +1,4 @@
-Shortcut: {Shift + D}
+Shortcut: {sc:CONTENTS_TO_PALETTE}
 
-Extracts every non-transparent color from the chosen project scope (selection, layer-frame, layer,
-frame, or the entire project) and adds them to the selected palette.
+Extracts every non-transparent color from the chosen project scope (selection, cel, layer, frame,
+or the entire project) and adds them to the selected palette.

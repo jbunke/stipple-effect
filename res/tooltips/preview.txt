@@ -1,1 +1,1 @@
-Show preview | {Shift + Space}
+Show preview | {sc:PREVIEW}

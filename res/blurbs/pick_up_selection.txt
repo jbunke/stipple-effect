@@ -1,4 +1,4 @@
-Shortcut: {U}
+Shortcut: {sc:SET_TOOL_PICK_UP_SELECTION}
 
 Move: {Click & Drag} or {Arrow Keys}
 [ Move Modifiers ]

@@ -1,4 +1,4 @@
-Shortcut: {C}
+Shortcut: {sc:SET_TOOL_COLOR_PICKER}
 
 Use the color picker to set the primary or secondary color to the color on the current layer of the
 pixel that was clicked.

@@ -1,4 +1,4 @@
-Shortcut to toggle: {Ctrl + 1}
+Shortcut to toggle: {sc:CYCLE_LAYER_ONION_SKIN_MODE}
 
 Enabling one of the onion skin modes will render translucent previews of {one or both of the frames}
 {adjacent} to the active frame under the editing layer. Note that the onion skins may not be visible

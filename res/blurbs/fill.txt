@@ -1,4 +1,4 @@
-Shortcut: {F}
+Shortcut: {sc:SET_TOOL_FILL}
 
 Use fill to fill adjacent pixels of the same or similar color as the initial pixel that was clicked.
 Adjust the tolerance of fill to increase or decrease the threshold of the similarity of the colors.

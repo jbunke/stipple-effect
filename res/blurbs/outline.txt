@@ -1,7 +1,7 @@
-Open outline selection options menu: {Shift + O}
-Outline selection with current settings: {Ctrl + 9}
-Single outline selection: {Shift + 9}
-Double outline selection: {Ctrl + Shift + 9}
+Open outline selection options menu: {sc:CONFIGURE_OUTLINE}
+Outline selection with current settings: {sc:LAST_OUTLINE}
+Single outline selection: {sc:SINGLE_OUTLINE}
+Double outline selection: {sc:DOUBLE_OUTLINE}
 
 Automatically shift the current pixel selection to the adjacent pixels of the {frontier} of the
 previous selection. Inclusion of adjacent pixels of each direction can be determined in the outline

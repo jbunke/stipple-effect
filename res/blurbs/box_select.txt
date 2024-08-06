@@ -1,4 +1,4 @@
-Shortcut: {X}
+Shortcut: {sc:SET_TOOL_BOX_SELECT}
 
 Use the box select tool to make rectangular selections.
 This is a convenient way to quickly enclose a desired selection area.

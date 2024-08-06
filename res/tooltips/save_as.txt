@@ -1,1 +1,1 @@
-Save project as... | {Ctrl + Shift + S}
+Save project as... | {sc:SAVE_AS}

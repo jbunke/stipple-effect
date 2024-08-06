@@ -1,2 +1,2 @@
 Playback mode
-Toggle: {Ctrl + Enter}
+Toggle: {sc:CYCLE_PLAYBACK_MODE}

@@ -1,4 +1,4 @@
-Shortcut: {Ctrl + Shift + M}
+Shortcut: {sc:MERGE_WITH_LAYER_BELOW}
 
 Draws the contents of this layer onto the layer below it and removes the layer above. The merged layer
 inherits all the lower layer's properties.

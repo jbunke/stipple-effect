@@ -1,1 +1,1 @@
-New font... | {Shift + T}
+New font... | {sc:NEW_FONT}

@@ -65,7 +65,7 @@ public final class MoveSelection extends MoverTool<Selection> {
     ) {
         final ProjectState result = context.getState()
                 .changeSelectionBounds(selection);
-        context.getStateManager().performAction(result, transform
+        context.stateManager.performAction(result, transform
                 ? Operation.TRANSFORM_SELECTION_BOUNDS
                 : Operation.MOVE_SELECTION_BOUNDS);
     }

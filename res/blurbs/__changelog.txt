@@ -2,6 +2,7 @@
 
 Fixed:
 > Bug: Tool mouse actions can still be executed when the cursor is in a dropdown menu
+> Bug: Cannot use the brush tool without a selected palette
 
 {1.0.1} - 2024-07-11
 

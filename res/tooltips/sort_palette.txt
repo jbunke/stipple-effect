@@ -1,1 +1,1 @@
-Sort palette... | {Shift + M}
+Sort palette... | {sc:SORT_PALETTE}

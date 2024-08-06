@@ -1,1 +1,1 @@
-Wand | {W}
+Wand | {sc:SET_TOOL_WAND}

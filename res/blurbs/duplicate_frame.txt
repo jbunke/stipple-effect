@@ -1,3 +1,3 @@
-Shortcut: {Ctrl + Shift + F}
+Shortcut: {sc:DUPLICATE_FRAME}
 
 Creates a new frame by duplicating the previously selected one.

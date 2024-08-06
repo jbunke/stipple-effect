@@ -1,1 +1,1 @@
-Shift selected color left in palette | {Shift + ,}
+Shift selected color left in palette | {sc:MOVE_COLOR_LEFT}

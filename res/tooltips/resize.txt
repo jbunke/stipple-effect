@@ -1,1 +1,1 @@
-Resize canvas... | {Ctrl + R}
+Resize canvas... | {sc:RESIZE}

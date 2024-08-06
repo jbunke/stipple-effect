@@ -73,7 +73,7 @@ public final class PickUpSelection extends MoverTool<SelectionContents> {
     ) {
         final ProjectState result = context.getState()
                 .changeSelectionContents(transformation);
-        context.getStateManager().performAction(result, transform
+        context.stateManager.performAction(result, transform
                 ? Operation.TRANSFORM_SELECTION_CONTENTS
                 : Operation.MOVE_SELECTION_CONTENTS);
     }

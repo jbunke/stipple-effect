@@ -1,2 +1,2 @@
-Reflect selection bounds about y-axis: {Ctrl + 4}
-Reflect selection contents about y-axis: {Ctrl + Shift + 4}
+Reflect selection bounds about y-axis: {sc:HORZ_BOUNDS_REFLECTION}
+Reflect selection contents about y-axis: {sc:HORZ_CONTENTS_REFLECTION}

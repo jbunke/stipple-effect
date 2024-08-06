@@ -1,1 +1,1 @@
-Layer settings... | {Shift + L}
+Layer settings... | {sc:LAYER_SETTINGS}

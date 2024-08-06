@@ -7,7 +7,6 @@ import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -32,8 +31,7 @@ public final class AsylumThemeLogic extends ThemeLogic {
 
     @Override
     public GameImage transformIcon(final GameImage asset) {
-        return pixelWiseTransformation(asset, c -> c.equals(SEColors.white())
-                ? SEColors.transparent() : GraphicsUtils.greyscale(c));
+        return pixelWiseTransformation(asset, GraphicsUtils::greyscale);
     }
 
     @Override

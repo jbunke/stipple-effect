@@ -1,3 +1,3 @@
-Shortcut: {Ctrl + N}
+Shortcut: {sc:NEW_PROJECT}
 
 Opens a dialog that lets the user set the canvas size for a blank new project

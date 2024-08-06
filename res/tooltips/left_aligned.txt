@@ -1,2 +1,2 @@
 Left-aligned
-Toggle: {Ctrl + K}
+Toggle: {sc:TOGGLE_ALIGNMENT}

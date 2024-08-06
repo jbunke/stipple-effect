@@ -1,1 +1,1 @@
-Palette settings | {Shift + E}
+Palette settings | {sc:PALETTE_SETTINGS}

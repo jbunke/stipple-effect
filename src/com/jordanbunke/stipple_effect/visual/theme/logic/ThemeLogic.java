@@ -2,7 +2,7 @@ package com.jordanbunke.stipple_effect.visual.theme.logic;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -116,7 +116,7 @@ public abstract class ThemeLogic {
         final Theme t = Settings.getTheme();
         final String code = tb.getLabel();
 
-        final boolean hasIcon = IconCodes.hasIcon(code);
+        final boolean hasIcon = ResourceCodes.hasIcon(code);
         final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
                 textY = Layout.TEXT_Y_OFFSET;
 
@@ -141,7 +141,7 @@ public abstract class ThemeLogic {
             final GameImage actionImage = switch (segments.length) {
                 case 2 -> {
                     final String action = segments[0].replace("|", "").trim(),
-                            shortcut = segments[1].trim();
+                            shortcut = ParserUtils.getShortcut(segments[1].trim());
 
                     final GameImage shortcutImage = GraphicsUtils.uiText(shortcutCol)
                             .addText(shortcut).build().draw();
@@ -239,7 +239,7 @@ public abstract class ThemeLogic {
         // dropdown list button
         if (type == ButtonType.DD_HEAD) {
             final GameImage icon = GraphicsUtils.loadIcon(
-                    tb.isSelected() ? IconCodes.COLLAPSE : IconCodes.EXPAND);
+                    tb.isSelected() ? ResourceCodes.COLLAPSE : ResourceCodes.EXPAND);
 
             img.draw(icon, w - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
         }
@@ -450,6 +450,10 @@ public abstract class ThemeLogic {
                 diffD = ColorMath.diff(background, dark);
 
         return diffD > diffL ? dark : light;
+    }
+
+    public static Color intuitTextColor(final boolean main) {
+        return intuitTextColor(Settings.getTheme().panelBackground, main);
     }
 
     public static GameImage hueFromColorTransformation(

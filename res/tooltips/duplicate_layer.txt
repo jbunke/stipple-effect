@@ -1,1 +1,1 @@
-Duplicate layer | {Ctrl + Shift + L}
+Duplicate layer | {sc:DUPLICATE_LAYER}

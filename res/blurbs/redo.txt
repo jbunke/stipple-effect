@@ -1,3 +1,3 @@
-Shortcut: {Ctrl + Y}
+Shortcut: {sc:REDO}
 
 Advance to the project state of the next completed operation.
