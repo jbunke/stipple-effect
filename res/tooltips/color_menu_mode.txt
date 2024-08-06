@@ -1,2 +1,0 @@
-TODO
-Toggle between palettes and RGBA-HSV color selection | {Ctrl + Shift + C}

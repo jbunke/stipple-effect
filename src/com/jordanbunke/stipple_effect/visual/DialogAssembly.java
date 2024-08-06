@@ -51,6 +51,8 @@ import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
+import static com.jordanbunke.stipple_effect.utility.Layout.*;
+
 import java.awt.*;
 import java.io.File;
 import java.net.URI;
@@ -2994,7 +2996,6 @@ public class DialogAssembly {
         return assembleInfoScreenContents(
                 new String[] {
                         ResourceCodes.SWAP_COLORS,
-                        ResourceCodes.COLOR_MENU_MODE,
                         ResourceCodes.HSV_SHIFT,
                         ResourceCodes.COLOR_SCRIPT,
                         ResourceCodes.NEW_PALETTE,
@@ -3005,14 +3006,10 @@ public class DialogAssembly {
                         ResourceCodes.SORT_PALETTE,
                         ResourceCodes.PALETTIZE,
                         ResourceCodes.PALETTE_SETTINGS,
-                        ResourceCodes.ADD_TO_PALETTE,
-                        ResourceCodes.REMOVE_FROM_PALETTE,
-                        ResourceCodes.MOVE_LEFT_IN_PALETTE,
-                        ResourceCodes.MOVE_RIGHT_IN_PALETTE
+                        ResourceCodes.ADD_TO_PALETTE
                 },
                 new String[] {
                         "Swap primary and secondary color",
-                        "Toggle between palettes and RGBA-HSV color selection",
                         "Adjust HSV color levels",
                         "Run a color script",
                         "Create a new palette",
@@ -3024,10 +3021,7 @@ public class DialogAssembly {
                         "Sort colors in palette",
                         "Palettize project contents",
                         "Open the settings dialog for the selected palette",
-                        "Add selected color to palette",
-                        "Remove selected color from palette",
-                        "Shift the selected color one slot to the left in the selected palette",
-                        "Shift the selected color one slot to the right in the selected palette"
+                        "Add selected color to palette"
                 }, contentAssembler, contentStart, initialBottomY
         );
     }

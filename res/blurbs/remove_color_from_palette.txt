@@ -1,5 +1,0 @@
-TODO
-Shortcut: {Shift + Z}
-
-Removes the selected color (whichever of primary and secondary is marked with the selection icon)
-from the currently selected palette.

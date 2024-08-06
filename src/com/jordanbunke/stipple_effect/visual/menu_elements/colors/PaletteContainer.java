@@ -18,45 +18,71 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class PaletteContainer extends MenuElement {
-    private final VerticalScrollBox container;
+    private static PaletteContainer INSTANCE;
+    private static int buttonsPerLine = 0;
+
+    private VerticalScrollBox container;
     private final Palette palette;
 
-    public PaletteContainer(
+    private PaletteContainer(
             final Coord2D position, final Bounds2D dimensions,
             final Palette palette
     ) {
         super(position, dimensions, Anchor.LEFT_TOP, true);
 
         this.palette = palette;
-        this.container = makeContainer();
+        makeContainer(false);
     }
 
-    private VerticalScrollBox makeContainer() {
-        final int fitsOnLine = (getWidth() - Layout.SLIDER_OFF_DIM) /
+    public static PaletteContainer get() {
+        return INSTANCE;
+    }
+
+    public static PaletteContainer make(
+            final Coord2D position, final Bounds2D dimensions,
+            final Palette palette
+    ) {
+        INSTANCE = new PaletteContainer(position, dimensions, palette);
+
+        return INSTANCE;
+    }
+
+    public void makeContainer(final boolean refresh) {
+        final int initialOffsetY = refresh ? -container.getOffset().y : 0;
+
+        buttonsPerLine = (getWidth() - Layout.SLIDER_OFF_DIM) /
                 Layout.PALETTE_DIMS.width();
 
         final List<MenuElement> buttons = new ArrayList<>();
         final Color[] colors = palette.getColors();
 
+        PaletteColorButton.resetColorButtons();
+
         for (int i = 0; i <= colors.length; i++) {
-            final int x = i % fitsOnLine, y = i / fitsOnLine;
+            final int x = i % buttonsPerLine, y = i / buttonsPerLine;
             final Coord2D pos = getPosition().displace(
                     x * Layout.PALETTE_DIMS.width(),
                     y * Layout.PALETTE_DIMS.height());
 
-            buttons.add(i == colors.length
-                    ? new ActionButton(pos.displace(
-                            Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET),
-                    SEAction.ADD_TO_PALETTE, null)
-                    : new PaletteColorButton(pos, colors[i], palette));
+            if (i == colors.length)
+                buttons.add(new ActionButton(pos.displace(
+                        Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET),
+                        SEAction.ADD_TO_PALETTE, null));
+            else {
+                final PaletteColorButton cb = new PaletteColorButton(
+                        pos, colors[i], palette, i);
+
+                PaletteColorButton.addColorButton(cb);
+                buttons.add(cb);
+            }
         }
 
-        return new VerticalScrollBox(
+        container = new VerticalScrollBox(
                 getPosition(), getDimensions(),
                 buttons.stream().map(Scrollable::new)
                         .toArray(Scrollable[]::new),
-                getY() + (((colors.length / fitsOnLine) + 1) *
-                        Layout.PALETTE_DIMS.height()), 0);
+                getY() + (((colors.length / buttonsPerLine) + 1) *
+                        Layout.PALETTE_DIMS.height()), initialOffsetY);
     }
 
     @Override
@@ -77,5 +103,9 @@ public final class PaletteContainer extends MenuElement {
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {
 
+    }
+
+    public static int getButtonsPerLine() {
+        return buttonsPerLine;
     }
 }

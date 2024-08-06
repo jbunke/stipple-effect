@@ -1,2 +1,0 @@
-TODO
-Shortcut: {Ctrl + Shift + C}

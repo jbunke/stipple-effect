@@ -69,4 +69,9 @@ public class VerticalScrollBox extends AbstractVerticalScrollBox {
     public boolean renderingChild(final Scrollable child) {
         return renderAndProcessChild(child);
     }
+
+    @Override
+    public Coord2D getOffset() {
+        return super.getOffset();
+    }
 }

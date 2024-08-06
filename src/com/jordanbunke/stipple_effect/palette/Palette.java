@@ -71,6 +71,13 @@ public class Palette {
         }
     }
 
+    public void moveToIndex(final Color c, final int i) {
+        final int index = MathPlus.bounded(0, i, colorSequence.size());
+
+        colorSequence.remove(c);
+        colorSequence.add(index, c);
+    }
+
     public Color nextLeft(final Color c) {
         return adjacentIncludedColor(c, -1, i -> i > 0);
     }
@@ -141,11 +148,11 @@ public class Palette {
     }
 
     public boolean canMoveLeft(final Color candidate) {
-        return mutable && colorSequence.indexOf(candidate) > 0;
+        return colorSequence.indexOf(candidate) > 0;
     }
 
     public boolean canMoveRight(final Color candidate) {
-        return mutable && colorSequence.contains(candidate) &&
+        return colorSequence.contains(candidate) &&
                 colorSequence.indexOf(candidate) < colorSequence.size() - 1;
     }
 
@@ -174,5 +181,9 @@ public class Palette {
 
     public boolean isIncluded(final Color c) {
         return inclusionMap.getOrDefault(c, false);
+    }
+
+    public boolean containsColor(final Color c) {
+        return colorSequence.contains(c);
     }
 }

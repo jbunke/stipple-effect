@@ -125,16 +125,14 @@ public class StatusUpdates {
     public static void cannotShiftColorPalette(
             final Palette p, final Color c, final boolean isLeft
     ) {
-        final boolean colorInPalette = p.canRemove(c);
+        final boolean colorInPalette = p.containsColor(c);
 
         final String dir = isLeft ? "left" : "right";
 
         actionNotPermitted("shift the selected color " + processColor(c) +
                         " to the " + dir + " in \"" + p.getName() + "\"",
-                p.isMutable() ? (colorInPalette
-                        ? ("it is already the " + dir + "most color")
-                        : "it is not in the palette")
-                        : "\"" + p.getName() + "\" is immutable");
+                colorInPalette ? ("it is already the " + dir + "most color")
+                        : "it is not in the palette");
     }
 
     public static void cannotColorPalette(

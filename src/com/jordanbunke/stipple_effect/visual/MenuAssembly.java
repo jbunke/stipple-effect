@@ -660,7 +660,7 @@ public class MenuAssembly {
         // sampler manager
         mb.add(new SamplerManager(samplerContentMap));
 
-        // TODO: palette
+        // palette
         final Coord2D paletteStartingPos = wAlphaPos
                 .displace(0, incY + bigIncY);
         final TextLabel paletteLabel =
@@ -705,7 +705,7 @@ public class MenuAssembly {
                     paletteH = ph - ((palettePos.y - panelPos.y) +
                             Layout.CONTENT_BUFFER_PX);
 
-            mb.add(new PaletteContainer(palettePos,
+            mb.add(PaletteContainer.make(palettePos,
                     new Bounds2D(paletteW, paletteH), s.getSelectedPalette()));
         }
 
