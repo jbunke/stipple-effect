@@ -15,6 +15,9 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalSc
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 public final class CelButton extends MenuButton {
+    private static SelectionStatus selectionStatus;
+    private static int framesFrom, layersFrom, framesTo, layersTo;
+
     private final int layerIndex, frameIndex;
     private final Scrollable frameButton, layerButton;
     private final VerticalScrollBox layers;
@@ -27,8 +30,37 @@ public final class CelButton extends MenuButton {
     private Status status;
     private boolean enabled;
 
+    static {
+        selectionStatus = SelectionStatus.NONE;
+
+        framesFrom = 0;
+        layersFrom = 0;
+        framesTo = 0;
+        layersTo = 0;
+    }
+
+    public enum SelectionStatus {
+        NONE, SELECTING, SELECTED
+    }
+
     public enum Status {
         LINKED, EMPTY, POPULATED
+    }
+
+    public static int getFramesFrom() {
+        return framesFrom;
+    }
+
+    public static int getFramesTo() {
+        return framesTo;
+    }
+
+    public static int getLayersFrom() {
+        return layersFrom;
+    }
+
+    public static int getLayersTo() {
+        return layersTo;
     }
 
     public CelButton(

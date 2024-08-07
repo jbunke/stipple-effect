@@ -17,7 +17,7 @@ public enum Operation {
     // selection operations
     RESET_SELECTION_CONTENTS, MOVE_SELECTION_CONTENTS,
     TRANSFORM_SELECTION_CONTENTS,
-    PASTE, RAISE, DROP,
+    PASTE, PASTE_CELS, RAISE, DROP,
     DELETE_SELECTION_CONTENTS,
     MOVE_SELECTION_BOUNDS, TRANSFORM_SELECTION_BOUNDS,
     DESELECT, SELECT,
@@ -62,9 +62,11 @@ public enum Operation {
 
     public ActionType getActionType() {
         return switch (this) {
-            case ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME, MOVE_FRAME -> ActionType.FRAME;
+            case ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
+                    MOVE_FRAME, PASTE_CELS -> ActionType.FRAME;
             case ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER, MOVE_LAYER,
-                    MERGE_WITH_LAYER_BELOW, FLATTEN, CHANGE_LAYER_NAME -> ActionType.LAYER;
+                    MERGE_WITH_LAYER_BELOW, FLATTEN,
+                    CHANGE_LAYER_NAME -> ActionType.LAYER;
             case STITCH, SPLIT -> ActionType.MAJOR;
             default -> ActionType.CANVAS;
         };

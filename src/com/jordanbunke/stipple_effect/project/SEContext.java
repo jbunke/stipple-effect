@@ -1235,6 +1235,7 @@ public class SEContext {
     }
 
     // paste
+    // TODO: potentially update pre-check condition
     public void paste(final boolean newLayer) {
         if (SEClipboard.get().hasContent()) {
             if (getState().hasSelectionContents())
@@ -1268,6 +1269,50 @@ public class SEContext {
             StippleEffect.get().autoAssignPickUpSelection();
         } else
             StatusUpdates.pasteFailed();
+    }
+
+    // TODO: paste cels
+    public void pasteCels() {
+        // pre-check
+        if (/* TODO: temp */ true) {
+            final CelSelection cels = new CelSelection(this); // TODO: temp
+
+            ProjectState s = getState();
+            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+            final int fc = s.getFrameCount(),
+                    layerIndex = s.getLayerEditIndex(),
+                    frameIndex = s.getFrameIndex();
+
+            if (cels.isCompatible(s)) {
+                final int framesToAppend = cels.framesToAppend(s);
+
+                for (int i = 0; i < framesToAppend; i++) {
+                    final int addIndex = fc + i;
+                    layers.replaceAll(l -> l.returnAddedFrame(addIndex,
+                            cels.celWidth, cels.celHeight));
+
+                    final List<Double> frameDurations =
+                            new ArrayList<>(s.getFrameDurations());
+                    frameDurations.add(addIndex, Constants.DEFAULT_FRAME_DURATION);
+
+                    s = s.changeFrames(layers, frameIndex, addIndex + 1, frameDurations);
+                }
+
+                for (int l = 0; l < cels.layersRange; l++) {
+                    for (int f = 0; f < cels.frameRange; f++) {
+                        final int li = layerIndex + l, fi = frameIndex + f;
+
+                        layers.set(li, layers.get(li)
+                                .returnFrameReplaced(cels.getCel(l, f), fi));
+                    }
+                }
+
+                s = s.changeFrames(layers, frameIndex,
+                        fc + framesToAppend, s.getFrameDurations());
+                stateManager.performAction(s, Operation.PASTE_CELS);
+            }
+        }
     }
 
     // raise selection to contents
