@@ -125,6 +125,7 @@ public class PaletteColorButton extends SelectableMenuElement
 
         updateAssets();
         logic.add(this);
+        lockPosition();
     }
 
     private String colorText() {

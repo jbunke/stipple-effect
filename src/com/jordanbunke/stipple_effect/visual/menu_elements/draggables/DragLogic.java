@@ -75,7 +75,7 @@ public class DragLogic<T extends Draggable> {
             e.lockPosition();
     }
 
-    public void startMoving() {
+    private void startMoving() {
         moving = true;
     }
 

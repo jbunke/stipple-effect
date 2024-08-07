@@ -1995,6 +1995,23 @@ public class SEContext {
         }
     }
 
+    public void moveLayer(final int from, final int to) {
+        final ProjectState s = getState();
+        final int lc = s.getLayers().size();
+
+        // check
+        if (from >= 0 && to >= 0 && from < lc && to < lc) {
+            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+            final SELayer toMove = layers.remove(from);
+            layers.add(to, toMove);
+
+            final ProjectState result = s.changeLayers(layers, to);
+            stateManager.performAction(result, Operation.MOVE_LAYER_UP);
+            StatusUpdates.movedLayer(toMove.getName(), from, to, lc);
+        }
+    }
+
     // merge with layer below
     public void mergeWithLayerBelow() {
         // pre-check - identical pass case as can move layer down
