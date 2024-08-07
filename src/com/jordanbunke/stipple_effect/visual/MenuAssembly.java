@@ -32,6 +32,7 @@ import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.draggables.FrameButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.draggables.LayerButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
@@ -360,13 +361,10 @@ public class MenuAssembly {
         final Scrollable[] frameButtons = new Scrollable[frameCount];
 
         Coord2D fbPos = firstFBPos;
+        FrameButton.logic.reset();
 
         for (int i = 0; i < frameCount; i++) {
-            // TODO: frame buttons
-            frameButtons[i] = new Scrollable(SelectableListItemButton.make(
-                    fbPos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1),
-                    i, () -> c.getState().getFrameIndex(),
-                    f -> c.getState().setFrameIndex(f)));
+            frameButtons[i] = new Scrollable(new FrameButton(fbPos, i, c));
 
             fbPos = fbPos.displace(Layout.FRAME_BUTTON_W +
                     (i + 1 < frameCount ? Layout.BUTTON_OFFSET : 0), 0);

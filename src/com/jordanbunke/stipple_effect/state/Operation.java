@@ -6,11 +6,10 @@ public enum Operation {
     STITCH, SPLIT,
     // frame operations
     ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
-    MOVE_FRAME_BACK, MOVE_FRAME_FORWARD,
-    CHANGE_FRAME_DURATION,
+    MOVE_FRAME, CHANGE_FRAME_DURATION,
     // layer operations
     ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
-    MOVE_LAYER_DOWN, MOVE_LAYER_UP,
+    MOVE_LAYER, MOVE_LAYER_UP,
     MERGE_WITH_LAYER_BELOW, FLATTEN,
     CHANGE_LAYER_NAME,
     // layer operations without menu redraw consequences
@@ -63,12 +62,9 @@ public enum Operation {
 
     public ActionType getActionType() {
         return switch (this) {
-            case ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
-                    MOVE_FRAME_BACK, MOVE_FRAME_FORWARD -> ActionType.FRAME;
-            case ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
-                    MOVE_LAYER_DOWN, MOVE_LAYER_UP,
-                    MERGE_WITH_LAYER_BELOW, FLATTEN,
-                    CHANGE_LAYER_NAME -> ActionType.LAYER;
+            case ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME, MOVE_FRAME -> ActionType.FRAME;
+            case ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER, MOVE_LAYER,
+                    MERGE_WITH_LAYER_BELOW, FLATTEN, CHANGE_LAYER_NAME -> ActionType.LAYER;
             case STITCH, SPLIT -> ActionType.MAJOR;
             default -> ActionType.CANVAS;
         };
