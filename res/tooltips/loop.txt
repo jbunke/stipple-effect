@@ -1,2 +1,2 @@
-Playback mode
-Toggle: {sc:CYCLE_PLAYBACK_MODE}
+Loop mode
+Cycle playback mode | {sc:CYCLE_PLAYBACK_MODE}

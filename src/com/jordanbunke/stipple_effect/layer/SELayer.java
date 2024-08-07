@@ -298,30 +298,28 @@ public final class SELayer {
                 opacity, enabled, framesLinked, onionSkinMode, name);
     }
 
-    public SELayer returnFrameMovedBack(
-            final int oldFrameIndex
+    public SELayer returnFrameMoved(
+            final int from, final int to
     ) {
         final List<GameImage> frames = new ArrayList<>(this.frames);
 
-        final GameImage frame = frames.get(oldFrameIndex);
-        frames.remove(oldFrameIndex);
-        frames.add(oldFrameIndex - 1, frame);
+        final GameImage frame = frames.remove(from);
+        frames.add(to, frame);
 
         return new SELayer(frames, frameLinkedContent, opacity, enabled,
                 framesLinked, onionSkinMode, name);
     }
 
+    public SELayer returnFrameMovedBack(
+            final int oldFrameIndex
+    ) {
+        return returnFrameMoved(oldFrameIndex, oldFrameIndex - 1);
+    }
+
     public SELayer returnFrameMovedForward(
             final int oldFrameIndex
     ) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
-
-        final GameImage frame = frames.get(oldFrameIndex);
-        frames.remove(oldFrameIndex);
-        frames.add(oldFrameIndex + 1, frame);
-
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+        return returnFrameMoved(oldFrameIndex, oldFrameIndex + 1);
     }
 
     public SELayer returnAddedFrame(

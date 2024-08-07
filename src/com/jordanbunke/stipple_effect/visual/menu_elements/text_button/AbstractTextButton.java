@@ -8,8 +8,6 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 
-import java.util.function.Function;
-
 public abstract class AbstractTextButton extends MenuButton implements TextButton {
     private final Alignment alignment;
     private final ButtonType buttonType;
@@ -32,21 +30,18 @@ public abstract class AbstractTextButton extends MenuButton implements TextButto
     }
 
     protected final void populateMatrix() {
-        final Function<Integer, Boolean> fVal = ImageMatrix::valueFromInt;
-
         for (int selected = 0; selected < ImageMatrix.DIM; selected++)
             for (int highlighted = 0; highlighted < ImageMatrix.DIM; highlighted++)
                 imageMatrix[selected][highlighted] =
                         Settings.getTheme().logic.drawTextButton(
-                                sim(fVal.apply(selected), fVal.apply(highlighted)));
+                                sim(ImageMatrix.valueFromInt(selected),
+                                        ImageMatrix.valueFromInt(highlighted)));
     }
 
     @Override
     public final void render(final GameImage canvas) {
-        final Function<Boolean, Integer> fInd = ImageMatrix::indexFromValue;
-
-        draw(imageMatrix[fInd.apply(isSelected())]
-                [fInd.apply(isHighlighted())], canvas);
+        draw(imageMatrix[ImageMatrix.indexFromValue(isSelected())]
+                [ImageMatrix.indexFromValue(isHighlighted())], canvas);
     }
 
     @Override

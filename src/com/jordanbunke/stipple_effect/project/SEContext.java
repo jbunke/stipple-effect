@@ -1611,7 +1611,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(
                     layers, toIndex, frameCount, frameDurations);
-            stateManager.performAction(result, Operation.MOVE_FRAME_FORWARD);
+            stateManager.performAction(result, Operation.MOVE_FRAME);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveFrame(frameIndex, true);
@@ -1637,10 +1637,33 @@ public class SEContext {
 
             final ProjectState result = getState().changeFrames(
                     layers, toIndex, frameCount, frameDurations);
-            stateManager.performAction(result, Operation.MOVE_FRAME_BACK);
+            stateManager.performAction(result, Operation.MOVE_FRAME);
             StatusUpdates.movedFrame(frameIndex, toIndex, frameCount);
         } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveFrame(frameIndex, false);
+        }
+    }
+
+    public void moveFrame(final int from, final int to) {
+        final ProjectState s = getState();
+        final int fc = s.getFrameCount();
+
+        // check
+        if (from >= 0 && to >= 0 && from < fc && to < fc) {
+            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+            // resort frames of all layers
+            layers.replaceAll(l -> l.returnFrameMoved(from, to));
+
+            // frame durations
+            final List<Double> frameDurations = new ArrayList<>(s.getFrameDurations());
+            final double movedDuration = frameDurations.remove(from);
+            frameDurations.add(to, movedDuration);
+
+            final ProjectState result =
+                    s.changeFrames(layers, to, fc, frameDurations);
+            stateManager.performAction(result, Operation.MOVE_FRAME);
+            StatusUpdates.movedFrame(from, to, fc);
         }
     }
 
@@ -1963,7 +1986,7 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
-            stateManager.performAction(result, Operation.MOVE_LAYER_DOWN);
+            stateManager.performAction(result, Operation.MOVE_LAYER);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
         } else if (!Layout.isFlipbookPanelShowing()) {
@@ -1986,12 +2009,29 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(
                     layers, reinsertionIndex);
-            stateManager.performAction(result, Operation.MOVE_LAYER_UP);
+            stateManager.performAction(result, Operation.MOVE_LAYER);
             StatusUpdates.movedLayer(toMove.getName(), removalIndex,
                     reinsertionIndex, layers.size());
         } else if (!Layout.isFlipbookPanelShowing()) {
             StatusUpdates.cannotMoveLayer(
                     getState().getEditingLayer().getName(), true);
+        }
+    }
+
+    public void moveLayer(final int from, final int to) {
+        final ProjectState s = getState();
+        final int lc = s.getLayers().size();
+
+        // check
+        if (from >= 0 && to >= 0 && from < lc && to < lc) {
+            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+            final SELayer toMove = layers.remove(from);
+            layers.add(to, toMove);
+
+            final ProjectState result = s.changeLayers(layers, to);
+            stateManager.performAction(result, Operation.MOVE_LAYER);
+            StatusUpdates.movedLayer(toMove.getName(), from, to, lc);
         }
     }
 

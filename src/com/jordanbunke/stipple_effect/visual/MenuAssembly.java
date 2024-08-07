@@ -32,6 +32,8 @@ import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.draggables.FrameButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.draggables.LayerButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.layout.VerticalPanelAdjuster;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.Navbar;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.ThinkingActionItem;
@@ -309,21 +311,14 @@ public class MenuAssembly {
 
         int realBottomY = firstLBPos.y;
 
+        LayerButton.logic.reset();
+
         for (int i = layerCount - 1; i >= 0; i--) {
-            final SELayer layer = layers.get(i);
-
-            final String name = layer.getName(),
-                    text = name.length() > Layout.LAYER_NAME_LENGTH_CUTOFF
-                            ? name.substring(0, Layout.LAYER_NAME_LENGTH_CUTOFF) + "..."
-                            : name;
-
             final Coord2D pos = firstLBPos.displace(0,
                     (layerCount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
 
-            layerButtons[i] = new Scrollable(SelectableListItemButton.make(
-                    pos, Layout.LAYER_BUTTON_W, text, i,
-                    () -> c.getState().getLayerEditIndex(),
-                    l -> c.getState().setLayerEditIndex(l)));
+            layerButtons[i] = new Scrollable(
+                    new LayerButton(pos, i, c, layers.get(i)));
             layerElements.add(layerButtons[i]);
 
             // visibility toggle
@@ -366,12 +361,10 @@ public class MenuAssembly {
         final Scrollable[] frameButtons = new Scrollable[frameCount];
 
         Coord2D fbPos = firstFBPos;
+        FrameButton.logic.reset();
 
         for (int i = 0; i < frameCount; i++) {
-            frameButtons[i] = new Scrollable(SelectableListItemButton.make(
-                    fbPos, Layout.FRAME_BUTTON_W, String.valueOf(i + 1),
-                    i, () -> c.getState().getFrameIndex(),
-                    f -> c.getState().setFrameIndex(f)));
+            frameButtons[i] = new Scrollable(new FrameButton(fbPos, i, c));
 
             fbPos = fbPos.displace(Layout.FRAME_BUTTON_W +
                     (i + 1 < frameCount ? Layout.BUTTON_OFFSET : 0), 0);
