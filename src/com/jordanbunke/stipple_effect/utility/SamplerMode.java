@@ -9,10 +9,10 @@ public enum SamplerMode {
     @Override
     public String toString() {
         return switch (this) {
-            case RGB_SLIDERS -> "RGB Sliders";
-            case HSV_SLIDERS -> "HSV Sliders";
-            case SAT_VAL_MATRIX -> "Sat-Value Matrix";
-            default -> EnumUtils.formattedName(this);
+            case RGB_SLIDERS -> "RGB-A sliders";
+            case HSV_SLIDERS -> "HSV-A sliders";
+            case SAT_VAL_MATRIX -> "Sat. - value matrix";
+            case COLOR_WHEEL -> "Color wheel";
         };
     }
 

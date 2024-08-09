@@ -1,5 +1,40 @@
 # Changelog
 
+## **1.1.0** - The UI/UX Update - 2024-08-09
+
+### Added:
+* Draggable buttons: buttons can be clicked and dragged to resort...
+  * Frames
+  * Layers
+  * Palette colors
+* Cel buttons
+  * A range of cels across multiple frames and layers can be selected
+  * Cel selection operations: copy, cut, paste, delete
+* Multiple color sampling modes
+  * RGB-A sliders
+  * HSV-A sliders
+  * Saturation-value matrix
+  * Color wheel
+* Navigation bar
+* Number key icons to first {9} project buttons
+
+### Changed:
+* Layout overhaul
+  * The layers and frames panels have been replaced with the "flipbook" panel
+  * The colors panel now displays the color sampler and the palette simultaneously
+* The preset palettes are no longer preloaded; can now be accessed in the navigation bar
+
+### Fixed:
+* Bug: Tool mouse actions can still be executed when the cursor is in a dropdown menu
+* Bug: Cannot use the brush tool without a selected palette
+
+### API Changes:
+* Removed:
+  * Removed the property `mutable` of the type `palette`
+
+* Changed:
+  * API references to `LAYER-FRAME` have been renamed to `CEL`; no changed behaviour
+
 ## **1.0.1** - 2024-07-11
 
 ### Added:
