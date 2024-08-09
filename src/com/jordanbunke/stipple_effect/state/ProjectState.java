@@ -158,7 +158,7 @@ public class ProjectState {
             final List<SELayer> layers
     ) {
         return new ProjectState(imageWidth, imageHeight,
-                new ArrayList<>(layers), layerEditIndex,
+                layers, layerEditIndex,
                 frameCount, frameDurations, frameIndex,
                 selectionMode, selection, selectionContents);
     }

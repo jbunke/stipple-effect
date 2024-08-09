@@ -742,7 +742,6 @@ public class MenuAssembly {
                         Layout.getToolsHeight() - Layout.BUTTON_INC);
         mb.add(new ActionButton(outlinePos, CONFIGURE_OUTLINE, c));
 
-        // TODO: use thinking elements to update icons
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
                 generateIconButton(ResourceCodes.VERTICAL_REFLECTION,

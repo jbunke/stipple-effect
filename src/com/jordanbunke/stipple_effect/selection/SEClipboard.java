@@ -11,18 +11,13 @@ import java.awt.datatransfer.Transferable;
 
 public class SEClipboard {
     private static final SEClipboard INSTANCE;
-    private static final DataFlavor NATIVE_DATA_FLAVOR;
-
-    private SelectionContents contents;
-
-    private SEClipboard() {
-        contents = null;
-    }
+    private static final DataFlavor NATIVE_DATA_FLAVOR, CELS_DATA_FLAVOR;
 
     static {
         INSTANCE = new SEClipboard();
         NATIVE_DATA_FLAVOR = new DataFlavor(SelectionContents.class,
                 StippleEffect.PROGRAM_NAME + " selection");
+        CELS_DATA_FLAVOR = new DataFlavor(CelSelection.class, "Cels");
     }
 
     public static SEClipboard get() {
@@ -30,7 +25,7 @@ public class SEClipboard {
     }
 
     public void sendSelectionToClipboard(final ProjectState state) {
-        contents = switch (state.getSelectionMode()) {
+        final SelectionContents contents = switch (state.getSelectionMode()) {
             case BOUNDS -> SelectionContents.make(
                     state.getActiveLayerFrame(), state.getSelection());
             case CONTENTS -> state.getSelectionContents();
@@ -40,11 +35,18 @@ public class SEClipboard {
                 new ClipboardData(contents, NATIVE_DATA_FLAVOR));
     }
 
+    public CelSelection sendCelsToClipboard(final ProjectState state) {
+        final CelSelection cels = new CelSelection(state);
+        ClipboardUtils.setContent(new ClipboardData(cels, CELS_DATA_FLAVOR));
+
+        return cels;
+    }
+
     public boolean hasContent() {
         return getContent() != null;
     }
 
-    public SelectionContents getContent() {
+    public Object getContent() {
         final Transferable content = ClipboardUtils.getContent();
 
         if (content == null)
@@ -67,8 +69,13 @@ public class SEClipboard {
             return res;
         } else if (content.isDataFlavorSupported(NATIVE_DATA_FLAVOR)) {
             try {
-                return (SelectionContents) content
-                        .getTransferData(NATIVE_DATA_FLAVOR);
+                return content.getTransferData(NATIVE_DATA_FLAVOR);
+            } catch (Exception e) {
+                return null;
+            }
+        } else if (content.isDataFlavorSupported(CELS_DATA_FLAVOR)) {
+            try {
+                return content.getTransferData(CELS_DATA_FLAVOR);
             } catch (Exception e) {
                 return null;
             }

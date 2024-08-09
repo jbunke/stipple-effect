@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -25,6 +26,7 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -275,10 +277,12 @@ public class SEContext {
                 if (e instanceof GameMouseEvent me) {
                     if (me.matchesAction(GameMouseEvent.Action.DOWN) &&
                             inWorkspaceBounds) {
+                        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
                         tool.onMouseDown(this, me);
                         me.markAsProcessed();
                     } else if (me.matchesAction(GameMouseEvent.Action.CLICK) &&
                             inWorkspaceBounds) {
+                        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
                         tool.onClick(this, me);
                         me.markAsProcessed();
                     } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
@@ -878,10 +882,14 @@ public class SEContext {
 
     // copy - (not a state change unlike cut and paste)
     public void copy() {
-        if (getState().hasSelection()) {
-            SEClipboard.get().sendSelectionToClipboard(getState());
-            StatusUpdates.sendToClipboard(true,
-                    getState().getSelection().size());
+        final ProjectState s = getState();
+
+        if (Permissions.selectionIsCels()) {
+            final CelSelection cels = SEClipboard.get().sendCelsToClipboard(s);
+            StatusUpdates.sentCelsToClipboard(true, cels);
+        } else if (s.hasSelection()) {
+            SEClipboard.get().sendSelectionToClipboard(s);
+            StatusUpdates.sentSelectionToClipboard(true, s.getSelection().size());
         } else
             StatusUpdates.clipboardSendFailed(true);
     }
@@ -1225,22 +1233,28 @@ public class SEContext {
 
     // cut
     public void cut() {
-        if (getState().hasSelection()) {
-            SEClipboard.get().sendSelectionToClipboard(getState());
-            final int pixelCount = getState().getSelection().size();
+        final ProjectState s = getState();
+
+        if (Permissions.selectionIsCels()) {
+            final CelSelection cels = SEClipboard.get().sendCelsToClipboard(s);
+            deleteSelectedCels();
+            StatusUpdates.sentCelsToClipboard(false, cels);
+        } else if (s.hasSelection()) {
+            SEClipboard.get().sendSelectionToClipboard(s);
+            final int pixelCount = s.getSelection().size();
             deleteSelectionContents(true);
-            StatusUpdates.sendToClipboard(false, pixelCount);
+            StatusUpdates.sentSelectionToClipboard(false, pixelCount);
         } else
             StatusUpdates.clipboardSendFailed(false);
     }
 
     // paste
     public void paste(final boolean newLayer) {
-        if (SEClipboard.get().hasContent()) {
+        final Object content = SEClipboard.get().getContent();
+
+        if (content instanceof SelectionContents toPaste) {
             if (getState().hasSelectionContents())
                 dropContentsToLayer(false, true);
-
-            final SelectionContents toPaste = SEClipboard.get().getContent();
 
             if (newLayer)
                 addLayer();
@@ -1266,8 +1280,54 @@ public class SEContext {
                             displacement)), Operation.PASTE);
 
             StippleEffect.get().autoAssignPickUpSelection();
-        } else
+        } else if (content instanceof CelSelection cels)
+            pasteCels(cels);
+        else
             StatusUpdates.pasteFailed();
+    }
+
+    // paste cels
+    private void pasteCels(final CelSelection cels) {
+        ProjectState s = getState();
+        final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+        final int fc = s.getFrameCount(),
+                layerIndex = s.getLayerEditIndex(),
+                frameIndex = s.getFrameIndex();
+
+        if (cels.isCompatible(s)) {
+            final int framesToAppend = cels.framesToAppend(s);
+
+            for (int i = 0; i < framesToAppend; i++) {
+                final int addIndex = fc + i;
+                layers.replaceAll(l -> l.returnAddedFrame(addIndex,
+                        cels.celWidth, cels.celHeight));
+
+                final List<Double> frameDurations =
+                        new ArrayList<>(s.getFrameDurations());
+                frameDurations.add(addIndex, Constants.DEFAULT_FRAME_DURATION);
+
+                s = s.changeFrames(layers, frameIndex, addIndex + 1, frameDurations);
+            }
+
+            for (int l = 0; l < cels.layersRange; l++) {
+                final int li = layerIndex + l;
+
+                SELayer layer = layers.get(li);
+
+                for (int f = 0; f < cels.frameRange; f++) {
+                    final int fi = frameIndex + f;
+
+                    layer = layer.returnFrameReplaced(cels.getCel(l, f), fi);
+                }
+
+                layers.set(li, layer);
+            }
+
+            s = s.changeLayers(layers);
+            stateManager.performAction(s, Operation.PASTE_CELS);
+        } else
+            StatusUpdates.pasteCelsFailed();
     }
 
     // raise selection to contents
@@ -1315,7 +1375,9 @@ public class SEContext {
 
     // delete selection contents
     public void deleteSelectionContents(final boolean deselect) {
-        if (getState().hasSelection()) {
+        if (Permissions.selectionIsCels())
+            deleteSelectedCels();
+        else if (getState().hasSelection()) {
             final Selection selection = getState().getSelection();
 
             if (selection.hasSelection()) {
@@ -1331,6 +1393,39 @@ public class SEContext {
                     deselect ? Selection.EMPTY : selection),
                     Operation.DELETE_SELECTION_CONTENTS);
         }
+    }
+
+    private void deleteSelectedCels() {
+        final ProjectState s = getState();
+
+        final int f0 = CelButton.getFramesFrom(),
+                f1 = CelButton.getFramesTo(),
+                l0 = CelButton.getLayersFrom(),
+                l1 = CelButton.getLayersTo();
+
+        final int fMin = Math.min(f0, f1), fMax = Math.max(f0, f1),
+                lMin = Math.min(l0, l1), lMax = Math.max(l0, l1),
+                fc = s.getFrameCount(), lc = s.getLayers().size();
+
+        if (fMax < fc && lMax < lc) {
+            final GameImage replacement =
+                    new GameImage(s.getImageWidth(), s.getImageHeight());
+            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+            for (int l = lMin; l <= lMax; l++) {
+                SELayer layer = layers.get(l);
+
+                for (int f = fMin; f <= fMax; f++)
+                    layer = layer.returnFrameReplaced(replacement, f);
+
+                layers.set(l, layer);
+            }
+
+            final ProjectState res = s.changeLayers(layers);
+            stateManager.performAction(res, Operation.DELETE_CELS);
+            DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+        } else
+            StatusUpdates.deleteCelsFailed();
     }
 
     // fill selection
@@ -1362,6 +1457,8 @@ public class SEContext {
 
     // deselect
     public void deselect(final boolean checkpoint) {
+        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+
         if (getState().hasSelection()) {
             if (getState().getSelectionMode() == SelectionMode.CONTENTS)
                 dropContentsToLayer(checkpoint, true);
@@ -1375,6 +1472,8 @@ public class SEContext {
 
     // select all
     public void selectAll() {
+        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+
         final boolean dropAndRaise = getState().hasSelection() &&
                 getState().getSelectionMode() == SelectionMode.CONTENTS;
 
@@ -1397,6 +1496,8 @@ public class SEContext {
 
     // invert selection
     public void invertSelection() {
+        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+
         final boolean dropAndRaise = getState().hasSelection() &&
                 getState().getSelectionMode() == SelectionMode.CONTENTS;
 

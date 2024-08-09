@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.selection.CelSelection;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 
 import java.awt.*;
@@ -344,7 +345,16 @@ public class StatusUpdates {
                 ": " + width + "x" + height);
     }
 
-    public static void sendToClipboard(
+    public static void sentCelsToClipboard(
+            final boolean copied, final CelSelection cels
+    ) {
+        final int celCount = cels.frameRange * cels.layersRange;
+
+        send((copied ? "Copied" : "Cut") + " " + celCount + " cels of " +
+                cels.celWidth + "x" + cels.celHeight + "px to the clipboard");
+    }
+
+    public static void sentSelectionToClipboard(
             final boolean copied, final int pixelCount
     ) {
         send((copied ? "Copied" : "Cut") + " " + pixelCount + " pixels " +
@@ -360,7 +370,17 @@ public class StatusUpdates {
 
     public static void pasteFailed() {
         actionNotPermitted("paste",
-                "the " + StippleEffect.PROGRAM_NAME + " clipboard is empty");
+                "the clipboard is empty or does not content content of a valid data type");
+    }
+
+    public static void pasteCelsFailed() {
+        actionNotPermitted("paste the selected cels",
+                "the clipboard contents are incompatible with this project");
+    }
+
+    public static void deleteCelsFailed() {
+        actionNotPermitted("delete the selected cels",
+                "the selected range is incompatible with this project");
     }
 
     public static void saving() {

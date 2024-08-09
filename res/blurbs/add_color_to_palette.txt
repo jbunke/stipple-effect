@@ -1,4 +1,4 @@
-Shortcut: {Shift + A}
+Shortcut: {sc:ADD_TO_PALETTE}
 
 Adds the selected color (whichever of primary and secondary is marked with the selection icon) to
 the currently selected palette.

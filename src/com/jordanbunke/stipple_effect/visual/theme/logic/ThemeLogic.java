@@ -293,7 +293,8 @@ public abstract class ThemeLogic {
 
     public GameImage drawCelButton(
             final boolean selected, final boolean highlighted,
-            final CelButton.Status status, final boolean enabled
+            final CelButton.Status status, final boolean enabled,
+            final boolean partOfSelection
     ) {
         final Theme t = Settings.getTheme();
         final int w = Layout.FRAME_BUTTON_W, h = Layout.STD_TEXT_BUTTON_H;
@@ -302,7 +303,7 @@ public abstract class ThemeLogic {
         final TextButton representation =
                 TextButton.of("", w).sim(selected, highlighted);
 
-        final Color backgroundColor = t.buttonBody,
+        final Color backgroundColor = partOfSelection ? t.highlightOutline : t.buttonBody,
                 stencilColor = intuitTextColor(backgroundColor, enabled);
 
         drawTextButtonBackground(img, representation, backgroundColor);
