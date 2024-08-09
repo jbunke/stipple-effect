@@ -35,9 +35,11 @@ public class SEClipboard {
                 new ClipboardData(contents, NATIVE_DATA_FLAVOR));
     }
 
-    public void sendCelsToClipboard(final ProjectState state) {
+    public CelSelection sendCelsToClipboard(final ProjectState state) {
         final CelSelection cels = new CelSelection(state);
         ClipboardUtils.setContent(new ClipboardData(cels, CELS_DATA_FLAVOR));
+
+        return cels;
     }
 
     public boolean hasContent() {

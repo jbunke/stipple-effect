@@ -26,6 +26,7 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
+import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
@@ -884,11 +885,11 @@ public class SEContext {
         final ProjectState s = getState();
 
         if (Permissions.selectionIsCels()) {
-            SEClipboard.get().sendCelsToClipboard(s);
-            // TODO
+            final CelSelection cels = SEClipboard.get().sendCelsToClipboard(s);
+            StatusUpdates.sentCelsToClipboard(true, cels);
         } else if (s.hasSelection()) {
             SEClipboard.get().sendSelectionToClipboard(s);
-            StatusUpdates.sendToClipboard(true, s.getSelection().size());
+            StatusUpdates.sentSelectionToClipboard(true, s.getSelection().size());
         } else
             StatusUpdates.clipboardSendFailed(true);
     }
@@ -1235,14 +1236,14 @@ public class SEContext {
         final ProjectState s = getState();
 
         if (Permissions.selectionIsCels()) {
-            SEClipboard.get().sendCelsToClipboard(s);
-            // TODO: clear selected cels
-            // TODO: status update
+            final CelSelection cels = SEClipboard.get().sendCelsToClipboard(s);
+            deleteSelectedCels();
+            StatusUpdates.sentCelsToClipboard(false, cels);
         } else if (s.hasSelection()) {
             SEClipboard.get().sendSelectionToClipboard(s);
             final int pixelCount = s.getSelection().size();
             deleteSelectionContents(true);
-            StatusUpdates.sendToClipboard(false, pixelCount);
+            StatusUpdates.sentSelectionToClipboard(false, pixelCount);
         } else
             StatusUpdates.clipboardSendFailed(false);
     }
@@ -1310,16 +1311,20 @@ public class SEContext {
             }
 
             for (int l = 0; l < cels.layersRange; l++) {
-                for (int f = 0; f < cels.frameRange; f++) {
-                    final int li = layerIndex + l, fi = frameIndex + f;
+                final int li = layerIndex + l;
 
-                    layers.set(li, layers.get(li)
-                            .returnFrameReplaced(cels.getCel(l, f), fi));
+                SELayer layer = layers.get(li);
+
+                for (int f = 0; f < cels.frameRange; f++) {
+                    final int fi = frameIndex + f;
+
+                    layer = layer.returnFrameReplaced(cels.getCel(l, f), fi);
                 }
+
+                layers.set(li, layer);
             }
 
-            s = s.changeFrames(layers, frameIndex,
-                    fc + framesToAppend, s.getFrameDurations());
+            s = s.changeLayers(layers);
             stateManager.performAction(s, Operation.PASTE_CELS);
         } else
             StatusUpdates.pasteCelsFailed();
@@ -1370,7 +1375,9 @@ public class SEContext {
 
     // delete selection contents
     public void deleteSelectionContents(final boolean deselect) {
-        if (getState().hasSelection()) {
+        if (Permissions.selectionIsCels())
+            deleteSelectedCels();
+        else if (getState().hasSelection()) {
             final Selection selection = getState().getSelection();
 
             if (selection.hasSelection()) {
@@ -1386,6 +1393,39 @@ public class SEContext {
                     deselect ? Selection.EMPTY : selection),
                     Operation.DELETE_SELECTION_CONTENTS);
         }
+    }
+
+    private void deleteSelectedCels() {
+        final ProjectState s = getState();
+
+        final int f0 = CelButton.getFramesFrom(),
+                f1 = CelButton.getFramesTo(),
+                l0 = CelButton.getLayersFrom(),
+                l1 = CelButton.getLayersTo();
+
+        final int fMin = Math.min(f0, f1), fMax = Math.max(f0, f1),
+                lMin = Math.min(l0, l1), lMax = Math.max(l0, l1),
+                fc = s.getFrameCount(), lc = s.getLayers().size();
+
+        if (fMax < fc && lMax < lc) {
+            final GameImage replacement =
+                    new GameImage(s.getImageWidth(), s.getImageHeight());
+            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+
+            for (int l = lMin; l <= lMax; l++) {
+                SELayer layer = layers.get(l);
+
+                for (int f = fMin; f <= fMax; f++)
+                    layer = layer.returnFrameReplaced(replacement, f);
+
+                layers.set(l, layer);
+            }
+
+            final ProjectState res = s.changeLayers(layers);
+            stateManager.performAction(res, Operation.DELETE_CELS);
+            DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+        } else
+            StatusUpdates.deleteCelsFailed();
     }
 
     // fill selection

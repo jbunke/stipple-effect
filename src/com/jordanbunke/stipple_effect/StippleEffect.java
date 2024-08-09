@@ -945,8 +945,10 @@ public class StippleEffect implements ProgramContext {
 
             if (contextIndex >= contexts.size())
                 setContextIndex(contexts.size() - 1);
-            else
+            else {
+                DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
                 rebuildAllMenus();
+            }
 
             if (contexts.size() == 0)
                 exitProgram();
@@ -1070,6 +1072,7 @@ public class StippleEffect implements ProgramContext {
             this.contextIndex = contextIndex;
 
             // auxiliaries
+            DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
             rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
             getContext().redrawCanvasAuxiliaries();

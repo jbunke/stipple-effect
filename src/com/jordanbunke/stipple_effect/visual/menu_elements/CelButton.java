@@ -101,6 +101,10 @@ public final class CelButton extends MenuElement {
 
     @Override
     public void update(final double deltaTime) {
+        // use the guaranteed cel button to update global once per cycle
+        if (frameIndex == 0 && layerIndex == 0)
+            updateGlobal(c.getState());
+
         if (highlighted)
             StippleEffect.get().sendToolTipUpdate(ResourceCodes.CEL_BUTTON);
 
@@ -128,6 +132,16 @@ public final class CelButton extends MenuElement {
         if (oldStatus != status || wasEnabled != enabled ||
                 wasPartOfSelection != partOfSelection)
             updateAssets();
+    }
+
+    private static void updateGlobal(final ProjectState s) {
+        if (Permissions.selectionIsCels()) {
+            final int fc = s.getFrameCount(), lc = s.getLayers().size();
+
+            if (Math.max(framesFrom, framesTo) >= fc ||
+                    Math.max(layersFrom, layersTo) >= lc)
+                DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+        }
     }
 
     private boolean determinePartOfSelection() {

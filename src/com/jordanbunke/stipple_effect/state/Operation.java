@@ -9,8 +9,7 @@ public enum Operation {
     MOVE_FRAME, CHANGE_FRAME_DURATION,
     // layer operations
     ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
-    MOVE_LAYER, MOVE_LAYER_UP,
-    MERGE_WITH_LAYER_BELOW, FLATTEN,
+    MOVE_LAYER, MERGE_WITH_LAYER_BELOW, FLATTEN,
     CHANGE_LAYER_NAME,
     // layer operations without menu redraw consequences
     LAYER_VISIBILITY_CHANGE, LAYER_LINKING_CHANGE, LAYER_OPACITY_CHANGE,
@@ -18,7 +17,7 @@ public enum Operation {
     RESET_SELECTION_CONTENTS, MOVE_SELECTION_CONTENTS,
     TRANSFORM_SELECTION_CONTENTS,
     PASTE, PASTE_CELS, RAISE, DROP,
-    DELETE_SELECTION_CONTENTS,
+    DELETE_SELECTION_CONTENTS, DELETE_CELS,
     MOVE_SELECTION_BOUNDS, TRANSFORM_SELECTION_BOUNDS,
     DESELECT, SELECT,
     // canvas edit operations
@@ -63,7 +62,7 @@ public enum Operation {
     public ActionType getActionType() {
         return switch (this) {
             case ADD_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
-                    MOVE_FRAME, PASTE_CELS -> ActionType.FRAME;
+                    MOVE_FRAME, PASTE_CELS, DELETE_CELS -> ActionType.FRAME;
             case ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER, MOVE_LAYER,
                     MERGE_WITH_LAYER_BELOW, FLATTEN,
                     CHANGE_LAYER_NAME -> ActionType.LAYER;

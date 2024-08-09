@@ -90,14 +90,14 @@ public class ColorComponent extends MenuElementContainer {
         };
 
         return new ColorComponent(
-                0, scaleMax, labelText, labelPos, fSpectral,
+                scaleMax, labelText, labelPos, fSpectral,
                 c -> StippleEffect.get().setSelectedColor(c, lastEdit),
                 () -> componentGetter.apply(
                         StippleEffect.get().getSelectedColor()));
     }
 
     private ColorComponent(
-            final int minValue, final int maxValue,
+            final int maxValue,
             final String labelText, final Coord2D labelPos,
             final Function<Integer, Color> spectralFunction,
             final Consumer<Color> setter, final Supplier<Integer> getter
@@ -133,7 +133,7 @@ public class ColorComponent extends MenuElementContainer {
         final Coord2D sliderPos = labelPos.displace(
                 0, Layout.DIALOG_CONTENT_INC_Y);
         mb.add(new ColorSlider(sliderPos, elementWidthAllowance,
-                minValue, maxValue, getter, spectralFunction,
+                0, maxValue, getter, spectralFunction,
                 i -> setter.accept(spectralFunction.apply(i))));
 
         menuElements = mb.build().getMenuElements();

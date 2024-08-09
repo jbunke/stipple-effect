@@ -1052,7 +1052,7 @@ public class DialogAssembly {
     }
 
     public static void setDialogToExitProgramAYS() {
-        setDialogToAYS("Exit " + StippleEffect.PROGRAM_NAME + "?",
+        setDialogToAYS("Quit " + StippleEffect.PROGRAM_NAME + "?",
                 "All open projects will be closed without saving...",
                 () -> StippleEffect.get().exitProgram());
     }

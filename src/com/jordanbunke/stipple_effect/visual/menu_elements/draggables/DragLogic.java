@@ -116,10 +116,6 @@ public class DragLogic<T extends Draggable> {
         add(elements.size(), element);
     }
 
-    public int size() {
-        return elements.size();
-    }
-
     public Coord2D deltaMousePosition() {
         return lastMousePos.displace(onClickPos.scale(-1));
     }
