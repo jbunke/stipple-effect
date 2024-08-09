@@ -97,7 +97,7 @@ public class ProjectInfo {
 
     public void save() {
         if (!hasSaveAssociation()) {
-            DialogAssembly.setDialogToSave();
+            DialogAssembly.setDialogToSave(context);
             return;
         }
 

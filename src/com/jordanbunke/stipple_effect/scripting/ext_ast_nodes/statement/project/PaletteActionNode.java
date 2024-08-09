@@ -72,15 +72,8 @@ public final class PaletteActionNode extends ProjectStatementNode {
 
             if (palettize)
                 project.palettize(palette);
-            else if (palette.isMutable())
+            else
                 project.contentsToPalette(palette);
-            else {
-                StatusUpdates.scriptActionNotPermitted(
-                        "extract project contents to the palette \"" +
-                                palette.getName() + "\"",
-                        "\"" + palette.getName() + "\" is an immutable palette",
-                        arguments.args()[0].getPosition());
-            }
 
             // reset to dialog values
             DialogVals.setScope(scopeWas);

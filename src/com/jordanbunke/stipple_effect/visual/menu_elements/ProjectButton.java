@@ -6,13 +6,20 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ProjectButton extends SelectableListItemButton {
+    private static final int MAX_QUICK_SELECTABLE_INDEX = 8;
+
     private final SEContext project;
 
     private GameImage image, highlighted;
@@ -48,8 +55,8 @@ public class ProjectButton extends SelectableListItemButton {
 
         return new ProjectButton(position,
                 new Bounds2D(paddedTextWidth, Layout.STD_TEXT_BUTTON_H),
-                index, project, () -> StippleEffect.get().getContextIndex(),
-                s -> StippleEffect.get().setContextIndex(s));
+                index, project, StippleEffect.get()::getContextIndex,
+                StippleEffect.get()::setContextIndex);
     }
 
     @Override
@@ -68,10 +75,28 @@ public class ProjectButton extends SelectableListItemButton {
     }
 
     private void updateImages() {
-        image = GraphicsUtils.drawTextButton(getWidth(),
-                project.projectInfo.getFormattedName(true, true),
-                isSelected());
-        highlighted = GraphicsUtils.highlightButton(image);
+        final ThemeLogic tl = Settings.getTheme().logic;
+
+        final boolean quickSelectable = index <= MAX_QUICK_SELECTABLE_INDEX;
+        final int width = getWidth();
+        final String text = project.projectInfo.
+                getFormattedName(true, true);
+        final TextButton base = TextButton.of(text, width,
+                quickSelectable ? Alignment.RIGHT : Alignment.CENTER,
+                ButtonType.STANDARD);
+
+        image = tl.drawTextButton(base.sim(isSelected(), false));
+        highlighted = tl.drawTextButton(base.sim(isSelected(), true));
+
+        if (quickSelectable) {
+            final int offset = -Layout.ICON_BUTTON_OFFSET_Y;
+            final GameImage keyIcon = GraphicsUtils.loadNumkeyIcon(index + 1);
+
+            image.draw(keyIcon, offset, offset);
+            highlighted.draw(keyIcon, offset, offset);
+            image.free();
+            highlighted.free();
+        }
     }
 
     @Override

@@ -1,1 +1,1 @@
-Create new palette... | {Shift + N}
+New palette | {sc:NEW_PALETTE}

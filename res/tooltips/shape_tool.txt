@@ -1,1 +1,1 @@
-Shape Tool | {R}
+Shape Tool | {sc:SET_TOOL_SHAPE}

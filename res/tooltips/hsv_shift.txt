@@ -1,1 +1,1 @@
-Shift color levels... | {Ctrl + Shift + H}
+Adjust HSV color levels... | {sc:HSV_SHIFT}

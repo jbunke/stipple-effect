@@ -90,8 +90,7 @@ public final class HSVShiftNode extends ProjectStatementNode {
                     DialogVals.setValueScale(vShift.scale);
 
                 final ProjectState res = project.prepHSVShift();
-                project.getStateManager()
-                        .performAction(res, Operation.EDIT_IMAGE);
+                project.stateManager.performAction(res, Operation.EDIT_IMAGE);
 
                 // reset to dialog values
                 DialogVals.setScope(scopeWas);

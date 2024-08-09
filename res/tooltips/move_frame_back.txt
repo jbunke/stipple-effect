@@ -1,1 +1,1 @@
-Move frame back | {Ctrl + Shift + Left Arrow}
+Move frame back | {sc:MOVE_FRAME_BACK}

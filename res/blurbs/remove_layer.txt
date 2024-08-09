@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + Shift + Backspace}
+Shortcut: {sc:REMOVE_LAYER}

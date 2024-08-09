@@ -1,1 +1,1 @@
-Stipple Pencil | {O}
+Stipple Pencil | {sc:SET_TOOL_STIPPLE_PENCIL}

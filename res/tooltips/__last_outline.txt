@@ -1,0 +1,1 @@
+Outline selection with current config | {sc:LAST_OUTLINE}

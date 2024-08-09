@@ -12,19 +12,13 @@ import java.util.function.Function;
 
 public class Palette {
     private String name;
-    private final boolean mutable;
     private final List<Color> colorSequence;
     private final Map<Color, Boolean> inclusionMap;
 
-    public Palette(final String name, final Color[] loaded) {
-        this(name, loaded, true);
-    }
-
     public Palette(
-            final String name, final Color[] loaded, final boolean mutable
+            final String name, final Color[] loaded
     ) {
         this.name = name;
-        this.mutable = mutable;
         this.colorSequence = new ArrayList<>();
         this.inclusionMap = new HashMap<>();
 
@@ -69,6 +63,13 @@ public class Palette {
             colorSequence.remove(c);
             colorSequence.add(indexUpdate.apply(i), c);
         }
+    }
+
+    public void moveToIndex(final Color c, final int i) {
+        final int index = MathPlus.bounded(0, i, colorSequence.size());
+
+        colorSequence.remove(c);
+        colorSequence.add(index, c);
     }
 
     public Color nextLeft(final Color c) {
@@ -133,26 +134,23 @@ public class Palette {
     }
 
     public boolean canAdd(final Color candidate) {
-        return mutable && !colorSequence.contains(candidate);
+        return !colorSequence.contains(candidate);
     }
 
     public boolean canRemove(final Color candidate) {
-        return mutable && colorSequence.contains(candidate);
+        return colorSequence.contains(candidate);
     }
 
     public boolean canMoveLeft(final Color candidate) {
-        return mutable && colorSequence.indexOf(candidate) > 0;
+        return colorSequence.indexOf(candidate) > 0;
     }
 
     public boolean canMoveRight(final Color candidate) {
-        return mutable && colorSequence.contains(candidate) &&
+        return colorSequence.contains(candidate) &&
                 colorSequence.indexOf(candidate) < colorSequence.size() - 1;
     }
 
     public void setName(final String name) {
-        if (!mutable)
-            return;
-
         this.name = name;
     }
 
@@ -168,11 +166,11 @@ public class Palette {
         return name;
     }
 
-    public boolean isMutable() {
-        return mutable;
-    }
-
     public boolean isIncluded(final Color c) {
         return inclusionMap.getOrDefault(c, false);
+    }
+
+    public boolean containsColor(final Color c) {
+        return colorSequence.contains(c);
     }
 }

@@ -3,20 +3,23 @@ package com.jordanbunke.stipple_effect.visual;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
-import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.ParserUtils;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconToggleButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.StaticTextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -29,19 +32,28 @@ import java.util.function.Supplier;
 
 public class GraphicsUtils {
     public static GameImage HIGHLIGHT_OVERLAY,
-            SELECT_OVERLAY, TRANSFORM_NODE, CHECKMARK;
+            SELECT_OVERLAY, TRANSFORM_NODE, COLOR_NODE, CHECKMARK;
+    private static final Map<CelButton.Status, GameImage> stencilMap;
     private static final Map<String, GameImage> iconMap;
 
     static {
         TRANSFORM_NODE = loadUtil("transform_node");
+        COLOR_NODE = loadUtil("color_node");
         CHECKMARK = loadUtil("checkmark");
 
         iconMap = new HashMap<>();
+
+        stencilMap = new HashMap<>();
+        fetchStencils();
 
         final Theme theme = Settings.getTheme();
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
         SELECT_OVERLAY = theme.logic.selectedIconOverlay();
+    }
+
+    public static GameImage loadStencil(final CelButton.Status status) {
+        return stencilMap.get(status);
     }
 
     private static GameImage loadUtil(final String code) {
@@ -55,6 +67,7 @@ public class GraphicsUtils {
         final Theme theme = Settings.getTheme();
 
         TRANSFORM_NODE = loadUtil("transform_node");
+        COLOR_NODE = loadUtil("color_node");
         CHECKMARK = loadUtil("checkmark");
 
         HIGHLIGHT_OVERLAY = theme.logic.highlightedIconOverlay();
@@ -64,6 +77,13 @@ public class GraphicsUtils {
 
         SECursor.refresh();
         Arrays.stream(Tool.getAll()).forEach(Tool::refreshIcons);
+    }
+
+    private static void fetchStencils() {
+        for (CelButton.Status status : CelButton.Status.values())
+            stencilMap.put(status, ResourceLoader.loadImageResource(
+                    Constants.MISC_FOLDER.resolve(
+                            status.name().toLowerCase() + "_stencil.png")));
     }
 
     public static TextBuilder uiText(final Color color) {
@@ -102,69 +122,70 @@ public class GraphicsUtils {
                 highlighted, accentColor, backgroundColor);
     }
 
-    public static GameImage drawDropdownButton(
-            final int width, final String text, final boolean selected
-    ) {
-        final GameImage base = drawTextButton(
-                width, text, selected, ButtonType.DD_HEAD);
-
-        final GameImage icon = loadIcon(
-                selected ? IconCodes.COLLAPSE : IconCodes.EXPAND);
-
-        base.draw(icon, base.getWidth() - (Layout.BUTTON_INC),
-                Layout.BUTTON_BORDER_PX);
-
-        return base.submit();
-    }
-
-    public static GameImage drawTextButton(
-            final int width, final String text,
-            final boolean selected, final ButtonType type
-    ) {
-        return Settings.getTheme().logic
-                .drawTextButton(width, text, selected, type);
-    }
-
-    public static GameImage drawTextButton(
-            final int width, final String text, final boolean selected
-    ) {
-        return drawTextButton(width, text, selected, ButtonType.STANDARD);
-    }
-
-    public static SimpleMenuButton makeStandardTextButton(
+    public static StaticTextButton makeStandardTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final GameImage base =
-                drawTextButton(Layout.STD_TEXT_BUTTON_W, text, false);
-        return new SimpleMenuButton(pos, new Bounds2D(Layout.STD_TEXT_BUTTON_W,
-                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
-                true, onClick, base, highlightButton(base));
+        return new StaticTextButton(pos, text,
+                Layout.STD_TEXT_BUTTON_W, onClick,
+                Alignment.CENTER, ButtonType.STANDARD);
     }
 
-    public static SimpleMenuButton makeBespokeTextButton(
+    public static StaticTextButton makeBespokeTextButton(
             final String text, final Coord2D pos, final Runnable onClick
     ) {
-        final int w = uiText(SEColors.def())
+        final int w = bespokeTextMenuElementWidth(text);
+
+        return new StaticTextButton(pos, text, w, onClick,
+                Alignment.CENTER, ButtonType.STANDARD);
+    }
+
+    public static int bespokeTextMenuElementWidth(final String text) {
+        return uiText(SEColors.def())
                 .addText(text).build().draw()
                 .getWidth() + Layout.CONTENT_BUFFER_PX;
+    }
 
-        final GameImage base = drawTextButton(w, text, false);
-        return new SimpleMenuButton(pos, new Bounds2D(w,
-                Layout.STD_TEXT_BUTTON_H), MenuElement.Anchor.LEFT_TOP,
-                true, onClick, base, highlightButton(base));
+    public static int dropdownMenuHeaderWidth(final String text) {
+        return bespokeTextMenuElementWidth(text) +
+                Layout.DD_MENU_HEADER_RIGHT_BUFFER;
+    }
+
+    public static int dropdownMenuLeafWidth(final String code) {
+        final int FAIL = 1, buttonWidth = ResourceCodes.hasIcon(code)
+                ? Layout.BUTTON_INC : 0;
+        final String[] lines = ParserUtils.getToolTip(code);
+
+        if (lines.length != 1)
+            return FAIL;
+
+        final String[] segments = ParserUtils.extractHighlight(lines[0]);
+
+        return switch (segments.length) {
+            case 1 -> {
+                final String action = segments[0].trim();
+
+                yield buttonWidth + bespokeTextMenuElementWidth(action) +
+                        Layout.CONTENT_BUFFER_PX;
+            }
+            case 2 -> {
+                final String action = segments[0].replace("|", "").trim(),
+                        shortcut = ParserUtils.getShortcut(segments[1].trim());
+
+                yield buttonWidth + bespokeTextMenuElementWidth(action) +
+                        Layout.DD_MENU_LEAF_MIDDLE_BUFFER +
+                        bespokeTextMenuElementWidth(shortcut);
+            }
+            default -> FAIL;
+        };
     }
 
     public static GameImage drawSelectedTextbox(final GameImage bounds) {
         final GameImage selected = new GameImage(bounds);
         final int w = selected.getWidth();
-        selected.draw(loadIcon(IconCodes.BULLET_POINT),
+        selected.draw(loadIcon(ResourceCodes.BULLET_POINT),
                 w - Layout.BUTTON_INC, Layout.BUTTON_BORDER_PX);
 
         return selected.submit();
-    }
-
-    public static GameImage highlightButton(final GameImage nhi) {
-        return Settings.getTheme().logic.highlightButton(nhi);
     }
 
     public static GameImage drawSelectionOverlay(
@@ -234,6 +255,13 @@ public class GraphicsUtils {
             }
     }
 
+    public static GameImage loadNumkeyIcon(final int num) {
+        if (num < 1 || num > 9)
+            return GameImage.dummy();
+
+        return loadIcon(ResourceCodes.NUMKEY_PREFIX + num);
+    }
+
     public static GameImage loadIcon(final String code) {
         if (iconMap.containsKey(code))
             return new GameImage(iconMap.get(code));
@@ -260,13 +288,13 @@ public class GraphicsUtils {
     }
 
     public static MenuElement generateIconButton(
-            final String iconID, final Coord2D position,
+            final String code, final Coord2D position,
             final Supplier<Boolean> precondition, final Runnable behaviour
     ) {
-        final IconButton icon = IconButton.make(iconID, position, behaviour);
+        final IconButton icon = IconButton.make(code, position, behaviour);
         final StaticMenuElement stub = new StaticMenuElement(position,
                 Layout.ICON_DIMS, MenuElement.Anchor.LEFT_TOP,
-                Settings.getTheme().logic.unclickableIcon(loadIcon(iconID)));
+                Settings.getTheme().logic.unclickableIcon(loadIcon(code)));
 
         return new ThinkingMenuElement(() -> precondition.get() ? icon : stub);
     }
@@ -292,16 +320,5 @@ public class GraphicsUtils {
 
         final int avg = (orig.getRed() + orig.getGreen() + orig.getBlue()) / 3;
         return new Color(avg, avg, avg, orig.getAlpha());
-    }
-
-    public enum ButtonType {
-        STANDARD, STUB, DD_HEAD, DD_OPTION;
-
-        public boolean isDropdown() {
-            return switch (this) {
-                case DD_HEAD, DD_OPTION -> true;
-                default -> false;
-            };
-        }
     }
 }

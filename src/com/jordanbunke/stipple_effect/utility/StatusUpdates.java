@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.selection.CelSelection;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 
 import java.awt.*;
@@ -48,6 +49,11 @@ public class StatusUpdates {
     public static void cannotSetPixelGrid() {
         actionNotPermitted("turn pixel grid on or off",
                 "the pixel grid cannot be rendered for this project's current dimensions and/or zoom level");
+    }
+
+    public static void cannotCropToSelection() {
+        actionNotPermitted("crop the canvas to the selection",
+                "nothing is selected");
     }
 
     public static void cannotFlatten() {
@@ -120,16 +126,14 @@ public class StatusUpdates {
     public static void cannotShiftColorPalette(
             final Palette p, final Color c, final boolean isLeft
     ) {
-        final boolean colorInPalette = p.canRemove(c);
+        final boolean colorInPalette = p.containsColor(c);
 
         final String dir = isLeft ? "left" : "right";
 
         actionNotPermitted("shift the selected color " + processColor(c) +
                         " to the " + dir + " in \"" + p.getName() + "\"",
-                p.isMutable() ? (colorInPalette
-                        ? ("it is already the " + dir + "most color")
-                        : "it is not in the palette")
-                        : "\"" + p.getName() + "\" is immutable");
+                colorInPalette ? ("it is already the " + dir + "most color")
+                        : "it is not in the palette");
     }
 
     public static void cannotColorPalette(
@@ -341,7 +345,16 @@ public class StatusUpdates {
                 ": " + width + "x" + height);
     }
 
-    public static void sendToClipboard(
+    public static void sentCelsToClipboard(
+            final boolean copied, final CelSelection cels
+    ) {
+        final int celCount = cels.frameRange * cels.layersRange;
+
+        send((copied ? "Copied" : "Cut") + " " + celCount + " cels of " +
+                cels.celWidth + "x" + cels.celHeight + "px to the clipboard");
+    }
+
+    public static void sentSelectionToClipboard(
             final boolean copied, final int pixelCount
     ) {
         send((copied ? "Copied" : "Cut") + " " + pixelCount + " pixels " +
@@ -351,13 +364,23 @@ public class StatusUpdates {
     public static void clipboardSendFailed(
             final boolean triedCopy
     ) {
-        send("Cannot " + (triedCopy ? "copy" : "cut") +
-                "; there is nothing selected");
+        actionNotPermitted(triedCopy ? "copy" : "cut",
+                "there is nothing selected");
     }
 
     public static void pasteFailed() {
-        send("Cannot paste; the " + StippleEffect.PROGRAM_NAME +
-                " clipboard is empty");
+        actionNotPermitted("paste",
+                "the clipboard is empty or does not content content of a valid data type");
+    }
+
+    public static void pasteCelsFailed() {
+        actionNotPermitted("paste the selected cels",
+                "the clipboard contents are incompatible with this project");
+    }
+
+    public static void deleteCelsFailed() {
+        actionNotPermitted("delete the selected cels",
+                "the selected range is incompatible with this project");
     }
 
     public static void saving() {

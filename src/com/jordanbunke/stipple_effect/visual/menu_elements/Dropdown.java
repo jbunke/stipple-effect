@@ -1,19 +1,27 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.AbstractDropdownList;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.SimpleItem;
+import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.AbstractVerticalScrollBox;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.StaticTextButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Dropdown extends AbstractDropdownList {
@@ -34,6 +42,21 @@ public class Dropdown extends AbstractDropdownList {
         this.dropdownAllowanceY = dropdownAllowanceY;
 
         make();
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
+        final Optional<?> scope = DeltaTimeGlobal.getStatusOf(
+                DeltaTimeGlobal.SC_CURSOR_CAPTURED);
+        final AbstractVerticalScrollBox container = getContainer();
+
+        if (scope.isEmpty() && isDroppedDown() &&
+                container.mouseIsWithinBounds(
+                        eventLogger.getAdjustedMousePosition()))
+            DeltaTimeGlobal.setStatus(DeltaTimeGlobal.SC_CURSOR_CAPTURED,
+                    container);
+
+        super.process(eventLogger);
     }
 
     private static SimpleItem[] composeItems(
@@ -90,15 +113,10 @@ public class Dropdown extends AbstractDropdownList {
         for (int i = 0; i < size; i++) {
             final int index = i;
 
-            final GameImage nhi = GraphicsUtils.drawTextButton(
-                    buttonWidth, getLabelTextFor(i), false,
-                    GraphicsUtils.ButtonType.DD_OPTION);
-
-            scrollables[i] = new SimpleMenuButton(
+            scrollables[i] = new StaticTextButton(
                     position.displace(0, i * Layout.STD_TEXT_BUTTON_H),
-                    new Bounds2D(buttonWidth, Layout.STD_TEXT_BUTTON_H),
-                    Anchor.LEFT_TOP, true, () -> select(index),
-                    nhi, GraphicsUtils.highlightButton(nhi));
+                    getLabelTextFor(i), buttonWidth, () -> select(index),
+                    Alignment.LEFT, ButtonType.DD_OPTION);
         }
 
         final Bounds2D dimensions = new Bounds2D(getWidth(),
@@ -113,16 +131,22 @@ public class Dropdown extends AbstractDropdownList {
 
     @Override
     protected SimpleToggleMenuButton makeDDButton() {
+        final ThemeLogic tl = Settings.getTheme().logic;
+
+        final int width = getWidth();
         final String text = getCurrentLabelText();
+        final TextButton base = TextButton.of(text, width,
+                Alignment.LEFT, ButtonType.DD_HEAD);
 
         final GameImage[] bases = new GameImage[] {
-                GraphicsUtils.drawDropdownButton(getWidth(), text, false),
-                GraphicsUtils.drawDropdownButton(getWidth(), text, true)
+                tl.drawTextButton(base),
+                tl.drawTextButton(base.sim(true, false))
         };
 
-        final GameImage[] highlighted = Arrays.stream(bases)
-                .map(GraphicsUtils::highlightButton)
-                .toArray(GameImage[]::new);
+        final GameImage[] highlighted = new GameImage[] {
+                tl.drawTextButton(base.sim(false, true)),
+                tl.drawTextButton(base.sim(true, true))
+        };
 
         return new SimpleToggleMenuButton(new Coord2D(getX(), getY()),
                 new Bounds2D(getWidth(), Layout.STD_TEXT_BUTTON_H),

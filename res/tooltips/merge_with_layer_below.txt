@@ -1,1 +1,1 @@
-Merge with layer below | {Ctrl + Shift + M}
+Merge with layer below | {sc:MERGE_WITH_LAYER_BELOW}

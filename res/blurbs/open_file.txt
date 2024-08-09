@@ -1,4 +1,4 @@
-Shortcut: {Ctrl + O}
+Shortcut: {sc:OPEN_FILE}
 
 Creates a project from an imported image file
 

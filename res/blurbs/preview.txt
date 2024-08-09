@@ -1,3 +1,3 @@
-Shortcut: {Shift + Space}
+Shortcut: {sc:PREVIEW}
 
 Opens a new window that displays the project at 100% size.

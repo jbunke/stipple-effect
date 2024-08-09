@@ -6,7 +6,11 @@ import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
+import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.util.function.Supplier;
 
@@ -37,12 +41,15 @@ public class SelectStateButton extends SimpleMenuButton {
             final Coord2D position, final Runnable onClick,
             final Supplier<Boolean> selectableChecker
     ) {
-        final GameImage base = GraphicsUtils.drawTextButton(
-                Layout.STD_TEXT_BUTTON_W, "Select", false),
-                highlighted = GraphicsUtils.highlightButton(base),
-                stub = GraphicsUtils.drawTextButton(
-                        Layout.STD_TEXT_BUTTON_W, "Selected", false,
-                        GraphicsUtils.ButtonType.STUB);
+        final ThemeLogic tl = Settings.getTheme().logic;
+        final int width = Layout.STD_TEXT_BUTTON_W;
+
+        final TextButton tmpl = TextButton.of("Select", width);
+
+        final GameImage base = tl.drawTextButton(tmpl),
+                highlighted = tl.drawTextButton(tmpl.sim(false, true)),
+                stub = tl.drawTextButton(TextButton.of("Selected",
+                        width, Alignment.CENTER, ButtonType.STUB));
 
         return new SelectStateButton(position, onClick,
                 selectableChecker, base, highlighted, stub);

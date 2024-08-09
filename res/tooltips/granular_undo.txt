@@ -1,1 +1,1 @@
-Granular undo | {Ctrl + Shift + Z}
+Granular undo | {sc:GRANULAR_UNDO}

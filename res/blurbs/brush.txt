@@ -1,4 +1,4 @@
-Shortcut: {B}
+Shortcut: {sc:SET_TOOL_BRUSH}
 
 A pixel-perfect paint brush with no anti-aliasing
 

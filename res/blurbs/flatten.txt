@@ -1,3 +1,3 @@
-Shortcut: {Ctrl + M}
+Shortcut: {sc:FLATTEN}
 
 Compresses project's visible contents down to a single layer

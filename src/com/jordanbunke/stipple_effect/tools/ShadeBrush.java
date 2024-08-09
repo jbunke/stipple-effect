@@ -35,13 +35,15 @@ public final class ShadeBrush extends AbstractBrush {
     @Override
     void setColorGetter(final SEContext context, final GameMouseEvent me) {
         palette = StippleEffect.get().getSelectedPalette();
-        c = me.button == GameMouseEvent.Button.LEFT
-                ? palette::nextLeft : palette::nextRight;
+
+        if (palette != null)
+            c = me.button == GameMouseEvent.Button.LEFT
+                    ? palette::nextLeft : palette::nextRight;
     }
 
     @Override
     boolean paintCondition(final Color existing, final int x, final int y) {
-        return palette.isIncluded(existing);
+        return palette != null && palette.isIncluded(existing);
     }
 
     @Override

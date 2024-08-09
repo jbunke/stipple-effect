@@ -1,1 +1,1 @@
-Add selected color to palette | {Shift + A}
+Add selected color to palette | {sc:ADD_TO_PALETTE}

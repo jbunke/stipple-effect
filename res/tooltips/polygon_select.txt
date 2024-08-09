@@ -1,1 +1,1 @@
-Polygon Select | {Y}
+Polygon Select | {sc:SET_TOOL_POLYGON_SELECT}

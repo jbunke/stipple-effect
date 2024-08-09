@@ -1,1 +1,1 @@
-Shortcut: {Shift + E}
+Shortcut: {sc:PALETTE_SETTINGS}

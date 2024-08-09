@@ -1,1 +1,1 @@
-Save | {Ctrl + S}
+Save project | {sc:SAVE}

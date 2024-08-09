@@ -1,0 +1,1 @@
+Fill selection with primary color | {sc:FILL_PRIMARY}

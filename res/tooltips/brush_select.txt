@@ -1,1 +1,1 @@
-Brush Select | {V}
+Brush Select | {sc:SET_TOOL_BRUSH_SELECT}

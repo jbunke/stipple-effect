@@ -1,1 +1,1 @@
-Fill | {F}
+Fill | {sc:SET_TOOL_FILL}

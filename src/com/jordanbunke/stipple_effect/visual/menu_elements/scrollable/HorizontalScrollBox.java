@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
+import com.jordanbunke.delta_time.menu.menu_elements.ext.drawing_functions.ScrollBoxDrawingFunction;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.AbstractHorizontalScrollBox;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.scroll.Scrollable;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
@@ -13,8 +14,17 @@ public class HorizontalScrollBox extends AbstractHorizontalScrollBox {
             final Scrollable[] menuElements,
             final int realRightX, final int initialOffsetX
     ) {
-        super(position, dimensions, menuElements,
-                Settings.getTheme().logic::drawScrollBoxBackground,
+        this(position, dimensions, menuElements, realRightX, initialOffsetX,
+                Settings.getTheme().logic::drawScrollBoxBackground);
+    }
+
+    public HorizontalScrollBox(
+            final Coord2D position, final Bounds2D dimensions,
+            final Scrollable[] menuElements,
+            final int realRightX, final int initialOffsetX,
+            final ScrollBoxDrawingFunction fDraw
+    ) {
+        super(position, dimensions, menuElements, fDraw,
                 Layout.PX_PER_SCROLL, realRightX, initialOffsetX);
     }
 
@@ -27,5 +37,9 @@ public class HorizontalScrollBox extends AbstractHorizontalScrollBox {
                 0, maxOffsetX, () -> -getOffset().x, o -> setOffsetX(-o));
         slider.updateAssets();
         return slider;
+    }
+
+    public boolean renderingChild(final Scrollable child) {
+        return renderAndProcessChild(child);
     }
 }

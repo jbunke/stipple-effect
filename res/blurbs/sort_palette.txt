@@ -1,4 +1,4 @@
-Shortcut: {Shift + M}
+Shortcut: {sc:SORT_PALETTE}
 
 Rearrange the colors in the palette according to one of the following orderings:
 

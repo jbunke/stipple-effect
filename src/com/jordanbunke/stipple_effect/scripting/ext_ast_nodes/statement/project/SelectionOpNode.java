@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 
 public final class SelectionOpNode extends CondProjectOpNode {
     public static final String
@@ -10,17 +11,11 @@ public final class SelectionOpNode extends CondProjectOpNode {
             ALL = "select_all",
             DESELECT = "deselect";
 
-    public enum Op {
-        DESELECT, SELECT_ALL, INVERT_SELECTION;
-
-        public final String NAME = name().toLowerCase();
-    }
-
-    private final Op operation;
+    private final SEAction operation;
 
     public SelectionOpNode(
             final TextPosition position, final ExpressionNode scope,
-            final ExpressionNode[] args, final Op operation
+            final ExpressionNode[] args, final SEAction operation
     ) {
         super(position, scope, args);
 
@@ -38,6 +33,7 @@ public final class SelectionOpNode extends CondProjectOpNode {
             case DESELECT -> "void the project's selection";
             case SELECT_ALL -> "select all pixels in the project canvas";
             case INVERT_SELECTION -> "invert the project selection";
+            default -> "invalid";
         };
     }
 
@@ -48,15 +44,11 @@ public final class SelectionOpNode extends CondProjectOpNode {
 
     @Override
     protected void operation(final SEContext project) {
-        switch (operation) {
-            case SELECT_ALL -> project.selectAll();
-            case DESELECT -> project.deselect(true);
-            case INVERT_SELECTION -> project.invertSelection();
-        }
+        operation.behaviour.accept(project);
     }
 
     @Override
     protected String callName() {
-        return operation.NAME;
+        return operation.name().toLowerCase();
     }
 }

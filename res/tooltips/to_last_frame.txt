@@ -1,1 +1,1 @@
-To last frame | {Ctrl + Right Arrow Key}
+To last frame | {sc:TO_LAST_FRAME}

@@ -1,1 +1,1 @@
-Flatten project | {Ctrl + M}
+Flatten project | {sc:FLATTEN}

@@ -1,7 +1,7 @@
-Select entire canvas: {Ctrl + A}
-Deselect: {Ctrl + D}
-Invert selection: {Ctrl + I}
-Fill selection with primary color: {Backspace}
-Fill selection with secondary color: {Shift + Backspace}
-Erase selection contents: {Delete}
-Erase selection contents and keep selection area: {Shift + Delete}
+Select entire canvas: {sc:SELECT_ALL}
+Deselect: {sc:DESELECT}
+Invert selection: {sc:INVERT_SELECTION}
+Fill selection with primary color: {sc:FILL_PRIMARY}
+Fill selection with secondary color: {sc:FILL_SECONDARY}
+Delete selection contents: {sc:DELETE_SELECTION_CONTENTS}
+Delete selection contents and keep selection area: {sc:DELETE_SELECTION_CONTENTS_NO_DESELECT}

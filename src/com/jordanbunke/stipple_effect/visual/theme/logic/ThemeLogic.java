@@ -2,10 +2,16 @@ package com.jordanbunke.stipple_effect.visual.theme.logic;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.menu_elements.CelButton;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DropdownExpansion;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
@@ -102,42 +108,218 @@ public abstract class ThemeLogic {
                         (2 * Layout.SLIDER_THINNING)), sd);
     }
 
-    public GameImage drawTextButton(final int width, final String text,
-            final boolean selected, final GraphicsUtils.ButtonType type) {
+    public final GameImage drawDropdownMenuLeafStub(final TextButton tb) {
+        return drawDropdownMenuLeaf(tb, false);
+    }
+
+    protected GameImage drawDropdownMenuLeaf(final TextButton tb, final boolean conditionPassed) {
+        final Theme t = Settings.getTheme();
+        final String code = tb.getLabel();
+
+        final boolean hasIcon = ResourceCodes.hasIcon(code);
+        final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
+                textY = Layout.TEXT_Y_OFFSET;
+
+        final GameImage button = new GameImage(w, h);
+
+        final Color backgroundColor = t.dropdownOptionBody;
+        final Color actionCol = intuitTextColor(backgroundColor, conditionPassed),
+                shortcutCol = intuitTextColor(backgroundColor, false);
+        button.fill(backgroundColor);
+
+        if (hasIcon) {
+            final GameImage baseIcon = GraphicsUtils.loadIcon(code),
+                    icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
+            button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+        }
+
+        final String[] lines = ParserUtils.getToolTip(code);
+
+        if (lines.length >= 1) {
+            final String[] segments = ParserUtils.extractHighlight(lines[0]);
+
+            final GameImage actionImage = switch (segments.length) {
+                case 2 -> {
+                    final String action = segments[0].replace("|", "").trim(),
+                            shortcut = ParserUtils.getShortcut(segments[1].trim());
+
+                    final GameImage shortcutImage = GraphicsUtils.uiText(shortcutCol)
+                            .addText(shortcut).build().draw();
+                    button.draw(shortcutImage, w - (shortcutImage.getWidth() +
+                            Layout.CONTENT_BUFFER_PX), textY);
+
+                    yield GraphicsUtils.uiText(actionCol)
+                            .addText(action).build().draw();
+                }
+                case 1 -> GraphicsUtils.uiText(actionCol)
+                        .addText(segments[0]).build().draw();
+                default -> GameImage.dummy();
+            };
+
+            final int actionTextX = Layout.CONTENT_BUFFER_PX +
+                    (hasIcon ? Layout.BUTTON_INC : 0);
+            button.draw(actionImage, actionTextX, textY);
+
+            if (tb.isHighlighted()) {
+                final int underlineY = Layout.STD_TEXT_BUTTON_H - 4;
+                button.drawLine(actionCol, 1f, actionTextX, underlineY,
+                        actionTextX + actionImage.getWidth(), underlineY);
+            }
+        }
+
+        return button.submit();
+    }
+
+    protected Color getTextButtonBackgroundColor(final TextButton tb) {
         final Theme t = Settings.getTheme();
 
-        final Color backgroundColor = switch (type) {
+        return switch (tb.getButtonType()) {
             case DD_OPTION -> t.dropdownOptionBody;
             case STUB -> t.stubButtonBody;
             default -> t.buttonBody;
         };
+    }
 
-        final boolean leftAligned = type.isDropdown();
-        final boolean drawBorder = type != GraphicsUtils.ButtonType.DD_OPTION;
+    protected Color getTextButtonTextColor(
+            final TextButton tb, final Color backgroundColor
+    ) {
+        return intuitTextColor(backgroundColor, true);
+    }
 
-        final Color textColor = intuitTextColor(backgroundColor, true);
-        final GameImage textImage = GraphicsUtils.uiText(textColor)
-                .addText(text).build().draw();
+    protected void drawTextButtonBackground(
+            final GameImage img, final TextButton tb, final Color backgroundColor
+    ) {
+        img.fill(backgroundColor);
+    }
 
-        final int w = Math.max(width, textImage.getWidth() +
-                (4 * Layout.BUTTON_BORDER_PX)),
-                h = Layout.STD_TEXT_BUTTON_H;
-
-        final GameImage nhi = new GameImage(w, h);
-        nhi.fillRectangle(backgroundColor, 0, 0, w, h);
-
-        final int x = leftAligned
-                ? (2 * Layout.BUTTON_BORDER_PX)
-                : (w - textImage.getWidth()) / 2;
-
-        nhi.draw(textImage, x, Layout.BUTTON_TEXT_OFFSET_Y);
+    protected void drawTextButtonForeground(
+            final GameImage img, final TextButton tb
+    ) {
+        final boolean drawBorder = tb.getButtonType() != ButtonType.DD_OPTION;
 
         if (drawBorder) {
-            final Color frame = buttonBorderColor(selected);
-            nhi.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+            final Color frame = buttonBorderColor(tb.isSelected());
+            final int w = img.getWidth(), h = img.getHeight();
+
+            img.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+        }
+    }
+
+    protected GameImage textButtonPostprocessing(
+            final GameImage img, final TextButton tb
+    ) {
+        img.free();
+        return tb.isHighlighted() && !tb.isSelected()
+                ? highlightButton(img) : img;
+    }
+
+    public final GameImage drawTextButton(final TextButton tb) {
+        final ButtonType type = tb.getButtonType();
+
+        if (type == ButtonType.DD_MENU_LEAF)
+            return drawDropdownMenuLeaf(tb, true);
+
+        final Color backgroundColor = getTextButtonBackgroundColor(tb),
+                textColor = getTextButtonTextColor(tb, backgroundColor);
+        final GameImage textImage = GraphicsUtils.uiText(textColor)
+                .addText(tb.getLabel()).build().draw();
+
+        final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H;
+        final GameImage img = new GameImage(w, h);
+
+        drawTextButtonBackground(img, tb, backgroundColor);
+
+        final int x = switch (tb.getAlignment()) {
+            case LEFT -> (2 * Layout.BUTTON_BORDER_PX);
+            case CENTER -> (w - textImage.getWidth()) / 2;
+            case RIGHT -> w - (textImage.getWidth() + (2 * Layout.BUTTON_BORDER_PX));
+        };
+
+        img.draw(textImage, x, Layout.TEXT_Y_OFFSET);
+
+        // dropdown list button
+        if (type == ButtonType.DD_HEAD) {
+            final GameImage icon = GraphicsUtils.loadIcon(
+                    tb.isSelected() ? ResourceCodes.COLLAPSE : ResourceCodes.EXPAND);
+
+            img.draw(icon, w - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
         }
 
-        return nhi.submit();
+        drawTextButtonForeground(img, tb);
+        return textButtonPostprocessing(img, tb);
+    }
+
+    public GameImage drawDropdownHeader(
+            final TextButton ddh, final DropdownExpansion expansion
+    ) {
+        final Theme t = Settings.getTheme();
+
+        final int w = ddh.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
+                textY = Layout.TEXT_Y_OFFSET,
+                underlineY = Layout.STD_TEXT_BUTTON_H - 4;
+
+        final GameImage button = new GameImage(w, h);
+
+        final Color backgroundColor = ddh.isSelected() ? t.buttonBody
+                : (expansion == DropdownExpansion.DOWN
+                ? t.panelBackground : t.dropdownOptionBody);
+        final Color textColor = intuitTextColor(backgroundColor, true);
+        button.fill(backgroundColor);
+
+        final GameImage text = GraphicsUtils.uiText(textColor)
+                .addText(ddh.getLabel()).build().draw();
+        button.draw(text, Layout.CONTENT_BUFFER_PX, textY);
+
+        if (ddh.isHighlighted() && !ddh.isSelected())
+            button.drawLine(textColor, 1f, Layout.CONTENT_BUFFER_PX,
+                    underlineY, Layout.CONTENT_BUFFER_PX + text.getWidth(),
+                    underlineY);
+
+        if (expansion == DropdownExpansion.RIGHT) {
+            final String expText = ddh.isSelected() ? "<" : ">";
+            final GameImage exp = GraphicsUtils.uiText(textColor)
+                    .addText(expText).build().draw();
+            button.draw(exp, w - (exp.getWidth() +
+                    Layout.CONTENT_BUFFER_PX), textY);
+        }
+
+        if (ddh.isSelected()) {
+            button.drawLine(t.dropdownOptionBody, 2f, 1, 0, 1, h);
+            button.drawLine(t.dropdownOptionBody, 2f, w - 1, 0, w - 1, h);
+        }
+
+        return button.submit();
+    }
+
+    public GameImage drawCelButton(
+            final boolean selected, final boolean highlighted,
+            final CelButton.Status status, final boolean enabled,
+            final boolean partOfSelection
+    ) {
+        final Theme t = Settings.getTheme();
+        final int w = Layout.FRAME_BUTTON_W, h = Layout.STD_TEXT_BUTTON_H;
+        final GameImage img = new GameImage(w, h);
+
+        final TextButton representation =
+                TextButton.of("", w).sim(selected, highlighted);
+
+        final Color backgroundColor = partOfSelection ? t.highlightOutline : t.buttonBody,
+                stencilColor = intuitTextColor(backgroundColor, enabled);
+
+        drawTextButtonBackground(img, representation, backgroundColor);
+
+        final GameImage stencil = GraphicsUtils.loadStencil(status);
+        stencil.setColor(stencilColor);
+
+        for (int x = 0; x < stencil.getWidth(); x++)
+            for (int y = 0; y < stencil.getHeight(); y++)
+                if (stencil.getColorAt(x, y).getAlpha() > 0)
+                    stencil.dot(x, y);
+
+        img.draw(stencil.submit(), 0, 0);
+
+        drawTextButtonForeground(img, representation);
+        return textButtonPostprocessing(img, representation);
     }
 
     public GameImage highlightSliderBall(final GameImage baseSliderBall) {
@@ -198,7 +380,7 @@ public abstract class ThemeLogic {
                 postSelImage = GraphicsUtils.uiText(mainTextC)
                         .addText(postSel).build().draw();
 
-        Coord2D textPos = new Coord2D(2 * px, Layout.BUTTON_TEXT_OFFSET_Y);
+        Coord2D textPos = new Coord2D(2 * px, Layout.TEXT_Y_OFFSET);
 
         // possible prefix
         nhi.draw(prefixImage, textPos.x, textPos.y);
@@ -270,6 +452,10 @@ public abstract class ThemeLogic {
                 diffD = ColorMath.diff(background, dark);
 
         return diffD > diffL ? dark : light;
+    }
+
+    public static Color intuitTextColor(final boolean main) {
+        return intuitTextColor(Settings.getTheme().panelBackground, main);
     }
 
     public static GameImage hueFromColorTransformation(

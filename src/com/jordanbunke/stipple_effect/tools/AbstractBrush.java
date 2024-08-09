@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.tools;
 import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -25,8 +24,7 @@ public sealed abstract class AbstractBrush
 
     @Override
     public void onMouseDown(final SEContext context, final GameMouseEvent me) {
-        if (StippleEffect.get().hasPaletteContents() &&
-                !context.getTargetPixel().equals(Constants.NO_VALID_TARGET) &&
+        if (!context.getTargetPixel().equals(Constants.NO_VALID_TARGET) &&
                 me.button != GameMouseEvent.Button.MIDDLE) {
             painting = true;
             setColorGetter(context, me);

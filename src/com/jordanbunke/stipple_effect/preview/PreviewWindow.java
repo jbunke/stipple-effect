@@ -27,7 +27,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -122,10 +122,10 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
             if (hasScript) {
                 final MenuElement removeButton =
                         GraphicsUtils.generateIconButton(
-                                IconCodes.REMOVE_SCRIPT, initial,
+                                ResourceCodes.REMOVE_SCRIPT, initial,
                                 () -> true, this::removeScript),
                         importButton = GraphicsUtils.generateIconButton(
-                                IconCodes.IMPORT_PREVIEW,
+                                ResourceCodes.IMPORT_PREVIEW,
                                 initial.displace(Layout.BUTTON_INC, 0),
                                 () -> content != null && content.length > 0,
                                 this::importPreview),
@@ -137,7 +137,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
             } else {
                 final MenuElement scriptButton =
                         GraphicsUtils.generateIconButton(
-                                IconCodes.IMPORT_SCRIPT, initial,
+                                ResourceCodes.IMPORT_SCRIPT, initial,
                                 () -> true, this::openPreviewScript),
                         scriptText = labelAfterLastButton(
                                 scriptButton, () -> text, text);
@@ -149,29 +149,29 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
 
         final MenuElement firstFrame =
                 GraphicsUtils.generateIconButton(
-                        IconCodes.TO_FIRST_FRAME,
+                        ResourceCodes.TO_FIRST_FRAME,
                         initial.displace(0, Layout.BUTTON_INC),
                         hasMultipleFrames, () -> frameIndex = 0),
                 previousFrame = GraphicsUtils.generateIconButton(
-                        IconCodes.PREVIOUS, firstFrame.getRenderPosition()
+                        ResourceCodes.PREVIOUS, firstFrame.getRenderPosition()
                                 .displace(Layout.BUTTON_INC, 0),
                         hasMultipleFrames, () -> frameIndex = frameIndex == 0
                                 ? frameCount - 1 : frameIndex - 1),
                 playStop = GraphicsUtils.generateIconToggleButton(
                         previousFrame.getRenderPosition()
                                 .displace(Layout.BUTTON_INC, 0),
-                        new String[] { IconCodes.PLAY, IconCodes.STOP },
+                        new String[] { ResourceCodes.PLAY, ResourceCodes.STOP },
                         new Runnable[] {
                                 playbackInfo::play, playbackInfo::stop
                         }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
-                        hasMultipleFrames, IconCodes.PLAY),
+                        hasMultipleFrames, ResourceCodes.PLAY),
                 nextFrame = GraphicsUtils.generateIconButton(
-                        IconCodes.NEXT, playStop.getRenderPosition()
+                        ResourceCodes.NEXT, playStop.getRenderPosition()
                                 .displace(Layout.BUTTON_INC, 0),
                         hasMultipleFrames, () ->
                                 frameIndex = (frameIndex + 1) % frameCount),
                 lastFrame = GraphicsUtils.generateIconButton(
-                        IconCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
+                        ResourceCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
                                 .displace(Layout.BUTTON_INC, 0),
                         hasMultipleFrames, () -> frameIndex = frameCount - 1);
 
@@ -191,7 +191,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                                 .toArray(Runnable[]::new),
                         () -> playbackInfo.getMode().buttonIndex(),
                         playbackInfo::toggleMode, hasMultipleFrames,
-                        IconCodes.LOOP);
+                        ResourceCodes.LOOP);
         final DynamicLabel frameTracker = labelAfterLastButton(
                 playbackModeButton,
                 () -> "Frm. " + (frameIndex + 1) + "/" + frameCount,
@@ -214,11 +214,11 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                         i -> i, sv -> sv, sv -> sv + " FPS", "XXX FPS");
         mb.addAll(fps.decButton, fps.incButton, fps.slider, fps.value);
 
-        final IconButton decZoom = IconButton.make(IconCodes.DECREMENT,
+        final IconButton decZoom = IconButton.make(ResourceCodes.DECREMENT,
                 firstFrame.getRenderPosition()
                         .displace(0, Layout.BUTTON_INC * 2),
                 this::zoomOut),
-                incZoom = IconButton.make(IconCodes.INCREMENT,
+                incZoom = IconButton.make(ResourceCodes.INCREMENT,
                         decZoom.getRenderPosition()
                                 .displace(Layout.BUTTON_INC, 0),
                         this::zoomIn);
@@ -415,7 +415,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
 
         final GameWindow window = new GameWindow("Preview: " +
                 context.projectInfo.getFormattedName(false, false),
-                width, height, GraphicsUtils.readIconAsset(IconCodes.PROGRAM),
+                width, height, GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
                 false, false, false);
         window.hideCursor();
         window.setPosition(winX, winY);

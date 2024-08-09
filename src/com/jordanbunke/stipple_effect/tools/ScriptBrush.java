@@ -1,7 +1,6 @@
 package com.jordanbunke.stipple_effect.tools;
 
 import com.jordanbunke.delta_time.events.GameMouseEvent;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -14,6 +13,7 @@ import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.StaticTextButton;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -90,7 +90,7 @@ public final class ScriptBrush extends AbstractBrush
                 "Color script");
 
         // upload script button
-        final SimpleMenuButton scriptButton =
+        final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         new Coord2D(Layout.optionsBarNextElementX(
                                 scriptLabel, false),

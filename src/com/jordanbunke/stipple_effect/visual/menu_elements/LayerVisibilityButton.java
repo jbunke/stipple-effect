@@ -9,8 +9,9 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.SelectableMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.utility.IconCodes;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
+import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.List;
@@ -91,7 +92,7 @@ public class LayerVisibilityButton extends SelectableMenuElement {
         if (was != enabled)
             updateAssets();
 
-        if (highlighted)
+        if (highlighted && Permissions.isCursorFree())
             StippleEffect.get().sendToolTipUpdate(getCode());
     }
 
@@ -107,8 +108,8 @@ public class LayerVisibilityButton extends SelectableMenuElement {
 
     private String getCode() {
         return enabled
-                ? IconCodes.LAYER_ENABLED
-                : IconCodes.LAYER_DISABLED;
+                ? ResourceCodes.LAYER_ENABLED
+                : ResourceCodes.LAYER_DISABLED;
     }
 
     @Override

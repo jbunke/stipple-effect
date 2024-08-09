@@ -7,7 +7,6 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
-import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 public abstract class Tool {
     private GameImage icon, highlightedIcon, selectedIcon;
@@ -111,18 +110,11 @@ public abstract class Tool {
     }
 
     public MenuElementGrouping buildToolOptionsBar() {
-        return new MenuElementGrouping(getOptionsLabel());
-    }
-
-    private TextLabel getOptionsLabel() {
-        return TextLabel.make(new Coord2D(
-                Layout.getToolOptionsBarPosition().x +
-                        Layout.CONTENT_BUFFER_PX, Layout.optionsBarTextY()),
-                "Tool Options");
+        return new MenuElementGrouping();
     }
 
     Coord2D getFirstOptionLabelPosition() {
-        return new Coord2D(Layout.optionsBarNextElementX(
-                getOptionsLabel(), true), Layout.optionsBarTextY());
+        return new Coord2D(Layout.getToolOptionsBarPosition().x +
+                Layout.CONTENT_BUFFER_PX, Layout.optionsBarTextY());
     }
 }

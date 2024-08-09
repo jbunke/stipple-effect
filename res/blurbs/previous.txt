@@ -1,1 +1,1 @@
-Shortcut: {Ctrl + Shift + Space}
+Shortcut: {sc:PREVIOUS_FRAME}

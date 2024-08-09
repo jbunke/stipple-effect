@@ -1,2 +1,1 @@
-Pixel grid is OFF
-Turn on: {Ctrl + G}
+Show pixel grid | {sc:SHOW_PIXEL_GRID}

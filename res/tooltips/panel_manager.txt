@@ -1,3 +1,1 @@
-Open panel manager... | {Shift + Escape}
-
-Toggle show all / minimal: {Ctrl + Shift + A}
+Panel Manager | {sc:PANEL_MANAGER}

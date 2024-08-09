@@ -1,0 +1,1 @@
+Select range of cels anchored by the active cel | {Shift + Click}

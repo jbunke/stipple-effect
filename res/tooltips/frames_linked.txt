@@ -1,2 +1,2 @@
 Frames linked
-Toggle: {Ctrl + Q}
+Toggle: {sc:TOGGLE_LAYER_LINKING}

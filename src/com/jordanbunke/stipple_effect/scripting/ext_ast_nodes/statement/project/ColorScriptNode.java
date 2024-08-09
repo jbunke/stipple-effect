@@ -69,8 +69,7 @@ public final class ColorScriptNode extends ProjectStatementNode {
                 DialogVals.setIgnoreSelection(ignoreSelection);
 
                 final ProjectState res = project.prepColorScript(colorScript);
-                project.getStateManager()
-                        .performAction(res, Operation.EDIT_IMAGE);
+                project.stateManager.performAction(res, Operation.EDIT_IMAGE);
 
                 // reset to dialog values
                 DialogVals.setScope(scopeWas);

@@ -1,4 +1,4 @@
-Shortcut: {D}
+Shortcut: {sc:SET_TOOL_SHADE_BRUSH}
 
 Works like the regular {Brush} tool, but shifts the color of a pixel that is {painted over} to one of
 the colors next to it in the current palette {if the pixel's initial color is in the palette}.

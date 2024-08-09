@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.awt.*;
 
-public final class MutablePaletteColorOpNode extends PaletteStatementNode {
+public final class PaletteColorOpNode extends PaletteStatementNode {
     public static final String
             ADD = "add_color", REMOVE = "remove_color",
             MOVE_LEFT = "move_color_left", MOVE_RIGHT = "move_color_right";
@@ -71,15 +71,15 @@ public final class MutablePaletteColorOpNode extends PaletteStatementNode {
         @Override
         public String toString() {
             return switch (this) {
-                case ADD -> MutablePaletteColorOpNode.ADD;
-                case REMOVE -> MutablePaletteColorOpNode.REMOVE;
-                case MOVE_LEFT -> MutablePaletteColorOpNode.MOVE_LEFT;
-                case MOVE_RIGHT -> MutablePaletteColorOpNode.MOVE_RIGHT;
+                case ADD -> PaletteColorOpNode.ADD;
+                case REMOVE -> PaletteColorOpNode.REMOVE;
+                case MOVE_LEFT -> PaletteColorOpNode.MOVE_LEFT;
+                case MOVE_RIGHT -> PaletteColorOpNode.MOVE_RIGHT;
             };
         }
     }
 
-    private MutablePaletteColorOpNode(
+    private PaletteColorOpNode(
             final TextPosition position, final ExpressionNode scope,
             final ExpressionNode[] args, final Op operation
     ) {
@@ -88,32 +88,32 @@ public final class MutablePaletteColorOpNode extends PaletteStatementNode {
         this.operation = operation;
     }
 
-    public static MutablePaletteColorOpNode add(
+    public static PaletteColorOpNode add(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new MutablePaletteColorOpNode(position, scope, args, Op.ADD);
+        return new PaletteColorOpNode(position, scope, args, Op.ADD);
     }
 
-    public static MutablePaletteColorOpNode remove(
+    public static PaletteColorOpNode remove(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new MutablePaletteColorOpNode(position, scope, args, Op.REMOVE);
+        return new PaletteColorOpNode(position, scope, args, Op.REMOVE);
     }
 
-    public static MutablePaletteColorOpNode moveLeft(
+    public static PaletteColorOpNode moveLeft(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new MutablePaletteColorOpNode(position, scope, args, Op.MOVE_LEFT);
+        return new PaletteColorOpNode(position, scope, args, Op.MOVE_LEFT);
     }
 
-    public static MutablePaletteColorOpNode moveRight(
+    public static PaletteColorOpNode moveRight(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new MutablePaletteColorOpNode(position, scope, args, Op.MOVE_RIGHT);
+        return new PaletteColorOpNode(position, scope, args, Op.MOVE_RIGHT);
     }
 
     @Override
@@ -121,12 +121,7 @@ public final class MutablePaletteColorOpNode extends PaletteStatementNode {
         final Palette palette = getPalette(symbolTable);
         final Color color = (Color) arguments.getValues(symbolTable)[0];
 
-        if (!palette.isMutable())
-            StatusUpdates.scriptActionNotPermitted(
-                    operation.attempt(palette, color),
-                    "the palette \"" + palette.getName() + "\" is immutable",
-                    scope.caller().getPosition());
-        else if (!operation.condition(palette, color))
+        if (!operation.condition(palette, color))
             StatusUpdates.scriptActionNotPermitted(
                     operation.attempt(palette, color),
                     operation.failReason(palette, color),

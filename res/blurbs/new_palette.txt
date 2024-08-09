@@ -1,1 +1,1 @@
-Shortcut: {Shift + N}
+Shortcut: {sc:NEW_PALETTE}

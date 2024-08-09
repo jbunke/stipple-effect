@@ -47,11 +47,11 @@ public class Constants {
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
             SCRIPT_FILE_SUFFIX = "ses", SCRIPT_GLOBAL_NAMESPACE = "SE",
             ASCII_TEMPLATE = "ascii", LATIN_EXTENDED_TEMPLATE = "latin-extended",
-            COLOR_TOOL_TIP_PREFIX = "color:",
+            COLOR_TOOL_TIP_PREFIX = "color:", SHORTCUT_PREFIX = "sc:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_COLOR = "<#", CLOSE_COLOR = ">",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
-            ICON_ID_GAP_CODE = "", TYPING_CODE = "typing",
+            TYPING_CODE = "typing", CEL_SELECTION = "cel_selection",
             GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";
 
     public static final int DEFAULT_CANVAS_W = 32, DEFAULT_CANVAS_H = 32,

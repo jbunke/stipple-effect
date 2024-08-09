@@ -1,1 +1,1 @@
-Previous frame | {Ctrl + Shift + Space}
+Previous frame | {sc:PREVIOUS_FRAME}

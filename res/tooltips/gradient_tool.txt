@@ -1,1 +1,1 @@
-Gradient Tool | {G}
+Gradient Tool | {sc:SET_TOOL_GRADIENT}

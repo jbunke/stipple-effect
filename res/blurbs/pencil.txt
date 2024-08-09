@@ -1,4 +1,4 @@
-Shortcut: {P}
+Shortcut: {sc:SET_TOOL_PENCIL}
 
 A pixel-perfect pencil that draws one pixel at a time
 

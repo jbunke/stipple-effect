@@ -1,1 +1,1 @@
-Palettize... | {Shift + P}
+Palettize... | {sc:PALETTIZE}

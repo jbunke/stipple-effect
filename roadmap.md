@@ -1,9 +1,15 @@
 # Roadmap
 
-This is a rough outline of planned features and when to expect them. Everything you see here is
-subject to change.
+This is a rough outline of planned features and when to expect them. Everything you see here is subject to change.
 
 ## Q3 2024
-* Timeline: frames and layers combined in a single UI panel
-* Lossless video export
 * Presets for common scriptable behaviours
+* Onion skin options:
+  * Look ahead/behind multiple frames
+  * Opacity dropoff
+  * Types of skins
+  * Settings unique to layer
+
+## Q4 2024
+* Lossless video exporting
+* Preview window embedded in main window while program is fullscreened

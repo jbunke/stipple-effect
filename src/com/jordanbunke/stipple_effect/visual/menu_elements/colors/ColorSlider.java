@@ -22,7 +22,7 @@ public class ColorSlider extends HorizontalSlider {
             final Function<Integer, Color> spectralFunction,
             final Consumer<Integer> setter
     ) {
-        super(position, width, Anchor.CENTRAL, minValue, maxValue,
+        super(position, width, Anchor.LEFT_TOP, minValue, maxValue,
                 getter, setter, false);
 
         this.spectralFunction = spectralFunction;

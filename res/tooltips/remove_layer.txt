@@ -1,1 +1,1 @@
-Remove layer | {Ctrl + Shift + Backspace}
+Remove layer | {sc:REMOVE_LAYER}

@@ -1,1 +1,1 @@
-Stitch/split frames... | {Ctrl + Shift + G}
+Stitch/split frames... | {sc:STITCH_SPLIT}

@@ -7,8 +7,6 @@ import com.jordanbunke.delta_time._core.ProgramContext;
 import com.jordanbunke.delta_time.debug.DebugChannel;
 import com.jordanbunke.delta_time.debug.GameDebugger;
 import com.jordanbunke.delta_time.error.GameError;
-import com.jordanbunke.delta_time.events.GameKeyEvent;
-import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.image.ImageProcessing;
 import com.jordanbunke.delta_time.io.FileIO;
@@ -18,6 +16,7 @@ import com.jordanbunke.delta_time.io.ResourceLoader;
 import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.text.TextBuilder;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.Version;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
@@ -25,9 +24,7 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.palette.ColorMenuMode;
 import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
@@ -35,6 +32,8 @@ import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.tools.*;
 import com.jordanbunke.stipple_effect.utility.*;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
+import com.jordanbunke.stipple_effect.utility.action.SEAction;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -52,6 +51,8 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+
+import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public class StippleEffect implements ProgramContext {
     public static String
@@ -83,16 +84,12 @@ public class StippleEffect implements ProgramContext {
     // colors
     private final Color[] colors;
     private int colorIndex;
-    private ColorMenuMode colorMenuMode;
     private final List<Palette> palettes;
     private int paletteIndex;
     private Menu colorsMenu;
 
-    // layers
-    private Menu layersMenu;
-
-    // frames
-    private Menu framesMenu;
+    // flipbook
+    private Menu flipbookMenu;
 
     // bottom bar
     private Menu bottomBarMenu;
@@ -225,16 +222,14 @@ public class StippleEffect implements ProgramContext {
         colors[SECONDARY] = SEColors.white();
         colorIndex = PRIMARY;
 
-        colorMenuMode = ColorMenuMode.RGBA_HSV;
-        palettes = PaletteLoader.loadOnStartup();
-        paletteIndex = palettes.isEmpty() ? Constants.NO_SELECTION : 0;
+        palettes = new ArrayList<>();
+        paletteIndex = Constants.NO_SELECTION;
 
         // menu stubs
         toolButtonMenu = MenuAssembly.stub();
         bottomBarMenu = MenuAssembly.stub();
         colorsMenu = MenuAssembly.stub();
-        layersMenu = MenuAssembly.stub();
-        framesMenu = MenuAssembly.stub();
+        flipbookMenu = MenuAssembly.stub();
         projectsMenu = MenuAssembly.stub();
 
         dialog = null;
@@ -251,8 +246,8 @@ public class StippleEffect implements ProgramContext {
         statusUpdate = GameImage.dummy();
 
         toolTipMillisCounter = 0;
-        provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
-        toolTipCode = Constants.ICON_ID_GAP_CODE;
+        provisionalToolTipCode = ResourceCodes.NONE;
+        toolTipCode = ResourceCodes.NONE;
         toolTip = GameImage.dummy();
 
         timerCounter = 0;
@@ -270,8 +265,8 @@ public class StippleEffect implements ProgramContext {
 
     public static void main(final String[] args) {
         if (args.length > 0)
-            get().launchWithFile(Path.of(Arrays.stream(args)
-                    .reduce("", (a, b) -> a + " " + b).trim()));
+            get().launchWithFile(Path.of(Arrays.stream(args).reduce("",
+                    (a, b) -> a.length() == 0 ? b : a + " " + b).trim()));
     }
 
     private void launchWithFile(final Path filepath) {
@@ -317,7 +312,7 @@ public class StippleEffect implements ProgramContext {
         final GameWindow window = new GameWindow(
                 PROGRAM_NAME + " " + getVersion(),
                 size.width(), size.height(),
-                GraphicsUtils.readIconAsset(IconCodes.PROGRAM),
+                GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
                 true, false, !windowed);
         window.hideCursor();
         return window;
@@ -339,8 +334,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     public void rebuildStateDependentMenus() {
-        rebuildLayersMenu();
-        rebuildFramesMenu();
+        rebuildFlipbookMenu();
         rebuildProjectsMenu();
         rebuildBottomBarMenu();
     }
@@ -359,14 +353,9 @@ public class StippleEffect implements ProgramContext {
         bottomBarMenu = MenuAssembly.buildBottomBarMenu();
     }
 
-    public void rebuildLayersMenu() {
-        layersMenu = Layout.isLayersPanelShowing()
-                ? MenuAssembly.buildLayersMenu() : MenuAssembly.stub();
-    }
-
-    public void rebuildFramesMenu() {
-        framesMenu = Layout.isFramesPanelShowing()
-                ? MenuAssembly.buildFramesMenu() : MenuAssembly.stub();
+    public void rebuildFlipbookMenu() {
+        flipbookMenu = Layout.isFlipbookPanelShowing()
+                ? MenuAssembly.buildFlipbookMenu() : MenuAssembly.stub();
     }
 
     public void rebuildProjectsMenu() {
@@ -376,266 +365,73 @@ public class StippleEffect implements ProgramContext {
     @Override
     public void process(final InputEventLogger eventLogger) {
         mousePos = eventLogger.getAdjustedMousePosition();
+        DeltaTimeGlobal.setStatus(DeltaTimeGlobal.SC_CURSOR_CAPTURED, null);
+        SECursor.resetCursorCode();
 
         if (dialog == null) {
             if (!Permissions.isTyping())
                 processNonStateKeyPresses(eventLogger);
 
-            // bottom bar
-            bottomBarMenu.process(eventLogger);
-            // tools
-            toolButtonMenu.process(eventLogger);
-            // colors
-            colorsMenu.process(eventLogger);
-            // layers
-            layersMenu.process(eventLogger);
-            // frames
-            framesMenu.process(eventLogger);
             // projects
             projectsMenu.process(eventLogger);
+            // colors
+            colorsMenu.process(eventLogger);
+            // tools
+            toolButtonMenu.process(eventLogger);
+            // flipbook
+            flipbookMenu.process(eventLogger);
+            // bottom bar
+            bottomBarMenu.process(eventLogger);
 
             // workspace
             getContext().process(eventLogger);
         } else {
             dialog.process(eventLogger);
-
-            // close dialog on ESC press
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    this::clearDialog);
+            CLEAR_DIALOG.doForMatchingKeyStroke(eventLogger, null);
         }
     }
 
     private void processNonStateKeyPresses(final InputEventLogger eventLogger) {
-        if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-            // Ctrl + Shift + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.S, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToSave);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToPad);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    Layout::togglePanels);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    this::toggleColorMenuMode);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
-                    this::stitchOrSplit);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToColorScript);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToHSVShift);
-        } else if (eventLogger.isPressed(Key.CTRL)) {
-            // Ctrl + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToInfo);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToProgramSettings);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToNewProject);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    this::openProject);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToResize);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents() &&
-                                getSelectedPalette().isMutable())
-                            DialogAssembly.setDialogToSavePalette(getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.K, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (tool.equals(TextTool.get()))
-                            TextTool.get().toggleAlignment();
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
-                    this::selectPaletteColorToTheLeft);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
-                    this::selectPaletteColorToTheRight);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
-                    this::openAutomationScript);
-        } else if (eventLogger.isPressed(Key.SHIFT)) {
-            // Shift + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToHistory);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    this::swapColors);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToOutline);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.A, GameKeyEvent.Action.PRESS),
-                    this::addColorToPalette);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    this::removeColorFromPalette);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents() &&
-                                getSelectedPalette().isMutable())
-                            DialogAssembly.setDialogToAddContentsToPalette(
-                                    getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents())
-                            DialogAssembly.setDialogToPalettize(
-                                    getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    DialogAssembly::setDialogToPanelManager);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.N, GameKeyEvent.Action.PRESS),
-                    this::newPalette);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents())
-                            DialogAssembly.setDialogToSortPalette(
-                                    getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (hasPaletteContents() &&
-                                getSelectedPalette().isMutable())
-                            DialogAssembly.setDialogToPaletteSettings(
-                                    getSelectedPalette());
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
-                    () -> {
-                        if (tool.equals(TextTool.get()))
-                            DialogAssembly.setDialogToNewFont();
-                    });
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.COMMA, GameKeyEvent.Action.PRESS),
-                    this::moveColorLeftInPalette);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.PERIOD, GameKeyEvent.Action.PRESS),
-                    this::moveColorRightInPalette);
-        } else {
-            // single key presses
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ESCAPE, GameKeyEvent.Action.PRESS),
-                    this::toggleFullscreen);
+        SETTINGS.doForMatchingKeyStroke(eventLogger, null);
+        INFO.doForMatchingKeyStroke(eventLogger, null);
+        AUTOMATION_SCRIPT.doForMatchingKeyStroke(eventLogger, null);
 
-            // quick context select
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._1, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(0));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._2, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(1));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._3, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(2));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._4, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(3));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._5, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(4));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._6, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(5));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._7, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(6));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._8, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(7));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key._9, GameKeyEvent.Action.PRESS),
-                    () -> setContextIndex(8));
+        NEW_PROJECT.doForMatchingKeyStroke(eventLogger, null);
+        OPEN_FILE.doForMatchingKeyStroke(eventLogger, null);
 
-            // set tools
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Z, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Zoom.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.H, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Hand.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.O, GameKeyEvent.Action.PRESS),
-                    () -> setTool(StipplePencil.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.P, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Pencil.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.B, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Brush.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.D, GameKeyEvent.Action.PRESS),
-                    () -> setTool(ShadeBrush.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Q, GameKeyEvent.Action.PRESS),
-                    () -> setTool(ScriptBrush.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.G, GameKeyEvent.Action.PRESS),
-                    () -> setTool(GradientTool.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.E, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Eraser.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.C, GameKeyEvent.Action.PRESS),
-                    () -> setTool(ColorPicker.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.F, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Fill.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.L, GameKeyEvent.Action.PRESS),
-                    () -> setTool(LineTool.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.R, GameKeyEvent.Action.PRESS),
-                    () -> setTool(ShapeTool.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.T, GameKeyEvent.Action.PRESS),
-                    () -> setTool(TextTool.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.W, GameKeyEvent.Action.PRESS),
-                    () -> setTool(Wand.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.V, GameKeyEvent.Action.PRESS),
-                    () -> setTool(BrushSelect.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.X, GameKeyEvent.Action.PRESS),
-                    () -> setTool(BoxSelect.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.Y, GameKeyEvent.Action.PRESS),
-                    () -> setTool(PolygonSelect.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.M, GameKeyEvent.Action.PRESS),
-                    () -> setTool(MoveSelection.get()));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.U, GameKeyEvent.Action.PRESS),
-                    () -> setTool(PickUpSelection.get()));
-        }
+        NEW_PALETTE.doForMatchingKeyStroke(eventLogger, null);
+        SAVE_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
+        SORT_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
+        PALETTE_SETTINGS.tryForMatchingKeyStroke(eventLogger, null);
+
+        ADD_TO_PALETTE.tryForMatchingKeyStroke(eventLogger, null);
+        MOVE_COLOR_LEFT.doForMatchingKeyStroke(eventLogger, null);
+        MOVE_COLOR_RIGHT.doForMatchingKeyStroke(eventLogger, null);
+        SELECT_COLOR_LEFT.doForMatchingKeyStroke(eventLogger, null);
+        SELECT_COLOR_RIGHT.doForMatchingKeyStroke(eventLogger, null);
+
+        PANEL_MANAGER.doForMatchingKeyStroke(eventLogger, null);
+        TOGGLE_PANELS.doForMatchingKeyStroke(eventLogger, null);
+
+        NEW_FONT.tryForMatchingKeyStroke(eventLogger, null);
+        TOGGLE_ALIGNMENT.tryForMatchingKeyStroke(eventLogger, null);
+        SWAP_COLORS.doForMatchingKeyStroke(eventLogger, null);
+
+        // represents both fullscreen and windowed as calls are identical
+        FULLSCREEN.doForMatchingKeyStroke(eventLogger, null);
+
+        // quick context select
+        for (SEAction qs : quickSelectActions())
+            qs.doForMatchingKeyStroke(eventLogger, null);
+
+        // set tools
+        for (SEAction setTool : setToolActions())
+            setTool.doForMatchingKeyStroke(eventLogger, null);
     }
 
     @Override
     public void update(final double deltaTime) {
-        provisionalToolTipCode = Constants.ICON_ID_GAP_CODE;
+        provisionalToolTipCode = ResourceCodes.NONE;
 
         while (!jobScheduler.isEmpty())
             jobScheduler.poll().run();
@@ -669,12 +465,10 @@ public class StippleEffect implements ProgramContext {
             toolButtonMenu.update(deltaTime);
             // colors
             colorsMenu.update(deltaTime);
-            // layers
-            layersMenu.update(deltaTime);
-            // frames
-            framesMenu.update(deltaTime);
             // projects
             projectsMenu.update(deltaTime);
+            // flipbook
+            flipbookMenu.update(deltaTime);
         } else {
             dialog.update(deltaTime);
         }
@@ -684,7 +478,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     private void updateToolTip() {
-        if (!provisionalToolTipCode.equals(Constants.ICON_ID_GAP_CODE) &&
+        if (!provisionalToolTipCode.equals(ResourceCodes.NONE) &&
                 provisionalToolTipCode.equals(toolTipCode)) {
             toolTipMillisCounter +=
                     (int) (Constants.MILLIS_IN_SECOND / Constants.TICK_HZ);
@@ -708,12 +502,17 @@ public class StippleEffect implements ProgramContext {
             final String[] segments = ParserUtils.extractHighlight(lines[l]);
 
             for (int i = 0; i < segments.length; i++) {
-                if (i % 2 == 0)
-                    tb.setColor(cText);
-                else
-                    tb.setColor(t.textShortcut);
+                final String text;
 
-                tb.addText(segments[i]);
+                if (i % 2 == 0) {
+                    tb.setColor(cText);
+                    text = segments[i];
+                } else {
+                    tb.setColor(t.textShortcut);
+                    text = ParserUtils.getShortcut(segments[i]);
+                }
+
+                tb.addText(text);
             }
 
             if (l + 1 < lines.length)
@@ -737,75 +536,62 @@ public class StippleEffect implements ProgramContext {
         final Coord2D wp = Layout.getWorkspacePosition(),
                 tp = Layout.getToolsPosition(),
                 tobp = Layout.getToolOptionsBarPosition(),
-                lp = Layout.getLayersPosition(),
                 cp = Layout.getColorsPosition(),
                 pp = Layout.getProjectsPosition(),
-                fp = Layout.getFramesPosition(),
+                fbp = Layout.getFlipbookPosition(),
                 bbp = Layout.getBottomBarPosition();
+
+        // panel backgrounds
+
+        canvas.draw(drawBottomBar(), bbp.x, bbp.y);
+
+        if (Layout.isToolbarShowing()) {
+            canvas.draw(drawTools(), tp.x, tp.y);
+
+            if (tool.hasToolOptionsBar())
+                canvas.draw(drawToolOptionsBar(), tobp.x, tobp.y);
+        }
+
+        if (Layout.isColorsPanelShowing())
+            canvas.draw(drawColorsSegment(), cp.x, cp.y);
+
+        canvas.draw(drawProjects(), pp.x, pp.y);
+
+        if (Layout.isFlipbookPanelShowing())
+            canvas.draw(drawFlipbook(), fbp.x, fbp.y);
 
         // workspace
         final GameImage workspace = getContext().drawWorkspace();
         canvas.draw(workspace, wp.x, wp.y);
 
-        if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
-            canvas.draw(statusUpdate, wp.x, wp.y);
-
-        // segment backgrounds
-
-        // bottom bar - zoom, animation
-        final GameImage bottomBar = drawBottomBar();
-        canvas.draw(bottomBar, bbp.x, bbp.y);
-        bottomBarMenu.render(canvas);
-
-        // tools
-        if (Layout.isToolbarShowing()) {
-            final GameImage tools = drawTools();
-            canvas.draw(tools, tp.x, tp.y);
-
-            if (tool.hasToolOptionsBar()) {
-                final GameImage toolOptionsBar = drawToolOptionsBar();
-                canvas.draw(toolOptionsBar, tobp.x, tobp.y);
-            }
-        }
-        toolButtonMenu.render(canvas);
-
-        // layers
-        if (Layout.isLayersPanelShowing()) {
-            final GameImage layers = drawLayers();
-            canvas.draw(layers, lp.x, lp.y);
-        }
-        layersMenu.render(canvas);
-
-        // colors
-        if (Layout.isColorsPanelShowing()) {
-            final GameImage colors = drawColorsSegment();
-            canvas.draw(colors, cp.x, cp.y);
-        }
-        colorsMenu.render(canvas);
-
-        // projects / contexts
-        final GameImage projects = drawProjects();
-        canvas.draw(projects, pp.x, pp.y);
-        projectsMenu.render(canvas);
-
-        // frames
-        if (Layout.isFramesPanelShowing()) {
-            final GameImage frames = drawFrames();
-            canvas.draw(frames, fp.x, fp.y);
-        }
-        framesMenu.render(canvas);
-
         // borders
         final float strokeWidth = 2f;
 
         canvas.setColor(Settings.getTheme().panelDivisions);
-        canvas.drawLine(strokeWidth, fp.x, fp.y, fp.x, tobp.y); // projects and frame separation
         canvas.drawLine(strokeWidth, pp.x, tobp.y, Layout.width(), tobp.y); // top segments and middle separation
-        canvas.drawLine(strokeWidth, tp.x, wp.y, lp.x, wp.y); // tool options bar and tools/workspace separation
+        canvas.drawLine(strokeWidth, tp.x, wp.y, cp.x, wp.y); // tool options bar and tools/workspace separation
         canvas.drawLine(strokeWidth, bbp.x, bbp.y, Layout.width(), bbp.y); // middle segments and bottom bar separation
-        canvas.drawLine(strokeWidth, cp.x, cp.y, Layout.width(), cp.y); // layers and colors separation
         canvas.drawLine(strokeWidth, wp.x, wp.y, wp.x, bbp.y); // tools and workspace separation
-        canvas.drawLine(strokeWidth, lp.x, lp.y, lp.x, bbp.y); // workspace/option bar and right segments separation
+        canvas.drawLine(strokeWidth, wp.x, fbp.y, cp.x, fbp.y); // workspace and flipbook separation
+        canvas.drawLine(strokeWidth, cp.x, cp.y, cp.x, bbp.y); // workspace/option bar and right segments separation
+
+        if (millisSinceStatusUpdate < Constants.STATUS_UPDATE_DURATION_MILLIS)
+            canvas.draw(statusUpdate, wp.x, wp.y);
+
+        // bottom bar - zoom, animation
+        bottomBarMenu.render(canvas);
+
+        // flipbook
+        flipbookMenu.render(canvas);
+
+        // tools
+        toolButtonMenu.render(canvas);
+
+        // colors
+        colorsMenu.render(canvas);
+
+        // projects / contexts
+        projectsMenu.render(canvas);
 
         if (dialog != null) {
             canvas.fillRectangle(Settings.getTheme().dialogVeil,
@@ -826,9 +612,12 @@ public class StippleEffect implements ProgramContext {
         }
 
         // cursor
+        final String cursorCode = SECursor.systemCursorCode();
         final GameImage cursor = SECursor.fetchCursor(
-                getContext().isInWorkspaceBounds() && dialog == null
-                        ? tool.getCursorCode() : SECursor.MAIN_CURSOR);
+                getContext().isInWorkspaceBounds() && dialog == null &&
+                        Permissions.isCursorFree() &&
+                        cursorCode.equals(SECursor.MAIN_CURSOR)
+                        ? tool.getCursorCode() : cursorCode);
         canvas.draw(cursor, mousePos.x - (Layout.CURSOR_DIM / 2),
                 mousePos.y - (Layout.CURSOR_DIM / 2));
     }
@@ -839,79 +628,39 @@ public class StippleEffect implements ProgramContext {
     }
 
     private GameImage drawColorsSegment() {
-        final GameImage colors = new GameImage(Layout.getColorsWidth(),
+        return drawPanel(Layout.getColorsWidth(),
                 Layout.getColorsHeight());
-        colors.fillRectangle(Settings.getTheme().panelBackground, 0, 0,
-                Layout.getColorsWidth(), Layout.getColorsHeight());
-
-        return colors.submit();
     }
 
     private GameImage drawTools() {
-        final GameImage tools = new GameImage(Layout.getToolsWidth(),
+        return drawPanel(Layout.getToolsWidth(),
                 Layout.getToolsHeight());
-        tools.fillRectangle(Settings.getTheme().panelBackground, 0, 0,
-                Layout.getToolsWidth(), Layout.getToolsHeight());
-
-        return tools.submit();
     }
 
     private GameImage drawToolOptionsBar() {
-        final GameImage toolOptionsBar = new GameImage(
-                Layout.getToolOptionsBarWidth(),
+        return drawPanel(Layout.getToolOptionsBarWidth(),
                 Layout.TOOL_OPTIONS_BAR_H);
-        toolOptionsBar.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getToolOptionsBarWidth(), Layout.TOOL_OPTIONS_BAR_H);
-
-        return toolOptionsBar.submit();
-    }
-
-    private GameImage drawLayers() {
-        final GameImage layers = new GameImage(Layout.getLayersWidth(),
-                Layout.getLayersHeight());
-        layers.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getLayersWidth(), Layout.getLayersHeight());
-
-        return layers.submit();
     }
 
     private GameImage drawProjects() {
-        final GameImage projects = new GameImage(Layout.getProjectsWidth(),
+        return drawPanel(Layout.getProjectsWidth(),
                 Layout.getTopPanelHeight());
-        projects.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getProjectsWidth(), Layout.getTopPanelHeight());
-
-        return projects.submit();
     }
 
-    private GameImage drawFrames() {
-        final GameImage frames = new GameImage(Layout.getFramesWidth(),
-                Layout.getTopPanelHeight());
-        frames.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.getFramesWidth(), Layout.getTopPanelHeight());
-
-        return frames.submit();
+    private GameImage drawFlipbook() {
+        return drawPanel(Layout.getFlipbookWidth(),
+                Layout.getFlipbookHeight());
     }
 
     private GameImage drawBottomBar() {
-        final GameImage bottomBar =
-                new GameImage(Layout.width(), Layout.BOTTOM_BAR_H);
-        bottomBar.fillRectangle(
-                Settings.getTheme().panelBackground, 0, 0,
-                Layout.width(), Layout.BOTTOM_BAR_H);
-
-        return bottomBar.submit();
+        return drawPanel(Layout.width(), Layout.BOTTOM_BAR_H);
     }
 
-    public void stitchOrSplit() {
-        if (getContext().getState().getFrameCount() > 1)
-            DialogAssembly.setDialogToStitchFramesTogether();
-        else
-            DialogAssembly.setDialogToSplitCanvasIntoFrames();
+    private GameImage drawPanel(final int w, final int h) {
+        final GameImage panel = new GameImage(w, h);
+        panel.fill(Settings.getTheme().panelBackground);
+
+        return panel.submit();
     }
 
     public SEContext getContext() {
@@ -946,10 +695,6 @@ public class StippleEffect implements ProgramContext {
         return colors[index];
     }
 
-    public ColorMenuMode getColorMenuMode() {
-        return colorMenuMode;
-    }
-
     public int getPaletteIndex() {
         return paletteIndex;
     }
@@ -968,6 +713,10 @@ public class StippleEffect implements ProgramContext {
 
     public boolean isTimerToggle() {
         return timerToggle;
+    }
+
+    public boolean isWindowed() {
+        return windowed;
     }
 
     public void newProject() {
@@ -1195,8 +944,10 @@ public class StippleEffect implements ProgramContext {
 
             if (contextIndex >= contexts.size())
                 setContextIndex(contexts.size() - 1);
-            else
+            else {
+                DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
                 rebuildAllMenus();
+            }
 
             if (contexts.size() == 0)
                 exitProgram();
@@ -1214,7 +965,6 @@ public class StippleEffect implements ProgramContext {
         if (setActive)
             setPaletteIndex(palettes.size() - 1);
 
-        colorMenuMode = ColorMenuMode.PALETTE;
         rebuildColorsMenu();
     }
 
@@ -1225,7 +975,6 @@ public class StippleEffect implements ProgramContext {
             if (paletteIndex >= palettes.size())
                 setPaletteIndex(palettes.size() - 1);
 
-            colorMenuMode = ColorMenuMode.PALETTE;
             rebuildColorsMenu();
         }
     }
@@ -1245,10 +994,10 @@ public class StippleEffect implements ProgramContext {
                 (p, c) -> StatusUpdates.cannotColorPalette(true, p, c));
     }
 
-    public void removeColorFromPalette() {
-        paletteSelectedColorAction(Palette::removeColor,
-                Palette::canRemove, StatusUpdates::removeColorFromPalette,
-                (p, c) -> StatusUpdates.cannotColorPalette(false, p, c));
+    public void removeColorFromPalette(final Color c) {
+        paletteColorAction(c, Palette::removeColor, Palette::canRemove,
+                StatusUpdates::removeColorFromPalette,
+                (p, col) -> StatusUpdates.cannotColorPalette(false, p, col));
     }
 
     public void moveColorLeftInPalette() {
@@ -1285,13 +1034,22 @@ public class StippleEffect implements ProgramContext {
             final BiConsumer<Palette, Color> statusUpdate,
             final BiConsumer<Palette, Color> notPermitted
     ) {
+        paletteColorAction(getSelectedColor(), f,
+                precondition, statusUpdate, notPermitted);
+    }
+
+    private void paletteColorAction(
+            final Color c, final BiConsumer<Palette, Color> f,
+            final BiFunction<Palette, Color, Boolean> precondition,
+            final BiConsumer<Palette, Color> statusUpdate,
+            final BiConsumer<Palette, Color> notPermitted
+    ) {
         final Palette p = getSelectedPalette();
-        final Color c = getSelectedColor();
 
         if (hasPaletteContents() && precondition.apply(p, c)) {
             f.accept(p, c);
 
-            if (Layout.isColorsPanelShowing() && colorMenuMode == ColorMenuMode.PALETTE)
+            if (Layout.isColorsPanelShowing())
                 rebuildColorsMenu();
             else
                 statusUpdate.accept(p, c);
@@ -1313,6 +1071,7 @@ public class StippleEffect implements ProgramContext {
             this.contextIndex = contextIndex;
 
             // auxiliaries
+            DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
             rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
             getContext().redrawCanvasAuxiliaries();
@@ -1429,21 +1188,12 @@ public class StippleEffect implements ProgramContext {
             StatusUpdates.swapColors();
     }
 
-    public void toggleColorMenuMode() {
-        colorMenuMode = colorMenuMode.toggle();
-
-        if (Layout.isColorsPanelShowing())
-            rebuildColorsMenu();
-        else
-            Layout.adjustPanels(() -> Layout.setColorsPanelShowing(true));
-    }
-
     public void setPaletteIndex(final int paletteIndex) {
         this.paletteIndex = paletteIndex;
         rebuildColorsMenu();
     }
 
-    private void toggleFullscreen() {
+    public void toggleFullscreen() {
         windowed = !windowed;
 
         remakeWindow();

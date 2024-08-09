@@ -1,1 +1,1 @@
-Script Brush | {Q}
+Script Brush | {sc:SET_TOOL_SCRIPT_BRUSH}

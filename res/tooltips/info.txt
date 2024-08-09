@@ -1,1 +1,1 @@
-Info | {Ctrl + H}
+Info | {sc:INFO}

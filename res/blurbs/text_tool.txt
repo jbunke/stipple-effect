@@ -1,4 +1,4 @@
-Shortcut: {T}
+Shortcut: {sc:SET_TOOL_TEXT}
 
 The text tool is used to write text from pixel art fonts complying with the {Delta Time} font
 specification. Stipple Effect system fonts are automatically loaded in, and further fonts can be
@@ -7,10 +7,10 @@ the text to be written.
 
 Start typing: {Click}
 
-Increment/decrement font scale factor: {Down/Up Arrow Keys} or {Shift + Scroll Wheel}
-Navigate to previous/next font: {Left/Right Arrow Keys}
-Toggle text alignment: {Ctrl + K}
-Upload new font: {Shift + T}
+Increment/decrement font scale factor: {Down/Up Arrow} or {Shift + Scroll Wheel}
+Navigate to previous/next font: {Left/Right Arrow}
+Toggle text alignment: {sc:TOGGLE_ALIGNMENT}
+Upload new font: {sc:NEW_FONT}
 
 (While typing)
     Modify text: < type as normal >

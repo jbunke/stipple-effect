@@ -1,1 +1,1 @@
-Shortcut: {Shift + ,}
+Shortcut: {sc:MOVE_COLOR_LEFT}

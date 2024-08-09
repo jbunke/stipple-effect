@@ -1,10 +1,12 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.scrollable;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -56,5 +58,13 @@ public class HorizontalSlider extends Slider {
     @Override
     protected int getSizeDimension() {
         return getWidth();
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
+        super.process(eventLogger);
+
+        if (isSliding())
+            SECursor.setCursorCode(SECursor.SLIDE_HORZ);
     }
 }
