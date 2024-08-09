@@ -95,6 +95,11 @@ public class PaletteColorButton extends SelectableMenuElement
         updateAssets();
     }
 
+    @Override
+    public void updateAssetFromMoving() {
+        updateAssets();
+    }
+
     public enum ColorSelection {
         PRIMARY, SECONDARY, NEITHER;
 

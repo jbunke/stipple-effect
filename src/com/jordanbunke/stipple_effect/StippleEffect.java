@@ -25,7 +25,6 @@ import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
@@ -223,8 +222,8 @@ public class StippleEffect implements ProgramContext {
         colors[SECONDARY] = SEColors.white();
         colorIndex = PRIMARY;
 
-        palettes = PaletteLoader.loadOnStartup();
-        paletteIndex = palettes.isEmpty() ? Constants.NO_SELECTION : 0;
+        palettes = new ArrayList<>();
+        paletteIndex = Constants.NO_SELECTION;
 
         // menu stubs
         toolButtonMenu = MenuAssembly.stub();

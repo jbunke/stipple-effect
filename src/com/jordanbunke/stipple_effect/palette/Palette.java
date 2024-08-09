@@ -12,19 +12,13 @@ import java.util.function.Function;
 
 public class Palette {
     private String name;
-    private final boolean mutable;
     private final List<Color> colorSequence;
     private final Map<Color, Boolean> inclusionMap;
 
-    public Palette(final String name, final Color[] loaded) {
-        this(name, loaded, true);
-    }
-
     public Palette(
-            final String name, final Color[] loaded, final boolean mutable
+            final String name, final Color[] loaded
     ) {
         this.name = name;
-        this.mutable = mutable;
         this.colorSequence = new ArrayList<>();
         this.inclusionMap = new HashMap<>();
 
@@ -140,11 +134,11 @@ public class Palette {
     }
 
     public boolean canAdd(final Color candidate) {
-        return mutable && !colorSequence.contains(candidate);
+        return !colorSequence.contains(candidate);
     }
 
     public boolean canRemove(final Color candidate) {
-        return mutable && colorSequence.contains(candidate);
+        return colorSequence.contains(candidate);
     }
 
     public boolean canMoveLeft(final Color candidate) {
@@ -157,9 +151,6 @@ public class Palette {
     }
 
     public void setName(final String name) {
-        if (!mutable)
-            return;
-
         this.name = name;
     }
 
@@ -173,10 +164,6 @@ public class Palette {
 
     public String getName() {
         return name;
-    }
-
-    public boolean isMutable() {
-        return mutable;
     }
 
     public boolean isIncluded(final Color c) {

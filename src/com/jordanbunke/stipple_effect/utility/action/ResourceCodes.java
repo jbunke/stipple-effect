@@ -103,7 +103,8 @@ public final class ResourceCodes {
 
     private static final String NO_ICON_PREFIX = "__";
     public static final String NONE = "",
-            OUTLINE_PREFIX = "outline_", NUMKEY_PREFIX = "numkey_";
+            OUTLINE_PREFIX = "outline_", NUMKEY_PREFIX = "numkey_",
+            PALETTE_PRESET_PREFIX = NO_ICON_PREFIX + "pal_";
 
     public static final String
             ABOUT = NO_ICON_PREFIX + "about",

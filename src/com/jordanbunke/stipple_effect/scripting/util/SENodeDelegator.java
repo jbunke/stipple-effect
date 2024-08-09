@@ -10,11 +10,10 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteMutableNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.MutablePaletteColorOpNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
@@ -86,8 +85,6 @@ public final class SENodeDelegator {
                     ColorPropertyGetterNode.sat(position, scope);
             case ColorPropertyGetterNode.VAL ->
                     ColorPropertyGetterNode.val(position, scope);
-            case PaletteMutableNode.NAME ->
-                    new PaletteMutableNode(position, scope);
             case LayerIndexPropertyNode.NAME ->
                     new LayerIndexPropertyNode(position, scope);
             case LayerProjectPropertyNode.NAME ->
@@ -231,14 +228,14 @@ public final class SENodeDelegator {
                     new ColorScriptNode(position, scope, args);
             case HSVShiftNode.NAME ->
                     new HSVShiftNode(position, scope, args);
-            case MutablePaletteColorOpNode.ADD ->
-                    MutablePaletteColorOpNode.add(position, scope, args);
-            case MutablePaletteColorOpNode.REMOVE ->
-                    MutablePaletteColorOpNode.remove(position, scope, args);
-            case MutablePaletteColorOpNode.MOVE_LEFT ->
-                    MutablePaletteColorOpNode.moveLeft(position, scope, args);
-            case MutablePaletteColorOpNode.MOVE_RIGHT ->
-                    MutablePaletteColorOpNode.moveRight(position, scope, args);
+            case PaletteColorOpNode.ADD ->
+                    PaletteColorOpNode.add(position, scope, args);
+            case PaletteColorOpNode.REMOVE ->
+                    PaletteColorOpNode.remove(position, scope, args);
+            case PaletteColorOpNode.MOVE_LEFT ->
+                    PaletteColorOpNode.moveLeft(position, scope, args);
+            case PaletteColorOpNode.MOVE_RIGHT ->
+                    PaletteColorOpNode.moveRight(position, scope, args);
             case SetFrameDurationNode.NAME ->
                     new SetFrameDurationNode(position, scope, args);
             // extend here

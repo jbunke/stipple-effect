@@ -250,7 +250,8 @@ public enum SEAction {
     DELETE_PALETTE(ResourceCodes.DELETE_PALETTE,
             condFromSE(StippleEffect::hasPaletteContents),
             fromSE(StippleEffect::deletePalette), null),
-    SAVE_PALETTE(ResourceCodes.SAVE_PALETTE, mutablePalette(),
+    SAVE_PALETTE(ResourceCodes.SAVE_PALETTE,
+            condFromSE(StippleEffect::hasPaletteContents),
             fromSE(s -> DialogAssembly.setDialogToSavePalette(
                     s.getSelectedPalette())),
             new KeyShortcut(true, false, P)),
@@ -259,13 +260,15 @@ public enum SEAction {
             fromSE(s -> DialogAssembly.setDialogToSortPalette(
                     s.getSelectedPalette())),
             new KeyShortcut(false, true, M)),
-    PALETTE_SETTINGS(ResourceCodes.PALETTE_SETTINGS, mutablePalette(),
+    PALETTE_SETTINGS(ResourceCodes.PALETTE_SETTINGS,
+            condFromSE(StippleEffect::hasPaletteContents),
             fromSE(s -> DialogAssembly.setDialogToPaletteSettings(
                     s.getSelectedPalette())),
             new KeyShortcut(false, true, E)),
 
     // palette color
-    ADD_TO_PALETTE(ResourceCodes.ADD_TO_PALETTE, mutablePalette(),
+    ADD_TO_PALETTE(ResourceCodes.ADD_TO_PALETTE,
+            condFromSE(StippleEffect::hasPaletteContents),
             fromSE(StippleEffect::addColorToPalette),
             new KeyShortcut(false, true, A)),
     MOVE_COLOR_LEFT(ResourceCodes.MOVE_LEFT_IN_PALETTE,
@@ -353,7 +356,8 @@ public enum SEAction {
     COLOR_SCRIPT(ResourceCodes.COLOR_SCRIPT,
             DialogAssembly::setDialogToColorScript,
             new KeyShortcut(true, true, W)),
-    CONTENTS_TO_PALETTE(ResourceCodes.CONTENTS_TO_PALETTE, mutablePalette(),
+    CONTENTS_TO_PALETTE(ResourceCodes.CONTENTS_TO_PALETTE,
+            condFromSE(StippleEffect::hasPaletteContents),
             c -> DialogAssembly.setDialogToAddContentsToPalette(c,
                     StippleEffect.get().getSelectedPalette()),
             new KeyShortcut(false, true, D)),
@@ -555,11 +559,6 @@ public enum SEAction {
             final Predicate<StippleEffect> precondition
     ) {
         return c -> precondition.test(StippleEffect.get());
-    }
-
-    private static Predicate<SEContext> mutablePalette() {
-        return condFromSE(s -> s.hasPaletteContents() &&
-                s.getSelectedPalette().isMutable());
     }
 
     public static SEAction[] quickSelectActions() {

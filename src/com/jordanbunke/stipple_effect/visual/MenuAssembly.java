@@ -18,6 +18,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
+import com.jordanbunke.stipple_effect.palette.PaletteLoader;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.project.ZoomLevel;
@@ -137,9 +138,17 @@ public class MenuAssembly {
                                 LAST_OUTLINE.toItem(c),
                                 SINGLE_OUTLINE.toItem(c),
                                 DOUBLE_OUTLINE.toItem(c))),
-                new NestedItem("Palette", Arrays.stream(paletteActions())
-                        .map(a -> a.toItem(c))
-                        .toArray(DropdownItem[]::new)),
+                new NestedItem("Palette",
+                        NEW_PALETTE.toItem(c),
+                        IMPORT_PALETTE.toItem(c),
+                        DELETE_PALETTE.toItem(c),
+                        SAVE_PALETTE.toItem(c),
+                        SORT_PALETTE.toItem(c),
+                        PALETTE_SETTINGS.toItem(c),
+                        new NestedItem("Load preset palette...",
+                                Arrays.stream(PaletteLoader.Preset.values())
+                                        .map(PaletteLoader.Preset::toItem)
+                                        .toArray(DropdownItem[]::new))),
                 new NestedItem("Actions", Arrays.stream(actionsMenuActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new))));

@@ -87,12 +87,12 @@ public class DragLogic<T extends Draggable> {
     private void release() {
         final int sourceIndex = movingIndex, destinationIndex = wouldBeIndex;
 
-        final Draggable draggable = elements.get(sourceIndex);
-        draggable.updateAssetFromMoving();
-
         moving = false;
         movingIndex = NONE;
         wouldBeIndex = NONE;
+
+        final Draggable draggable = elements.get(sourceIndex);
+        draggable.updateAssetFromMoving();
 
         if (destinationIndex != sourceIndex) {
             draggable.reachedDestination(destinationIndex);

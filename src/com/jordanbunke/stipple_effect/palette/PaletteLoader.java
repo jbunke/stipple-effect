@@ -2,8 +2,11 @@ package com.jordanbunke.stipple_effect.palette;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.ResourceLoader;
+import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
+import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.SimpleActionItem;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
@@ -12,28 +15,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaletteLoader {
-    // palette codes
-    private static final String NES_PALETTE = "nes",
-            PICO_8_PALETTE = "pico_8",
-            WINDOWS_PALETTE = "win";
+    public enum Preset {
+        BW, NES, PICO_8, WINDOWS;
 
-    public static List<Palette> loadOnStartup() {
-        final List<Palette> palettes = new ArrayList<>();
+        @Override
+        public String toString() {
+            return switch (this) {
+                case BW -> "Black & White (1-bit)";
+                case NES -> "NES";
+                case PICO_8 -> "PICO-8";
+                case WINDOWS -> "Windows";
+            };
+        }
 
-        loadHardCodedPalettes(palettes);
+        private String code() {
+            return switch (this) {
+                case BW -> "bw";
+                case NES -> "nes";
+                case PICO_8 -> "pico_8";
+                case WINDOWS -> "win";
+            };
+        }
 
-        return palettes;
-    }
+        private Palette load() {
+            return new Palette(toString(), this == BW
+                    ? new Color[] { SEColors.black(), SEColors.white() }
+                    : paletteColorsFromCode(code()));
+        }
 
-    private static void loadHardCodedPalettes(final List<Palette> palettes) {
-        palettes.add(new Palette("Black & White (1-bit)",
-                new Color[] { SEColors.black(), SEColors.white() }, false));
-        palettes.add(new Palette("NES",
-                paletteColorsFromCode(NES_PALETTE), false));
-        palettes.add(new Palette("PICO-8",
-                paletteColorsFromCode(PICO_8_PALETTE), false));
-        palettes.add(new Palette("Windows",
-                paletteColorsFromCode(WINDOWS_PALETTE), false));
+        public SimpleActionItem toItem() {
+            return new SimpleActionItem(
+                    ResourceCodes.PALETTE_PRESET_PREFIX + code(),
+                    () -> StippleEffect.get().addPalette(load(), true), true);
+        }
     }
 
     private static Color[] paletteColorsFromCode(final String code) {
