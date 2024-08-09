@@ -236,6 +236,7 @@ public enum SEAction {
             SEContext::cut, new KeyShortcut(true, false, X)),
     COPY(ResourceCodes.COPY, c -> c.getState().hasSelection(),
             SEContext::copy, new KeyShortcut(true, false, C)),
+    // TODO
     PASTE(ResourceCodes.PASTE, c -> SEClipboard.get().hasContent(),
             c -> c.paste(false), new KeyShortcut(true, false, V)),
     PASTE_NEW_LAYER(ResourceCodes.PASTE_NEW_LAYER,

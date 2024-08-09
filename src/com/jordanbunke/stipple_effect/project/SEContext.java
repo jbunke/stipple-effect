@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.*;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
@@ -275,10 +276,12 @@ public class SEContext {
                 if (e instanceof GameMouseEvent me) {
                     if (me.matchesAction(GameMouseEvent.Action.DOWN) &&
                             inWorkspaceBounds) {
+                        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
                         tool.onMouseDown(this, me);
                         me.markAsProcessed();
                     } else if (me.matchesAction(GameMouseEvent.Action.CLICK) &&
                             inWorkspaceBounds) {
+                        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
                         tool.onClick(this, me);
                         me.markAsProcessed();
                     } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
@@ -878,10 +881,14 @@ public class SEContext {
 
     // copy - (not a state change unlike cut and paste)
     public void copy() {
-        if (getState().hasSelection()) {
-            SEClipboard.get().sendSelectionToClipboard(getState());
-            StatusUpdates.sendToClipboard(true,
-                    getState().getSelection().size());
+        final ProjectState s = getState();
+
+        if (Permissions.selectionIsCels()) {
+            SEClipboard.get().sendCelsToClipboard(s);
+            // TODO
+        } else if (s.hasSelection()) {
+            SEClipboard.get().sendSelectionToClipboard(s);
+            StatusUpdates.sendToClipboard(true, s.getSelection().size());
         } else
             StatusUpdates.clipboardSendFailed(true);
     }
@@ -1225,9 +1232,15 @@ public class SEContext {
 
     // cut
     public void cut() {
-        if (getState().hasSelection()) {
-            SEClipboard.get().sendSelectionToClipboard(getState());
-            final int pixelCount = getState().getSelection().size();
+        final ProjectState s = getState();
+
+        if (Permissions.selectionIsCels()) {
+            SEClipboard.get().sendCelsToClipboard(s);
+            // TODO: clear selected cels
+            // TODO: status update
+        } else if (s.hasSelection()) {
+            SEClipboard.get().sendSelectionToClipboard(s);
+            final int pixelCount = s.getSelection().size();
             deleteSelectionContents(true);
             StatusUpdates.sendToClipboard(false, pixelCount);
         } else
@@ -1235,13 +1248,12 @@ public class SEContext {
     }
 
     // paste
-    // TODO: potentially update pre-check condition
     public void paste(final boolean newLayer) {
-        if (SEClipboard.get().hasContent()) {
+        final Object content = SEClipboard.get().getContent();
+
+        if (content instanceof SelectionContents toPaste) {
             if (getState().hasSelectionContents())
                 dropContentsToLayer(false, true);
-
-            final SelectionContents toPaste = SEClipboard.get().getContent();
 
             if (newLayer)
                 addLayer();
@@ -1267,52 +1279,50 @@ public class SEContext {
                             displacement)), Operation.PASTE);
 
             StippleEffect.get().autoAssignPickUpSelection();
-        } else
+        } else if (content instanceof CelSelection cels)
+            pasteCels(cels);
+        else
             StatusUpdates.pasteFailed();
     }
 
-    // TODO: paste cels
-    public void pasteCels() {
-        // pre-check
-        if (/* TODO: temp */ true) {
-            final CelSelection cels = new CelSelection(this); // TODO: temp
+    // paste cels
+    private void pasteCels(final CelSelection cels) {
+        ProjectState s = getState();
+        final List<SELayer> layers = new ArrayList<>(s.getLayers());
 
-            ProjectState s = getState();
-            final List<SELayer> layers = new ArrayList<>(s.getLayers());
+        final int fc = s.getFrameCount(),
+                layerIndex = s.getLayerEditIndex(),
+                frameIndex = s.getFrameIndex();
 
-            final int fc = s.getFrameCount(),
-                    layerIndex = s.getLayerEditIndex(),
-                    frameIndex = s.getFrameIndex();
+        if (cels.isCompatible(s)) {
+            final int framesToAppend = cels.framesToAppend(s);
 
-            if (cels.isCompatible(s)) {
-                final int framesToAppend = cels.framesToAppend(s);
+            for (int i = 0; i < framesToAppend; i++) {
+                final int addIndex = fc + i;
+                layers.replaceAll(l -> l.returnAddedFrame(addIndex,
+                        cels.celWidth, cels.celHeight));
 
-                for (int i = 0; i < framesToAppend; i++) {
-                    final int addIndex = fc + i;
-                    layers.replaceAll(l -> l.returnAddedFrame(addIndex,
-                            cels.celWidth, cels.celHeight));
+                final List<Double> frameDurations =
+                        new ArrayList<>(s.getFrameDurations());
+                frameDurations.add(addIndex, Constants.DEFAULT_FRAME_DURATION);
 
-                    final List<Double> frameDurations =
-                            new ArrayList<>(s.getFrameDurations());
-                    frameDurations.add(addIndex, Constants.DEFAULT_FRAME_DURATION);
-
-                    s = s.changeFrames(layers, frameIndex, addIndex + 1, frameDurations);
-                }
-
-                for (int l = 0; l < cels.layersRange; l++) {
-                    for (int f = 0; f < cels.frameRange; f++) {
-                        final int li = layerIndex + l, fi = frameIndex + f;
-
-                        layers.set(li, layers.get(li)
-                                .returnFrameReplaced(cels.getCel(l, f), fi));
-                    }
-                }
-
-                s = s.changeFrames(layers, frameIndex,
-                        fc + framesToAppend, s.getFrameDurations());
-                stateManager.performAction(s, Operation.PASTE_CELS);
+                s = s.changeFrames(layers, frameIndex, addIndex + 1, frameDurations);
             }
-        }
+
+            for (int l = 0; l < cels.layersRange; l++) {
+                for (int f = 0; f < cels.frameRange; f++) {
+                    final int li = layerIndex + l, fi = frameIndex + f;
+
+                    layers.set(li, layers.get(li)
+                            .returnFrameReplaced(cels.getCel(l, f), fi));
+                }
+            }
+
+            s = s.changeFrames(layers, frameIndex,
+                    fc + framesToAppend, s.getFrameDurations());
+            stateManager.performAction(s, Operation.PASTE_CELS);
+        } else
+            StatusUpdates.pasteCelsFailed();
     }
 
     // raise selection to contents
@@ -1407,6 +1417,8 @@ public class SEContext {
 
     // deselect
     public void deselect(final boolean checkpoint) {
+        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+
         if (getState().hasSelection()) {
             if (getState().getSelectionMode() == SelectionMode.CONTENTS)
                 dropContentsToLayer(checkpoint, true);
@@ -1420,6 +1432,8 @@ public class SEContext {
 
     // select all
     public void selectAll() {
+        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+
         final boolean dropAndRaise = getState().hasSelection() &&
                 getState().getSelectionMode() == SelectionMode.CONTENTS;
 
@@ -1442,6 +1456,8 @@ public class SEContext {
 
     // invert selection
     public void invertSelection() {
+        DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
+
         final boolean dropAndRaise = getState().hasSelection() &&
                 getState().getSelectionMode() == SelectionMode.CONTENTS;
 

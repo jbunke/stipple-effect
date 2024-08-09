@@ -129,6 +129,7 @@ public final class ResourceCodes {
             SET_PIXEL_GRID_SELECTION = NO_ICON_PREFIX + "set_pixel_grid_selection",
             FULLSCREEN = NO_ICON_PREFIX + "fullscreen",
             WINDOWED = NO_ICON_PREFIX + "windowed",
+            CEL_BUTTON = NO_ICON_PREFIX + "cel_button",
             SELECTION_SHORTCUTS = NO_ICON_PREFIX + "selection_shortcuts",
             COLOR_SHORTCUTS = NO_ICON_PREFIX + "color_shortcuts",
             PLAYBACK_MODES = NO_ICON_PREFIX + "playback",

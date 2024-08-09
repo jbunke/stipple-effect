@@ -51,7 +51,7 @@ public class Constants {
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",
             OPEN_COLOR = "<#", CLOSE_COLOR = ">",
             OPEN_SETTING_VAL = "{", CLOSE_SETTING_VAL = "}", SETTING_SEPARATOR = ":",
-            TYPING_CODE = "typing",
+            TYPING_CODE = "typing", CEL_SELECTION = "cel_selection",
             GENERIC_APPROVAL_TEXT = "Confirm", CLOSE_DIALOG_TEXT = "Close";
 
     public static final int DEFAULT_CANVAS_W = 32, DEFAULT_CANVAS_H = 32,

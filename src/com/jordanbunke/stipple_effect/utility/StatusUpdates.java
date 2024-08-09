@@ -360,7 +360,12 @@ public class StatusUpdates {
 
     public static void pasteFailed() {
         actionNotPermitted("paste",
-                "the " + StippleEffect.PROGRAM_NAME + " clipboard is empty");
+                "the clipboard is empty or does not content content of a valid data type");
+    }
+
+    public static void pasteCelsFailed() {
+        actionNotPermitted("paste the selected cels",
+                "the clipboard contents are incompatible with this project");
     }
 
     public static void saving() {

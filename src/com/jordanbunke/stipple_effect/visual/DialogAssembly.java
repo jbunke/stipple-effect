@@ -27,9 +27,7 @@ import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
-import com.jordanbunke.stipple_effect.selection.Outliner;
-import com.jordanbunke.stipple_effect.selection.SEClipboard;
-import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -696,14 +694,19 @@ public class DialogAssembly {
         final int NO_CLIPBOARD = 0;
 
         final int initialW, initialH, clipboardW, clipboardH;
-        final boolean hasClipboard = SEClipboard.get().hasContent();
+        final Object contents = SEClipboard.get().getContent();
 
-        if (hasClipboard) {
-            final Selection clipboard = SEClipboard.get()
-                    .getContent().getSelection();
+        if (contents instanceof SelectionContents sc) {
+            final Selection clipboard = sc.getSelection();
 
             clipboardW = clipboard.bounds.width();
             clipboardH = clipboard.bounds.height();
+
+            initialW = clipboardW;
+            initialH = clipboardH;
+        } else if (contents instanceof CelSelection cs) {
+            clipboardW = cs.celWidth;
+            clipboardH = cs.celHeight;
 
             initialW = clipboardW;
             initialH = clipboardH;
@@ -740,7 +743,7 @@ public class DialogAssembly {
                         getDialogContentToRightOfContent(defaultPreset), () -> {
                             DialogVals.setNewProjectWidth(clipboardW);
                             DialogVals.setNewProjectHeight(clipboardH);
-                }), () -> hasClipboard);
+                }), () -> clipboardW != NO_CLIPBOARD);
 
         // dim textboxes
         final DynamicTextbox widthTextbox = makeDialogDynamicTextbox(
@@ -754,11 +757,11 @@ public class DialogAssembly {
                 DialogVals::setNewProjectHeight,
                 DialogVals::getNewProjectHeight, 4);
 
-        final MenuElementGrouping contents = new MenuElementGrouping(
+        final MenuElementGrouping menu = new MenuElementGrouping(
                 presetLabel, defaultPreset, clipboardPreset,
                 widthLabel, heightLabel, explanation,
                 widthTextbox, heightTextbox);
-        setDialog(assembleDialog("New project...", contents,
+        setDialog(assembleDialog("New project...", menu,
                 () -> widthTextbox.isValid() && heightTextbox.isValid(),
                 "Create", () -> StippleEffect.get().newProject(), true));
     }

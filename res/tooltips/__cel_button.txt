@@ -1,0 +1,1 @@
+Select range of cels anchored by edit cel | {Shift + Click}
