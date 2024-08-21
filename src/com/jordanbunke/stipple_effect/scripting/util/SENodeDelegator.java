@@ -156,7 +156,7 @@ public final class SENodeDelegator {
                     new GetLayerIndexNode(position, scope, args);
             case GetLayerNode.NAME -> switch (args.length) {
                 case 0 -> new GetEditingLayerNode(position, scope, args);
-                case 1 -> new GetIndexLayerNode(position, scope, args);
+                case 1 -> new GetOneArgLayerNode(position, scope, args);
                 default -> new IllegalExpressionNode(position,
                         "Scoped function \"" + fID +
                                 "\" takes 0 or 1 argument(s)");
@@ -173,6 +173,10 @@ public final class SENodeDelegator {
                     new GetFrameDurationNode(position, scope, args);
             case GetFrameDurationsNode.NAME ->
                     new GetFrameDurationsNode(position, scope, args);
+            case GetDimNode.WIDTH ->
+                    GetDimNode.newWidth(position, scope, args);
+            case GetDimNode.HEIGHT ->
+                    GetDimNode.newHeight(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +

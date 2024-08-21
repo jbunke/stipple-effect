@@ -10,6 +10,10 @@ API Changes:
   > Added `layer` functions; for some `layer L`...
     > `L.get_name() -> string`
     > `L.set_name(string);`
+  > Added `project` functions; for some `project P`...
+    > `P.get_width() -> int`
+    > `P.get_height() -> int`
+    > `P.get_layer(string) -> layer`
 
   Changed:
   > Renamed some `layer` functions; for some `layer L`...
