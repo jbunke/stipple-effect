@@ -5,10 +5,10 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
-public final class UnlinkFramesNode extends LayerStatementNode {
-    public static final String NAME = "unlink_frames";
+public final class LinkCelsNode extends LayerStatementNode {
+    public static final String NAME = "link_cels";
 
-    public UnlinkFramesNode(
+    public LinkCelsNode(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
@@ -19,7 +19,7 @@ public final class UnlinkFramesNode extends LayerStatementNode {
     protected void operation(
             final LayerRep layer, final SymbolTable symbolTable
     ) {
-        layer.project().unlinkFramesInLayer(layer.index());
+        layer.project().linkCelsInLayer(layer.index());
     }
 
     @Override

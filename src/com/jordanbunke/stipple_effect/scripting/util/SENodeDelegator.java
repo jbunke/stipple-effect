@@ -6,17 +6,27 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.statement.IllegalStatement
 import com.jordanbunke.delta_time.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.ColorPropertyGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.AssignColorNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewPaletteNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewProjectStatementNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.SetSideMaskNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.LayerTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.PaletteTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SEExtTypeNode;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
+
+import java.util.Arrays;
 
 public final class SENodeDelegator {
     public static StatementNode globalFunctionStatement(
@@ -34,7 +44,7 @@ public final class SENodeDelegator {
             case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
             default -> new IllegalStatementNode(position,
-                    "Undefined function \"$" + fID + "\"");
+                    "Undefined function \"" + formatGlobal(fID) + "\"");
         };
     }
 
@@ -70,11 +80,31 @@ public final class SENodeDelegator {
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
-                    "Undefined function \"$" + fID + "\"");
+                    "Undefined function \"" + formatGlobal(fID) + "\"");
         };
     }
 
-    public static ExpressionNode property(
+    public static ExpressionNode globalProperty(
+            final TextPosition position, final String propertyID
+    ) {
+        final boolean matchesScope = Arrays.stream(Scope.values())
+                .map(s -> s.name().equals(propertyID))
+                .reduce(false, Boolean::logicalOr);
+
+        if (matchesScope)
+            return new ScopeConstantExpressionNode(position,
+                    Scope.valueOf(propertyID));
+        // extend here
+        else
+            return new IllegalExpressionNode(position,
+                    "No property \"" + formatGlobal(propertyID) + "\" exists");
+    }
+
+    private static String formatGlobal(final String subidentifier) {
+        return "$" + Constants.SCRIPT_GLOBAL_NAMESPACE + "." + subidentifier;
+    }
+
+    public static ExpressionNode scopedProperty(
             final TextPosition position, final ExpressionNode scope,
             final String propertyID
     ) {
@@ -100,12 +130,14 @@ public final class SENodeDelegator {
             final String fID, final ExpressionNode... args
     ) {
         return switch (fID) {
+            case LayerGetNameNode.NAME ->
+                    new LayerGetNameNode(position, scope, args);
             case OpacityGetterNode.OPACITY ->
                     OpacityGetterNode.opacity(position, scope, args);
             case OpacityGetterNode.OPAQUE ->
                     OpacityGetterNode.opaque(position, scope, args);
-            case GetFrameNode.NAME ->
-                    new GetFrameNode(position, scope, args);
+            case GetCelNode.NAME ->
+                    new GetCelNode(position, scope, args);
             case IsEnabledNode.NAME ->
                     new IsEnabledNode(position, scope, args);
             case IsLinkedNode.NAME ->
@@ -153,18 +185,20 @@ public final class SENodeDelegator {
             final String fID, final ExpressionNode... args
     ) {
         return switch (fID) {
-            case SetFrameNode.SET_NAME ->
-                    SetFrameNode.newSet(position, scope, args);
-            case SetFrameNode.EDIT_NAME ->
-                    SetFrameNode.newEdit(position, scope, args);
+            case LayerSetNameNode.NAME ->
+                    new LayerSetNameNode(position, scope, args);
+            case SetCelNode.SET ->
+                    SetCelNode.newSet(position, scope, args);
+            case SetCelNode.EDIT ->
+                    SetCelNode.newEdit(position, scope, args);
             case SetOpacityNode.NAME ->
                     new SetOpacityNode(position, scope, args);
             case WipeFrameNode.NAME ->
                     new WipeFrameNode(position, scope, args);
-            case UnlinkFramesNode.NAME ->
-                    new UnlinkFramesNode(position, scope, args);
-            case LinkFramesNode.NAME ->
-                    new LinkFramesNode(position, scope, args);
+            case UnlinkCelsNode.NAME ->
+                    new UnlinkCelsNode(position, scope, args);
+            case LinkCelsNode.NAME ->
+                    new LinkCelsNode(position, scope, args);
             case DisableLayerNode.NAME ->
                     new DisableLayerNode(position, scope, args);
             case EnableLayerNode.NAME ->

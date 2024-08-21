@@ -476,8 +476,8 @@ public class MenuAssembly {
 
         return IconToggleButton.make(pos, codes,
                 new Runnable[] {
-                        () -> StippleEffect.get().getContext().linkFramesInLayer(index),
-                        () -> StippleEffect.get().getContext().unlinkFramesInLayer(index)
+                        () -> StippleEffect.get().getContext().linkCelsInLayer(index),
+                        () -> StippleEffect.get().getContext().unlinkCelsInLayer(index)
                 },
                 () -> StippleEffect.get().getContext().getState()
                         .getLayers().get(index).areFramesLinked() ? 1 : 0,

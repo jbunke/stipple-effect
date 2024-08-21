@@ -9,10 +9,10 @@ import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
-public final class GetFrameNode extends LayerExpressionNode {
-    public static final String NAME = "get_frame";
+public final class GetCelNode extends LayerExpressionNode {
+    public static final String NAME = "get_cel";
 
-    public GetFrameNode(
+    public GetCelNode(
             final TextPosition position, final ExpressionNode scope,
             final ExpressionNode[] args
     ) {
@@ -41,7 +41,7 @@ public final class GetFrameNode extends LayerExpressionNode {
                             (frameIndex == fc ? "greater than " : "equal to ") +
                             "the frame count (" + fc + ")");
         else
-            return new GameImage(evalLayer(symbolTable).getFrame(frameIndex));
+            return new GameImage(layerRep(symbolTable).get().getFrame(frameIndex));
 
 
         return null;

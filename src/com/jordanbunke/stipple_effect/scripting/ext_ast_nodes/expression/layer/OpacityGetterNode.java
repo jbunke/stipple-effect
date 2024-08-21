@@ -37,7 +37,7 @@ public final class OpacityGetterNode extends LayerExpressionNode {
 
     @Override
     public Object evaluate(final SymbolTable symbolTable) {
-        final double opacity = evalLayer(symbolTable).getOpacity();
+        final double opacity = layerRep(symbolTable).get().getOpacity();
 
         return get ? opacity : opacity == Constants.OPAQUE;
     }

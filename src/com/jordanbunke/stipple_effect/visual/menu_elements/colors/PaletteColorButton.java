@@ -140,7 +140,7 @@ public class PaletteColorButton extends SelectableMenuElement
                 ", A: " + color.getAlpha() +
                 "\n{Click + Drag} to resort" +
                 "\n{Shift + Click} to " + (included ? "ex" : "in") + "clude" +
-                "\n{Ctrl + Click} to remove from palette";
+                "\n{Ctrl + Click} to remove";
     }
 
     @Override

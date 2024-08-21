@@ -10,13 +10,12 @@ import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-public final class SetFrameNode extends LayerStatementNode {
-    public static final String SET_NAME = "set_frame",
-            EDIT_NAME = "edit_frame";
+public final class SetCelNode extends LayerStatementNode {
+    public static final String SET = "set_cel", EDIT = "edit_cel";
 
     private final boolean set;
 
-    private SetFrameNode(
+    private SetCelNode(
             final TextPosition position, final ExpressionNode scope,
             final ExpressionNode[] args, final boolean set
     ) {
@@ -25,18 +24,18 @@ public final class SetFrameNode extends LayerStatementNode {
         this.set = set;
     }
 
-    public static SetFrameNode newSet(
+    public static SetCelNode newSet(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new SetFrameNode(position, scope, args, true);
+        return new SetCelNode(position, scope, args, true);
     }
 
-    public static SetFrameNode newEdit(
+    public static SetCelNode newEdit(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
-        return new SetFrameNode(position, scope, args, false);
+        return new SetCelNode(position, scope, args, false);
     }
 
     @Override
@@ -52,7 +51,7 @@ public final class SetFrameNode extends LayerStatementNode {
                 eh = layer.project().getState().getImageHeight();
 
         final String attempt = (set ? "set" : "edit") +
-                " the content of this layer frame";
+                " the content of this cel";
 
         if (frameIndex < 0)
             StatusUpdates.scriptActionNotPermitted(attempt,
@@ -85,6 +84,6 @@ public final class SetFrameNode extends LayerStatementNode {
 
     @Override
     protected String callName() {
-        return set ? SET_NAME : EDIT_NAME;
+        return set ? SET : EDIT;
     }
 }

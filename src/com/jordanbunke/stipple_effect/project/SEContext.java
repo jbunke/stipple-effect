@@ -1888,20 +1888,20 @@ public class SEContext {
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
             if (layers.get(layerIndex).areFramesLinked())
-                unlinkFramesInLayer(layerIndex);
+                unlinkCelsInLayer(layerIndex);
             else
-                linkFramesInLayer(layerIndex);
+                linkCelsInLayer(layerIndex);
         }
     }
 
     // unlink frames in layer
-    public void unlinkFramesInLayer(final int layerIndex) {
+    public void unlinkCelsInLayer(final int layerIndex) {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 layers.get(layerIndex).areFramesLinked()) {
-            final SELayer layer = layers.get(layerIndex).returnUnlinkedFrames();
+            final SELayer layer = layers.get(layerIndex).returnUnlinkedCels();
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
@@ -1914,13 +1914,13 @@ public class SEContext {
     }
 
     // link frames in layer
-    public void linkFramesInLayer(final int layerIndex) {
+    public void linkCelsInLayer(final int layerIndex) {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
                 !layers.get(layerIndex).areFramesLinked()) {
-            final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
+            final SELayer layer = layers.get(layerIndex).returnLinkedCels(
                     getState().getFrameIndex());
             layer.setOnionSkinMode(OnionSkinMode.NONE);
             layers.set(layerIndex, layer);

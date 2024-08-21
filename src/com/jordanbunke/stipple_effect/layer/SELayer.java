@@ -261,12 +261,12 @@ public final class SELayer {
                 opacity, enabled, false, onionSkinMode, name);
     }
 
-    public SELayer returnLinkedFrames(final int frameIndex) {
+    public SELayer returnLinkedCels(final int frameIndex) {
         return new SELayer(new ArrayList<>(frames), getFrame(frameIndex),
                 opacity, enabled, true, onionSkinMode, name);
     }
 
-    public SELayer returnUnlinkedFrames() {
+    public SELayer returnUnlinkedCels() {
         final int frameCount = frames.size();
 
         final List<GameImage> clonedFromLinked = new ArrayList<>();

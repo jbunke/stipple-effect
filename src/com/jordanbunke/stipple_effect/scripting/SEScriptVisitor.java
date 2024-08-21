@@ -34,6 +34,23 @@ public final class SEScriptVisitor extends ScriptVisitor {
     }
 
     @Override
+    public ExpressionNode visitExtPropertyExpression(
+            final ScriptParser.ExtPropertyExpressionContext ctx
+    ) {
+        final String namespace = ctx.namespace().ident().getText(),
+                propertyID = ctx.namespace().subident().getText()
+                        .substring(SCOPE_SEP.length());
+
+        final TextPosition position = TextPosition.fromToken(ctx.start);
+
+        if (namespace.equals(Constants.SCRIPT_GLOBAL_NAMESPACE))
+            return SENodeDelegator.globalProperty(position, propertyID);
+
+        return new IllegalExpressionNode(position,
+                "\"" + namespace + "\" is an illegal namespace");
+    }
+
+    @Override
     public ExpressionNode visitExtFuncCallExpression(
             final ScriptParser.ExtFuncCallExpressionContext ctx
     ) {
@@ -80,7 +97,7 @@ public final class SEScriptVisitor extends ScriptVisitor {
             final TextPosition position, final ExpressionNode scope,
             final String propertyID
     ) {
-        return SENodeDelegator.property(position, scope, propertyID);
+        return SENodeDelegator.scopedProperty(position, scope, propertyID);
     }
 
     @Override
