@@ -1,2 +1,2 @@
-Frames linked
+Cels linked
 Toggle: {sc:TOGGLE_LAYER_LINKING}

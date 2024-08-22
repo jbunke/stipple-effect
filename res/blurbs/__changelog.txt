@@ -1,5 +1,9 @@
 {1.2.0} - 2024-0?-??
 
+Added:
+> Added layer visibility actions to navbar under "Layer" -> "Visibility status"
+> Added bug reporting and scripting API link to navbar
+
 Changed:
 > Cosmetic and layout changes
   > Simplified and shortened color sampler labels

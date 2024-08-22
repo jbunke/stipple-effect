@@ -70,6 +70,9 @@ public class MenuAssembly {
                         SETTINGS.toItem(c),
                         INFO.toItem(c),
                         AUTOMATION_SCRIPT.toItem(c),
+                        new NestedItem("Resources",
+                                REPORT_BUG.toItem(c),
+                                SCRIPTING_API.toItem(c)),
                         EXIT_PROGRAM.toItem(c)),
                 new NestedItem("File",
                         NEW_PROJECT.toItem(c),
@@ -116,9 +119,18 @@ public class MenuAssembly {
                                         na -> areAllPanelsShowing()
                                                 ? MINIMAL_UI : ALL_UI,
                                         ALL_UI, MINIMAL_UI))),
-                new NestedItem("Layer", Arrays.stream(layerActions())
-                        .map(a -> a.toItem(c))
-                        .toArray(DropdownItem[]::new)), // TODO
+                new NestedItem("Layer", NEW_LAYER.toItem(c),
+                        DUPLICATE_LAYER.toItem(c), REMOVE_LAYER.toItem(c),
+                        MOVE_LAYER_UP.toItem(c), MOVE_LAYER_DOWN.toItem(c),
+                        MERGE_WITH_LAYER_BELOW.toItem(c), FLATTEN.toItem(c),
+                        new NestedItem("Visibility status",
+                                new ThinkingActionItem(c, anon ->
+                                        anon.getState().getEditingLayer().isEnabled()
+                                                ? DISABLE_LAYER : ENABLE_LAYER,
+                                        DISABLE_LAYER, ENABLE_LAYER),
+                                ISOLATE_LAYER.toItem(c),
+                                ENABLE_ALL_LAYERS.toItem(c)),
+                        LAYER_SETTINGS.toItem(c)),
                 new NestedItem("Frame", Arrays.stream(frameActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new)),

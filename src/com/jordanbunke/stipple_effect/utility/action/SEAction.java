@@ -10,10 +10,7 @@ import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.*;
-import com.jordanbunke.stipple_effect.utility.DialogVals;
-import com.jordanbunke.stipple_effect.utility.EnumUtils;
-import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.StatusUpdates;
+import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.GatewayActionItem;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.SimpleActionItem;
@@ -83,6 +80,8 @@ public enum SEAction {
             KeyShortcut.single(ESCAPE)),
     CLEAR_DIALOG(ResourceCodes.NONE, fromSE(StippleEffect::clearDialog),
             KeyShortcut.single(ESCAPE)),
+    SCRIPTING_API(ResourceCodes.SCRIPTING_API, plain(WebUtils::scriptingAPI), null),
+    REPORT_BUG(ResourceCodes.REPORT_BUG, plain(WebUtils::reportBug), null),
 
     // non-project dialogs
     SETTINGS(ResourceCodes.SETTINGS,
@@ -157,10 +156,16 @@ public enum SEAction {
         else
             c.enableLayer(index);
     }, new KeyShortcut(false, true, _1)),
-    ISOLATE_LAYER(ResourceCodes.NONE,
+    DISABLE_LAYER(ResourceCodes.DISABLE_LAYER, null,
+            c -> c.disableLayer(c.getState().getLayerEditIndex()),
+            new KeyShortcut(false, true, _1), null, false),
+    ENABLE_LAYER(ResourceCodes.ENABLE_LAYER, null,
+            c -> c.enableLayer(c.getState().getLayerEditIndex()),
+            new KeyShortcut(false, true, _1), null, false),
+    ISOLATE_LAYER(ResourceCodes.ISOLATE_LAYER,
             c -> c.isolateLayer(c.getState().getLayerEditIndex()),
             new KeyShortcut(false, true, _2)),
-    ENABLE_ALL_LAYERS(ResourceCodes.NONE, SEContext::enableAllLayers,
+    ENABLE_ALL_LAYERS(ResourceCodes.ENABLE_ALL_LAYERS, SEContext::enableAllLayers,
             new KeyShortcut(false, true, _3)),
 
     // current layer

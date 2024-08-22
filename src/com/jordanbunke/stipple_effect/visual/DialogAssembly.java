@@ -53,7 +53,6 @@ import static com.jordanbunke.stipple_effect.utility.Layout.*;
 
 import java.awt.*;
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
@@ -2925,24 +2924,18 @@ public class DialogAssembly {
                 contentStart.displace(indent, bottomY + TEXT_Y_OFFSET),
                 "Donate on the store page: "),
                 sponsorLabel = TextLabel.make(textBelowPos(storePageLabel),
-                "Sponsor me on GitHub: "),
-                patreonLabel = TextLabel.make(textBelowPos(sponsorLabel),
-                        "Become a patron on Patreon: ");
+                "Sponsor me on GitHub: ");
         final StaticTextButton storePageButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(storePageLabel),
-                        () -> visitSite(Constants.DONATE_LINK)),
+                        WebUtils::storePage),
                 sponsorButton = GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(sponsorLabel),
-                        () -> visitSite(Constants.SPONSOR_LINK)),
-                patreonButton = GraphicsUtils.makeStandardTextButton("Go",
-                        contentPositionAfterLabel(patreonLabel),
-                        () -> visitSite(Constants.PATREON_LINK));
-        contentAssembler.addAll(Set.of(
-                storePageLabel, sponsorLabel, patreonLabel,
-                storePageButton, sponsorButton, patreonButton));
+                        WebUtils::sponsorPage);
+        contentAssembler.addAll(Set.of(storePageLabel, sponsorLabel,
+                storePageButton, sponsorButton));
 
-        bottomY += DIALOG_CONTENT_INC_Y * 4;
+        bottomY += DIALOG_CONTENT_INC_Y * 3;
 
         return bottomY - initialBottomY;
     }
@@ -2963,10 +2956,10 @@ public class DialogAssembly {
         final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(scriptLabel),
-                        () -> visitSite(Constants.SCRIPT_WIKI_LINK));
+                        WebUtils::scriptingAPI);
         contentAssembler.addAll(Set.of(scriptLabel, scriptButton));
 
-        bottomY += DIALOG_CONTENT_INC_Y * 2;
+        bottomY += DIALOG_CONTENT_INC_Y;
 
         return bottomY - initialBottomY;
     }
@@ -3086,8 +3079,8 @@ public class DialogAssembly {
                         "Next frame",
                         "Previous and next frame",
                         "Layer frame status",
-                        "Frames are linked / layer is static",
-                        "Frames are free / layer is dynamic",
+                        "This layer's cels are linked",
+                        "This layer's cels are not linked",
                         "Layer settings"
                 }, contentAssembler, contentStart, initialBottomY
         );
@@ -3282,13 +3275,5 @@ public class DialogAssembly {
         mb.add(border);
 
         return mb.build();
-    }
-
-    private static void visitSite(final String link) {
-        try {
-            Desktop.getDesktop().browse(new URI(link));
-        } catch (Exception e) {
-            StatusUpdates.invalidLink(link);
-        }
     }
 }

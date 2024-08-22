@@ -13,12 +13,6 @@ public class Constants {
             NATIVE_STANDARD_CODE = "native_standard",
             PALETTE_STANDARD_CODE = "palette_standard";
 
-    public static final String
-            DONATE_LINK = "https://flinkerflitzer.itch.io/stipple-effect",
-            SPONSOR_LINK = "https://github.com/sponsors/jbunke",
-            PATREON_LINK = "https://www.patreon.com/FlinkerFlitzer",
-            SCRIPT_WIKI_LINK = "https://github.com/jbunke/stipple-effect/wiki/Scripting";
-
     public static final Path PROGRAM_FILE = Path.of("program"),
             ICON_FOLDER = Path.of("icons"),
             PALETTE_FOLDER = Path.of("palettes"),
