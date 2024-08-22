@@ -1,5 +1,11 @@
 {1.2.0} - 2024-0?-??
 
+Changed:
+> Cosmetic and layout changes
+  > Simplified and shortened color sampler labels
+  > Updated {Zo} theme colors
+  > Updated layer button layout and flipbook panel sizing
+
 API Changes:
   Added:
   > `script` type

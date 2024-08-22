@@ -30,7 +30,6 @@ public class SEColors {
             HAITI_RED = new Color(210, 16, 52),
             HAITI_BLUE = new Color(1, 32, 160),
             CEU = new Color(97, 121, 213),
-            DEEP_OCEAN = new Color(21, 29, 80),
             PURPLE = new Color(100, 0, 125),
             HAITI_PURPLE = new Color(106, 24, 106),
             CHITIN = new Color(144, 79, 161),

@@ -26,7 +26,6 @@ import com.jordanbunke.stipple_effect.selection.SelectionMode;
 import com.jordanbunke.stipple_effect.tools.Tool;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
-import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.SamplerMode;
 import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
@@ -46,10 +45,13 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButto
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 import java.util.stream.IntStream;
 
+import static com.jordanbunke.stipple_effect.utility.Layout.*;
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public class MenuAssembly {
@@ -111,12 +113,12 @@ public class MenuAssembly {
                         new NestedItem("Layout",
                                 PANEL_MANAGER.toItem(c),
                                 new ThinkingActionItem(c,
-                                        na -> Layout.areAllPanelsShowing()
+                                        na -> areAllPanelsShowing()
                                                 ? MINIMAL_UI : ALL_UI,
                                         ALL_UI, MINIMAL_UI))),
                 new NestedItem("Layer", Arrays.stream(layerActions())
                         .map(a -> a.toItem(c))
-                        .toArray(DropdownItem[]::new)),
+                        .toArray(DropdownItem[]::new)), // TODO
                 new NestedItem("Frame", Arrays.stream(frameActions())
                         .map(a -> a.toItem(c))
                         .toArray(DropdownItem[]::new)),
@@ -154,19 +156,19 @@ public class MenuAssembly {
                         .toArray(DropdownItem[]::new))));
 
         // panel expand / collapse
-        final Coord2D panelIconPos = Layout.getProjectsPosition().displace(
-                Layout.getProjectsWidth() - Layout.BUTTON_INC,
-                Layout.ICON_BUTTON_OFFSET_Y);
+        final Coord2D panelIconPos = getProjectsPosition().displace(
+                getProjectsWidth() - BUTTON_INC,
+                ICON_BUTTON_OFFSET_Y);
 
-        if (!Layout.isProjectsExpanded())
+        if (!isProjectsExpanded())
             mb.add(IconButton.make(ResourceCodes.EXPAND_PANEL, panelIconPos,
-                    () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(true))));
+                    () -> adjustPanels(() -> setProjectsExpanded(true))));
         else
             mb.add(IconButton.make(ResourceCodes.COLLAPSE_PANEL, panelIconPos,
-                    () -> Layout.adjustPanels(() -> Layout.setProjectsExpanded(false))));
+                    () -> adjustPanels(() -> setProjectsExpanded(false))));
 
         // early break if collapsed
-        if (!Layout.isProjectsExpanded())
+        if (!isProjectsExpanded())
             return mb.build();
 
         // project previews
@@ -176,8 +178,8 @@ public class MenuAssembly {
 
         final MenuBuilder toScroll = new MenuBuilder();
 
-        final Coord2D firstPos = Layout.getProjectsPosition()
-                .displace(Layout.getPanelContentDisplacement());
+        final Coord2D firstPos = getProjectsPosition()
+                .displace(getPanelContentDisplacement());
         int realRightX = firstPos.x, cumulativeWidth = 0, initialOffsetX = 0;
 
         for (int i = 0; i < amount; i++) {
@@ -187,13 +189,13 @@ public class MenuAssembly {
             final ProjectButton projectButton = ProjectButton.make(pos, i);
             toScroll.add(projectButton);
 
-            offsetX += projectButton.getWidth() + Layout.BUTTON_OFFSET;
+            offsetX += projectButton.getWidth() + BUTTON_OFFSET;
 
             // close project button
             final Coord2D cpPos = pos.displace(offsetX,
-                    (Layout.STD_TEXT_BUTTON_H - Layout.BUTTON_DIM) / 2);
+                    (STD_TEXT_BUTTON_H - BUTTON_DIM) / 2);
 
-            offsetX += Layout.BUTTON_DIM + Layout.SPACE_BETWEEN_PROJECT_BUTTONS_X;
+            offsetX += BUTTON_DIM + SPACE_BETWEEN_PROJECT_BUTTONS_X;
 
             final int index = i;
             final Runnable closeBehaviour = () -> {
@@ -206,17 +208,17 @@ public class MenuAssembly {
             toScroll.add(IconButton.make(ResourceCodes.CLOSE_PROJECT, cpPos, closeBehaviour));
 
             cumulativeWidth += offsetX;
-            realRightX = cpPos.x + Layout.BUTTON_DIM;
+            realRightX = cpPos.x + BUTTON_DIM;
 
-            if (i == selectedIndex - Layout.PROJECTS_BEFORE_TO_DISPLAY)
+            if (i == selectedIndex - PROJECTS_BEFORE_TO_DISPLAY)
                 initialOffsetX = pos.x - firstPos.x;
         }
 
-        final int scrollBoxW = Layout.getProjectScrollWindowWidth();
+        final int scrollBoxW = getProjectScrollWindowWidth();
         final boolean requiresScrolling = realRightX > firstPos.x + scrollBoxW;
-        final int scrollBoxH = Layout.TOP_PANEL_SCROLL_WINDOW_H -
-                (requiresScrolling ? 0 : Layout.SLIDER_BALL_DIM);
-        Layout.setProjectsRequiresScrolling(requiresScrolling);
+        final int scrollBoxH = TOP_PANEL_SCROLL_WINDOW_H -
+                (requiresScrolling ? 0 : SLIDER_BALL_DIM);
+        setProjectsRequiresScrolling(requiresScrolling);
 
         mb.add(new HorizontalScrollBox(firstPos,
                 new Bounds2D(scrollBoxW, scrollBoxH),
@@ -231,41 +233,41 @@ public class MenuAssembly {
     public static Menu buildFlipbookMenu() {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
-        final Coord2D panelPos = Layout.getFlipbookPosition();
+        final Coord2D panelPos = getFlipbookPosition();
 
-        final int panelHeight = Layout.getFlipbookHeight(),
-                panelWidth = Layout.getFlipbookWidth(),
-                lbLeftBuffer = (2 * Layout.BUTTON_INC) - Layout.CONTENT_BUFFER_PX,
-                lbTopBuffer = 3 * Layout.STD_TEXT_BUTTON_INC,
-                fbOffsetFromLB = lbLeftBuffer + Layout.VERT_SCROLL_WINDOW_W +
-                        Layout.CONTENT_BUFFER_PX;
+        final int panelHeight = getFlipbookHeight(),
+                panelWidth = getFlipbookWidth(),
+                lbLeftBuffer = CONTENT_BUFFER_PX,
+                lbTopBuffer = 4 * STD_TEXT_BUTTON_INC,
+                lbBoxWidth = LAYER_BUTTON_W + (5 * BUTTON_INC),
+                fbOffsetFromLB = lbLeftBuffer + lbBoxWidth + CONTENT_BUFFER_PX;
 
         addHidePanelToMenuBuilder(mb,
                 panelPos.displace(panelWidth, 0),
-                () -> Layout.setFlipbookPanelShowing(false));
+                () -> setFlipbookPanelShowing(false));
 
         final Coord2D firstFBPos = panelPos.displace(fbOffsetFromLB,
-                Layout.PANEL_TITLE_CONTENT_OFFSET_Y),
+                PANEL_TITLE_CONTENT_OFFSET_Y),
                 firstLBPos = panelPos.displace(lbLeftBuffer, lbTopBuffer);
 
         // aesthetic box
         final int abX = firstLBPos.x, abY = firstFBPos.y,
                 abInPanelX = abX - panelPos.x, abInPanelY = abY - panelPos.y,
-                abWidth = panelWidth - (abInPanelX + Layout.CONTENT_BUFFER_PX),
-                abHeight = panelHeight - (abInPanelY + Layout.CONTENT_BUFFER_PX);
+                abWidth = panelWidth - (abInPanelX + CONTENT_BUFFER_PX),
+                abHeight = panelHeight - (abInPanelY + CONTENT_BUFFER_PX);
         mb.add(new VerticalScrollBox(
                 new Coord2D(abX, abY), new Bounds2D(abWidth, abHeight),
                 new Scrollable[0], abY + abHeight, 0));
 
         // playback
         final Coord2D labelPos = panelPos.displace(0,
-                Layout.PANEL_TITLE_CONTENT_OFFSET_Y);
+                ICON_BUTTON_OFFSET_Y + BUTTON_INC);
 
         final TextLabel playbackLabel = TextLabel.make(labelPos, "");
         final IncrementalRangeElements<Integer> playback =
                 IncrementalRangeElements.makeForInt(playbackLabel,
-                        labelPos.y + Layout.ICON_BUTTON_OFFSET_Y,
-                        labelPos.y + Layout.TEXT_Y_OFFSET, 1,
+                        labelPos.y + ICON_BUTTON_OFFSET_Y,
+                        labelPos.y + TEXT_Y_OFFSET, 1,
                         Constants.MIN_PLAYBACK_FPS, Constants.MAX_PLAYBACK_FPS,
                         c.playbackInfo::setFps, c.playbackInfo::getFps,
                         fps -> fps, fps -> fps, fps -> fps + " FPS",
@@ -277,25 +279,23 @@ public class MenuAssembly {
         populateButtonsIntoBuilder(mb, new SEAction[] {
                 NEW_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
                 MOVE_LAYER_UP, MOVE_LAYER_DOWN, MERGE_WITH_LAYER_BELOW
-        }, c, panelPos.displace(Layout.CONTENT_BUFFER_PX,
-                lbTopBuffer + Layout.BUTTON_OFFSET), true);
+        }, c, panelPos.displace(CONTENT_BUFFER_PX,
+                lbTopBuffer - STD_TEXT_BUTTON_INC));
 
         // playback controls
         populateButtonsIntoBuilder(mb, new SEAction[] {
                 TO_FIRST_FRAME, PREVIOUS_FRAME, DUMMY,
                 NEXT_FRAME, TO_LAST_FRAME
-        }, c, panelPos.displace(Layout.CONTENT_BUFFER_PX,
-                Layout.ICON_BUTTON_OFFSET_Y), false);
+        }, c, panelPos.displace(CONTENT_BUFFER_PX, ICON_BUTTON_OFFSET_Y));
 
         final int PLAY_STOP_INDEX = 2,
                 PLAYBACK_MODE_INDEX = 5;
 
         // play/stop as toggle
-        final Coord2D disp = new Coord2D(Layout.BUTTON_INC, 0),
-                playStopTogglePos =
-                        panelPos.displace(Layout.CONTENT_BUFFER_PX +
-                                        (PLAY_STOP_INDEX * Layout.BUTTON_INC),
-                                Layout.ICON_BUTTON_OFFSET_Y);
+        final Coord2D disp = new Coord2D(BUTTON_INC, 0),
+                playStopTogglePos = panelPos.displace(CONTENT_BUFFER_PX +
+                                (PLAY_STOP_INDEX * BUTTON_INC),
+                        ICON_BUTTON_OFFSET_Y);
         mb.add(generatePlayStopToggle(c, playStopTogglePos));
 
         // playback mode toggle button
@@ -309,7 +309,7 @@ public class MenuAssembly {
                 NEW_FRAME, DUPLICATE_FRAME, REMOVE_FRAME,
                 MOVE_FRAME_BACK, MOVE_FRAME_FORWARD, DUMMY,
                 FRAME_PROPERTIES
-        }, c, frameControlPos.displace(0, Layout.ICON_BUTTON_OFFSET_Y), false);
+        }, c, frameControlPos.displace(0, ICON_BUTTON_OFFSET_Y));
 
         // layer buttons
         final List<SELayer> layers = c.getState().getLayers();
@@ -324,40 +324,38 @@ public class MenuAssembly {
 
         for (int i = layerCount - 1; i >= 0; i--) {
             final Coord2D pos = firstLBPos.displace(0,
-                    (layerCount - (i + 1)) * Layout.STD_TEXT_BUTTON_INC);
+                    (layerCount - (i + 1)) * STD_TEXT_BUTTON_INC);
 
             layerButtons[i] = new Scrollable(
                     new LayerButton(pos, i, c, layers.get(i)));
             layerElements.add(layerButtons[i]);
 
             // visibility toggle
-            final Coord2D vtPos = pos.displace(
-                    Layout.LAYER_BUTTON_W + Layout.BUTTON_OFFSET,
-                    (Layout.STD_TEXT_BUTTON_H / 2)  - (Layout.BUTTON_DIM / 2));
+            final Coord2D vtPos = pos.displace(LAYER_BUTTON_W + BUTTON_OFFSET,
+                    (STD_TEXT_BUTTON_H / 2)  - (BUTTON_DIM / 2));
             layerElements.add(new LayerVisibilityButton(vtPos, i));
 
             // frames linked toggle
-            final Coord2D flPos = vtPos.displace(Layout.BUTTON_INC, 0);
+            final Coord2D flPos = vtPos.displace(BUTTON_INC, 0);
             layerElements.add(generateFramesLinkedToggle(i, flPos));
 
             // onion skin toggle
-            final Coord2D onionPos = vtPos.displace(Layout.BUTTON_INC * 2, 0);
+            final Coord2D onionPos = vtPos.displace(BUTTON_INC * 2, 0);
             layerElements.add(generateOnionSkinToggle(i, onionPos));
 
             // layer settings
             final int index = i;
-            final Coord2D lsPos = vtPos.displace(Layout.BUTTON_INC * 3, 0);
+            final Coord2D lsPos = vtPos.displace(BUTTON_INC * 3, 0);
             layerElements.add(IconButton.make(ResourceCodes.LAYER_SETTINGS, lsPos,
                     () -> DialogAssembly.setDialogToLayerSettings(index)));
 
-            realBottomY = pos.y + Layout.STD_TEXT_BUTTON_H;
+            realBottomY = pos.y + STD_TEXT_BUTTON_H;
         }
 
         final int boxInPanelY = firstLBPos.y - panelPos.y,
-                lbBoxHeight = panelHeight -
-                        (boxInPanelY + Layout.CONTENT_BUFFER_PX);
+                lbBoxHeight = panelHeight - (boxInPanelY + CONTENT_BUFFER_PX);
         final VerticalScrollBox lbBox = new VerticalScrollBox(firstLBPos,
-                new Bounds2D(Layout.VERT_SCROLL_WINDOW_W, lbBoxHeight),
+                new Bounds2D(lbBoxWidth, lbBoxHeight),
                 Arrays.stream(layerElements.build().getMenuElements())
                         .map(m -> m instanceof Scrollable
                                 ? (Scrollable) m
@@ -375,15 +373,14 @@ public class MenuAssembly {
         for (int i = 0; i < frameCount; i++) {
             frameButtons[i] = new Scrollable(new FrameButton(fbPos, i, c));
 
-            fbPos = fbPos.displace(Layout.FRAME_BUTTON_W +
-                    (i + 1 < frameCount ? Layout.BUTTON_OFFSET : 0), 0);
+            fbPos = fbPos.displace(FRAME_BUTTON_W +
+                    (i + 1 < frameCount ? BUTTON_OFFSET : 0), 0);
         }
 
         final int boxInPanelX = firstFBPos.x - panelPos.x,
-                fbBoxWidth = panelWidth -
-                        (boxInPanelX + Layout.CONTENT_BUFFER_PX);
+                fbBoxWidth = panelWidth - (boxInPanelX + CONTENT_BUFFER_PX);
         final HorizontalScrollBox fbBox = new HorizontalScrollBox(firstFBPos,
-                new Bounds2D(fbBoxWidth, Layout.TOP_PANEL_SCROLL_WINDOW_H),
+                new Bounds2D(fbBoxWidth, TOP_PANEL_SCROLL_WINDOW_H + CONTENT_BUFFER_PX),
                 frameButtons, fbPos.x, frameButtonXDisplacement(c),
                 GameImage::new);
         mb.addAll(lbBox, fbBox);
@@ -396,9 +393,9 @@ public class MenuAssembly {
 
         // panel adjuster
         mb.add(new VerticalPanelAdjuster(panelPos, panelWidth,
-                Layout.getFlipbookUpLeeway(),
-                Layout.getFlipbookDownLeeway(), dh -> {
-            Layout.changeFlipbookHeight(dh);
+                getFlipbookUpLeeway(),
+                getFlipbookDownLeeway(), dh -> {
+            changeFlipbookHeight(dh);
             StippleEffect.get().rebuildAllMenus();
         }));
 
@@ -439,8 +436,8 @@ public class MenuAssembly {
 
     private static int frameButtonXDisplacement(final SEContext c) {
         return (c.getState().getFrameIndex() -
-                Layout.FRAMES_BEFORE_TO_DISPLAY) *
-                (Layout.FRAME_BUTTON_W + Layout.BUTTON_OFFSET);
+                FRAMES_BEFORE_TO_DISPLAY) *
+                (FRAME_BUTTON_W + BUTTON_OFFSET);
     }
 
     private static MenuElement generateOnionSkinToggle(
@@ -488,48 +485,45 @@ public class MenuAssembly {
             final SEContext c, final int amount
     ) {
         return (amount - ((c.getState().getLayerEditIndex() +
-                Layout.LAYERS_ABOVE_TO_DISPLAY) + 1)) *
-                Layout.STD_TEXT_BUTTON_INC;
+                LAYERS_ABOVE_TO_DISPLAY) + 1)) *
+                STD_TEXT_BUTTON_INC;
     }
 
     private static void populateButtonsIntoBuilder(
             final MenuBuilder mb, final SEAction[] actions,
-            final SEContext c, final Coord2D firstPos, final boolean vertical
+            final SEContext c, final Coord2D firstPos
     ) {
-        final Coord2D displacement = vertical
-                ? new Coord2D(0, Layout.BUTTON_INC)
-                : new Coord2D(Layout.BUTTON_INC, 0);
         Coord2D pos = firstPos;
 
         for (SEAction action : actions) {
             if (!action.code.equals(ResourceCodes.NONE))
                 mb.add(new ActionButton(pos, action, c));
 
-            pos = pos.displace(displacement);
+            pos = pos.displace(BUTTON_INC, 0);
         }
     }
 
     public static Menu buildColorsMenu() {
         final StippleEffect s = StippleEffect.get();
         final MenuBuilder mb = new MenuBuilder();
-        final Coord2D panelPos = Layout.getColorsPosition();
-        final int pw = Layout.getColorsWidth(),
-                ph = Layout.getColorsHeight(),
-                leftMargin = panelPos.x + Layout.CONTENT_BUFFER_PX,
+        final Coord2D panelPos = getColorsPosition();
+        final int pw = getColorsWidth(),
+                ph = getColorsHeight(),
+                leftMargin = panelPos.x + CONTENT_BUFFER_PX,
                 leftColumn = panelPos.x + (pw / 4),
                 middle = panelPos.x + (pw / 2),
                 rightColumn = panelPos.x + ((3 * pw) / 4);
 
         mb.add(TextLabel.make(panelPos.displace(
-                Layout.CONTENT_BUFFER_PX, Layout.TEXT_Y_OFFSET),
+                CONTENT_BUFFER_PX, TEXT_Y_OFFSET),
                 "Colors"));
 
         addHidePanelToMenuBuilder(mb, panelPos.displace(pw, 0),
-                () -> Layout.setColorsPanelShowing(false));
+                () -> setColorsPanelShowing(false));
 
         final int PRI = 0, SEC = 1;
 
-        final int incY = Layout.PANEL_TITLE_CONTENT_OFFSET_Y,
+        final int incY = PANEL_TITLE_CONTENT_OFFSET_Y,
                 bigIncY = (int)(incY * 1.5), biggestIncY = incY * 2,
                 colorLabelY = panelPos.y + incY,
                 colorTextboxY = colorLabelY + incY;
@@ -571,7 +565,7 @@ public class MenuAssembly {
 
         // swap colors icon
         mb.add(new ActionButton(
-                new Coord2D(middle, colorTextboxY + Layout.BUTTON_OFFSET),
+                new Coord2D(middle, colorTextboxY + BUTTON_OFFSET),
                 MenuElement.Anchor.CENTRAL_TOP, SWAP_COLORS, null));
 
         // sampler mode choice
@@ -579,7 +573,7 @@ public class MenuAssembly {
                 colorTextboxY + bigIncY);
         final TextLabel samplerLabel =
                 TextLabel.make(samplerLabelPos, "Sampler:");
-        final Coord2D samplerDropdownPos = Layout.contentPositionAfterLabel(samplerLabel);
+        final Coord2D samplerDropdownPos = contentPositionAfterLabel(samplerLabel);
         final Dropdown samplerDropdown = new Dropdown(samplerDropdownPos,
                 contentWidthAllowance(panelPos.x, pw, samplerDropdownPos.x),
                 MenuElement.Anchor.LEFT_TOP,
@@ -588,9 +582,9 @@ public class MenuAssembly {
                         .map(SamplerMode::toString)
                         .toArray(String[]::new),
                 EnumUtils.stream(SamplerMode.class)
-                        .map(sm -> (Runnable) () -> Layout.setSamplerMode(sm))
+                        .map(sm -> (Runnable) () -> setSamplerMode(sm))
                         .toArray(Runnable[]::new),
-                () -> Layout.getSamplerMode().ordinal());
+                () -> getSamplerMode().ordinal());
         mb.addAll(samplerLabel, samplerDropdown);
 
         // sampler
@@ -640,7 +634,7 @@ public class MenuAssembly {
         final ColorComponent mHue = ColorComponent.hue(mHuePos),
                 mAlpha = ColorComponent.alpha(mAlphaPos);
 
-        samplerContentMap.put(SamplerMode.SAT_VAL_MATRIX,
+        samplerContentMap.put(SamplerMode.SV_MATRIX,
                 new MenuElementGrouping(matrix, mHue, mAlpha));
 
         // color wheel
@@ -668,10 +662,10 @@ public class MenuAssembly {
         final TextLabel paletteLabel =
                 TextLabel.make(paletteStartingPos, "Palette:");
         final Coord2D paletteDropdownPos =
-                Layout.contentPositionAfterLabel(paletteLabel);
+                contentPositionAfterLabel(paletteLabel);
         final int paletteDropdownH = ph - (
                 (paletteDropdownPos.y - panelPos.y) +
-                        Layout.CONTENT_BUFFER_PX + Layout.STD_TEXT_BUTTON_H),
+                        CONTENT_BUFFER_PX + STD_TEXT_BUTTON_H),
                 paletteDropdownW = contentWidthAllowance(
                         panelPos.x, pw, paletteDropdownPos.x);
         final List<Palette> palettes = s.getPalettes();
@@ -685,7 +679,7 @@ public class MenuAssembly {
                         .mapToObj(i -> (Runnable) () -> s.setPaletteIndex(i))
                         .toArray(Runnable[]::new), s::getPaletteIndex)
                 : new StaticMenuElement(paletteDropdownPos,
-                new Bounds2D(paletteDropdownW, Layout.STD_TEXT_BUTTON_H),
+                new Bounds2D(paletteDropdownW, STD_TEXT_BUTTON_H),
                 MenuElement.Anchor.LEFT_TOP,
                 Settings.getTheme().logic.drawTextButton(
                         TextButton.of("No palettes", paletteDropdownW,
@@ -694,10 +688,8 @@ public class MenuAssembly {
         mb.addAll(paletteLabel, paletteDropdown);
 
         // palette buttons
-        final Coord2D paletteButtonPos =
-                paletteStartingPos.displace(0, bigIncY);
-        populateButtonsIntoBuilder(mb, paletteActions(),
-                null, paletteButtonPos, false);
+        final Coord2D paletteButtonPos = paletteStartingPos.displace(0, bigIncY);
+        populateButtonsIntoBuilder(mb, paletteActions(), null, paletteButtonPos);
 
         // palette colors
         if (hasPaletteContents) {
@@ -705,7 +697,7 @@ public class MenuAssembly {
             final int paletteW = contentWidthAllowance(
                     panelPos.x, pw, palettePos.x),
                     paletteH = ph - ((palettePos.y - panelPos.y) +
-                            Layout.CONTENT_BUFFER_PX);
+                            CONTENT_BUFFER_PX);
 
             mb.add(PaletteContainer.make(palettePos,
                     new Bounds2D(paletteW, paletteH), s.getSelectedPalette()));
@@ -717,19 +709,19 @@ public class MenuAssembly {
     private static int contentWidthAllowance(
             final int panelX, final int panelWidth, final int x
     ) {
-        final int BUFFER = Layout.CONTENT_BUFFER_PX, xInPanel = x - panelX;
+        final int xInPanel = x - panelX;
 
-        return (panelWidth - BUFFER) - xInPanel;
+        return (panelWidth - CONTENT_BUFFER_PX) - xInPanel;
     }
 
     private static void addHidePanelToMenuBuilder(
             final MenuBuilder mb, final Coord2D topRight,
             final Runnable onClick
     ) {
-        final Coord2D pos = topRight.displace(-Layout.BUTTON_INC,
-                Layout.ICON_BUTTON_OFFSET_Y);
+        final Coord2D pos = topRight.displace(-BUTTON_INC,
+                ICON_BUTTON_OFFSET_Y);
         mb.add(IconButton.make(ResourceCodes.HIDE_PANEL, pos,
-                () -> Layout.adjustPanels(onClick)));
+                () -> adjustPanels(onClick)));
     }
 
     public static Menu buildToolButtonMenu() {
@@ -741,20 +733,20 @@ public class MenuAssembly {
             mb.add(toolButtonFromTool(all[i], i));
         }
 
-        addHidePanelToMenuBuilder(mb, Layout.getToolsPosition()
-                        .displace(Layout.getToolsWidth(), 0),
-                () -> Layout.setToolbarShowing(false));
+        addHidePanelToMenuBuilder(mb, getToolsPosition()
+                        .displace(getToolsWidth(), 0),
+                () -> setToolbarShowing(false));
 
         // outline button
-        final Coord2D outlinePos = Layout.getToolsPosition()
-                .displace(Layout.BUTTON_OFFSET,
-                        Layout.getToolsHeight() - Layout.BUTTON_INC);
+        final Coord2D outlinePos = getToolsPosition()
+                .displace(BUTTON_OFFSET,
+                        getToolsHeight() - BUTTON_INC);
         mb.add(new ActionButton(outlinePos, CONFIGURE_OUTLINE, c));
 
         // reflection buttons
         final MenuElement verticalReflectionButton = GraphicsUtils.
                 generateIconButton(ResourceCodes.VERTICAL_REFLECTION,
-                        outlinePos.displace(0, -Layout.BUTTON_INC),
+                        outlinePos.displace(0, -BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
                                 VERT_BOUNDS_REFLECTION.behaviour.accept(c);
@@ -765,7 +757,7 @@ public class MenuAssembly {
         mb.add(verticalReflectionButton);
         final MenuElement horizontalReflectionButton = GraphicsUtils.
                 generateIconButton(ResourceCodes.HORIZONTAL_REFLECTION,
-                        outlinePos.displace(0, -2 * Layout.BUTTON_INC),
+                        outlinePos.displace(0, -2 * BUTTON_INC),
                         () -> c.getState().hasSelection(), () -> {
                             if (c.getState().getSelectionMode() == SelectionMode.BOUNDS)
                                 HORZ_BOUNDS_REFLECTION.behaviour.accept(c);
@@ -777,7 +769,7 @@ public class MenuAssembly {
         // pixel grid
         final MenuElement pixelGridToggleButton = GraphicsUtils
                 .generateIconToggleButton(
-                        outlinePos.displace(0, -3 * Layout.BUTTON_INC),
+                        outlinePos.displace(0, -3 * BUTTON_INC),
                         new String[] {
                                 ResourceCodes.PIXEL_GRID_OFF,
                                 ResourceCodes.PIXEL_GRID_ON
@@ -801,9 +793,9 @@ public class MenuAssembly {
     private static SimpleMenuButton toolButtonFromTool(
             final Tool tool, final int index
     ) {
-        final Coord2D position = Layout.getToolsPosition().displace(
-                Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET +
-                        (Layout.BUTTON_INC * (index + 1)));
+        final Coord2D position = getToolsPosition().displace(
+                BUTTON_OFFSET, BUTTON_OFFSET +
+                        (BUTTON_INC * (index + 1)));
 
         final boolean selected = StippleEffect.get().getTool().equals(tool);
         final GameImage icon = selected
@@ -818,49 +810,49 @@ public class MenuAssembly {
         final MenuBuilder mb = new MenuBuilder();
         final SEContext c = StippleEffect.get().getContext();
 
-        final int bottomBarTextY = Layout.getBottomBarPosition().y +
-                Layout.TEXT_Y_OFFSET,
-                bottomBarButtonY = Layout.getBottomBarPosition().y +
-                        Layout.BUTTON_OFFSET;
+        final int bottomBarTextY = getBottomBarPosition().y +
+                TEXT_Y_OFFSET,
+                bottomBarButtonY = getBottomBarPosition().y +
+                        BUTTON_OFFSET;
 
         // active tool
         final Indicator toolIndicator = new Indicator(new Coord2D(
-                Layout.BUTTON_OFFSET, bottomBarButtonY),
+                BUTTON_OFFSET, bottomBarButtonY),
                 ResourceCodes.IND_TOOL);
         final DynamicLabel toolLabel = DynamicLabel.make(new Coord2D(
-                Layout.optionsBarNextElementX(toolIndicator, false),
+                optionsBarNextElementX(toolIndicator, false),
                 bottomBarTextY),
                 () -> StippleEffect.get().getTool().getBottomBarText(),
-                Layout.getBottomBarToolWidth());
+                getBottomBarToolWidth());
         mb.addAll(toolIndicator, toolLabel);
 
         // target pixel
         final Indicator targetIndicator = new Indicator(new Coord2D(
-                Layout.getBottomBarTargetPixelX(), bottomBarButtonY),
+                getBottomBarTargetPixelX(), bottomBarButtonY),
                 ResourceCodes.IND_TARGET);
         final DynamicLabel targetLabel = DynamicLabel.make(new Coord2D(
-                Layout.optionsBarNextElementX(targetIndicator, false),
+                optionsBarNextElementX(targetIndicator, false),
                 bottomBarTextY),
-                c::getTargetPixelText, Layout.getBottomBarTargetPixelWidth());
+                c::getTargetPixelText, getBottomBarTargetPixelWidth());
         mb.addAll(targetIndicator, targetLabel);
 
         // canvas size
         final Indicator boundsIndicator = new Indicator(new Coord2D(
-                Layout.getBottomBarCanvasSizeX(), bottomBarButtonY),
+                getBottomBarCanvasSizeX(), bottomBarButtonY),
                 ResourceCodes.IND_BOUNDS);
         final DynamicLabel boundsLabel = DynamicLabel.make(new Coord2D(
-                Layout.optionsBarNextElementX(boundsIndicator, false),
+                optionsBarNextElementX(boundsIndicator, false),
                 bottomBarTextY),
-                c::getImageSizeText, Layout.getBottomBarCanvasSizeWidth());
+                c::getImageSizeText, getBottomBarCanvasSizeWidth());
         mb.addAll(boundsIndicator, boundsLabel);
 
         // zoom
         final Indicator zoomIndicator = new Indicator(
-                new Coord2D(Layout.getBottomBarZoomPercentageX(),
+                new Coord2D(getBottomBarZoomPercentageX(),
                         bottomBarButtonY), ResourceCodes.IND_ZOOM);
         final IncrementalRangeElements<Float> zoom =
                 IncrementalRangeElements.makeForFloat(zoomIndicator,
-                        Layout.getBottomBarPosition().y + Layout.BUTTON_OFFSET,
+                        getBottomBarPosition().y + BUTTON_OFFSET,
                         bottomBarTextY,
                         () -> c.renderInfo.zoomOut(Constants.NO_VALID_TARGET),
                         () -> c.renderInfo.zoomIn(Constants.NO_VALID_TARGET),
@@ -874,11 +866,11 @@ public class MenuAssembly {
                 zoom.slider, zoom.value);
 
         // selection
-        mb.add(DynamicLabel.make(new Coord2D(Layout.width() -
-                Layout.CONTENT_BUFFER_PX, bottomBarTextY),
+        mb.add(DynamicLabel.make(new Coord2D(width() -
+                CONTENT_BUFFER_PX, bottomBarTextY),
                 MenuElement.Anchor.RIGHT_TOP, c::getSelectionText,
-                Layout.width() -
-                (Layout.getBottomBarZoomSliderX() + Layout.getUISliderWidth())));
+                width() -
+                (getBottomBarZoomSliderX() + getUISliderWidth())));
 
         return mb.build();
     }
