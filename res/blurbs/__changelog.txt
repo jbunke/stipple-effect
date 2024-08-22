@@ -2,6 +2,7 @@
 
 API Changes:
   Added:
+  > `script` type
   > Constants for scope
     > `$SE.PROJECT` = `0`
     > `$SE.LAYER` = `1`
@@ -14,6 +15,8 @@ API Changes:
     > `P.get_width() -> int`
     > `P.get_height() -> int`
     > `P.get_layer(string) -> layer`
+  > Added global functions
+    > `$SE.read_script(string) -> script`
 
   Changed:
   > Renamed some `layer` functions; for some `layer L`...

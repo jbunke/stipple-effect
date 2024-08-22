@@ -7,7 +7,7 @@ public final class ProjectTypeNode extends SEExtTypeNode {
     public static final String NAME = "project";
     private static final ProjectTypeNode INSTANCE;
 
-    public ProjectTypeNode(TextPosition position) {
+    public ProjectTypeNode(final TextPosition position) {
         super(position);
     }
 

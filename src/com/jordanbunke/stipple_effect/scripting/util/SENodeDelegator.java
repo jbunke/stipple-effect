@@ -18,10 +18,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.S
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.LayerTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.PaletteTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SEExtTypeNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
@@ -78,6 +75,7 @@ public final class SENodeDelegator {
             case PresetOutlineNode.SINGLE -> PresetOutlineNode.sng(position, args);
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
+            case ReadScriptNode.NAME -> new ReadScriptNode(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "Undefined function \"" + formatGlobal(fID) + "\"");
@@ -290,6 +288,7 @@ public final class SENodeDelegator {
             case LayerTypeNode.NAME -> new LayerTypeNode(position);
             case ProjectTypeNode.NAME -> new ProjectTypeNode(position);
             case PaletteTypeNode.NAME -> new PaletteTypeNode(position);
+            case ScriptTypeNode.NAME -> new ScriptTypeNode(position);
             default -> null;
         };
 
