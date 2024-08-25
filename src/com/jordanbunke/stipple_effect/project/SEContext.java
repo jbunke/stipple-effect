@@ -1027,7 +1027,6 @@ public class SEContext {
 
         try {
             return switch (scope) {
-                // case SELECTION -> runCAOnSelection(internal, map);
                 case CEL -> runCAOnFrame(internal, map, state,
                         state.getFrameIndex(), state.getLayerEditIndex(), selection);
                 case LAYER -> {

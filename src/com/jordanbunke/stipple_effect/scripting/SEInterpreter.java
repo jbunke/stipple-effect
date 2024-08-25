@@ -61,15 +61,17 @@ public final class SEInterpreter extends Interpreter {
                 IMG_ARRAY_TYPE = TypeNode.arrayOf(IMG_TYPE),
                 returnType = script.getReturnType();
 
-        final boolean animation = context.getState().getFrameCount() > 1;
-        final TypeNode[] expectedParam = new TypeNode[]
-                { animation ? IMG_ARRAY_TYPE : IMG_TYPE },
-                arrayParam = new TypeNode[] { IMG_ARRAY_TYPE };
+        final boolean imgReturn = returnType.equals(IMG_TYPE),
+                arrayReturn = returnType.equals(IMG_ARRAY_TYPE),
+                imgParam = script.paramsMatch(new TypeNode[] { IMG_TYPE }),
+                arrayParam = script.paramsMatch(new TypeNode[] { IMG_ARRAY_TYPE });
 
-        return (script.paramsMatch(expectedParam) ||
-                script.paramsMatch(arrayParam)) &&
-                (returnType.equals(IMG_TYPE) ||
-                        returnType.equals(IMG_ARRAY_TYPE));
+        if (!(imgReturn || arrayReturn))
+            return false;
+
+        return context.getState().getFrameCount() > 1
+                ? (imgParam ? imgReturn : arrayParam)
+                : imgParam || arrayParam;
     }
 
     @Override

@@ -5,6 +5,7 @@ Added:
 > Bug reporting and scripting API link to navbar
 
 Changed:
+> `(image -> image)` preview scripts can be run on animated projects
 > Cosmetic and layout changes
   > Simplified and shortened color sampler labels
   > Updated {Zo} theme colors

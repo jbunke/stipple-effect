@@ -348,24 +348,52 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
         frameIndex %= content.length;
 
         final boolean animScript = script.paramsMatch(
-                new TypeNode[] { TypeNode.arrayOf(TypeNode.getImage()) });
+                new TypeNode[] { TypeNode.arrayOf(TypeNode.getImage()) }),
+                imgReturn = script.getReturnType().equals(TypeNode.getImage());
 
-        final Object arg = animScript || content.length > 1
-                ? content : content[frameIndex];
+        if (animScript) {
+            final Object result = SEInterpreter.get().run(script, (Object) content);
 
-        final Object result = SEInterpreter.get().run(script, arg);
+            if (result instanceof GameImage image)
+                content = new GameImage[] { image };
+            else if (result instanceof ScriptArray arr)
+                content = convertScriptRes(arr);
+            else
+                window.closeInstance();
+        } else if (imgReturn) {
+            final GameImage[] output = new GameImage[content.length];
 
-        if (result instanceof GameImage image)
-            content = new GameImage[] { image };
-        else if (result instanceof ScriptArray arr) {
-            final GameImage[] images = new GameImage[arr.size()];
+            for (int i = 0; i < output.length; i++) {
+                final Object result = SEInterpreter.get().run(script, content[i]);
 
-            for (int i = 0; i < images.length; i++)
-                images[i] = (GameImage) arr.get(i);
+                if (result instanceof GameImage image)
+                    output[i] = image;
+                else {
+                    window.closeInstance();
+                    return;
+                }
+            }
 
-            content = images;
-        } else
-            window.closeInstance();
+            content = output;
+        } else if (content.length == 1) {
+            final Object result = SEInterpreter.get().run(script, content[0]);
+
+            if (result instanceof ScriptArray arr)
+                content = convertScriptRes(arr);
+            else
+                window.closeInstance();
+        }
+
+        frameIndex %= content.length;
+    }
+
+    private static GameImage[] convertScriptRes(final ScriptArray arr) {
+        final GameImage[] images = new GameImage[arr.size()];
+
+        for (int i = 0; i < images.length; i++)
+            images[i] = (GameImage) arr.get(i);
+
+        return images;
     }
 
     private boolean checkIfProjectHasBeenClosed() {
