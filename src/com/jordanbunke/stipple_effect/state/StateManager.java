@@ -130,7 +130,7 @@ public class StateManager {
         final SEContext c = StippleEffect.get().getContext();
 
         if (edited)
-            c.projectInfo.markAsEdited();
+            c.getSaveConfig().markAsEdited();
 
         if (redrawSelectionOverlay)
             c.redrawSelectionOverlay();
@@ -155,7 +155,7 @@ public class StateManager {
 
     private void markAsEditedIfEdited(final ProjectState state) {
         if (state.getOperation().constitutesEdit())
-            StippleEffect.get().getContext().projectInfo.markAsEdited();
+            StippleEffect.get().getContext().getSaveConfig().markAsEdited();
     }
 
     private void redrawSelectionOverlayIfTriggered(final ProjectState state) {
@@ -181,7 +181,7 @@ public class StateManager {
     public void setState(final int index, final SEContext c) {
         this.index = index;
 
-        c.projectInfo.markAsEdited();
+        c.getSaveConfig().markAsEdited();
         c.redrawSelectionOverlay();
         c.redrawCanvasAuxiliaries();
 

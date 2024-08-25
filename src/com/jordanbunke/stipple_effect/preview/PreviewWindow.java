@@ -325,7 +325,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                         frameIndex, frameCount);
         }
 
-        if (context.projectInfo.hasChangesSincePreview())
+        if (context.getSaveConfig().hasChangesSincePreview())
             updateContent();
 
         frameCount = content.length;
@@ -333,7 +333,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
     }
 
     private void updateContent() {
-        context.projectInfo.logPreview();
+        context.getSaveConfig().logPreview();
 
         content = IntStream.range(0, context.getState().getFrameCount())
                 .mapToObj(i -> context.getState()
@@ -442,7 +442,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                 height = yBase + Math.min(zoomH, Constants.MAX_CANVAS_H) + extraW;
 
         final GameWindow window = new GameWindow("Preview: " +
-                context.projectInfo.getFormattedName(false, false),
+                context.getSaveConfig().getFormattedName(false, false),
                 width, height, GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
                 false, false, false);
         window.hideCursor();

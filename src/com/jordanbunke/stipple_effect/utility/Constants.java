@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.project.ZoomLevel;
 
 import java.nio.file.Path;
@@ -23,7 +23,7 @@ public class Constants {
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
             "jpg",
-            ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix()
+            SaveConfig.SaveType.PNG_STITCHED.getFileSuffix()
     };
 
     public static final Coord2D NO_VALID_TARGET = new Coord2D(Integer.MIN_VALUE, Integer.MIN_VALUE);

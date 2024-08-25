@@ -23,10 +23,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BinaryOperator;
 
-public class ProjectInfo {
+public final class SaveConfig {
     private static final int INVALID_BOUND = -1;
-
-    private final SEContext context;
 
     private Path folder;
     private String name, indexPrefix, indexSuffix;
@@ -49,10 +47,10 @@ public class ProjectInfo {
             };
         }
 
-        public String getButtonText(final ProjectInfo projectInfo) {
+        public String getButtonText(final SEContext context) {
             return switch (this) {
                 case PNG_STITCHED -> "Single PNG" +
-                        (projectInfo.isAnimation()
+                        (isAnimation(context)
                                 ? " (spritesheet)" : "");
                 case PNG_SEPARATE -> "Separate PNGs per frame";
                 case GIF -> "Animated GIF";
@@ -63,25 +61,14 @@ public class ProjectInfo {
         }
     }
 
-    public ProjectInfo(final SEContext context, final Path filepath) {
-        this.context = context;
-
-        if (filepath == null) {
-            folder = null;
-            name = "";
-        } else {
-            folder = filepath.getParent();
-            final String filename = filepath.getFileName().toString();
-
-            name = filename.contains(".") ? filename.substring(0,
-                    filename.lastIndexOf(".")) : filename;
-        }
+    public SaveConfig(final Path folder, final String name, final SaveType saveType) {
+        this.folder = folder;
+        this.name = name;
+        this.saveType = saveType;
 
         editedSinceLastSave = false;
         editedSinceLastPreview = true;
-        saveType = filepath != null && filepath.getFileName()
-                .toString().endsWith(SaveType.NATIVE.getFileSuffix())
-                ? SaveType.NATIVE : SaveType.PNG_STITCHED;
+
         framesPerDim = 1;
         fps = Constants.DEFAULT_PLAYBACK_FPS;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
@@ -95,7 +82,29 @@ public class ProjectInfo {
         upperBound = INVALID_BOUND;
     }
 
-    public void save() {
+    public static SaveConfig fromFilepath(final Path filepath) {
+        final Path folder;
+        final String name;
+
+        if (filepath == null) {
+            folder = null;
+            name = "";
+        } else {
+            folder = filepath.getParent();
+            final String filename = filepath.getFileName().toString();
+
+            name = filename.contains(".") ? filename.substring(0,
+                    filename.lastIndexOf(".")) : filename;
+        }
+
+        final SaveType saveType = filepath != null && filepath.getFileName()
+                .toString().endsWith(SaveType.NATIVE.getFileSuffix())
+                ? SaveType.NATIVE : SaveType.PNG_STITCHED;
+
+        return new SaveConfig(folder, name, saveType);
+    }
+
+    public void save(final SEContext context) {
         if (!hasSaveAssociation()) {
             DialogAssembly.setDialogToSave(context);
             return;
@@ -110,7 +119,7 @@ public class ProjectInfo {
 
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight(),
-                framesToSave = calculateNumFrames(),
+                framesToSave = calculateNumFrames(context),
                 f0 = saveRangeOfFrames ? lowerBound : 0;
 
         setFramesPerDim(Math.min(framesToSave, framesPerDim));
@@ -184,7 +193,7 @@ public class ProjectInfo {
                 case PNG_STITCHED -> {
                     final boolean isHorizontal = StitchSplitMath.isHorizontal();
                     final int fpd = getFramesPerDim(),
-                            fpcd = calcFramesPerCompDim(),
+                            fpcd = calcFramesPerCompDim(context),
                             sw = w * (isHorizontal ? fpd : fpcd),
                             sh = h * (isHorizontal ? fpcd : fpd);
 
@@ -216,9 +225,9 @@ public class ProjectInfo {
         StippleEffect.get().rebuildProjectsMenu();
     }
 
-    private int calcFramesPerCompDim() {
+    private int calcFramesPerCompDim(final SEContext context) {
         return DialogVals.calculateFramesPerComplementaryDim(
-                calculateNumFrames(), framesPerDim);
+                calculateNumFrames(context), framesPerDim);
     }
 
     public void markAsEdited() {
@@ -242,18 +251,18 @@ public class ProjectInfo {
         return buildFilepath("");
     }
 
-    public boolean isAnimation() {
+    public static boolean isAnimation(final SEContext context) {
         return context.getState().getFrameCount() > 1;
     }
 
-    public SaveType[] getSaveOptions() {
-        if (isAnimation())
+    public static SaveType[] getSaveOptions(final SEContext context) {
+        if (isAnimation(context))
             return SaveType.values();
 
         return new SaveType[] { SaveType.NATIVE, SaveType.PNG_STITCHED };
     }
 
-    public int calculateNumFrames() {
+    public int calculateNumFrames(final SEContext context) {
         if (!saveRangeOfFrames)
             return context.getState().getFrameCount();
 
@@ -344,15 +353,17 @@ public class ProjectInfo {
         this.saveRangeOfFrames = saveRangeOfFrames;
     }
 
-    public void setLowerBound(final int lowerBound) {
-        this.lowerBound = clampFrameBounds(lowerBound);
+    public void setLowerBound(final int lowerBound, final SEContext context) {
+        this.lowerBound = clampFrameBounds(lowerBound, context);
     }
 
-    public void setUpperBound(final int upperBound) {
-        this.upperBound = clampFrameBounds(upperBound);
+    public void setUpperBound(final int upperBound, final SEContext context) {
+        this.upperBound = clampFrameBounds(upperBound, context);
     }
 
-    private int clampFrameBounds(final int candidate) {
+    private static int clampFrameBounds(
+            final int candidate, final SEContext context
+    ) {
         return MathPlus.bounded(0, candidate, context.getState().getFrameCount() - 1);
     }
 

@@ -26,8 +26,8 @@ public enum SEAction {
     DUMMY(ResourceCodes.NONE, c -> {}, null),
 
     // miscellaneous
-    SAVE(ResourceCodes.SAVE, c -> c.projectInfo.hasSaveAssociation(),
-            c -> c.projectInfo.save(), new KeyShortcut(true, false, S)),
+    SAVE(ResourceCodes.SAVE, c -> c.getSaveConfig().hasSaveAssociation(),
+            c -> c.getSaveConfig().save(c), new KeyShortcut(true, false, S)),
     OPEN_FILE(ResourceCodes.OPEN_FILE, fromSE(StippleEffect::openProject),
             new KeyShortcut(true, false, O)),
     PREVIEW(ResourceCodes.PREVIEW, null, PreviewWindow::set,

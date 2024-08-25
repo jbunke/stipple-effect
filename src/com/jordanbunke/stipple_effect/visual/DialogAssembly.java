@@ -25,7 +25,7 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
@@ -66,15 +66,14 @@ public class DialogAssembly {
     private static final int LINE_ABOVE = -2, AFTER_COMMON_COLOR_ACTION_ROW = 4;
 
     public static void setDialogToSave(final SEContext c) {
+        final SaveConfig sc = c.getSaveConfig();
+
         // preprocessing logic
         // ensure frame bounds validity
-        c.projectInfo.setLowerBound(
-                c.projectInfo.isSaveRangeOfFrames()
-                        ? c.projectInfo.getLowerBound() : 0);
-        c.projectInfo.setUpperBound(
-                c.projectInfo.isSaveRangeOfFrames()
-                        ? c.projectInfo.getUpperBound()
-                        : c.getState().getFrameCount() - 1);
+        sc.setLowerBound(sc.isSaveRangeOfFrames()
+                ? sc.getLowerBound() : 0, c);
+        sc.setUpperBound(sc.isSaveRangeOfFrames()
+                ? sc.getUpperBound() : c.getState().getFrameCount() - 1, c);
 
         final MenuBuilder mb = new MenuBuilder();
 
@@ -107,33 +106,33 @@ public class DialogAssembly {
 
         // folder selection button
         final DynamicTextButton folderButton = makeFolderSelectionButton(
-                folderLabel, c.projectInfo::getFolder, c.projectInfo::setFolder);
+                folderLabel, sc::getFolder, sc::setFolder);
         mb.add(folderButton);
 
         // name text box
         final Textbox nameTextbox = makeDialogNameTextBox(nameLabel,
-                c.projectInfo.getName(), c.projectInfo::setName);
+                sc.getName(), sc::setName);
         mb.add(nameTextbox);
 
         // save as type dropdown
-        final ProjectInfo.SaveType[] saveOptions = c.projectInfo.getSaveOptions();
+        final SaveConfig.SaveType[] saveOptions = SaveConfig.getSaveOptions(c);
         final Dropdown saveAsTypeDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(saveAsTypeLabel),
                 DIALOG_CONTENT_BIG_W_ALLOWANCE,
                 Arrays.stream(saveOptions)
-                        .map(st -> st.getButtonText(c.projectInfo))
+                        .map(st -> st.getButtonText(c))
                         .toArray(String[]::new),
                 Arrays.stream(saveOptions)
                         .map(type -> (Runnable)
-                                () -> c.projectInfo.setSaveType(type))
+                                () -> sc.setSaveType(type))
                         .toArray(Runnable[]::new), () -> {
-                    final ProjectInfo.SaveType saveType = c.projectInfo.getSaveType();
+                    final SaveConfig.SaveType saveType = sc.getSaveType();
 
                     for (int i = 0; i < saveOptions.length; i++)
                         if (saveType == saveOptions[i])
                             return i;
 
-                    c.projectInfo.setSaveType(saveOptions[0]);
+                    sc.setSaveType(saveOptions[0]);
                     return 0;
                 });
         mb.add(saveAsTypeDropdown);
@@ -145,63 +144,61 @@ public class DialogAssembly {
                                 DIALOG_CONTENT_COMP_OFFSET_Y,
                         scaleUpLabel.getY(), 1,
                         Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
-                        c.projectInfo::setScaleUp, c.projectInfo::getScaleUp,
+                        sc::setScaleUp, sc::getScaleUp,
                         i -> i, i -> i, i -> i + "x", "XXx");
         final GatewayMenuElement scaleUpGateway = new GatewayMenuElement(
                 new MenuElementGrouping(scaleUpLabel,
                         scaleUp.decButton, scaleUp.incButton,
                         scaleUp.slider, scaleUp.value),
-                () -> !c.projectInfo.getSaveType()
-                        .equals(ProjectInfo.SaveType.NATIVE));
+                () -> !sc.getSaveType().equals(SaveConfig.SaveType.NATIVE));
         mb.add(scaleUpGateway);
 
         // frame bounds: (only save from frame A to B)
         final Supplier<Boolean> frameBoundsCondition =
-                () -> c.projectInfo.isAnimation() &&
-                        !c.projectInfo.getSaveType()
-                                .equals(ProjectInfo.SaveType.NATIVE);
+                () -> SaveConfig.isAnimation(c) &&
+                        !sc.getSaveType().equals(SaveConfig.SaveType.NATIVE);
         final Checkbox frameBoundsCheckbox = new Checkbox(
                 contentPositionAfterLabel(frameBoundsLabel),
                 new ConcreteProperty<>(
-                        c.projectInfo::isSaveRangeOfFrames,
-                        c.projectInfo::setSaveRangeOfFrames));
+                        sc::isSaveRangeOfFrames,
+                        sc::setSaveRangeOfFrames));
         final String FRAME_NUM_PREFIX = "Frm. ";
         final DynamicTextbox lowerBoundTextbox =
                 makeDialogNumericalDynamicTextbox(lowerBoundsLabel,
                         Layout::contentPositionAfterLabel,
-                        FRAME_NUM_PREFIX, c.projectInfo.getLowerBound() + 1,
+                        FRAME_NUM_PREFIX, sc.getLowerBound() + 1,
                         "", tbv -> {
                     final int boundValue = tbv - 1;
 
                     final boolean inBounds = boundValue >= 0 &&
                             boundValue < c.getState().getFrameCount();
                     final boolean lowerThanUpper = boundValue <=
-                            c.projectInfo.getUpperBound();
+                            sc.getUpperBound();
 
                     return inBounds && lowerThanUpper;
-                    }, tbv -> c.projectInfo.setLowerBound(tbv - 1),
-                        () -> c.projectInfo.getLowerBound() + 1, 3),
+                    }, tbv -> sc.setLowerBound(tbv - 1, c),
+                        () -> sc.getLowerBound() + 1, 3),
                 upperBoundTextbox = makeDialogNumericalDynamicTextbox(
                         upperBoundsLabel,
                         Layout::contentPositionAfterLabel,
-                        FRAME_NUM_PREFIX, c.projectInfo.getUpperBound() + 1,
+                        FRAME_NUM_PREFIX, sc.getUpperBound() + 1,
                         "", tbv -> {
                             final int boundValue = tbv - 1;
 
                             final boolean inBounds = boundValue >= 0 &&
                                     boundValue < c.getState().getFrameCount();
                             final boolean higherThanLower = boundValue >=
-                                    c.projectInfo.getLowerBound();
+                                    sc.getLowerBound();
 
                             return inBounds && higherThanLower;
-                        }, tbv -> c.projectInfo.setUpperBound(tbv - 1),
-                        () -> c.projectInfo.getUpperBound() + 1, 3);
+                        }, tbv -> sc.setUpperBound(tbv - 1, c),
+                        () -> sc.getUpperBound() + 1, 3);
         final GatewayMenuElement nestedBoundsGateway = new GatewayMenuElement(
                 new MenuElementGrouping(
                         lowerBoundsLabel, lowerBoundTextbox,
                         upperBoundsLabel, upperBoundTextbox),
                 () -> frameBoundsCondition.get() &&
-                        c.projectInfo.isSaveRangeOfFrames()),
+                        sc.isSaveRangeOfFrames()),
                 frameBoundsGateway = new GatewayMenuElement(
                         new MenuElementGrouping(
                                 frameBoundsLabel, frameBoundsCheckbox,
@@ -221,8 +218,7 @@ public class DialogAssembly {
                 IncrementalRangeElements.makeForInt(fpsLabel,
                         fpsLabel.getY() + DIALOG_CONTENT_COMP_OFFSET_Y,
                         fpsLabel.getY(), 1, Constants.MIN_PLAYBACK_FPS,
-                        Constants.MAX_PLAYBACK_FPS,
-                        c.projectInfo::setFps, c.projectInfo::getFps,
+                        Constants.MAX_PLAYBACK_FPS, sc::setFps, sc::getFps,
                         i -> i, sv -> sv, i -> i + " FPS", "XXX FPS");
 
         // GIF and MP4 contents
@@ -233,20 +229,16 @@ public class DialogAssembly {
         // Extra file naming options IFF saveType is PNG_SEPARATE
         final DynamicTextbox indexPrefixTextbox =
                 makeDialogAffixDynamicTextbox(indexPrefixLabel,
-                        c.projectInfo::setIndexPrefix,
-                        c.projectInfo::getIndexPrefix),
+                        sc::setIndexPrefix, sc::getIndexPrefix),
                 indexSuffixTextbox =
                         makeDialogAffixDynamicTextbox(indexSuffixLabel,
-                                c.projectInfo::setIndexSuffix,
-                                c.projectInfo::getIndexSuffix);
+                                sc::setIndexSuffix, sc::getIndexSuffix);
         final Textbox countFromTextbox = makeDialogCustomTextBox(
                 countFromLabel, DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                Layout::contentPositionAfterLabel,
-                c.projectInfo::getIndexPrefix,
-                String.valueOf(c.projectInfo.getCountFrom()),
-                c.projectInfo::getIndexSuffix,
+                Layout::contentPositionAfterLabel, sc::getIndexPrefix,
+                String.valueOf(sc.getCountFrom()), sc::getIndexSuffix,
                 Textbox.getIntTextValidator(i -> true),
-                s -> c.projectInfo.setCountFrom(Integer.parseInt(s)), 4);
+                s -> sc.setCountFrom(Integer.parseInt(s)), 4);
 
         final MenuElementGrouping pngSeparateContents = new MenuElementGrouping(
                 indexPrefixLabel, indexPrefixTextbox,
@@ -255,7 +247,7 @@ public class DialogAssembly {
 
         // save type decision maker
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
-                switch (c.projectInfo.getSaveType()) {
+                switch (sc.getSaveType()) {
                     case PNG_STITCHED -> c.getState().getFrameCount() > 1
                             ? pngStitchedContents : new PlaceholderMenuElement();
                     case PNG_SEPARATE -> pngSeparateContents;
@@ -266,18 +258,17 @@ public class DialogAssembly {
 
         // dynamic label preview
         final DynamicLabel preview = makeDialogLeftDynamicLabelAtBottom(() -> {
-            if (c.projectInfo.getFolder() == null ||
-                    c.projectInfo.getName().equals(""))
+            if (!sc.hasSaveAssociation())
                 return "[ Select a folder and provide a name ]";
 
             final int PRINT_LETTERS = 64, ENDS = (PRINT_LETTERS / 2) - 1;
 
-            final boolean multipleFiles = c.projectInfo
-                    .getSaveType().equals(ProjectInfo.SaveType.PNG_SEPARATE);
+            final boolean multipleFiles = sc.getSaveType()
+                    .equals(SaveConfig.SaveType.PNG_SEPARATE);
 
             final Path filepath = multipleFiles
-                    ? c.projectInfo.buildFilepath(c.projectInfo.getCountFrom())
-                    : c.projectInfo.buildFilepath();
+                    ? sc.buildFilepath(sc.getCountFrom())
+                    : sc.buildFilepath();
 
             final String composed = filepath +
                             (multipleFiles ? " + others" : "");
@@ -294,8 +285,7 @@ public class DialogAssembly {
         final MenuElementGrouping contents = new MenuElementGrouping(
                 mb.build().getMenuElements());
         setDialog(assembleDialog("Save project...", contents,
-                c.projectInfo::hasSaveAssociation,
-                "Save", c.projectInfo::save, true));
+                sc::hasSaveAssociation, "Save", () -> sc.save(c), true));
     }
 
     public static void setDialogToResize(final SEContext c) {
@@ -871,7 +861,7 @@ public class DialogAssembly {
         mb.add(selectedLabel);
 
         setDialog(assembleDialog("History of \"" +
-                        c.projectInfo.getFormattedName(false, false) + "\"",
+                        c.getSaveConfig().getFormattedName(false, false) + "\"",
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 precondition, "Revert...",
                 () -> setDialogToPreviewAction(
@@ -1058,7 +1048,7 @@ public class DialogAssembly {
 
     public static void setDialogToCloseProjectAYS(final int index) {
         setDialogToAYS("Close the project \"" + StippleEffect.get()
-                        .getContexts().get(index).projectInfo
+                        .getContexts().get(index).getSaveConfig()
                         .getFormattedName(false, true) + "\"?",
                 "All unsaved changes will be lost...",
                 () -> StippleEffect.get().removeContext(index));
@@ -2008,10 +1998,10 @@ public class DialogAssembly {
             final MenuBuilder mb, final SEContext c,
             final TextLabel referenceLabel
     ) {
-        makeStitchElements(mb,
-                c.projectInfo::setFramesPerDim,
-                c.projectInfo::getFramesPerDim,
-                c.projectInfo::calculateNumFrames, referenceLabel);
+        final SaveConfig sc = c.getSaveConfig();
+
+        makeStitchElements(mb, sc::setFramesPerDim, sc::getFramesPerDim,
+                () -> sc.calculateNumFrames(c), referenceLabel);
     }
 
     private static void makeStitchElements(

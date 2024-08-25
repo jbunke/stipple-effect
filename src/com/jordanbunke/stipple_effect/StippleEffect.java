@@ -25,7 +25,7 @@ import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -733,12 +733,12 @@ public class StippleEffect implements ProgramContext {
         FileIO.setDialogToFilesOnly();
         final Optional<File[]> opened = FileIO.openFilesFromSystem(
                 new String[] {
-                        PROGRAM_NAME + " projects (." + ProjectInfo.SaveType
+                        PROGRAM_NAME + " projects (." + SaveConfig.SaveType
                                 .NATIVE.getFileSuffix() + ")",
                         "Accepted image types"
                 },
                 new String[][] {
-                        new String[] { ProjectInfo.SaveType.NATIVE.getFileSuffix() },
+                        new String[] { SaveConfig.SaveType.NATIVE.getFileSuffix() },
                         Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES
                 });
         window.getEventLogger().unpressAllKeys();
@@ -834,7 +834,7 @@ public class StippleEffect implements ProgramContext {
     private void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix())) {
+        if (fileName.endsWith(SaveConfig.SaveType.NATIVE.getFileSuffix())) {
             final String contents = FileIO.readFile(filepath);
             openNativeProject(contents, filepath);
 
@@ -922,9 +922,9 @@ public class StippleEffect implements ProgramContext {
 
     public void addContext(final SEContext context, final boolean setActive) {
         // close unmodified untitled project
-        if (contexts.size() == 1 && !contexts.get(0).projectInfo
+        if (contexts.size() == 1 && !contexts.get(0).getSaveConfig()
                 .hasUnsavedChanges() &&
-                !contexts.get(0).projectInfo.hasSaveAssociation()) {
+                !contexts.get(0).getSaveConfig().hasSaveAssociation()) {
             contexts.get(0).releasePixelGrid();
             contexts.remove(0);
         }
