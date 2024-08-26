@@ -16,11 +16,21 @@ API Changes:
   > New types
     > `script`
     > `save_config`
-  > Constants for scope
-    > `$SE.PROJECT` = `0`
-    > `$SE.LAYER` = `1`
-    > `$SE.FRAME` = `2`
-    > `$SE.CEL` = `3`
+  > Constants
+    > Scope constants that evaluate to `int`
+      > `$SE.PROJECT` = `0`
+      > `$SE.LAYER` = `1`
+      > `$SE.FRAME` = `2`
+      > `$SE.CEL` = `3`
+    > Save type constants that evaluate to `int`
+      > `$SE.NATIVE` = `0`
+      > `$SE.PNG_SHEET` = `1`
+      > `$SE.PNG_SEPARATE` = `2`
+      > `$SE.GIF` = `3`
+      > `$SE.MP4` = `4`
+    > Dimension constants that evaluate to `bool`
+      > `$SE.HORZ` = `true`
+      > `$SE.VERT` = `false`
   > Added `layer` functions; for some `layer L`...
     > `L.get_name() -> string`
     > `L.set_name(string);`

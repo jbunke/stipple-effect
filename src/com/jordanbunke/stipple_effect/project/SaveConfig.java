@@ -36,11 +36,11 @@ public final class SaveConfig {
     private int framesPerDim, fps, scaleUp, countFrom, lowerBound, upperBound;
 
     public enum SaveType {
-        NATIVE, PNG_STITCHED, PNG_SEPARATE, GIF, MP4;
+        NATIVE, PNG_SHEET, PNG_SEPARATE, GIF, MP4;
 
         public String getFileSuffix() {
             return switch (this) {
-                case PNG_SEPARATE, PNG_STITCHED -> "png";
+                case PNG_SEPARATE, PNG_SHEET -> "png";
                 case GIF -> "gif";
                 case MP4 -> "mp4";
                 case NATIVE -> Constants.NATIVE_FILE_SUFFIX;
@@ -49,9 +49,8 @@ public final class SaveConfig {
 
         public String getButtonText(final SEContext context) {
             return switch (this) {
-                case PNG_STITCHED -> "Single PNG" +
-                        (isAnimation(context)
-                                ? " (spritesheet)" : "");
+                case PNG_SHEET -> "Single PNG" +
+                        (context.isAnimation() ? " (spritesheet)" : "");
                 case PNG_SEPARATE -> "Separate PNGs per frame";
                 case GIF -> "Animated GIF";
                 case MP4 -> "MP4 Video";
@@ -99,7 +98,7 @@ public final class SaveConfig {
 
         final SaveType saveType = filepath != null && filepath.getFileName()
                 .toString().endsWith(SaveType.NATIVE.getFileSuffix())
-                ? SaveType.NATIVE : SaveType.PNG_STITCHED;
+                ? SaveType.NATIVE : SaveType.PNG_SHEET;
 
         return new SaveConfig(folder, name, saveType);
     }
@@ -136,7 +135,7 @@ public final class SaveConfig {
         } else {
             final int frameCount = context.getState().getFrameCount();
 
-            if (f0 + framesToSave > frameCount) {
+            if (f0 + framesToSave > frameCount || f0 < 0 || framesToSave <= 0) {
                 StatusUpdates.saveFailed();
                 return;
             }
@@ -190,7 +189,7 @@ public final class SaveConfig {
 
                     StatusUpdates.savedAllFrames(folder);
                 }
-                case PNG_STITCHED -> {
+                case PNG_SHEET -> {
                     final boolean isHorizontal = StitchSplitMath.isHorizontal();
                     final int fpd = getFramesPerDim(),
                             fpcd = calcFramesPerCompDim(context),
@@ -251,15 +250,11 @@ public final class SaveConfig {
         return buildFilepath("");
     }
 
-    public static boolean isAnimation(final SEContext context) {
-        return context.getState().getFrameCount() > 1;
-    }
-
     public static SaveType[] getSaveOptions(final SEContext context) {
-        if (isAnimation(context))
+        if (context.isAnimation())
             return SaveType.values();
 
-        return new SaveType[] { SaveType.NATIVE, SaveType.PNG_STITCHED };
+        return new SaveType[] { SaveType.NATIVE, SaveType.PNG_SHEET};
     }
 
     public int calculateNumFrames(final SEContext context) {
@@ -357,8 +352,16 @@ public final class SaveConfig {
         this.lowerBound = clampFrameBounds(lowerBound, context);
     }
 
+    public void setLowerBound(final int lowerBound) {
+        this.lowerBound = lowerBound;
+    }
+
     public void setUpperBound(final int upperBound, final SEContext context) {
         this.upperBound = clampFrameBounds(upperBound, context);
+    }
+
+    public void setUpperBound(final int upperBound) {
+        this.upperBound = upperBound;
     }
 
     private static int clampFrameBounds(

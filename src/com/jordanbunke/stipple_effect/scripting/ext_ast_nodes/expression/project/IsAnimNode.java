@@ -18,7 +18,7 @@ public final class IsAnimNode extends ProjectExpressionNode {
 
     @Override
     public Boolean evaluate(final SymbolTable symbolTable) {
-        return getProject(symbolTable).getState().getFrameCount() > 1;
+        return getProject(symbolTable).isAnimation();
     }
 
     @Override

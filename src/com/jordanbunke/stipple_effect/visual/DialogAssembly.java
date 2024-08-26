@@ -155,7 +155,7 @@ public class DialogAssembly {
 
         // frame bounds: (only save from frame A to B)
         final Supplier<Boolean> frameBoundsCondition =
-                () -> SaveConfig.isAnimation(c) &&
+                () -> c.isAnimation() &&
                         !sc.getSaveType().equals(SaveConfig.SaveType.NATIVE);
         final Checkbox frameBoundsCheckbox = new Checkbox(
                 contentPositionAfterLabel(frameBoundsLabel),
@@ -248,7 +248,7 @@ public class DialogAssembly {
         // save type decision maker
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
                 switch (sc.getSaveType()) {
-                    case PNG_STITCHED -> c.getState().getFrameCount() > 1
+                    case PNG_SHEET -> c.isAnimation()
                             ? pngStitchedContents : new PlaceholderMenuElement();
                     case PNG_SEPARATE -> pngSeparateContents;
                     case GIF, MP4 -> gifContents;

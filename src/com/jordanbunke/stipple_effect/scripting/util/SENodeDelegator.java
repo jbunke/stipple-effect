@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.statement.IllegalStatement
 import com.jordanbunke.delta_time.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.ColorPropertyGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
@@ -18,12 +19,12 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.S
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.save_config.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
-
-import java.util.Arrays;
 
 public final class SENodeDelegator {
     public static StatementNode globalFunctionStatement(
@@ -85,17 +86,21 @@ public final class SENodeDelegator {
     public static ExpressionNode globalProperty(
             final TextPosition position, final String propertyID
     ) {
-        final boolean matchesScope = Arrays.stream(Scope.values())
-                .map(s -> s.name().equals(propertyID))
-                .reduce(false, Boolean::logicalOr);
-
-        if (matchesScope)
-            return new ScopeConstantExpressionNode(position,
+        if (EnumUtils.matches(propertyID, Scope.class))
+            return new ScopeConstantNode(position,
                     Scope.valueOf(propertyID));
-        // extend here
+        else if (EnumUtils.matches(propertyID, SaveConfig.SaveType.class))
+            return new SaveTypeConstantNode(position,
+                    SaveConfig.SaveType.valueOf(propertyID));
         else
-            return new IllegalExpressionNode(position,
-                    "No property \"" + formatGlobal(propertyID) + "\" exists");
+            return switch (propertyID) {
+                case DimConstantNode.HORZ -> new DimConstantNode(position, true);
+                case DimConstantNode.VERT -> new DimConstantNode(position, false);
+                // extend here
+                default -> new IllegalExpressionNode(position,
+                        "No property \"" + formatGlobal(propertyID) +
+                                "\" exists");
+            };
     }
 
     private static String formatGlobal(final String subidentifier) {
@@ -274,6 +279,26 @@ public final class SENodeDelegator {
                     PaletteColorOpNode.moveRight(position, scope, args);
             case SetFrameDurationNode.NAME ->
                     new SetFrameDurationNode(position, scope, args);
+            case SetBoundNode.LOWER ->
+                    SetBoundNode.lower(position, scope, args);
+            case SetBoundNode.UPPER ->
+                    SetBoundNode.upper(position, scope, args);
+            case UnboundedNode.NAME ->
+                    new UnboundedNode(position, scope, args);
+            case SetSaveTypeNode.NAME ->
+                    new SetSaveTypeNode(position, scope, args);
+            case SaveConfigStringSetterNode.NAME ->
+                    SaveConfigStringSetterNode.name(position, scope, args);
+            case SaveConfigStringSetterNode.PREFIX ->
+                    SaveConfigStringSetterNode.name(position, scope, args);
+            case SaveConfigStringSetterNode.SUFFIX ->
+                    SaveConfigStringSetterNode.name(position, scope, args);
+            case SaveConfigIntSetterNode.SCALE_UP ->
+                    SaveConfigIntSetterNode.scaleUp(position, scope, args);
+            case SaveConfigIntSetterNode.FPD ->
+                    SaveConfigIntSetterNode.fpd(position, scope, args);
+            case SaveConfigIntSetterNode.COUNT_FROM ->
+                    SaveConfigIntSetterNode.countFrom(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +

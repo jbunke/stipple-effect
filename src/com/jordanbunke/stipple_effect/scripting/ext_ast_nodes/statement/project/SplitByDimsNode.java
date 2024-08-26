@@ -9,8 +9,6 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.Arrays;
-
 public final class SplitByDimsNode extends SplitNode {
     public static final String NAME = "split";
 
@@ -23,9 +21,7 @@ public final class SplitByDimsNode extends SplitNode {
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(arguments.args())
-                .map(a -> a.evaluate(symbolTable))
-                .toArray(Object[]::new);
+        final Object[] dims = arguments.getValues(symbolTable);
         final SEContext project = getProject(symbolTable);
         final int cols = (int) dims[0], rows = (int) dims[1];
         final boolean horizontal = (boolean) dims[2],

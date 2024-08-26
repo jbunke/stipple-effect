@@ -10,8 +10,6 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.Arrays;
-
 public final class StitchNode extends ProjectStatementNode {
     public static final String NAME = "stitch";
 
@@ -25,9 +23,7 @@ public final class StitchNode extends ProjectStatementNode {
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(arguments.args())
-                .map(a -> a.evaluate(symbolTable))
-                .toArray(Object[]::new);
+        final Object[] dims = arguments.getValues(symbolTable);
         final SEContext project = getProject(symbolTable);
         final int fpd = (int) dims[0];
         final boolean horizontal = (boolean) dims[1];

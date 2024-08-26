@@ -4,8 +4,8 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-public abstract class ConstantExpressionNode extends GlobalExpressionNode {
-    public ConstantExpressionNode(final TextPosition position) {
+public abstract class ConstantNode extends GlobalExpressionNode {
+    public ConstantNode(final TextPosition position) {
         super(position, new ExpressionNode[] {});
     }
 

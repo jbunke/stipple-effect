@@ -69,7 +69,7 @@ public final class SEInterpreter extends Interpreter {
         if (!(imgReturn || arrayReturn))
             return false;
 
-        return context.getState().getFrameCount() > 1
+        return context.isAnimation()
                 ? (imgParam ? imgReturn : arrayParam)
                 : imgParam || arrayParam;
     }

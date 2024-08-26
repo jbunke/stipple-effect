@@ -846,7 +846,7 @@ public class SEContext {
     }
 
     public void stitchOrSplit() {
-        if (getState().getFrameCount() > 1)
+        if (isAnimation())
             DialogAssembly.setDialogToStitchFramesTogether();
         else
             DialogAssembly.setDialogToSplitCanvasIntoFrames();
@@ -2203,6 +2203,10 @@ public class SEContext {
 
     public boolean isInWorkspaceBounds() {
         return inWorkspaceBounds;
+    }
+
+    public boolean isAnimation() {
+        return getState().getFrameCount() > 1;
     }
 
     public Coord2D getTargetPixel() {

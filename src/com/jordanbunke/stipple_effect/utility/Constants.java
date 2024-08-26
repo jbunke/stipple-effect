@@ -23,7 +23,7 @@ public class Constants {
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
             "jpg",
-            SaveConfig.SaveType.PNG_STITCHED.getFileSuffix()
+            SaveConfig.SaveType.PNG_SHEET.getFileSuffix()
     };
 
     public static final Coord2D NO_VALID_TARGET = new Coord2D(Integer.MIN_VALUE, Integer.MIN_VALUE);

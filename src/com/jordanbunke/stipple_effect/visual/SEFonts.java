@@ -71,7 +71,7 @@ public class SEFonts {
             final Runnable failed,
             final Consumer<GameImage> passed
     ) {
-        final String suffix = SaveConfig.SaveType.PNG_STITCHED.getFileSuffix();
+        final String suffix = SaveConfig.SaveType.PNG_SHEET.getFileSuffix();
 
         FileIO.setDialogToFilesOnly();
         final Optional<File> opened = FileIO.openFileFromSystem(
