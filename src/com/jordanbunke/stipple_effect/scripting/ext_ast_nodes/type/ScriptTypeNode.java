@@ -3,7 +3,7 @@ package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 
-public class ScriptTypeNode extends SEExtTypeNode {
+public final class ScriptTypeNode extends SEExtTypeNode {
     public static final String NAME = "script";
     private static final ScriptTypeNode INSTANCE;
 

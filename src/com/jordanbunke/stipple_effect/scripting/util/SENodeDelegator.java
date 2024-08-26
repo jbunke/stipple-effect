@@ -289,6 +289,7 @@ public final class SENodeDelegator {
             case ProjectTypeNode.NAME -> new ProjectTypeNode(position);
             case PaletteTypeNode.NAME -> new PaletteTypeNode(position);
             case ScriptTypeNode.NAME -> new ScriptTypeNode(position);
+            case SaveConfigTypeNode.NAME -> new SaveConfigTypeNode(position);
             default -> null;
         };
 

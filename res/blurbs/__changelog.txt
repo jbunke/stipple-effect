@@ -13,7 +13,9 @@ Changed:
 
 API Changes:
   Added:
-  > `script` type
+  > New types
+    > `script`
+    > `save_config`
   > Constants for scope
     > `$SE.PROJECT` = `0`
     > `$SE.LAYER` = `1`
