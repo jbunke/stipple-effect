@@ -12,6 +12,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.script.ScriptRunExpressionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.AssignColorNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewPaletteNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewProjectStatementNode;
@@ -20,6 +21,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.save_config.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.script.ScriptRunStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
@@ -187,6 +189,8 @@ public final class SENodeDelegator {
                     GetDimNode.newHeight(position, scope, args);
             case GetSaveConfigNode.NAME ->
                     new GetSaveConfigNode(position, scope, args);
+            case ScriptRunExpressionNode.NAME ->
+                    new ScriptRunExpressionNode(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -307,6 +311,8 @@ public final class SENodeDelegator {
                     SaveConfigIntSetterNode.fps(position, scope, args);
             case SetDimNode.NAME -> new SetDimNode(position, scope, args);
             case SetFolderNode.NAME -> new SetFolderNode(position, scope, args);
+            case ScriptRunStatementNode.NAME ->
+                    new ScriptRunStatementNode(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
