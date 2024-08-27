@@ -77,6 +77,7 @@ public final class SENodeDelegator {
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
             case ReadScriptNode.NAME -> new ReadScriptNode(position, args);
+            case NewSaveConfigNode.NAME -> new NewSaveConfigNode(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "Undefined function \"" + formatGlobal(fID) + "\"");
@@ -180,6 +181,8 @@ public final class SENodeDelegator {
                     GetDimNode.newWidth(position, scope, args);
             case GetDimNode.HEIGHT ->
                     GetDimNode.newHeight(position, scope, args);
+            case GetSaveConfigNode.NAME ->
+                    new GetSaveConfigNode(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -210,14 +213,11 @@ public final class SENodeDelegator {
                     new DisableLayerNode(position, scope, args);
             case EnableLayerNode.NAME ->
                     new EnableLayerNode(position, scope, args);
-            case ResizeNode.NAME ->
-                    new ResizeNode(position, scope, args);
-            case SaveNode.NAME ->
-                    new SaveNode(position, scope, args);
-            case PadNode.NAME ->
-                    new PadNode(position, scope, args);
-            case StitchNode.NAME ->
-                    new StitchNode(position, scope, args);
+            case ResizeNode.NAME -> new ResizeNode(position, scope, args);
+            case SaveNode.NAME -> new SaveNode(position, scope, args);
+            case SaveAsNode.NAME -> new SaveAsNode(position, scope, args);
+            case PadNode.NAME -> new PadNode(position, scope, args);
+            case StitchNode.NAME -> new StitchNode(position, scope, args);
             case SplitByPixelsNode.NAME ->
                     new SplitByPixelsNode(position, scope, args);
             case SplitByDimsNode.NAME ->
@@ -299,6 +299,8 @@ public final class SENodeDelegator {
                     SaveConfigIntSetterNode.fpd(position, scope, args);
             case SaveConfigIntSetterNode.COUNT_FROM ->
                     SaveConfigIntSetterNode.countFrom(position, scope, args);
+            case SetDimNode.NAME -> new SetDimNode(position, scope, args);
+            case SetFolderNode.NAME -> new SetFolderNode(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +

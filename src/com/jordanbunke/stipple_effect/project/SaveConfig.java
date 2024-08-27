@@ -15,7 +15,6 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
-import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 
@@ -34,6 +33,8 @@ public final class SaveConfig {
             saveRangeOfFrames;
 
     private int framesPerDim, fps, scaleUp, countFrom, lowerBound, upperBound;
+
+    private DialogVals.SequenceOrder sequenceOrder;
 
     public enum SaveType {
         NATIVE, PNG_SHEET, PNG_SEPARATE, GIF, MP4;
@@ -69,6 +70,7 @@ public final class SaveConfig {
         editedSinceLastPreview = true;
 
         framesPerDim = 1;
+        sequenceOrder = DialogVals.SequenceOrder.HORIZONTAL;
         fps = Constants.DEFAULT_PLAYBACK_FPS;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
 
@@ -190,7 +192,8 @@ public final class SaveConfig {
                     StatusUpdates.savedAllFrames(folder);
                 }
                 case PNG_SHEET -> {
-                    final boolean isHorizontal = StitchSplitMath.isHorizontal();
+                    final boolean isHorizontal =
+                            sequenceOrder == DialogVals.SequenceOrder.HORIZONTAL;
                     final int fpd = getFramesPerDim(),
                             fpcd = calcFramesPerCompDim(context),
                             sw = w * (isHorizontal ? fpd : fpcd),
@@ -316,6 +319,10 @@ public final class SaveConfig {
         return framesPerDim;
     }
 
+    public DialogVals.SequenceOrder getSequenceOrder() {
+        return sequenceOrder;
+    }
+
     public SaveType getSaveType() {
         return saveType;
     }
@@ -376,6 +383,10 @@ public final class SaveConfig {
 
     public void setFramesPerDim(final int framesPerDim) {
         this.framesPerDim = framesPerDim;
+    }
+
+    public void setSequenceOrder(final DialogVals.SequenceOrder sequenceOrder) {
+        this.sequenceOrder = sequenceOrder;
     }
 
     public void setSaveType(final SaveType saveType) {

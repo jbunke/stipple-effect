@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.CollectionTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.Selection;
 
@@ -29,11 +29,11 @@ public final class OutlineNode extends GlobalExpressionNode {
     public ScriptSet evaluate(final SymbolTable symbolTable) {
         final Object[] vs = arguments.getValues(symbolTable);
         final Selection selection =
-                ScriptSelectionUtils.convertSelection((ScriptSet) vs[0]);
+                ScriptUtils.convertSelection((ScriptSet) vs[0]);
         final int[] sideMask = ((ScriptArray) vs[1]).stream()
                 .mapToInt(s -> (int) s).toArray();
 
-        if (ScriptSelectionUtils.invalidSideMask(
+        if (ScriptUtils.invalidSideMask(
                 sideMask, arguments.args()[1]))
             return null;
 

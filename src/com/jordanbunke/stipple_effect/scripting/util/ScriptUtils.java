@@ -9,11 +9,22 @@ import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
-public class ScriptSelectionUtils {
+public class ScriptUtils {
+    public static Path scriptFolderToPath(final ScriptArray folder) {
+        final String first = (String) folder.get(0);
+        final String[] rest = new String[folder.size() - 1];
+
+        for (int i = 0; i < rest.length; i++)
+            rest[i] = (String) folder.get(i + 1);
+
+        return Path.of(first, rest);
+    }
+
     public static Selection convertSelection(
             final ScriptSet input, final int w, final int h
     ) {

@@ -46,12 +46,25 @@ public class Outliner {
         }
     }
 
+    public static int[] getSingleOutlineMask(final int sideLength) {
+        return new int[] {
+                sideLength, sideLength, sideLength, sideLength, 0, 0, 0, 0
+        };
+    }
+
     public static int[] getSingleOutlineMask() {
-        return new int[] { 1, 1, 1, 1, 0, 0, 0, 0 };
+        return getSingleOutlineMask(1);
+    }
+
+    public static int[] getDoubleOutlineMask(final int sideLength) {
+        return new int[] {
+                sideLength, sideLength, sideLength, sideLength,
+                sideLength, sideLength, sideLength, sideLength
+        };
     }
 
     public static int[] getDoubleOutlineMask() {
-        return new int[] { 1, 1, 1, 1, 1, 1, 1, 1 };
+        return getDoubleOutlineMask(1);
     }
 
     public static Selection outline(

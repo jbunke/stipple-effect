@@ -10,6 +10,8 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
+import static com.jordanbunke.stipple_effect.utility.DialogVals.SequenceOrder.*;
+
 public final class StitchNode extends ProjectStatementNode {
     public static final String NAME = "stitch";
 
@@ -48,9 +50,7 @@ public final class StitchNode extends ProjectStatementNode {
                         "the prospective dimensions are invalid: width = " +
                                 sw + ", height = " + sh, getPosition());
             else {
-                DialogVals.setSequenceOrder(horizontal
-                        ? DialogVals.SequenceOrder.HORIZONTAL
-                        : DialogVals.SequenceOrder.VERTICAL);
+                DialogVals.setSequenceOrder(horizontal ? HORIZONTAL : VERTICAL);
                 DialogVals.setFramesPerDim(fpd);
 
                 project.stitch();

@@ -2001,6 +2001,7 @@ public class DialogAssembly {
         final SaveConfig sc = c.getSaveConfig();
 
         makeStitchElements(mb, sc::setFramesPerDim, sc::getFramesPerDim,
+                sc::setSequenceOrder, sc::getSequenceOrder,
                 () -> sc.calculateNumFrames(c), referenceLabel);
     }
 
@@ -2009,20 +2010,25 @@ public class DialogAssembly {
             final TextLabel referenceLabel
     ) {
         makeStitchElements(mb, DialogVals::setFramesPerDim,
-                DialogVals::getFramesPerDim, fcGetter, referenceLabel);
+                DialogVals::getFramesPerDim,
+                DialogVals::setSequenceOrder, DialogVals::getSequenceOrder,
+                fcGetter, referenceLabel);
     }
 
     private static void makeStitchElements(
             final MenuBuilder mb,
             final Consumer<Integer> fpdSetter,
             final Supplier<Integer> fpdGetter,
-            final Supplier<Integer> fcGetter, final TextLabel referenceLabel
+            final Consumer<DialogVals.SequenceOrder> soSetter,
+            final Supplier<DialogVals.SequenceOrder> soGetter,
+            final Supplier<Integer> fcGetter,
+            final TextLabel referenceLabel
     ) {
         // pre-processing
         fpdSetter.accept(fcGetter.get());
 
         // sequence order
-        makeSequenceOrderElements(mb, referenceLabel);
+        makeSequenceOrderElements(mb, soGetter, soSetter, referenceLabel);
 
         // frames per [dim]
         final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
@@ -2109,7 +2115,8 @@ public class DialogAssembly {
         rowSetter.accept(initialRows);
 
         // sequence order
-        makeSequenceOrderElements(mb, referenceLabel);
+        makeSequenceOrderElements(mb, DialogVals::getSequenceOrder,
+                DialogVals::setSequenceOrder, referenceLabel);
 
         // columns
         final TextLabel columnsLabel = TextLabel.make(
@@ -2186,7 +2193,10 @@ public class DialogAssembly {
     }
 
     private static void makeSequenceOrderElements(
-            final MenuBuilder mb, final TextLabel referenceLabel
+            final MenuBuilder mb,
+            final Supplier<DialogVals.SequenceOrder> soGetter,
+            final Consumer<DialogVals.SequenceOrder> soSetter,
+            final TextLabel referenceLabel
     ) {
         final TextLabel sequenceLabel = TextLabel.make(
                 textBelowPos(referenceLabel, 1),
@@ -2196,9 +2206,9 @@ public class DialogAssembly {
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
                         .map(EnumUtils::formattedName).toArray(String[]::new),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
+                        .map(so -> (Runnable) () -> soSetter.accept(so))
                         .toArray(Runnable[]::new),
-                () -> DialogVals.getSequenceOrder().ordinal());
+                () -> soGetter.get().ordinal());
         mb.addAll(sequenceLabel, sequenceDropdown);
     }
 

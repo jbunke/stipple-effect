@@ -11,6 +11,9 @@ Changed:
   > Updated {Zo} theme colors
   > Updated layer button layout and flipbook panel sizing
 
+Fixed:
+> Bug: `$SE.single_outline()` calls a double outline instead of a single outline
+
 API Changes:
   Added:
   > New types
@@ -38,8 +41,11 @@ API Changes:
     > `P.get_width() -> int`
     > `P.get_height() -> int`
     > `P.get_layer(string) -> layer`
+    > `P.get_save_config() -> save_config`
+    > `P.save_as(save_config);`
   > Added global functions
     > `$SE.read_script(string) -> script`
+    > `$SE.new_save_config(string[], string, int) -> save_config`
 
   Changed:
   > Renamed some `layer` functions; for some `layer L`...
