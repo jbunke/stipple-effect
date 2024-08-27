@@ -50,6 +50,7 @@ API Changes:
     > `$SE.read_script(string) -> script`
     > `$SE.new_save_config(string[], string, int) -> save_config`
     > `$SE.transform(project, script, bool, bool) -> project`
+    > `$SE.transform(project, script) -> project`
     > `$SE.new_project(int, int, bool) -> project`
 
   Changed:
