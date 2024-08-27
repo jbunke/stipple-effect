@@ -53,7 +53,7 @@ API Changes:
     > `$SE.new_project(int, int, bool) -> project`
 
   Changed:
-  > Renamed some `layer` functions; for some `layer L`...
+  > Renamed `layer` functions; for some `layer L`...
     > Renamed `L.get_frame(int)` to `L.get_cel(int)`
     > Renamed `L.set_frame(int, image)` to `L.set_cel(int, image)`
     > Renamed `L.edit_frame(int, image)` to `L.edit_cel(int, image)`

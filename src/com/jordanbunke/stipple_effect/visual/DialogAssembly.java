@@ -2034,7 +2034,7 @@ public class DialogAssembly {
         final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
         final DynamicLabel framesPerDimLabel = makeDynamicLabel(
                 textBelowPos(referenceLabel, 2), () -> FPD_PREFIX +
-                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
+                        soGetter.get().dimName() + FPD_SUFFIX,
                 FPD_PREFIX + "column" + FPD_SUFFIX);
         final DynamicTextbox framesPerDimTextbox = makeDialogNumericalDynamicTextbox(
                 framesPerDimLabel,
@@ -2056,8 +2056,7 @@ public class DialogAssembly {
 
                     return FPCD_PREFIX + comp + (
                             comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
-                    ) + DialogVals.getSequenceOrder()
-                            .complement().dimName();
+                    ) + soGetter.get().complement().dimName();
                 }, FPCD_PREFIX +
                         Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
         mb.add(framesPerCompDim);
