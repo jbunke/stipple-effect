@@ -24,10 +24,29 @@ import java.util.stream.IntStream;
 public final class TransformNode extends GlobalExpressionNode {
     public static final String NAME = "transform";
 
+    private final boolean shortened;
+
     public TransformNode(
+            final TextPosition position, final ExpressionNode[] args,
+            final boolean shortened, final TypeNode... expectedTypes
+    ) {
+        super(position, args, expectedTypes);
+
+        this.shortened = shortened;
+    }
+
+    public static TransformNode shortened(
             final TextPosition position, final ExpressionNode[] args
     ) {
-        super(position, args, ProjectTypeNode.get(), ScriptTypeNode.get(),
+        return new TransformNode(position, args, true,
+                ProjectTypeNode.get(), ScriptTypeNode.get());
+    }
+
+    public static TransformNode reg(
+            final TextPosition position, final ExpressionNode[] args
+    ) {
+        return new TransformNode(position, args, false,
+                ProjectTypeNode.get(), ScriptTypeNode.get(),
                 TypeNode.getBool(), TypeNode.getBool());
     }
 
@@ -37,8 +56,8 @@ public final class TransformNode extends GlobalExpressionNode {
 
         final SEContext c = (SEContext) vs[0];
         final HeadFuncNode script = (HeadFuncNode) vs[1];
-        final boolean openInSE = (boolean) vs[2],
-                runPerLayer = (boolean) vs[3];
+        final boolean openInSE = shortened || (boolean) vs[2],
+                runPerLayer = !shortened && (boolean) vs[3];
 
         if (SEInterpreter.validatePreviewScript(script, c)) {
             final SEContext result = runPerLayer

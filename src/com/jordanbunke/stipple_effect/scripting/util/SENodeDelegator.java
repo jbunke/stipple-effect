@@ -79,7 +79,9 @@ public final class SENodeDelegator {
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
             case ReadScriptNode.NAME -> new ReadScriptNode(position, args);
             case NewSaveConfigNode.NAME -> new NewSaveConfigNode(position, args);
-            case TransformNode.NAME -> new TransformNode(position, args);
+            case TransformNode.NAME -> args.length == 2
+                    ? TransformNode.shortened(position, args)
+                    : TransformNode.reg(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "Undefined function \"" + formatGlobal(fID) + "\"");
