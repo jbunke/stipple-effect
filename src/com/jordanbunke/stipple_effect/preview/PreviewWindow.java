@@ -4,7 +4,10 @@ import com.jordanbunke.delta_time._core.GameManager;
 import com.jordanbunke.delta_time._core.Program;
 import com.jordanbunke.delta_time._core.ProgramContext;
 import com.jordanbunke.delta_time.debug.GameDebugger;
-import com.jordanbunke.delta_time.events.*;
+import com.jordanbunke.delta_time.events.GameEvent;
+import com.jordanbunke.delta_time.events.GameMouseScrollEvent;
+import com.jordanbunke.delta_time.events.GameWindowEvent;
+import com.jordanbunke.delta_time.events.WindowMovedEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.delta_time.io.InputEventLogger;
@@ -14,9 +17,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
-import com.jordanbunke.delta_time.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
-import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
@@ -25,11 +26,12 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
@@ -325,7 +327,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                         frameIndex, frameCount);
         }
 
-        if (context.projectInfo.hasChangesSincePreview())
+        if (context.getSaveConfig().hasChangesSincePreview())
             updateContent();
 
         frameCount = content.length;
@@ -333,7 +335,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
     }
 
     private void updateContent() {
-        context.projectInfo.logPreview();
+        context.getSaveConfig().logPreview();
 
         content = IntStream.range(0, context.getState().getFrameCount())
                 .mapToObj(i -> context.getState()
@@ -345,55 +347,12 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
     }
 
     private void runScript() {
-        frameIndex %= content.length;
+        content = ScriptUtils.runPreviewScript(content, script);
 
-        final boolean animScript = script.paramsMatch(
-                new TypeNode[] { TypeNode.arrayOf(TypeNode.getImage()) }),
-                imgReturn = script.getReturnType().equals(TypeNode.getImage());
-
-        if (animScript) {
-            final Object result = SEInterpreter.get().run(script, (Object) content);
-
-            if (result instanceof GameImage image)
-                content = new GameImage[] { image };
-            else if (result instanceof ScriptArray arr)
-                content = convertScriptRes(arr);
-            else
-                window.closeInstance();
-        } else if (imgReturn) {
-            final GameImage[] output = new GameImage[content.length];
-
-            for (int i = 0; i < output.length; i++) {
-                final Object result = SEInterpreter.get().run(script, content[i]);
-
-                if (result instanceof GameImage image)
-                    output[i] = image;
-                else {
-                    window.closeInstance();
-                    return;
-                }
-            }
-
-            content = output;
-        } else if (content.length == 1) {
-            final Object result = SEInterpreter.get().run(script, content[0]);
-
-            if (result instanceof ScriptArray arr)
-                content = convertScriptRes(arr);
-            else
-                window.closeInstance();
-        }
-
-        frameIndex %= content.length;
-    }
-
-    private static GameImage[] convertScriptRes(final ScriptArray arr) {
-        final GameImage[] images = new GameImage[arr.size()];
-
-        for (int i = 0; i < images.length; i++)
-            images[i] = (GameImage) arr.get(i);
-
-        return images;
+        if (content == null)
+            window.closeInstance();
+        else
+            frameIndex %= content.length;
     }
 
     private boolean checkIfProjectHasBeenClosed() {
@@ -442,7 +401,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                 height = yBase + Math.min(zoomH, Constants.MAX_CANVAS_H) + extraW;
 
         final GameWindow window = new GameWindow("Preview: " +
-                context.projectInfo.getFormattedName(false, false),
+                context.getSaveConfig().getFormattedName(false, false),
                 width, height, GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
                 false, false, false);
         window.hideCursor();

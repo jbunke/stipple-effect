@@ -9,8 +9,6 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.Arrays;
-
 public final class ResizeNode extends ProjectStatementNode {
     public static final String NAME = "resize";
 
@@ -24,9 +22,7 @@ public final class ResizeNode extends ProjectStatementNode {
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(arguments.args())
-                .map(a -> a.evaluate(symbolTable))
-                .toArray(Object[]::new);
+        final Object[] dims = arguments.getValues(symbolTable);
         final SEContext project = getProject(symbolTable);
         final int w = (int) dims[0], h = (int) dims[1];
 

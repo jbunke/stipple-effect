@@ -15,7 +15,6 @@ import com.jordanbunke.stipple_effect.stip.ParserSerializer;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
-import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 
@@ -23,10 +22,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BinaryOperator;
 
-public class ProjectInfo {
+public final class SaveConfig {
     private static final int INVALID_BOUND = -1;
-
-    private final SEContext context;
 
     private Path folder;
     private String name, indexPrefix, indexSuffix;
@@ -37,23 +34,24 @@ public class ProjectInfo {
 
     private int framesPerDim, fps, scaleUp, countFrom, lowerBound, upperBound;
 
+    private DialogVals.SequenceOrder sequenceOrder;
+
     public enum SaveType {
-        NATIVE, PNG_STITCHED, PNG_SEPARATE, GIF, MP4;
+        NATIVE, PNG_SHEET, PNG_SEPARATE, GIF, MP4;
 
         public String getFileSuffix() {
             return switch (this) {
-                case PNG_SEPARATE, PNG_STITCHED -> "png";
+                case PNG_SEPARATE, PNG_SHEET -> "png";
                 case GIF -> "gif";
                 case MP4 -> "mp4";
                 case NATIVE -> Constants.NATIVE_FILE_SUFFIX;
             };
         }
 
-        public String getButtonText(final ProjectInfo projectInfo) {
+        public String getButtonText(final SEContext context) {
             return switch (this) {
-                case PNG_STITCHED -> "Single PNG" +
-                        (projectInfo.isAnimation()
-                                ? " (spritesheet)" : "");
+                case PNG_SHEET -> "Single PNG" +
+                        (context.isAnimation() ? " (spritesheet)" : "");
                 case PNG_SEPARATE -> "Separate PNGs per frame";
                 case GIF -> "Animated GIF";
                 case MP4 -> "MP4 Video";
@@ -63,26 +61,16 @@ public class ProjectInfo {
         }
     }
 
-    public ProjectInfo(final SEContext context, final Path filepath) {
-        this.context = context;
-
-        if (filepath == null) {
-            folder = null;
-            name = "";
-        } else {
-            folder = filepath.getParent();
-            final String filename = filepath.getFileName().toString();
-
-            name = filename.contains(".") ? filename.substring(0,
-                    filename.lastIndexOf(".")) : filename;
-        }
+    public SaveConfig(final Path folder, final String name, final SaveType saveType) {
+        this.folder = folder;
+        this.name = name;
+        this.saveType = saveType;
 
         editedSinceLastSave = false;
         editedSinceLastPreview = true;
-        saveType = filepath != null && filepath.getFileName()
-                .toString().endsWith(SaveType.NATIVE.getFileSuffix())
-                ? SaveType.NATIVE : SaveType.PNG_STITCHED;
+
         framesPerDim = 1;
+        sequenceOrder = DialogVals.SequenceOrder.HORIZONTAL;
         fps = Constants.DEFAULT_PLAYBACK_FPS;
         scaleUp = Constants.DEFAULT_SAVE_SCALE_UP;
 
@@ -95,7 +83,29 @@ public class ProjectInfo {
         upperBound = INVALID_BOUND;
     }
 
-    public void save() {
+    public static SaveConfig fromFilepath(final Path filepath) {
+        final Path folder;
+        final String name;
+
+        if (filepath == null) {
+            folder = null;
+            name = "";
+        } else {
+            folder = filepath.getParent();
+            final String filename = filepath.getFileName().toString();
+
+            name = filename.contains(".") ? filename.substring(0,
+                    filename.lastIndexOf(".")) : filename;
+        }
+
+        final SaveType saveType = filepath != null && filepath.getFileName()
+                .toString().endsWith(SaveType.NATIVE.getFileSuffix())
+                ? SaveType.NATIVE : SaveType.PNG_SHEET;
+
+        return new SaveConfig(folder, name, saveType);
+    }
+
+    public void save(final SEContext context) {
         if (!hasSaveAssociation()) {
             DialogAssembly.setDialogToSave(context);
             return;
@@ -110,7 +120,7 @@ public class ProjectInfo {
 
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight(),
-                framesToSave = calculateNumFrames(),
+                framesToSave = calculateNumFrames(context),
                 f0 = saveRangeOfFrames ? lowerBound : 0;
 
         setFramesPerDim(Math.min(framesToSave, framesPerDim));
@@ -127,7 +137,7 @@ public class ProjectInfo {
         } else {
             final int frameCount = context.getState().getFrameCount();
 
-            if (f0 + framesToSave > frameCount) {
+            if (f0 + framesToSave > frameCount || f0 < 0 || framesToSave <= 0) {
                 StatusUpdates.saveFailed();
                 return;
             }
@@ -181,10 +191,11 @@ public class ProjectInfo {
 
                     StatusUpdates.savedAllFrames(folder);
                 }
-                case PNG_STITCHED -> {
-                    final boolean isHorizontal = StitchSplitMath.isHorizontal();
+                case PNG_SHEET -> {
+                    final boolean isHorizontal =
+                            sequenceOrder == DialogVals.SequenceOrder.HORIZONTAL;
                     final int fpd = getFramesPerDim(),
-                            fpcd = calcFramesPerCompDim(),
+                            fpcd = calcFramesPerCompDim(context),
                             sw = w * (isHorizontal ? fpd : fpcd),
                             sh = h * (isHorizontal ? fpcd : fpd);
 
@@ -216,9 +227,9 @@ public class ProjectInfo {
         StippleEffect.get().rebuildProjectsMenu();
     }
 
-    private int calcFramesPerCompDim() {
+    private int calcFramesPerCompDim(final SEContext context) {
         return DialogVals.calculateFramesPerComplementaryDim(
-                calculateNumFrames(), framesPerDim);
+                calculateNumFrames(context), framesPerDim);
     }
 
     public void markAsEdited() {
@@ -242,18 +253,14 @@ public class ProjectInfo {
         return buildFilepath("");
     }
 
-    public boolean isAnimation() {
-        return context.getState().getFrameCount() > 1;
-    }
-
-    public SaveType[] getSaveOptions() {
-        if (isAnimation())
+    public static SaveType[] getSaveOptions(final SEContext context) {
+        if (context.isAnimation())
             return SaveType.values();
 
-        return new SaveType[] { SaveType.NATIVE, SaveType.PNG_STITCHED };
+        return new SaveType[] { SaveType.NATIVE, SaveType.PNG_SHEET};
     }
 
-    public int calculateNumFrames() {
+    public int calculateNumFrames(final SEContext context) {
         if (!saveRangeOfFrames)
             return context.getState().getFrameCount();
 
@@ -312,6 +319,10 @@ public class ProjectInfo {
         return framesPerDim;
     }
 
+    public DialogVals.SequenceOrder getSequenceOrder() {
+        return sequenceOrder;
+    }
+
     public SaveType getSaveType() {
         return saveType;
     }
@@ -344,15 +355,25 @@ public class ProjectInfo {
         this.saveRangeOfFrames = saveRangeOfFrames;
     }
 
+    public void setLowerBound(final int lowerBound, final SEContext context) {
+        this.lowerBound = clampFrameBounds(lowerBound, context);
+    }
+
     public void setLowerBound(final int lowerBound) {
-        this.lowerBound = clampFrameBounds(lowerBound);
+        this.lowerBound = lowerBound;
+    }
+
+    public void setUpperBound(final int upperBound, final SEContext context) {
+        this.upperBound = clampFrameBounds(upperBound, context);
     }
 
     public void setUpperBound(final int upperBound) {
-        this.upperBound = clampFrameBounds(upperBound);
+        this.upperBound = upperBound;
     }
 
-    private int clampFrameBounds(final int candidate) {
+    private static int clampFrameBounds(
+            final int candidate, final SEContext context
+    ) {
         return MathPlus.bounded(0, candidate, context.getState().getFrameCount() - 1);
     }
 
@@ -362,6 +383,10 @@ public class ProjectInfo {
 
     public void setFramesPerDim(final int framesPerDim) {
         this.framesPerDim = framesPerDim;
+    }
+
+    public void setSequenceOrder(final DialogVals.SequenceOrder sequenceOrder) {
+        this.sequenceOrder = sequenceOrder;
     }
 
     public void setSaveType(final SaveType saveType) {

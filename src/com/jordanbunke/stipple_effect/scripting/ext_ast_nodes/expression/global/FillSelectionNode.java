@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
 import com.jordanbunke.stipple_effect.selection.Selection;
 
 import java.awt.*;
@@ -49,7 +49,7 @@ public class FillSelectionNode extends GlobalExpressionNode {
         final Color c = (Color) vs[1];
         final Selection selection = systemSelection
                 ? StippleEffect.get().getContext().getState().getSelection()
-                : ScriptSelectionUtils.convertSelection(
+                : ScriptUtils.convertSelection(
                         (ScriptSet) vs[2], img.getWidth(), img.getHeight());
 
         selection.unboundedPixelAlgorithm(

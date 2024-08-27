@@ -43,7 +43,7 @@ import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 public class SEContext {
     private static final int TL = 0, BR = 1, DIM = 2, TRP = 3, BOUNDS = 4;
 
-    public final ProjectInfo projectInfo;
+    private SaveConfig saveConfig;
     public final StateManager stateManager;
     public final RenderInfo renderInfo;
     public final PlaybackInfo playbackInfo;
@@ -66,7 +66,7 @@ public class SEContext {
             final Path filepath, final ProjectState projectState,
             final int imageWidth, final int imageHeight
     ) {
-        projectInfo = new ProjectInfo(this, filepath);
+        saveConfig = SaveConfig.fromFilepath(filepath);
         stateManager = new StateManager(projectState);
         renderInfo = new RenderInfo(imageWidth, imageHeight);
         playbackInfo = new PlaybackInfo();
@@ -846,7 +846,7 @@ public class SEContext {
     }
 
     public void stitchOrSplit() {
-        if (getState().getFrameCount() > 1)
+        if (isAnimation())
             DialogAssembly.setDialogToStitchFramesTogether();
         else
             DialogAssembly.setDialogToSplitCanvasIntoFrames();
@@ -2205,6 +2205,10 @@ public class SEContext {
         return inWorkspaceBounds;
     }
 
+    public boolean isAnimation() {
+        return getState().getFrameCount() > 1;
+    }
+
     public Coord2D getTargetPixel() {
         return targetPixel;
     }
@@ -2237,5 +2241,14 @@ public class SEContext {
 
     public GameImage getCheckerboard() {
         return checkerboard;
+    }
+
+    public SaveConfig getSaveConfig() {
+        return saveConfig;
+    }
+
+    // SETTERS
+    public void setSaveConfig(final SaveConfig saveConfig) {
+        this.saveConfig = saveConfig;
     }
 }

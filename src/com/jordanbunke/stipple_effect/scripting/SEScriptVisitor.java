@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.scripting.util.TypeCompatibility;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SEExtTypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 import com.jordanbunke.stipple_effect.scripting.util.SENodeDelegator;
@@ -19,8 +20,9 @@ public final class SEScriptVisitor extends ScriptVisitor {
     private static final String SCOPE_SEP = ".";
 
     static {
-        final Set<Class<?>> extensionTypeObjects =
-                Set.of(SEContext.class, LayerRep.class, Palette.class);
+        final Set<Class<?>> extensionTypeObjects = Set.of(
+                SEContext.class, LayerRep.class,
+                Palette.class, SaveConfig.class);
 
         extensionTypeObjects.forEach(TypeCompatibility::addBaseType);
     }

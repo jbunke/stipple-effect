@@ -36,7 +36,7 @@ public class ProjectButton extends SelectableListItemButton {
                 index, selectedIndexGetter, selectFunction);
 
         this.project = project;
-        edited = project.projectInfo.hasUnsavedChanges();
+        edited = project.getSaveConfig().hasUnsavedChanges();
 
         updateImages();
     }
@@ -45,7 +45,7 @@ public class ProjectButton extends SelectableListItemButton {
             final Coord2D position, final int index
     ) {
         final SEContext project = StippleEffect.get().getContexts().get(index);
-        final String maxText = "* " + project.projectInfo
+        final String maxText = "* " + project.getSaveConfig()
                 .getFormattedName(false, true);
 
         // placeholder calculation
@@ -65,7 +65,7 @@ public class ProjectButton extends SelectableListItemButton {
 
         super.update(deltaTime);
 
-        edited = project.projectInfo.hasUnsavedChanges();
+        edited = project.getSaveConfig().hasUnsavedChanges();
 
         final boolean change = wasSelected != isSelected() ||
                 wasEdited != edited;
@@ -79,7 +79,7 @@ public class ProjectButton extends SelectableListItemButton {
 
         final boolean quickSelectable = index <= MAX_QUICK_SELECTABLE_INDEX;
         final int width = getWidth();
-        final String text = project.projectInfo.
+        final String text = project.getSaveConfig().
                 getFormattedName(true, true);
         final TextButton base = TextButton.of(text, width,
                 quickSelectable ? Alignment.RIGHT : Alignment.CENTER,

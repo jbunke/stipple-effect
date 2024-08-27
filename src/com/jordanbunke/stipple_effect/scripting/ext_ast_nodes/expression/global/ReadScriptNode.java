@@ -13,7 +13,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ScriptTypeNod
 import java.io.File;
 import java.nio.file.Path;
 
-public class ReadScriptNode extends GlobalExpressionNode {
+public final class ReadScriptNode extends GlobalExpressionNode {
     public static final String NAME = "read_script";
 
     public ReadScriptNode(

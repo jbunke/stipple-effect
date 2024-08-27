@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.util.ScriptSelectionUtils;
+import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 
 public final class SetSideMaskNode extends GlobalStatementNode {
@@ -24,7 +24,7 @@ public final class SetSideMaskNode extends GlobalStatementNode {
                 ((ScriptArray) arguments.getValues(symbolTable)[0])
                         .stream().mapToInt(s -> (int) s).toArray();
 
-        if (ScriptSelectionUtils.invalidSideMask(sideMask, arguments.args()[0]))
+        if (ScriptUtils.invalidSideMask(sideMask, arguments.args()[0]))
             return FuncControlFlow.cont();
 
         DialogVals.setOutlineSideMask(sideMask);

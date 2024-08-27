@@ -211,7 +211,8 @@ public class MenuAssembly {
 
             final int index = i;
             final Runnable closeBehaviour = () -> {
-                if (StippleEffect.get().getContexts().get(index).projectInfo.hasUnsavedChanges())
+                if (StippleEffect.get().getContexts().get(index)
+                        .getSaveConfig().hasUnsavedChanges())
                     DialogAssembly.setDialogToCloseProjectAYS(index);
                 else
                     StippleEffect.get().removeContext(index);

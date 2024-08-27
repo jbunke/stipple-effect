@@ -5,6 +5,7 @@ import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
 import com.jordanbunke.delta_time.scripting.util.FuncControlFlow;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 public final class SaveNode extends ProjectStatementNode {
@@ -20,9 +21,10 @@ public final class SaveNode extends ProjectStatementNode {
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
         final SEContext project = getProject(symbolTable);
+        final SaveConfig sc = project.getSaveConfig();
 
-        if (project.projectInfo.hasSaveAssociation())
-            project.projectInfo.save();
+        if (sc.hasSaveAssociation())
+            sc.save(project);
         else
             StatusUpdates.scriptActionNotPermitted("save the project",
                     "the project does not have a valid save association",

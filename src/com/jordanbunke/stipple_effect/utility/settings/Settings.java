@@ -81,12 +81,12 @@ public class Settings {
         DEFAULT_INDEX_PREFIX(new Setting<>(
                 StringSettingType.get(), "", prefix -> {
                     StippleEffect.get().getContexts().forEach(
-                            c -> c.projectInfo.setIndexPrefix(prefix));
+                            c -> c.getSaveConfig().setIndexPrefix(prefix));
                 })),
         DEFAULT_INDEX_SUFFIX(new Setting<>(
                 StringSettingType.get(), "", suffix -> {
                     StippleEffect.get().getContexts().forEach(
-                            c -> c.projectInfo.setIndexSuffix(suffix));
+                            c -> c.getSaveConfig().setIndexSuffix(suffix));
                 })),
 
         // enum settings

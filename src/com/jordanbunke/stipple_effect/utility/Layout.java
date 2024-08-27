@@ -76,9 +76,9 @@ public final class Layout {
 
         projectsRequiresScrolling = false;
 
-        flipbookHeight = MIN_FLIPBOOK_H;
+        flipbookHeight = (MIN_FLIPBOOK_H + MAX_FLIPBOOK_H) / 2;
 
-        samplerMode = SamplerMode.RGB_SLIDERS;
+        samplerMode = SamplerMode.SV_MATRIX;
     }
 
     // panel display

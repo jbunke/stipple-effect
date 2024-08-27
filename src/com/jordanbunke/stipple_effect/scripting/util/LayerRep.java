@@ -7,7 +7,7 @@ public record LayerRep(SEContext project, int index) {
     @Override
     public String toString() {
         return (index + 1) + " of " + project.getState().getLayers().size() +
-                " in " + project.projectInfo.getName();
+                " in " + project.getSaveConfig().getName();
     }
 
     public SELayer get() {

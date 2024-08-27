@@ -40,4 +40,12 @@ public class EnumUtils {
     public static <T extends Enum<T>> Stream<T> stream(final Class<T> enumClass) {
         return Arrays.stream(enumClass.getEnumConstants());
     }
+
+    public static <T extends Enum<T>> boolean matches(
+            final String name, final Class<T> enumClass
+    ) {
+        return stream(enumClass)
+                .map(e -> e.name().equals(name))
+                .reduce(false, Boolean::logicalOr);
+    }
 }
