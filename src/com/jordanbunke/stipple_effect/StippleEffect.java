@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.stream.Stream;
 
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
@@ -731,16 +732,14 @@ public class StippleEffect implements ProgramContext {
 
     public void openProject() {
         FileIO.setDialogToFilesOnly();
+        final String[] acceptedFileTypes = Stream.concat(
+                Stream.of(SaveConfig.SaveType.NATIVE.getFileSuffix()),
+                Arrays.stream(Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES)
+        ).toArray(String[]::new);
+
         final Optional<File[]> opened = FileIO.openFilesFromSystem(
-                new String[] {
-                        PROGRAM_NAME + " projects (." + SaveConfig.SaveType
-                                .NATIVE.getFileSuffix() + ")",
-                        "Accepted image types"
-                },
-                new String[][] {
-                        new String[] { SaveConfig.SaveType.NATIVE.getFileSuffix() },
-                        Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES
-                });
+                new String[] { "Accepted file types" },
+                new String[][] { acceptedFileTypes });
         window.getEventLogger().unpressAllKeys();
 
         if (opened.isEmpty())

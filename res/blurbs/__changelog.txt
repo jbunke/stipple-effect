@@ -10,6 +10,7 @@ Changed:
   > Simplified and shortened color sampler labels
   > Updated {Zo} theme colors
   > Updated layer button layout and flipbook panel sizing
+> Combined file dialog file filters for {.stip} and image files into a single filter
 
 Fixed:
 > Bug: `$SE.single_outline()` calls a double outline instead of a single outline
