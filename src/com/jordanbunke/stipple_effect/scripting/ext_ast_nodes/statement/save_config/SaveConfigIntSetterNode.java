@@ -11,7 +11,8 @@ import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 public final class SaveConfigIntSetterNode extends SaveConfigStatementNode {
     public static final String SCALE_UP = "set_scale_up",
-            FPD = "set_frames_per_dim", COUNT_FROM = "set_count_from";
+            FPD = "set_frames_per_dim", COUNT_FROM = "set_count_from",
+            FPS = "set_fps";
 
     private final String property;
 
@@ -45,6 +46,13 @@ public final class SaveConfigIntSetterNode extends SaveConfigStatementNode {
         return new SaveConfigIntSetterNode(position, scope, args, COUNT_FROM);
     }
 
+    public static SaveConfigIntSetterNode fps(
+            final TextPosition position, final ExpressionNode scope,
+            final ExpressionNode[] args
+    ) {
+        return new SaveConfigIntSetterNode(position, scope, args, FPS);
+    }
+
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
         final SaveConfig sc = getSaveConfig(symbolTable);
@@ -73,6 +81,7 @@ public final class SaveConfigIntSetterNode extends SaveConfigStatementNode {
                 else
                     sc.setScaleUp(toSet);
             }
+            case FPS -> sc.setFps(toSet);
         }
 
         return FuncControlFlow.cont();

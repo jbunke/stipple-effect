@@ -2228,13 +2228,12 @@ public class DialogAssembly {
 
                     final Path folder = opened.get().toPath();
                     setter.accept(folder);
-                    // c.projectInfo.setFolder(folder);
                 },
                 () -> {
                     final StringBuilder folderPathName = new StringBuilder();
                     final String ELLIPSE = "...";
 
-                    Path folder = getter.get(); // c.projectInfo.getFolder();
+                    Path folder = getter.get();
                     int placements = 0;
 
                     if (folder == null)

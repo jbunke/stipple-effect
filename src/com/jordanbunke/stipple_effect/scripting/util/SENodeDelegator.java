@@ -54,8 +54,9 @@ public final class SENodeDelegator {
             case GetProjectNoArgsNode.NAME ->
                     new GetProjectNoArgsNode(position, args);
             case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
-            case NewProjectExpressionNode.NAME ->
-                    new NewProjectExpressionNode(position, args);
+            case NewProjectNode.NAME -> args.length == 2
+                    ? NewProjectNode.twoArg(position, args)
+                    : NewProjectNode.threeArg(position, args);
             case GetColorNode.PRIM_NAME ->
                     GetColorNode.primary(position, args);
             case GetColorNode.SEC_NAME ->
@@ -78,6 +79,7 @@ public final class SENodeDelegator {
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
             case ReadScriptNode.NAME -> new ReadScriptNode(position, args);
             case NewSaveConfigNode.NAME -> new NewSaveConfigNode(position, args);
+            case TransformNode.NAME -> new TransformNode(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "Undefined function \"" + formatGlobal(fID) + "\"");
@@ -299,6 +301,8 @@ public final class SENodeDelegator {
                     SaveConfigIntSetterNode.fpd(position, scope, args);
             case SaveConfigIntSetterNode.COUNT_FROM ->
                     SaveConfigIntSetterNode.countFrom(position, scope, args);
+            case SaveConfigIntSetterNode.FPS ->
+                    SaveConfigIntSetterNode.fps(position, scope, args);
             case SetDimNode.NAME -> new SetDimNode(position, scope, args);
             case SetFolderNode.NAME -> new SetFolderNode(position, scope, args);
             // extend here

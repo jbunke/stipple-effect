@@ -5,6 +5,7 @@ Added:
 > Bug reporting and scripting API link to navbar
 
 Changed:
+> Improved file dialogs on Windows
 > `(image -> image)` preview scripts can be run on animated projects
 > Cosmetic and layout changes
   > Simplified and shortened color sampler labels
@@ -14,6 +15,7 @@ Changed:
 
 Fixed:
 > Bug: `$SE.single_outline()` calls a double outline instead of a single outline
+> Bug: void helper functions cannot be called
 
 API Changes:
   Added:
@@ -47,6 +49,8 @@ API Changes:
   > Added global functions
     > `$SE.read_script(string) -> script`
     > `$SE.new_save_config(string[], string, int) -> save_config`
+    > `$SE.transform(project, script, bool, bool) -> project`
+    > `$SE.new_project(int, int, bool) -> project`
 
   Changed:
   > Renamed some `layer` functions; for some `layer L`...

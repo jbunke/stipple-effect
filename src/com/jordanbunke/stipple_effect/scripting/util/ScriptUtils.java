@@ -1,10 +1,14 @@
 package com.jordanbunke.stipple_effect.scripting.util;
 
+import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptArray;
 import com.jordanbunke.delta_time.scripting.ast.collection.ScriptSet;
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
+import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
+import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.utility.Constants;
@@ -15,6 +19,57 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 
 public class ScriptUtils {
+    public static GameImage[] runPreviewScript(
+            final GameImage[] input, final HeadFuncNode script
+    ) {
+        final boolean animScript = script.paramsMatch(
+                new TypeNode[] { TypeNode.arrayOf(TypeNode.getImage()) }),
+                imgReturn = script.getReturnType().equals(TypeNode.getImage());
+
+        if (animScript) {
+            // image[] -> image[] or image[] -> image
+            final Object result = SEInterpreter.get().run(script, (Object) input);
+
+            if (result instanceof GameImage image)
+                return new GameImage[] { image };
+            else if (result instanceof ScriptArray arr)
+                return convertScriptImageArray(arr);
+
+            return null;
+        } else if (imgReturn) {
+            // image -> image
+            final GameImage[] output = new GameImage[input.length];
+
+            for (int i = 0; i < output.length; i++) {
+                final Object result = SEInterpreter.get().run(script, input[i]);
+
+                if (result instanceof GameImage image)
+                    output[i] = image;
+                else
+                    return null;
+            }
+
+            return output;
+        } else if (input.length == 1) {
+            // image -> image[]
+            final Object result = SEInterpreter.get().run(script, input[0]);
+
+            return (result instanceof ScriptArray arr)
+                    ? convertScriptImageArray(arr) : null;
+        }
+
+        return null;
+    }
+
+    private static GameImage[] convertScriptImageArray(final ScriptArray arr) {
+        final GameImage[] images = new GameImage[arr.size()];
+
+        for (int i = 0; i < images.length; i++)
+            images[i] = (GameImage) arr.get(i);
+
+        return images;
+    }
+
     public static Path scriptFolderToPath(final ScriptArray folder) {
         final String first = (String) folder.get(0);
         final String[] rest = new String[folder.size() - 1];

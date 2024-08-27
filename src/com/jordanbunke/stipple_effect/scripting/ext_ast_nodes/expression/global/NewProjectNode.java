@@ -10,24 +10,39 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.ProjectTypeNode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-import java.util.Arrays;
-
-public final class NewProjectExpressionNode extends GlobalExpressionNode {
+public final class NewProjectNode extends GlobalExpressionNode {
     public static final String NAME = "new_project";
 
-    public NewProjectExpressionNode(
-            final TextPosition position,
-            final ExpressionNode[] args
+    private final boolean twoArg;
+
+    private NewProjectNode(
+            final TextPosition position, final ExpressionNode[] args,
+            final boolean twoArg, final TypeNode... expectedTypes
     ) {
-        super(position, args, TypeNode.getInt(), TypeNode.getInt());
+        super(position, args, expectedTypes);
+
+        this.twoArg = twoArg;
+    }
+
+    public static NewProjectNode twoArg(
+            final TextPosition position, final ExpressionNode[] args
+    ) {
+        return new NewProjectNode(position, args, true,
+                TypeNode.getInt(), TypeNode.getInt());
+    }
+
+    public static NewProjectNode threeArg(
+            final TextPosition position, final ExpressionNode[] args
+    ) {
+        return new NewProjectNode(position, args, false,
+                TypeNode.getInt(), TypeNode.getInt(), TypeNode.getBool());
     }
 
     @Override
     public SEContext evaluate(final SymbolTable symbolTable) {
-        final Integer[] dims = Arrays.stream(arguments.args())
-                .map(a -> (Integer) a.evaluate(symbolTable))
-                .toArray(Integer[]::new);
-        final int w = dims[0], h = dims[1];
+        final Object[] vs = arguments.getValues(symbolTable);
+        final int w = (int) vs[0], h = (int) vs[1];
+        final boolean openInSE = twoArg || (boolean) vs[2];
 
         if (w <= 0 || w > Constants.MAX_CANVAS_W) {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
@@ -41,10 +56,14 @@ public final class NewProjectExpressionNode extends GlobalExpressionNode {
                             " is out of bounds: 0 < h <= " +
                             Constants.MAX_CANVAS_H);
             return null;
-        } else
-            StippleEffect.get().addContext(new SEContext(w, h), true);
+        } else {
+            final SEContext c = new SEContext(w, h);
 
-        return StippleEffect.get().getContext();
+            if (openInSE)
+                StippleEffect.get().addContext(c, true);
+
+            return c;
+        }
     }
 
     @Override

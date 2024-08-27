@@ -29,7 +29,18 @@ public final class SELayer {
         final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
 
         return new SELayer(frames, content[0], Constants.OPAQUE,
-                true, false, OnionSkinMode.NONE, Constants.FROM_PREVIEW_LAYER_NAME);
+                true, false, OnionSkinMode.NONE,
+                Constants.FROM_PREVIEW_LAYER_NAME);
+    }
+
+    public static SELayer fromPreviewContent(
+            final GameImage[] content, final SELayer source
+    ) {
+        final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
+
+        return new SELayer(frames, content[0], source.opacity,
+                source.enabled, source.framesLinked, source.onionSkinMode,
+                source.name);
     }
 
     public static SELayer newLayer(
