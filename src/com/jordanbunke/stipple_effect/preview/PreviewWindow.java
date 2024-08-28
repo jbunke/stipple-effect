@@ -22,12 +22,10 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
-import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
@@ -46,6 +44,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+@Deprecated
 public class PreviewWindow implements ProgramContext, PreviewPlayback {
     public static final int BORDER = 1,
             MENU_X_ALLOTMENT_PX = Layout.BUTTON_INC * 10,
@@ -112,8 +111,8 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
         final MenuBuilder mb = new MenuBuilder();
 
         final Coord2D initial = new Coord2D(
-                Layout.PREVIEW_WINDOW_BUFFER_PX,
-                Layout.PREVIEW_WINDOW_BUFFER_PX);
+                Layout.PREV_TL_BUFFER,
+                Layout.PREV_TL_BUFFER);
         final Supplier<Boolean> hasMultipleFrames =
                 () -> frameCount > 1;
 
@@ -192,7 +191,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
                                 .map(mode -> (Runnable) () -> {})
                                 .toArray(Runnable[]::new),
                         () -> playbackInfo.getMode().buttonIndex(),
-                        playbackInfo::toggleMode, hasMultipleFrames,
+                        playbackInfo::cycleMode, hasMultipleFrames,
                         ResourceCodes.LOOP);
         final DynamicLabel frameTracker = labelAfterLastButton(
                 playbackModeButton,
@@ -388,13 +387,13 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
         final int zoomW = (int) (zoom * canvasW),
                 zoomH = (int) (zoom * canvasH);
 
-        final int buffer = 2 * Layout.PREVIEW_WINDOW_BUFFER_PX,
+        final int buffer = 2 * Layout.PREV_TL_BUFFER,
                 addOn = buffer + (2 * BORDER),
                 yBase = addOn + MENU_Y_ALLOTMENT_PX,
                 extraW = zoomW > Constants.MAX_CANVAS_W
-                        ? Layout.PREVIEW_WINDOW_BUFFER_PX : 0,
+                        ? Layout.PREV_TL_BUFFER : 0,
                 extraH = zoomH > Constants.MAX_CANVAS_H
-                        ? Layout.PREVIEW_WINDOW_BUFFER_PX : 0;
+                        ? Layout.PREV_TL_BUFFER : 0;
 
         final int width = addOn + MathPlus.bounded(
                 MENU_X_ALLOTMENT_PX, zoomW, Constants.MAX_CANVAS_W) + extraH,
@@ -482,13 +481,7 @@ public class PreviewWindow implements ProgramContext, PreviewPlayback {
     }
 
     private void importPreview() {
-        final int frameCount = content.length,
-                w = content[0].getWidth(),
-                h = content[0].getHeight();
-
-        final ProjectState state = ProjectState.makeFromRasterFile(w, h,
-                SELayer.fromPreviewContent(content), frameCount);
-        final SEContext project = new SEContext(null, state, w, h);
+        final SEContext project = ScriptUtils.projectFromScriptOutput(content);
 
         StippleEffect.get().scheduleJob(() ->
                 StippleEffect.get().addContext(project, true));

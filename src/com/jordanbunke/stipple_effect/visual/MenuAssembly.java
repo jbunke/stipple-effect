@@ -432,7 +432,7 @@ public class MenuAssembly {
                 Arrays.stream(validModes).map(mode ->
                         (Runnable) () -> {}).toArray(Runnable[]::new),
                 () -> c.playbackInfo.getMode().buttonIndex(),
-                c.playbackInfo::toggleMode);
+                c.playbackInfo::cycleMode);
     }
 
     private static SimpleToggleMenuButton generatePlayStopToggle(

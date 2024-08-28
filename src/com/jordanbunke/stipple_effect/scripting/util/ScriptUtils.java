@@ -7,18 +7,89 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
+import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.layer.SELayer;
+import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.stream.IntStream;
 
 public class ScriptUtils {
+    public static SEContext transformProjectPerLayer(
+            final SEContext c, final HeadFuncNode script
+    ) {
+        int w = 1, h = 1, fc = 1;
+
+        final int srcFC = c.getState().getFrameCount();
+
+        final List<SELayer> layers = new ArrayList<>(),
+                srcLayers = new ArrayList<>(c.getState().getLayers());
+
+        for (final SELayer layer : srcLayers) {
+            final GameImage[] layerContent = IntStream.range(0, srcFC)
+                    .mapToObj(layer::getFrame).toArray(GameImage[]::new);
+
+            final GameImage[] output =
+                    ScriptUtils.runPreviewScript(layerContent, script);
+
+            if (output == null) {
+                ScriptErrorLog.fireError(
+                        ScriptErrorLog.Message.CUSTOM_RT, TextPosition.N_A,
+                        "Script failed to produce a result for layer \"" +
+                                layer.getName() + "\"");
+                return null;
+            }
+
+            fc = Math.max(fc, output.length);
+            w = Math.max(w, Arrays.stream(output).map(GameImage::getWidth)
+                    .reduce(0, Math::max));
+            h = Math.max(h, Arrays.stream(output).map(GameImage::getHeight)
+                    .reduce(0, Math::max));
+
+            layers.add(SELayer.fromPreviewContent(output, layer));
+        }
+
+        final ProjectState state = ProjectState.makeFromNativeFile(
+                w, h, layers, fc, ProjectState.defaultFrameDurations(fc));
+
+        return new SEContext(null, state, w, h);
+    }
+
+    public static SEContext transform(
+            final GameImage[] input, final HeadFuncNode script
+    ) {
+        return projectFromScriptOutput(runPreviewScript(input, script));
+    }
+
+    public static SEContext projectFromScriptOutput(final GameImage[] output) {
+        if (output == null) {
+            ScriptErrorLog.fireError(
+                    ScriptErrorLog.Message.CUSTOM_RT, TextPosition.N_A,
+                    "Script failed to produce a result");
+            return null;
+        }
+
+        final int fc = output.length;
+        final int w = Arrays.stream(output).map(GameImage::getWidth)
+                .reduce(0, Math::max),
+                h = Arrays.stream(output).map(GameImage::getHeight)
+                        .reduce(0, Math::max);
+
+        final SELayer layer = SELayer.fromPreviewContent(output);
+        final ProjectState state =
+                ProjectState.makeFromRasterFile(w, h, layer, fc);
+
+        return new SEContext(null, state, w, h);
+    }
+
     public static GameImage[] runPreviewScript(
             final GameImage[] input, final HeadFuncNode script
     ) {

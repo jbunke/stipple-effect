@@ -179,7 +179,7 @@ public class PlaybackInfo {
         this.mode = mode;
     }
 
-    public void toggleMode() {
+    public void cycleMode() {
         this.mode = mode.next();
     }
 

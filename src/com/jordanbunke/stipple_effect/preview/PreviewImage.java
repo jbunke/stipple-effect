@@ -9,12 +9,13 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 
+@Deprecated
 public class PreviewImage extends MenuElement {
     private GameImage image;
 
     public PreviewImage() {
-        super(new Coord2D(Layout.PREVIEW_WINDOW_BUFFER_PX,
-                        Layout.PREVIEW_WINDOW_BUFFER_PX +
+        super(new Coord2D(Layout.PREV_TL_BUFFER,
+                        Layout.PREV_TL_BUFFER +
                                 PreviewWindow.MENU_Y_ALLOTMENT_PX),
                 new Bounds2D(Constants.MAX_CANVAS_W, Constants.MAX_CANVAS_H),
                 Anchor.LEFT_TOP, true);

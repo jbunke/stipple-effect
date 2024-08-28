@@ -1578,7 +1578,7 @@ public class DialogAssembly {
                                     .map(mode -> (Runnable) () -> {})
                                     .toArray(Runnable[]::new),
                             () -> playbackInfo.getMode().buttonIndex(),
-                            playbackInfo::toggleMode, () -> true, ResourceCodes.LOOP);
+                            playbackInfo::cycleMode, () -> true, ResourceCodes.LOOP);
             final DynamicLabel frameTracker = makeDynamicLabel(
                     playbackModeButton.getRenderPosition().displace(
                             BUTTON_DIM + CONTENT_BUFFER_PX,

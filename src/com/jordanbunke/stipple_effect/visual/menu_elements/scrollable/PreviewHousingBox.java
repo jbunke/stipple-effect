@@ -11,6 +11,7 @@ import com.jordanbunke.stipple_effect.preview.PreviewWindow;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 
+@Deprecated
 public class PreviewHousingBox extends AbstractBidirectionalScrollBox {
     private PreviewHousingBox(
             final Coord2D position, final Bounds2D dimensions,
@@ -18,12 +19,7 @@ public class PreviewHousingBox extends AbstractBidirectionalScrollBox {
             final int realRightX, final int realBottomY
     ) {
         super(position, dimensions, menuElements, Layout.PX_PER_SCROLL,
-                PreviewHousingBox::drawBox,
-                realRightX, realBottomY, 0, 0);
-    }
-
-    private static GameImage drawBox(final int w, final int h) {
-        return new GameImage(w, h);
+                GameImage::new, realRightX, realBottomY, 0, 0);
     }
 
     public static PreviewHousingBox make(
@@ -33,8 +29,8 @@ public class PreviewHousingBox extends AbstractBidirectionalScrollBox {
         final int BUFFER = (2 * PreviewWindow.BORDER);
 
         final Coord2D position = new Coord2D(
-                Layout.PREVIEW_WINDOW_BUFFER_PX,
-                Layout.PREVIEW_WINDOW_BUFFER_PX +
+                Layout.PREV_TL_BUFFER,
+                Layout.PREV_TL_BUFFER +
                         PreviewWindow.MENU_Y_ALLOTMENT_PX);
         final Bounds2D dimensions = new Bounds2D(
                 Math.min(Constants.MAX_CANVAS_W, zoomWidth) + BUFFER,
