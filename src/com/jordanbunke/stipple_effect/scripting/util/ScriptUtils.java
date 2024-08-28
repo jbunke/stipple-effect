@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.stream.IntStream;
 
 public class ScriptUtils {
     public static GameImage[] runPreviewScript(
@@ -69,14 +68,6 @@ public class ScriptUtils {
             images[i] = (GameImage) arr.get(i);
 
         return images;
-    }
-
-    public static TypeNode[] wildcards(final ExpressionNode[] args) {
-        if (args.length == 0)
-            return new TypeNode[0];
-
-        return IntStream.range(0, args.length)
-                .mapToObj(i -> TypeNode.wildcard()).toArray(TypeNode[]::new);
     }
 
     public static Path scriptFolderToPath(final ScriptArray folder) {
