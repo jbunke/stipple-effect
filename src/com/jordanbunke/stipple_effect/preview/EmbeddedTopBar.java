@@ -136,6 +136,11 @@ public final class EmbeddedTopBar extends MenuElement {
         positionUpdated();
     }
 
+    @Override
+    public void incrementX(int deltaX) {
+        super.setX(getPosition().x + deltaX);
+    }
+
     private void boundingCheck() {
         final int ww = width(), wh = height(), w = getWidth(),
                 h = getHeight() + preview.getHeight(), x = getX(), y = getY();

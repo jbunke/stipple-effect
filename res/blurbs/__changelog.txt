@@ -22,6 +22,7 @@ Changed:
 Fixed:
 > Bug: `$SE.single_outline()` calls a double outline instead of a single outline
 > Bug: void helper functions cannot be called
+> Bug: suspended execution due to file dialog display leads to a playback backlog
 
 API Changes:
   Added:
