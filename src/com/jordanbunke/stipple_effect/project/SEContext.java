@@ -39,10 +39,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
+import static com.jordanbunke.stipple_effect.project.RenderInfo.*;
 
 public class SEContext {
-    private static final int TL = 0, BR = 1, DIM = 2, TRP = 3, BOUNDS = 4;
-
     private SaveConfig saveConfig;
     public final StateManager stateManager;
     public final RenderInfo renderInfo;
@@ -87,38 +86,6 @@ public class SEContext {
         selectionOverlay.updateTL(getState().getSelection());
     }
 
-    private Coord2D[] getImageRenderBounds(
-            final Coord2D render, final int w, final int h, final float z
-    ) {
-        final int ww = Layout.getWorkspaceWidth(),
-                wh = Layout.getWorkspaceHeight();
-        final Coord2D[] bounds = new Coord2D[BOUNDS];
-
-        if (render.x > ww || render.y > wh ||
-                render.x + (int)(w * z) <= 0 ||
-                render.y + (int)(h * z) <= 0)
-            return new Coord2D[] {};
-
-        final int tlx, tly, brx, bry;
-
-        final float modX = render.x % z, modY = render.y % z;
-
-        tlx = Math.max((int)(-render.x / z), 0);
-        tly = Math.max((int)(-render.y / z), 0);
-        brx = Math.min((int)((ww - render.x) / z) + 1, w);
-        bry = Math.min((int)((wh - render.y) / z) + 1, h);
-
-        bounds[TL] = new Coord2D(tlx, tly);
-        bounds[BR] = new Coord2D(brx, bry);
-        bounds[DIM] = new Coord2D(brx - tlx, bry - tly);
-        bounds[TRP] = new Coord2D(
-                tlx == 0 ? render.x : (int) modX,
-                tly == 0 ? render.y : (int) modY
-        );
-
-        return bounds;
-    }
-
     public GameImage drawWorkspace() {
         final int ww = Layout.getWorkspaceWidth(),
                 wh = Layout.getWorkspaceHeight();
@@ -126,15 +93,14 @@ public class SEContext {
         final GameImage workspace = new GameImage(ww, wh);
 
         // background
-        workspace.fillRectangle(
-                Settings.getTheme().workspaceBackground, 0, 0, ww, wh);
+        workspace.fill(Settings.getTheme().workspaceBackground);
 
         // math
         final float zoomFactor = renderInfo.getZoomFactor();
         final Coord2D render = getImageRenderPositionInWorkspace();
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
-        final Coord2D[] bounds = getImageRenderBounds(render, w, h, zoomFactor);
+        final Coord2D[] bounds = renderBounds(render, w, h, zoomFactor);
 
         if (bounds.length == BOUNDS) {
             // transparency checkerboard
@@ -712,13 +678,8 @@ public class SEContext {
     }
 
     private Coord2D getImageRenderPositionInWorkspace() {
-        final float zoomFactor = renderInfo.getZoomFactor();
-        final Coord2D anchor = renderInfo.getAnchor(),
-                middle = new Coord2D(Layout.getWorkspaceWidth() / 2,
-                        Layout.getWorkspaceHeight() / 2);
-
-        return new Coord2D(middle.x - (int)(zoomFactor * anchor.x),
-                middle.y - (int)(zoomFactor * anchor.y));
+        return renderInfo.localRenderPosition(
+                Layout.getWorkspaceWidth(), Layout.getWorkspaceHeight());
     }
 
     public void redrawCanvasAuxiliaries() {

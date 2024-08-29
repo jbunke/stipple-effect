@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.preview.PreviewWindow;
+import com.jordanbunke.stipple_effect.preview.Preview;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
@@ -30,7 +30,7 @@ public enum SEAction {
             c -> c.getSaveConfig().save(c), new KeyShortcut(true, false, S)),
     OPEN_FILE(ResourceCodes.OPEN_FILE, fromSE(StippleEffect::openProject),
             new KeyShortcut(true, false, O)),
-    PREVIEW(ResourceCodes.PREVIEW, null, PreviewWindow::set,
+    PREVIEW(ResourceCodes.PREVIEW, null, Preview::set,
             new KeyShortcut(false, true, SPACE),
             (c, eventLogger) -> eventLogger.unpressAllKeys(), true),
     ALL_UI(ResourceCodes.ALL_UI, c -> Layout.showAllPanels(),
@@ -223,7 +223,7 @@ public enum SEAction {
     TOGGLE_PLAYING(ResourceCodes.NONE, null,
             c -> c.playbackInfo.togglePlaying(), KeyShortcut.single(SPACE)),
     CYCLE_PLAYBACK_MODE(ResourceCodes.NONE, null,
-            c -> c.playbackInfo.toggleMode(),
+            c -> c.playbackInfo.cycleMode(),
             new KeyShortcut(true, false, ENTER)),
 
     // layer navigation

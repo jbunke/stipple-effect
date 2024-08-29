@@ -26,6 +26,7 @@ public class Settings {
         // boolean settings
         FULLSCREEN_ON_STARTUP(new Setting<>(BooleanSettingType.get(), false)),
         PIXEL_GRID_ON_BY_DEFAULT(new Setting<>(BooleanSettingType.get(), false)),
+        SEPARATED_PREVIEW(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_ZOOM_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
@@ -206,6 +207,10 @@ public class Settings {
         Code.PIXEL_GRID_ON_BY_DEFAULT.set(pixelGridOnByDefault);
     }
 
+    public static void setSeparatedPreview(final boolean separatedPreview) {
+        Code.SEPARATED_PREVIEW.set(separatedPreview);
+    }
+
     public static void setInvertZoomDirection(final boolean invertZoomDirection) {
         Code.INVERT_ZOOM_DIRECTION.set(invertZoomDirection);
     }
@@ -305,6 +310,10 @@ public class Settings {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.check();
     }
 
+    public static boolean checkIsSeparatedPreview() {
+        return (boolean) Code.SEPARATED_PREVIEW.setting.check();
+    }
+
     public static boolean checkIsInvertZoomDirection() {
         return (boolean) Code.INVERT_ZOOM_DIRECTION.setting.check();
      }
@@ -380,6 +389,10 @@ public class Settings {
 
     public static boolean isPixelGridOnByDefault() {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.get();
+    }
+
+    public static boolean isSeparatedPreview() {
+        return (boolean) Code.SEPARATED_PREVIEW.setting.get();
     }
 
     public static int getWindowedWidth() {

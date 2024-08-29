@@ -88,6 +88,7 @@ public final class ResourceCodes {
             IMPORT_SCRIPT = "import_script",
             REMOVE_SCRIPT = "remove_script",
             IMPORT_PREVIEW = "import_preview",
+            IMPORT_PER_LAYER = "import_per_layer",
             SELECTION_REPRESENTATION = "sel_rep",
             NO_OUTLINE = "no_outline",
             SETTINGS = "settings",

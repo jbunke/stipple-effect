@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
+import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 
 import java.util.Arrays;
@@ -62,8 +63,10 @@ public class IconToggleButton extends SimpleToggleMenuButton {
     public void update(final double deltaTime) {
         super.update(deltaTime);
 
-        if (isHighlighted() && Permissions.isCursorFree())
-            StippleEffect.get().sendToolTipUpdate(
-                    iconCodeFunction.apply(getIndex()));
+        final String code = iconCodeFunction.apply(getIndex());
+
+        if (isHighlighted() && Permissions.canSendToolTip() &&
+                !code.equals(ResourceCodes.NO_TOOLTIP))
+            StippleEffect.get().sendToolTipUpdate(code);
     }
 }

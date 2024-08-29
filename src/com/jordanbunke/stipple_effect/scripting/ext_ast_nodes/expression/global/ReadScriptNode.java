@@ -37,7 +37,11 @@ public final class ReadScriptNode extends GlobalExpressionNode {
                     arg.getPosition(), "No file to read at \"" +
                             scriptFP + "\"");
 
-        return SEInterpreter.get().build(FileIO.readFile(scriptPath));
+        final HeadFuncNode script =
+                SEInterpreter.get().build(FileIO.readFile(scriptPath));
+        script.semanticErrorCheck(SymbolTable.root(script));
+
+        return script;
     }
 
     @Override

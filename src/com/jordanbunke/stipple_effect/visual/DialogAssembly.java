@@ -1538,54 +1538,32 @@ public class DialogAssembly {
         if (fc > 1) {
             // frame and playback mode controls
             final MenuElement firstFrame =
-                    GraphicsUtils.generateIconButton(ResourceCodes.TO_FIRST_FRAME,
+                    IconButton.make(ResourceCodes.TO_FIRST_FRAME,
                             backButton.getPosition()
                                     .displace(0, DIALOG_CONTENT_INC_Y),
-                            () -> true, previewer::toFirstFrame),
-                    previousFrame = GraphicsUtils.generateIconButton(
-                            ResourceCodes.PREVIOUS, firstFrame.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            () -> true, previewer::previousFrame),
-                    playStop = GraphicsUtils.generateIconToggleButton(
+                            previewer::toFirstFrame),
+                    previousFrame = IconButton.make(ResourceCodes.PREVIOUS,
+                            firstFrame.getRenderPosition().displace(BUTTON_INC, 0),
+                            previewer::previousFrame),
+                    playStop = MenuAssembly.generatePlayStopToggle(playbackInfo,
                             previousFrame.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            new String[] { ResourceCodes.PLAY, ResourceCodes.STOP },
-                            new Runnable[] {
-                                    playbackInfo::play, playbackInfo::stop
-                            }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
-                            () -> true, ResourceCodes.PLAY),
-                    nextFrame = GraphicsUtils.generateIconButton(
-                            ResourceCodes.NEXT, playStop.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            () -> true, previewer::nextFrame),
-                    lastFrame = GraphicsUtils.generateIconButton(
-                            ResourceCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            () -> true, previewer::toLastFrame);
+                                    .displace(BUTTON_INC, 0)),
+                    nextFrame = IconButton.make(ResourceCodes.NEXT,
+                            playStop.getRenderPosition().displace(BUTTON_INC, 0),
+                            previewer::nextFrame),
+                    lastFrame = IconButton.make(ResourceCodes.TO_LAST_FRAME,
+                            nextFrame.getRenderPosition().displace(BUTTON_INC, 0),
+                            previewer::toLastFrame);
 
-            final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
-                    PlaybackInfo.Mode.FORWARDS, PlaybackInfo.Mode.BACKWARDS,
-                    PlaybackInfo.Mode.LOOP, PlaybackInfo.Mode.PONG_FORWARDS
-            };
             final MenuElement playbackModeButton =
-                    GraphicsUtils.generateIconToggleButton(
-                            lastFrame.getRenderPosition().displace(
-                                    BUTTON_INC, 0),
-                            Arrays.stream(validModes)
-                                    .map(PlaybackInfo.Mode::getIconCode)
-                                    .toArray(String[]::new),
-                            Arrays.stream(validModes)
-                                    .map(mode -> (Runnable) () -> {})
-                                    .toArray(Runnable[]::new),
-                            () -> playbackInfo.getMode().buttonIndex(),
-                            playbackInfo::toggleMode, () -> true, ResourceCodes.LOOP);
+                    MenuAssembly.generatePlaybackModeToggle(playbackInfo,
+                            lastFrame.getRenderPosition().displace(BUTTON_INC, 0));
             final DynamicLabel frameTracker = makeDynamicLabel(
                     playbackModeButton.getRenderPosition().displace(
                             BUTTON_DIM + CONTENT_BUFFER_PX,
                             -BUTTON_OFFSET + TEXT_Y_OFFSET),
-                    () -> "Frm. " + (previewer.getFrameIndex() + 1) +
-                            "/" + previewer.getFrameCount(),
-                    "Frm. XXX/XXX");
+                    () -> (previewer.getFrameIndex() + 1) + "/" +
+                            previewer.getFrameCount(), "XXX/XXX");
 
             mb.addAll(firstFrame, previousFrame, playStop, nextFrame,
                     lastFrame, playbackModeButton, frameTracker);
@@ -2034,7 +2012,7 @@ public class DialogAssembly {
         final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
         final DynamicLabel framesPerDimLabel = makeDynamicLabel(
                 textBelowPos(referenceLabel, 2), () -> FPD_PREFIX +
-                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
+                        soGetter.get().dimName() + FPD_SUFFIX,
                 FPD_PREFIX + "column" + FPD_SUFFIX);
         final DynamicTextbox framesPerDimTextbox = makeDialogNumericalDynamicTextbox(
                 framesPerDimLabel,
@@ -2056,8 +2034,7 @@ public class DialogAssembly {
 
                     return FPCD_PREFIX + comp + (
                             comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
-                    ) + DialogVals.getSequenceOrder()
-                            .complement().dimName();
+                    ) + soGetter.get().complement().dimName();
                 }, FPCD_PREFIX +
                         Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
         mb.add(framesPerCompDim);
@@ -2651,7 +2628,10 @@ public class DialogAssembly {
                                         " pixel grid lines (X + Y) on"),
                         pixelGridLimits2 = TextLabel.make(
                                 textBelowPos(pixelGridLimits1),
-                                "the canvas due to performance constraints.");
+                                "the canvas due to performance constraints."),
+                        separatedPreview = TextLabel.make(
+                                textBelowPos(pixelGridLimits2, 1),
+                                "Open preview panel in a separate window?");
 
                 final Dropdown fontDropdown = Dropdown.forDialog(
                         contentPositionAfterLabel(fontLabel),
@@ -2712,6 +2692,12 @@ public class DialogAssembly {
                                 Settings::setPixelGridYPixels,
                                 Settings::checkPixelGridYPixels, 3);
 
+                final Checkbox separatedPreviewCheckbox = new Checkbox(
+                        contentPositionAfterLabel(separatedPreview),
+                        new ConcreteProperty<>(
+                                Settings::checkIsSeparatedPreview,
+                                Settings::setSeparatedPreview));
+
                 mb.addAll(fontLabel, fontDropdown, themeLabel, themeDropdown,
                         windowedSizeLabel,
                         windowedWidthLabel, windowedWidthTextbox,
@@ -2723,10 +2709,11 @@ public class DialogAssembly {
                         checkerboardContext, pixelGridLabel,
                         pixelGridXLabel, pixelGridXTextbox,
                         pixelGridYLabel, pixelGridYTextbox,
-                        pixelGridContext, pixelGridLimits1, pixelGridLimits2);
+                        pixelGridContext, pixelGridLimits1, pixelGridLimits2,
+                        separatedPreview, separatedPreviewCheckbox);
 
                 // update as new settings are added to category
-                yield pixelGridLimits2;
+                yield separatedPreview;
             }
         };
 

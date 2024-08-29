@@ -1,10 +1,9 @@
 package com.jordanbunke.stipple_effect.preview;
 
-import com.jordanbunke.delta_time.events.GameKeyEvent;
-import com.jordanbunke.delta_time.events.Key;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
-import com.jordanbunke.stipple_effect.utility.Constants;
+
+import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public interface PreviewPlayback {
     void toFirstFrame();
@@ -17,38 +16,19 @@ public interface PreviewPlayback {
     default void processKeys(final InputEventLogger eventLogger) {
         final PlaybackInfo playbackInfo = getPlaybackInfo();
 
-        if (eventLogger.isPressed(Key.CTRL) && eventLogger.isPressed(Key.SHIFT)) {
-            // CTRL + SHIFT + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    this::previousFrame);
-        } else if (eventLogger.isPressed(Key.CTRL)) {
-            // CTRL + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    this::nextFrame);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    this::toFirstFrame);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    this::toLastFrame);
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.ENTER, GameKeyEvent.Action.PRESS),
-                    playbackInfo::toggleMode);
-        } else if (eventLogger.isPressed(Key.SHIFT)) {
-            // SHIFT + ?
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> playbackInfo.incrementFps(-Constants.PLAYBACK_FPS_INC));
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.RIGHT_ARROW, GameKeyEvent.Action.PRESS),
-                    () -> playbackInfo.incrementFps(Constants.PLAYBACK_FPS_INC));
-        } else {
-            // single key presses
-            eventLogger.checkForMatchingKeyStroke(
-                    GameKeyEvent.newKeyStroke(Key.SPACE, GameKeyEvent.Action.PRESS),
-                    playbackInfo::togglePlaying);
-        }
+        PREVIOUS_FRAME.shortcut.checkIfPressed(
+                eventLogger, this::previousFrame);
+        NEXT_FRAME.shortcut.checkIfPressed(
+                eventLogger, this::nextFrame);
+
+        TO_FIRST_FRAME.shortcut.checkIfPressed(
+                eventLogger, this::toFirstFrame);
+        TO_LAST_FRAME.shortcut.checkIfPressed(
+                eventLogger, this::toLastFrame);
+
+        TOGGLE_PLAYING.shortcut.checkIfPressed(
+                eventLogger, playbackInfo::togglePlaying);
+        CYCLE_PLAYBACK_MODE.shortcut.checkIfPressed(
+                eventLogger, playbackInfo::cycleMode);
     }
 }

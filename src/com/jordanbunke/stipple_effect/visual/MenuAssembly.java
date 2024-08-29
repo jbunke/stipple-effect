@@ -5,7 +5,6 @@ import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleMenuButton;
-import com.jordanbunke.delta_time.menu.menu_elements.button.SimpleToggleMenuButton;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.NestedItem;
@@ -309,12 +308,12 @@ public class MenuAssembly {
                 playStopTogglePos = panelPos.displace(CONTENT_BUFFER_PX +
                                 (PLAY_STOP_INDEX * BUTTON_INC),
                         ICON_BUTTON_OFFSET_Y);
-        mb.add(generatePlayStopToggle(c, playStopTogglePos));
+        mb.add(generatePlayStopToggle(c.playbackInfo, playStopTogglePos));
 
         // playback mode toggle button
         final Coord2D playbackModeTogglePos = playStopTogglePos.displace(
                 disp.scale(PLAYBACK_MODE_INDEX - PLAY_STOP_INDEX));
-        mb.add(generatePlaybackModeToggle(c, playbackModeTogglePos));
+        mb.add(generatePlaybackModeToggle(c.playbackInfo, playbackModeTogglePos));
 
         // frame controls
         final Coord2D frameControlPos = panelPos.displace(fbOffsetFromLB, 0);
@@ -415,8 +414,8 @@ public class MenuAssembly {
         return mb.build();
     }
 
-    private static SimpleToggleMenuButton generatePlaybackModeToggle(
-            final SEContext c, final Coord2D pos
+    public static IconToggleButton generatePlaybackModeToggle(
+            final PlaybackInfo pbi, final Coord2D pos
     ) {
         final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
                 PlaybackInfo.Mode.FORWARDS,
@@ -431,20 +430,19 @@ public class MenuAssembly {
         return IconToggleButton.make(pos, codes,
                 Arrays.stream(validModes).map(mode ->
                         (Runnable) () -> {}).toArray(Runnable[]::new),
-                () -> c.playbackInfo.getMode().buttonIndex(),
-                c.playbackInfo::toggleMode);
+                () -> pbi.getMode().buttonIndex(), pbi::cycleMode);
     }
 
-    private static SimpleToggleMenuButton generatePlayStopToggle(
-            final SEContext c, final Coord2D pos
+    public static IconToggleButton generatePlayStopToggle(
+            final PlaybackInfo pbi, final Coord2D pos
     ) {
         // 0: is playing, button click should STOP; 1: vice-versa
         final String[] codes = new String[]
                 { ResourceCodes.STOP, ResourceCodes.PLAY };
 
         return IconToggleButton.make(pos, codes, new Runnable[] {
-                c.playbackInfo::stop, c.playbackInfo::play
-        }, () -> c.playbackInfo.isPlaying() ? 0 : 1, () -> {});
+                pbi::stop, pbi::play
+        }, () -> pbi.isPlaying() ? 0 : 1, () -> {});
     }
 
     private static int frameButtonXDisplacement(final SEContext c) {

@@ -25,8 +25,10 @@ import com.jordanbunke.delta_time.window.GameWindow;
 import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.project.SaveConfig;
+import com.jordanbunke.stipple_effect.preview.EmbeddedPreview;
+import com.jordanbunke.stipple_effect.preview.Preview;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -373,19 +375,34 @@ public class StippleEffect implements ProgramContext {
             if (!Permissions.isTyping())
                 processNonStateKeyPresses(eventLogger);
 
-            // projects
-            projectsMenu.process(eventLogger);
-            // colors
-            colorsMenu.process(eventLogger);
-            // tools
-            toolButtonMenu.process(eventLogger);
-            // flipbook
-            flipbookMenu.process(eventLogger);
-            // bottom bar
-            bottomBarMenu.process(eventLogger);
+            final boolean doBehindPreview;
 
-            // workspace
-            getContext().process(eventLogger);
+            if (Preview.get() instanceof EmbeddedPreview ep) {
+                if (ep.inBounds(mousePos)) {
+                    ep.process(eventLogger);
+                    doBehindPreview = false;
+                } else {
+                    ep.processExternal(eventLogger);
+                    doBehindPreview = true;
+                }
+            } else
+                doBehindPreview = true;
+
+            if (doBehindPreview) {
+                // projects
+                projectsMenu.process(eventLogger);
+                // colors
+                colorsMenu.process(eventLogger);
+                // tools
+                toolButtonMenu.process(eventLogger);
+                // flipbook
+                flipbookMenu.process(eventLogger);
+                // bottom bar
+                bottomBarMenu.process(eventLogger);
+
+                // workspace
+                getContext().process(eventLogger);
+            }
         } else {
             dialog.process(eventLogger);
             CLEAR_DIALOG.doForMatchingKeyStroke(eventLogger, null);
@@ -470,6 +487,10 @@ public class StippleEffect implements ProgramContext {
             projectsMenu.update(deltaTime);
             // flipbook
             flipbookMenu.update(deltaTime);
+
+            // preview
+            if (Preview.get() instanceof EmbeddedPreview ep)
+                ep.update(deltaTime);
         } else {
             dialog.update(deltaTime);
         }
@@ -594,6 +615,10 @@ public class StippleEffect implements ProgramContext {
         // projects / contexts
         projectsMenu.render(canvas);
 
+        // preview
+        if (Preview.get() instanceof EmbeddedPreview ep)
+            ep.render(canvas);
+
         if (dialog != null) {
             canvas.fillRectangle(Settings.getTheme().dialogVeil,
                     0, 0, Layout.width(), Layout.height());
@@ -624,9 +649,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     @Override
-    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
-
-    }
+    public void debugRender(final GameImage canvas, final GameDebugger debugger) {}
 
     private GameImage drawColorsSegment() {
         return drawPanel(Layout.getColorsWidth(),
@@ -1205,6 +1228,15 @@ public class StippleEffect implements ProgramContext {
 
         // redraw everything
         rebuildAllMenus();
+
+        final Preview p = Preview.get();
+
+        if (p instanceof EmbeddedPreview ep && !Settings.isSeparatedPreview())
+            ep.refresh();
+        else if (p != null)
+            Preview.set(getContext());
+
+        window.focus();
     }
 
     public void autoAssignPickUpSelection() {
