@@ -25,6 +25,7 @@ public final class PreviewContainer extends MenuElement {
 
     // hand auxiliaries
     private boolean panning;
+    private Coord2D startMousePos, startAnchor;
 
     public PreviewContainer(
             final Coord2D position, final Preview preview
@@ -36,12 +37,29 @@ public final class PreviewContainer extends MenuElement {
         frame = GameImage.dummy();
 
         panning = false;
+        startMousePos = new Coord2D();
+        startAnchor = new Coord2D();
     }
 
     @Override
     public void process(final InputEventLogger eventLogger) {
-        final boolean inBounds = mouseIsWithinBounds(
-                eventLogger.getAdjustedMousePosition());
+        final Coord2D mousePos = eventLogger.getAdjustedMousePosition();
+        final boolean inBounds = mouseIsWithinBounds(mousePos);
+
+        if (panning) {
+            final float z = renderInfo.getZoomFactor();
+
+            final Coord2D shift = new Coord2D(
+                    (int)((startMousePos.x - mousePos.x) / z),
+                    (int)((startMousePos.y - mousePos.y) / z));
+
+            final Coord2D anchor = new Coord2D(
+                    startAnchor.x + shift.x, startAnchor.y + shift.y);
+            renderInfo.setAnchor(anchor, frame.getWidth(), frame.getHeight());
+
+            if (!inBounds)
+                panning = false;
+        }
 
         if (inBounds) {
             final List<GameEvent> unprocessed = eventLogger.getUnprocessedEvents();
@@ -56,14 +74,21 @@ public final class PreviewContainer extends MenuElement {
                     else
                         renderInfo.zoomOutPreview();
                 } else if (event instanceof GameMouseEvent me) {
-                    // TODO
-
-                    me.markAsProcessed();
+                    if (me.matchesAction(GameMouseEvent.Action.DOWN)) {
+                        panning = true;
+                        startMousePos = mousePos;
+                        startAnchor = renderInfo.getAnchor();
+                        me.markAsProcessed();
+                    } else if (me.matchesAction(GameMouseEvent.Action.UP)) {
+                        panning = false;
+                        me.markAsProcessed();
+                    }
                 }
+        }
 
+        if (panning || inBounds)
             SECursor.setCursorCode(panning
                     ? SECursor.HAND_GRAB : SECursor.HAND_OPEN);
-        }
     }
 
     @Override
@@ -86,7 +111,7 @@ public final class PreviewContainer extends MenuElement {
         final GameImage container = new GameImage(w, h);
         container.fill(Settings.getTheme().workspaceBackground);
 
-        // TODO - checkerboard?
+        // checkerboard?
 
         final Coord2D rp = renderInfo.localRenderPosition(w, h);
         final Coord2D[] bounds = renderBounds(rp, fw, fh, z);

@@ -55,6 +55,7 @@ public final class Layout {
             PREV_MIN_W = 262, PREV_MIN_H = 334, PREV_TL_BUFFER = 20,
             PREV_CONTAINER_Y = PREV_TL_BUFFER + (BUTTON_INC * 3) +
                     (CONTENT_BUFFER_PX - BUTTON_OFFSET),
+            EMBED_PREV_TOP_BAR_Y = STD_TEXT_BUTTON_H,
             COLOR_TEXTBOX_W = 116,
             SLIDER_OFF_DIM = 20, SLIDER_BALL_DIM = 20, SLIDER_THINNING = 4,
             TOP_PANEL_SCROLL_WINDOW_H = STD_TEXT_BUTTON_H + SLIDER_BALL_DIM,

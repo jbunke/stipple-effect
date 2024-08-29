@@ -106,7 +106,7 @@ public class RenderInfo {
         setAnchor(anchor, w, h);
     }
 
-    private void setAnchor(final Coord2D anchor, final int w, final int h) {
+    public void setAnchor(final Coord2D anchor, final int w, final int h) {
         this.anchor = new Coord2D(
                 MathPlus.bounded(0, anchor.x, w),
                 MathPlus.bounded(0, anchor.y, h));

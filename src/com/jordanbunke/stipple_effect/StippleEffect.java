@@ -375,10 +375,20 @@ public class StippleEffect implements ProgramContext {
             if (!Permissions.isTyping())
                 processNonStateKeyPresses(eventLogger);
 
-            if (Preview.get() instanceof EmbeddedPreview ep &&
-                    ep.mouseIsWithinBounds(mousePos))
-                ep.process(eventLogger);
-            else {
+            final boolean doBehindPreview;
+
+            if (Preview.get() instanceof EmbeddedPreview ep) {
+                if (ep.inBounds(mousePos)) {
+                    ep.process(eventLogger);
+                    doBehindPreview = false;
+                } else {
+                    ep.processExternal(eventLogger);
+                    doBehindPreview = true;
+                }
+            } else
+                doBehindPreview = true;
+
+            if (doBehindPreview) {
                 // projects
                 projectsMenu.process(eventLogger);
                 // colors

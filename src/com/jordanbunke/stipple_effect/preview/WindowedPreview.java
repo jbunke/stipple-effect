@@ -57,7 +57,7 @@ public final class WindowedPreview extends Preview {
 
         window.hideCursor();
         window.setPosition(winX, winY);
-        window.setSizeBounds(Preview.minSize(), Preview.maxSize());
+        window.setSizeBounds(minSize(), maxSize());
 
         window.setOnCloseBehaviour(preview::terminateExecution);
         window.setPostResizeLogic((w, h) -> {
@@ -86,7 +86,7 @@ public final class WindowedPreview extends Preview {
 
         for (GameEvent event : unprocessed)
             if (event instanceof GameWindowEvent gwe && gwe.action == GameWindowEvent.Action.CLOSING) {
-                window.executeOnClose();
+                close();
                 gwe.markAsProcessed();
                 return;
             } else if (event instanceof WindowMovedEvent wme) {

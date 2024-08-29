@@ -24,6 +24,7 @@ import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
+import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 
 import java.nio.file.Path;
@@ -62,9 +63,9 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
         if (INSTANCE != null)
             INSTANCE.close();
 
-        final boolean embedded = false; // TODO - fetch from setting
+        final boolean embedded = true; // TODO - fetch from setting
 
-        INSTANCE = embedded ? EmbeddedPreview.make(c) : new WindowedPreview(c);
+        INSTANCE = embedded ? new EmbeddedPreview(c) : new WindowedPreview(c);
     }
 
     public static Preview get() {
@@ -105,42 +106,33 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
         final Supplier<Boolean> hasMultipleFrames = () -> frameCount > 1;
 
         // SCRIPT
-        final MenuElement smartScriptElement = new ThinkingMenuElement(() -> {
-            final boolean hasScript = script != null;
-            final String text = (hasScript ? "Running" : "No") + " script";
+        final String script = "Running script", noScript = "No script";
 
-            if (hasScript) {
-                final MenuElement removeButton =
-                        GraphicsUtils.generateIconButton(
-                                ResourceCodes.REMOVE_SCRIPT, initial,
-                                () -> true, this::removeScript),
-                        importButton = GraphicsUtils.generateIconButton(
-                                ResourceCodes.IMPORT_PREVIEW,
-                                initial.displace(BUTTON_INC, 0),
-                                () -> content != null && content.length > 0,
-                                this::importPreview),
-                        // TODO - import per layer
-                        scriptText = labelAfterLastButton(
-                                importButton, () -> text, text);
+        final MenuElement removeButton = IconButton.make(
+                ResourceCodes.REMOVE_SCRIPT, initial, this::removeScript),
+                importButton = IconButton.make(
+                        ResourceCodes.IMPORT_PREVIEW,
+                        initial.displace(BUTTON_INC, 0),
+                        this::importPreview),
+                perLayerButton = IconButton.make(
+                        ResourceCodes.IMPORT_PER_LAYER,
+                        initial.displace(BUTTON_INC * 2, 0),
+                        this::importPerLayer),
+                scriptText = labelAfterLastButton(
+                        perLayerButton, () -> script, script),
+                uploadButton = IconButton.make(
+                        ResourceCodes.IMPORT_SCRIPT,
+                        initial, this::openPreviewScript),
+                noScriptText = labelAfterLastButton(
+                        uploadButton, () -> noScript, noScript);
+        addMenuComponents(uploadButton, removeButton, importButton,
+                perLayerButton, scriptText, noScriptText);
 
-                addMenuComponents(removeButton, importButton, scriptText);
-
-                return new MenuElementGrouping(
-                        removeButton, importButton, scriptText);
-            } else {
-                final MenuElement scriptButton =
-                        GraphicsUtils.generateIconButton(
-                                ResourceCodes.IMPORT_SCRIPT, initial,
-                                () -> true, this::openPreviewScript),
-                        scriptText = labelAfterLastButton(
-                                scriptButton, () -> text, text);
-
-                addMenuComponents(scriptButton, scriptText);
-
-                return new MenuElementGrouping(scriptButton, scriptText);
-            }
-        });
-        mb.addAll(smartScriptElement);
+        final MenuElement smartScriptElement = new ThinkingMenuElement(() ->
+                this.script != null ? new MenuElementGrouping(
+                        removeButton, importButton, perLayerButton, scriptText)
+                        : new MenuElementGrouping(uploadButton, noScriptText));
+        mb.add(smartScriptElement);
 
         // PLAYBACK
         final MenuElement firstFrame =
@@ -375,6 +367,13 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
     private void importPreview() {
         final SEContext project = ScriptUtils.projectFromScriptOutput(content);
+
+        StippleEffect.get().scheduleJob(() ->
+                StippleEffect.get().addContext(project, true));
+    }
+
+    private void importPerLayer() {
+        final SEContext project = ScriptUtils.transformProjectPerLayer(c, script);
 
         StippleEffect.get().scheduleJob(() ->
                 StippleEffect.get().addContext(project, true));

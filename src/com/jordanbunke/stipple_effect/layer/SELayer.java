@@ -38,9 +38,9 @@ public final class SELayer {
     ) {
         final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
 
-        return new SELayer(frames, content[0], source.opacity,
-                source.enabled, source.framesLinked, source.onionSkinMode,
-                source.name);
+        return new SELayer(frames, content[0], source.opacity, source.enabled,
+                content.length == 1 && source.framesLinked,
+                source.onionSkinMode, source.name);
     }
 
     public static SELayer newLayer(
