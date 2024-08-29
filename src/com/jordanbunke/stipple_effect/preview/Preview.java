@@ -61,14 +61,19 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     }
 
     public static void set(final SEContext c) {
+        final boolean windowed = StippleEffect.get().isWindowed(),
+                separated = Settings.isSeparatedPreview();
+
         if (INSTANCE != null) {
-            if (INSTANCE.c.equals(c) && INSTANCE instanceof EmbeddedPreview)
+            if (INSTANCE.c.equals(c) && INSTANCE instanceof EmbeddedPreview ep &&
+                    !windowed) {
+                ep.refresh();
                 return;
-            else
+            } else
                 INSTANCE.close();
         }
 
-        INSTANCE = (StippleEffect.get().isWindowed() && true)
+        INSTANCE = (windowed && separated)
                 ? new WindowedPreview(c) : new EmbeddedPreview(c);
     }
 
@@ -259,7 +264,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {}
 
-    protected void close() {
+    public void close() {
         kill();
     }
     protected void executeOnFileDialogOpen() {}

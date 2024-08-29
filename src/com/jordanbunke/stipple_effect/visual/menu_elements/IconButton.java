@@ -56,7 +56,7 @@ public class IconButton extends SimpleMenuButton {
 
     @Override
     public void update(final double deltaTime) {
-        if (isHighlighted() && Permissions.canSendToolTip(code) &&
+        if (isHighlighted() && Permissions.canSendToolTip() &&
                 !code.equals(ResourceCodes.NO_TOOLTIP))
             StippleEffect.get().sendToolTipUpdate(code);
     }

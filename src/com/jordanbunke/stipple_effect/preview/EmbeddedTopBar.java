@@ -148,10 +148,11 @@ public final class EmbeddedTopBar extends MenuElement {
         if (x + w > ww)
             super.setX(ww - w);
         // navbar is off-limits
-        if (y < STD_TEXT_BUTTON_H)
-            super.setY(STD_TEXT_BUTTON_H);
-        if (y + h > wh)
-            super.setY(wh - h);
+        if (y < COLLAPSED_PROJECTS_H)
+            super.setY(COLLAPSED_PROJECTS_H);
+        // bottom bar is off-limits
+        if (y + h > wh - BOTTOM_BAR_H)
+            super.setY((wh - BOTTOM_BAR_H) - h);
     }
 
     @Override

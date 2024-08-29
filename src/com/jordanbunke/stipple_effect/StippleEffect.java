@@ -27,8 +27,8 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.preview.EmbeddedPreview;
 import com.jordanbunke.stipple_effect.preview.Preview;
-import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -1229,8 +1229,14 @@ public class StippleEffect implements ProgramContext {
         // redraw everything
         rebuildAllMenus();
 
-        if (Preview.get() instanceof EmbeddedPreview ep)
+        final Preview p = Preview.get();
+
+        if (p instanceof EmbeddedPreview ep && !Settings.isSeparatedPreview())
             ep.refresh();
+        else if (p != null)
+            Preview.set(getContext());
+
+        window.focus();
     }
 
     public void autoAssignPickUpSelection() {

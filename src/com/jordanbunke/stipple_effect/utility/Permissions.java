@@ -3,10 +3,9 @@ package com.jordanbunke.stipple_effect.utility;
 import com.jordanbunke.stipple_effect.preview.EmbeddedPreview;
 
 import java.util.Optional;
-import java.util.Set;
 
-import static com.jordanbunke.delta_time.utility.DeltaTimeGlobal.*;
-import static com.jordanbunke.stipple_effect.utility.action.ResourceCodes.*;
+import static com.jordanbunke.delta_time.utility.DeltaTimeGlobal.SC_CURSOR_CAPTURED;
+import static com.jordanbunke.delta_time.utility.DeltaTimeGlobal.getStatusOf;
 
 public class Permissions {
     public static boolean isTyping() {
@@ -18,15 +17,13 @@ public class Permissions {
         return getStatusOf(SC_CURSOR_CAPTURED).isEmpty();
     }
 
-    public static boolean canSendToolTip(final String code) {
-        final Set<String> previewCodes = Set.of(IMPORT_SCRIPT,
-                REMOVE_SCRIPT, IMPORT_PREVIEW, IMPORT_PER_LAYER);
-
+    public static boolean canSendToolTip() {
         final Optional<Object> status = getStatusOf(SC_CURSOR_CAPTURED);
 
-        return status.isEmpty() ||
-                (status.get() instanceof EmbeddedPreview &&
-                        previewCodes.contains(code));
+        if (status.isEmpty())
+            return true;
+
+        return status.get() instanceof EmbeddedPreview;
     }
 
     public static boolean selectionIsCels() {

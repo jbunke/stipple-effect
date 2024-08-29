@@ -3,15 +3,19 @@
 Added:
 > Layer visibility actions to navbar under "Layer" -> "Visibility status"
 > Bug reporting and scripting API link to navbar
+> Setting for whether preview windows are opened in a separate window
+> Reimport a preview into Stipple Effect with layers preserved
 
 Changed:
 > Improved file dialogs on Windows
+> Combined file dialog file filters for {.stip} and image files into a single filter
 > `(image -> image)` preview scripts can be run on animated projects
 > Cosmetic and layout changes
   > Simplified and shortened color sampler labels
   > Updated {Zo} theme colors
   > Updated layer button layout and flipbook panel sizing
-> Combined file dialog file filters for {.stip} and image files into a single filter
+> Preview windows are now resizeable
+> Preview windows can run in the main program window or a separate window as before
 
 Fixed:
 > Bug: `$SE.single_outline()` calls a double outline instead of a single outline

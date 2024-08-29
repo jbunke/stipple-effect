@@ -108,7 +108,7 @@ public final class WindowedPreview extends Preview {
     }
 
     @Override
-    protected void close() {
+    public void close() {
         window.closeInstance();
         super.close();
     }

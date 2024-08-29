@@ -18,6 +18,7 @@ import java.util.List;
 import static com.jordanbunke.stipple_effect.project.RenderInfo.*;
 import static com.jordanbunke.stipple_effect.utility.Layout.PREV_CONTAINER_Y;
 import static com.jordanbunke.stipple_effect.utility.Layout.PREV_TL_BUFFER;
+import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public final class PreviewContainer extends MenuElement {
     private final RenderInfo renderInfo;
@@ -45,6 +46,10 @@ public final class PreviewContainer extends MenuElement {
     public void process(final InputEventLogger eventLogger) {
         final Coord2D mousePos = eventLogger.getAdjustedMousePosition();
         final boolean inBounds = mouseIsWithinBounds(mousePos);
+        final int w = frame.getWidth(), h = frame.getHeight();
+
+        SNAP_TO_CENTER.shortcut.checkIfPressed(
+                eventLogger, () -> renderInfo.center(w, h));
 
         if (panning) {
             final float z = renderInfo.getZoomFactor();
@@ -55,7 +60,7 @@ public final class PreviewContainer extends MenuElement {
 
             final Coord2D anchor = new Coord2D(
                     startAnchor.x + shift.x, startAnchor.y + shift.y);
-            renderInfo.setAnchor(anchor, frame.getWidth(), frame.getHeight());
+            renderInfo.setAnchor(anchor, w, h);
 
             if (!inBounds)
                 panning = false;
