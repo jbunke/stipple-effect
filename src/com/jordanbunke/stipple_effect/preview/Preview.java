@@ -40,7 +40,7 @@ import static com.jordanbunke.stipple_effect.utility.Layout.*;
 public abstract class Preview extends MenuElement implements PreviewPlayback {
     private static Preview INSTANCE;
 
-    private final SEContext c;
+    public final SEContext c;
     private HeadFuncNode script;
 
     // playback
@@ -66,7 +66,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
         if (INSTANCE != null) {
             if (INSTANCE.c.equals(c) && INSTANCE instanceof EmbeddedPreview ep &&
-                    !windowed) {
+                    !(windowed && separated)) {
                 ep.refresh();
                 return;
             } else
@@ -240,7 +240,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
     @Override
     public void update(final double deltaTime) {
-        if (!projectActive()) {
+        if (!projectOpen()) {
             close();
             return;
         }
@@ -278,8 +278,18 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
                 (int)(height() * 0.75));
     }
 
-    private boolean projectActive() {
-        return c.equals(StippleEffect.get().getContext());
+    public void copyState(final Preview source) {
+        if (!c.equals(source.c))
+            return;
+
+        setScript(source.script);
+
+        container.setFrame(source.container.getFrame());
+        container.setRenderInfo(source.container.getRenderInfo());
+    }
+
+    private boolean projectOpen() {
+        return StippleEffect.get().getContexts().contains(c);
     }
 
     private void animate(final double deltaTime) {

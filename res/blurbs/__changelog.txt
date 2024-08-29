@@ -14,8 +14,10 @@ Changed:
   > Simplified and shortened color sampler labels
   > Updated {Zo} theme colors
   > Updated layer button layout and flipbook panel sizing
-> Preview windows are now resizeable
-> Preview windows can run in the main program window or a separate window as before
+> Preview window changes
+  > Preview windows are now resizeable
+  > Preview windows can run in the main program window or a separate window as before
+  > Preview windows now persist across project context switches
 
 Fixed:
 > Bug: `$SE.single_outline()` calls a double outline instead of a single outline

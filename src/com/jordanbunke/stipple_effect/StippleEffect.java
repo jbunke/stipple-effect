@@ -1233,8 +1233,10 @@ public class StippleEffect implements ProgramContext {
 
         if (p instanceof EmbeddedPreview ep && !Settings.isSeparatedPreview())
             ep.refresh();
-        else if (p != null)
-            Preview.set(getContext());
+        else if (p != null) {
+            Preview.set(p.c);
+            Preview.get().copyState(p);
+        }
 
         window.focus();
     }
