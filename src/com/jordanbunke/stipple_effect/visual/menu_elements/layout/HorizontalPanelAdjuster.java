@@ -12,4 +12,12 @@ public final class HorizontalPanelAdjuster extends PanelAdjuster {
     ) {
         super(position, length, false, leftLeeway, rightLeeway, consequence);
     }
+
+    public void setLeftLeeway(final int leftLeeway) {
+        setMinusLeeway(leftLeeway);
+    }
+
+    public void setRightLeeway(final int rightLeeway) {
+        setPlusLeeway(rightLeeway);
+    }
 }

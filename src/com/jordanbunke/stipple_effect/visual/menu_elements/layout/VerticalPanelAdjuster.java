@@ -13,4 +13,12 @@ public final class VerticalPanelAdjuster extends PanelAdjuster {
     ) {
         super(position, width, true, upLeeway, downLeeway, consequence);
     }
+
+    public void setUpLeeway(final int upLeeway) {
+        setMinusLeeway(upLeeway);
+    }
+
+    public void setDownLeeway(final int downLeeway) {
+        setPlusLeeway(downLeeway);
+    }
 }

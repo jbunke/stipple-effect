@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.menu.Menu;
 import com.jordanbunke.delta_time.menu.MenuBuilder;
 import com.jordanbunke.delta_time.menu.menu_elements.MenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
@@ -18,17 +19,17 @@ import com.jordanbunke.stipple_effect.project.PlaybackInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
-import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
+import com.jordanbunke.stipple_effect.visual.MenuAssembly;
 import com.jordanbunke.stipple_effect.visual.menu_elements.DynamicLabel;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IconButton;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -39,7 +40,7 @@ import static com.jordanbunke.stipple_effect.utility.Layout.*;
 public abstract class Preview extends MenuElement implements PreviewPlayback {
     private static Preview INSTANCE;
 
-    final SEContext c;
+    private final SEContext c;
     private HeadFuncNode script;
 
     // playback
@@ -60,12 +61,15 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     }
 
     public static void set(final SEContext c) {
-        if (INSTANCE != null)
-            INSTANCE.close();
+        if (INSTANCE != null) {
+            if (INSTANCE.c.equals(c) && INSTANCE instanceof EmbeddedPreview)
+                return;
+            else
+                INSTANCE.close();
+        }
 
-        final boolean embedded = true; // TODO - fetch from setting
-
-        INSTANCE = embedded ? new EmbeddedPreview(c) : new WindowedPreview(c);
+        INSTANCE = (StippleEffect.get().isWindowed() && true)
+                ? new WindowedPreview(c) : new EmbeddedPreview(c);
     }
 
     public static Preview get() {
@@ -95,6 +99,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
         container = new PreviewContainer(
                 initialPos.displace(PREV_TL_BUFFER, PREV_CONTAINER_Y), this);
+        addMenuComponents(container);
     }
 
     private Menu makeMenu() {
@@ -136,57 +141,29 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
         // PLAYBACK
         final MenuElement firstFrame =
-                GraphicsUtils.generateIconButton(
-                        ResourceCodes.TO_FIRST_FRAME,
-                        initial.displace(0, BUTTON_INC),
-                        hasMultipleFrames, () -> frameIndex = 0),
-                previousFrame = GraphicsUtils.generateIconButton(
-                        ResourceCodes.PREVIOUS, firstFrame.getRenderPosition()
-                                .displace(BUTTON_INC, 0),
-                        hasMultipleFrames, () -> frameIndex = frameIndex == 0
-                                ? frameCount - 1 : frameIndex - 1),
-                playStop = GraphicsUtils.generateIconToggleButton(
+                IconButton.make(ResourceCodes.TO_FIRST_FRAME,
+                        initial.displace(0, BUTTON_INC), this::toFirstFrame),
+                previousFrame = IconButton.make(ResourceCodes.PREVIOUS,
+                        firstFrame.getRenderPosition().displace(BUTTON_INC, 0),
+                        this::previousFrame),
+                playStop = MenuAssembly.generatePlayStopToggle(playbackInfo,
                         previousFrame.getRenderPosition()
-                                .displace(BUTTON_INC, 0),
-                        new String[] { ResourceCodes.PLAY, ResourceCodes.STOP },
-                        new Runnable[] {
-                                playbackInfo::play, playbackInfo::stop
-                        }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
-                        hasMultipleFrames, ResourceCodes.PLAY),
-                nextFrame = GraphicsUtils.generateIconButton(
-                        ResourceCodes.NEXT, playStop.getRenderPosition()
-                                .displace(BUTTON_INC, 0),
-                        hasMultipleFrames, () ->
-                                frameIndex = (frameIndex + 1) % frameCount),
-                lastFrame = GraphicsUtils.generateIconButton(
-                        ResourceCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
-                                .displace(BUTTON_INC, 0),
-                        hasMultipleFrames, () -> frameIndex = frameCount - 1);
+                                .displace(BUTTON_INC, 0)),
+                nextFrame = IconButton.make(ResourceCodes.NEXT,
+                        playStop.getRenderPosition().displace(BUTTON_INC, 0),
+                        this::nextFrame),
+                lastFrame = IconButton.make(ResourceCodes.TO_LAST_FRAME,
+                        nextFrame.getRenderPosition().displace(BUTTON_INC, 0),
+                        this::toLastFrame);
 
-        final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
-                PlaybackInfo.Mode.FORWARDS, PlaybackInfo.Mode.BACKWARDS,
-                PlaybackInfo.Mode.LOOP, PlaybackInfo.Mode.PONG_FORWARDS
-        };
         final MenuElement playbackModeButton =
-                GraphicsUtils.generateIconToggleButton(
-                        lastFrame.getRenderPosition().displace(
-                                BUTTON_INC, 0),
-                        Arrays.stream(validModes)
-                                .map(PlaybackInfo.Mode::getIconCode)
-                                .toArray(String[]::new),
-                        Arrays.stream(validModes)
-                                .map(mode -> (Runnable) () -> {})
-                                .toArray(Runnable[]::new),
-                        () -> playbackInfo.getMode().buttonIndex(),
-                        playbackInfo::cycleMode, hasMultipleFrames,
-                        ResourceCodes.LOOP);
+                MenuAssembly.generatePlaybackModeToggle(playbackInfo,
+                        lastFrame.getRenderPosition().displace(BUTTON_INC, 0));
         final DynamicLabel frameTracker = labelAfterLastButton(
                 playbackModeButton,
                 () -> (frameIndex + 1) + "/" + frameCount, "XXX/XXX");
 
         addMenuComponents(firstFrame, previousFrame, playStop,
-                nextFrame, lastFrame, playbackModeButton, frameTracker);
-        mb.addAll(firstFrame, previousFrame, playStop,
                 nextFrame, lastFrame, playbackModeButton, frameTracker);
 
         // FPS
@@ -204,7 +181,14 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
                         i -> i, sv -> sv, sv -> sv + " FPS", "XXX FPS");
 
         addMenuComponents(fps.decButton, fps.incButton, fps.slider, fps.value);
-        mb.addAll(fps.decButton, fps.incButton, fps.slider, fps.value);
+
+        final MenuElement smartPlaybackElement = new GatewayMenuElement(
+                new MenuElementGrouping(
+                        firstFrame, previousFrame, playStop,
+                        nextFrame, lastFrame, playbackModeButton, frameTracker,
+                        fps.decButton, fps.incButton, fps.slider, fps.value
+                ), hasMultipleFrames);
+        mb.add(smartPlaybackElement);
 
         return mb.build();
     }
@@ -220,7 +204,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
                 getter, DynamicLabel.getWidth(widestCase));
     }
 
-    private void addMenuComponents(final MenuElement... components) {
+    void addMenuComponents(final MenuElement... components) {
         for (MenuElement component : components)
             componentsPositions.put(component, component.getPosition());
     }
@@ -275,8 +259,10 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {}
 
-    protected abstract void close();
-    protected abstract void executeOnFileDialogOpen();
+    protected void close() {
+        kill();
+    }
+    protected void executeOnFileDialogOpen() {}
 
     protected static Bounds2D minSize() {
         return new Bounds2D(PREV_MIN_W, PREV_MIN_H);
@@ -292,8 +278,10 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     }
 
     private void animate(final double deltaTime) {
+        final ProjectState s = c.getState();
+
         final double duration = script == null
-                ? c.getState().getFrameDurations().get(frameIndex)
+                ? s.getFrameDurations().get(frameIndex % s.getFrameCount())
                 : Constants.DEFAULT_FRAME_DURATION;
 
         if (playbackInfo.isPlaying()) {
@@ -406,5 +394,10 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     @Override
     public PlaybackInfo getPlaybackInfo() {
         return playbackInfo;
+    }
+
+    @Override
+    public String toString() {
+        return "Preview: " + c.getSaveConfig().getFormattedName(false, false);
     }
 }

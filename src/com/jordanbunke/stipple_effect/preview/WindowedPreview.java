@@ -45,9 +45,8 @@ public final class WindowedPreview extends Preview {
     }
 
     private GameWindow makeWindow() {
-        return new GameWindow("Preview: " +
-                c.getSaveConfig().getFormattedName(false, false),
-                winW, winH, GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
+        return new GameWindow(toString(), winW, winH,
+                GraphicsUtils.readIconAsset(ResourceCodes.PROGRAM),
                 false, true, false);
     }
 
@@ -111,7 +110,7 @@ public final class WindowedPreview extends Preview {
     @Override
     protected void close() {
         window.closeInstance();
-        kill();
+        super.close();
     }
 
     @Override

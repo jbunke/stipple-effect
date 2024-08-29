@@ -22,14 +22,15 @@ public abstract class PanelAdjuster extends MenuElement {
     private boolean moving, highlighted;
     private int onClickDim;
 
+    private final boolean vertical;
     private final Function<Coord2D, Integer> dimGetter;
     private final Supplier<Integer> valGetter;
     private final Consumer<Integer> valSetter;
     private final String cursor;
 
-    private final GameImage movingImg, highlightImg;
+    private GameImage movingImg, highlightImg;
     private final Consumer<Integer> consequence;
-    private final int minusLeeway, plusLeeway;
+    private int minusLeeway, plusLeeway;
 
     public PanelAdjuster(
             final Coord2D position, final int length,
@@ -42,22 +43,11 @@ public abstract class PanelAdjuster extends MenuElement {
                 vertical ? Anchor.LEFT_CENTRAL
                         : Anchor.CENTRAL_TOP, true);
 
-        final Theme t = Settings.getTheme();
+        this.vertical = vertical;
+        updateAssets();
 
-        final int imgW = vertical ? getWidth() : getWidth() / 2,
-                imgH = vertical ? getHeight() / 2 : getHeight();
-
-        movingImg = new GameImage(imgW, imgH);
-        movingImg.fill(t.highlightOutline);
-        movingImg.free();
-
-        highlightImg = new GameImage(imgW, imgH);
-        highlightImg.fill(t.buttonOutline);
-        highlightImg.fill(t.highlightOverlay);
-        highlightImg.free();
-
-        this.minusLeeway = Math.max(0, minusLeeway);
-        this.plusLeeway = Math.max(0, plusLeeway);
+        setMinusLeeway(minusLeeway);
+        setPlusLeeway(plusLeeway);
 
         this.consequence = consequence;
 
@@ -128,4 +118,40 @@ public abstract class PanelAdjuster extends MenuElement {
 
     @Override
     public void debugRender(final GameImage canvas, final GameDebugger debugger) {}
+
+    void setMinusLeeway(final int minusLeeway) {
+        this.minusLeeway = Math.max(0, minusLeeway);
+    }
+
+    void setPlusLeeway(final int plusLeeway) {
+        this.plusLeeway = Math.max(0, plusLeeway);
+    }
+
+    private void updateAssets() {
+        final Theme t = Settings.getTheme();
+
+        final int imgW = getWidth(), imgH = getHeight(),
+                w = vertical ? imgW : imgW / 2,
+                h = vertical ? imgH / 2 : imgH,
+                x = vertical ? 0 : THICKNESS / 4,
+                y = vertical ? THICKNESS / 4 : 0;
+
+        movingImg = new GameImage(imgW, imgH);
+        movingImg.fillRectangle(t.highlightOutline, x, y, w, h);
+        movingImg.free();
+
+        highlightImg = new GameImage(imgW, imgH);
+        highlightImg.fillRectangle(t.buttonOutline, x, y, w, h);
+        highlightImg.fillRectangle(t.highlightOverlay, x, y, w, h);
+        highlightImg.free();
+    }
+
+    public void setLength(final int length) {
+        if (vertical)
+            setWidth(length);
+        else
+            setHeight(length);
+
+        updateAssets();
+    }
 }

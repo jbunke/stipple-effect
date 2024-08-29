@@ -1228,6 +1228,9 @@ public class StippleEffect implements ProgramContext {
 
         // redraw everything
         rebuildAllMenus();
+
+        if (Preview.get() instanceof EmbeddedPreview ep)
+            ep.refresh();
     }
 
     public void autoAssignPickUpSelection() {

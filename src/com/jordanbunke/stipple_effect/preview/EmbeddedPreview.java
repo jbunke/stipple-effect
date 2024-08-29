@@ -13,11 +13,13 @@ import static com.jordanbunke.stipple_effect.utility.Layout.*;
 import static com.jordanbunke.stipple_effect.visual.SECursor.*;
 
 public final class EmbeddedPreview extends Preview {
-    // TODO:
-    //  moveable top bar with title
     private static int embX, embY, embW, embH;
 
-    private PanelAdjuster vertAdjuster, horzAdjuster;
+    private final EmbeddedTopBar topBar;
+    private VerticalPanelAdjuster vertAdjuster;
+    private HorizontalPanelAdjuster horzAdjuster;
+
+    private final int initialW, initialH;
 
     static {
         embX = 0;
@@ -30,8 +32,13 @@ public final class EmbeddedPreview extends Preview {
         super(c, new Coord2D(embX, embY + EMBED_PREV_TOP_BAR_Y),
                 new Bounds2D(embW, embH));
 
-        // TODO - define top bar
+        topBar = new EmbeddedTopBar(this);
         makeAdjusters();
+
+        initialW = embW;
+        initialH = embH;
+
+        refresh();
     }
 
     private void makeAdjusters() {
@@ -39,28 +46,67 @@ public final class EmbeddedPreview extends Preview {
 
         vertAdjuster = new VerticalPanelAdjuster(
                 getPosition().displace(0, h),
-                w, h - minSize().height(), maxSize().height() - h,
-                dh -> {
+                w, upLeeway(), downLeeway(), dh -> {
                     embH = getHeight() - dh;
                     setHeight(embH);
-                    makeAdjusters();
+                    horzAdjuster.setLength(embH);
+
+                    vertAdjuster.setDownLeeway(downLeeway());
+                    vertAdjuster.setUpLeeway(upLeeway());
                 });
         horzAdjuster = new HorizontalPanelAdjuster(
                 getPosition().displace(w, 0), h,
-                w - minSize().width(), maxSize().width() - w,
-                dw -> {
+                leftLeeway(), rightLeeway(), dw -> {
                     embW = getWidth() - dw;
                     setWidth(embW);
-                    // TODO - set top bar width
-                    makeAdjusters();
+                    topBar.setWidth(embW);
+                    vertAdjuster.setLength(embW);
+
+                    horzAdjuster.setLeftLeeway(leftLeeway());
+                    horzAdjuster.setRightLeeway(rightLeeway());
                 });
+
+        addMenuComponents(vertAdjuster, horzAdjuster);
+    }
+
+    private int upLeeway() {
+        return getHeight() - minSize().height();
+    }
+
+    private int downLeeway() {
+        return maxSize().height() - getHeight();
+    }
+
+    private int leftLeeway() {
+        return getWidth() - minSize().width();
+    }
+
+    private int rightLeeway() {
+        return maxSize().width() - getWidth();
+    }
+
+    public void refresh() {
+        // triggers bounding check
+        topBar.setPosition(topBar.getPosition());
+    }
+
+    @Override
+    public void setPosition(final Coord2D position) {
+        super.setPosition(position);
+
+        // panel adjuster fix
+        vertAdjuster.incrementY(embH - initialH);
+        horzAdjuster.incrementX(embW - initialW);
+
+        embX = position.x;
+        embY = position.y - EMBED_PREV_TOP_BAR_Y;
     }
 
     @Override
     public void update(final double deltaTime) {
         super.update(deltaTime);
 
-        // TODO
+        topBar.update(deltaTime);
     }
 
     @Override
@@ -77,14 +123,12 @@ public final class EmbeddedPreview extends Preview {
         vertAdjuster.render(canvas);
         horzAdjuster.render(canvas);
 
-        // TODO - render top bar
+        topBar.render(canvas);
     }
 
     @Override
     public void process(final InputEventLogger eventLogger) {
         processExternal(eventLogger);
-
-        // TODO - top bar
 
         super.process(eventLogger);
 
@@ -103,18 +147,12 @@ public final class EmbeddedPreview extends Preview {
     public void processExternal(final InputEventLogger eventLogger) {
         vertAdjuster.process(eventLogger);
         horzAdjuster.process(eventLogger);
+
+        topBar.process(eventLogger);
     }
 
     public boolean inBounds(final Coord2D mousePos) {
-        // TODO - potentially adjust for top bar
-        return mouseIsWithinBounds(mousePos);
+        return mouseIsWithinBounds(mousePos) ||
+                topBar.mouseIsWithinBounds(mousePos);
     }
-
-    @Override
-    protected void close() {
-        kill();
-    }
-
-    @Override
-    protected void executeOnFileDialogOpen() {}
 }

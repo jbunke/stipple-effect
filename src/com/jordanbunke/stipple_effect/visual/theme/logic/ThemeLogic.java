@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.visual.theme.logic;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
-import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.ParserUtils;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
@@ -18,6 +17,8 @@ import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import java.awt.*;
 import java.nio.file.Path;
 import java.util.function.Function;
+
+import static com.jordanbunke.stipple_effect.utility.Layout.*;
 
 public abstract class ThemeLogic {
     protected static final Path THEMES_FOLDER = Path.of("themes");
@@ -53,7 +54,7 @@ public abstract class ThemeLogic {
     public GameImage drawCheckbox(
             final boolean highlighted, final boolean checked
     ) {
-        final int w = Layout.ICON_DIMS.width(), h = Layout.ICON_DIMS.height();
+        final int w = ICON_DIMS.width(), h = ICON_DIMS.height();
 
         final GameImage checkbox = new GameImage(w, h);
         checkbox.fillRectangle(Settings.getTheme().buttonBody, 0, 0, w, h);
@@ -62,7 +63,7 @@ public abstract class ThemeLogic {
             checkbox.draw(GraphicsUtils.CHECKMARK);
 
         final Color frame = buttonBorderColor(false);
-        checkbox.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX,
+        checkbox.drawRectangle(frame, 2f * BUTTON_BORDER_PX,
                 0, 0, w, h);
 
         return highlighted ? highlightButton(checkbox.submit())
@@ -72,15 +73,15 @@ public abstract class ThemeLogic {
     public GameImage drawSliderBall(
             final boolean selected, final boolean highlighted, final Color fill
     ) {
-        final int sbd = Layout.SLIDER_BALL_DIM,
-                sbcd = sbd - (2 * Layout.BUTTON_BORDER_PX);
+        final int sbd = SLIDER_BALL_DIM,
+                sbcd = sbd - (2 * BUTTON_BORDER_PX);
 
         final GameImage ball = new GameImage(sbd, sbd);
         final Color border = buttonBorderColor(selected);
 
         ball.fillRectangle(border, 0, 0, sbd, sbd);
-        ball.fillRectangle(fill, Layout.BUTTON_BORDER_PX,
-                Layout.BUTTON_BORDER_PX, sbcd, sbcd);
+        ball.fillRectangle(fill, BUTTON_BORDER_PX,
+                BUTTON_BORDER_PX, sbcd, sbcd);
 
         ball.free();
 
@@ -88,24 +89,57 @@ public abstract class ThemeLogic {
     }
 
     public void drawHorizontalSliderOutline(final GameImage vesselWithCore) {
-        final int sd = vesselWithCore.getWidth() - Layout.SLIDER_BALL_DIM;
+        final int sd = vesselWithCore.getWidth() - SLIDER_BALL_DIM;
 
         vesselWithCore.drawRectangle(Settings.getTheme().buttonOutline,
-                Layout.BUTTON_BORDER_PX, Layout.SLIDER_BALL_DIM / 2,
-                Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2), sd,
-                vesselWithCore.getHeight() - (Layout.BUTTON_BORDER_PX +
-                        (2 * Layout.SLIDER_THINNING)));
+                BUTTON_BORDER_PX, SLIDER_BALL_DIM / 2,
+                SLIDER_THINNING + (BUTTON_BORDER_PX / 2), sd,
+                vesselWithCore.getHeight() - (BUTTON_BORDER_PX +
+                        (2 * SLIDER_THINNING)));
     }
 
     public void drawVerticalSliderOutline(final GameImage vesselWithCore) {
-        final int sd = vesselWithCore.getHeight() - Layout.SLIDER_BALL_DIM;
+        final int sd = vesselWithCore.getHeight() - SLIDER_BALL_DIM;
 
         vesselWithCore.drawRectangle(Settings.getTheme().buttonOutline,
-                Layout.BUTTON_BORDER_PX,
-                Layout.SLIDER_THINNING + (Layout.BUTTON_BORDER_PX / 2),
-                Layout.SLIDER_BALL_DIM / 2,
-                vesselWithCore.getWidth() - (Layout.BUTTON_BORDER_PX +
-                        (2 * Layout.SLIDER_THINNING)), sd);
+                BUTTON_BORDER_PX,
+                SLIDER_THINNING + (BUTTON_BORDER_PX / 2),
+                SLIDER_BALL_DIM / 2,
+                vesselWithCore.getWidth() - (BUTTON_BORDER_PX +
+                        (2 * SLIDER_THINNING)), sd);
+    }
+
+    public GameImage drawTopBar(final TextButton tb) {
+        final Theme t = Settings.getTheme();
+        final Color backgroundColor;
+
+        if (tb.isSelected())
+            backgroundColor = t.highlightOutline;
+        else
+            backgroundColor = t.buttonBody;
+
+        final Color textColor = intuitTextColor(backgroundColor, true);
+
+        final GameImage textImage = GraphicsUtils.uiText(textColor)
+                .addText(tb.getLabel()).build().draw();
+
+        final int w = tb.getWidth();
+        final GameImage img = new GameImage(w, EMBED_PREV_TOP_BAR_Y);
+
+        drawTextButtonBackground(img, tb, backgroundColor);
+
+        final int x = switch (tb.getAlignment()) {
+            case LEFT -> (2 * BUTTON_BORDER_PX);
+            case CENTER -> (w - textImage.getWidth()) / 2;
+            case RIGHT -> w - (textImage.getWidth() + (2 * BUTTON_BORDER_PX));
+        };
+
+        img.draw(textImage, x, TEXT_Y_OFFSET);
+
+        if (tb.isHighlighted())
+            img.fill(t.highlightOverlay);
+
+        return img.submit();
     }
 
     public final GameImage drawDropdownMenuLeafStub(final TextButton tb) {
@@ -117,10 +151,9 @@ public abstract class ThemeLogic {
         final String code = tb.getLabel();
 
         final boolean hasIcon = ResourceCodes.hasIcon(code);
-        final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
-                textY = Layout.TEXT_Y_OFFSET;
+        final int w = tb.getWidth(), textY = TEXT_Y_OFFSET;
 
-        final GameImage button = new GameImage(w, h);
+        final GameImage button = new GameImage(w, STD_TEXT_BUTTON_H);
 
         final Color backgroundColor = t.dropdownOptionBody;
         final Color actionCol = intuitTextColor(backgroundColor, conditionPassed),
@@ -130,7 +163,7 @@ public abstract class ThemeLogic {
         if (hasIcon) {
             final GameImage baseIcon = GraphicsUtils.loadIcon(code),
                     icon = conditionPassed ? baseIcon : unclickableIcon(baseIcon);
-            button.draw(icon, Layout.BUTTON_OFFSET, Layout.BUTTON_OFFSET);
+            button.draw(icon, BUTTON_OFFSET, BUTTON_OFFSET);
         }
 
         final String[] lines = ParserUtils.getToolTip(code);
@@ -146,7 +179,7 @@ public abstract class ThemeLogic {
                     final GameImage shortcutImage = GraphicsUtils.uiText(shortcutCol)
                             .addText(shortcut).build().draw();
                     button.draw(shortcutImage, w - (shortcutImage.getWidth() +
-                            Layout.CONTENT_BUFFER_PX), textY);
+                            CONTENT_BUFFER_PX), textY);
 
                     yield GraphicsUtils.uiText(actionCol)
                             .addText(action).build().draw();
@@ -156,12 +189,12 @@ public abstract class ThemeLogic {
                 default -> GameImage.dummy();
             };
 
-            final int actionTextX = Layout.CONTENT_BUFFER_PX +
-                    (hasIcon ? Layout.BUTTON_INC : 0);
+            final int actionTextX = CONTENT_BUFFER_PX +
+                    (hasIcon ? BUTTON_INC : 0);
             button.draw(actionImage, actionTextX, textY);
 
             if (tb.isHighlighted()) {
-                final int underlineY = Layout.STD_TEXT_BUTTON_H - 4;
+                final int underlineY = STD_TEXT_BUTTON_H - 4;
                 button.drawLine(actionCol, 1f, actionTextX, underlineY,
                         actionTextX + actionImage.getWidth(), underlineY);
             }
@@ -201,7 +234,7 @@ public abstract class ThemeLogic {
             final Color frame = buttonBorderColor(tb.isSelected());
             final int w = img.getWidth(), h = img.getHeight();
 
-            img.drawRectangle(frame, 2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+            img.drawRectangle(frame, 2f * BUTTON_BORDER_PX, 0, 0, w, h);
         }
     }
 
@@ -224,25 +257,25 @@ public abstract class ThemeLogic {
         final GameImage textImage = GraphicsUtils.uiText(textColor)
                 .addText(tb.getLabel()).build().draw();
 
-        final int w = tb.getWidth(), h = Layout.STD_TEXT_BUTTON_H;
-        final GameImage img = new GameImage(w, h);
+        final int w = tb.getWidth();
+        final GameImage img = new GameImage(w, STD_TEXT_BUTTON_H);
 
         drawTextButtonBackground(img, tb, backgroundColor);
 
         final int x = switch (tb.getAlignment()) {
-            case LEFT -> (2 * Layout.BUTTON_BORDER_PX);
+            case LEFT -> (2 * BUTTON_BORDER_PX);
             case CENTER -> (w - textImage.getWidth()) / 2;
-            case RIGHT -> w - (textImage.getWidth() + (2 * Layout.BUTTON_BORDER_PX));
+            case RIGHT -> w - (textImage.getWidth() + (2 * BUTTON_BORDER_PX));
         };
 
-        img.draw(textImage, x, Layout.TEXT_Y_OFFSET);
+        img.draw(textImage, x, TEXT_Y_OFFSET);
 
         // dropdown list button
         if (type == ButtonType.DD_HEAD) {
             final GameImage icon = GraphicsUtils.loadIcon(
                     tb.isSelected() ? ResourceCodes.COLLAPSE : ResourceCodes.EXPAND);
 
-            img.draw(icon, w - (Layout.BUTTON_INC), Layout.BUTTON_BORDER_PX);
+            img.draw(icon, w - (BUTTON_INC), BUTTON_BORDER_PX);
         }
 
         drawTextButtonForeground(img, tb);
@@ -254,9 +287,9 @@ public abstract class ThemeLogic {
     ) {
         final Theme t = Settings.getTheme();
 
-        final int w = ddh.getWidth(), h = Layout.STD_TEXT_BUTTON_H,
-                textY = Layout.TEXT_Y_OFFSET,
-                underlineY = Layout.STD_TEXT_BUTTON_H - 4;
+        final int w = ddh.getWidth(), h = STD_TEXT_BUTTON_H,
+                textY = TEXT_Y_OFFSET,
+                underlineY = STD_TEXT_BUTTON_H - 4;
 
         final GameImage button = new GameImage(w, h);
 
@@ -268,11 +301,11 @@ public abstract class ThemeLogic {
 
         final GameImage text = GraphicsUtils.uiText(textColor)
                 .addText(ddh.getLabel()).build().draw();
-        button.draw(text, Layout.CONTENT_BUFFER_PX, textY);
+        button.draw(text, CONTENT_BUFFER_PX, textY);
 
         if (ddh.isHighlighted() && !ddh.isSelected())
-            button.drawLine(textColor, 1f, Layout.CONTENT_BUFFER_PX,
-                    underlineY, Layout.CONTENT_BUFFER_PX + text.getWidth(),
+            button.drawLine(textColor, 1f, CONTENT_BUFFER_PX,
+                    underlineY, CONTENT_BUFFER_PX + text.getWidth(),
                     underlineY);
 
         if (expansion == DropdownExpansion.RIGHT) {
@@ -280,7 +313,7 @@ public abstract class ThemeLogic {
             final GameImage exp = GraphicsUtils.uiText(textColor)
                     .addText(expText).build().draw();
             button.draw(exp, w - (exp.getWidth() +
-                    Layout.CONTENT_BUFFER_PX), textY);
+                    CONTENT_BUFFER_PX), textY);
         }
 
         if (ddh.isSelected()) {
@@ -297,8 +330,8 @@ public abstract class ThemeLogic {
             final boolean partOfSelection
     ) {
         final Theme t = Settings.getTheme();
-        final int w = Layout.FRAME_BUTTON_W, h = Layout.STD_TEXT_BUTTON_H;
-        final GameImage img = new GameImage(w, h);
+        final int w = FRAME_BUTTON_W;
+        final GameImage img = new GameImage(w, STD_TEXT_BUTTON_H);
 
         final TextButton representation =
                 TextButton.of("", w).sim(selected, highlighted);
@@ -329,9 +362,9 @@ public abstract class ThemeLogic {
     public GameImage highlightButton(final GameImage baseButton) {
         final GameImage hi = new GameImage(baseButton);
         final int w = hi.getWidth(), h = hi.getHeight();
-        hi.fillRectangle(Settings.getTheme().highlightOverlay, 0, 0, w, h);
+        hi.fill(Settings.getTheme().highlightOverlay);
         hi.drawRectangle(Settings.getTheme().buttonOutline,
-                2f * Layout.BUTTON_BORDER_PX, 0, 0, w, h);
+                2f * BUTTON_BORDER_PX, 0, 0, w, h);
 
         return hi.submit();
     }
@@ -358,8 +391,8 @@ public abstract class ThemeLogic {
         final boolean hasSelection = left != right,
                 cursorAtRight = cursorIndex == right;
 
-        final int height = Layout.STD_TEXT_BUTTON_H,
-                px = Layout.BUTTON_BORDER_PX;
+        final int height = STD_TEXT_BUTTON_H,
+                px = BUTTON_BORDER_PX;
 
         final GameImage nhi = new GameImage(width, height);
         nhi.fillRectangle(backgroundColor, 0, 0, width, height);
@@ -380,7 +413,7 @@ public abstract class ThemeLogic {
                 postSelImage = GraphicsUtils.uiText(mainTextC)
                         .addText(postSel).build().draw();
 
-        Coord2D textPos = new Coord2D(2 * px, Layout.TEXT_Y_OFFSET);
+        Coord2D textPos = new Coord2D(2 * px, TEXT_Y_OFFSET);
 
         // possible prefix
         nhi.draw(prefixImage, textPos.x, textPos.y);
