@@ -1,0 +1,2 @@
+Onion skin off
+Toggle: {sc:TOGGLE_ONION_SKIN}

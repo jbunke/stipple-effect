@@ -10,7 +10,7 @@ public enum Operation {
     // layer operations
     ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
     MOVE_LAYER, MERGE_WITH_LAYER_BELOW, FLATTEN,
-    CHANGE_LAYER_NAME,
+    CHANGE_LAYER_NAME, CHANGE_ONION_SKIN,
     // layer operations without menu redraw consequences
     LAYER_VISIBILITY_CHANGE, LAYER_LINKING_CHANGE, LAYER_OPACITY_CHANGE,
     // selection operations

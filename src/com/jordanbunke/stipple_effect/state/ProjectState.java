@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
@@ -230,15 +231,15 @@ public class ProjectState {
 
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
-                // onion skin previous
-                if (includeOnionSkins && layer.getOnionSkinMode()
-                        .doPrevious() && frameIndex > 0)
-                    image.draw(layer.getOnionSkin(frameIndex - 1));
+                final boolean osOn = layer.isOnionSkinOn();
+                final OnionSkin os = layer.getOnionSkin();
+                final GameImage onionSkinCel = includeOnionSkins && osOn
+                        ? layer.getOnionSkinCel(frameIndex)
+                        : GameImage.dummy();
 
-                // onion skin next
-                if (includeOnionSkins && layer.getOnionSkinMode()
-                        .doNext() && frameIndex + 1 < frameCount)
-                    image.draw(layer.getOnionSkin(frameIndex + 1));
+                // render onion skin under layer
+                if (includeOnionSkins && osOn && os.under)
+                    image.draw(onionSkinCel);
 
                 // this layer
                 GameImage layerImage = new GameImage(layer.getRender(frameIndex));
@@ -254,13 +255,17 @@ public class ProjectState {
 
                 if (previewCondition) {
                     final Selection selection = selectionContents.getSelection();
-                    final int rgb = SEColors.transparent().getRGB();
+                    final int t = SEColors.transparent().getRGB();
 
                     selection.pixelAlgorithm(imageWidth, imageHeight,
-                            (x, y) -> layerImage.setRGB(x, y, rgb));
+                            (x, y) -> layerImage.setRGB(x, y, t));
                 }
 
                 image.draw(layerImage.submit());
+
+                // render onion skin above layer
+                if (includeOnionSkins && osOn && !os.under)
+                    image.draw(onionSkinCel);
 
                 if (previewCondition) {
                     final GameImage preview = selectionContents

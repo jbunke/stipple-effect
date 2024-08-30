@@ -3,7 +3,6 @@ package com.jordanbunke.stipple_effect.utility.action;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.preview.Preview;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
@@ -175,11 +174,9 @@ public enum SEAction {
             new KeyShortcut(false, true, L)),
     TOGGLE_LAYER_LINKING(ResourceCodes.NONE, SEContext::toggleLayerLinking,
             new KeyShortcut(true, false, Q)),
-    CYCLE_LAYER_ONION_SKIN_MODE(ResourceCodes.NONE,
-            c -> {
-        final SELayer layer = c.getState().getEditingLayer();
-        layer.setOnionSkinMode(EnumUtils.next(layer.getOnionSkinMode()));
-    }, new KeyShortcut(true, false, _1)),
+    TOGGLE_ONION_SKIN(ResourceCodes.NONE,
+            c -> c.getState().getEditingLayer().toggleOnionSkin(),
+            new KeyShortcut(true, false, _1)),
 
     // frames
     NEW_FRAME(ResourceCodes.NEW_FRAME,

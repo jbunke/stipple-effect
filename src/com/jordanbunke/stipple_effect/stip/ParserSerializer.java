@@ -2,8 +2,9 @@ package com.jordanbunke.stipple_effect.stip;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.io.FileIO;
+import com.jordanbunke.delta_time.utility.math.Pair;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.project.SEContext;
@@ -27,7 +28,8 @@ public class ParserSerializer {
     private static final int NOT_FOUND = -1;
 
     private static final double FS_INITIAL = 1.0,
-            FS_LINKED_OPTIMIZATION_THRESHOLD = 1.1;
+            FS_LINKED_OPTIMIZATION_THRESHOLD = 1.1,
+            FS_NEW_ONION_SKIN_THRESHOLD = 1.3;
 
     // tags
     private static final String
@@ -48,7 +50,14 @@ public class ParserSerializer {
             LINKED_LAYER_TAG = "linked_layer",
             FRAME_TAG = "frame",
             COLOR_TAG = "cols",
-            DIMENSION_TAG = "dims";
+            DIMENSION_TAG = "dims",
+            SKIN_TYPE_TAG = "skin_type",
+            HUE_BACK_TAG = "hue_back",
+            HUE_FORWARD_TAG = "hue_forward",
+            FADE_FACTOR_TAG = "fade_factor",
+            LOOK_BACK_TAG = "look_back",
+            LOOK_FORWARD_TAG = "look_forward",
+            UNDER_TAG = "under";
 
     public static Palette loadPalette(final String file) {
         final String contents = file
@@ -185,7 +194,7 @@ public class ParserSerializer {
         GameImage linked = GameImage.dummy();
         double opacity = 1.0;
         boolean enabled = true, framesLinked = false;
-        OnionSkinMode osm = OnionSkinMode.NONE;
+        OnionSkin os = OnionSkin.trivial();
         String name = "";
 
         for (SerialBlock block : blocks) {
@@ -196,7 +205,7 @@ public class ParserSerializer {
                 case LAYER_LINKED_STATUS_TAG ->
                         framesLinked = Boolean.parseBoolean(block.value());
                 case LAYER_ONION_SKIN_TAG ->
-                        osm = OnionSkinMode.valueOf(block.value());
+                        os = deserializeOnionSkin(block.value(), fileStandard);
                 case LAYER_OPACITY_TAG ->
                         opacity = Double.parseDouble(block.value());
                 case LINKED_LAYER_TAG ->
@@ -222,7 +231,39 @@ public class ParserSerializer {
         } else
             linked = frames.isEmpty() ? GameImage.dummy() : frames.get(0);
 
-        return new SELayer(frames, linked, opacity, enabled, framesLinked, osm, name);
+        return new SELayer(frames, linked, opacity, enabled,
+                framesLinked, false, os, name);
+    }
+
+    private static OnionSkin deserializeOnionSkin(
+            final String contents, final double fileStandard
+    ) {
+        if (fileStandard < FS_NEW_ONION_SKIN_THRESHOLD || contents.isEmpty())
+            return OnionSkin.trivial();
+
+        OnionSkin.reset();
+        final SerialBlock[] blocks = deserializeBlocksAtDepthLevel(contents);
+
+        for (SerialBlock block : blocks) {
+            switch (block.tag()) {
+                case SKIN_TYPE_TAG ->
+                        OnionSkin.setDSkinType(OnionSkin.SkinType.valueOf(block.value()));
+                case HUE_BACK_TAG ->
+                        OnionSkin.setDHueBack(Double.parseDouble(block.value()));
+                case HUE_FORWARD_TAG ->
+                        OnionSkin.setDHueForward(Double.parseDouble(block.value()));
+                case FADE_FACTOR_TAG ->
+                        OnionSkin.setDFadeFactor(Double.parseDouble(block.value()));
+                case LOOK_BACK_TAG ->
+                        OnionSkin.setDLookBack(Integer.parseInt(block.value()));
+                case LOOK_FORWARD_TAG ->
+                        OnionSkin.setDLookForward(Integer.parseInt(block.value()));
+                case UNDER_TAG ->
+                        OnionSkin.setDUnder(Boolean.parseBoolean(block.value()));
+            }
+        }
+
+        return OnionSkin.load();
     }
 
     private static GameImage deserializeImage(final String contents) {
@@ -402,32 +443,16 @@ public class ParserSerializer {
         indent(sb, indentLevel);
         openWithTag(sb, LAYER_TAG).append(NL);
 
-        // name definition
-        indent(sb, indentLevel + 1);
-        openWithTag(sb, LAYER_NAME_TAG).append(layer.getName())
-                .append(ENCLOSER_CLOSE).append(NL);
-
-        // is enabled definition
-        indent(sb, indentLevel + 1);
-        openWithTag(sb, LAYER_ENABLED_STATUS_TAG).append(layer.isEnabled())
-                .append(ENCLOSER_CLOSE).append(NL);
-
-        // is linked definition
-        indent(sb, indentLevel + 1);
-        openWithTag(sb, LAYER_LINKED_STATUS_TAG).append(layer.areFramesLinked())
-                .append(ENCLOSER_CLOSE).append(NL);
+        serializeSimpleAttributes(sb, indentLevel, buildAttributes(
+                new Pair<>(LAYER_NAME_TAG, layer.getName()),
+                new Pair<>(LAYER_ENABLED_STATUS_TAG, layer.isEnabled()),
+                new Pair<>(LAYER_LINKED_STATUS_TAG, layer.areCelsLinked()),
+                new Pair<>(LAYER_OPACITY_TAG, layer.getOpacity())));
 
         // onion skin definition
-        indent(sb, indentLevel + 1);
-        openWithTag(sb, LAYER_ONION_SKIN_TAG).append(layer.getOnionSkinMode())
-                .append(ENCLOSER_CLOSE).append(NL);
+        sb.append(serializeOnionSkin(layer.getOnionSkin()));
 
-        // opacity definition
-        indent(sb, indentLevel + 1);
-        openWithTag(sb, LAYER_OPACITY_TAG).append(layer.getOpacity())
-                .append(ENCLOSER_CLOSE).append(NL);
-
-        if (layer.areFramesLinked())
+        if (layer.areCelsLinked())
             sb.append(serializeImage(layer.getFrame(0), false, true));
         else {
             // frames tag opener
@@ -450,6 +475,54 @@ public class ParserSerializer {
                 ? CONTENT_SEPARATOR : "").append(NL);
 
         return sb.toString();
+    }
+
+    private static String serializeOnionSkin(final OnionSkin onionSkin) {
+        final StringBuilder sb = new StringBuilder();
+        final int indentLevel = 2;
+
+        // onion skin tag opener
+        indent(sb, indentLevel);
+        openWithTag(sb, LAYER_ONION_SKIN_TAG);
+
+        // leave attribute blank if trivial
+        if (!onionSkin.equals(OnionSkin.trivial())) {
+            sb.append(NL);
+
+            serializeSimpleAttributes(sb, indentLevel, buildAttributes(
+                    new Pair<>(SKIN_TYPE_TAG, onionSkin.skinType),
+                    new Pair<>(HUE_BACK_TAG, onionSkin.hueBack),
+                    new Pair<>(HUE_FORWARD_TAG, onionSkin.hueForward),
+                    new Pair<>(FADE_FACTOR_TAG, onionSkin.fadeFactor),
+                    new Pair<>(LOOK_BACK_TAG, onionSkin.lookBack),
+                    new Pair<>(LOOK_FORWARD_TAG, onionSkin.lookForward),
+                    new Pair<>(UNDER_TAG, onionSkin.under)));
+
+            indent(sb, indentLevel);
+        }
+
+        // onion skin tag closer
+        sb.append(ENCLOSER_CLOSE).append(NL);
+
+        return sb.toString();
+    }
+
+    @SafeVarargs
+    private static Pair<String, Object>[] buildAttributes(
+            final Pair<String, Object>... attributes
+    ) {
+        return attributes;
+    }
+
+    private static void serializeSimpleAttributes(
+            final StringBuilder sb, final int indentLevel,
+            final Pair<String, Object>[] tagValuePairs
+    ) {
+        for (Pair<String, Object> tvPair : tagValuePairs) {
+            indent(sb, indentLevel + 1);
+            openWithTag(sb, tvPair.a()).append(tvPair.b())
+                    .append(ENCLOSER_CLOSE).append(NL);
+        }
     }
 
     private static String serializeImage(

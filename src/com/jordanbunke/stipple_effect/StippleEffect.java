@@ -22,7 +22,7 @@ import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.preview.EmbeddedPreview;
@@ -925,7 +925,7 @@ public class StippleEffect implements ProgramContext {
 
         final SELayer firstLayer = new SELayer(frames,
                 new GameImage(fw, fh), Constants.OPAQUE, true, false,
-                OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
+                false, OnionSkin.trivial(), Constants.BASE_LAYER_NAME);
         final ProjectState initialState = ProjectState.makeFromRasterFile(
                 fw, fh, firstLayer, frameCount);
 
@@ -1233,8 +1233,10 @@ public class StippleEffect implements ProgramContext {
 
         if (p instanceof EmbeddedPreview ep && !Settings.isSeparatedPreview())
             ep.refresh();
-        else if (p != null)
-            Preview.set(getContext());
+        else if (p != null) {
+            Preview.set(p.c);
+            Preview.get().copyState(p);
+        }
 
         window.focus();
     }

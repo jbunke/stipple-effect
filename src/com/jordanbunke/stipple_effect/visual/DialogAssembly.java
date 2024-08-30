@@ -19,8 +19,10 @@ import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
@@ -40,6 +42,7 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorComponent;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DynamicTextButton;
@@ -1763,24 +1766,85 @@ public class DialogAssembly {
     }
 
     public static void setDialogToLayerSettings(final int index) {
+        final MenuBuilder mb = new MenuBuilder();
+
         final SEContext c = StippleEffect.get().getContext();
         final SELayer layer = c.getState().getLayers().get(index);
 
         DialogVals.setLayerOpacity(layer.getOpacity());
         DialogVals.setLayerName(layer.getName());
 
+        layer.getOnionSkin().prep();
+
         // text labels
         final TextLabel layerNameLabel =
                 makeDialogLeftLabel(0, "Name:"),
                 opacityLabel = TextLabel.make(textBelowPos(layerNameLabel),
-                        "Opacity:");
+                        "Opacity:"),
+                onionSkinAnnouncer = TextLabel.make(
+                        textBelowPos(opacityLabel, 1), "Onion skin settings"),
+                skinTypeLabel = TextLabel.make(
+                        textBelowPos(onionSkinAnnouncer), "Type:"),
+                lookBackLabel = TextLabel.make(
+                        textBelowPos(skinTypeLabel, 2), "Cels behind:"),
+                lookForwardLabel = makeDialogRightLabel(lookBackLabel, "Cels ahead:"),
+                fadeFactorLabel = TextLabel.make(
+                        textBelowPos(lookBackLabel), "Fade per frame"),
+                underLabel = makeDialogRightLabel(fadeFactorLabel, "Render under?");
 
-        // name textbox
+        mb.addAll(layerNameLabel, opacityLabel, onionSkinAnnouncer, skinTypeLabel,
+                lookBackLabel, lookForwardLabel, fadeFactorLabel, underLabel);
+
+        // textboxes
         final Textbox layerNameTextbox = makeDialogNameTextBox(
-                layerNameLabel, layer.getName(), DialogVals::setLayerName);
+                layerNameLabel, layer.getName(), DialogVals::setLayerName),
+                lookBackTextbox = makeDialogNumericalDynamicTextbox(
+                        lookBackLabel, Layout::contentPositionAfterLabel,
+                        "", OnionSkin.getDLookBack(), "",
+                        lb -> lb >= OnionSkin.MIN_LOOK && lb <= OnionSkin.MAX_LOOK,
+                        OnionSkin::setDLookBack, OnionSkin::getDLookBack, 1),
+                lookForwardTextbox = makeDialogNumericalDynamicTextbox(
+                        lookForwardLabel, Layout::contentPositionAfterLabel,
+                        "", OnionSkin.getDLookForward(), "",
+                        lb -> lb >= OnionSkin.MIN_LOOK && lb <= OnionSkin.MAX_LOOK,
+                        OnionSkin::setDLookForward, OnionSkin::getDLookForward, 1);
+
+        mb.addAll(layerNameTextbox, lookBackTextbox, lookForwardTextbox);
+
+        // fade factor
+        final int PERCENT = 100;
+        final Consumer<Boolean> tickFade = up -> {
+            final double was = OnionSkin.getDFadeFactor(),
+                    delta = 1d / (double) PERCENT;
+            OnionSkin.setDFadeFactor(MathPlus.bounded(
+                    OnionSkin.MIN_FADE,
+                    was + (up ? delta : -delta), OnionSkin.MAX_FADE));
+        };
+        final IncrementalRangeElements<Double> fadeFactorUI =
+                IncrementalRangeElements.makeForDouble(fadeFactorLabel,
+                        fadeFactorLabel.getY() +
+                                DIALOG_CONTENT_COMP_OFFSET_Y,
+                        fadeFactorLabel.getY(),
+                        () -> tickFade.accept(false), () -> tickFade.accept(true),
+                        OnionSkin.MIN_FADE, OnionSkin.MAX_FADE,
+                        OnionSkin::setDFadeFactor, OnionSkin::getDFadeFactor,
+                        o -> (int)(o * PERCENT),
+                        sv -> sv / (double) PERCENT,
+                        o -> (int) (o * PERCENT) + "%", "XXX%");
+        mb.addAll(fadeFactorUI.decButton, fadeFactorUI.incButton,
+                fadeFactorUI.slider, fadeFactorUI.value);
+
+        // hues
+        final TextLabel ref = TextLabel.make(
+                textBelowPos(skinTypeLabel), ""),
+                ref2 = makeDialogRightLabel(ref, "");
+        mb.add(new GatewayMenuElement(new MenuElementGrouping(
+                ColorComponent.onionSkinHue(ref.getPosition(), true),
+                ColorComponent.onionSkinHue(ref2.getRenderPosition(), false)
+        ), () -> OnionSkin.getDSkinType().hasHue()));
 
         // opacity slider
-        final int MAX_OPACITY = 255;
+        final int MAX_OPACITY = Constants.RGBA_SCALE;
         DialogVals.setLayerOpacity(layer.getOpacity());
 
         final Runnable fDecrement = () -> {
@@ -1792,7 +1856,7 @@ public class DialogAssembly {
             DialogVals.setLayerOpacity(Math.min(Constants.OPAQUE,
                     was + (1d / (double) MAX_OPACITY)));
         };
-        final IncrementalRangeElements<Double> opacity =
+        final IncrementalRangeElements<Double> opacityUI =
                 IncrementalRangeElements.makeForDouble(opacityLabel,
                         opacityLabel.getY() +
                                 DIALOG_CONTENT_COMP_OFFSET_Y,
@@ -1803,15 +1867,41 @@ public class DialogAssembly {
                         sv -> sv / (double) MAX_OPACITY,
                         o -> String.valueOf((int) (o * MAX_OPACITY)), "XXX");
 
-        final MenuElementGrouping contents = new MenuElementGrouping(
-                layerNameLabel, opacityLabel, layerNameTextbox,
-                opacity.decButton, opacity.incButton,
-                opacity.slider, opacity.value);
+        mb.addAll(opacityUI.decButton, opacityUI.incButton,
+                opacityUI.slider, opacityUI.value);
+
+        final Dropdown skinTypeDropdown = Dropdown.forDialog(
+                contentPositionAfterLabel(skinTypeLabel),
+                EnumUtils.stream(OnionSkin.SkinType.class)
+                        .map(EnumUtils::formattedName)
+                        .toArray(String[]::new),
+                EnumUtils.stream(OnionSkin.SkinType.class)
+                        .map(os -> (Runnable) () -> OnionSkin.setDSkinType(os))
+                        .toArray(Runnable[]::new),
+                () -> OnionSkin.getDSkinType().ordinal());
+
+        final Checkbox underCheckbox = new Checkbox(
+                contentPositionAfterLabel(underLabel), new ConcreteProperty<>(
+                        OnionSkin::isDUnder, OnionSkin::setDUnder));
+
+        mb.addAll(skinTypeDropdown, underCheckbox);
+
         setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
-                contents, layerNameTextbox::isValid,
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                layerNameTextbox::isValid,
                 Constants.GENERIC_APPROVAL_TEXT, () -> {
-            c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
-            c.changeLayerName(DialogVals.getLayerName(), index);
+            final OnionSkin configured = OnionSkin.load();
+            final String name = DialogVals.getLayerName();
+            final double opacity = DialogVals.getLayerOpacity();
+
+            if (!layer.getName().equals(name))
+                c.changeLayerName(name, index);
+
+            if (layer.getOpacity() != opacity)
+                c.changeLayerOpacity(opacity, index, true);
+
+            if (!layer.getOnionSkin().equals(configured))
+                c.changeLayerOnionSkin(configured, index);
         }, true));
     }
 
@@ -2014,13 +2104,14 @@ public class DialogAssembly {
                 textBelowPos(referenceLabel, 2), () -> FPD_PREFIX +
                         soGetter.get().dimName() + FPD_SUFFIX,
                 FPD_PREFIX + "column" + FPD_SUFFIX);
-        final DynamicTextbox framesPerDimTextbox = makeDialogNumericalDynamicTextbox(
-                framesPerDimLabel,
-                Layout::contentPositionAfterLabel,
-                "", fcGetter.get(), "",
-                tbv -> tbv >= 1 && tbv <= Constants.MAX_NUM_FRAMES,
-                fpdSetter, fpdGetter,
-                String.valueOf(Constants.MAX_NUM_FRAMES).length());
+        final DynamicTextbox framesPerDimTextbox =
+                makeDialogNumericalDynamicTextbox(
+                        framesPerDimLabel,
+                        Layout::contentPositionAfterLabel,
+                        "", fcGetter.get(), "",
+                        tbv -> tbv >= 1 && tbv <= Constants.MAX_NUM_FRAMES,
+                        fpdSetter, fpdGetter,
+                        String.valueOf(Constants.MAX_NUM_FRAMES).length());
         mb.addAll(framesPerDimLabel, framesPerDimTextbox);
 
         // frames per complementary dim
@@ -3039,10 +3130,6 @@ public class DialogAssembly {
                         ResourceCodes.LAYER_ENABLED,
                         ResourceCodes.LAYER_DISABLED,
                         ResourceCodes.ONION_SKIN,
-                        ResourceCodes.ONION_SKIN_NONE,
-                        ResourceCodes.ONION_SKIN_PREVIOUS,
-                        ResourceCodes.ONION_SKIN_NEXT,
-                        ResourceCodes.ONION_SKIN_BOTH,
                         ResourceCodes.FRAME_LOCKING,
                         ResourceCodes.FRAMES_LINKED,
                         ResourceCodes.FRAMES_UNLINKED,
@@ -3059,12 +3146,8 @@ public class DialogAssembly {
                         "Layer visibility controls",
                         "Layer is visible/enabled",
                         "Layer is invisible/disabled",
-                        "Onion skin modes",
-                        "Disabled",
-                        "Previous frame",
-                        "Next frame",
-                        "Previous and next frame",
-                        "Layer frame status",
+                        "Onion skin",
+                        "Cel linking",
                         "This layer's cels are linked",
                         "This layer's cels are not linked",
                         "Layer settings"

@@ -16,8 +16,8 @@ public final class EmbeddedPreview extends Preview {
     private static int embX, embY, embW, embH;
 
     private final EmbeddedTopBar topBar;
-    private VerticalPanelAdjuster vertAdjuster;
-    private HorizontalPanelAdjuster horzAdjuster;
+    private VerticalPanelAdjuster bottomAdjuster;
+    private HorizontalPanelAdjuster leftAdjuster, rightAdjuster;
 
     private final int initialW, initialH;
 
@@ -44,29 +44,52 @@ public final class EmbeddedPreview extends Preview {
     private void makeAdjusters() {
         final int w = getWidth(), h = getHeight();
 
-        vertAdjuster = new VerticalPanelAdjuster(
-                getPosition().displace(0, h),
-                w, upLeeway(), downLeeway(), dh -> {
+        bottomAdjuster = new VerticalPanelAdjuster(
+                getPosition().displace(0, h), w,
+                upLeeway(), downLeeway(), dh -> {
                     embH = getHeight() - dh;
                     setHeight(embH);
-                    horzAdjuster.setLength(embH);
+                    leftAdjuster.setLength(embH);
+                    rightAdjuster.setLength(embH);
 
-                    vertAdjuster.setDownLeeway(downLeeway());
-                    vertAdjuster.setUpLeeway(upLeeway());
+                    bottomAdjuster.setDownLeeway(downLeeway());
+                    bottomAdjuster.setUpLeeway(upLeeway());
                 });
-        horzAdjuster = new HorizontalPanelAdjuster(
+        leftAdjuster = new HorizontalPanelAdjuster(
+                getPosition(), h, sideGainLeeway(), sideLossLeeway(),
+                dw -> {
+                    incrementX(-dw);
+                    topBar.incrementX(-dw);
+                    bottomAdjuster.incrementX(-dw);
+
+                    final Coord2D position = getPosition();
+                    embX = position.x;
+                    embY = position.y - EMBED_PREV_TOP_BAR_Y;
+
+                    sideAdjustment(getWidth() + dw);
+
+                    refresh();
+                });
+        rightAdjuster = new HorizontalPanelAdjuster(
                 getPosition().displace(w, 0), h,
-                leftLeeway(), rightLeeway(), dw -> {
-                    embW = getWidth() - dw;
-                    setWidth(embW);
-                    topBar.setWidth(embW);
-                    vertAdjuster.setLength(embW);
+                sideLossLeeway(), sideGainLeeway(),
+                dw -> sideAdjustment(getWidth() - dw));
 
-                    horzAdjuster.setLeftLeeway(leftLeeway());
-                    horzAdjuster.setRightLeeway(rightLeeway());
-                });
+        addMenuComponents(bottomAdjuster, leftAdjuster, rightAdjuster);
+    }
 
-        addMenuComponents(vertAdjuster, horzAdjuster);
+    private void sideAdjustment(final int newW) {
+        embW = newW;
+        setWidth(embW);
+        topBar.setWidth(embW);
+        bottomAdjuster.setLength(embW);
+
+        final int gain = sideGainLeeway(), loss = sideLossLeeway();
+
+        leftAdjuster.setLeftLeeway(gain);
+        leftAdjuster.setRightLeeway(loss);
+        rightAdjuster.setLeftLeeway(loss);
+        rightAdjuster.setRightLeeway(gain);
     }
 
     private int upLeeway() {
@@ -77,11 +100,11 @@ public final class EmbeddedPreview extends Preview {
         return maxSize().height() - getHeight();
     }
 
-    private int leftLeeway() {
+    private int sideLossLeeway() {
         return getWidth() - minSize().width();
     }
 
-    private int rightLeeway() {
+    private int sideGainLeeway() {
         return maxSize().width() - getWidth();
     }
 
@@ -95,8 +118,8 @@ public final class EmbeddedPreview extends Preview {
         super.setPosition(position);
 
         // panel adjuster fix
-        vertAdjuster.incrementY(embH - initialH);
-        horzAdjuster.incrementX(embW - initialW);
+        bottomAdjuster.incrementY(embH - initialH);
+        rightAdjuster.incrementX(embW - initialW);
 
         embX = position.x;
         embY = position.y - EMBED_PREV_TOP_BAR_Y;
@@ -120,8 +143,9 @@ public final class EmbeddedPreview extends Preview {
                 2f, getX(), getY(), w, h);
 
         // adjuster
-        vertAdjuster.render(canvas);
-        horzAdjuster.render(canvas);
+        bottomAdjuster.render(canvas);
+        leftAdjuster.render(canvas);
+        rightAdjuster.render(canvas);
 
         topBar.render(canvas);
     }
@@ -145,8 +169,9 @@ public final class EmbeddedPreview extends Preview {
     }
 
     public void processExternal(final InputEventLogger eventLogger) {
-        vertAdjuster.process(eventLogger);
-        horzAdjuster.process(eventLogger);
+        bottomAdjuster.process(eventLogger);
+        leftAdjuster.process(eventLogger);
+        rightAdjuster.process(eventLogger);
 
         topBar.process(eventLogger);
     }

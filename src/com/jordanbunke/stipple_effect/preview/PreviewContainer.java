@@ -21,7 +21,7 @@ import static com.jordanbunke.stipple_effect.utility.Layout.PREV_TL_BUFFER;
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
 public final class PreviewContainer extends MenuElement {
-    private final RenderInfo renderInfo;
+    private RenderInfo renderInfo;
     private GameImage frame;
 
     // hand auxiliaries
@@ -155,7 +155,23 @@ public final class PreviewContainer extends MenuElement {
             renderInfo.updateAnchor(w, h);
     }
 
-    public boolean isPanning() {
+    boolean isPanning() {
         return panning;
+    }
+
+    GameImage getFrame() {
+        return frame;
+    }
+
+    RenderInfo getRenderInfo() {
+        return renderInfo;
+    }
+
+    void setFrame(final GameImage frame) {
+        this.frame = frame;
+    }
+
+    void setRenderInfo(final RenderInfo renderInfo) {
+        this.renderInfo = renderInfo;
     }
 }

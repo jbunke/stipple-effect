@@ -9,7 +9,7 @@ import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
@@ -385,7 +385,7 @@ public class SEContext {
         // current layer
         LAYER_SETTINGS.doForMatchingKeyStroke(eventLogger, this);
         TOGGLE_LAYER_LINKING.doForMatchingKeyStroke(eventLogger, this);
-        CYCLE_LAYER_ONION_SKIN_MODE.doForMatchingKeyStroke(eventLogger, this);
+        TOGGLE_ONION_SKIN.doForMatchingKeyStroke(eventLogger, this);
 
         // layer navigation
         LAYER_ABOVE.doForMatchingKeyStroke(eventLogger, this);
@@ -991,7 +991,7 @@ public class SEContext {
                 case CEL -> runCAOnFrame(internal, map, state,
                         state.getFrameIndex(), state.getLayerEditIndex(), selection);
                 case LAYER -> {
-                    if (state.getEditingLayer().areFramesLinked()) {
+                    if (state.getEditingLayer().areCelsLinked()) {
                         yield runCAOnFrame(internal, map, state,
                                 state.getFrameIndex(),
                                 state.getLayerEditIndex(), selection);
@@ -1025,7 +1025,7 @@ public class SEContext {
                                 state.getLayers().get(l).isEnabled()))
                             continue;
 
-                        if (state.getLayers().get(l).areFramesLinked()) {
+                        if (state.getLayers().get(l).areCelsLinked()) {
                             state = runCAOnFrame(internal, map, state,
                                     state.getFrameIndex(), l, selection);
                         } else {
@@ -1847,7 +1847,7 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
-            if (layers.get(layerIndex).areFramesLinked())
+            if (layers.get(layerIndex).areCelsLinked())
                 unlinkCelsInLayer(layerIndex);
             else
                 linkCelsInLayer(layerIndex);
@@ -1860,7 +1860,7 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
-                layers.get(layerIndex).areFramesLinked()) {
+                layers.get(layerIndex).areCelsLinked()) {
             final SELayer layer = layers.get(layerIndex).returnUnlinkedCels();
             layers.set(layerIndex, layer);
 
@@ -1879,10 +1879,9 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
-                !layers.get(layerIndex).areFramesLinked()) {
+                !layers.get(layerIndex).areCelsLinked()) {
             final SELayer layer = layers.get(layerIndex).returnLinkedCels(
                     getState().getFrameIndex());
-            layer.setOnionSkinMode(OnionSkinMode.NONE);
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
@@ -1945,6 +1944,21 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, Operation.CHANGE_LAYER_NAME);
+        }
+    }
+
+    // change layer onion skin
+    public void changeLayerOnionSkin(final OnionSkin onionSkin, final int layerIndex) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size()) {
+            final SELayer layer = layers.get(layerIndex)
+                    .returnChangedOnionSkin(onionSkin);
+            layers.set(layerIndex, layer);
+
+            final ProjectState result = getState().changeLayers(layers);
+            stateManager.performAction(result, Operation.CHANGE_ONION_SKIN);
         }
     }
 
@@ -2143,7 +2157,7 @@ public class SEContext {
                 frames.add(getState().draw(false, false, i));
 
             final SELayer flattened = new SELayer(frames, frames.get(0),
-                    Constants.OPAQUE, true, false, OnionSkinMode.NONE,
+                    Constants.OPAQUE, true, false, false, OnionSkin.trivial(),
                     Constants.FLATTENED_LAYER_NAME);
             final ProjectState result = getState().changeLayers(
                     new ArrayList<>(List.of(flattened)), 0);

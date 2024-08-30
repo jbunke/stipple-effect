@@ -25,11 +25,11 @@ public class LayerHelper {
 
         // override frame linking on below layer if above layer is unlinked
         // and frameCount > 1
-        final boolean framesLinked = below.areFramesLinked() &&
-                (above.areFramesLinked() || frameCount == 1);
+        final boolean framesLinked = below.areCelsLinked() &&
+                (above.areCelsLinked() || frameCount == 1);
 
         return new SELayer(frames, frameLinkedContent, below.getOpacity(),
-                below.isEnabled(), framesLinked, below.getOnionSkinMode(),
-                below.getName());
+                below.isEnabled(), framesLinked, below.isOnionSkinOn(),
+                below.getOnionSkin(), below.getName());
     }
 }
