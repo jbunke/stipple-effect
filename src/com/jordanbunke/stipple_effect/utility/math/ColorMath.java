@@ -146,11 +146,11 @@ public class ColorMath {
         return lastHSVEdit == LastHSVEdit.NONE ? rgbToValue(c) : lastValue;
     }
 
-    private static int scaleUp(final double value, final int scaleMax) {
+    public static int scaleUp(final double value, final int scaleMax) {
         return MathPlus.bounded(0, (int) Math.round(value * scaleMax), scaleMax);
     }
 
-    private static double scaleDown(final int value, final int scaleMax) {
+    public static double scaleDown(final int value, final int scaleMax) {
         return value / (double) scaleMax;
     }
 

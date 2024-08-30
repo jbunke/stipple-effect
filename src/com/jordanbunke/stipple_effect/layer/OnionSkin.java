@@ -27,7 +27,14 @@ public final class OnionSkin {
     public final boolean under;
 
     public enum SkinType {
-        SIMPLE, OUTLINE, TINTED
+        SIMPLE, OUTLINE, TINTED;
+
+        public boolean hasHue() {
+            return switch (this) {
+                case OUTLINE, TINTED -> true;
+                default -> false;
+            };
+        }
     }
 
     static {

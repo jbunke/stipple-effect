@@ -24,7 +24,7 @@ public final class Layout {
             MIN_FLIPBOOK_H = 168, MAX_FLIPBOOK_H = 411;
     public static final int
             COLLAPSED_PROJECTS_H = 27, BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30,
-            SCREEN_H_BUFFER = 120,
+            COLOR_COMP_W_ALLOWANCE = RIGHT_PANEL_W, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
             MIN_WINDOW_H = 708,
             MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),

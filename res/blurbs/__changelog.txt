@@ -7,6 +7,13 @@ Added:
 > Reimport a preview into Stipple Effect with layers preserved
 
 Changed:
+> Overhauled and extended onion skin system
+  > Onion skins can now be rendered below or above the cel contents
+  > Onion skin types:
+    > Standard translucent copy of contents
+    > Outline
+    > Tinted
+  > Render skins for up to 6 cels behind or ahead of the current frame index
 > Improved file dialogs on Windows
 > Combined file dialog file filters for {.stip} and image files into a single filter
 > `(image -> image)` preview scripts can be run on animated projects

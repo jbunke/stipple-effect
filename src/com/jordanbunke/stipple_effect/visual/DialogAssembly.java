@@ -42,6 +42,7 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorComponent;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DynamicTextButton;
@@ -1784,11 +1785,8 @@ public class DialogAssembly {
                         textBelowPos(opacityLabel, 1), "Onion skin settings"),
                 skinTypeLabel = TextLabel.make(
                         textBelowPos(onionSkinAnnouncer), "Type:"),
-                hueBackLabel = TextLabel.make(
-                        textBelowPos(skinTypeLabel), ""),
-                hueForwardLabel = makeDialogRightLabel(hueBackLabel, ""),
                 lookBackLabel = TextLabel.make(
-                        textBelowPos(hueBackLabel), "Cels behind:"),
+                        textBelowPos(skinTypeLabel, 2), "Cels behind:"),
                 lookForwardLabel = makeDialogRightLabel(lookBackLabel, "Cels ahead:"),
                 fadeFactorLabel = TextLabel.make(
                         textBelowPos(lookBackLabel), "Fade per frame"),
@@ -1813,7 +1811,7 @@ public class DialogAssembly {
 
         mb.addAll(layerNameTextbox, lookBackTextbox, lookForwardTextbox);
 
-        // TODO - fade factor
+        // fade factor
         final int PERCENT = 100;
         final Consumer<Boolean> tickFade = up -> {
             final double was = OnionSkin.getDFadeFactor(),
@@ -1832,15 +1830,18 @@ public class DialogAssembly {
                         OnionSkin::setDFadeFactor, OnionSkin::getDFadeFactor,
                         o -> (int)(o * PERCENT),
                         sv -> sv / (double) PERCENT,
-                        o -> (int) (o * PERCENT) + " %", "XXX %");
+                        o -> (int) (o * PERCENT) + "%", "XXX%");
         mb.addAll(fadeFactorUI.decButton, fadeFactorUI.incButton,
                 fadeFactorUI.slider, fadeFactorUI.value);
 
-        // TODO - hues
-
-        mb.add(new GatewayMenuElement(
-                new MenuElementGrouping(hueBackLabel, hueForwardLabel), // TODO
-                () -> OnionSkin.getDSkinType() != OnionSkin.SkinType.SIMPLE));
+        // hues
+        final TextLabel ref = TextLabel.make(
+                textBelowPos(skinTypeLabel), ""),
+                ref2 = makeDialogRightLabel(ref, "");
+        mb.add(new GatewayMenuElement(new MenuElementGrouping(
+                ColorComponent.onionSkinHue(ref.getPosition(), true),
+                ColorComponent.onionSkinHue(ref2.getRenderPosition(), false)
+        ), () -> OnionSkin.getDSkinType().hasHue()));
 
         // opacity slider
         final int MAX_OPACITY = Constants.RGBA_SCALE;
