@@ -26,7 +26,7 @@ public final class CelSelection {
 
         for (int l = lMin; l <= lMax; l++)
             for (int f = fMin; f <= fMax; f++)
-                cels[l - lMin][f - fMin] = s.getLayers().get(l).getFrame(f);
+                cels[l - lMin][f - fMin] = s.getLayers().get(l).getCel(f);
     }
 
     public boolean isCompatible(final ProjectState state) {

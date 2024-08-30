@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.funke.core.ConcreteProperty;
@@ -104,7 +105,7 @@ public final class GradientTool extends ToolWithBreadth
         final int w = context.getState().getImageWidth(),
                 h = context.getState().getImageHeight();
 
-        final GameImage frame = context.getState().getActiveLayerFrame();
+        final GameImage frame = context.getState().getActiveCel();
 
         final Color maskColor = masked && anchorInBounds(w, h)
                 ? frame.getColorAt(anchor.x, anchor.y)
@@ -403,20 +404,27 @@ public final class GradientTool extends ToolWithBreadth
         // inherited content called first to trigger correct ditherTextX assignment
         final MenuElementGrouping inherited = super.buildToolOptionsBar();
 
-        // dithered label
-        final TextLabel ditheredLabel = TextLabel.make(
-                new Coord2D(getAfterBreadthTextX(), Layout.optionsBarTextY()),
-                "Dithered");
+        // dithered labels
+        final TextLabel gDitheredLabel = TextLabel.make(
+                getFirstOptionLabelPosition(), "Dithered"),
+                bDitheredLabel = TextLabel.make(
+                        new Coord2D(getAfterBreadthTextX(),
+                                Layout.optionsBarTextY()), "Dithered");
 
-        // dithered checkbox
-        final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
-                Layout.optionsBarNextElementX(ditheredLabel, false),
-                Layout.optionsBarButtonY()), new ConcreteProperty<>(
-                () -> dithered, this::setDithered));
+        // dithered checkboxs
+        final ConcreteProperty<Boolean> ditheredProperty =
+                new ConcreteProperty<>(() -> dithered, this::setDithered);
+
+        final Checkbox gDitheredCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(gDitheredLabel, false),
+                Layout.optionsBarButtonY()), ditheredProperty),
+                bDitheredCheckbox = new Checkbox(new Coord2D(
+                        Layout.optionsBarNextElementX(bDitheredLabel, false),
+                        Layout.optionsBarButtonY()), ditheredProperty);
 
         // shape label
         final TextLabel shapeLabel = TextLabel.make(new Coord2D(
-                        Layout.optionsBarNextElementX(ditheredCheckbox, true),
+                        Layout.optionsBarNextElementX(gDitheredCheckbox, true),
                         Layout.optionsBarTextY()), "Shape");
 
         // shape dropdown
@@ -489,9 +497,14 @@ public final class GradientTool extends ToolWithBreadth
                         tolerance.incButton, tolerance.slider,
                         tolerance.value), () -> masked);
 
-        return new MenuElementGrouping(inherited,
-                ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
-                boundedLabel, boundedCheckbox,
-                maskedLabel, maskedCheckbox, maskUnlocks);
+        final MenuElementGrouping brushContents = new MenuElementGrouping(
+                inherited, bDitheredLabel, bDitheredCheckbox),
+                globalContents = new MenuElementGrouping(
+                        gDitheredLabel, gDitheredCheckbox, shapeLabel,
+                        shapeDropdown, boundedLabel, boundedCheckbox,
+                        maskedLabel, maskedCheckbox, maskUnlocks);
+
+        return new MenuElementGrouping(new ThinkingMenuElement(
+                () -> global ? globalContents : brushContents));
     }
 }

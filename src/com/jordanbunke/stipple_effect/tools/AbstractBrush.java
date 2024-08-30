@@ -53,11 +53,14 @@ public sealed abstract class AbstractBrush
                 painted.clear();
 
             final GameImage edit = new GameImage(w, h),
-                    current = context.getState().getActiveLayerFrame();
+                    current = context.getState().getActiveCel();
             populateAround(edit, current, tp, selection, w, h);
 
-            fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(edit,
-                    current, getLastTP().displace(x, y), selection, w, h));
+            final Coord2D lastTP = getLastTP();
+
+            if (!lastTP.equals(Constants.NO_VALID_TARGET))
+                fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(edit,
+                        current, getLastTP().displace(x, y), selection, w, h));
 
             context.paintOverImage(edit.submit());
             updateLast(context);

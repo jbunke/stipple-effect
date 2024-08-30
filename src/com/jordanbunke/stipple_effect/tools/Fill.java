@@ -37,7 +37,7 @@ public final class Fill extends ToolThatSearches {
                     h = context.getState().getImageHeight();
             final Coord2D tp = context.getTargetPixel();
 
-            final GameImage image = context.getState().getActiveLayerFrame();
+            final GameImage image = context.getState().getActiveCel();
             final Color fillColor = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.get().getPrimary()
                     : StippleEffect.get().getSecondary();

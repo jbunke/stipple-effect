@@ -200,13 +200,14 @@ public class StateManager {
     }
 
     public List<ProjectState> getStatesForTimeLapse() {
-        final List<ProjectState> timeLapseStates = new ArrayList<>();
+        final List<ProjectState> timeLapseStates =
+                new ArrayList<>(List.of(getState()));
 
-        for (int i = index; i >= 0 &&
+        for (int i = index - 1; i >= 0 &&
                 timeLapseStates.size() < Constants.MAX_NUM_FRAMES; i--) {
             final ProjectState s = getState(i);
 
-            if (s.isCheckpoint())
+            if (s.isCheckpoint() && s.getOperation().qualifiesForTimeLapse())
                 timeLapseStates.add(s);
         }
 

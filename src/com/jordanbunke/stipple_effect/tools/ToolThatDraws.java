@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
+import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
@@ -134,23 +135,17 @@ public abstract class ToolThatDraws extends Tool {
             final Coord2D from, final Coord2D to,
             final BiConsumer<Integer, Integer> action
     ) {
-        final int xDiff = to.x - from.x,
-                yDiff = to.y - from.y,
-                xUnit = (int)Math.signum(xDiff),
-                yUnit = (int)Math.signum(yDiff);
-        if (!from.equals(Constants.NO_VALID_TARGET) &&
-                (Math.abs(xDiff) > 1 || Math.abs(yDiff) > 1)) {
-            if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                for (int x = xUnit; Math.abs(x) < Math.abs(xDiff); x += xUnit) {
-                    final int y = (int)Math.round(x * (yDiff / (double)xDiff));
-                    action.accept(x, y);
-                }
-            } else {
-                for (int y = yUnit; Math.abs(y) < Math.abs(yDiff); y += yUnit) {
-                    final int x = (int)Math.round(y * (xDiff / (double)yDiff));
-                    action.accept(x, y);
-                }
-            }
+        final LineSegment line = new LineSegment(from, to);
+
+        if (line.isSinglePoint())
+            return;
+
+        final double distance = line.distance();
+
+        for (int step = 0; step < distance; step++) {
+            final Coord2D here = line.pointAlongLineD(step)
+                    .displace(from.scale(-1));
+            action.accept(here.x, here.y);
         }
     }
 
@@ -229,11 +224,11 @@ public abstract class ToolThatDraws extends Tool {
         // bias label
         final TextLabel biasLabel = TextLabel.make(
                 new Coord2D(getAfterBreadthTextX(), Layout.optionsBarTextY()),
-                "Combination mode bias");
+                "Comb. bias");
 
         // bias content
         final int PERCENT = 100;
-        final String INFIX = "% towards ", SUFFIX = " color";
+        final String INFIX = "% ", SUFFIX = " color";
         final IncrementalRangeElements<Double> biasElems =
                 IncrementalRangeElements.makeForDouble(biasLabel,
                         Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
@@ -246,10 +241,10 @@ public abstract class ToolThatDraws extends Tool {
                     final int biasPercentage = (int)
                             (Math.abs(Constants.UNBIASED - b) * PERCENT * 2);
                     final String color = b < Constants.UNBIASED
-                            ? "secondary" : "primary";
+                            ? "sec." : "prim.";
 
                     return biasPercentage + INFIX + color + SUFFIX;
-                    }, "XXX" + INFIX + "secondary" + SUFFIX);
+                    }, "XXX" + INFIX + "prim." + SUFFIX);
 
         return new MenuElementGrouping(
                 super.buildToolOptionsBar(), biasLabel,

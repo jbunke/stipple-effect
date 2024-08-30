@@ -453,7 +453,7 @@ public class ParserSerializer {
         sb.append(serializeOnionSkin(layer.getOnionSkin()));
 
         if (layer.areCelsLinked())
-            sb.append(serializeImage(layer.getFrame(0), false, true));
+            sb.append(serializeImage(layer.getCel(0), false, true));
         else {
             // frames tag opener
             indent(sb, indentLevel + 1);
@@ -461,7 +461,7 @@ public class ParserSerializer {
 
             // frames
             for (int i = 0; i < frameCount; i++)
-                sb.append(serializeImage(layer.getFrame(i),
+                sb.append(serializeImage(layer.getCel(i),
                         i + 1 < frameCount, false));
 
             // frames tag closer

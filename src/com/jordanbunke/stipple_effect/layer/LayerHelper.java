@@ -13,7 +13,7 @@ public class LayerHelper {
         final List<GameImage> frames = new ArrayList<>();
 
         for (int i = 0; i < frameCount; i++) {
-            final GameImage frame = new GameImage(below.getFrame(i));
+            final GameImage frame = new GameImage(below.getCel(i));
             frame.draw(above.getRender(i));
 
             frames.add(frame.submit());

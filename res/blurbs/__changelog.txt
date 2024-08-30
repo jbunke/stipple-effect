@@ -6,6 +6,9 @@ Added:
 > Setting for whether preview windows are opened in a separate window
 > Reimport a preview into Stipple Effect with layers preserved
 > Generate time lapses that track project changes
+> New brush shapes
+  > Square
+  > Line + angle
 
 Changed:
 > Overhauled and extended onion skin system
