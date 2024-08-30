@@ -121,7 +121,7 @@ public final class CelButton extends MenuElement {
 
         final SELayer layer = s.getLayers().get(layerIndex);
         final boolean populated = s.isCelPopulated(layerIndex, frameIndex),
-                linked = layer.areFramesLinked();
+                linked = layer.areCelsLinked();
 
         status = populated
                 ? (linked ? Status.LINKED : Status.POPULATED)

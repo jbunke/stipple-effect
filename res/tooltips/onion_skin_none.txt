@@ -1,2 +1,0 @@
-Onion skin mode
-Toggle: {sc:CYCLE_LAYER_ONION_SKIN_MODE}

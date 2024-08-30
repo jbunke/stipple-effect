@@ -14,7 +14,6 @@ import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
@@ -455,22 +454,15 @@ public class MenuAssembly {
             final int index, final Coord2D pos
     ) {
         final SEContext c = StippleEffect.get().getContext();
-        final String[] codes = EnumUtils.stream(OnionSkinMode.class)
-                .map(OnionSkinMode::getIconCode).toArray(String[]::new);
+        final String[] codes = new String[]
+                { ResourceCodes.ONION_SKIN_OFF, ResourceCodes.ONION_SKIN_ON };
 
-        final Runnable[] behaviours = EnumUtils.stream(OnionSkinMode.class).map(
-                osm -> (Runnable) () -> {
-                    final int nextIndex = (osm.ordinal() + 1) %
-                            OnionSkinMode.values().length;
-                    c.getState().getLayers().get(index).setOnionSkinMode(
-                                    OnionSkinMode.values()[nextIndex]);
-                }).toArray(Runnable[]::new);
-
-        return GraphicsUtils.generateIconToggleButton(pos, codes, behaviours,
-                () -> c.getState().getLayers().get(index).getOnionSkinMode().ordinal(),
-                () -> {},
-                () -> !c.getState().getLayers().get(index).areFramesLinked(),
-                OnionSkinMode.NONE.getIconCode());
+        return GraphicsUtils.generateIconToggleButton(pos, codes,
+                new Runnable[] { () -> {}, () -> {} },
+                () -> c.getState().getLayers().get(index).isOnionSkinOn() ? 1 : 0,
+                () -> c.getState().getLayers().get(index).toggleOnionSkin(),
+                () -> !c.getState().getLayers().get(index).areCelsLinked(),
+                ResourceCodes.ONION_SKIN_OFF);
     }
 
     private static MenuElement generateFramesLinkedToggle(
@@ -488,7 +480,7 @@ public class MenuAssembly {
                         () -> StippleEffect.get().getContext().unlinkCelsInLayer(index)
                 },
                 () -> StippleEffect.get().getContext().getState()
-                        .getLayers().get(index).areFramesLinked() ? 1 : 0,
+                        .getLayers().get(index).areCelsLinked() ? 1 : 0,
                 () -> {});
     }
 

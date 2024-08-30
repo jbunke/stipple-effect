@@ -530,7 +530,7 @@ public abstract class ThemeLogic {
     }
 
     @FunctionalInterface
-    interface ColorProducer {
+    public interface ColorProducer {
         Color apply(final GameImage input, final int x, final int y);
     }
 }

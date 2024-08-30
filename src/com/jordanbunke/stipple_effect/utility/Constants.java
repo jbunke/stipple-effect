@@ -30,7 +30,7 @@ public class Constants {
 
     public static final double TICK_HZ = 100d, FPS = 60d;
 
-    public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5,
+    public static final double OPAQUE = 1d,
             CIRCLE = Math.PI * 2, _45_SNAP_INC = CIRCLE / 8d,
             _15_SNAP_INC = _45_SNAP_INC / 3d;
 
@@ -73,9 +73,7 @@ public class Constants {
     public static final float
             DEF_ZOOM = ZoomLevel.PLUS_6.z,
             ZOOM_FOR_OVERLAY = ZoomLevel.NONE.z,
-            ZOOM_FOR_GRID = DEF_ZOOM,
-            NO_ZOOM = ZoomLevel.NONE.z,
-            MAX_PREVIEW_ZOOM = ZoomLevel.PLUS_11.z;
+            ZOOM_FOR_GRID = DEF_ZOOM;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

@@ -18,10 +18,11 @@ public final class SELayer {
     private final List<GameImage> frames, renders, onionSkins;
     private final GameImage frameLinkedContent;
     private final double opacity;
-    private final boolean enabled, framesLinked;
+    private final boolean enabled, celsLinked;
     private final String name;
 
-    private OnionSkinMode onionSkinMode;
+    private final OnionSkin onionSkin;
+    private boolean onionSkinOn;
 
     public static SELayer fromPreviewContent(
             final GameImage[] content
@@ -29,7 +30,7 @@ public final class SELayer {
         final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
 
         return new SELayer(frames, content[0], Constants.OPAQUE,
-                true, false, OnionSkinMode.NONE,
+                true, false, false, OnionSkin.trivial(),
                 Constants.FROM_PREVIEW_LAYER_NAME);
     }
 
@@ -39,8 +40,8 @@ public final class SELayer {
         final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
 
         return new SELayer(frames, content[0], source.opacity, source.enabled,
-                content.length == 1 && source.framesLinked,
-                source.onionSkinMode, source.name);
+                content.length == 1 && source.celsLinked,
+                source.onionSkinOn, source.onionSkin, source.name);
     }
 
     public static SELayer newLayer(
@@ -53,28 +54,31 @@ public final class SELayer {
         }
 
         return new SELayer(frames, new GameImage(w, h), Constants.OPAQUE,
-                true, false, OnionSkinMode.NONE, giveLayerDefaultName());
+                true, false, false, OnionSkin.trivial(), giveLayerDefaultName());
     }
 
     public SELayer(final int imageWidth, final int imageHeight) {
         this(new ArrayList<>(List.of(new GameImage(imageWidth, imageHeight))),
                 new GameImage(imageWidth, imageHeight), Constants.OPAQUE,
-                true, false, OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
+                true, false, false, OnionSkin.trivial(),
+                Constants.BASE_LAYER_NAME);
     }
 
     public SELayer(
             final List<GameImage> frames, final GameImage frameLinkedContent,
             final double opacity,
-            final boolean enabled, final boolean framesLinked,
-            final OnionSkinMode onionSkinMode, final String name
+            final boolean enabled, final boolean celsLinked,
+            final boolean onionSkinOn, final OnionSkin onionSkin, final String name
     ) {
         this.frames = frames;
         this.frameLinkedContent = frameLinkedContent;
         this.opacity = opacity;
         this.enabled = enabled;
-        this.framesLinked = framesLinked;
-        this.onionSkinMode = onionSkinMode;
+        this.celsLinked = celsLinked;
         this.name = name;
+
+        this.onionSkin = onionSkin;
+        this.onionSkinOn = onionSkinOn;
 
         renders = new ArrayList<>();
         onionSkins = new ArrayList<>();
@@ -84,9 +88,9 @@ public final class SELayer {
     }
 
     private void generateRenders() {
-        if (framesLinked && opacity == Constants.OPAQUE)
+        if (celsLinked && opacity == Constants.OPAQUE)
             renders.add(frames.get(0));
-        else if (framesLinked)
+        else if (celsLinked)
             renders.add(renderFrame(0));
         else if (opacity == Constants.OPAQUE)
             renders.addAll(frames);
@@ -97,11 +101,22 @@ public final class SELayer {
     }
 
     private void generateOnionSkins() {
-        if (framesLinked || onionSkinMode == OnionSkinMode.NONE)
+        if (celsLinked || !onionSkinOn)
             return;
 
-        for (int i = 0; i < frames.size(); i++)
-            onionSkins.add(renderOnionSkin(i));
+        final int fc = frames.size();
+
+        final GameImage[] backBases = new GameImage[fc],
+                forwardBases = new GameImage[fc];
+
+        for (int i = 0; i < fc; i++) {
+            final GameImage cel = getFrame(i);
+
+            backBases[i] = onionSkin.drawBase(cel, true);
+            forwardBases[i] = onionSkin.drawBase(cel, false);
+        }
+
+        onionSkin.populateOnionSkins(fc, onionSkins, backBases, forwardBases);
     }
 
     private static String giveLayerDefaultName() {
@@ -111,7 +126,7 @@ public final class SELayer {
 
     public SELayer duplicate() {
         return new SELayer(new ArrayList<>(frames), frameLinkedContent, opacity,
-                enabled, framesLinked, onionSkinMode, name + " (copy)");
+                enabled, celsLinked, onionSkinOn, onionSkin, name + " (copy)");
     }
 
     public SELayer returnFrameReplaced(final GameImage edit, final int frameIndex) {
@@ -119,7 +134,7 @@ public final class SELayer {
         frames.set(frameIndex, edit);
 
         return new SELayer(frames, edit, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnStamped(
@@ -140,7 +155,7 @@ public final class SELayer {
         frames.set(frameIndex, composed);
 
         return new SELayer(frames, composed, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnPaintedOver(final GameImage edit, final int frameIndex) {
@@ -153,7 +168,7 @@ public final class SELayer {
         frames.set(frameIndex, composed);
 
         return new SELayer(frames, composed, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnErased(final boolean[][] eraserMask, final int frameIndex) {
@@ -173,7 +188,7 @@ public final class SELayer {
         frames.set(frameIndex, after);
 
         return new SELayer(frames, after, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnResized(final int w, final int h) {
@@ -187,7 +202,7 @@ public final class SELayer {
                 frameLinkedContent, w, h);
 
         return new SELayer(resizedFrames, resizedFLC, opacity,
-                enabled, framesLinked, onionSkinMode, name);
+                enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnPadded(
@@ -206,7 +221,7 @@ public final class SELayer {
         paddedFLC.draw(frameLinkedContent, left, top);
 
         return new SELayer(paddedFrames, paddedFLC.submit(), opacity,
-                enabled, framesLinked, onionSkinMode, name);
+                enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnStitched(
@@ -235,7 +250,7 @@ public final class SELayer {
         frame.free();
 
         return new SELayer(new ArrayList<>(List.of(frame)), frame,
-                opacity, enabled, true, onionSkinMode, name);
+                opacity, enabled, true, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnSplit(
@@ -269,12 +284,12 @@ public final class SELayer {
         }
 
         return new SELayer(frames, frames.get(0),
-                opacity, enabled, false, onionSkinMode, name);
+                opacity, enabled, false, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnLinkedCels(final int frameIndex) {
         return new SELayer(new ArrayList<>(frames), getFrame(frameIndex),
-                opacity, enabled, true, onionSkinMode, name);
+                opacity, enabled, true, false, onionSkin, name);
     }
 
     public SELayer returnUnlinkedCels() {
@@ -286,27 +301,32 @@ public final class SELayer {
             clonedFromLinked.add(frameLinkedContent);
 
         return new SELayer(clonedFromLinked, frameLinkedContent,
-                opacity, enabled, false, onionSkinMode, name);
+                opacity, enabled, false, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnChangedOpacity(final double opacity) {
         return new SELayer(new ArrayList<>(frames), frameLinkedContent,
-                opacity, enabled, framesLinked, onionSkinMode, name);
+                opacity, enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnDisabled() {
         return new SELayer(new ArrayList<>(frames), frameLinkedContent,
-                opacity, false, framesLinked, onionSkinMode, name);
+                opacity, false, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnEnabled() {
         return new SELayer(new ArrayList<>(frames), frameLinkedContent,
-                opacity, true, framesLinked, onionSkinMode, name);
+                opacity, true, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnRenamed(final String name) {
         return new SELayer(new ArrayList<>(frames), frameLinkedContent,
-                opacity, enabled, framesLinked, onionSkinMode, name);
+                opacity, enabled, celsLinked, onionSkinOn, onionSkin, name);
+    }
+
+    public SELayer returnChangedOnionSkin(final OnionSkin onionSkin) {
+        return new SELayer(new ArrayList<>(frames), frameLinkedContent,
+                opacity, enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnFrameMoved(
@@ -318,7 +338,7 @@ public final class SELayer {
         frames.add(to, frame);
 
         return new SELayer(frames, frameLinkedContent, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnFrameMovedBack(
@@ -341,7 +361,7 @@ public final class SELayer {
         frames.add(addIndex, new GameImage(w, h));
 
         return new SELayer(frames, frameLinkedContent, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnDuplicatedFrame(final int fromIndex) {
@@ -350,7 +370,7 @@ public final class SELayer {
         frames.add(fromIndex + 1, new GameImage(frames.get(fromIndex)));
 
         return new SELayer(frames, frameLinkedContent, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnRemovedFrame(final int fromIndex) {
@@ -359,29 +379,25 @@ public final class SELayer {
         frames.remove(fromIndex);
 
         return new SELayer(frames, frameLinkedContent, opacity, enabled,
-                framesLinked, onionSkinMode, name);
+                celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public GameImage getFrame(final int frameIndex) {
-        return framesLinked ? frameLinkedContent : frames.get(frameIndex);
+        return celsLinked ? frameLinkedContent : frames.get(frameIndex);
     }
 
     public GameImage getRender(final int frameIndex) {
         if (opacity == Constants.OPAQUE)
             return getFrame(frameIndex);
 
-        return renders.get(framesLinked ? 0 : frameIndex);
+        return renders.get(celsLinked ? 0 : frameIndex);
     }
 
-    public GameImage getOnionSkin(final int frameIndex) {
-        if (framesLinked || frameIndex >= onionSkins.size())
+    public GameImage getOnionSkinCel(final int frameIndex) {
+        if (celsLinked || frameIndex >= onionSkins.size())
             return GameImage.dummy();
 
         return onionSkins.get(frameIndex);
-    }
-
-    private GameImage renderOnionSkin(final int frameIndex) {
-        return renderFrame(frameIndex, opacity * Constants.ONION_SKIN_OPACITY);
     }
 
     private GameImage renderFrame(final int frameIndex) {
@@ -409,23 +425,31 @@ public final class SELayer {
         return render.submit();
     }
 
-    public void setOnionSkinMode(final OnionSkinMode onionSkinMode) {
-        this.onionSkinMode = onionSkinMode;
+    public void toggleOnionSkin() {
+        setOnionSkinOn(!onionSkinOn);
+    }
 
-        if (onionSkins.isEmpty())
+    public void setOnionSkinOn(final boolean onionSkinOn) {
+        this.onionSkinOn = onionSkinOn;
+
+        if (onionSkinOn && onionSkins.isEmpty())
             generateOnionSkins();
     }
 
-    public OnionSkinMode getOnionSkinMode() {
-        return onionSkinMode;
+    public boolean isOnionSkinOn() {
+        return onionSkinOn;
+    }
+
+    public OnionSkin getOnionSkin() {
+        return onionSkin;
     }
 
     public boolean isEnabled() {
         return enabled;
     }
 
-    public boolean areFramesLinked() {
-        return framesLinked;
+    public boolean areCelsLinked() {
+        return celsLinked;
     }
 
     public double getOpacity() {
