@@ -142,6 +142,7 @@ public final class ResourceCodes {
             LAYER_VISIBILITY = NO_ICON_PREFIX + "visibility",
             ONION_SKIN = NO_ICON_PREFIX + "onion_skin",
             FRAME_LOCKING = NO_ICON_PREFIX + "frame_locking",
+            GENERATE_TIME_LAPSE = NO_ICON_PREFIX + "time_lapse",
             FONT_EXAMPLE_TEXT = NO_ICON_PREFIX + "font_example_text";
 
     private static final String INDICATOR_PREFIX = "indicator_";

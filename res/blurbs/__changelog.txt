@@ -5,6 +5,7 @@ Added:
 > Bug reporting and scripting API link to navbar
 > Setting for whether preview windows are opened in a separate window
 > Reimport a preview into Stipple Effect with layers preserved
+> Generate time lapses that track project changes
 
 Changed:
 > Overhauled and extended onion skin system

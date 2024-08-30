@@ -5,10 +5,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class StateManager {
     private int index;
@@ -200,5 +197,20 @@ public class StateManager {
                 checkpoints.add(i);
 
         return checkpoints;
+    }
+
+    public List<ProjectState> getStatesForTimeLapse() {
+        final List<ProjectState> timeLapseStates = new ArrayList<>();
+
+        for (int i = index; i >= 0 &&
+                timeLapseStates.size() < Constants.MAX_NUM_FRAMES; i--) {
+            final ProjectState s = getState(i);
+
+            if (s.isCheckpoint())
+                timeLapseStates.add(s);
+        }
+
+        Collections.reverse(timeLapseStates);
+        return timeLapseStates;
     }
 }

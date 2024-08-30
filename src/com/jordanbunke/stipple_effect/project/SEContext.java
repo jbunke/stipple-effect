@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Pair;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
 import com.jordanbunke.stipple_effect.layer.OnionSkin;
@@ -941,6 +942,42 @@ public class SEContext {
 
         PaletteLoader.addPaletteColorsFromImage(
                 layer.getFrame(frameIndex), colors, selection);
+    }
+
+    // generate time lapse
+    public void generateTimeLapse() {
+        final List<ProjectState> states = stateManager.getStatesForTimeLapse();
+
+        final Pair<Integer, Integer> maxDims = states.stream()
+                .map(s -> new Pair<>(s.getImageWidth(), s.getImageHeight()))
+                .reduce(new Pair<>(1, 1), (q, r) ->
+                        new Pair<>(Math.max(q.a(), r.a()),
+                                Math.max(q.b(), r.b())));
+        final int w = maxDims.a(), h = maxDims.b();
+
+        final List<GameImage> snapshots = new ArrayList<>();
+
+        for (ProjectState s : states) {
+            final GameImage snapshot = new GameImage(w, h),
+                    content = s.draw(false, false, 0);
+
+            final int x = (w - content.getWidth()) / 2,
+                    y = (h - content.getHeight()) / 2;
+
+            snapshot.draw(content, x, y);
+
+            snapshots.add(snapshot.submit());
+        }
+
+        final ProjectState res = ProjectState.makeFromRasterFile(w, h,
+                new SELayer(snapshots, new GameImage(w, h), Constants.OPAQUE,
+                        true, false, false, OnionSkin.trivial(),
+                        Constants.TIME_LAPSE), snapshots.size());
+        final SEContext timeLapse = new SEContext(null, res, w, h);
+        timeLapse.saveConfig.setName(Constants.TIME_LAPSE + " of " +
+                saveConfig.getFormattedName(false, true));
+
+        StippleEffect.get().addContext(timeLapse, true);
     }
 
     // previewed state changes - not state changes in and of themselves
