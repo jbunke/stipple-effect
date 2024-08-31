@@ -11,6 +11,7 @@ import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -36,7 +37,7 @@ public final class GradientTool extends ToolWithBreadth
             masked, bounded, contiguous;
     private GameImage toolContentPreview;
     private Coord2D anchor;
-    private List<Set<Coord2D>> gradientStages;
+    private final List<Set<Coord2D>> gradientStages;
     private Shape shape;
     private Selection accessible;
 
@@ -95,7 +96,7 @@ public final class GradientTool extends ToolWithBreadth
 
             reset();
             anchor = tp;
-            gradientStages = new ArrayList<>();
+            gradientStages.clear();
 
             initializeMask(context);
         }
@@ -117,10 +118,10 @@ public final class GradientTool extends ToolWithBreadth
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();
+        final ProjectState s = context.getState();
 
         if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
+            final int w = s.getImageWidth(), h = s.getImageHeight();
 
             if (tp.equals(getLastTP()))
                 return;
@@ -144,8 +145,11 @@ public final class GradientTool extends ToolWithBreadth
         final Set<Coord2D> gradientStage = new HashSet<>();
 
         populateAround(gradientStage, tp, selection);
-        fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
-                gradientStage, getLastTP().displace(x, y), selection));
+
+        final Coord2D lastTP = getLastTP();
+
+        fillLineSpace(lastTP, tp, (x, y) -> populateAround(
+                gradientStage, lastTP.displace(x, y), selection));
 
         gradientStages.add(gradientStage);
 

@@ -6,6 +6,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
@@ -19,7 +20,7 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
     private Color c;
     private GameImage toolContentPreview;
     private Coord2D anchor;
-    private Set<Coord2D> included;
+    private final Set<Coord2D> included;
 
     protected GeometryTool() {
         drawing = false;
@@ -45,28 +46,34 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
 
             reset();
             anchor = tp;
-            included = new HashSet<>();
+            included.clear();
         }
     }
 
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();
+        final ProjectState s = context.getState();
 
         if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
-            final Selection selection = context.getState().getSelection();
+            final int w = s.getImageWidth(), h = s.getImageHeight();
+            final Selection selection = s.getSelection();
 
             if (tp.equals(getLastTP()))
                 return;
 
             toolContentPreview = new GameImage(w, h);
-            included = new HashSet<>();
+            included.clear();
 
             final Coord2D endpoint = isSnap()
                     ? snappedEndpoint(anchor, tp) : tp;
             geoDefinition(anchor, endpoint, selection);
+            fillGaps(w, h, anchor, endpoint,
+                    (x, y) -> included.contains(new Coord2D(x, y)),
+                    (x, y) -> {
+                        toolContentPreview.dot(c, x, y);
+                        included.add(new Coord2D(x, y));
+                    });
 
             updateLast(context);
         }
