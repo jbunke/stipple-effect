@@ -135,6 +135,9 @@ public abstract class ToolThatDraws extends Tool {
             final Coord2D from, final Coord2D to,
             final BiConsumer<Integer, Integer> action
     ) {
+        if (from.equals(Constants.NO_VALID_TARGET))
+            return;
+
         final LineSegment line = new LineSegment(from, to);
 
         if (line.isSinglePoint())

@@ -20,6 +20,7 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
 
 public sealed abstract class ToolWithBreadth extends ToolThatDraws
         permits AbstractBrush, Eraser, BrushSelect, GradientTool, GeometryTool {
@@ -209,14 +210,9 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
                                 Math.pow(sv, 3))) / SLIDER_MULT,
                         b -> b + " px", Constants.MAX_BREADTH + " px");
 
-        // brush shape label
-        final TextLabel shapeLabel = TextLabel.make(new Coord2D(
-                Layout.optionsBarNextElementX(breadth.value, true),
-                Layout.optionsBarTextY()), "Shape");
-
         // shape dropdown
         final Dropdown shapeDropdown = Dropdown.forToolOptionsBar(
-                Layout.optionsBarNextElementX(shapeLabel, false),
+                Layout.optionsBarNextElementX(breadth.value, true),
                 EnumUtils.stream(BrushShape.class)
                         .map(EnumUtils::formattedName)
                         .toArray(String[]::new),
@@ -248,12 +244,21 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
 
         return new MenuElementGrouping(super.buildToolOptionsBar(),
                 breadthLabel, breadth.decButton, breadth.incButton,
-                breadth.slider, breadth.value, shapeLabel, shapeDropdown,
-                angleLogic);
+                breadth.slider, breadth.value, shapeDropdown, angleLogic);
     }
 
     @Override
     int getAfterBreadthTextX() {
         return afterBreadthTextX;
+    }
+
+    @Override
+    public void fillLineSpace(
+            final Coord2D from, final Coord2D to,
+            final BiConsumer<Integer, Integer> action
+    ) {
+        super.fillLineSpace(from, to, action);
+
+        // TODO - attempt fix to address line shape + angle gaps
     }
 }
