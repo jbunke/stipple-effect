@@ -7,7 +7,6 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -16,7 +15,7 @@ import java.util.Set;
 public sealed abstract class AbstractBrush
         extends ToolWithBreadth
         permits Brush, ShadeBrush, ScriptBrush {
-    private boolean painting, dump;
+    private boolean painting;
     private final Set<Coord2D> painted, recentPainted, paintedNow;
 
     AbstractBrush() {
@@ -24,7 +23,6 @@ public sealed abstract class AbstractBrush
 
         painted = new HashSet<>();
         recentPainted = new HashSet<>();
-        dump = false;
         paintedNow = new HashSet<>();
     }
 
@@ -36,7 +34,6 @@ public sealed abstract class AbstractBrush
             setColorGetter(context, me);
             painted.clear();
             recentPainted.clear();
-            dump = false;
             paintedNow.clear();
 
             reset();
@@ -72,13 +69,11 @@ public sealed abstract class AbstractBrush
                         current, lastTP.displace(x, y), selection, w, h));
                 fillGaps(w, h, lastTP, tp, this::couldBeNextToGap,
                         (x, y) -> {
-                    // TODO - temp
                             final Coord2D pixel = new Coord2D(x, y);
 
                             if (!painted.contains(pixel)) {
-                                edit.dot(SEColors.red(),
-                                        // getColor(current.getColorAt(x, y),x, y),
-                                        x, y);
+                                edit.dot(getColor(current.getColorAt(x, y),
+                                                x, y), x, y);
 
                                 painted.add(pixel);
                                 paintedNow.add(pixel);
@@ -89,10 +84,7 @@ public sealed abstract class AbstractBrush
             context.paintOverImage(edit.submit());
             updateLast(context);
 
-            if (dump)
-                recentPainted.clear();
-
-            dump = !dump;
+            recentPainted.clear();
 
             recentPainted.addAll(paintedNow);
             paintedNow.clear();
@@ -127,8 +119,7 @@ public sealed abstract class AbstractBrush
                     continue;
 
                 final Color existing = current.getColorAt(b.x, b.y);
-                if (mask[x][y] && !painted.contains(b) &&
-                        paintCondition(existing, b.x, b.y)) {
+                if (mask[x][y] && paintCondition(existing, b.x, b.y)) {
                     if (!painted.contains(b)) {
                         edit.dot(getColor(existing, b.x, b.y), b.x, b.y);
                         painted.add(b);
