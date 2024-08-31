@@ -16,13 +16,15 @@ import java.util.Set;
 public sealed abstract class AbstractBrush
         extends ToolWithBreadth
         permits Brush, ShadeBrush, ScriptBrush {
-    private boolean painting;
+    private boolean painting, dump;
     private final Set<Coord2D> painted, recentPainted, paintedNow;
 
     AbstractBrush() {
         painting = false;
+
         painted = new HashSet<>();
         recentPainted = new HashSet<>();
+        dump = false;
         paintedNow = new HashSet<>();
     }
 
@@ -34,6 +36,7 @@ public sealed abstract class AbstractBrush
             setColorGetter(context, me);
             painted.clear();
             recentPainted.clear();
+            dump = false;
             paintedNow.clear();
 
             reset();
@@ -86,7 +89,11 @@ public sealed abstract class AbstractBrush
             context.paintOverImage(edit.submit());
             updateLast(context);
 
-            recentPainted.clear();
+            if (dump)
+                recentPainted.clear();
+
+            dump = !dump;
+
             recentPainted.addAll(paintedNow);
             paintedNow.clear();
         }
@@ -122,8 +129,11 @@ public sealed abstract class AbstractBrush
                 final Color existing = current.getColorAt(b.x, b.y);
                 if (mask[x][y] && !painted.contains(b) &&
                         paintCondition(existing, b.x, b.y)) {
-                    edit.dot(getColor(existing, b.x, b.y), b.x, b.y);
-                    painted.add(b);
+                    if (!painted.contains(b)) {
+                        edit.dot(getColor(existing, b.x, b.y), b.x, b.y);
+                        painted.add(b);
+                    }
+
                     paintedNow.add(b);
                 }
             }
