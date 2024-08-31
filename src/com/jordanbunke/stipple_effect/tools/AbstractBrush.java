@@ -5,7 +5,9 @@ import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -15,11 +17,13 @@ public sealed abstract class AbstractBrush
         extends ToolWithBreadth
         permits Brush, ShadeBrush, ScriptBrush {
     private boolean painting;
-    private Set<Coord2D> painted;
+    private final Set<Coord2D> painted, recentPainted, paintedNow;
 
     AbstractBrush() {
         painting = false;
         painted = new HashSet<>();
+        recentPainted = new HashSet<>();
+        paintedNow = new HashSet<>();
     }
 
     @Override
@@ -28,7 +32,9 @@ public sealed abstract class AbstractBrush
                 me.button != GameMouseEvent.Button.MIDDLE) {
             painting = true;
             setColorGetter(context, me);
-            painted = new HashSet<>();
+            painted.clear();
+            recentPainted.clear();
+            paintedNow.clear();
 
             reset();
             context.getState().markAsCheckpoint(false);
@@ -40,11 +46,11 @@ public sealed abstract class AbstractBrush
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();
+        final ProjectState s = context.getState();
 
         if (painting && !tp.equals(Constants.NO_VALID_TARGET)) {
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
-            final Selection selection = context.getState().getSelection();
+            final int w = s.getImageWidth(), h = s.getImageHeight();
+            final Selection selection = s.getSelection();
 
             if (isUnchanged(context))
                 return;
@@ -53,18 +59,44 @@ public sealed abstract class AbstractBrush
                 painted.clear();
 
             final GameImage edit = new GameImage(w, h),
-                    current = context.getState().getActiveCel();
+                    current = s.getActiveCel();
             populateAround(edit, current, tp, selection, w, h);
 
             final Coord2D lastTP = getLastTP();
 
-            if (!lastTP.equals(Constants.NO_VALID_TARGET))
-                fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(edit,
-                        current, getLastTP().displace(x, y), selection, w, h));
+            if (!lastTP.equals(Constants.NO_VALID_TARGET)) {
+                fillLineSpace(lastTP, tp, (x, y) -> populateAround(edit,
+                        current, lastTP.displace(x, y), selection, w, h));
+                fillGaps(w, h, lastTP, tp, this::couldBeNextToGap,
+                        (x, y) -> {
+                    // TODO - temp
+                            final Coord2D pixel = new Coord2D(x, y);
+
+                            if (!painted.contains(pixel)) {
+                                edit.dot(SEColors.red(),
+                                        // getColor(current.getColorAt(x, y),x, y),
+                                        x, y);
+
+                                painted.add(pixel);
+                                paintedNow.add(pixel);
+                            }
+                        });
+            }
 
             context.paintOverImage(edit.submit());
             updateLast(context);
+
+            recentPainted.clear();
+            recentPainted.addAll(paintedNow);
+            paintedNow.clear();
         }
+    }
+
+    private boolean couldBeNextToGap(final int x, final int y) {
+        final Coord2D pixel = new Coord2D(x, y);
+
+        return recentPainted.contains(pixel) ||
+                paintedNow.contains(pixel);
     }
 
     private void populateAround(
@@ -92,6 +124,7 @@ public sealed abstract class AbstractBrush
                         paintCondition(existing, b.x, b.y)) {
                     edit.dot(getColor(existing, b.x, b.y), b.x, b.y);
                     painted.add(b);
+                    paintedNow.add(b);
                 }
             }
     }

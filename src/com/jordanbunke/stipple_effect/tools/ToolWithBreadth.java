@@ -15,13 +15,14 @@ import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Dropdown;
-import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.menu_elements.IncrementalRangeElements;
 import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
+import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 public sealed abstract class ToolWithBreadth extends ToolThatDraws
         permits AbstractBrush, Eraser, BrushSelect, GradientTool, GeometryTool {
@@ -39,6 +40,10 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
         CIRCLE, SQUARE, LINE;
 
         public boolean hasAngle() {
+            return this == LINE;
+        }
+
+        public boolean gapProne() {
             return this == LINE;
         }
     }
@@ -250,13 +255,36 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
         return afterBreadthTextX;
     }
 
-    @Override
-    public void fillLineSpace(
-            final Coord2D from, final Coord2D to,
+    void fillGaps(
+            final int w, final int h, final Coord2D from, final Coord2D to,
+            final BiPredicate<Integer, Integer> condition,
             final BiConsumer<Integer, Integer> action
     ) {
-        super.fillLineSpace(from, to, action);
+        if (!brushShape.gapProne())
+            return;
 
-        // TODO - attempt fix to address line shape + angle gaps
+        final int b = (getBreadth() / 2) + 1,
+                xMin = Math.max(0, Math.min(from.x, to.x) - b),
+                xMax = Math.min(w, Math.max(from.x, to.x) + b + 1),
+                yMin = Math.max(0, Math.min(from.y, to.y) - b),
+                yMax = Math.min(h, Math.max(from.y, to.y) + b + 1);
+
+        for (int x = xMin; x < xMax; x++) {
+            for (int y = yMin; y < yMax; y++) {
+                final boolean oobLeft = x - 1 < 0,
+                        oobRight = x + 1 >= w,
+                        oobTop = y - 1 < 0,
+                        oobBottom = y + 1 >= h,
+                        left = !oobLeft && condition.test(x - 1, y),
+                        right = !oobRight && condition.test(x + 1, y),
+                        top = !oobTop && condition.test(x, y - 1),
+                        bottom = !oobBottom && condition.test(x, y + 1),
+                        met = (oobLeft || left) && (oobRight || right) &&
+                                (oobTop || top) && (oobBottom || bottom);
+
+                if (met)
+                    action.accept(x, y);
+            }
+        }
     }
 }
