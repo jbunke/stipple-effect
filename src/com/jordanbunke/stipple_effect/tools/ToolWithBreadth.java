@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.math.Geometry;
+import com.jordanbunke.stipple_effect.utility.math.LineSegment;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SECursor;
@@ -99,21 +100,18 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
                         mask[offset + x][offset + y] = true;
             }
             case LINE -> {
-                // TODO - iron out kinks
-
-                final int max = (halfB * 2) - 1;
                 final double complement =
                         angle + (angle < Math.PI ? Math.PI : -Math.PI);
+                final Coord2D middle = new Coord2D(halfB, halfB),
+                        from = Geometry.projectPoint(middle, angle, b / 2d),
+                        to = Geometry.projectPoint(middle, complement, b / 2d);
 
-                if (odd)
-                    mask[halfB][halfB] = true;
+                final LineSegment line = new LineSegment(from, to);
+                final int distance = (int) Math.round(line.distance()),
+                        max = (halfB * 2) - 1;
 
-                for (int i = 0; i < b; i++) {
-                    final double toUse = i <= halfB ? angle : complement;
-                    final int distance = Math.abs(i - halfB);
-
-                    final Coord2D projected = Geometry.projectPoint(
-                            new Coord2D(halfB, halfB), toUse, distance);
+                for (int i = 0; i <= distance; i++) {
+                    final Coord2D projected = line.pointAlongLineD(i);
 
                     if (projected.x < 0 || projected.y < 0 ||
                             projected.x > max || projected.y > max)
