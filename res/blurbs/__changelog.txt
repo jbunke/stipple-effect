@@ -9,6 +9,14 @@ Added:
 > New brush shapes
   > Square
   > Line + angle
+> Added setting to propagate changes made to breadth tool properties to all tools; affected tools:
+  > Brush
+  > Shade Brush
+  > Script Brush
+  > Eraser
+  > Line Tool
+  > Shape Tool
+  > Gradient Tool
 
 Changed:
 > Overhauled and extended onion skin system

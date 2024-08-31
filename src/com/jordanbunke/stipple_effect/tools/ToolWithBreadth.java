@@ -23,10 +23,11 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 
 public sealed abstract class ToolWithBreadth extends ToolThatDraws
         permits AbstractBrush, Eraser, BrushSelect, GradientTool, GeometryTool {
-    private static final double ANGLE_INC = Constants.CIRCLE / 36d;
+    private static final double ANGLE_INC = Constants.CIRCLE / 144d;
 
     private int breadth;
     private BrushShape brushShape;
@@ -56,11 +57,39 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
         afterBreadthTextX = 0;
     }
 
-    public static void redrawToolOverlays() {
-        Arrays.stream(Tool.getAll()).forEach(t -> {
-            if (t instanceof ToolWithBreadth twb)
-                twb.drawOverlay();
+    public static Stream<ToolWithBreadth> streamAll() {
+        return Arrays.stream(Tool.getAll())
+                .filter(t -> t instanceof ToolWithBreadth)
+                .map(t -> (ToolWithBreadth) t);
+    }
+
+    public static void resetAll() {
+        streamAll().forEach(t -> {
+            t.setBreadth(Settings.getDefaultToolBreadth(), false, false);
+            t.setAngle(0d, false, false);
+            t.setBrushShape(BrushShape.CIRCLE, false, false);
+
+            t.drawOverlay();
         });
+    }
+
+    private static void propagateBreadth(final ToolWithBreadth caller) {
+        streamAll().filter(t -> !t.equals(caller)).forEach(t ->
+                t.setBreadth(caller.breadth, true, false));
+    }
+
+    private static void propagateBrushShape(final ToolWithBreadth caller) {
+        streamAll().filter(t -> !t.equals(caller)).forEach(t ->
+                t.setBrushShape(caller.brushShape, true, false));
+    }
+
+    private static void propagateAngle(final ToolWithBreadth caller) {
+        streamAll().filter(t -> !t.equals(caller)).forEach(t ->
+                t.setAngle(caller.angle, true, false));
+    }
+
+    public static void redrawToolOverlays() {
+        streamAll().forEach(ToolWithBreadth::drawOverlay);
     }
 
     public void drawOverlay() {
@@ -153,23 +182,57 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
         return overlay;
     }
 
-    public void setBreadth(final int breadth) {
+    public void setBreadth(
+            final int breadth, final boolean redraw, final boolean ownCaller
+    ) {
         this.breadth = MathPlus.bounded(
                 Constants.MIN_BREADTH, breadth, Constants.MAX_BREADTH);
 
-        drawOverlay();
+        if (redraw) {
+            drawOverlay();
+
+            if (ownCaller && Settings.isPropagateBreadth())
+                propagateBreadth(this);
+        }
+    }
+
+    public void setBreadth(final int breadth) {
+        setBreadth(breadth, true, true);
+    }
+
+    public void setBrushShape(
+            final BrushShape brushShape, final boolean redraw,
+            final boolean ownCaller
+    ) {
+        this.brushShape = brushShape;
+
+        if (redraw) {
+            drawOverlay();
+
+            if (ownCaller && Settings.isPropagateBreadth())
+                propagateBrushShape(this);
+        }
     }
 
     public void setBrushShape(final BrushShape brushShape) {
-        this.brushShape = brushShape;
+        setBrushShape(brushShape, true, true);
+    }
 
-        drawOverlay();
+    public void setAngle(
+            final double angle, final boolean redraw, final boolean ownCaller
+    ) {
+        this.angle = MathPlus.bounded(0d, angle, Math.PI);
+
+        if (redraw) {
+            drawOverlay();
+
+            if (ownCaller && Settings.isPropagateBreadth())
+                propagateAngle(this);
+        }
     }
 
     public void setAngle(final double angle) {
-        this.angle = MathPlus.bounded(0d, angle, Constants.CIRCLE);
-
-        drawOverlay();
+        setAngle(angle, true, true);
     }
 
     private void decreaseAngle() {
@@ -233,7 +296,7 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
                 IncrementalRangeElements.makeForDouble(angleLabel,
                         Layout.optionsBarButtonY(), Layout.optionsBarTextY(),
                         this::decreaseAngle, this::increaseAngle,
-                        0d, Constants.CIRCLE, this::setAngle, () -> this.angle,
+                        0d, Math.PI, this::setAngle, () -> this.angle,
                         Geometry::radToDegreesRounded, Geometry::degreesToRad,
                         rad -> Geometry.radToDegreesRounded(rad) + " deg",
                         "XXX deg");

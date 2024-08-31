@@ -2666,6 +2666,22 @@ public class DialogAssembly {
 
                 yield invertFontSizeLabel;
             }
+            case TOOLS -> {
+                // text labels
+                final TextLabel propagateBreadthLabel =
+                        makeDialogLeftLabel(initialYIndex,
+                        "Propagate breadth tool property changes to all tools?");
+
+                final Checkbox propagateBreadthCheckbox = new Checkbox(
+                        contentPositionAfterLabel(propagateBreadthLabel),
+                        new ConcreteProperty<>(
+                                Settings::checkIsPropagateBreadth,
+                                Settings::setPropagateBreadth));
+
+                mb.addAll(propagateBreadthLabel, propagateBreadthCheckbox);
+
+                yield propagateBreadthLabel;
+            }
             case VISUAL -> {
                 // text labels
                 final TextLabel fontLabel = makeDialogLeftLabel(
@@ -3036,7 +3052,7 @@ public class DialogAssembly {
                         WebUtils::scriptingAPI);
         contentAssembler.addAll(Set.of(scriptLabel, scriptButton));
 
-        bottomY += DIALOG_CONTENT_INC_Y;
+        bottomY += DIALOG_CONTENT_INC_Y * 2;
 
         return bottomY - initialBottomY;
     }
