@@ -211,10 +211,10 @@ public final class SELayer {
         final List<GameImage> paddedCels = new ArrayList<>();
 
         for (int i = 0; i < cels.size(); i++) {
-            final GameImage frame = new GameImage(w, h);
-            frame.draw(getCel(i), left, top);
+            final GameImage cel = new GameImage(w, h);
+            cel.draw(getCel(i), left, top);
 
-            paddedCels.add(frame.submit());
+            paddedCels.add(cel.submit());
         }
 
         final GameImage paddedFLC = new GameImage(w, h);
