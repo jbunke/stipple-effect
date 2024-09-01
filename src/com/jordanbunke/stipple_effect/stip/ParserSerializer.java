@@ -51,13 +51,16 @@ public class ParserSerializer {
             FRAME_TAG = "frame",
             COLOR_TAG = "cols",
             DIMENSION_TAG = "dims",
-            SKIN_TYPE_TAG = "skin_type",
+            SKIN_TYPE_BACK_TAG = "skin_type_back",
+            SKIN_TYPE_FORWARD_TAG = "skin_type_forward",
             HUE_BACK_TAG = "hue_back",
             HUE_FORWARD_TAG = "hue_forward",
-            FADE_FACTOR_TAG = "fade_factor",
+            FADE_FACTOR_BACK_TAG = "fade_factor_back",
+            FADE_FACTOR_FORWARD_TAG = "fade_factor_forward",
             LOOK_BACK_TAG = "look_back",
             LOOK_FORWARD_TAG = "look_forward",
-            UNDER_TAG = "under";
+            UNDER_BACK_TAG = "under_back",
+            UNDER_FORWARD_TAG = "under_forward";
 
     public static Palette loadPalette(final String file) {
         final String contents = file
@@ -246,20 +249,26 @@ public class ParserSerializer {
 
         for (SerialBlock block : blocks) {
             switch (block.tag()) {
-                case SKIN_TYPE_TAG ->
-                        OnionSkin.setDSkinType(OnionSkin.SkinType.valueOf(block.value()));
+                case SKIN_TYPE_BACK_TAG ->
+                        OnionSkin.setDSkinTypeBack(OnionSkin.SkinType.valueOf(block.value()));
+                case SKIN_TYPE_FORWARD_TAG ->
+                        OnionSkin.setdSkinTypeForward(OnionSkin.SkinType.valueOf(block.value()));
                 case HUE_BACK_TAG ->
                         OnionSkin.setDHueBack(Double.parseDouble(block.value()));
                 case HUE_FORWARD_TAG ->
                         OnionSkin.setDHueForward(Double.parseDouble(block.value()));
-                case FADE_FACTOR_TAG ->
-                        OnionSkin.setDFadeFactor(Double.parseDouble(block.value()));
+                case FADE_FACTOR_BACK_TAG ->
+                        OnionSkin.setDFadeFactorBack(Double.parseDouble(block.value()));
+                case FADE_FACTOR_FORWARD_TAG ->
+                        OnionSkin.setdFadeFactorForward(Double.parseDouble(block.value()));
                 case LOOK_BACK_TAG ->
                         OnionSkin.setDLookBack(Integer.parseInt(block.value()));
                 case LOOK_FORWARD_TAG ->
                         OnionSkin.setDLookForward(Integer.parseInt(block.value()));
-                case UNDER_TAG ->
-                        OnionSkin.setDUnder(Boolean.parseBoolean(block.value()));
+                case UNDER_BACK_TAG ->
+                        OnionSkin.setDUnderBack(Boolean.parseBoolean(block.value()));
+                case UNDER_FORWARD_TAG ->
+                        OnionSkin.setdUnderForward(Boolean.parseBoolean(block.value()));
             }
         }
 
@@ -490,13 +499,16 @@ public class ParserSerializer {
             sb.append(NL);
 
             serializeSimpleAttributes(sb, indentLevel, buildAttributes(
-                    new Pair<>(SKIN_TYPE_TAG, onionSkin.skinType),
+                    new Pair<>(SKIN_TYPE_BACK_TAG, onionSkin.skinTypeBack),
+                    new Pair<>(SKIN_TYPE_FORWARD_TAG, onionSkin.skinTypeForward),
                     new Pair<>(HUE_BACK_TAG, onionSkin.hueBack),
                     new Pair<>(HUE_FORWARD_TAG, onionSkin.hueForward),
-                    new Pair<>(FADE_FACTOR_TAG, onionSkin.fadeFactor),
+                    new Pair<>(FADE_FACTOR_BACK_TAG, onionSkin.fadeFactorBack),
+                    new Pair<>(FADE_FACTOR_FORWARD_TAG, onionSkin.fadeFactorForward),
                     new Pair<>(LOOK_BACK_TAG, onionSkin.lookBack),
                     new Pair<>(LOOK_FORWARD_TAG, onionSkin.lookForward),
-                    new Pair<>(UNDER_TAG, onionSkin.under)));
+                    new Pair<>(UNDER_BACK_TAG, onionSkin.underBack),
+                    new Pair<>(UNDER_FORWARD_TAG, onionSkin.underForward)));
 
             indent(sb, indentLevel);
         }

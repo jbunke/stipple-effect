@@ -19,7 +19,6 @@ import com.jordanbunke.delta_time.menu.menu_elements.visual.StaticMenuElement;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.OnionSkin;
@@ -27,8 +26,8 @@ import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
-import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -52,8 +51,6 @@ import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
-import static com.jordanbunke.stipple_effect.utility.Layout.*;
-
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
@@ -64,6 +61,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.jordanbunke.stipple_effect.utility.Layout.*;
 
 public class DialogAssembly {
     private static final int LINE_ABOVE = -2, AFTER_COMMON_COLOR_ACTION_ROW = 4;
@@ -82,30 +81,30 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                folderLabel = makeDialogLeftLabel(0, "Folder:"),
+                folderLabel = makeDialogLeftLabel(0, "Folder"),
                 nameLabel = TextLabel.make(textBelowPos(folderLabel),
-                        "File name:"),
+                        "File name"),
                 saveAsTypeLabel = TextLabel.make(textBelowPos(nameLabel),
-                        "Save as:"),
+                        "Save as"),
                 scaleUpLabel = TextLabel.make(textBelowPos(saveAsTypeLabel),
-                        "Scale factor:"),
+                        "Scale factor"),
                 frameBoundsLabel = TextLabel.make(textBelowPos(scaleUpLabel),
                         "Save limited range of frames?"),
                 lowerBoundsLabel = TextLabel.make(textBelowPos(frameBoundsLabel),
-                        "Lower bound:"),
+                        "Lower bound"),
                 upperBoundsLabel = makeDialogRightLabel(
-                        lowerBoundsLabel, "Upper bound:");
+                        lowerBoundsLabel, "Upper bound");
         mb.addAll(folderLabel, nameLabel, saveAsTypeLabel);
 
         final TextLabel indexPrefixLabel = TextLabel.make(
                         textBelowPos(lowerBoundsLabel, 1),
-                        "Prefix:"),
-                indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix:"),
+                        "Prefix"),
+                indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix"),
                 countFromLabel = TextLabel.make(textBelowPos(indexPrefixLabel),
-                        "Count from:"),
+                        "Count from"),
                 fpsLabel = TextLabel.make(
                         textBelowPos(lowerBoundsLabel, 1),
-                        "Frame rate:");
+                        "Frame rate");
 
         // folder selection button
         final DynamicTextButton folderButton = makeFolderSelectionButton(
@@ -322,7 +321,7 @@ public class DialogAssembly {
 
         final TextLabel resizeTypeLabel =
                 TextLabel.make(textBelowPos(preserveAspectRatioLabel),
-                        "Resize by:");
+                        "Resize by");
         final Dropdown resizeByDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(resizeTypeLabel),
                 EnumUtils.stream(DialogVals.ResizeBy.class)
@@ -337,7 +336,7 @@ public class DialogAssembly {
         // case 1: resize by scale and preserve aspect ratio
         final TextLabel universalScaleLabel = TextLabel.make(
                 textBelowPos(resizeTypeLabel, 1),
-                "Scale factor:");
+                "Scale factor");
         final Textbox universalScaleTextbox = makeDialogCustomTextBox(
                 universalScaleLabel, SMALL_TEXT_BOX_W,
                 Layout::contentPositionAfterLabel,
@@ -348,9 +347,9 @@ public class DialogAssembly {
         // case 2: resize by scale but aspect ratio is free
         final TextLabel scaleXLabel = TextLabel.make(
                 textBelowPos(resizeTypeLabel, 1),
-                "Scale factor (X):"),
+                "Scale factor (X)"),
                 scaleYLabel = makeDialogRightLabel(
-                        scaleXLabel, "Scale factor (Y):");
+                        scaleXLabel, "Scale factor (Y)");
         final Textbox scaleXTextbox = makeDialogCustomTextBox(
                 scaleXLabel, SMALL_TEXT_BOX_W,
                 Layout::contentPositionAfterLabel,
@@ -367,8 +366,8 @@ public class DialogAssembly {
         // case 3: resize by pixels
         final TextLabel widthLabel = TextLabel.make(
                 textBelowPos(resizeTypeLabel, 1),
-                "Width:"),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height:");
+                "Width"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height");
         final DynamicTextbox widthTextbox =
                 makeDialogPixelDynamicTextbox(widthLabel,
                         Layout::contentPositionAfterLabel,
@@ -431,11 +430,11 @@ public class DialogAssembly {
         // text labels
         final TextLabel
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
-                allLabel = TextLabel.make(textBelowPos(context, 1), "All:"),
-                leftLabel = TextLabel.make(textBelowPos(allLabel, 1), "Left:"),
-                rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right:"),
-                topLabel = TextLabel.make(textBelowPos(rightLabel), "Top:"),
-                bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom:"),
+                allLabel = TextLabel.make(textBelowPos(context, 1), "All"),
+                leftLabel = TextLabel.make(textBelowPos(allLabel, 1), "Left"),
+                rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right"),
+                topLabel = TextLabel.make(textBelowPos(rightLabel), "Top"),
+                bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom"),
                 explanation = makeValidDimensionsBottomLabel();
         mb.addAll(context, explanation, allLabel,
                 leftLabel, rightLabel, topLabel, bottomLabel);
@@ -615,7 +614,7 @@ public class DialogAssembly {
         // text labels
         final TextLabel context = makeDialogLeftLabel(0,
                 "Current size: " + w + "x" + h + (tooBig
-                        ? " ... must be split or downscaled" :""));
+                        ? " ... must be split or downscaled" : ""));
         mb.add(context);
 
         final TextLabel resizeLabel = TextLabel.make(
@@ -623,8 +622,8 @@ public class DialogAssembly {
                 preserveAspectRatioLabel = TextLabel.make(textBelowPos(
                         resizeLabel), "Preserve aspect ratio?"),
                 widthLabel = TextLabel.make(textBelowPos(
-                        preserveAspectRatioLabel), "Width:"),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height:");
+                        preserveAspectRatioLabel), "Width"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height");
         final Checkbox preserveAspectRatioCheckbox = new Checkbox(
                 contentPositionAfterLabel(preserveAspectRatioLabel),
                 new ConcreteProperty<>(
@@ -715,11 +714,11 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                presetLabel = makeDialogLeftLabel(0, "Size presets:"),
+                presetLabel = makeDialogLeftLabel(0, "Size presets"),
                 widthLabel = TextLabel.make(
                         textBelowPos(presetLabel, 1),
-                        "Width:"),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height:"),
+                        "Width"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height"),
                 explanation = makeValidDimensionsBottomLabel();
 
         // preset buttons
@@ -907,7 +906,7 @@ public class DialogAssembly {
         lines += 1 + LINE_BREAK;
 
         // name
-        final TextLabel nameLabel = makeDialogLeftLabel(lines, "Font name:");
+        final TextLabel nameLabel = makeDialogLeftLabel(lines, "Font name");
         final Textbox nameTextbox = makeDialogCustomTextBox(nameLabel,
                 LONG_NAME_TEXTBOX_W,
                 Layout::contentPositionAfterLabel,
@@ -918,7 +917,7 @@ public class DialogAssembly {
         lines++;
 
         // pixel spacing
-        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing:");
+        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing");
         final Textbox spacingTextbox = makeDialogPixelDynamicTextbox(
                 spacingLabel, Layout::contentPositionAfterLabel,
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
@@ -938,7 +937,7 @@ public class DialogAssembly {
 
         // ASCII
         final TextLabel asciiLabel = makeDialogLeftLabel(
-                lines, "ASCII source file:");
+                lines, "ASCII source file");
         final StaticTextButton asciiButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         contentPositionAfterLabel(asciiLabel),
@@ -958,7 +957,7 @@ public class DialogAssembly {
                 new ConcreteProperty<>(
                         DialogVals::hasLatinEx, DialogVals::setHasLatinEx));
         final TextLabel latinExLabel = makeDialogLeftLabel(
-                lines + 1, "Latin Extended source file:");
+                lines + 1, "Latin Extended source file");
         final StaticTextButton latinExButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         contentPositionAfterLabel(latinExLabel),
@@ -1076,8 +1075,8 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         // labels
-        final TextLabel setAllLabel = makeDialogLeftLabel(0, "Set all edges:"),
-                presets = TextLabel.make(textBelowPos(setAllLabel), "Presets:"),
+        final TextLabel setAllLabel = makeDialogLeftLabel(0, "Set all edges"),
+                presets = TextLabel.make(textBelowPos(setAllLabel), "Presets"),
                 validity = TextLabel.make(textBelowPos(presets),
                         "Valid outline thickness can range from -" +
                                 Constants.MAX_OUTLINE_PX + " to " +
@@ -1139,7 +1138,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         // presets: single & double
-        final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
+        final TextLabel presets = makeDialogLeftLabel(0, "Presets");
         mb.add(presets);
 
         // buttons for panel arrangement presets
@@ -1175,7 +1174,7 @@ public class DialogAssembly {
 
             // panel label
             final TextLabel label = TextLabel.make(textBelowPos(presets, 1 + i),
-                    labelTexts[i] + ":");
+                    labelTexts[i]);
 
             // panel toggle
             final Consumer<Boolean>
@@ -1212,10 +1211,10 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel hueLabel = makeDialogLeftLabel(
-                AFTER_COMMON_COLOR_ACTION_ROW, "Shift hue:");
+                AFTER_COMMON_COLOR_ACTION_ROW, "Shift hue");
 
         final String T_SHIFT = "Shift ", T_SCALE = "Scale ",
-                T_SAT = "sat:", T_VAL = "value:";
+                T_SAT = "sat.", T_VAL = "value";
 
         final DynamicLabel satLabel = makeDynamicLabel(
                 textBelowPos(hueLabel),
@@ -1432,7 +1431,7 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel scriptLabel = makeDialogLeftLabel(
-                AFTER_COMMON_COLOR_ACTION_ROW, "Script file:");
+                AFTER_COMMON_COLOR_ACTION_ROW, "Script file");
         final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         contentPositionAfterLabel(scriptLabel),
@@ -1599,9 +1598,9 @@ public class DialogAssembly {
 
         // labels
         final TextLabel
-                folderLabel = makeDialogLeftLabel(0, "Folder:"),
+                folderLabel = makeDialogLeftLabel(0, "Folder"),
                 nameLabel = TextLabel.make(textBelowPos(folderLabel),
-                        "File name:");
+                        "File name");
         mb.addAll(folderLabel, nameLabel);
 
         // folder button
@@ -1637,7 +1636,7 @@ public class DialogAssembly {
 
         final MenuBuilder mb = new MenuBuilder();
 
-        final TextLabel sortLabel = makeDialogLeftLabel(0, "Sort colors by:"),
+        final TextLabel sortLabel = makeDialogLeftLabel(0, "Sort colors by"),
                 backwardsLabel = TextLabel.make(textBelowPos(sortLabel),
                         "Backwards?");
         final Dropdown sortDropdown = Dropdown.forDialog(
@@ -1705,7 +1704,7 @@ public class DialogAssembly {
         DialogVals.setPaletteName(palette.getName());
 
         // text labels
-        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name:");
+        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name");
 
         // name textbox
         DialogVals.setPaletteName(palette.getName());
@@ -1778,22 +1777,37 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel layerNameLabel =
-                makeDialogLeftLabel(0, "Name:"),
+                makeDialogLeftLabel(0, "Name"),
                 opacityLabel = TextLabel.make(textBelowPos(layerNameLabel),
-                        "Opacity:"),
+                        "Opacity"),
                 onionSkinAnnouncer = TextLabel.make(
-                        textBelowPos(opacityLabel, 1), "Onion skin settings"),
-                skinTypeLabel = TextLabel.make(
-                        textBelowPos(onionSkinAnnouncer), "Type:"),
+                        textBelowPos(opacityLabel), "Onion skin settings"),
+                precedingLabel = TextLabel.make(
+                        textBelowPos(onionSkinAnnouncer), "Preceding cels"),
+                followingLabel = makeDialogRightLabel(
+                        precedingLabel, "Following cels"),
+                skinTypeBackLabel = TextLabel.make(
+                        textBelowPos(precedingLabel), "Type"),
+                skinTypeForwardLabel = makeDialogRightLabel(
+                        skinTypeBackLabel, "Type"),
                 lookBackLabel = TextLabel.make(
-                        textBelowPos(skinTypeLabel, 2), "Cels behind:"),
-                lookForwardLabel = makeDialogRightLabel(lookBackLabel, "Cels ahead:"),
-                fadeFactorLabel = TextLabel.make(
+                        textBelowPos(skinTypeBackLabel, 2), "# cels"),
+                lookForwardLabel = makeDialogRightLabel(lookBackLabel, "# cels"),
+                fadeFactorBackLabel = TextLabel.make(
                         textBelowPos(lookBackLabel), "Fade per frame"),
-                underLabel = makeDialogRightLabel(fadeFactorLabel, "Render under?");
+                fadeFactorForwardLabel = makeDialogRightLabel(
+                        fadeFactorBackLabel, "Fade per frame"),
+                underBackLabel = TextLabel.make(
+                        textBelowPos(fadeFactorBackLabel), "Render under?"),
+                underForwardLabel = makeDialogRightLabel(
+                        underBackLabel, "Render under?");
 
-        mb.addAll(layerNameLabel, opacityLabel, onionSkinAnnouncer, skinTypeLabel,
-                lookBackLabel, lookForwardLabel, fadeFactorLabel, underLabel);
+        mb.addAll(layerNameLabel, opacityLabel, onionSkinAnnouncer,
+                precedingLabel, followingLabel,
+                skinTypeBackLabel, skinTypeForwardLabel,
+                lookBackLabel, lookForwardLabel,
+                fadeFactorBackLabel, fadeFactorForwardLabel,
+                underBackLabel, underForwardLabel);
 
         // textboxes
         final Textbox layerNameTextbox = makeDialogNameTextBox(
@@ -1813,35 +1827,54 @@ public class DialogAssembly {
 
         // fade factor
         final int PERCENT = 100;
-        final Consumer<Boolean> tickFade = up -> {
-            final double was = OnionSkin.getDFadeFactor(),
-                    delta = 1d / (double) PERCENT;
-            OnionSkin.setDFadeFactor(MathPlus.bounded(
-                    OnionSkin.MIN_FADE,
-                    was + (up ? delta : -delta), OnionSkin.MAX_FADE));
+        final double delta = 1 / (double) PERCENT;
+        final Consumer<Boolean> tickFadeBack = up -> {
+            final double was = OnionSkin.getDFadeFactorBack();
+            OnionSkin.setDFadeFactorBack(was + (up ? delta : -delta));
+        }, tickFadeForward = up -> {
+            final double was = OnionSkin.getDFadeFactorForward();
+            OnionSkin.setdFadeFactorForward(was + (up ? delta : -delta));
         };
-        final IncrementalRangeElements<Double> fadeFactorUI =
-                IncrementalRangeElements.makeForDouble(fadeFactorLabel,
-                        fadeFactorLabel.getY() +
+        final IncrementalRangeElements<Double> fadeFactorBackUI =
+                IncrementalRangeElements.makeForDouble(fadeFactorBackLabel,
+                        fadeFactorBackLabel.getY() +
                                 DIALOG_CONTENT_COMP_OFFSET_Y,
-                        fadeFactorLabel.getY(),
-                        () -> tickFade.accept(false), () -> tickFade.accept(true),
+                        fadeFactorBackLabel.getY(),
+                        () -> tickFadeBack.accept(false),
+                        () -> tickFadeBack.accept(true),
                         OnionSkin.MIN_FADE, OnionSkin.MAX_FADE,
-                        OnionSkin::setDFadeFactor, OnionSkin::getDFadeFactor,
+                        OnionSkin::setDFadeFactorBack,
+                        OnionSkin::getDFadeFactorBack,
+                        o -> (int)(o * PERCENT),
+                        sv -> sv / (double) PERCENT,
+                        o -> (int) (o * PERCENT) + "%", "XXX%"),
+                fadeFactorForwardUI = IncrementalRangeElements.makeForDouble(
+                        fadeFactorForwardLabel,
+                        fadeFactorForwardLabel.getY() + DIALOG_CONTENT_COMP_OFFSET_Y,
+                        fadeFactorBackLabel.getY(),
+                        () -> tickFadeForward.accept(false),
+                        () -> tickFadeForward.accept(true),
+                        OnionSkin.MIN_FADE, OnionSkin.MAX_FADE,
+                        OnionSkin::setdFadeFactorForward,
+                        OnionSkin::getDFadeFactorForward,
                         o -> (int)(o * PERCENT),
                         sv -> sv / (double) PERCENT,
                         o -> (int) (o * PERCENT) + "%", "XXX%");
-        mb.addAll(fadeFactorUI.decButton, fadeFactorUI.incButton,
-                fadeFactorUI.slider, fadeFactorUI.value);
+        mb.addAll(fadeFactorBackUI.decButton, fadeFactorBackUI.incButton,
+                fadeFactorBackUI.slider, fadeFactorBackUI.value,
+                fadeFactorForwardUI.decButton, fadeFactorForwardUI.incButton,
+                fadeFactorForwardUI.slider, fadeFactorForwardUI.value);
 
         // hues
-        final TextLabel ref = TextLabel.make(
-                textBelowPos(skinTypeLabel), ""),
-                ref2 = makeDialogRightLabel(ref, "");
-        mb.add(new GatewayMenuElement(new MenuElementGrouping(
-                ColorComponent.onionSkinHue(ref.getPosition(), true),
-                ColorComponent.onionSkinHue(ref2.getRenderPosition(), false)
-        ), () -> OnionSkin.getDSkinType().hasHue()));
+        final TextLabel backRef = TextLabel.make(
+                textBelowPos(skinTypeBackLabel), ""),
+                forwardRef = makeDialogRightLabel(backRef, "");
+        mb.addAll(new GatewayMenuElement(new MenuElementGrouping(
+                ColorComponent.onionSkinHue(backRef.getPosition(), true)
+                ), () -> OnionSkin.getDSkinTypeBack().hasHue()),
+                new GatewayMenuElement(new MenuElementGrouping(
+                        ColorComponent.onionSkinHue(forwardRef.getRenderPosition(), false)
+                ), () -> OnionSkin.getdSkinTypeForward().hasHue()));
 
         // opacity slider
         final int MAX_OPACITY = Constants.RGBA_SCALE;
@@ -1870,21 +1903,36 @@ public class DialogAssembly {
         mb.addAll(opacityUI.decButton, opacityUI.incButton,
                 opacityUI.slider, opacityUI.value);
 
-        final Dropdown skinTypeDropdown = Dropdown.forDialog(
-                contentPositionAfterLabel(skinTypeLabel),
+        final Dropdown skinTypeBackDropdown = Dropdown.forDialog(
+                contentPositionAfterLabel(skinTypeBackLabel),
                 EnumUtils.stream(OnionSkin.SkinType.class)
                         .map(EnumUtils::formattedName)
                         .toArray(String[]::new),
                 EnumUtils.stream(OnionSkin.SkinType.class)
-                        .map(os -> (Runnable) () -> OnionSkin.setDSkinType(os))
+                        .map(os -> (Runnable) () -> OnionSkin.setDSkinTypeBack(os))
                         .toArray(Runnable[]::new),
-                () -> OnionSkin.getDSkinType().ordinal());
+                () -> OnionSkin.getDSkinTypeBack().ordinal()),
+                skinTypeForwardDropdown = Dropdown.forDialog(
+                        contentPositionAfterLabel(skinTypeForwardLabel),
+                        EnumUtils.stream(OnionSkin.SkinType.class)
+                                .map(EnumUtils::formattedName)
+                                .toArray(String[]::new),
+                        EnumUtils.stream(OnionSkin.SkinType.class)
+                                .map(os -> (Runnable)
+                                        () -> OnionSkin.setdSkinTypeForward(os))
+                                .toArray(Runnable[]::new),
+                        () -> OnionSkin.getdSkinTypeForward().ordinal());
 
-        final Checkbox underCheckbox = new Checkbox(
-                contentPositionAfterLabel(underLabel), new ConcreteProperty<>(
-                        OnionSkin::isDUnder, OnionSkin::setDUnder));
+        final Checkbox underBackCheckbox = new Checkbox(
+                contentPositionAfterLabel(underBackLabel), new ConcreteProperty<>(
+                        OnionSkin::isDUnderBack, OnionSkin::setDUnderBack)),
+                underForwardCheckbox = new Checkbox(
+                        contentPositionAfterLabel(underForwardLabel),
+                        new ConcreteProperty<>(OnionSkin::isDUnderForward,
+                                OnionSkin::setdUnderForward));
 
-        mb.addAll(skinTypeDropdown, underCheckbox);
+        mb.addAll(skinTypeBackDropdown, skinTypeForwardDropdown,
+                underBackCheckbox, underForwardCheckbox);
 
         setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
                 new MenuElementGrouping(mb.build().getMenuElements()),
@@ -1911,7 +1959,7 @@ public class DialogAssembly {
 
         DialogVals.setFrameDuration(c.getState().getFrameDurations().get(index));
 
-        final TextLabel durationLabel = makeDialogLeftLabel(0, "Frame duration:");
+        final TextLabel durationLabel = makeDialogLeftLabel(0, "Frame duration");
 
         final double STEP = 0.1, DIV = 10d,
                 MIN = Constants.MIN_FRAME_DURATION,
@@ -2023,7 +2071,7 @@ public class DialogAssembly {
         final int initialIndex = DialogVals.getScope().ordinal();
         final boolean hasSelection = c.getState().hasSelection();
 
-        final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope:"),
+        final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope"),
                 disabledLayersLabel = TextLabel.make(
                         textBelowPos(scopeLabel),
                         "Include disabled layers?"),
@@ -2099,11 +2147,10 @@ public class DialogAssembly {
         makeSequenceOrderElements(mb, soGetter, soSetter, referenceLabel);
 
         // frames per [dim]
-        final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
+        final String FPD_PREFIX = "Frames per ";
         final DynamicLabel framesPerDimLabel = makeDynamicLabel(
                 textBelowPos(referenceLabel, 2), () -> FPD_PREFIX +
-                        soGetter.get().dimName() + FPD_SUFFIX,
-                FPD_PREFIX + "column" + FPD_SUFFIX);
+                        soGetter.get().dimName(), FPD_PREFIX + "column");
         final DynamicTextbox framesPerDimTextbox =
                 makeDialogNumericalDynamicTextbox(
                         framesPerDimLabel,
@@ -2188,7 +2235,7 @@ public class DialogAssembly {
 
         // columns
         final TextLabel columnsLabel = TextLabel.make(
-                textBelowPos(referenceLabel, 2), "Columns:");
+                textBelowPos(referenceLabel, 2), "Columns");
         final DynamicTextbox columnsTextbox = makeDialogDynamicTextbox(
                 columnsLabel, Layout::contentPositionAfterLabel,
                 1, initialColumns, Constants.MAX_NUM_FRAMES, "",
@@ -2198,7 +2245,7 @@ public class DialogAssembly {
 
         // rows
         final TextLabel yDivsLabel = makeDialogRightLabel(
-                columnsLabel, "Rows:");
+                columnsLabel, "Rows");
         final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
                 yDivsLabel, Layout::contentPositionAfterLabel,
                 1, initialRows, Constants.MAX_NUM_FRAMES, "",
@@ -2208,7 +2255,7 @@ public class DialogAssembly {
 
         // frame width
         final TextLabel frameWidthLabel = TextLabel.make(
-                textBelowPos(columnsLabel), "Frame width:");
+                textBelowPos(columnsLabel), "Frame width");
         final DynamicTextbox frameWidthTextbox =
                 makeDialogPixelDynamicTextbox(frameWidthLabel,
                         Layout::contentPositionAfterLabel,
@@ -2219,7 +2266,7 @@ public class DialogAssembly {
 
         // frame height
         final TextLabel frameHeightLabel = makeDialogRightLabel(
-                frameWidthLabel, "Frame height:");
+                frameWidthLabel, "Frame height");
         final DynamicTextbox frameHeightTextbox =
                 makeDialogPixelDynamicTextbox(frameHeightLabel,
                         Layout::contentPositionAfterLabel,
@@ -2233,7 +2280,7 @@ public class DialogAssembly {
 
         // X-axis remainder
         final TextLabel xRemainderLabel = TextLabel.make(
-                textBelowPos(frameWidthLabel), "X-axis remainder:");
+                textBelowPos(frameWidthLabel), "X-axis remainder");
         final Dropdown xRemainderDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(xRemainderLabel),
                 remainderLabels, new Runnable[] {
@@ -2247,7 +2294,7 @@ public class DialogAssembly {
 
         // Y-axis remainder
         final TextLabel yRemainderLabel = makeDialogRightLabel(
-                xRemainderLabel, "Y-axis remainder:");
+                xRemainderLabel, "Y-axis remainder");
         final Dropdown yRemainderDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(yRemainderLabel),
                 remainderLabels, new Runnable[] {
@@ -2267,8 +2314,7 @@ public class DialogAssembly {
             final TextLabel referenceLabel
     ) {
         final TextLabel sequenceLabel = TextLabel.make(
-                textBelowPos(referenceLabel, 1),
-                "Sequence order:");
+                textBelowPos(referenceLabel, 1), "Sequence order");
         final Dropdown sequenceDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(sequenceLabel),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
@@ -2539,29 +2585,29 @@ public class DialogAssembly {
             case DEFAULTS -> {
                 // text labels
                 final TextLabel fullscreenLabel = makeDialogLeftLabel(
-                        initialYIndex, "Fullscreen on startup:"),
+                        initialYIndex, "Fullscreen on startup"),
                         pixelGridDefaultLabel = TextLabel.make(
                                 textBelowPos(fullscreenLabel, 1),
-                                "Pixel grid on by default:"),
+                                "Pixel grid on by default"),
                         defaultNewProjectSizeLabel = TextLabel.make(
                                 textBelowPos(pixelGridDefaultLabel, 1),
                                 "Default canvas size for new projects"),
                         newProjectWidthLabel = TextLabel.make(
                                 textBelowPos(defaultNewProjectSizeLabel),
-                                "Width:"),
+                                "Width"),
                         newProjectHeightLabel = makeDialogRightLabel(
-                                newProjectWidthLabel, "Height:"),
+                                newProjectWidthLabel, "Height"),
                         defaultToolBreadthLabel = TextLabel.make(
                                 textBelowPos(newProjectWidthLabel, 1),
-                                "Default tool breadth:"),
+                                "Default tool breadth"),
                         frameAffixLabel = TextLabel.make(
                                 textBelowPos(defaultToolBreadthLabel, 1),
                                 "Default separate PNGs frame affixes"),
                         prefixLabel = TextLabel.make(
                                 textBelowPos(frameAffixLabel),
-                                "Prefix:"),
+                                "Prefix"),
                         suffixLabel = makeDialogRightLabel(prefixLabel,
-                                "Suffix:");
+                                "Suffix");
 
                 final Checkbox fullscreenCheckbox = new Checkbox(
                         contentPositionAfterLabel(fullscreenLabel),
@@ -2685,17 +2731,17 @@ public class DialogAssembly {
             case VISUAL -> {
                 // text labels
                 final TextLabel fontLabel = makeDialogLeftLabel(
-                        initialYIndex, "Program font:"),
+                        initialYIndex, "Program font"),
                         themeLabel = makeDialogRightLabel(fontLabel,
-                                "Theme:"),
+                                "Theme"),
                         windowedSizeLabel = TextLabel.make(
                                 textBelowPos(fontLabel, 1),
                                 "Windowed program size"),
                         windowedWidthLabel = TextLabel.make(
                                 textBelowPos(windowedSizeLabel),
-                                "Window width:"),
+                                "Window width"),
                         windowedHeightLabel = makeDialogRightLabel(
-                                windowedWidthLabel, "Window height:"),
+                                windowedWidthLabel, "Window height"),
                         windowedContext = TextLabel.make(
                                 textBelowPos(windowedWidthLabel),
                                 "On this device, the windowed program can range from "),
@@ -2708,9 +2754,9 @@ public class DialogAssembly {
                                 "Checkerboard size"),
                         checkerboardWidthLabel = TextLabel.make(
                                 textBelowPos(checkerboardLabel),
-                                "Cell width:"),
+                                "Cell width"),
                         checkerboardHeightLabel = makeDialogRightLabel(
-                                checkerboardWidthLabel, "Cell height:"),
+                                checkerboardWidthLabel, "Cell height"),
                         checkerboardContext = TextLabel.make(
                                 textBelowPos(checkerboardWidthLabel),
                                 "Valid checkerboard size values range from " +
@@ -2721,9 +2767,9 @@ public class DialogAssembly {
                                 "Pixel grid"),
                         pixelGridXLabel = TextLabel.make(
                                 textBelowPos(pixelGridLabel),
-                                "X-axis increment:"),
+                                "X-axis increment"),
                         pixelGridYLabel = makeDialogRightLabel(
-                                pixelGridXLabel, "Y-axis increment:"),
+                                pixelGridXLabel, "Y-axis increment"),
                         pixelGridContext = TextLabel.make(
                                 textBelowPos(pixelGridXLabel),
                                 "Valid pixel grid size values range from " +

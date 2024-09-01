@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 
 public final class SELayer {
-    private final List<GameImage> cels, renders, onionSkins;
+    private final List<GameImage> cels, renders, backOnionSkins, forwardOnionSkins;
     private final GameImage linkedContent;
     private final double opacity;
     private final boolean enabled, celsLinked;
@@ -81,7 +81,8 @@ public final class SELayer {
         this.onionSkinOn = onionSkinOn;
 
         renders = new ArrayList<>();
-        onionSkins = new ArrayList<>();
+        backOnionSkins = new ArrayList<>();
+        forwardOnionSkins = new ArrayList<>();
 
         generateRenders();
         generateOnionSkins();
@@ -116,7 +117,9 @@ public final class SELayer {
             forwardBases[i] = onionSkin.drawBase(cel, false);
         }
 
-        onionSkin.populateOnionSkins(fc, onionSkins, backBases, forwardBases);
+        onionSkin.populateOnionSkins(fc,
+                backOnionSkins, forwardOnionSkins,
+                backBases, forwardBases);
     }
 
     private static String giveLayerDefaultName() {
@@ -393,7 +396,10 @@ public final class SELayer {
         return renders.get(celsLinked ? 0 : frameIndex);
     }
 
-    public GameImage getOnionSkinCel(final int frameIndex) {
+    public GameImage getOnionSkinCel(final int frameIndex, final boolean back) {
+        final List<GameImage> onionSkins = back
+                ? backOnionSkins : forwardOnionSkins;
+
         if (celsLinked || frameIndex >= onionSkins.size())
             return GameImage.dummy();
 
@@ -432,7 +438,7 @@ public final class SELayer {
     public void setOnionSkinOn(final boolean onionSkinOn) {
         this.onionSkinOn = onionSkinOn;
 
-        if (onionSkinOn && onionSkins.isEmpty())
+        if (onionSkinOn && backOnionSkins.isEmpty())
             generateOnionSkins();
     }
 

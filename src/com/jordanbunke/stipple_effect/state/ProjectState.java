@@ -233,13 +233,24 @@ public class ProjectState {
             if (layer.isEnabled()) {
                 final boolean osOn = layer.isOnionSkinOn();
                 final OnionSkin os = layer.getOnionSkin();
-                final GameImage onionSkinCel = includeOnionSkins && osOn
-                        ? layer.getOnionSkinCel(frameIndex)
-                        : GameImage.dummy();
+                final GameImage onionSkinBack, onionSkinForward;
+
+                if (includeOnionSkins && osOn) {
+                    onionSkinBack = layer.getOnionSkinCel(frameIndex, true);
+                    onionSkinForward = layer.getOnionSkinCel(frameIndex, false);
+                } else {
+                    onionSkinBack = GameImage.dummy();
+                    onionSkinForward = GameImage.dummy();
+                }
 
                 // render onion skin under layer
-                if (includeOnionSkins && osOn && os.under)
-                    image.draw(onionSkinCel);
+                if (includeOnionSkins && osOn) {
+                    if (os.underBack)
+                        image.draw(onionSkinBack);
+
+                    if (os.underForward)
+                        image.draw(onionSkinForward);
+                }
 
                 // this layer
                 GameImage layerImage = new GameImage(layer.getRender(frameIndex));
@@ -264,8 +275,13 @@ public class ProjectState {
                 image.draw(layerImage.submit());
 
                 // render onion skin above layer
-                if (includeOnionSkins && osOn && !os.under)
-                    image.draw(onionSkinCel);
+                if (includeOnionSkins && osOn) {
+                    if (!os.underBack)
+                        image.draw(onionSkinBack);
+
+                    if (!os.underForward)
+                        image.draw(onionSkinForward);
+                }
 
                 if (previewCondition) {
                     final GameImage preview = selectionContents

@@ -37,9 +37,7 @@ public class ColorComponent extends MenuElementContainer {
         final Function<Integer, Color> fSpectral = i ->
                 fromHSV(scaleDown(i, scaleMax), 1d, 1d, Constants.RGBA_SCALE);
 
-        return new ColorComponent(scaleMax,
-                "Hue " + (back ? "behind" : "ahead") + ":", labelPos,
-                fSpectral, c -> {
+        return new ColorComponent(scaleMax, "Hue", labelPos, fSpectral, c -> {
             final double hue = rgbToHue(c);
 
             if (back)

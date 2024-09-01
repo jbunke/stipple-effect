@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.layer;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
@@ -16,15 +17,15 @@ public final class OnionSkin {
     public static final double RED = 0d, GREEN = 1 / 3d,
             DEF_FADE = 0.5, MIN_FADE = 0.1, MAX_FADE = 0.8;
 
-    private static SkinType dSkinType;
-    private static double dHueBack, dHueForward, dFadeFactor;
+    private static SkinType dSkinTypeBack, dSkinTypeForward;
+    private static double dHueBack, dHueForward, dFadeFactorBack, dFadeFactorForward;
     private static int dLookBack, dLookForward;
-    private static boolean dUnder;
+    private static boolean dUnderBack, dUnderForward;
 
-    public final SkinType skinType;
-    public final double hueBack, hueForward, fadeFactor;
+    public final SkinType skinTypeBack, skinTypeForward;
+    public final double hueBack, hueForward, fadeFactorBack, fadeFactorForward;
     public final int lookBack, lookForward;
-    public final boolean under;
+    public final boolean underBack, underForward;
 
     public enum SkinType {
         SIMPLE, OUTLINE, TINTED;
@@ -42,27 +43,37 @@ public final class OnionSkin {
     }
 
     private OnionSkin() {
-        skinType = dSkinType;
+        skinTypeBack = dSkinTypeBack;
+        skinTypeForward = dSkinTypeForward;
 
         hueBack = dHueBack;
         hueForward = dHueForward;
 
-        fadeFactor = dFadeFactor;
+        fadeFactorBack = dFadeFactorBack;
+        fadeFactorForward = dFadeFactorForward;
+
         lookBack = dLookBack;
         lookForward = dLookForward;
 
-        under = dUnder;
+        underBack = dUnderBack;
+        underForward = dUnderForward;
     }
 
     public static void reset() {
-        dSkinType = SkinType.SIMPLE;
+        dSkinTypeBack = SkinType.SIMPLE;
+        dSkinTypeForward = SkinType.SIMPLE;
+
         dHueBack = RED;
         dHueForward = GREEN;
-        dFadeFactor = DEF_FADE;
+
+        dFadeFactorBack = DEF_FADE;
+        dFadeFactorForward = DEF_FADE;
+
         dLookBack = DEF_LOOK;
         dLookForward = DEF_LOOK;
 
-        dUnder = true;
+        dUnderBack = true;
+        dUnderForward = false;
     }
 
     public static OnionSkin trivial() {
@@ -75,20 +86,25 @@ public final class OnionSkin {
     }
 
     public void prep() {
-        dSkinType = skinType;
+        dSkinTypeBack = skinTypeBack;
+        dSkinTypeForward = skinTypeForward;
 
         dHueBack = hueBack;
         dHueForward = hueForward;
 
-        dFadeFactor = fadeFactor;
+        dFadeFactorBack = fadeFactorBack;
+        dFadeFactorForward = fadeFactorForward;
+
         dLookBack = lookBack;
         dLookForward = lookForward;
 
-        dUnder = under;
+        dUnderBack = underBack;
+        dUnderForward = underForward;
     }
 
     GameImage drawBase(final GameImage cel, final boolean back) {
         final double hue = back ? hueBack : hueForward;
+        final SkinType skinType = back ? skinTypeBack : skinTypeForward;
 
         return switch (skinType) {
             case SIMPLE -> cel;
@@ -108,31 +124,40 @@ public final class OnionSkin {
 
         return ThemeLogic.contextualTransformation(source, (asset, x, y) -> {
             final Color orig = asset.getColorAt(x, y);
+            final int NEIGHBOURS = 4;
 
             if (orig.getAlpha() == 0)
                 return orig;
             else {
                 boolean transparentNeighbour = false;
 
-                outer:
-                for (int sx = Math.max(x - 1, 0); sx < Math.min(w, x + 2); sx++)
-                    for (int sy = Math.max(y - 1, 0); sy < Math.min(h, y + 2); sy++) {
-                        if (sx == x && sy == y)
-                            continue;
+                for (int i = 0; i < NEIGHBOURS; i++) {
+                    final int sx = x + switch (i) {
+                        case 1 -> -1;
+                        case 2 -> 1;
+                        default -> 0;
+                    }, sy = y + switch (i) {
+                        case 0 -> -1;
+                        case 3 -> 1;
+                        default -> 0;
+                    };
 
-                        if (asset.getColorAt(sx, sy).getAlpha() == 0) {
-                            transparentNeighbour = true;
-                            break outer;
-                        }
+                    if (sx < 0 || sx >= w || sy < 0 || sy >= h)
+                        continue;
+
+                    if (asset.getColorAt(sx, sy).getAlpha() == 0) {
+                        transparentNeighbour = true;
+                        break;
                     }
+                }
 
                 return transparentNeighbour ? found : notFound;
             }
         });
     }
 
-    void populateOnionSkins(
-            final int fc, final List<GameImage> host,
+    void populateOnionSkins(final int fc,
+            final List<GameImage> backHost, final List<GameImage> forwardHost,
             final GameImage[] backBases, final GameImage[] forwardBases
     ) {
         final GameImage ref = backBases[0];
@@ -140,24 +165,27 @@ public final class OnionSkin {
                 range = Math.max(lookBack, lookForward);
 
         for (int f = 0; f < fc; f++) {
-            final GameImage onionSkin = new GameImage(w, h);
+            final GameImage backSkin = new GameImage(w, h),
+                    forwardSkin = new GameImage(w, h);
 
             for (int prox = range; prox > 0; prox--) {
                 final boolean doBack = f - prox >= 0 && prox <= lookBack,
                         doForward = f + prox < fc && prox <= lookForward;
                 final int fBack = f - prox, fForward = f + prox;
-                final double opacity = Math.pow(fadeFactor, prox);
+                final double oBack = Math.pow(fadeFactorBack, prox),
+                        oForward = Math.pow(fadeFactorForward, prox);
 
                 if (doBack)
-                    onionSkin.draw(algo(c -> fade(c, opacity),
+                    backSkin.draw(algo(c -> fade(c, oBack),
                             new HashMap<>(), backBases[fBack], null));
 
                 if (doForward)
-                    onionSkin.draw(algo(c -> fade(c, opacity),
+                    forwardSkin.draw(algo(c -> fade(c, oForward),
                             new HashMap<>(), forwardBases[fForward], null));
             }
 
-            host.add(onionSkin.submit());
+            backHost.add(backSkin.submit());
+            forwardHost.add(forwardSkin.submit());
         }
     }
 
@@ -168,10 +196,17 @@ public final class OnionSkin {
 
     @Override
     public boolean equals(final Object o) {
-        return o instanceof OnionSkin os && skinType == os.skinType &&
-                hueBack == os.hueBack && hueForward == os.hueForward &&
-                fadeFactor == os.fadeFactor && under == os.under &&
-                lookBack == os.lookBack && lookForward == os.lookForward;
+        return o instanceof OnionSkin os &&
+                skinTypeBack == os.skinTypeBack &&
+                skinTypeForward == os.skinTypeForward &&
+                hueBack == os.hueBack &&
+                hueForward == os.hueForward &&
+                fadeFactorBack == os.fadeFactorBack &&
+                fadeFactorForward == os.fadeFactorForward &&
+                underBack == os.underBack &&
+                underForward == os.underForward &&
+                lookBack == os.lookBack &&
+                lookForward == os.lookForward;
     }
 
     @Override
@@ -179,59 +214,83 @@ public final class OnionSkin {
         return ((MAX_LOOK + 1) * lookBack) + lookForward;
     }
 
-    public static SkinType getDSkinType() {
-        return dSkinType;
+    public static SkinType getDSkinTypeBack() {
+        return dSkinTypeBack;
     }
 
-    public static void setDSkinType(final SkinType dSkinType) {
-        OnionSkin.dSkinType = dSkinType;
+    public static void setDSkinTypeBack(final SkinType skinType) {
+        dSkinTypeBack = skinType;
+    }
+
+    public static SkinType getdSkinTypeForward() {
+        return dSkinTypeForward;
+    }
+
+    public static void setdSkinTypeForward(final SkinType skinType) {
+        dSkinTypeForward = skinType;
     }
 
     public static double getDHueBack() {
         return dHueBack;
     }
 
-    public static void setDHueBack(final double dHueBack) {
-        OnionSkin.dHueBack = dHueBack;
+    public static void setDHueBack(final double hue) {
+        dHueBack = hue;
     }
 
     public static double getDHueForward() {
         return dHueForward;
     }
 
-    public static void setDHueForward(final double dHueForward) {
-        OnionSkin.dHueForward = dHueForward;
+    public static void setDHueForward(final double hue) {
+        dHueForward = hue;
     }
 
-    public static double getDFadeFactor() {
-        return dFadeFactor;
+    public static double getDFadeFactorBack() {
+        return dFadeFactorBack;
     }
 
-    public static void setDFadeFactor(final double dFadeFactor) {
-        OnionSkin.dFadeFactor = dFadeFactor;
+    public static void setDFadeFactorBack(final double fadeFactor) {
+        dFadeFactorBack = MathPlus.bounded(MIN_FADE, fadeFactor, MAX_FADE);
+    }
+
+    public static double getDFadeFactorForward() {
+        return dFadeFactorForward;
+    }
+
+    public static void setdFadeFactorForward(final double fadeFactor) {
+        dFadeFactorForward = MathPlus.bounded(MIN_FADE, fadeFactor, MAX_FADE);
     }
 
     public static int getDLookBack() {
         return dLookBack;
     }
 
-    public static void setDLookBack(final int dLookBack) {
-        OnionSkin.dLookBack = dLookBack;
+    public static void setDLookBack(final int look) {
+        dLookBack = look;
     }
 
     public static int getDLookForward() {
         return dLookForward;
     }
 
-    public static void setDLookForward(final int dLookForward) {
-        OnionSkin.dLookForward = dLookForward;
+    public static void setDLookForward(final int look) {
+        dLookForward = look;
     }
 
-    public static boolean isDUnder() {
-        return dUnder;
+    public static boolean isDUnderBack() {
+        return dUnderBack;
     }
 
-    public static void setDUnder(final boolean dUnder) {
-        OnionSkin.dUnder = dUnder;
+    public static void setDUnderBack(final boolean under) {
+        dUnderBack = under;
+    }
+
+    public static boolean isDUnderForward() {
+        return dUnderForward;
+    }
+
+    public static void setdUnderForward(final boolean under) {
+        dUnderForward = under;
     }
 }

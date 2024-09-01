@@ -576,7 +576,7 @@ public class MenuAssembly {
         final Coord2D samplerLabelPos = new Coord2D(leftMargin,
                 colorTextboxY + bigIncY);
         final TextLabel samplerLabel =
-                TextLabel.make(samplerLabelPos, "Sampler:");
+                TextLabel.make(samplerLabelPos, "Sampler");
         final Coord2D samplerDropdownPos = contentPositionAfterLabel(samplerLabel);
         final Dropdown samplerDropdown = new Dropdown(samplerDropdownPos,
                 contentWidthAllowance(panelPos.x, pw, samplerDropdownPos.x),
@@ -664,7 +664,7 @@ public class MenuAssembly {
         final Coord2D paletteStartingPos = wAlphaPos
                 .displace(0, incY + bigIncY);
         final TextLabel paletteLabel =
-                TextLabel.make(paletteStartingPos, "Palette:");
+                TextLabel.make(paletteStartingPos, "Palette");
         final Coord2D paletteDropdownPos =
                 contentPositionAfterLabel(paletteLabel);
         final int paletteDropdownH = ph - (
