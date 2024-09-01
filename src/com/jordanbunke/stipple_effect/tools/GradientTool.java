@@ -38,6 +38,7 @@ public final class GradientTool extends ToolWithBreadth
     private GameImage toolContentPreview;
     private Coord2D anchor;
     private final List<Set<Coord2D>> gradientStages;
+    private final Set<Coord2D> recent;
     private Shape shape;
     private Selection accessible;
 
@@ -75,6 +76,8 @@ public final class GradientTool extends ToolWithBreadth
 
         anchor = Constants.NO_VALID_TARGET;
         gradientStages = new ArrayList<>();
+
+        recent = new HashSet<>();
     }
 
     public static GradientTool get() {
@@ -97,6 +100,8 @@ public final class GradientTool extends ToolWithBreadth
             reset();
             anchor = tp;
             gradientStages.clear();
+
+            recent.clear();
 
             initializeMask(context);
         }
@@ -149,12 +154,26 @@ public final class GradientTool extends ToolWithBreadth
 
         final Coord2D lastTP = getLastTP();
 
-        fillLineSpace(lastTP, tp, (x, y) -> populateAround(
-                gradientStage, lastTP.displace(x, y), selection));
+        if (!lastTP.equals(Constants.NO_VALID_TARGET)) {
+            fillLineSpace(lastTP, tp, (x, y) -> populateAround(
+                    gradientStage, lastTP.displace(x, y), selection));
+            fillGaps(w, h, lastTP, tp, (x, y) -> {
+                final Coord2D pixel = new Coord2D(x, y);
+
+                return recent.contains(pixel) || gradientStage.contains(pixel);
+                }, (x, y) -> {
+                final Coord2D pixel = new Coord2D(x, y);
+
+                gradientStage.add(pixel);
+            });
+        }
 
         gradientStages.add(gradientStage);
 
         drawGradientStages(w, h);
+
+        recent.clear();
+        recent.addAll(gradientStage);
     }
 
     private void updateGlobalMode(

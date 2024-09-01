@@ -96,11 +96,11 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
                         populateAround(lastTP.displace(x, y)));
                 fillGaps(w, h, lastTP, tp, this::couldBeNextToGap,
                         (x, y) -> {
-                            if (inBounds(x, y)) {
-                                pixels[x][y] = true;
-                                now.add(new Coord2D(x, y));
-                            }
-                        });
+                    if (inBounds(x, y)) {
+                        pixels[x][y] = true;
+                        now.add(new Coord2D(x, y));
+                    }
+                });
             }
 
             drawSelection(context);

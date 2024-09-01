@@ -71,9 +71,9 @@ public sealed abstract class GeometryTool extends ToolWithBreadth
             fillGaps(w, h, anchor, endpoint,
                     (x, y) -> included.contains(new Coord2D(x, y)),
                     (x, y) -> {
-                        toolContentPreview.dot(c, x, y);
-                        included.add(new Coord2D(x, y));
-                    });
+                toolContentPreview.dot(c, x, y);
+                included.add(new Coord2D(x, y));
+            });
 
             updateLast(context);
         }

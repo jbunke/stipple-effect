@@ -71,13 +71,13 @@ public sealed abstract class Scrubber<T> extends ToolWithBreadth
                                 additionalCondition, internalCondition, onPass));
                 fillGaps(w, h, lastTP, tp, this::couldBeNextToGap,
                         (x, y) -> {
-                            final Coord2D pixel = new Coord2D(x, y);
+                    final Coord2D pixel = new Coord2D(x, y);
 
-                            if (internalCondition.test(pixel)) {
-                                onPass.accept(pixel);
-                                now.add(pixel);
-                            }
-                        });
+                    if (internalCondition.test(pixel)) {
+                        onPass.accept(pixel);
+                        now.add(pixel);
+                    }
+                });
             }
 
             perform(context, data);
