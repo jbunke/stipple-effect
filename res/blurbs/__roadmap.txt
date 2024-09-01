@@ -6,3 +6,4 @@ subject to change.
 
 {Q4 2024}
 > Lossless video exporting
+> Improved dialog menus
