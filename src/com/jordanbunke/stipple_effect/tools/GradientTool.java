@@ -495,7 +495,7 @@ public final class GradientTool extends ToolWithBreadth
 
         // tolerance
         final TextLabel toleranceLabel = Layout.optionsBarNextSectionLabel(
-                contiguousCheckbox, "Tol.");
+                contiguousCheckbox, "Tolerance");
 
         final int PERCENT = 100;
         final IncrementalRangeElements<Double> tolerance =

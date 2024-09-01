@@ -26,7 +26,7 @@ public final class Layout {
             COLLAPSED_PROJECTS_H = 27, BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30,
             COLOR_COMP_W_ALLOWANCE = RIGHT_PANEL_W, SCREEN_H_BUFFER = 120,
             MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
-            MIN_WINDOW_H = 708,
+            MIN_WINDOW_H = 788,
             MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),
             MIN_WINDOW_W = (int)(MIN_WINDOW_H * (16 / 9.)),
             TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
