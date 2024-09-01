@@ -46,14 +46,14 @@ public sealed abstract class Scrubber<T> extends ToolWithBreadth
         final ProjectState s = context.getState();
 
         if (using && !tp.equals(Constants.NO_VALID_TARGET)) {
-            final int w = s.getImageWidth(), h = s.getImageHeight();
-            final Selection selection = s.getSelection();
-
             if (isUnchanged(context))
                 return;
 
             if (!stillSameFrame(context))
                 onFrameChange();
+
+            final int w = s.getImageWidth(), h = s.getImageHeight();
+            final Selection selection = s.getSelection();
 
             final T data = createData(w, h);
             final Predicate<Coord2D>

@@ -20,7 +20,8 @@ import com.jordanbunke.stipple_effect.visual.menu_elements.TextLabel;
 import com.jordanbunke.stipple_effect.visual.theme.SEColors;
 
 import java.awt.*;
-import java.util.Arrays;
+import java.util.*;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
@@ -143,16 +144,42 @@ public sealed abstract class ToolWithBreadth extends ToolThatDraws
                 final LineSegment line = new LineSegment(from, to);
                 final int distance = (int) Math.round(line.distance()),
                         max = (halfB * 2) - 1;
+                final List<Coord2D> candidates = new ArrayList<>();
 
                 for (int i = 0; i <= distance; i++) {
-                    final Coord2D projected = line.pointAlongLineD(i);
+                    final Coord2D px = line.pointAlongLineD(i);
 
-                    if (projected.x < 0 || projected.y < 0 ||
-                            projected.x > max || projected.y > max)
-                        continue;
-
-                    mask[projected.x][projected.y] = true;
+                    if (px.x >= 0 && px.y >= 0 &&
+                            px.x <= max && px.y <= max)
+                        candidates.add(px);
                 }
+
+                for (int i = 0; i < candidates.size(); i++) {
+                    final Coord2D px = candidates.get(i),
+                            le = px.displace(-1, 0),
+                            ri = px.displace(1, 0),
+                            ab = px.displace(0, -1),
+                            be = px.displace(0, 1);
+
+                    final boolean left = candidates.contains(le),
+                            right = candidates.contains(ri),
+                            above = candidates.contains(ab),
+                            below = candidates.contains(be);
+
+                    if ((above || below) && (left || right)) {
+                        final Set<Coord2D> cluster =
+                                Set.of(px, above ? ab : be, left ? le : ri);
+
+                        final Coord2D worstFit = MathPlus.findBest(px, 0d,
+                                point -> line.deviation(point.x, point.y),
+                                (c, d) -> c > d, cluster.toArray(Coord2D[]::new));
+                        candidates.remove(worstFit);
+                        i = 0;
+                    }
+                }
+
+                for (Coord2D px : candidates)
+                    mask[px.x][px.y] = true;
             }
         }
 
