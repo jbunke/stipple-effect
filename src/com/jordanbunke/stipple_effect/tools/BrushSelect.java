@@ -130,7 +130,7 @@ public final class BrushSelect extends ToolWithBreadth implements OverlayTool {
 
                     if (inBounds(px, py)) {
                         pixels[px][py] = true;
-                        now.add(new Coord2D(x, y));
+                        now.add(new Coord2D(px, py));
                     }
                 }
     }
