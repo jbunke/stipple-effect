@@ -26,7 +26,7 @@ import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
 public sealed abstract class ToolWithBreadth extends ToolThatDraws
-        permits AbstractBrush, Eraser, BrushSelect, GradientTool, GeometryTool {
+        permits Scrubber, BrushSelect, GradientTool, GeometryTool {
     private static final double ANGLE_INC = Constants.CIRCLE / 144d;
 
     private int breadth;

@@ -90,8 +90,8 @@ public final class GradientTool extends ToolWithBreadth
             drawing = true;
             backwards = me.button == GameMouseEvent.Button.RIGHT;
 
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
+            final ProjectState s = context.getState();
+            final int w = s.getImageWidth(), h = s.getImageHeight();
             toolContentPreview = new GameImage(w, h);
 
             reset();
@@ -103,16 +103,17 @@ public final class GradientTool extends ToolWithBreadth
     }
 
     private void initializeMask(final SEContext context) {
-        final int w = context.getState().getImageWidth(),
-                h = context.getState().getImageHeight();
+        final ProjectState s = context.getState();
 
-        final GameImage frame = context.getState().getActiveCel();
+        final int w = s.getImageWidth(), h = s.getImageHeight();
+
+        final GameImage cel = s.getActiveCel();
 
         final Color maskColor = masked && anchorInBounds(w, h)
-                ? frame.getColorAt(anchor.x, anchor.y)
+                ? cel.getColorAt(anchor.x, anchor.y)
                 : null;
         accessible = maskColor != null
-                ? search(frame, maskColor) : Selection.EMPTY;
+                ? search(cel, maskColor) : Selection.EMPTY;
     }
 
     @Override
