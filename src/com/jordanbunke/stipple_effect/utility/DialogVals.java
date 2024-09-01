@@ -139,7 +139,7 @@ public class DialogVals {
     }
 
     public enum SettingScreen {
-        DEFAULTS, CONTROLS, VISUAL;
+        DEFAULTS, CONTROLS, TOOLS, VISUAL;
 
         public String getTitle() {
             return (this == DEFAULTS ? this + " and startup" : this) + " settings";
@@ -562,11 +562,11 @@ public class DialogVals {
 
     public static String colorScriptMessage() {
         if (isColorScriptValid())
-            return "Validated color script";
+            return "Validated";
         else if (colorScript == null)
-            return "Nothing uploaded / failed to read";
+            return "No script / upload failed";
         else
-            return "Not a valid color script";
+            return "Invalid";
     }
 
     public static boolean isColorScriptValid() {

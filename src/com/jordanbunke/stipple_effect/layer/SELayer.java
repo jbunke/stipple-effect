@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 
 public final class SELayer {
-    private final List<GameImage> frames, renders, onionSkins;
-    private final GameImage frameLinkedContent;
+    private final List<GameImage> cels, renders, onionSkins;
+    private final GameImage linkedContent;
     private final double opacity;
     private final boolean enabled, celsLinked;
     private final String name;
@@ -27,9 +27,9 @@ public final class SELayer {
     public static SELayer fromPreviewContent(
             final GameImage[] content
     ) {
-        final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
+        final List<GameImage> cels = new ArrayList<>(Arrays.asList(content));
 
-        return new SELayer(frames, content[0], Constants.OPAQUE,
+        return new SELayer(cels, content[0], Constants.OPAQUE,
                 true, false, false, OnionSkin.trivial(),
                 Constants.FROM_PREVIEW_LAYER_NAME);
     }
@@ -37,9 +37,9 @@ public final class SELayer {
     public static SELayer fromPreviewContent(
             final GameImage[] content, final SELayer source
     ) {
-        final List<GameImage> frames = new ArrayList<>(Arrays.asList(content));
+        final List<GameImage> cels = new ArrayList<>(Arrays.asList(content));
 
-        return new SELayer(frames, content[0], source.opacity, source.enabled,
+        return new SELayer(cels, content[0], source.opacity, source.enabled,
                 content.length == 1 && source.celsLinked,
                 source.onionSkinOn, source.onionSkin, source.name);
     }
@@ -47,13 +47,13 @@ public final class SELayer {
     public static SELayer newLayer(
             final int w, final int h, final int frameCount
     ) {
-        final List<GameImage> frames = new ArrayList<>();
+        final List<GameImage> cels = new ArrayList<>();
 
         for (int f = 0; f < frameCount; f++) {
-            frames.add(new GameImage(w, h));
+            cels.add(new GameImage(w, h));
         }
 
-        return new SELayer(frames, new GameImage(w, h), Constants.OPAQUE,
+        return new SELayer(cels, new GameImage(w, h), Constants.OPAQUE,
                 true, false, false, OnionSkin.trivial(), giveLayerDefaultName());
     }
 
@@ -65,13 +65,13 @@ public final class SELayer {
     }
 
     public SELayer(
-            final List<GameImage> frames, final GameImage frameLinkedContent,
+            final List<GameImage> cels, final GameImage linkedContent,
             final double opacity,
             final boolean enabled, final boolean celsLinked,
             final boolean onionSkinOn, final OnionSkin onionSkin, final String name
     ) {
-        this.frames = frames;
-        this.frameLinkedContent = frameLinkedContent;
+        this.cels = cels;
+        this.linkedContent = linkedContent;
         this.opacity = opacity;
         this.enabled = enabled;
         this.celsLinked = celsLinked;
@@ -89,14 +89,14 @@ public final class SELayer {
 
     private void generateRenders() {
         if (celsLinked && opacity == Constants.OPAQUE)
-            renders.add(frames.get(0));
+            renders.add(cels.get(0));
         else if (celsLinked)
-            renders.add(renderFrame(0));
+            renders.add(renderCel(0));
         else if (opacity == Constants.OPAQUE)
-            renders.addAll(frames);
+            renders.addAll(cels);
         else {
-            for (int i = 0; i < frames.size(); i++)
-                renders.add(renderFrame(i));
+            for (int i = 0; i < cels.size(); i++)
+                renders.add(renderCel(i));
         }
     }
 
@@ -104,13 +104,13 @@ public final class SELayer {
         if (celsLinked || !onionSkinOn)
             return;
 
-        final int fc = frames.size();
+        final int fc = cels.size();
 
         final GameImage[] backBases = new GameImage[fc],
                 forwardBases = new GameImage[fc];
 
         for (int i = 0; i < fc; i++) {
-            final GameImage cel = getFrame(i);
+            final GameImage cel = getCel(i);
 
             backBases[i] = onionSkin.drawBase(cel, true);
             forwardBases[i] = onionSkin.drawBase(cel, false);
@@ -125,23 +125,23 @@ public final class SELayer {
     }
 
     public SELayer duplicate() {
-        return new SELayer(new ArrayList<>(frames), frameLinkedContent, opacity,
+        return new SELayer(new ArrayList<>(cels), linkedContent, opacity,
                 enabled, celsLinked, onionSkinOn, onionSkin, name + " (copy)");
     }
 
-    public SELayer returnFrameReplaced(final GameImage edit, final int frameIndex) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
-        frames.set(frameIndex, edit);
+    public SELayer returnCelReplaced(final GameImage edit, final int frameIndex) {
+        final List<GameImage> cels = new ArrayList<>(this.cels);
+        cels.set(frameIndex, edit);
 
-        return new SELayer(frames, edit, opacity, enabled,
+        return new SELayer(cels, edit, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnStamped(
             final GameImage edit, final Selection selection, final int frameIndex
     ) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
-        final GameImage content = getFrame(frameIndex);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
+        final GameImage content = getCel(frameIndex);
 
         final GameImage composed = new GameImage(content);
         final int w = composed.getWidth(), h = composed.getHeight();
@@ -152,28 +152,28 @@ public final class SELayer {
         });
 
         composed.free();
-        frames.set(frameIndex, composed);
+        cels.set(frameIndex, composed);
 
-        return new SELayer(frames, composed, opacity, enabled,
+        return new SELayer(cels, composed, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnPaintedOver(final GameImage edit, final int frameIndex) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
-        final GameImage content = getFrame(frameIndex);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
+        final GameImage content = getCel(frameIndex);
 
         final GameImage composed = new GameImage(content);
         composed.draw(edit);
         composed.free();
-        frames.set(frameIndex, composed);
+        cels.set(frameIndex, composed);
 
-        return new SELayer(frames, composed, opacity, enabled,
+        return new SELayer(cels, composed, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnErased(final boolean[][] eraserMask, final int frameIndex) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
-        final GameImage content = getFrame(frameIndex);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
+        final GameImage content = getCel(frameIndex);
 
         final GameImage after = new GameImage(content);
 
@@ -185,42 +185,42 @@ public final class SELayer {
         }
 
         after.free();
-        frames.set(frameIndex, after);
+        cels.set(frameIndex, after);
 
-        return new SELayer(frames, after, opacity, enabled,
+        return new SELayer(cels, after, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnResized(final int w, final int h) {
-        final List<GameImage> resizedFrames = new ArrayList<>();
+        final List<GameImage> resizedCels = new ArrayList<>();
 
-        for (int i = 0; i < frames.size(); i++)
-            resizedFrames.add(ImageProcessing.scale(
-                    getFrame(i), w, h));
+        for (int i = 0; i < cels.size(); i++)
+            resizedCels.add(ImageProcessing.scale(
+                    getCel(i), w, h));
 
         final GameImage resizedFLC = ImageProcessing.scale(
-                frameLinkedContent, w, h);
+                linkedContent, w, h);
 
-        return new SELayer(resizedFrames, resizedFLC, opacity,
+        return new SELayer(resizedCels, resizedFLC, opacity,
                 enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnPadded(
             final int left, final int top, final int w, final int h
     ) {
-        final List<GameImage> paddedFrames = new ArrayList<>();
+        final List<GameImage> paddedCels = new ArrayList<>();
 
-        for (int i = 0; i < frames.size(); i++) {
-            final GameImage frame = new GameImage(w, h);
-            frame.draw(getFrame(i), left, top);
+        for (int i = 0; i < cels.size(); i++) {
+            final GameImage cel = new GameImage(w, h);
+            cel.draw(getCel(i), left, top);
 
-            paddedFrames.add(frame.submit());
+            paddedCels.add(cel.submit());
         }
 
         final GameImage paddedFLC = new GameImage(w, h);
-        paddedFLC.draw(frameLinkedContent, left, top);
+        paddedFLC.draw(linkedContent, left, top);
 
-        return new SELayer(paddedFrames, paddedFLC.submit(), opacity,
+        return new SELayer(paddedCels, paddedFLC.submit(), opacity,
                 enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
@@ -238,18 +238,18 @@ public final class SELayer {
                 xOp = isHorizontal ? horz : vert,
                 yOp = isHorizontal ? vert : horz;
 
-        final GameImage frame = new GameImage(w, h);
+        final GameImage cel = new GameImage(w, h);
 
         for (int i = 0; i < fc; i++) {
             final int x = xOp.apply(i, fpd) * fw,
                     y = yOp.apply(i, fpd) * fh;
 
-            frame.draw(getFrame(i), x, y);
+            cel.draw(getCel(i), x, y);
         }
 
-        frame.free();
+        cel.free();
 
-        return new SELayer(new ArrayList<>(List.of(frame)), frame,
+        return new SELayer(new ArrayList<>(List.of(cel)), cel,
                 opacity, enabled, true, onionSkinOn, onionSkin, name);
     }
 
@@ -270,74 +270,74 @@ public final class SELayer {
 
         final int fpd = isHorizontal ? fx : fy;
 
-        final List<GameImage> frames = new ArrayList<>();
-        final GameImage canvas = getFrame(0);
+        final List<GameImage> cels = new ArrayList<>();
+        final GameImage canvas = getCel(0);
 
         for (int i = 0; i < fc; i++) {
-            final GameImage frame = new GameImage(fw, fh);
+            final GameImage cel = new GameImage(fw, fh);
 
             final int x = xOp.apply(i, fpd) * fw,
                     y = yOp.apply(i, fpd) * fh;
 
-            frame.draw(canvas, -1 * x, -1 * y);
-            frames.add(frame.submit());
+            cel.draw(canvas, -1 * x, -1 * y);
+            cels.add(cel.submit());
         }
 
-        return new SELayer(frames, frames.get(0),
+        return new SELayer(cels, cels.get(0),
                 opacity, enabled, false, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnLinkedCels(final int frameIndex) {
-        return new SELayer(new ArrayList<>(frames), getFrame(frameIndex),
+        return new SELayer(new ArrayList<>(cels), getCel(frameIndex),
                 opacity, enabled, true, false, onionSkin, name);
     }
 
     public SELayer returnUnlinkedCels() {
-        final int frameCount = frames.size();
+        final int frameCount = cels.size();
 
         final List<GameImage> clonedFromLinked = new ArrayList<>();
 
         for (int i = 0; i < frameCount; i++)
-            clonedFromLinked.add(frameLinkedContent);
+            clonedFromLinked.add(linkedContent);
 
-        return new SELayer(clonedFromLinked, frameLinkedContent,
+        return new SELayer(clonedFromLinked, linkedContent,
                 opacity, enabled, false, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnChangedOpacity(final double opacity) {
-        return new SELayer(new ArrayList<>(frames), frameLinkedContent,
+        return new SELayer(new ArrayList<>(cels), linkedContent,
                 opacity, enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnDisabled() {
-        return new SELayer(new ArrayList<>(frames), frameLinkedContent,
+        return new SELayer(new ArrayList<>(cels), linkedContent,
                 opacity, false, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnEnabled() {
-        return new SELayer(new ArrayList<>(frames), frameLinkedContent,
+        return new SELayer(new ArrayList<>(cels), linkedContent,
                 opacity, true, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnRenamed(final String name) {
-        return new SELayer(new ArrayList<>(frames), frameLinkedContent,
+        return new SELayer(new ArrayList<>(cels), linkedContent,
                 opacity, enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnChangedOnionSkin(final OnionSkin onionSkin) {
-        return new SELayer(new ArrayList<>(frames), frameLinkedContent,
+        return new SELayer(new ArrayList<>(cels), linkedContent,
                 opacity, enabled, celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnFrameMoved(
             final int from, final int to
     ) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
 
-        final GameImage frame = frames.remove(from);
-        frames.add(to, frame);
+        final GameImage moved = cels.remove(from);
+        cels.add(to, moved);
 
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
+        return new SELayer(cels, linkedContent, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
@@ -356,39 +356,39 @@ public final class SELayer {
     public SELayer returnAddedFrame(
             final int addIndex, final int w, final int h
     ) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
 
-        frames.add(addIndex, new GameImage(w, h));
+        cels.add(addIndex, new GameImage(w, h));
 
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
+        return new SELayer(cels, linkedContent, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnDuplicatedFrame(final int fromIndex) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
 
-        frames.add(fromIndex + 1, new GameImage(frames.get(fromIndex)));
+        cels.add(fromIndex + 1, new GameImage(cels.get(fromIndex)));
 
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
+        return new SELayer(cels, linkedContent, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
     public SELayer returnRemovedFrame(final int fromIndex) {
-        final List<GameImage> frames = new ArrayList<>(this.frames);
+        final List<GameImage> cels = new ArrayList<>(this.cels);
 
-        frames.remove(fromIndex);
+        cels.remove(fromIndex);
 
-        return new SELayer(frames, frameLinkedContent, opacity, enabled,
+        return new SELayer(cels, linkedContent, opacity, enabled,
                 celsLinked, onionSkinOn, onionSkin, name);
     }
 
-    public GameImage getFrame(final int frameIndex) {
-        return celsLinked ? frameLinkedContent : frames.get(frameIndex);
+    public GameImage getCel(final int frameIndex) {
+        return celsLinked ? linkedContent : cels.get(frameIndex);
     }
 
     public GameImage getRender(final int frameIndex) {
         if (opacity == Constants.OPAQUE)
-            return getFrame(frameIndex);
+            return getCel(frameIndex);
 
         return renders.get(celsLinked ? 0 : frameIndex);
     }
@@ -400,18 +400,18 @@ public final class SELayer {
         return onionSkins.get(frameIndex);
     }
 
-    private GameImage renderFrame(final int frameIndex) {
-        return renderFrame(frameIndex, opacity);
+    private GameImage renderCel(final int frameIndex) {
+        return renderCel(frameIndex, opacity);
     }
 
-    private GameImage renderFrame(final int frameIndex, final double opacity) {
-        final GameImage frame = getFrame(frameIndex);
+    private GameImage renderCel(final int frameIndex, final double opacity) {
+        final GameImage cel = getCel(frameIndex);
 
-        final GameImage render = new GameImage(frame.getWidth(), frame.getHeight());
+        final GameImage render = new GameImage(cel.getWidth(), cel.getHeight());
 
         for (int x = 0; x < render.getWidth(); x++) {
             for (int y = 0; y < render.getHeight(); y++) {
-                final Color c = frame.getColorAt(x, y);
+                final Color c = cel.getColorAt(x, y);
 
                 if (c.getAlpha() == 0)
                     continue;

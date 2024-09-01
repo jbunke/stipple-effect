@@ -41,7 +41,7 @@ public final class GetCelNode extends LayerExpressionNode {
                             (frameIndex == fc ? "greater than " : "equal to ") +
                             "the frame count (" + fc + ")");
         else
-            return new GameImage(layerRep(symbolTable).get().getFrame(frameIndex));
+            return new GameImage(layerRep(symbolTable).get().getCel(frameIndex));
 
 
         return null;

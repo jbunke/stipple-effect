@@ -1,10 +1,22 @@
-{1.2.0} - 2024-0?-??
+{1.2.0} - 2024-09-??
 
 Added:
 > Layer visibility actions to navbar under "Layer" -> "Visibility status"
 > Bug reporting and scripting API link to navbar
 > Setting for whether preview windows are opened in a separate window
 > Reimport a preview into Stipple Effect with layers preserved
+> Generate time lapses that track project changes
+> New brush shapes
+  > Square
+  > Line + angle
+> Added setting to propagate changes made to breadth tool properties to all tools; affected tools:
+  > Brush
+  > Shade Brush
+  > Script Brush
+  > Eraser
+  > Line Tool
+  > Shape Tool
+  > Gradient Tool
 
 Changed:
 > Overhauled and extended onion skin system
@@ -25,6 +37,10 @@ Changed:
   > Preview windows are now resizeable
   > Preview windows can run in the main program window or a separate window as before
   > Preview windows now persist across project context switches
+> Palette colors are assigned differently according to the mouse button clicked:
+  > Left click: primary color
+  > Right click: secondary color
+  > Middle click: selected color (most recently assigned or modified of primary and secondary)
 
 Fixed:
 > Bug: `$SE.single_outline()` calls a double outline instead of a single outline

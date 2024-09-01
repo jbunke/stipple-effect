@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.utility.settings;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.OSUtils;
@@ -27,6 +28,10 @@ public class Settings {
         FULLSCREEN_ON_STARTUP(new Setting<>(BooleanSettingType.get(), false)),
         PIXEL_GRID_ON_BY_DEFAULT(new Setting<>(BooleanSettingType.get(), false)),
         SEPARATED_PREVIEW(new Setting<>(BooleanSettingType.get(), false)),
+        PROPAGATE_BREADTH(new Setting<>(BooleanSettingType.get(), false,
+                b -> {
+            if (b) ToolWithBreadth.resetAll();
+        })),
         INVERT_ZOOM_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
@@ -211,6 +216,10 @@ public class Settings {
         Code.SEPARATED_PREVIEW.set(separatedPreview);
     }
 
+    public static void setPropagateBreadth(final boolean propagateBreadth) {
+        Code.PROPAGATE_BREADTH.set(propagateBreadth);
+    }
+
     public static void setInvertZoomDirection(final boolean invertZoomDirection) {
         Code.INVERT_ZOOM_DIRECTION.set(invertZoomDirection);
     }
@@ -314,6 +323,10 @@ public class Settings {
         return (boolean) Code.SEPARATED_PREVIEW.setting.check();
     }
 
+    public static boolean checkIsPropagateBreadth() {
+        return (boolean) Code.PROPAGATE_BREADTH.setting.check();
+    }
+
     public static boolean checkIsInvertZoomDirection() {
         return (boolean) Code.INVERT_ZOOM_DIRECTION.setting.check();
      }
@@ -393,6 +406,10 @@ public class Settings {
 
     public static boolean isSeparatedPreview() {
         return (boolean) Code.SEPARATED_PREVIEW.setting.get();
+    }
+
+    public static boolean isPropagateBreadth() {
+        return (boolean) Code.PROPAGATE_BREADTH.setting.get();
     }
 
     public static int getWindowedWidth() {

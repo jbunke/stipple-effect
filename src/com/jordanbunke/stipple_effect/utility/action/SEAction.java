@@ -368,6 +368,8 @@ public enum SEAction {
             c -> DialogAssembly.setDialogToPalettize(c,
                     StippleEffect.get().getSelectedPalette()),
             new KeyShortcut(false, true, P)),
+    GENERATE_TIME_LAPSE(ResourceCodes.GENERATE_TIME_LAPSE,
+            SEContext::generateTimeLapse, null),
 
     // set tools
     SET_TOOL_HAND(ResourceCodes.NONE,
@@ -619,7 +621,8 @@ public enum SEAction {
 
     public static SEAction[] actionsMenuActions() {
         return new SEAction[] {
-                HSV_SHIFT, COLOR_SCRIPT, CONTENTS_TO_PALETTE, PALETTIZE
+                HSV_SHIFT, COLOR_SCRIPT, CONTENTS_TO_PALETTE, PALETTIZE,
+                GENERATE_TIME_LAPSE
         };
     }
 

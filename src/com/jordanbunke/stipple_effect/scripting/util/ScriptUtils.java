@@ -35,7 +35,7 @@ public class ScriptUtils {
 
         for (final SELayer layer : srcLayers) {
             final GameImage[] layerContent = IntStream.range(0, srcFC)
-                    .mapToObj(layer::getFrame).toArray(GameImage[]::new);
+                    .mapToObj(layer::getCel).toArray(GameImage[]::new);
 
             final GameImage[] output =
                     ScriptUtils.runPreviewScript(layerContent, script);

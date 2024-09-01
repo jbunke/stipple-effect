@@ -400,8 +400,8 @@ public class ProjectState {
         return layers.get(layerEditIndex);
     }
 
-    public GameImage getActiveLayerFrame() {
-        return getEditingLayer().getFrame(frameIndex);
+    public GameImage getActiveCel() {
+        return getEditingLayer().getCel(frameIndex);
     }
 
     public int getLayerEditIndex() {
@@ -461,7 +461,7 @@ public class ProjectState {
 
         for (int l = 0; l < layerCount; l++)
             for (int f = 0; f < frameCount; f++) {
-                final GameImage cel = layers.get(l).getFrame(f);
+                final GameImage cel = layers.get(l).getCel(f);
 
                 pixels:
                 for (int x = 0; x < cel.getWidth(); x++)

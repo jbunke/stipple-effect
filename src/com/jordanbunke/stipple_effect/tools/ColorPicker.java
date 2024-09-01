@@ -35,7 +35,7 @@ public final class ColorPicker extends Tool {
             final int index = me.button == GameMouseEvent.Button.LEFT
                     ? StippleEffect.PRIMARY : StippleEffect.SECONDARY;
 
-            final Color c = context.getState().getActiveLayerFrame()
+            final Color c = context.getState().getActiveCel()
                     .getColorAt(tp.x, tp.y);
 
             StippleEffect.get().setColorIndexAndColor(index, c);

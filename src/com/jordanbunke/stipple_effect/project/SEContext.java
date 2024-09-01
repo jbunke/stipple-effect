@@ -7,6 +7,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Pair;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
 import com.jordanbunke.stipple_effect.layer.OnionSkin;
@@ -322,7 +323,7 @@ public class SEContext {
                     if (mse.isProcessed())
                         continue;
 
-                    if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
+                    if (StippleEffect.get().getTool() instanceof ToolWithBreadth bt) {
                         mse.markAsProcessed();
 
                         final int cs = Settings.getScrollClicks(
@@ -518,7 +519,7 @@ public class SEContext {
 
         if (KeyShortcut.areModKeysPressed(false, false, eventLogger)) {
             // tool modifications
-            if (tool instanceof BreadthTool bt) {
+            if (tool instanceof ToolWithBreadth bt) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         bt::decreaseBreadth);
@@ -940,7 +941,43 @@ public class SEContext {
         final SELayer layer = layers.get(layerIndex);
 
         PaletteLoader.addPaletteColorsFromImage(
-                layer.getFrame(frameIndex), colors, selection);
+                layer.getCel(frameIndex), colors, selection);
+    }
+
+    // generate time lapse
+    public void generateTimeLapse() {
+        final List<ProjectState> states = stateManager.getStatesForTimeLapse();
+
+        final Pair<Integer, Integer> maxDims = states.stream()
+                .map(s -> new Pair<>(s.getImageWidth(), s.getImageHeight()))
+                .reduce(new Pair<>(1, 1), (q, r) ->
+                        new Pair<>(Math.max(q.a(), r.a()),
+                                Math.max(q.b(), r.b())));
+        final int w = maxDims.a(), h = maxDims.b();
+
+        final List<GameImage> snapshots = new ArrayList<>();
+
+        for (ProjectState s : states) {
+            final GameImage snapshot = new GameImage(w, h),
+                    content = s.draw(false, false, 0);
+
+            final int x = (w - content.getWidth()) / 2,
+                    y = (h - content.getHeight()) / 2;
+
+            snapshot.draw(content, x, y);
+
+            snapshots.add(snapshot.submit());
+        }
+
+        final ProjectState res = ProjectState.makeFromRasterFile(w, h,
+                new SELayer(snapshots, new GameImage(w, h), Constants.OPAQUE,
+                        true, false, false, OnionSkin.trivial(),
+                        Constants.TIME_LAPSE), snapshots.size());
+        final SEContext timeLapse = new SEContext(null, res, w, h);
+        timeLapse.saveConfig.setName(Constants.TIME_LAPSE + " of " +
+                saveConfig.getFormattedName(false, true));
+
+        StippleEffect.get().addContext(timeLapse, true);
     }
 
     // previewed state changes - not state changes in and of themselves
@@ -988,18 +1025,18 @@ public class SEContext {
 
         try {
             return switch (scope) {
-                case CEL -> runCAOnFrame(internal, map, state,
+                case CEL -> runCAOnCel(internal, map, state,
                         state.getFrameIndex(), state.getLayerEditIndex(), selection);
                 case LAYER -> {
                     if (state.getEditingLayer().areCelsLinked()) {
-                        yield runCAOnFrame(internal, map, state,
+                        yield runCAOnCel(internal, map, state,
                                 state.getFrameIndex(),
                                 state.getLayerEditIndex(), selection);
                     } else {
                         final int frameCount = state.getFrameCount();
 
                         for (int i = 0; i < frameCount; i++)
-                            state = runCAOnFrame(internal, map, state,
+                            state = runCAOnCel(internal, map, state,
                                     i, state.getLayerEditIndex(), selection);
 
                         yield state;
@@ -1011,7 +1048,7 @@ public class SEContext {
                     for (int i = 0; i < layerCount; i++)
                         if (includeDisabledLayers ||
                                 state.getLayers().get(i).isEnabled())
-                            state = runCAOnFrame(internal, map, state,
+                            state = runCAOnCel(internal, map, state,
                                     state.getFrameIndex(), i, selection);
 
                     yield state;
@@ -1026,11 +1063,11 @@ public class SEContext {
                             continue;
 
                         if (state.getLayers().get(l).areCelsLinked()) {
-                            state = runCAOnFrame(internal, map, state,
+                            state = runCAOnCel(internal, map, state,
                                     state.getFrameIndex(), l, selection);
                         } else {
                             for (int f = 0; f < frameCount; f++)
-                                state = runCAOnFrame(internal, map,
+                                state = runCAOnCel(internal, map,
                                         state, f, l, selection);
                         }
                     }
@@ -1043,7 +1080,7 @@ public class SEContext {
         }
     }
 
-    private ProjectState runCAOnFrame(
+    private ProjectState runCAOnCel(
             final Function<Color, Color> internal,
             final Map<Color, Color> map,
             final ProjectState state,
@@ -1053,11 +1090,11 @@ public class SEContext {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
-        final GameImage source = layer.getFrame(frameIndex),
+        final GameImage source = layer.getCel(frameIndex),
                 edit = ColorMath.algo(internal, map, source, selection);
 
         final SELayer replacement =
-                layer.returnFrameReplaced(edit, frameIndex);
+                layer.returnCelReplaced(edit, frameIndex);
         layers.set(layerIndex, replacement);
 
         return state.changeLayers(layers).changeIsCheckpoint(false);
@@ -1278,7 +1315,7 @@ public class SEContext {
                 for (int f = 0; f < cels.frameRange; f++) {
                     final int fi = frameIndex + f;
 
-                    layer = layer.returnFrameReplaced(cels.getCel(l, f), fi);
+                    layer = layer.returnCelReplaced(cels.getCel(l, f), fi);
                 }
 
                 layers.set(li, layer);
@@ -1300,7 +1337,7 @@ public class SEContext {
         if (!selection.hasSelection())
             selection = Selection.allInBounds(w, h);
 
-        final GameImage canvas = getState().getActiveLayerFrame();
+        final GameImage canvas = getState().getActiveCel();
         final SelectionContents selectionContents =
                 SelectionContents.make(canvas, selection);
 
@@ -1376,7 +1413,7 @@ public class SEContext {
                 SELayer layer = layers.get(l);
 
                 for (int f = fMin; f <= fMax; f++)
-                    layer = layer.returnFrameReplaced(replacement, f);
+                    layer = layer.returnCelReplaced(replacement, f);
 
                 layers.set(l, layer);
             }

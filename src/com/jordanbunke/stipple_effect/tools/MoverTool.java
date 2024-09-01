@@ -29,7 +29,7 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
         }
     }
 
-    private static final double CONVERSION = 180 / Math.PI, PRECISION = 1e2,
+    private static final double PRECISION = 1e2,
             CIRCLE_DEG = 360d, SEMI_CIRCLE_DEG = CIRCLE_DEG / 2;
 
     private ToolTaskHandler handler;
@@ -478,7 +478,7 @@ public sealed abstract class MoverTool<T> extends Tool implements SnappableTool
                         "x" + selection.bounds.height() + " px";
             }
             case ROTATE -> {
-                final double degrees = cachedAngle * CONVERSION,
+                final double degrees = Geometry.radToDegrees(cachedAngle),
                         closest = degrees > SEMI_CIRCLE_DEG
                                 ? -(CIRCLE_DEG - degrees) : degrees,
                         rounded = (int)(closest * PRECISION) / PRECISION;
