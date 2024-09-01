@@ -3,8 +3,7 @@ Shortcut: {sc:AUTOMATION_SCRIPT}
 Upload and run an automation script. Scripts are written in DeltaScript, which has been extended
 for Stipple Effect's specifications and needs.
 
-Automation scripts must fulfill the contract {()}.
-That is to say, they take no parameters and return nothing.
+Automation scripts must have the type signature {()} (no parameters and void return).
 
-For more information on DeltaScript and its Stipple Effect extension, you can consult the {Script}
-tab, or visit the GitHub repositories for {Stipple Effect} and {Delta Time} for the full documentation.
+For more information on DeltaScript and its Stipple Effect extension, you can check the {Script} tab,
+which links to the {scripting API} and {language documentation}.

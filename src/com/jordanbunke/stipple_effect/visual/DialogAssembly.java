@@ -3045,14 +3045,21 @@ public class DialogAssembly {
 
         final TextLabel scriptLabel = TextLabel.make(
                 contentStart.displace(indent, bottomY + TEXT_Y_OFFSET),
-                "For a more thorough breakdown of scripting and the scripting API: ");
+                "For a more thorough breakdown of scripting and the scripting API: "),
+                vsCodeLabel = TextLabel.make(
+                        textBelowPos(scriptLabel),
+                        "VS Code extension for Stipple Effect script syntax highlighting: ");
         final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(scriptLabel),
-                        WebUtils::scriptingAPI);
-        contentAssembler.addAll(Set.of(scriptLabel, scriptButton));
+                        WebUtils::scriptingAPI),
+                vsCodeButton = GraphicsUtils.makeStandardTextButton("Go",
+                        contentPositionAfterLabel(vsCodeLabel),
+                        WebUtils::vsCodeExt);
+        contentAssembler.addAll(
+                Set.of(scriptLabel, scriptButton, vsCodeLabel, vsCodeButton));
 
-        bottomY += DIALOG_CONTENT_INC_Y * 2;
+        bottomY += DIALOG_CONTENT_INC_Y * 3;
 
         return bottomY - initialBottomY;
     }

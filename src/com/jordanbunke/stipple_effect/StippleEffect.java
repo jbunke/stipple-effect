@@ -821,7 +821,7 @@ public class StippleEffect implements ProgramContext {
             return;
 
         final String content = FileIO.readFile(filepath);
-        SEInterpreter.get().runAutomationScript(content);
+        SEInterpreter.get().runAutomationScript(content, filepath);
     }
 
     public void openColorScript() {

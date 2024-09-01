@@ -8,6 +8,8 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 
+import java.nio.file.Path;
+
 public final class SEInterpreter extends Interpreter {
     private static boolean printErrorsToDialog = false;
 
@@ -23,13 +25,15 @@ public final class SEInterpreter extends Interpreter {
         printErrorsToDialog = true;
     }
 
-    public void runAutomationScript(final String content) {
+    public void runAutomationScript(final String content, final Path filepath) {
         final HeadFuncNode script = build(content);
 
         if (validateAutomationScript(script))
             run(script);
+        else if (script != null)
+            StatusUpdates.invalidAutomationScript(script.toString());
         else
-            StatusUpdates.invalidAutomationScript();
+            StatusUpdates.failedToCompileScript(filepath);
     }
 
     private boolean validateAutomationScript(

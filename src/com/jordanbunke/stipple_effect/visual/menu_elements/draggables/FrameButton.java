@@ -3,6 +3,7 @@ package com.jordanbunke.stipple_effect.visual.menu_elements.draggables;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 
 public final class FrameButton extends DraggableTextButton<FrameButton> {
@@ -17,7 +18,8 @@ public final class FrameButton extends DraggableTextButton<FrameButton> {
     ) {
         super(position, Layout.FRAME_BUTTON_W,
                 i -> c.getState().setFrameIndex(i),
-                index, String.valueOf(index + 1), c,
+                index, (index + 1) + (c.getState().getFrameDurations().get(index) !=
+                        Constants.DEFAULT_FRAME_DURATION ? "*" : ""), c,
                 () -> c.getState().getFrameIndex());
 
         logic.add(this);

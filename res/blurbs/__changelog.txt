@@ -2,7 +2,7 @@
 
 Added:
 > Layer visibility actions to navbar under "Layer" -> "Visibility status"
-> Bug reporting and scripting API link to navbar
+> Bug reporting, scripting API, VS Code extension links to navbar under "Stipple Effect" -> "Resources"
 > Setting for whether preview windows are opened in a separate window
 > Reimport a preview into Stipple Effect with layers preserved
 > Generate time lapses that track project changes
@@ -17,6 +17,7 @@ Added:
   > Line Tool
   > Shape Tool
   > Gradient Tool
+> Frames with non-standard durations show an asterisk ({*}) next to their frame number
 
 Changed:
 > Overhauled and extended onion skin system

@@ -351,7 +351,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
         if (SEInterpreter.validatePreviewScript(script, c))
             setScript(script);
         else if (script != null)
-            StatusUpdates.invalidPreviewScript();
+            StatusUpdates.invalidPreviewScript(script.toString());
         else
             StatusUpdates.failedToCompileScript(filepath);
     }

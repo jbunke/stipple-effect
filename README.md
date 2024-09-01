@@ -5,12 +5,14 @@
 [![Roadmap](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/buttons/roadmap.png)](roadmap.md)
 
 ## About
-_Stipple Effect_ is a pixel art editor that supports animation and scripting. It is designed to facilitate a variety of workflows and to encourage rapid, iterative creation of video game art assets and other types of artwork.
+*Stipple Effect* is a pixel art editor that supports animation and scripting. It is designed to facilitate a variety of workflows and to encourage rapid, iterative creation of video game art assets and other types of artwork.
 
-SE was made by a solo indie game developer with the needs and skill sets of other indie devs in mind. It is lightweight and simple to learn and use, yet allows for considerable depth and complexity. SE has a feature-rich scripting API that can be harnessed for the automation of otherwise tedious and repetitive tasks.
+* made by a solo game developer with the needs and skill sets of other indie devs in mind
+* lightweight and simple to learn and use, yet allows for considerable depth and complexity
+* expressive scripting API that can be used to **automate program actions** and **create dynamic preview and color transformations with complex logic**
 
 ![Preview](https://raw.githubusercontent.com/wiki/jbunke/stipple-effect/assets/complex-preview.gif)
-<div align="center">A custom preview in action... one of many applications of scripting</div>
+<div align="center">A preview script in action</div>
 
 ## Features
 * Symbiotic relationship between layers and frames
