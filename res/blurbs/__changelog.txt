@@ -88,6 +88,7 @@ API Changes:
   > Renamed {layer} functions; for some {layer L}...
     > Renamed {L.get_frame(int)} to {L.get_cel(int)}
     > Renamed {L.set_frame(int, image)} to {L.set_cel(int, image)}
+    > Renamed {L.wipe_frame(int, image)} to {L.wipe_cel(int, image)}
     > Renamed {L.edit_frame(int, image)} to {L.edit_cel(int, image)}
     > Renamed {L.link_frames()} to {L.link_cels()}
     > Renamed {L.unlink_frames()} to {L.unlink_cels()}

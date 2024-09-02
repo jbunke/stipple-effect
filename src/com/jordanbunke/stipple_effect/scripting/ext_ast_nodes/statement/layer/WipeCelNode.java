@@ -10,10 +10,10 @@ import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
 import java.util.Arrays;
 
-public final class WipeFrameNode extends LayerStatementNode {
-    public static final String NAME = "wipe_frame";
+public final class WipeCelNode extends LayerStatementNode {
+    public static final String NAME = "wipe_cel";
 
-    public WipeFrameNode(
+    public WipeCelNode(
             final TextPosition position,
             final ExpressionNode scope, final ExpressionNode[] args
     ) {
@@ -28,7 +28,7 @@ public final class WipeFrameNode extends LayerStatementNode {
         final int frameIndex = (int) vs[0],
                 fc = layer.project().getState().getFrameCount();
 
-        final String attempt = "wipe the content of this layer frame";
+        final String attempt = "wipe the content of this cel";
 
         if (frameIndex < 0)
             StatusUpdates.scriptActionNotPermitted(attempt,

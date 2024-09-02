@@ -211,8 +211,8 @@ public final class SENodeDelegator {
                     SetCelNode.newEdit(position, scope, args);
             case SetOpacityNode.NAME ->
                     new SetOpacityNode(position, scope, args);
-            case WipeFrameNode.NAME ->
-                    new WipeFrameNode(position, scope, args);
+            case WipeCelNode.NAME ->
+                    new WipeCelNode(position, scope, args);
             case UnlinkCelsNode.NAME ->
                     new UnlinkCelsNode(position, scope, args);
             case LinkCelsNode.NAME ->
