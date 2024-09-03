@@ -20,8 +20,9 @@
   * Shape Tool 
   * Gradient Tool 
 * Frames with non-standard durations show an asterisk (*) next to their frame number
+* Added `{` and `}` to the illegal character set for names (filename, layer name, etc.)
 
-Changed:
+### Changed:
 * Overhauled and extended onion skin system 
   * Onion skins can now be rendered below or above the cel contents 
   * Onion skin types:
@@ -45,10 +46,11 @@ Changed:
   * Right click: secondary color 
   * Middle click: selected color (most recently assigned or modified of primary and secondary)
 
-Fixed:
+### Fixed:
 * Bug: `$SE.single_outline()` calls a double outline instead of a single outline
 * Bug: void helper functions cannot be called
 * Bug: suspended execution due to file dialog display leads to a playback backlog
+* Bug: attempts to create the settings folder every time the program writes settings
 
 ### API Changes:
 * Added:

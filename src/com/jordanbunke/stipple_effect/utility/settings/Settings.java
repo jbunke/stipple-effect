@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.utility.settings;
 
+import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
@@ -18,6 +19,8 @@ import com.jordanbunke.stipple_effect.visual.SEFonts;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Settings {
@@ -178,7 +181,22 @@ public class Settings {
     }
 
     public static void write() {
-        FileIO.safeMakeDirectory(SETTINGS_FILE.getParent());
+        final Path settingsFolder = SETTINGS_FILE.getParent();
+
+        if (!settingsFolder.toFile().exists())
+            FileIO.safeMakeDirectory(settingsFolder);
+        else if (!settingsFolder.toFile().isDirectory()) {
+            try {
+                Files.delete(settingsFolder);
+                FileIO.safeMakeDirectory(settingsFolder);
+            } catch (IOException ioe) {
+                GameError.send("Couldn't delete file at " + settingsFolder +
+                        " needed to clear space for the settings folder. " +
+                        "Could not write " + StippleEffect.PROGRAM_NAME +
+                        " settings.");
+                return;
+            }
+        }
 
         final StringBuilder sb = new StringBuilder();
 

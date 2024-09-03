@@ -11,6 +11,8 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SaveConfigTyp
 import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.Textbox;
 
+import java.nio.file.Path;
+
 import static com.jordanbunke.stipple_effect.project.SaveConfig.SaveType;
 
 public final class NewSaveConfigNode extends GlobalExpressionNode {
@@ -30,26 +32,29 @@ public final class NewSaveConfigNode extends GlobalExpressionNode {
         final ScriptArray folder = (ScriptArray) vs[0];
         final String name = (String) vs[1];
         final int saveTypeIndex = (int) vs[2];
+        final Path fp = ScriptUtils.scriptFolderToPath(folder);
 
         if (folder.size() <= 0) {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
                     arguments.args()[0].getPosition(),
                     "the folder path supplied is empty");
-            return null;
+        } else if (!fp.toFile().isDirectory()) {
+            ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
+                    arguments.args()[0].getPosition(),
+                    "\"" + fp + "\" is not a directory");
         } else if (!Textbox.validateAsFileName(name)) {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
                     arguments.args()[1].getPosition(),
                     "\"" + name + "\" is not a valid filename");
-            return null;
         } else if (saveTypeIndex < 0 || saveTypeIndex >= SaveType.values().length) {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
                     arguments.args()[2].getPosition(),
                     saveTypeIndex + " is not a valid save type index (0 - " +
                             (SaveType.values().length - 1) + ")");
-            return null;
         } else
-            return new SaveConfig(ScriptUtils.scriptFolderToPath(folder),
-                    name, SaveType.values()[saveTypeIndex]);
+            return new SaveConfig(fp, name, SaveType.values()[saveTypeIndex]);
+
+        return null;
     }
 
     @Override

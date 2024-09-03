@@ -10,6 +10,8 @@ import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.util.ScriptUtils;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
+import java.nio.file.Path;
+
 public final class SetFolderNode extends SaveConfigStatementNode {
     public static final String NAME = "set_folder";
 
@@ -31,8 +33,17 @@ public final class SetFolderNode extends SaveConfigStatementNode {
                     "set the folder of this save configuration",
                     "the path supplied is empty",
                     arguments.args()[0].getPosition());
-        else
-            sc.setFolder(ScriptUtils.scriptFolderToPath(folder));
+        else {
+            final Path fp = ScriptUtils.scriptFolderToPath(folder);
+
+            if (!fp.toFile().isDirectory())
+                StatusUpdates.scriptActionNotPermitted(
+                        "set the folder of this save configuration",
+                        "\"" + fp + "\" is not a directory",
+                        arguments.args()[0].getPosition());
+            else
+                sc.setFolder(fp);
+        }
 
         return FuncControlFlow.cont();
     }
