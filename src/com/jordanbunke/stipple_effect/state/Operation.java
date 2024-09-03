@@ -10,11 +10,11 @@ public enum Operation {
     // layer operations
     ADD_LAYER, DUPLICATE_LAYER, REMOVE_LAYER,
     MOVE_LAYER, MERGE_WITH_LAYER_BELOW, FLATTEN,
-    CHANGE_LAYER_NAME,
+    CHANGE_LAYER_NAME, CHANGE_ONION_SKIN,
     // layer operations without menu redraw consequences
     LAYER_VISIBILITY_CHANGE, LAYER_LINKING_CHANGE, LAYER_OPACITY_CHANGE,
     // selection operations
-    RESET_SELECTION_CONTENTS, MOVE_SELECTION_CONTENTS,
+    MOVE_SELECTION_CONTENTS,
     TRANSFORM_SELECTION_CONTENTS,
     PASTE, PASTE_CELS, RAISE, DROP,
     DELETE_SELECTION_CONTENTS, DELETE_CELS,
@@ -25,6 +25,14 @@ public enum Operation {
     // placeholder
     NONE;
 
+    public boolean qualifiesForTimeLapse() {
+        return switch (this) {
+            case SELECT, DESELECT, MOVE_SELECTION_BOUNDS,
+                    TRANSFORM_SELECTION_BOUNDS, RAISE, DROP -> false;
+            default -> true;
+        };
+    }
+
     public boolean triggersCanvasAuxiliaryRedraw() {
         return switch (this) {
             case RESIZE, PAD, CROP_TO_SELECTION, STITCH, SPLIT -> true;
@@ -34,8 +42,7 @@ public enum Operation {
 
     public boolean triggersSelectionOverlayRedraw() {
         return switch (this) {
-            case RESET_SELECTION_CONTENTS,
-                    TRANSFORM_SELECTION_CONTENTS,
+            case TRANSFORM_SELECTION_CONTENTS,
                     TRANSFORM_SELECTION_BOUNDS,
                     PASTE, DROP, SELECT -> true;
             default -> false;

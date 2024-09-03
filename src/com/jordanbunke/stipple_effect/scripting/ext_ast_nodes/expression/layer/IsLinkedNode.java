@@ -18,7 +18,7 @@ public final class IsLinkedNode extends LayerExpressionNode {
 
     @Override
     public Boolean evaluate(final SymbolTable symbolTable) {
-        return evalLayer(symbolTable).areFramesLinked();
+        return layerRep(symbolTable).get().areCelsLinked();
     }
 
     @Override

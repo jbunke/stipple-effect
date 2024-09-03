@@ -6,7 +6,7 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 
 public final class DisableLayerNode extends LayerStatementNode {
-    public static final String NAME = "disable_layer";
+    public static final String NAME = "disable";
 
     public DisableLayerNode(
             final TextPosition position,

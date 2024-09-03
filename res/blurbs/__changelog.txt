@@ -1,3 +1,102 @@
+{1.2.0} - 2024-09-03
+
+Added:
+> Layer visibility actions to navbar under "Layer" -> "Visibility status"
+> Bug reporting, scripting API, VS Code extension links to navbar under "Stipple Effect" -> "Resources"
+> Setting for whether preview windows are opened in a separate window
+> Reimport a preview into Stipple Effect with layers preserved
+> Generate time lapses that track project changes
+> New brush shapes
+  > Square
+  > Line + angle
+> Added setting to propagate changes made to breadth tool properties to all tools; affected tools:
+  > Brush
+  > Shade Brush
+  > Script Brush
+  > Eraser
+  > Line Tool
+  > Shape Tool
+  > Gradient Tool
+> Frames with non-standard durations show an asterisk ({*}) next to their frame number
+> Added curly braces to the illegal character set for names (filename, layer name, etc.)
+
+Changed:
+> Overhauled and extended onion skin system
+  > Onion skins can now be rendered below or above the cel contents
+  > Onion skin types:
+    > Standard translucent copy of contents
+    > Outline
+    > Tinted
+  > Render skins for up to 6 cels behind or ahead of the current frame index
+> Improved file dialogs on Windows
+> Combined file dialog file filters for {.stip} and image files into a single filter
+> {(image -> image)} preview scripts can be run on animated projects
+> Cosmetic and layout changes
+  > Simplified and shortened color sampler labels
+  > Updated {Zo} theme colors
+  > Updated layer button layout and flipbook panel sizing
+> Preview window changes
+  > Preview windows are now resizeable
+  > Preview windows can run in the main program window or a separate window as before
+  > Preview windows now persist across project context switches
+> Palette colors are assigned differently according to the mouse button clicked:
+  > Left click: primary color
+  > Right click: secondary color
+  > Middle click: selected color (most recently assigned or modified of primary and secondary)
+
+Fixed:
+> Bug: {$SE.single_outline()} calls a double outline instead of a single outline
+> Bug: void helper functions cannot be called
+> Bug: suspended execution due to file dialog display leads to a playback backlog
+> Bug: attempts to create the settings folder every time the program writes settings
+
+API Changes:
+  Added:
+  > New types
+    > {script}
+    > {save_config}
+  > Constants
+    > Scope constants that evaluate to {int}
+      > {$SE.PROJECT} = {0}
+      > {$SE.LAYER} = {1}
+      > {$SE.FRAME} = {2}
+      > {$SE.CEL} = {3}
+    > Save type constants that evaluate to {int}
+      > {$SE.NATIVE} = {0}
+      > {$SE.PNG_SHEET} = {1}
+      > {$SE.PNG_SEPARATE} = {2}
+      > {$SE.GIF} = {3}
+      > {$SE.MP4} = {4}
+    > Dimension constants that evaluate to {bool}
+      > {$SE.HORZ} = {true}
+      > {$SE.VERT} = {false}
+  > Added {layer} functions; for some {layer L}...
+    > {L.get_name() -> string}
+    > {L.set_name(string);}
+  > Added {project} functions; for some {project P}...
+    > {P.get_width() -> int}
+    > {P.get_height() -> int}
+    > {P.get_layer(string) -> layer}
+    > {P.get_save_config() -> save_config}
+    > {P.save_as(save_config);}
+  > Added global functions
+    > {$SE.read_script(string) -> script}
+    > {$SE.new_save_config(string[], string, int) -> save_config}
+    > {$SE.transform(project, script, bool, bool) -> project}
+    > {$SE.transform(project, script) -> project}
+    > {$SE.new_project(int, int, bool) -> project}
+
+  Changed:
+  > Renamed {layer} functions; for some {layer L}...
+    > Renamed {L.get_frame(int)} to {L.get_cel(int)}
+    > Renamed {L.set_frame(int, image)} to {L.set_cel(int, image)}
+    > Renamed {L.wipe_frame(int, image)} to {L.wipe_cel(int, image)}
+    > Renamed {L.edit_frame(int, image)} to {L.edit_cel(int, image)}
+    > Renamed {L.link_frames()} to {L.link_cels()}
+    > Renamed {L.unlink_frames()} to {L.unlink_cels()}
+    > Renamed {L.disable_layer()} to {L.disable()}
+    > Renamed {L.enable_layer()} to {L.enable()}
+
 {1.1.0} - The UI/UX Update - 2024-08-09
 
 Added:

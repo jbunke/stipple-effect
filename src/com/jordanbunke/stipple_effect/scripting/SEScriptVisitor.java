@@ -8,6 +8,7 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.delta_time.scripting.util.TypeCompatibility;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.SEExtTypeNode;
 import com.jordanbunke.stipple_effect.scripting.util.LayerRep;
 import com.jordanbunke.stipple_effect.scripting.util.SENodeDelegator;
@@ -19,8 +20,9 @@ public final class SEScriptVisitor extends ScriptVisitor {
     private static final String SCOPE_SEP = ".";
 
     static {
-        final Set<Class<?>> extensionTypeObjects =
-                Set.of(SEContext.class, LayerRep.class, Palette.class);
+        final Set<Class<?>> extensionTypeObjects = Set.of(
+                SEContext.class, LayerRep.class,
+                Palette.class, SaveConfig.class);
 
         extensionTypeObjects.forEach(TypeCompatibility::addBaseType);
     }
@@ -31,6 +33,23 @@ public final class SEScriptVisitor extends ScriptVisitor {
     ) {
         return SENodeDelegator.type(
                 TextPosition.fromToken(ctx.start), ctx.ident().getText());
+    }
+
+    @Override
+    public ExpressionNode visitExtPropertyExpression(
+            final ScriptParser.ExtPropertyExpressionContext ctx
+    ) {
+        final String namespace = ctx.namespace().ident().getText(),
+                propertyID = ctx.namespace().subident().getText()
+                        .substring(SCOPE_SEP.length());
+
+        final TextPosition position = TextPosition.fromToken(ctx.start);
+
+        if (namespace.equals(Constants.SCRIPT_GLOBAL_NAMESPACE))
+            return SENodeDelegator.globalProperty(position, propertyID);
+
+        return new IllegalExpressionNode(position,
+                "\"" + namespace + "\" is an illegal namespace");
     }
 
     @Override
@@ -80,7 +99,7 @@ public final class SEScriptVisitor extends ScriptVisitor {
             final TextPosition position, final ExpressionNode scope,
             final String propertyID
     ) {
-        return SENodeDelegator.property(position, scope, propertyID);
+        return SENodeDelegator.scopedProperty(position, scope, propertyID);
     }
 
     @Override

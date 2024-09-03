@@ -7,6 +7,7 @@ import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
 
 public class PlaybackInfo {
     private static final double NANOS_IN_MILLI = 1e6;
+    private static final int TIMEOUT_FACTOR = 10;
 
     private boolean playing;
     private int fps, millisPerFrame, millisAccumulated;
@@ -157,6 +158,11 @@ public class PlaybackInfo {
 
         if (millisAccumulated >= millisForThisFrame) {
             millisAccumulated -= millisForThisFrame;
+
+            // timeout
+            if (millisAccumulated >= TIMEOUT_FACTOR * millisForThisFrame)
+                millisAccumulated = 0;
+
             return true;
         }
 
@@ -179,7 +185,7 @@ public class PlaybackInfo {
         this.mode = mode;
     }
 
-    public void toggleMode() {
+    public void cycleMode() {
         this.mode = mode.next();
     }
 

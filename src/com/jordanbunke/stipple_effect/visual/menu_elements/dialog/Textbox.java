@@ -115,7 +115,7 @@ public class Textbox extends AbstractTextbox {
 
     public static boolean validateAsFileName(final String text, final boolean allowEmpty) {
         final Set<Character> illegalCharSet = Set.of(
-                '/', '\\', ':', '*', '?', '"', '<', '>', '|');
+                '/', '\\', ':', '*', '?', '"', '<', '>', '|', '{', '}');
 
         return (allowEmpty || !text.isEmpty()) && illegalCharSet.stream()
                 .map(c -> text.indexOf(c) == -1)

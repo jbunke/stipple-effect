@@ -1,7 +1,7 @@
 package com.jordanbunke.stipple_effect.utility;
 
 import com.jordanbunke.delta_time.utility.math.Coord2D;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.project.ZoomLevel;
 
 import java.nio.file.Path;
@@ -13,12 +13,6 @@ public class Constants {
             NATIVE_STANDARD_CODE = "native_standard",
             PALETTE_STANDARD_CODE = "palette_standard";
 
-    public static final String
-            DONATE_LINK = "https://flinkerflitzer.itch.io/stipple-effect",
-            SPONSOR_LINK = "https://github.com/sponsors/jbunke",
-            PATREON_LINK = "https://www.patreon.com/FlinkerFlitzer",
-            SCRIPT_WIKI_LINK = "https://github.com/jbunke/stipple-effect/wiki/Scripting";
-
     public static final Path PROGRAM_FILE = Path.of("program"),
             ICON_FOLDER = Path.of("icons"),
             PALETTE_FOLDER = Path.of("palettes"),
@@ -29,20 +23,21 @@ public class Constants {
 
     public static final String[] ACCEPTED_RASTER_IMAGE_SUFFIXES = new String[] {
             "jpg",
-            ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix()
+            SaveConfig.SaveType.PNG_SHEET.getFileSuffix()
     };
 
     public static final Coord2D NO_VALID_TARGET = new Coord2D(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
     public static final double TICK_HZ = 100d, FPS = 60d;
 
-    public static final double OPAQUE = 1d, ONION_SKIN_OPACITY = 0.5,
+    public static final double OPAQUE = 1d,
             CIRCLE = Math.PI * 2, _45_SNAP_INC = CIRCLE / 8d,
             _15_SNAP_INC = _45_SNAP_INC / 3d;
 
     public static final String
             BASE_LAYER_NAME = "Background", STD_LAYER_PREFIX = "Layer ",
             FLATTENED_LAYER_NAME = "Flattened", FROM_PREVIEW_LAYER_NAME = "From script",
+            TIME_LAPSE = "Time lapse",
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
             SCRIPT_FILE_SUFFIX = "ses", SCRIPT_GLOBAL_NAMESPACE = "SE",
@@ -79,9 +74,7 @@ public class Constants {
     public static final float
             DEF_ZOOM = ZoomLevel.PLUS_6.z,
             ZOOM_FOR_OVERLAY = ZoomLevel.NONE.z,
-            ZOOM_FOR_GRID = DEF_ZOOM,
-            NO_ZOOM = ZoomLevel.NONE.z,
-            MAX_PREVIEW_ZOOM = ZoomLevel.PLUS_11.z;
+            ZOOM_FOR_GRID = DEF_ZOOM;
 
     public static final double EXACT_COLOR_MATCH = 0d,
             DEFAULT_TOLERANCE = EXACT_COLOR_MATCH, MAX_TOLERANCE = 1d,

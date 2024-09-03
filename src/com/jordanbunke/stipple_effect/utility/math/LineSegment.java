@@ -40,10 +40,9 @@ public record LineSegment(Coord2D pa, Coord2D pb) {
     public boolean pointOnLine(
             final double px, final double py
     ) {
-        final double margin = 0.1, m = slope(), b = yIntercept();
+        final double margin = 0.1;
         final boolean satisfiesEquation = isSlopeUndefined()
-                ? (int)Math.round(px) == pa.x
-                : Math.abs(((px * m) + b) - py) <= margin;
+                ? (int)Math.round(px) == pa.x : deviation(px, py) <= margin;
 
         if (!satisfiesEquation)
             return false;
@@ -64,5 +63,34 @@ public record LineSegment(Coord2D pa, Coord2D pb) {
                         : gt.apply(py, lby) && lt.apply(py, gby);
 
         return isInBoundsX && isInBoundsY;
+    }
+
+    public double deviation(
+            final double px, final double py
+    ) {
+        final double m = slope(), b = yIntercept();
+        return Math.abs(((px * m) + b) - py);
+    }
+
+    public double distance() {
+        return Coord2D.unitDistanceBetween(pa, pb);
+    }
+
+    public Coord2D pointAlongLine(final double ratio) {
+        if (ratio <= 0d)
+            return pa;
+        else if (ratio >= 1d)
+            return pb;
+
+        return pa.displace(
+                (int)Math.round(diffX() * ratio),
+                (int)Math.round(diffY() * ratio));
+    }
+
+    public Coord2D pointAlongLineD(final double distance) {
+        if (isSinglePoint())
+            return pa;
+
+        return pointAlongLine(distance / distance());
     }
 }

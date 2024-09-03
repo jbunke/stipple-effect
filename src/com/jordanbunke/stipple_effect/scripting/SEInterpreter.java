@@ -8,6 +8,8 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 
+import java.nio.file.Path;
+
 public final class SEInterpreter extends Interpreter {
     private static boolean printErrorsToDialog = false;
 
@@ -23,13 +25,15 @@ public final class SEInterpreter extends Interpreter {
         printErrorsToDialog = true;
     }
 
-    public void runAutomationScript(final String content) {
+    public void runAutomationScript(final String content, final Path filepath) {
         final HeadFuncNode script = build(content);
 
         if (validateAutomationScript(script))
             run(script);
+        else if (script != null)
+            StatusUpdates.invalidAutomationScript(script.toString());
         else
-            StatusUpdates.invalidAutomationScript();
+            StatusUpdates.failedToCompileScript(filepath);
     }
 
     private boolean validateAutomationScript(
@@ -61,15 +65,17 @@ public final class SEInterpreter extends Interpreter {
                 IMG_ARRAY_TYPE = TypeNode.arrayOf(IMG_TYPE),
                 returnType = script.getReturnType();
 
-        final boolean animation = context.getState().getFrameCount() > 1;
-        final TypeNode[] expectedParam = new TypeNode[]
-                { animation ? IMG_ARRAY_TYPE : IMG_TYPE },
-                arrayParam = new TypeNode[] { IMG_ARRAY_TYPE };
+        final boolean imgReturn = returnType.equals(IMG_TYPE),
+                arrayReturn = returnType.equals(IMG_ARRAY_TYPE),
+                imgParam = script.paramsMatch(new TypeNode[] { IMG_TYPE }),
+                arrayParam = script.paramsMatch(new TypeNode[] { IMG_ARRAY_TYPE });
 
-        return (script.paramsMatch(expectedParam) ||
-                script.paramsMatch(arrayParam)) &&
-                (returnType.equals(IMG_TYPE) ||
-                        returnType.equals(IMG_ARRAY_TYPE));
+        if (!(imgReturn || arrayReturn))
+            return false;
+
+        return context.isAnimation()
+                ? (imgParam ? imgReturn : arrayParam)
+                : imgParam || arrayParam;
     }
 
     @Override

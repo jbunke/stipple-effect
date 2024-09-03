@@ -207,7 +207,7 @@ public sealed abstract class ToolThatSearches extends ToolWithMode permits Fill,
 
         // diagonal label
         final TextLabel diagonalLabel = Layout.optionsBarNextSectionLabel(
-                tolerance.value, "Search diagonally adjacent pixels?");
+                tolerance.value, "Search diagonally?");
 
         // diagonal checkbox
         final Checkbox diagonalCheckbox = new Checkbox(new Coord2D(

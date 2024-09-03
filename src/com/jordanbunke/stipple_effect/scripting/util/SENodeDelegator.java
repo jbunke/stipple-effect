@@ -6,16 +6,26 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.statement.IllegalStatement
 import com.jordanbunke.delta_time.scripting.ast.nodes.statement.StatementNode;
 import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.*;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.ColorPropertyGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
-import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.script.ScriptRunExpressionNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.AssignColorNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewPaletteNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewProjectStatementNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.SetSideMaskNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.save_config.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.script.ScriptRunStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type.*;
+import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 
 public final class SENodeDelegator {
@@ -34,7 +44,7 @@ public final class SENodeDelegator {
             case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
             default -> new IllegalStatementNode(position,
-                    "Undefined function \"$" + fID + "\"");
+                    "Undefined function \"" + formatGlobal(fID) + "\"");
         };
     }
 
@@ -46,8 +56,9 @@ public final class SENodeDelegator {
             case GetProjectNoArgsNode.NAME ->
                     new GetProjectNoArgsNode(position, args);
             case GetProjectsNode.NAME -> new GetProjectsNode(position, args);
-            case NewProjectExpressionNode.NAME ->
-                    new NewProjectExpressionNode(position, args);
+            case NewProjectNode.NAME -> args.length == 2
+                    ? NewProjectNode.twoArg(position, args)
+                    : NewProjectNode.threeArg(position, args);
             case GetColorNode.PRIM_NAME ->
                     GetColorNode.primary(position, args);
             case GetColorNode.SEC_NAME ->
@@ -68,13 +79,42 @@ public final class SENodeDelegator {
             case PresetOutlineNode.SINGLE -> PresetOutlineNode.sng(position, args);
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
             case GetSideMaskNode.NAME -> new GetSideMaskNode(position, args);
+            case ReadScriptNode.NAME -> new ReadScriptNode(position, args);
+            case NewSaveConfigNode.NAME -> new NewSaveConfigNode(position, args);
+            case TransformNode.NAME -> args.length == 2
+                    ? TransformNode.shortened(position, args)
+                    : TransformNode.reg(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
-                    "Undefined function \"$" + fID + "\"");
+                    "Undefined function \"" + formatGlobal(fID) + "\"");
         };
     }
 
-    public static ExpressionNode property(
+    public static ExpressionNode globalProperty(
+            final TextPosition position, final String propertyID
+    ) {
+        if (EnumUtils.matches(propertyID, Scope.class))
+            return new ScopeConstantNode(position,
+                    Scope.valueOf(propertyID));
+        else if (EnumUtils.matches(propertyID, SaveConfig.SaveType.class))
+            return new SaveTypeConstantNode(position,
+                    SaveConfig.SaveType.valueOf(propertyID));
+        else
+            return switch (propertyID) {
+                case DimConstantNode.HORZ -> new DimConstantNode(position, true);
+                case DimConstantNode.VERT -> new DimConstantNode(position, false);
+                // extend here
+                default -> new IllegalExpressionNode(position,
+                        "No property \"" + formatGlobal(propertyID) +
+                                "\" exists");
+            };
+    }
+
+    private static String formatGlobal(final String subidentifier) {
+        return "$" + Constants.SCRIPT_GLOBAL_NAMESPACE + "." + subidentifier;
+    }
+
+    public static ExpressionNode scopedProperty(
             final TextPosition position, final ExpressionNode scope,
             final String propertyID
     ) {
@@ -100,12 +140,14 @@ public final class SENodeDelegator {
             final String fID, final ExpressionNode... args
     ) {
         return switch (fID) {
+            case LayerGetNameNode.NAME ->
+                    new LayerGetNameNode(position, scope, args);
             case OpacityGetterNode.OPACITY ->
                     OpacityGetterNode.opacity(position, scope, args);
             case OpacityGetterNode.OPAQUE ->
                     OpacityGetterNode.opaque(position, scope, args);
-            case GetFrameNode.NAME ->
-                    new GetFrameNode(position, scope, args);
+            case GetCelNode.NAME ->
+                    new GetCelNode(position, scope, args);
             case IsEnabledNode.NAME ->
                     new IsEnabledNode(position, scope, args);
             case IsLinkedNode.NAME ->
@@ -124,7 +166,7 @@ public final class SENodeDelegator {
                     new GetLayerIndexNode(position, scope, args);
             case GetLayerNode.NAME -> switch (args.length) {
                 case 0 -> new GetEditingLayerNode(position, scope, args);
-                case 1 -> new GetIndexLayerNode(position, scope, args);
+                case 1 -> new GetOneArgLayerNode(position, scope, args);
                 default -> new IllegalExpressionNode(position,
                         "Scoped function \"" + fID +
                                 "\" takes 0 or 1 argument(s)");
@@ -141,6 +183,14 @@ public final class SENodeDelegator {
                     new GetFrameDurationNode(position, scope, args);
             case GetFrameDurationsNode.NAME ->
                     new GetFrameDurationsNode(position, scope, args);
+            case GetDimNode.WIDTH ->
+                    GetDimNode.newWidth(position, scope, args);
+            case GetDimNode.HEIGHT ->
+                    GetDimNode.newHeight(position, scope, args);
+            case GetSaveConfigNode.NAME ->
+                    new GetSaveConfigNode(position, scope, args);
+            case ScriptRunExpressionNode.NAME ->
+                    new ScriptRunExpressionNode(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -153,30 +203,29 @@ public final class SENodeDelegator {
             final String fID, final ExpressionNode... args
     ) {
         return switch (fID) {
-            case SetFrameNode.SET_NAME ->
-                    SetFrameNode.newSet(position, scope, args);
-            case SetFrameNode.EDIT_NAME ->
-                    SetFrameNode.newEdit(position, scope, args);
+            case LayerSetNameNode.NAME ->
+                    new LayerSetNameNode(position, scope, args);
+            case SetCelNode.SET ->
+                    SetCelNode.newSet(position, scope, args);
+            case SetCelNode.EDIT ->
+                    SetCelNode.newEdit(position, scope, args);
             case SetOpacityNode.NAME ->
                     new SetOpacityNode(position, scope, args);
-            case WipeFrameNode.NAME ->
-                    new WipeFrameNode(position, scope, args);
-            case UnlinkFramesNode.NAME ->
-                    new UnlinkFramesNode(position, scope, args);
-            case LinkFramesNode.NAME ->
-                    new LinkFramesNode(position, scope, args);
+            case WipeCelNode.NAME ->
+                    new WipeCelNode(position, scope, args);
+            case UnlinkCelsNode.NAME ->
+                    new UnlinkCelsNode(position, scope, args);
+            case LinkCelsNode.NAME ->
+                    new LinkCelsNode(position, scope, args);
             case DisableLayerNode.NAME ->
                     new DisableLayerNode(position, scope, args);
             case EnableLayerNode.NAME ->
                     new EnableLayerNode(position, scope, args);
-            case ResizeNode.NAME ->
-                    new ResizeNode(position, scope, args);
-            case SaveNode.NAME ->
-                    new SaveNode(position, scope, args);
-            case PadNode.NAME ->
-                    new PadNode(position, scope, args);
-            case StitchNode.NAME ->
-                    new StitchNode(position, scope, args);
+            case ResizeNode.NAME -> new ResizeNode(position, scope, args);
+            case SaveNode.NAME -> new SaveNode(position, scope, args);
+            case SaveAsNode.NAME -> new SaveAsNode(position, scope, args);
+            case PadNode.NAME -> new PadNode(position, scope, args);
+            case StitchNode.NAME -> new StitchNode(position, scope, args);
             case SplitByPixelsNode.NAME ->
                     new SplitByPixelsNode(position, scope, args);
             case SplitByDimsNode.NAME ->
@@ -238,6 +287,32 @@ public final class SENodeDelegator {
                     PaletteColorOpNode.moveRight(position, scope, args);
             case SetFrameDurationNode.NAME ->
                     new SetFrameDurationNode(position, scope, args);
+            case SetBoundNode.LOWER ->
+                    SetBoundNode.lower(position, scope, args);
+            case SetBoundNode.UPPER ->
+                    SetBoundNode.upper(position, scope, args);
+            case UnboundedNode.NAME ->
+                    new UnboundedNode(position, scope, args);
+            case SetSaveTypeNode.NAME ->
+                    new SetSaveTypeNode(position, scope, args);
+            case SaveConfigStringSetterNode.NAME ->
+                    SaveConfigStringSetterNode.name(position, scope, args);
+            case SaveConfigStringSetterNode.PREFIX ->
+                    SaveConfigStringSetterNode.name(position, scope, args);
+            case SaveConfigStringSetterNode.SUFFIX ->
+                    SaveConfigStringSetterNode.name(position, scope, args);
+            case SaveConfigIntSetterNode.SCALE_UP ->
+                    SaveConfigIntSetterNode.scaleUp(position, scope, args);
+            case SaveConfigIntSetterNode.FPD ->
+                    SaveConfigIntSetterNode.fpd(position, scope, args);
+            case SaveConfigIntSetterNode.COUNT_FROM ->
+                    SaveConfigIntSetterNode.countFrom(position, scope, args);
+            case SaveConfigIntSetterNode.FPS ->
+                    SaveConfigIntSetterNode.fps(position, scope, args);
+            case SetDimNode.NAME -> new SetDimNode(position, scope, args);
+            case SetFolderNode.NAME -> new SetFolderNode(position, scope, args);
+            case ScriptRunStatementNode.NAME ->
+                    new ScriptRunStatementNode(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -252,6 +327,8 @@ public final class SENodeDelegator {
             case LayerTypeNode.NAME -> new LayerTypeNode(position);
             case ProjectTypeNode.NAME -> new ProjectTypeNode(position);
             case PaletteTypeNode.NAME -> new PaletteTypeNode(position);
+            case ScriptTypeNode.NAME -> new ScriptTypeNode(position);
+            case SaveConfigTypeNode.NAME -> new SaveConfigTypeNode(position);
             default -> null;
         };
 

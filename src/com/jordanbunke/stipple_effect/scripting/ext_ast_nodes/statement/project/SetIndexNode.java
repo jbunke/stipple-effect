@@ -8,8 +8,6 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.Arrays;
-
 public final class SetIndexNode extends ProjectStatementNode {
     public static final String LAYER_NAME = "set_layer_index",
             FRAME_NAME = "set_frame_index";
@@ -41,9 +39,7 @@ public final class SetIndexNode extends ProjectStatementNode {
 
     @Override
     public FuncControlFlow execute(final SymbolTable symbolTable) {
-        final Object[] vs = Arrays.stream(arguments.args())
-                .map(a -> a.evaluate(symbolTable))
-                .toArray(Object[]::new);
+        final Object[] vs = arguments.getValues(symbolTable);
         final SEContext project = getProject(symbolTable);
         final int index = (int) vs[0], size = frame
                 ? project.getState().getFrameCount()

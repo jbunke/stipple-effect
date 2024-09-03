@@ -4,12 +4,14 @@ import com.jordanbunke.delta_time.events.GameMouseEvent;
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementGrouping;
 import com.jordanbunke.delta_time.menu.menu_elements.invisible.GatewayMenuElement;
+import com.jordanbunke.delta_time.menu.menu_elements.invisible.ThinkingMenuElement;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Selection;
+import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.Layout;
@@ -35,7 +37,8 @@ public final class GradientTool extends ToolWithBreadth
             masked, bounded, contiguous;
     private GameImage toolContentPreview;
     private Coord2D anchor;
-    private List<Set<Coord2D>> gradientStages;
+    private final List<Set<Coord2D>> gradientStages;
+    private final Set<Coord2D> recent;
     private Shape shape;
     private Selection accessible;
 
@@ -73,6 +76,8 @@ public final class GradientTool extends ToolWithBreadth
 
         anchor = Constants.NO_VALID_TARGET;
         gradientStages = new ArrayList<>();
+
+        recent = new HashSet<>();
     }
 
     public static GradientTool get() {
@@ -88,38 +93,41 @@ public final class GradientTool extends ToolWithBreadth
             drawing = true;
             backwards = me.button == GameMouseEvent.Button.RIGHT;
 
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
+            final ProjectState s = context.getState();
+            final int w = s.getImageWidth(), h = s.getImageHeight();
             toolContentPreview = new GameImage(w, h);
 
             reset();
             anchor = tp;
-            gradientStages = new ArrayList<>();
+            gradientStages.clear();
+
+            recent.clear();
 
             initializeMask(context);
         }
     }
 
     private void initializeMask(final SEContext context) {
-        final int w = context.getState().getImageWidth(),
-                h = context.getState().getImageHeight();
+        final ProjectState s = context.getState();
 
-        final GameImage frame = context.getState().getActiveLayerFrame();
+        final int w = s.getImageWidth(), h = s.getImageHeight();
+
+        final GameImage cel = s.getActiveCel();
 
         final Color maskColor = masked && anchorInBounds(w, h)
-                ? frame.getColorAt(anchor.x, anchor.y)
+                ? cel.getColorAt(anchor.x, anchor.y)
                 : null;
         accessible = maskColor != null
-                ? search(frame, maskColor) : Selection.EMPTY;
+                ? search(cel, maskColor) : Selection.EMPTY;
     }
 
     @Override
     public void update(final SEContext context, final Coord2D mousePosition) {
         final Coord2D tp = context.getTargetPixel();
+        final ProjectState s = context.getState();
 
         if (drawing && !tp.equals(Constants.NO_VALID_TARGET)) {
-            final int w = context.getState().getImageWidth(),
-                    h = context.getState().getImageHeight();
+            final int w = s.getImageWidth(), h = s.getImageHeight();
 
             if (tp.equals(getLastTP()))
                 return;
@@ -143,12 +151,29 @@ public final class GradientTool extends ToolWithBreadth
         final Set<Coord2D> gradientStage = new HashSet<>();
 
         populateAround(gradientStage, tp, selection);
-        fillLineSpace(getLastTP(), tp, (x, y) -> populateAround(
-                gradientStage, getLastTP().displace(x, y), selection));
+
+        final Coord2D lastTP = getLastTP();
+
+        if (!lastTP.equals(Constants.NO_VALID_TARGET)) {
+            fillLineSpace(lastTP, tp, (x, y) -> populateAround(
+                    gradientStage, lastTP.displace(x, y), selection));
+            fillGaps(w, h, lastTP, tp, (x, y) -> {
+                final Coord2D pixel = new Coord2D(x, y);
+
+                return recent.contains(pixel) || gradientStage.contains(pixel);
+                }, (x, y) -> {
+                final Coord2D pixel = new Coord2D(x, y);
+
+                gradientStage.add(pixel);
+            });
+        }
 
         gradientStages.add(gradientStage);
 
         drawGradientStages(w, h);
+
+        recent.clear();
+        recent.addAll(gradientStage);
     }
 
     private void updateGlobalMode(
@@ -403,20 +428,27 @@ public final class GradientTool extends ToolWithBreadth
         // inherited content called first to trigger correct ditherTextX assignment
         final MenuElementGrouping inherited = super.buildToolOptionsBar();
 
-        // dithered label
-        final TextLabel ditheredLabel = TextLabel.make(
-                new Coord2D(getAfterBreadthTextX(), Layout.optionsBarTextY()),
-                "Dithered");
+        // dithered labels
+        final TextLabel gDitheredLabel = TextLabel.make(
+                getFirstOptionLabelPosition(), "Dithered"),
+                bDitheredLabel = TextLabel.make(
+                        new Coord2D(getAfterBreadthTextX(),
+                                Layout.optionsBarTextY()), "Dithered");
 
-        // dithered checkbox
-        final Checkbox ditheredCheckbox = new Checkbox(new Coord2D(
-                Layout.optionsBarNextElementX(ditheredLabel, false),
-                Layout.optionsBarButtonY()), new ConcreteProperty<>(
-                () -> dithered, this::setDithered));
+        // dithered checkboxs
+        final ConcreteProperty<Boolean> ditheredProperty =
+                new ConcreteProperty<>(() -> dithered, this::setDithered);
+
+        final Checkbox gDitheredCheckbox = new Checkbox(new Coord2D(
+                Layout.optionsBarNextElementX(gDitheredLabel, false),
+                Layout.optionsBarButtonY()), ditheredProperty),
+                bDitheredCheckbox = new Checkbox(new Coord2D(
+                        Layout.optionsBarNextElementX(bDitheredLabel, false),
+                        Layout.optionsBarButtonY()), ditheredProperty);
 
         // shape label
         final TextLabel shapeLabel = TextLabel.make(new Coord2D(
-                        Layout.optionsBarNextElementX(ditheredCheckbox, true),
+                        Layout.optionsBarNextElementX(gDitheredCheckbox, true),
                         Layout.optionsBarTextY()), "Shape");
 
         // shape dropdown
@@ -463,7 +495,7 @@ public final class GradientTool extends ToolWithBreadth
 
         // tolerance
         final TextLabel toleranceLabel = Layout.optionsBarNextSectionLabel(
-                contiguousCheckbox, "Tol.");
+                contiguousCheckbox, "Tolerance");
 
         final int PERCENT = 100;
         final IncrementalRangeElements<Double> tolerance =
@@ -489,9 +521,14 @@ public final class GradientTool extends ToolWithBreadth
                         tolerance.incButton, tolerance.slider,
                         tolerance.value), () -> masked);
 
-        return new MenuElementGrouping(inherited,
-                ditheredLabel, ditheredCheckbox, shapeLabel, shapeDropdown,
-                boundedLabel, boundedCheckbox,
-                maskedLabel, maskedCheckbox, maskUnlocks);
+        final MenuElementGrouping brushContents = new MenuElementGrouping(
+                inherited, bDitheredLabel, bDitheredCheckbox),
+                globalContents = new MenuElementGrouping(
+                        gDitheredLabel, gDitheredCheckbox, shapeLabel,
+                        shapeDropdown, boundedLabel, boundedCheckbox,
+                        maskedLabel, maskedCheckbox, maskUnlocks);
+
+        return new MenuElementGrouping(new ThinkingMenuElement(
+                () -> global ? globalContents : brushContents));
     }
 }

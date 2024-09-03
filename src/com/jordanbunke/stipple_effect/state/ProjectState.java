@@ -2,6 +2,7 @@ package com.jordanbunke.stipple_effect.state;
 
 import com.jordanbunke.delta_time.image.GameImage;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.selection.Selection;
 import com.jordanbunke.stipple_effect.selection.SelectionContents;
@@ -230,15 +231,26 @@ public class ProjectState {
 
         for (SELayer layer : layers) {
             if (layer.isEnabled()) {
-                // onion skin previous
-                if (includeOnionSkins && layer.getOnionSkinMode()
-                        .doPrevious() && frameIndex > 0)
-                    image.draw(layer.getOnionSkin(frameIndex - 1));
+                final boolean osOn = layer.isOnionSkinOn();
+                final OnionSkin os = layer.getOnionSkin();
+                final GameImage onionSkinBack, onionSkinForward;
 
-                // onion skin next
-                if (includeOnionSkins && layer.getOnionSkinMode()
-                        .doNext() && frameIndex + 1 < frameCount)
-                    image.draw(layer.getOnionSkin(frameIndex + 1));
+                if (includeOnionSkins && osOn) {
+                    onionSkinBack = layer.getOnionSkinCel(frameIndex, true);
+                    onionSkinForward = layer.getOnionSkinCel(frameIndex, false);
+                } else {
+                    onionSkinBack = GameImage.dummy();
+                    onionSkinForward = GameImage.dummy();
+                }
+
+                // render onion skin under layer
+                if (includeOnionSkins && osOn) {
+                    if (os.underBack)
+                        image.draw(onionSkinBack);
+
+                    if (os.underForward)
+                        image.draw(onionSkinForward);
+                }
 
                 // this layer
                 GameImage layerImage = new GameImage(layer.getRender(frameIndex));
@@ -254,13 +266,22 @@ public class ProjectState {
 
                 if (previewCondition) {
                     final Selection selection = selectionContents.getSelection();
-                    final int rgb = SEColors.transparent().getRGB();
+                    final int t = SEColors.transparent().getRGB();
 
                     selection.pixelAlgorithm(imageWidth, imageHeight,
-                            (x, y) -> layerImage.setRGB(x, y, rgb));
+                            (x, y) -> layerImage.setRGB(x, y, t));
                 }
 
                 image.draw(layerImage.submit());
+
+                // render onion skin above layer
+                if (includeOnionSkins && osOn) {
+                    if (!os.underBack)
+                        image.draw(onionSkinBack);
+
+                    if (!os.underForward)
+                        image.draw(onionSkinForward);
+                }
 
                 if (previewCondition) {
                     final GameImage preview = selectionContents
@@ -395,8 +416,8 @@ public class ProjectState {
         return layers.get(layerEditIndex);
     }
 
-    public GameImage getActiveLayerFrame() {
-        return getEditingLayer().getFrame(frameIndex);
+    public GameImage getActiveCel() {
+        return getEditingLayer().getCel(frameIndex);
     }
 
     public int getLayerEditIndex() {
@@ -456,7 +477,7 @@ public class ProjectState {
 
         for (int l = 0; l < layerCount; l++)
             for (int f = 0; f < frameCount; f++) {
-                final GameImage cel = layers.get(l).getFrame(f);
+                final GameImage cel = layers.get(l).getCel(f);
 
                 pixels:
                 for (int x = 0; x < cel.getWidth(); x++)

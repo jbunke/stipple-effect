@@ -88,7 +88,7 @@ public class ThemeBuilder {
 
         // backgrounds
         zoTB.setPanelBackground(BOURGOGNE)
-                .setWorkspaceBackground(DEEP_OCEAN)
+                .setWorkspaceBackground(HAITI_PURPLE)
                 .setScrollBackground(TRANSPARENT)
                 .setSplashBackground(HAITI_PURPLE);
 
@@ -103,7 +103,7 @@ public class ThemeBuilder {
                 .setSplashFlashingText(GOLD);
 
         // UI element bodies
-        zoTB.setDefaultSliderCore(HAITI_BLUE)
+        zoTB.setDefaultSliderCore(HAITI_PURPLE)
                 .setDefaultSliderBall(HAITI_RED)
                 .setDropdownOptionBody(BLACK)
                 .setButtonBody(HAITI_RED)
@@ -113,7 +113,7 @@ public class ThemeBuilder {
         // UI element outlines
         zoTB.setButtonOutline(BLACK)
                 .setHighlightOutline(GOLD)
-                .setPanelDivisions(HAITI_PURPLE);
+                .setPanelDivisions(BLACK);
 
         // selection
         zoTB.setSelectionFill(TRANSLUCENT_GOLD_2)

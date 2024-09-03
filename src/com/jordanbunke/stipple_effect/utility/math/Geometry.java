@@ -5,6 +5,8 @@ import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
 public class Geometry {
+    private static final double CONVERSION = 180 / Math.PI;
+
     public static double calculateAngleInRad(
             final Coord2D point, final Coord2D pivot
     ) {
@@ -53,5 +55,17 @@ public class Geometry {
                 deltaY = (int)Math.round(Math.sin(angle) * distance);
 
         return source.displace(deltaX, deltaY);
+    }
+
+    public static double radToDegrees(final double angle) {
+        return angle * CONVERSION;
+    }
+
+    public static int radToDegreesRounded(final double angle) {
+        return (int) Math.round(radToDegrees(angle));
+    }
+
+    public static double degreesToRad(final double angle) {
+        return angle / CONVERSION;
     }
 }

@@ -30,7 +30,7 @@ public final class Wand extends ToolThatSearches {
         if (context.isTargetingPixelOnCanvas()) {
             final Coord2D tp = context.getTargetPixel();
 
-            final GameImage image = context.getState().getActiveLayerFrame();
+            final GameImage image = context.getState().getActiveCel();
 
             // search
             context.editSelection(search(image, tp), true);

@@ -4,12 +4,9 @@ This is a rough outline of planned features and when to expect them. Everything 
 
 ## Q3 2024
 * Presets for common scriptable behaviours
-* Onion skin options:
-  * Look ahead/behind multiple frames
-  * Opacity dropoff
-  * Types of skins
-  * Settings unique to layer
 
 ## Q4 2024
 * Lossless video exporting
-* Preview window embedded in main window while program is fullscreened
+* Improved dialog menus
+* CLI tool 
+  * Test and debug scripts

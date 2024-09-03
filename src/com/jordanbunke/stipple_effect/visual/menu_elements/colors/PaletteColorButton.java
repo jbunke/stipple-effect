@@ -140,7 +140,7 @@ public class PaletteColorButton extends SelectableMenuElement
                 ", A: " + color.getAlpha() +
                 "\n{Click + Drag} to resort" +
                 "\n{Shift + Click} to " + (included ? "ex" : "in") + "clude" +
-                "\n{Ctrl + Click} to remove from palette";
+                "\n{Ctrl + Click} to remove";
     }
 
     @Override
@@ -169,8 +169,8 @@ public class PaletteColorButton extends SelectableMenuElement
     }
 
     private void updateAssets() {
-        final GameImage base = GraphicsUtils.loadIcon(
-                ResourceCodes.PALETTE_BUTTON_BACKGROUND);
+        final GameImage base = new GameImage(
+                GraphicsUtils.loadIcon(ResourceCodes.PALETTE_BUTTON_BACKGROUND));
 
         base.fillRectangle(color, 0, 0,
                 Layout.PALETTE_DIMS.width(),
@@ -216,7 +216,11 @@ public class PaletteColorButton extends SelectableMenuElement
                             else if (KeyShortcut.areModKeysPressed(true, false, eventLogger))
                                 StippleEffect.get().removeColorFromPalette(color);
                             else
-                                setSelectedColor();
+                                setSelectedColor(switch (me.button) {
+                                    case LEFT -> StippleEffect.PRIMARY;
+                                    case RIGHT -> StippleEffect.SECONDARY;
+                                    default -> StippleEffect.get().getColorIndex();
+                                });
 
                             return;
                         }
@@ -232,13 +236,14 @@ public class PaletteColorButton extends SelectableMenuElement
         logic.process(eventLogger, index);
     }
 
-    private void setSelectedColor() {
+    private void setSelectedColor(final int colorIndex) {
+        StippleEffect.get().setColorIndex(colorIndex);
         StippleEffect.get().setSelectedColor(color, ColorMath.LastHSVEdit.NONE);
     }
 
     @Override
     public void choose() {
-        setSelectedColor();
+        setSelectedColor(StippleEffect.get().getColorIndex());
     }
 
     @Override

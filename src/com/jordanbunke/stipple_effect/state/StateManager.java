@@ -5,10 +5,7 @@ import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class StateManager {
     private int index;
@@ -130,7 +127,7 @@ public class StateManager {
         final SEContext c = StippleEffect.get().getContext();
 
         if (edited)
-            c.projectInfo.markAsEdited();
+            c.getSaveConfig().markAsEdited();
 
         if (redrawSelectionOverlay)
             c.redrawSelectionOverlay();
@@ -155,7 +152,7 @@ public class StateManager {
 
     private void markAsEditedIfEdited(final ProjectState state) {
         if (state.getOperation().constitutesEdit())
-            StippleEffect.get().getContext().projectInfo.markAsEdited();
+            StippleEffect.get().getContext().getSaveConfig().markAsEdited();
     }
 
     private void redrawSelectionOverlayIfTriggered(final ProjectState state) {
@@ -181,7 +178,7 @@ public class StateManager {
     public void setState(final int index, final SEContext c) {
         this.index = index;
 
-        c.projectInfo.markAsEdited();
+        c.getSaveConfig().markAsEdited();
         c.redrawSelectionOverlay();
         c.redrawCanvasAuxiliaries();
 
@@ -200,5 +197,21 @@ public class StateManager {
                 checkpoints.add(i);
 
         return checkpoints;
+    }
+
+    public List<ProjectState> getStatesForTimeLapse() {
+        final List<ProjectState> timeLapseStates =
+                new ArrayList<>(List.of(getState()));
+
+        for (int i = index - 1; i >= 0 &&
+                timeLapseStates.size() < Constants.MAX_NUM_FRAMES; i--) {
+            final ProjectState s = getState(i);
+
+            if (s.isCheckpoint() && s.getOperation().qualifiesForTimeLapse())
+                timeLapseStates.add(s);
+        }
+
+        Collections.reverse(timeLapseStates);
+        return timeLapseStates;
     }
 }

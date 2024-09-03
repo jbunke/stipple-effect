@@ -9,7 +9,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.Arrays;
+import static com.jordanbunke.stipple_effect.utility.DialogVals.SequenceOrder.*;
 
 public final class SplitByPixelsNode extends SplitNode {
     public static final String NAME = "split_px";
@@ -23,9 +23,7 @@ public final class SplitByPixelsNode extends SplitNode {
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(arguments.args())
-                .map(a -> a.evaluate(symbolTable))
-                .toArray(Object[]::new);
+        final Object[] dims = arguments.getValues(symbolTable);
         final SEContext project = getProject(symbolTable);
         final int fw = (int) dims[0], fh = (int) dims[1];
         final boolean horizontal = (boolean) dims[2],
@@ -59,9 +57,7 @@ public final class SplitByPixelsNode extends SplitNode {
         else {
             DialogVals.setFrameWidth(fw, h);
             DialogVals.setFrameHeight(fh, h);
-            DialogVals.setSequenceOrder(horizontal
-                    ? DialogVals.SequenceOrder.HORIZONTAL
-                    : DialogVals.SequenceOrder.VERTICAL);
+            DialogVals.setSequenceOrder(horizontal ? HORIZONTAL : VERTICAL);
             DialogVals.setTruncateSplitX(truncateX);
             DialogVals.setTruncateSplitY(truncateY);
 

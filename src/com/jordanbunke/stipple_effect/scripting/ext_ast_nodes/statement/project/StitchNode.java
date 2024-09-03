@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.StatusUpdates;
 
-import java.util.Arrays;
+import static com.jordanbunke.stipple_effect.utility.DialogVals.SequenceOrder.*;
 
 public final class StitchNode extends ProjectStatementNode {
     public static final String NAME = "stitch";
@@ -25,9 +25,7 @@ public final class StitchNode extends ProjectStatementNode {
 
     @Override
     public FuncControlFlow execute(SymbolTable symbolTable) {
-        final Object[] dims = Arrays.stream(arguments.args())
-                .map(a -> a.evaluate(symbolTable))
-                .toArray(Object[]::new);
+        final Object[] dims = arguments.getValues(symbolTable);
         final SEContext project = getProject(symbolTable);
         final int fpd = (int) dims[0];
         final boolean horizontal = (boolean) dims[1];
@@ -52,9 +50,7 @@ public final class StitchNode extends ProjectStatementNode {
                         "the prospective dimensions are invalid: width = " +
                                 sw + ", height = " + sh, getPosition());
             else {
-                DialogVals.setSequenceOrder(horizontal
-                        ? DialogVals.SequenceOrder.HORIZONTAL
-                        : DialogVals.SequenceOrder.VERTICAL);
+                DialogVals.setSequenceOrder(horizontal ? HORIZONTAL : VERTICAL);
                 DialogVals.setFramesPerDim(fpd);
 
                 project.stitch();

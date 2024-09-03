@@ -3,17 +3,13 @@ package com.jordanbunke.stipple_effect.utility.action;
 import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.menu.menu_elements.ext.dropdown.DropdownItem;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.layer.SELayer;
-import com.jordanbunke.stipple_effect.preview.PreviewWindow;
+import com.jordanbunke.stipple_effect.preview.Preview;
 import com.jordanbunke.stipple_effect.project.SEContext;
 import com.jordanbunke.stipple_effect.selection.Outliner;
 import com.jordanbunke.stipple_effect.selection.SEClipboard;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.tools.*;
-import com.jordanbunke.stipple_effect.utility.DialogVals;
-import com.jordanbunke.stipple_effect.utility.EnumUtils;
-import com.jordanbunke.stipple_effect.utility.Layout;
-import com.jordanbunke.stipple_effect.utility.StatusUpdates;
+import com.jordanbunke.stipple_effect.utility.*;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.GatewayActionItem;
 import com.jordanbunke.stipple_effect.visual.menu_elements.navigation.logic.SimpleActionItem;
@@ -29,11 +25,11 @@ public enum SEAction {
     DUMMY(ResourceCodes.NONE, c -> {}, null),
 
     // miscellaneous
-    SAVE(ResourceCodes.SAVE, c -> c.projectInfo.hasSaveAssociation(),
-            c -> c.projectInfo.save(), new KeyShortcut(true, false, S)),
+    SAVE(ResourceCodes.SAVE, c -> c.getSaveConfig().hasSaveAssociation(),
+            c -> c.getSaveConfig().save(c), new KeyShortcut(true, false, S)),
     OPEN_FILE(ResourceCodes.OPEN_FILE, fromSE(StippleEffect::openProject),
             new KeyShortcut(true, false, O)),
-    PREVIEW(ResourceCodes.PREVIEW, null, PreviewWindow::set,
+    PREVIEW(ResourceCodes.PREVIEW, null, Preview::set,
             new KeyShortcut(false, true, SPACE),
             (c, eventLogger) -> eventLogger.unpressAllKeys(), true),
     ALL_UI(ResourceCodes.ALL_UI, c -> Layout.showAllPanels(),
@@ -83,6 +79,10 @@ public enum SEAction {
             KeyShortcut.single(ESCAPE)),
     CLEAR_DIALOG(ResourceCodes.NONE, fromSE(StippleEffect::clearDialog),
             KeyShortcut.single(ESCAPE)),
+    DOCUMENTATION(ResourceCodes.DOCUMENTATION, plain(WebUtils::documentation), null),
+    SCRIPTING_API(ResourceCodes.SCRIPTING_API, plain(WebUtils::scriptingAPI), null),
+    REPORT_BUG(ResourceCodes.REPORT_BUG, plain(WebUtils::reportBug), null),
+    VS_CODE_EXT(ResourceCodes.VS_CODE_EXT, plain(WebUtils::vsCodeExt), null),
 
     // non-project dialogs
     SETTINGS(ResourceCodes.SETTINGS,
@@ -157,10 +157,16 @@ public enum SEAction {
         else
             c.enableLayer(index);
     }, new KeyShortcut(false, true, _1)),
-    ISOLATE_LAYER(ResourceCodes.NONE,
+    DISABLE_LAYER(ResourceCodes.DISABLE_LAYER, null,
+            c -> c.disableLayer(c.getState().getLayerEditIndex()),
+            new KeyShortcut(false, true, _1), null, false),
+    ENABLE_LAYER(ResourceCodes.ENABLE_LAYER, null,
+            c -> c.enableLayer(c.getState().getLayerEditIndex()),
+            new KeyShortcut(false, true, _1), null, false),
+    ISOLATE_LAYER(ResourceCodes.ISOLATE_LAYER,
             c -> c.isolateLayer(c.getState().getLayerEditIndex()),
             new KeyShortcut(false, true, _2)),
-    ENABLE_ALL_LAYERS(ResourceCodes.NONE, SEContext::enableAllLayers,
+    ENABLE_ALL_LAYERS(ResourceCodes.ENABLE_ALL_LAYERS, SEContext::enableAllLayers,
             new KeyShortcut(false, true, _3)),
 
     // current layer
@@ -170,11 +176,9 @@ public enum SEAction {
             new KeyShortcut(false, true, L)),
     TOGGLE_LAYER_LINKING(ResourceCodes.NONE, SEContext::toggleLayerLinking,
             new KeyShortcut(true, false, Q)),
-    CYCLE_LAYER_ONION_SKIN_MODE(ResourceCodes.NONE,
-            c -> {
-        final SELayer layer = c.getState().getEditingLayer();
-        layer.setOnionSkinMode(EnumUtils.next(layer.getOnionSkinMode()));
-    }, new KeyShortcut(true, false, _1)),
+    TOGGLE_ONION_SKIN(ResourceCodes.NONE,
+            c -> c.getState().getEditingLayer().toggleOnionSkin(),
+            new KeyShortcut(true, false, _1)),
 
     // frames
     NEW_FRAME(ResourceCodes.NEW_FRAME,
@@ -218,7 +222,7 @@ public enum SEAction {
     TOGGLE_PLAYING(ResourceCodes.NONE, null,
             c -> c.playbackInfo.togglePlaying(), KeyShortcut.single(SPACE)),
     CYCLE_PLAYBACK_MODE(ResourceCodes.NONE, null,
-            c -> c.playbackInfo.toggleMode(),
+            c -> c.playbackInfo.cycleMode(),
             new KeyShortcut(true, false, ENTER)),
 
     // layer navigation
@@ -366,6 +370,8 @@ public enum SEAction {
             c -> DialogAssembly.setDialogToPalettize(c,
                     StippleEffect.get().getSelectedPalette()),
             new KeyShortcut(false, true, P)),
+    GENERATE_TIME_LAPSE(ResourceCodes.GENERATE_TIME_LAPSE,
+            SEContext::generateTimeLapse, null),
 
     // set tools
     SET_TOOL_HAND(ResourceCodes.NONE,
@@ -617,7 +623,8 @@ public enum SEAction {
 
     public static SEAction[] actionsMenuActions() {
         return new SEAction[] {
-                HSV_SHIFT, COLOR_SCRIPT, CONTENTS_TO_PALETTE, PALETTIZE
+                HSV_SHIFT, COLOR_SCRIPT, CONTENTS_TO_PALETTE, PALETTIZE,
+                GENERATE_TIME_LAPSE
         };
     }
 

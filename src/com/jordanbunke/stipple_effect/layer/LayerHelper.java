@@ -10,26 +10,26 @@ public class LayerHelper {
             final SELayer above, final SELayer below,
             final int frameIndex, final int frameCount
     ) {
-        final List<GameImage> frames = new ArrayList<>();
+        final List<GameImage> cels = new ArrayList<>();
 
         for (int i = 0; i < frameCount; i++) {
-            final GameImage frame = new GameImage(below.getFrame(i));
-            frame.draw(above.getRender(i));
+            final GameImage cel = new GameImage(below.getCel(i));
+            cel.draw(above.getRender(i));
 
-            frames.add(frame.submit());
+            cels.add(cel.submit());
         }
 
-        // if below layer is frame-linked, merged layer should form linked
+        // if below layer is linked, merged layer should form linked
         // content from above layer on selected frame
-        final GameImage frameLinkedContent = frames.get(frameIndex);
+        final GameImage linkedContent = cels.get(frameIndex);
 
-        // override frame linking on below layer if above layer is unlinked
+        // override cel linking on below layer if above layer is unlinked
         // and frameCount > 1
-        final boolean framesLinked = below.areFramesLinked() &&
-                (above.areFramesLinked() || frameCount == 1);
+        final boolean celsLinked = below.areCelsLinked() &&
+                (above.areCelsLinked() || frameCount == 1);
 
-        return new SELayer(frames, frameLinkedContent, below.getOpacity(),
-                below.isEnabled(), framesLinked, below.getOnionSkinMode(),
-                below.getName());
+        return new SELayer(cels, linkedContent, below.getOpacity(),
+                below.isEnabled(), celsLinked, below.isOnionSkinOn(),
+                below.getOnionSkin(), below.getName());
     }
 }

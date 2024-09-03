@@ -25,14 +25,16 @@ public class StatusUpdates {
                 "it is not a valid URL");
     }
 
-    public static void invalidPreviewScript() {
+    public static void invalidPreviewScript(final String signature) {
         actionNotPermitted("upload script",
-                "this script does not fulfill this project's preview script contract");
+                "a preview script with the type signature {" + signature +
+                        "} cannot be applied to this project");
     }
 
-    public static void invalidAutomationScript() {
+    public static void invalidAutomationScript(final String signature) {
         actionNotPermitted("upload script",
-                "this script does not fulfill the automation script contract");
+                "this script has the type signature {" + signature +
+                        "}; automation scripts must be {()}");
     }
 
     public static void cannotSetCheckAndGridToBounds(

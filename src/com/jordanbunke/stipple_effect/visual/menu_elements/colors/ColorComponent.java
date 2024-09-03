@@ -9,6 +9,7 @@ import com.jordanbunke.delta_time.menu.menu_elements.container.MenuElementContai
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
@@ -23,24 +24,45 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.jordanbunke.stipple_effect.utility.math.ColorMath.*;
+
 public class ColorComponent extends MenuElementContainer {
     private final MenuElement[] menuElements;
 
+    public static ColorComponent onionSkinHue(
+            final Coord2D labelPos, final boolean back
+    ) {
+        final int scaleMax = Constants.HUE_SCALE;
+
+        final Function<Integer, Color> fSpectral = i ->
+                fromHSV(scaleDown(i, scaleMax), 1d, 1d, Constants.RGBA_SCALE);
+
+        return new ColorComponent(scaleMax, "Hue", labelPos, fSpectral, c -> {
+            final double hue = rgbToHue(c);
+
+            if (back)
+                OnionSkin.setDHueBack(hue);
+            else
+                OnionSkin.setDHueForward(hue);
+        }, () -> scaleUp(back ? OnionSkin.getDHueBack()
+                : OnionSkin.getDHueForward(), scaleMax));
+    }
+
     public static ColorComponent hue(final Coord2D labelPos) {
         return rgbhsva(labelPos, "Hue",
-                Constants.HUE_SCALE, ColorMath.LastHSVEdit.HUE,
+                Constants.HUE_SCALE, LastHSVEdit.HUE,
                 ColorMath::hueAdjustedColor, ColorMath::hueGetter);
     }
 
     public static ColorComponent sat(final Coord2D labelPos) {
         return rgbhsva(labelPos, "Saturation",
-                Constants.SAT_SCALE, ColorMath.LastHSVEdit.SAT,
+                Constants.SAT_SCALE, LastHSVEdit.SAT,
                 ColorMath::satAdjustedColor, ColorMath::satGetter);
     }
 
     public static ColorComponent value(final Coord2D labelPos) {
         return rgbhsva(labelPos, "Value",
-                Constants.VALUE_SCALE, ColorMath.LastHSVEdit.VAL,
+                Constants.VALUE_SCALE, LastHSVEdit.VAL,
                 ColorMath::valueAdjustedColor, ColorMath::valueGetter);
     }
 
@@ -74,13 +96,13 @@ public class ColorComponent extends MenuElementContainer {
             final Function<Color, Integer> componentGetter
     ) {
         return rgbhsva(labelPos, labelText,
-                Constants.RGBA_SCALE, ColorMath.LastHSVEdit.NONE,
+                Constants.RGBA_SCALE, LastHSVEdit.NONE,
                 fCMod, componentGetter);
     }
 
     private static ColorComponent rgbhsva(
             final Coord2D labelPos, final String labelText,
-            final int scaleMax, final ColorMath.LastHSVEdit lastEdit,
+            final int scaleMax, final LastHSVEdit lastEdit,
             final BiFunction<Integer, Color, Color> fCMod,
             final Function<Color, Integer> componentGetter
     ) {
@@ -112,7 +134,7 @@ public class ColorComponent extends MenuElementContainer {
 
         // value
         final int elementWidthAllowance =
-                Layout.getColorsWidth() - (2 * Layout.CONTENT_BUFFER_PX),
+                Layout.COLOR_COMP_W_ALLOWANCE - (2 * Layout.CONTENT_BUFFER_PX),
                 valueX = labelPos.x + elementWidthAllowance;
         mb.add(DynamicLabel.make(new Coord2D(valueX, labelPos.y),
                 Anchor.RIGHT_TOP, () -> String.valueOf(getter.get()),

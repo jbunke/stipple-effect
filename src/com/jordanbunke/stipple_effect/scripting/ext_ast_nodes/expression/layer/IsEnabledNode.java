@@ -18,7 +18,7 @@ public final class IsEnabledNode extends LayerExpressionNode {
 
     @Override
     public Boolean evaluate(final SymbolTable symbolTable) {
-        return evalLayer(symbolTable).isEnabled();
+        return layerRep(symbolTable).get().isEnabled();
     }
 
     @Override

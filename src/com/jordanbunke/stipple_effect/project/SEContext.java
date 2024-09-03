@@ -7,9 +7,10 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.function.HeadFuncNode;
 import com.jordanbunke.delta_time.utility.DeltaTimeGlobal;
 import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.delta_time.utility.math.Pair;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.layer.LayerHelper;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteLoader;
@@ -39,11 +40,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
+import static com.jordanbunke.stipple_effect.project.RenderInfo.*;
 
 public class SEContext {
-    private static final int TL = 0, BR = 1, DIM = 2, TRP = 3, BOUNDS = 4;
-
-    public final ProjectInfo projectInfo;
+    private SaveConfig saveConfig;
     public final StateManager stateManager;
     public final RenderInfo renderInfo;
     public final PlaybackInfo playbackInfo;
@@ -66,7 +66,7 @@ public class SEContext {
             final Path filepath, final ProjectState projectState,
             final int imageWidth, final int imageHeight
     ) {
-        projectInfo = new ProjectInfo(this, filepath);
+        saveConfig = SaveConfig.fromFilepath(filepath);
         stateManager = new StateManager(projectState);
         renderInfo = new RenderInfo(imageWidth, imageHeight);
         playbackInfo = new PlaybackInfo();
@@ -87,38 +87,6 @@ public class SEContext {
         selectionOverlay.updateTL(getState().getSelection());
     }
 
-    private Coord2D[] getImageRenderBounds(
-            final Coord2D render, final int w, final int h, final float z
-    ) {
-        final int ww = Layout.getWorkspaceWidth(),
-                wh = Layout.getWorkspaceHeight();
-        final Coord2D[] bounds = new Coord2D[BOUNDS];
-
-        if (render.x > ww || render.y > wh ||
-                render.x + (int)(w * z) <= 0 ||
-                render.y + (int)(h * z) <= 0)
-            return new Coord2D[] {};
-
-        final int tlx, tly, brx, bry;
-
-        final float modX = render.x % z, modY = render.y % z;
-
-        tlx = Math.max((int)(-render.x / z), 0);
-        tly = Math.max((int)(-render.y / z), 0);
-        brx = Math.min((int)((ww - render.x) / z) + 1, w);
-        bry = Math.min((int)((wh - render.y) / z) + 1, h);
-
-        bounds[TL] = new Coord2D(tlx, tly);
-        bounds[BR] = new Coord2D(brx, bry);
-        bounds[DIM] = new Coord2D(brx - tlx, bry - tly);
-        bounds[TRP] = new Coord2D(
-                tlx == 0 ? render.x : (int) modX,
-                tly == 0 ? render.y : (int) modY
-        );
-
-        return bounds;
-    }
-
     public GameImage drawWorkspace() {
         final int ww = Layout.getWorkspaceWidth(),
                 wh = Layout.getWorkspaceHeight();
@@ -126,15 +94,14 @@ public class SEContext {
         final GameImage workspace = new GameImage(ww, wh);
 
         // background
-        workspace.fillRectangle(
-                Settings.getTheme().workspaceBackground, 0, 0, ww, wh);
+        workspace.fill(Settings.getTheme().workspaceBackground);
 
         // math
         final float zoomFactor = renderInfo.getZoomFactor();
         final Coord2D render = getImageRenderPositionInWorkspace();
         final int w = getState().getImageWidth(),
                 h = getState().getImageHeight();
-        final Coord2D[] bounds = getImageRenderBounds(render, w, h, zoomFactor);
+        final Coord2D[] bounds = renderBounds(render, w, h, zoomFactor);
 
         if (bounds.length == BOUNDS) {
             // transparency checkerboard
@@ -356,7 +323,7 @@ public class SEContext {
                     if (mse.isProcessed())
                         continue;
 
-                    if (StippleEffect.get().getTool() instanceof BreadthTool bt) {
+                    if (StippleEffect.get().getTool() instanceof ToolWithBreadth bt) {
                         mse.markAsProcessed();
 
                         final int cs = Settings.getScrollClicks(
@@ -419,7 +386,7 @@ public class SEContext {
         // current layer
         LAYER_SETTINGS.doForMatchingKeyStroke(eventLogger, this);
         TOGGLE_LAYER_LINKING.doForMatchingKeyStroke(eventLogger, this);
-        CYCLE_LAYER_ONION_SKIN_MODE.doForMatchingKeyStroke(eventLogger, this);
+        TOGGLE_ONION_SKIN.doForMatchingKeyStroke(eventLogger, this);
 
         // layer navigation
         LAYER_ABOVE.doForMatchingKeyStroke(eventLogger, this);
@@ -552,7 +519,7 @@ public class SEContext {
 
         if (KeyShortcut.areModKeysPressed(false, false, eventLogger)) {
             // tool modifications
-            if (tool instanceof BreadthTool bt) {
+            if (tool instanceof ToolWithBreadth bt) {
                 eventLogger.checkForMatchingKeyStroke(
                         GameKeyEvent.newKeyStroke(Key.LEFT_ARROW, GameKeyEvent.Action.PRESS),
                         bt::decreaseBreadth);
@@ -712,13 +679,8 @@ public class SEContext {
     }
 
     private Coord2D getImageRenderPositionInWorkspace() {
-        final float zoomFactor = renderInfo.getZoomFactor();
-        final Coord2D anchor = renderInfo.getAnchor(),
-                middle = new Coord2D(Layout.getWorkspaceWidth() / 2,
-                        Layout.getWorkspaceHeight() / 2);
-
-        return new Coord2D(middle.x - (int)(zoomFactor * anchor.x),
-                middle.y - (int)(zoomFactor * anchor.y));
+        return renderInfo.localRenderPosition(
+                Layout.getWorkspaceWidth(), Layout.getWorkspaceHeight());
     }
 
     public void redrawCanvasAuxiliaries() {
@@ -846,7 +808,7 @@ public class SEContext {
     }
 
     public void stitchOrSplit() {
-        if (getState().getFrameCount() > 1)
+        if (isAnimation())
             DialogAssembly.setDialogToStitchFramesTogether();
         else
             DialogAssembly.setDialogToSplitCanvasIntoFrames();
@@ -979,7 +941,43 @@ public class SEContext {
         final SELayer layer = layers.get(layerIndex);
 
         PaletteLoader.addPaletteColorsFromImage(
-                layer.getFrame(frameIndex), colors, selection);
+                layer.getCel(frameIndex), colors, selection);
+    }
+
+    // generate time lapse
+    public void generateTimeLapse() {
+        final List<ProjectState> states = stateManager.getStatesForTimeLapse();
+
+        final Pair<Integer, Integer> maxDims = states.stream()
+                .map(s -> new Pair<>(s.getImageWidth(), s.getImageHeight()))
+                .reduce(new Pair<>(1, 1), (q, r) ->
+                        new Pair<>(Math.max(q.a(), r.a()),
+                                Math.max(q.b(), r.b())));
+        final int w = maxDims.a(), h = maxDims.b();
+
+        final List<GameImage> snapshots = new ArrayList<>();
+
+        for (ProjectState s : states) {
+            final GameImage snapshot = new GameImage(w, h),
+                    content = s.draw(false, false, 0);
+
+            final int x = (w - content.getWidth()) / 2,
+                    y = (h - content.getHeight()) / 2;
+
+            snapshot.draw(content, x, y);
+
+            snapshots.add(snapshot.submit());
+        }
+
+        final ProjectState res = ProjectState.makeFromRasterFile(w, h,
+                new SELayer(snapshots, new GameImage(w, h), Constants.OPAQUE,
+                        true, false, false, OnionSkin.trivial(),
+                        Constants.TIME_LAPSE), snapshots.size());
+        final SEContext timeLapse = new SEContext(null, res, w, h);
+        timeLapse.saveConfig.setName(Constants.TIME_LAPSE + " of " +
+                saveConfig.getFormattedName(false, true));
+
+        StippleEffect.get().addContext(timeLapse, true);
     }
 
     // previewed state changes - not state changes in and of themselves
@@ -1027,19 +1025,18 @@ public class SEContext {
 
         try {
             return switch (scope) {
-                // case SELECTION -> runCAOnSelection(internal, map);
-                case CEL -> runCAOnFrame(internal, map, state,
+                case CEL -> runCAOnCel(internal, map, state,
                         state.getFrameIndex(), state.getLayerEditIndex(), selection);
                 case LAYER -> {
-                    if (state.getEditingLayer().areFramesLinked()) {
-                        yield runCAOnFrame(internal, map, state,
+                    if (state.getEditingLayer().areCelsLinked()) {
+                        yield runCAOnCel(internal, map, state,
                                 state.getFrameIndex(),
                                 state.getLayerEditIndex(), selection);
                     } else {
                         final int frameCount = state.getFrameCount();
 
                         for (int i = 0; i < frameCount; i++)
-                            state = runCAOnFrame(internal, map, state,
+                            state = runCAOnCel(internal, map, state,
                                     i, state.getLayerEditIndex(), selection);
 
                         yield state;
@@ -1051,7 +1048,7 @@ public class SEContext {
                     for (int i = 0; i < layerCount; i++)
                         if (includeDisabledLayers ||
                                 state.getLayers().get(i).isEnabled())
-                            state = runCAOnFrame(internal, map, state,
+                            state = runCAOnCel(internal, map, state,
                                     state.getFrameIndex(), i, selection);
 
                     yield state;
@@ -1065,12 +1062,12 @@ public class SEContext {
                                 state.getLayers().get(l).isEnabled()))
                             continue;
 
-                        if (state.getLayers().get(l).areFramesLinked()) {
-                            state = runCAOnFrame(internal, map, state,
+                        if (state.getLayers().get(l).areCelsLinked()) {
+                            state = runCAOnCel(internal, map, state,
                                     state.getFrameIndex(), l, selection);
                         } else {
                             for (int f = 0; f < frameCount; f++)
-                                state = runCAOnFrame(internal, map,
+                                state = runCAOnCel(internal, map,
                                         state, f, l, selection);
                         }
                     }
@@ -1083,7 +1080,7 @@ public class SEContext {
         }
     }
 
-    private ProjectState runCAOnFrame(
+    private ProjectState runCAOnCel(
             final Function<Color, Color> internal,
             final Map<Color, Color> map,
             final ProjectState state,
@@ -1093,11 +1090,11 @@ public class SEContext {
         final List<SELayer> layers = new ArrayList<>(state.getLayers());
         final SELayer layer = layers.get(layerIndex);
 
-        final GameImage source = layer.getFrame(frameIndex),
+        final GameImage source = layer.getCel(frameIndex),
                 edit = ColorMath.algo(internal, map, source, selection);
 
         final SELayer replacement =
-                layer.returnFrameReplaced(edit, frameIndex);
+                layer.returnCelReplaced(edit, frameIndex);
         layers.set(layerIndex, replacement);
 
         return state.changeLayers(layers).changeIsCheckpoint(false);
@@ -1318,7 +1315,7 @@ public class SEContext {
                 for (int f = 0; f < cels.frameRange; f++) {
                     final int fi = frameIndex + f;
 
-                    layer = layer.returnFrameReplaced(cels.getCel(l, f), fi);
+                    layer = layer.returnCelReplaced(cels.getCel(l, f), fi);
                 }
 
                 layers.set(li, layer);
@@ -1340,7 +1337,7 @@ public class SEContext {
         if (!selection.hasSelection())
             selection = Selection.allInBounds(w, h);
 
-        final GameImage canvas = getState().getActiveLayerFrame();
+        final GameImage canvas = getState().getActiveCel();
         final SelectionContents selectionContents =
                 SelectionContents.make(canvas, selection);
 
@@ -1416,7 +1413,7 @@ public class SEContext {
                 SELayer layer = layers.get(l);
 
                 for (int f = fMin; f <= fMax; f++)
-                    layer = layer.returnFrameReplaced(replacement, f);
+                    layer = layer.returnCelReplaced(replacement, f);
 
                 layers.set(l, layer);
             }
@@ -1887,21 +1884,21 @@ public class SEContext {
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size()) {
-            if (layers.get(layerIndex).areFramesLinked())
-                unlinkFramesInLayer(layerIndex);
+            if (layers.get(layerIndex).areCelsLinked())
+                unlinkCelsInLayer(layerIndex);
             else
-                linkFramesInLayer(layerIndex);
+                linkCelsInLayer(layerIndex);
         }
     }
 
     // unlink frames in layer
-    public void unlinkFramesInLayer(final int layerIndex) {
+    public void unlinkCelsInLayer(final int layerIndex) {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
-                layers.get(layerIndex).areFramesLinked()) {
-            final SELayer layer = layers.get(layerIndex).returnUnlinkedFrames();
+                layers.get(layerIndex).areCelsLinked()) {
+            final SELayer layer = layers.get(layerIndex).returnUnlinkedCels();
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
@@ -1914,15 +1911,14 @@ public class SEContext {
     }
 
     // link frames in layer
-    public void linkFramesInLayer(final int layerIndex) {
+    public void linkCelsInLayer(final int layerIndex) {
         final List<SELayer> layers = new ArrayList<>(getState().getLayers());
 
         // pre-check
         if (layerIndex >= 0 && layerIndex < layers.size() &&
-                !layers.get(layerIndex).areFramesLinked()) {
-            final SELayer layer = layers.get(layerIndex).returnLinkedFrames(
+                !layers.get(layerIndex).areCelsLinked()) {
+            final SELayer layer = layers.get(layerIndex).returnLinkedCels(
                     getState().getFrameIndex());
-            layer.setOnionSkinMode(OnionSkinMode.NONE);
             layers.set(layerIndex, layer);
 
             final ProjectState result = getState().changeLayers(layers);
@@ -1985,6 +1981,21 @@ public class SEContext {
 
             final ProjectState result = getState().changeLayers(layers);
             stateManager.performAction(result, Operation.CHANGE_LAYER_NAME);
+        }
+    }
+
+    // change layer onion skin
+    public void changeLayerOnionSkin(final OnionSkin onionSkin, final int layerIndex) {
+        final List<SELayer> layers = new ArrayList<>(getState().getLayers());
+
+        // pre-check
+        if (layerIndex >= 0 && layerIndex < layers.size()) {
+            final SELayer layer = layers.get(layerIndex)
+                    .returnChangedOnionSkin(onionSkin);
+            layers.set(layerIndex, layer);
+
+            final ProjectState result = getState().changeLayers(layers);
+            stateManager.performAction(result, Operation.CHANGE_ONION_SKIN);
         }
     }
 
@@ -2183,7 +2194,7 @@ public class SEContext {
                 frames.add(getState().draw(false, false, i));
 
             final SELayer flattened = new SELayer(frames, frames.get(0),
-                    Constants.OPAQUE, true, false, OnionSkinMode.NONE,
+                    Constants.OPAQUE, true, false, false, OnionSkin.trivial(),
                     Constants.FLATTENED_LAYER_NAME);
             final ProjectState result = getState().changeLayers(
                     new ArrayList<>(List.of(flattened)), 0);
@@ -2204,6 +2215,10 @@ public class SEContext {
 
     public boolean isInWorkspaceBounds() {
         return inWorkspaceBounds;
+    }
+
+    public boolean isAnimation() {
+        return getState().getFrameCount() > 1;
     }
 
     public Coord2D getTargetPixel() {
@@ -2238,5 +2253,14 @@ public class SEContext {
 
     public GameImage getCheckerboard() {
         return checkerboard;
+    }
+
+    public SaveConfig getSaveConfig() {
+        return saveConfig;
+    }
+
+    // SETTERS
+    public void setSaveConfig(final SaveConfig saveConfig) {
+        this.saveConfig = saveConfig;
     }
 }

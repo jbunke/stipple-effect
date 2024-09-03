@@ -1,20 +1,48 @@
-Stipple Effect allows for users to write scripts that fall into one of three categories:
+Stipple Effect scripts fall into the following categories:
 
 > Automation scripts
 > Preview scripts
 > Color scripts
+> Child scripts
 
-{Automation scripts} are scripts that are called from the main editor window that run a series of
-program actions automatically. For example, a script can be written that reverses the frames in a
-project. The full list of Stipple Effect program actions that can be executed via script are outlined
-in the {scripting API} (abstract programming interface).
+{Automation scripts} are scripts that run a series of program actions automatically. For example,
+a script can be written that reverses the frames in a project. The full list of Stipple Effect
+program actions that can be executed via script are outlined in the {scripting API}.
 
-{Preview scripts} allow for the alteration of the contents of the preview window. By default, the
-preview window merely previews the contents of the project as they are. This can already be used in
-a variety of ways, but it is made exponentially more powerful with scripting.
+Type signature for automation scripts: {()} - (no parameters and void return)
 
-{Color scripts} transform an input color into a different color. They are useful for defining complex
-transformation behaviours.
+{Preview scripts} allow for creation of complex custom previews by transforming the flattened contents
+of the project that acts as input into original output. Since preview scripts are essentially a
+{mapping}, the contents of the preview window will change dynamically as the project that defines its
+input is modified, without having to reload the script.
 
-Stipple Effect scripts are written in an extension dialect of my scripting language {DeltaScript}.
+Valid type signatures for preview scripts:
+> {(image -> image)}
+> {(image[] -> image)}
+> {(image[] -> image[])}
+> {(image -> image[])} - (only valid for projects with a single frame)
+
+{Color scripts} transform an input color into an output color. They can be run independently and
+applied to a certain {scope} of the active project, or they can be used to power the {Script Brush}.
+
+Type signature for color scripts: {(color -> color)}
+
+{Child scripts} are merely scripts that are run from within another script. Child scripts can have
+any type signature, but will trigger a runtime error if they are passed arguments that do not match
+the types of the parameters of their {header function}.
+
+You may run scripts from within any script, but it is recommended {NOT to run child scripts from}
+{within preview or color scripts} for the sake of performance. Also in the interest of performance,
+it is optimal to declare any child scripts used in a script as {final} (also {~}) {script} variables
+outside any loops. This way, the child script will only be loaded once per its parent script's
+execution.
+
+Stipple Effect scripts are written in an extension dialect of {DeltaScript} designed specifically for
+the program. DeltaScript is a lightweight, skeletal scripting language that I designed to be extended
+for the easy design of {domain-specific languages} interpreted to Java. It has a very simple syntax
+and will feel familiar to anyone with programming experience in languages such as C, C++, C#, Java
+and JavaScript.
+
 Script files can be written in the text editor of your choosing and use the file extension {.ses}.
+However, {VS Code} is recommended, as the official syntax highlighting extension for Stipple Effect
+scripting is only available for VS Code.

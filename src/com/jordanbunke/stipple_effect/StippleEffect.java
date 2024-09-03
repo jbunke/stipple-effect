@@ -22,11 +22,13 @@ import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.delta_time.utility.math.MathPlus;
 import com.jordanbunke.delta_time.window.GameWindow;
-import com.jordanbunke.stipple_effect.layer.OnionSkinMode;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.preview.EmbeddedPreview;
+import com.jordanbunke.stipple_effect.preview.Preview;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.SEInterpreter;
 import com.jordanbunke.stipple_effect.state.ProjectState;
 import com.jordanbunke.stipple_effect.stip.ParserSerializer;
@@ -51,6 +53,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.stream.Stream;
 
 import static com.jordanbunke.stipple_effect.utility.action.SEAction.*;
 
@@ -372,19 +375,34 @@ public class StippleEffect implements ProgramContext {
             if (!Permissions.isTyping())
                 processNonStateKeyPresses(eventLogger);
 
-            // projects
-            projectsMenu.process(eventLogger);
-            // colors
-            colorsMenu.process(eventLogger);
-            // tools
-            toolButtonMenu.process(eventLogger);
-            // flipbook
-            flipbookMenu.process(eventLogger);
-            // bottom bar
-            bottomBarMenu.process(eventLogger);
+            final boolean doBehindPreview;
 
-            // workspace
-            getContext().process(eventLogger);
+            if (Preview.get() instanceof EmbeddedPreview ep) {
+                if (ep.inBounds(mousePos)) {
+                    ep.process(eventLogger);
+                    doBehindPreview = false;
+                } else {
+                    ep.processExternal(eventLogger);
+                    doBehindPreview = true;
+                }
+            } else
+                doBehindPreview = true;
+
+            if (doBehindPreview) {
+                // projects
+                projectsMenu.process(eventLogger);
+                // colors
+                colorsMenu.process(eventLogger);
+                // tools
+                toolButtonMenu.process(eventLogger);
+                // flipbook
+                flipbookMenu.process(eventLogger);
+                // bottom bar
+                bottomBarMenu.process(eventLogger);
+
+                // workspace
+                getContext().process(eventLogger);
+            }
         } else {
             dialog.process(eventLogger);
             CLEAR_DIALOG.doForMatchingKeyStroke(eventLogger, null);
@@ -469,6 +487,10 @@ public class StippleEffect implements ProgramContext {
             projectsMenu.update(deltaTime);
             // flipbook
             flipbookMenu.update(deltaTime);
+
+            // preview
+            if (Preview.get() instanceof EmbeddedPreview ep)
+                ep.update(deltaTime);
         } else {
             dialog.update(deltaTime);
         }
@@ -593,6 +615,10 @@ public class StippleEffect implements ProgramContext {
         // projects / contexts
         projectsMenu.render(canvas);
 
+        // preview
+        if (Preview.get() instanceof EmbeddedPreview ep)
+            ep.render(canvas);
+
         if (dialog != null) {
             canvas.fillRectangle(Settings.getTheme().dialogVeil,
                     0, 0, Layout.width(), Layout.height());
@@ -623,9 +649,7 @@ public class StippleEffect implements ProgramContext {
     }
 
     @Override
-    public void debugRender(final GameImage canvas, final GameDebugger debugger) {
-
-    }
+    public void debugRender(final GameImage canvas, final GameDebugger debugger) {}
 
     private GameImage drawColorsSegment() {
         return drawPanel(Layout.getColorsWidth(),
@@ -731,16 +755,14 @@ public class StippleEffect implements ProgramContext {
 
     public void openProject() {
         FileIO.setDialogToFilesOnly();
+        final String[] acceptedFileTypes = Stream.concat(
+                Stream.of(SaveConfig.SaveType.NATIVE.getFileSuffix()),
+                Arrays.stream(Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES)
+        ).toArray(String[]::new);
+
         final Optional<File[]> opened = FileIO.openFilesFromSystem(
-                new String[] {
-                        PROGRAM_NAME + " projects (." + ProjectInfo.SaveType
-                                .NATIVE.getFileSuffix() + ")",
-                        "Accepted image types"
-                },
-                new String[][] {
-                        new String[] { ProjectInfo.SaveType.NATIVE.getFileSuffix() },
-                        Constants.ACCEPTED_RASTER_IMAGE_SUFFIXES
-                });
+                new String[] { "Accepted file types" },
+                new String[][] { acceptedFileTypes });
         window.getEventLogger().unpressAllKeys();
 
         if (opened.isEmpty())
@@ -799,7 +821,7 @@ public class StippleEffect implements ProgramContext {
             return;
 
         final String content = FileIO.readFile(filepath);
-        SEInterpreter.get().runAutomationScript(content);
+        SEInterpreter.get().runAutomationScript(content, filepath);
     }
 
     public void openColorScript() {
@@ -834,7 +856,7 @@ public class StippleEffect implements ProgramContext {
     private void verifyFilepath(final Path filepath) {
         final String fileName = filepath.getFileName().toString();
 
-        if (fileName.endsWith(ProjectInfo.SaveType.NATIVE.getFileSuffix())) {
+        if (fileName.endsWith(SaveConfig.SaveType.NATIVE.getFileSuffix())) {
             final String contents = FileIO.readFile(filepath);
             openNativeProject(contents, filepath);
 
@@ -903,7 +925,7 @@ public class StippleEffect implements ProgramContext {
 
         final SELayer firstLayer = new SELayer(frames,
                 new GameImage(fw, fh), Constants.OPAQUE, true, false,
-                OnionSkinMode.NONE, Constants.BASE_LAYER_NAME);
+                false, OnionSkin.trivial(), Constants.BASE_LAYER_NAME);
         final ProjectState initialState = ProjectState.makeFromRasterFile(
                 fw, fh, firstLayer, frameCount);
 
@@ -922,9 +944,9 @@ public class StippleEffect implements ProgramContext {
 
     public void addContext(final SEContext context, final boolean setActive) {
         // close unmodified untitled project
-        if (contexts.size() == 1 && !contexts.get(0).projectInfo
+        if (contexts.size() == 1 && !contexts.get(0).getSaveConfig()
                 .hasUnsavedChanges() &&
-                !contexts.get(0).projectInfo.hasSaveAssociation()) {
+                !contexts.get(0).getSaveConfig().hasSaveAssociation()) {
             contexts.get(0).releasePixelGrid();
             contexts.remove(0);
         }
@@ -1206,6 +1228,17 @@ public class StippleEffect implements ProgramContext {
 
         // redraw everything
         rebuildAllMenus();
+
+        final Preview p = Preview.get();
+
+        if (p instanceof EmbeddedPreview ep && !Settings.isSeparatedPreview())
+            ep.refresh();
+        else if (p != null) {
+            Preview.set(p.c);
+            Preview.get().copyState(p);
+        }
+
+        window.focus();
     }
 
     public void autoAssignPickUpSelection() {

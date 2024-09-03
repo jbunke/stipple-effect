@@ -4,14 +4,14 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorComponent;
 
 public enum SamplerMode {
-    RGB_SLIDERS, HSV_SLIDERS, SAT_VAL_MATRIX, COLOR_WHEEL;
+    RGB_SLIDERS, HSV_SLIDERS, SV_MATRIX, COLOR_WHEEL;
 
     @Override
     public String toString() {
         return switch (this) {
-            case RGB_SLIDERS -> "RGB-A sliders";
-            case HSV_SLIDERS -> "HSV-A sliders";
-            case SAT_VAL_MATRIX -> "Sat. - value matrix";
+            case RGB_SLIDERS -> "RGB sliders";
+            case HSV_SLIDERS -> "HSV sliders";
+            case SV_MATRIX -> "SV matrix";
             case COLOR_WHEEL -> "Color wheel";
         };
     }

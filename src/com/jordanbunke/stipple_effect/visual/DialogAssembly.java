@@ -21,12 +21,13 @@ import com.jordanbunke.delta_time.utility.math.Bounds2D;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.funke.core.ConcreteProperty;
 import com.jordanbunke.stipple_effect.StippleEffect;
+import com.jordanbunke.stipple_effect.layer.OnionSkin;
 import com.jordanbunke.stipple_effect.layer.SELayer;
 import com.jordanbunke.stipple_effect.palette.Palette;
 import com.jordanbunke.stipple_effect.palette.PaletteSorter;
 import com.jordanbunke.stipple_effect.project.PlaybackInfo;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.selection.*;
 import com.jordanbunke.stipple_effect.state.Operation;
 import com.jordanbunke.stipple_effect.state.ProjectState;
@@ -40,6 +41,7 @@ import com.jordanbunke.stipple_effect.utility.math.StitchSplitMath;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
 import com.jordanbunke.stipple_effect.visual.menu_elements.Checkbox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.*;
+import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorComponent;
 import com.jordanbunke.stipple_effect.visual.menu_elements.dialog.*;
 import com.jordanbunke.stipple_effect.visual.menu_elements.scrollable.VerticalScrollBox;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.DynamicTextButton;
@@ -49,11 +51,8 @@ import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 import com.jordanbunke.stipple_effect.visual.theme.logic.ThemeLogic;
 
-import static com.jordanbunke.stipple_effect.utility.Layout.*;
-
 import java.awt.*;
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.*;
@@ -63,78 +62,79 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.jordanbunke.stipple_effect.utility.Layout.*;
+
 public class DialogAssembly {
     private static final int LINE_ABOVE = -2, AFTER_COMMON_COLOR_ACTION_ROW = 4;
 
     public static void setDialogToSave(final SEContext c) {
+        final SaveConfig sc = c.getSaveConfig();
+
         // preprocessing logic
         // ensure frame bounds validity
-        c.projectInfo.setLowerBound(
-                c.projectInfo.isSaveRangeOfFrames()
-                        ? c.projectInfo.getLowerBound() : 0);
-        c.projectInfo.setUpperBound(
-                c.projectInfo.isSaveRangeOfFrames()
-                        ? c.projectInfo.getUpperBound()
-                        : c.getState().getFrameCount() - 1);
+        sc.setLowerBound(sc.isSaveRangeOfFrames()
+                ? sc.getLowerBound() : 0, c);
+        sc.setUpperBound(sc.isSaveRangeOfFrames()
+                ? sc.getUpperBound() : c.getState().getFrameCount() - 1, c);
 
         final MenuBuilder mb = new MenuBuilder();
 
         // text labels
         final TextLabel
-                folderLabel = makeDialogLeftLabel(0, "Folder:"),
+                folderLabel = makeDialogLeftLabel(0, "Folder"),
                 nameLabel = TextLabel.make(textBelowPos(folderLabel),
-                        "File name:"),
+                        "File name"),
                 saveAsTypeLabel = TextLabel.make(textBelowPos(nameLabel),
-                        "Save as:"),
+                        "Save as"),
                 scaleUpLabel = TextLabel.make(textBelowPos(saveAsTypeLabel),
-                        "Scale factor:"),
+                        "Scale factor"),
                 frameBoundsLabel = TextLabel.make(textBelowPos(scaleUpLabel),
                         "Save limited range of frames?"),
                 lowerBoundsLabel = TextLabel.make(textBelowPos(frameBoundsLabel),
-                        "Lower bound:"),
+                        "Lower bound"),
                 upperBoundsLabel = makeDialogRightLabel(
-                        lowerBoundsLabel, "Upper bound:");
+                        lowerBoundsLabel, "Upper bound");
         mb.addAll(folderLabel, nameLabel, saveAsTypeLabel);
 
         final TextLabel indexPrefixLabel = TextLabel.make(
                         textBelowPos(lowerBoundsLabel, 1),
-                        "Prefix:"),
-                indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix:"),
+                        "Prefix"),
+                indexSuffixLabel = makeDialogRightLabel(indexPrefixLabel, "Suffix"),
                 countFromLabel = TextLabel.make(textBelowPos(indexPrefixLabel),
-                        "Count from:"),
+                        "Count from"),
                 fpsLabel = TextLabel.make(
                         textBelowPos(lowerBoundsLabel, 1),
-                        "Frame rate:");
+                        "Frame rate");
 
         // folder selection button
         final DynamicTextButton folderButton = makeFolderSelectionButton(
-                folderLabel, c.projectInfo::getFolder, c.projectInfo::setFolder);
+                folderLabel, sc::getFolder, sc::setFolder);
         mb.add(folderButton);
 
         // name text box
         final Textbox nameTextbox = makeDialogNameTextBox(nameLabel,
-                c.projectInfo.getName(), c.projectInfo::setName);
+                sc.getName(), sc::setName);
         mb.add(nameTextbox);
 
         // save as type dropdown
-        final ProjectInfo.SaveType[] saveOptions = c.projectInfo.getSaveOptions();
+        final SaveConfig.SaveType[] saveOptions = SaveConfig.getSaveOptions(c);
         final Dropdown saveAsTypeDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(saveAsTypeLabel),
                 DIALOG_CONTENT_BIG_W_ALLOWANCE,
                 Arrays.stream(saveOptions)
-                        .map(st -> st.getButtonText(c.projectInfo))
+                        .map(st -> st.getButtonText(c))
                         .toArray(String[]::new),
                 Arrays.stream(saveOptions)
                         .map(type -> (Runnable)
-                                () -> c.projectInfo.setSaveType(type))
+                                () -> sc.setSaveType(type))
                         .toArray(Runnable[]::new), () -> {
-                    final ProjectInfo.SaveType saveType = c.projectInfo.getSaveType();
+                    final SaveConfig.SaveType saveType = sc.getSaveType();
 
                     for (int i = 0; i < saveOptions.length; i++)
                         if (saveType == saveOptions[i])
                             return i;
 
-                    c.projectInfo.setSaveType(saveOptions[0]);
+                    sc.setSaveType(saveOptions[0]);
                     return 0;
                 });
         mb.add(saveAsTypeDropdown);
@@ -146,63 +146,61 @@ public class DialogAssembly {
                                 DIALOG_CONTENT_COMP_OFFSET_Y,
                         scaleUpLabel.getY(), 1,
                         Constants.MIN_SCALE_UP, Constants.MAX_SCALE_UP,
-                        c.projectInfo::setScaleUp, c.projectInfo::getScaleUp,
+                        sc::setScaleUp, sc::getScaleUp,
                         i -> i, i -> i, i -> i + "x", "XXx");
         final GatewayMenuElement scaleUpGateway = new GatewayMenuElement(
                 new MenuElementGrouping(scaleUpLabel,
                         scaleUp.decButton, scaleUp.incButton,
                         scaleUp.slider, scaleUp.value),
-                () -> !c.projectInfo.getSaveType()
-                        .equals(ProjectInfo.SaveType.NATIVE));
+                () -> !sc.getSaveType().equals(SaveConfig.SaveType.NATIVE));
         mb.add(scaleUpGateway);
 
         // frame bounds: (only save from frame A to B)
         final Supplier<Boolean> frameBoundsCondition =
-                () -> c.projectInfo.isAnimation() &&
-                        !c.projectInfo.getSaveType()
-                                .equals(ProjectInfo.SaveType.NATIVE);
+                () -> c.isAnimation() &&
+                        !sc.getSaveType().equals(SaveConfig.SaveType.NATIVE);
         final Checkbox frameBoundsCheckbox = new Checkbox(
                 contentPositionAfterLabel(frameBoundsLabel),
                 new ConcreteProperty<>(
-                        c.projectInfo::isSaveRangeOfFrames,
-                        c.projectInfo::setSaveRangeOfFrames));
+                        sc::isSaveRangeOfFrames,
+                        sc::setSaveRangeOfFrames));
         final String FRAME_NUM_PREFIX = "Frm. ";
         final DynamicTextbox lowerBoundTextbox =
                 makeDialogNumericalDynamicTextbox(lowerBoundsLabel,
                         Layout::contentPositionAfterLabel,
-                        FRAME_NUM_PREFIX, c.projectInfo.getLowerBound() + 1,
+                        FRAME_NUM_PREFIX, sc.getLowerBound() + 1,
                         "", tbv -> {
                     final int boundValue = tbv - 1;
 
                     final boolean inBounds = boundValue >= 0 &&
                             boundValue < c.getState().getFrameCount();
                     final boolean lowerThanUpper = boundValue <=
-                            c.projectInfo.getUpperBound();
+                            sc.getUpperBound();
 
                     return inBounds && lowerThanUpper;
-                    }, tbv -> c.projectInfo.setLowerBound(tbv - 1),
-                        () -> c.projectInfo.getLowerBound() + 1, 3),
+                    }, tbv -> sc.setLowerBound(tbv - 1, c),
+                        () -> sc.getLowerBound() + 1, 3),
                 upperBoundTextbox = makeDialogNumericalDynamicTextbox(
                         upperBoundsLabel,
                         Layout::contentPositionAfterLabel,
-                        FRAME_NUM_PREFIX, c.projectInfo.getUpperBound() + 1,
+                        FRAME_NUM_PREFIX, sc.getUpperBound() + 1,
                         "", tbv -> {
                             final int boundValue = tbv - 1;
 
                             final boolean inBounds = boundValue >= 0 &&
                                     boundValue < c.getState().getFrameCount();
                             final boolean higherThanLower = boundValue >=
-                                    c.projectInfo.getLowerBound();
+                                    sc.getLowerBound();
 
                             return inBounds && higherThanLower;
-                        }, tbv -> c.projectInfo.setUpperBound(tbv - 1),
-                        () -> c.projectInfo.getUpperBound() + 1, 3);
+                        }, tbv -> sc.setUpperBound(tbv - 1, c),
+                        () -> sc.getUpperBound() + 1, 3);
         final GatewayMenuElement nestedBoundsGateway = new GatewayMenuElement(
                 new MenuElementGrouping(
                         lowerBoundsLabel, lowerBoundTextbox,
                         upperBoundsLabel, upperBoundTextbox),
                 () -> frameBoundsCondition.get() &&
-                        c.projectInfo.isSaveRangeOfFrames()),
+                        sc.isSaveRangeOfFrames()),
                 frameBoundsGateway = new GatewayMenuElement(
                         new MenuElementGrouping(
                                 frameBoundsLabel, frameBoundsCheckbox,
@@ -222,8 +220,7 @@ public class DialogAssembly {
                 IncrementalRangeElements.makeForInt(fpsLabel,
                         fpsLabel.getY() + DIALOG_CONTENT_COMP_OFFSET_Y,
                         fpsLabel.getY(), 1, Constants.MIN_PLAYBACK_FPS,
-                        Constants.MAX_PLAYBACK_FPS,
-                        c.projectInfo::setFps, c.projectInfo::getFps,
+                        Constants.MAX_PLAYBACK_FPS, sc::setFps, sc::getFps,
                         i -> i, sv -> sv, i -> i + " FPS", "XXX FPS");
 
         // GIF and MP4 contents
@@ -234,20 +231,16 @@ public class DialogAssembly {
         // Extra file naming options IFF saveType is PNG_SEPARATE
         final DynamicTextbox indexPrefixTextbox =
                 makeDialogAffixDynamicTextbox(indexPrefixLabel,
-                        c.projectInfo::setIndexPrefix,
-                        c.projectInfo::getIndexPrefix),
+                        sc::setIndexPrefix, sc::getIndexPrefix),
                 indexSuffixTextbox =
                         makeDialogAffixDynamicTextbox(indexSuffixLabel,
-                                c.projectInfo::setIndexSuffix,
-                                c.projectInfo::getIndexSuffix);
+                                sc::setIndexSuffix, sc::getIndexSuffix);
         final Textbox countFromTextbox = makeDialogCustomTextBox(
                 countFromLabel, DIALOG_CONTENT_SMALL_W_ALLOWANCE,
-                Layout::contentPositionAfterLabel,
-                c.projectInfo::getIndexPrefix,
-                String.valueOf(c.projectInfo.getCountFrom()),
-                c.projectInfo::getIndexSuffix,
+                Layout::contentPositionAfterLabel, sc::getIndexPrefix,
+                String.valueOf(sc.getCountFrom()), sc::getIndexSuffix,
                 Textbox.getIntTextValidator(i -> true),
-                s -> c.projectInfo.setCountFrom(Integer.parseInt(s)), 4);
+                s -> sc.setCountFrom(Integer.parseInt(s)), 4);
 
         final MenuElementGrouping pngSeparateContents = new MenuElementGrouping(
                 indexPrefixLabel, indexPrefixTextbox,
@@ -256,8 +249,8 @@ public class DialogAssembly {
 
         // save type decision maker
         final ThinkingMenuElement basedOnSaveType = new ThinkingMenuElement(() ->
-                switch (c.projectInfo.getSaveType()) {
-                    case PNG_STITCHED -> c.getState().getFrameCount() > 1
+                switch (sc.getSaveType()) {
+                    case PNG_SHEET -> c.isAnimation()
                             ? pngStitchedContents : new PlaceholderMenuElement();
                     case PNG_SEPARATE -> pngSeparateContents;
                     case GIF, MP4 -> gifContents;
@@ -267,18 +260,17 @@ public class DialogAssembly {
 
         // dynamic label preview
         final DynamicLabel preview = makeDialogLeftDynamicLabelAtBottom(() -> {
-            if (c.projectInfo.getFolder() == null ||
-                    c.projectInfo.getName().equals(""))
+            if (!sc.hasSaveAssociation())
                 return "[ Select a folder and provide a name ]";
 
             final int PRINT_LETTERS = 64, ENDS = (PRINT_LETTERS / 2) - 1;
 
-            final boolean multipleFiles = c.projectInfo
-                    .getSaveType().equals(ProjectInfo.SaveType.PNG_SEPARATE);
+            final boolean multipleFiles = sc.getSaveType()
+                    .equals(SaveConfig.SaveType.PNG_SEPARATE);
 
             final Path filepath = multipleFiles
-                    ? c.projectInfo.buildFilepath(c.projectInfo.getCountFrom())
-                    : c.projectInfo.buildFilepath();
+                    ? sc.buildFilepath(sc.getCountFrom())
+                    : sc.buildFilepath();
 
             final String composed = filepath +
                             (multipleFiles ? " + others" : "");
@@ -295,8 +287,7 @@ public class DialogAssembly {
         final MenuElementGrouping contents = new MenuElementGrouping(
                 mb.build().getMenuElements());
         setDialog(assembleDialog("Save project...", contents,
-                c.projectInfo::hasSaveAssociation,
-                "Save", c.projectInfo::save, true));
+                sc::hasSaveAssociation, "Save", () -> sc.save(c), true));
     }
 
     public static void setDialogToResize(final SEContext c) {
@@ -330,7 +321,7 @@ public class DialogAssembly {
 
         final TextLabel resizeTypeLabel =
                 TextLabel.make(textBelowPos(preserveAspectRatioLabel),
-                        "Resize by:");
+                        "Resize by");
         final Dropdown resizeByDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(resizeTypeLabel),
                 EnumUtils.stream(DialogVals.ResizeBy.class)
@@ -345,7 +336,7 @@ public class DialogAssembly {
         // case 1: resize by scale and preserve aspect ratio
         final TextLabel universalScaleLabel = TextLabel.make(
                 textBelowPos(resizeTypeLabel, 1),
-                "Scale factor:");
+                "Scale factor");
         final Textbox universalScaleTextbox = makeDialogCustomTextBox(
                 universalScaleLabel, SMALL_TEXT_BOX_W,
                 Layout::contentPositionAfterLabel,
@@ -356,9 +347,9 @@ public class DialogAssembly {
         // case 2: resize by scale but aspect ratio is free
         final TextLabel scaleXLabel = TextLabel.make(
                 textBelowPos(resizeTypeLabel, 1),
-                "Scale factor (X):"),
+                "Scale factor (X)"),
                 scaleYLabel = makeDialogRightLabel(
-                        scaleXLabel, "Scale factor (Y):");
+                        scaleXLabel, "Scale factor (Y)");
         final Textbox scaleXTextbox = makeDialogCustomTextBox(
                 scaleXLabel, SMALL_TEXT_BOX_W,
                 Layout::contentPositionAfterLabel,
@@ -375,8 +366,8 @@ public class DialogAssembly {
         // case 3: resize by pixels
         final TextLabel widthLabel = TextLabel.make(
                 textBelowPos(resizeTypeLabel, 1),
-                "Width:"),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height:");
+                "Width"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height");
         final DynamicTextbox widthTextbox =
                 makeDialogPixelDynamicTextbox(widthLabel,
                         Layout::contentPositionAfterLabel,
@@ -439,11 +430,11 @@ public class DialogAssembly {
         // text labels
         final TextLabel
                 context = makeDialogLeftLabel(0, "Current size: " + w + "x" + h),
-                allLabel = TextLabel.make(textBelowPos(context, 1), "All:"),
-                leftLabel = TextLabel.make(textBelowPos(allLabel, 1), "Left:"),
-                rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right:"),
-                topLabel = TextLabel.make(textBelowPos(rightLabel), "Top:"),
-                bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom:"),
+                allLabel = TextLabel.make(textBelowPos(context, 1), "All"),
+                leftLabel = TextLabel.make(textBelowPos(allLabel, 1), "Left"),
+                rightLabel = TextLabel.make(textBelowPos(leftLabel), "Right"),
+                topLabel = TextLabel.make(textBelowPos(rightLabel), "Top"),
+                bottomLabel = TextLabel.make(textBelowPos(topLabel), "Bottom"),
                 explanation = makeValidDimensionsBottomLabel();
         mb.addAll(context, explanation, allLabel,
                 leftLabel, rightLabel, topLabel, bottomLabel);
@@ -623,7 +614,7 @@ public class DialogAssembly {
         // text labels
         final TextLabel context = makeDialogLeftLabel(0,
                 "Current size: " + w + "x" + h + (tooBig
-                        ? " ... must be split or downscaled" :""));
+                        ? " ... must be split or downscaled" : ""));
         mb.add(context);
 
         final TextLabel resizeLabel = TextLabel.make(
@@ -631,8 +622,8 @@ public class DialogAssembly {
                 preserveAspectRatioLabel = TextLabel.make(textBelowPos(
                         resizeLabel), "Preserve aspect ratio?"),
                 widthLabel = TextLabel.make(textBelowPos(
-                        preserveAspectRatioLabel), "Width:"),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height:");
+                        preserveAspectRatioLabel), "Width"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height");
         final Checkbox preserveAspectRatioCheckbox = new Checkbox(
                 contentPositionAfterLabel(preserveAspectRatioLabel),
                 new ConcreteProperty<>(
@@ -723,11 +714,11 @@ public class DialogAssembly {
 
         // text labels
         final TextLabel
-                presetLabel = makeDialogLeftLabel(0, "Size presets:"),
+                presetLabel = makeDialogLeftLabel(0, "Size presets"),
                 widthLabel = TextLabel.make(
                         textBelowPos(presetLabel, 1),
-                        "Width:"),
-                heightLabel = makeDialogRightLabel(widthLabel, "Height:"),
+                        "Width"),
+                heightLabel = makeDialogRightLabel(widthLabel, "Height"),
                 explanation = makeValidDimensionsBottomLabel();
 
         // preset buttons
@@ -872,7 +863,7 @@ public class DialogAssembly {
         mb.add(selectedLabel);
 
         setDialog(assembleDialog("History of \"" +
-                        c.projectInfo.getFormattedName(false, false) + "\"",
+                        c.getSaveConfig().getFormattedName(false, false) + "\"",
                 new MenuElementGrouping(mb.build().getMenuElements()),
                 precondition, "Revert...",
                 () -> setDialogToPreviewAction(
@@ -915,7 +906,7 @@ public class DialogAssembly {
         lines += 1 + LINE_BREAK;
 
         // name
-        final TextLabel nameLabel = makeDialogLeftLabel(lines, "Font name:");
+        final TextLabel nameLabel = makeDialogLeftLabel(lines, "Font name");
         final Textbox nameTextbox = makeDialogCustomTextBox(nameLabel,
                 LONG_NAME_TEXTBOX_W,
                 Layout::contentPositionAfterLabel,
@@ -926,7 +917,7 @@ public class DialogAssembly {
         lines++;
 
         // pixel spacing
-        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing:");
+        final TextLabel spacingLabel = makeDialogLeftLabel(lines, "Spacing");
         final Textbox spacingTextbox = makeDialogPixelDynamicTextbox(
                 spacingLabel, Layout::contentPositionAfterLabel,
                 Constants.MIN_FONT_PX_SPACING, Constants.MAX_FONT_PX_SPACING,
@@ -946,7 +937,7 @@ public class DialogAssembly {
 
         // ASCII
         final TextLabel asciiLabel = makeDialogLeftLabel(
-                lines, "ASCII source file:");
+                lines, "ASCII source file");
         final StaticTextButton asciiButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         contentPositionAfterLabel(asciiLabel),
@@ -966,7 +957,7 @@ public class DialogAssembly {
                 new ConcreteProperty<>(
                         DialogVals::hasLatinEx, DialogVals::setHasLatinEx));
         final TextLabel latinExLabel = makeDialogLeftLabel(
-                lines + 1, "Latin Extended source file:");
+                lines + 1, "Latin Extended source file");
         final StaticTextButton latinExButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         contentPositionAfterLabel(latinExLabel),
@@ -1059,7 +1050,7 @@ public class DialogAssembly {
 
     public static void setDialogToCloseProjectAYS(final int index) {
         setDialogToAYS("Close the project \"" + StippleEffect.get()
-                        .getContexts().get(index).projectInfo
+                        .getContexts().get(index).getSaveConfig()
                         .getFormattedName(false, true) + "\"?",
                 "All unsaved changes will be lost...",
                 () -> StippleEffect.get().removeContext(index));
@@ -1084,8 +1075,8 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         // labels
-        final TextLabel setAllLabel = makeDialogLeftLabel(0, "Set all edges:"),
-                presets = TextLabel.make(textBelowPos(setAllLabel), "Presets:"),
+        final TextLabel setAllLabel = makeDialogLeftLabel(0, "Set all edges"),
+                presets = TextLabel.make(textBelowPos(setAllLabel), "Presets"),
                 validity = TextLabel.make(textBelowPos(presets),
                         "Valid outline thickness can range from -" +
                                 Constants.MAX_OUTLINE_PX + " to " +
@@ -1147,7 +1138,7 @@ public class DialogAssembly {
         final MenuBuilder mb = new MenuBuilder();
 
         // presets: single & double
-        final TextLabel presets = makeDialogLeftLabel(0, "Presets:");
+        final TextLabel presets = makeDialogLeftLabel(0, "Presets");
         mb.add(presets);
 
         // buttons for panel arrangement presets
@@ -1183,7 +1174,7 @@ public class DialogAssembly {
 
             // panel label
             final TextLabel label = TextLabel.make(textBelowPos(presets, 1 + i),
-                    labelTexts[i] + ":");
+                    labelTexts[i]);
 
             // panel toggle
             final Consumer<Boolean>
@@ -1220,10 +1211,10 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel hueLabel = makeDialogLeftLabel(
-                AFTER_COMMON_COLOR_ACTION_ROW, "Shift hue:");
+                AFTER_COMMON_COLOR_ACTION_ROW, "Shift hue");
 
         final String T_SHIFT = "Shift ", T_SCALE = "Scale ",
-                T_SAT = "sat:", T_VAL = "value:";
+                T_SAT = "sat.", T_VAL = "value";
 
         final DynamicLabel satLabel = makeDynamicLabel(
                 textBelowPos(hueLabel),
@@ -1440,7 +1431,7 @@ public class DialogAssembly {
         makeCommonColorOperationElements(mb, c);
 
         final TextLabel scriptLabel = makeDialogLeftLabel(
-                AFTER_COMMON_COLOR_ACTION_ROW, "Script file:");
+                AFTER_COMMON_COLOR_ACTION_ROW, "Script file");
         final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Upload",
                         contentPositionAfterLabel(scriptLabel),
@@ -1549,54 +1540,32 @@ public class DialogAssembly {
         if (fc > 1) {
             // frame and playback mode controls
             final MenuElement firstFrame =
-                    GraphicsUtils.generateIconButton(ResourceCodes.TO_FIRST_FRAME,
+                    IconButton.make(ResourceCodes.TO_FIRST_FRAME,
                             backButton.getPosition()
                                     .displace(0, DIALOG_CONTENT_INC_Y),
-                            () -> true, previewer::toFirstFrame),
-                    previousFrame = GraphicsUtils.generateIconButton(
-                            ResourceCodes.PREVIOUS, firstFrame.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            () -> true, previewer::previousFrame),
-                    playStop = GraphicsUtils.generateIconToggleButton(
+                            previewer::toFirstFrame),
+                    previousFrame = IconButton.make(ResourceCodes.PREVIOUS,
+                            firstFrame.getRenderPosition().displace(BUTTON_INC, 0),
+                            previewer::previousFrame),
+                    playStop = MenuAssembly.generatePlayStopToggle(playbackInfo,
                             previousFrame.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            new String[] { ResourceCodes.PLAY, ResourceCodes.STOP },
-                            new Runnable[] {
-                                    playbackInfo::play, playbackInfo::stop
-                            }, () -> playbackInfo.isPlaying() ? 1 : 0, () -> {},
-                            () -> true, ResourceCodes.PLAY),
-                    nextFrame = GraphicsUtils.generateIconButton(
-                            ResourceCodes.NEXT, playStop.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            () -> true, previewer::nextFrame),
-                    lastFrame = GraphicsUtils.generateIconButton(
-                            ResourceCodes.TO_LAST_FRAME, nextFrame.getRenderPosition()
-                                    .displace(BUTTON_INC, 0),
-                            () -> true, previewer::toLastFrame);
+                                    .displace(BUTTON_INC, 0)),
+                    nextFrame = IconButton.make(ResourceCodes.NEXT,
+                            playStop.getRenderPosition().displace(BUTTON_INC, 0),
+                            previewer::nextFrame),
+                    lastFrame = IconButton.make(ResourceCodes.TO_LAST_FRAME,
+                            nextFrame.getRenderPosition().displace(BUTTON_INC, 0),
+                            previewer::toLastFrame);
 
-            final PlaybackInfo.Mode[] validModes = new PlaybackInfo.Mode[] {
-                    PlaybackInfo.Mode.FORWARDS, PlaybackInfo.Mode.BACKWARDS,
-                    PlaybackInfo.Mode.LOOP, PlaybackInfo.Mode.PONG_FORWARDS
-            };
             final MenuElement playbackModeButton =
-                    GraphicsUtils.generateIconToggleButton(
-                            lastFrame.getRenderPosition().displace(
-                                    BUTTON_INC, 0),
-                            Arrays.stream(validModes)
-                                    .map(PlaybackInfo.Mode::getIconCode)
-                                    .toArray(String[]::new),
-                            Arrays.stream(validModes)
-                                    .map(mode -> (Runnable) () -> {})
-                                    .toArray(Runnable[]::new),
-                            () -> playbackInfo.getMode().buttonIndex(),
-                            playbackInfo::toggleMode, () -> true, ResourceCodes.LOOP);
+                    MenuAssembly.generatePlaybackModeToggle(playbackInfo,
+                            lastFrame.getRenderPosition().displace(BUTTON_INC, 0));
             final DynamicLabel frameTracker = makeDynamicLabel(
                     playbackModeButton.getRenderPosition().displace(
                             BUTTON_DIM + CONTENT_BUFFER_PX,
                             -BUTTON_OFFSET + TEXT_Y_OFFSET),
-                    () -> "Frm. " + (previewer.getFrameIndex() + 1) +
-                            "/" + previewer.getFrameCount(),
-                    "Frm. XXX/XXX");
+                    () -> (previewer.getFrameIndex() + 1) + "/" +
+                            previewer.getFrameCount(), "XXX/XXX");
 
             mb.addAll(firstFrame, previousFrame, playStop, nextFrame,
                     lastFrame, playbackModeButton, frameTracker);
@@ -1629,9 +1598,9 @@ public class DialogAssembly {
 
         // labels
         final TextLabel
-                folderLabel = makeDialogLeftLabel(0, "Folder:"),
+                folderLabel = makeDialogLeftLabel(0, "Folder"),
                 nameLabel = TextLabel.make(textBelowPos(folderLabel),
-                        "File name:");
+                        "File name");
         mb.addAll(folderLabel, nameLabel);
 
         // folder button
@@ -1667,7 +1636,7 @@ public class DialogAssembly {
 
         final MenuBuilder mb = new MenuBuilder();
 
-        final TextLabel sortLabel = makeDialogLeftLabel(0, "Sort colors by:"),
+        final TextLabel sortLabel = makeDialogLeftLabel(0, "Sort colors by"),
                 backwardsLabel = TextLabel.make(textBelowPos(sortLabel),
                         "Backwards?");
         final Dropdown sortDropdown = Dropdown.forDialog(
@@ -1735,7 +1704,7 @@ public class DialogAssembly {
         DialogVals.setPaletteName(palette.getName());
 
         // text labels
-        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name:");
+        final TextLabel paletteNameLabel = makeDialogLeftLabel(1, "Name");
 
         // name textbox
         DialogVals.setPaletteName(palette.getName());
@@ -1796,24 +1765,119 @@ public class DialogAssembly {
     }
 
     public static void setDialogToLayerSettings(final int index) {
+        final MenuBuilder mb = new MenuBuilder();
+
         final SEContext c = StippleEffect.get().getContext();
         final SELayer layer = c.getState().getLayers().get(index);
 
         DialogVals.setLayerOpacity(layer.getOpacity());
         DialogVals.setLayerName(layer.getName());
 
+        layer.getOnionSkin().prep();
+
         // text labels
         final TextLabel layerNameLabel =
-                makeDialogLeftLabel(0, "Name:"),
+                makeDialogLeftLabel(0, "Name"),
                 opacityLabel = TextLabel.make(textBelowPos(layerNameLabel),
-                        "Opacity:");
+                        "Opacity"),
+                onionSkinAnnouncer = TextLabel.make(
+                        textBelowPos(opacityLabel), "Onion skin settings"),
+                precedingLabel = TextLabel.make(
+                        textBelowPos(onionSkinAnnouncer), "Preceding cels"),
+                followingLabel = makeDialogRightLabel(
+                        precedingLabel, "Following cels"),
+                skinTypeBackLabel = TextLabel.make(
+                        textBelowPos(precedingLabel), "Type"),
+                skinTypeForwardLabel = makeDialogRightLabel(
+                        skinTypeBackLabel, "Type"),
+                lookBackLabel = TextLabel.make(
+                        textBelowPos(skinTypeBackLabel, 2), "# cels"),
+                lookForwardLabel = makeDialogRightLabel(lookBackLabel, "# cels"),
+                fadeFactorBackLabel = TextLabel.make(
+                        textBelowPos(lookBackLabel), "Fade per frame"),
+                fadeFactorForwardLabel = makeDialogRightLabel(
+                        fadeFactorBackLabel, "Fade per frame"),
+                underBackLabel = TextLabel.make(
+                        textBelowPos(fadeFactorBackLabel), "Render under?"),
+                underForwardLabel = makeDialogRightLabel(
+                        underBackLabel, "Render under?");
 
-        // name textbox
+        mb.addAll(layerNameLabel, opacityLabel, onionSkinAnnouncer,
+                precedingLabel, followingLabel,
+                skinTypeBackLabel, skinTypeForwardLabel,
+                lookBackLabel, lookForwardLabel,
+                fadeFactorBackLabel, fadeFactorForwardLabel,
+                underBackLabel, underForwardLabel);
+
+        // textboxes
         final Textbox layerNameTextbox = makeDialogNameTextBox(
-                layerNameLabel, layer.getName(), DialogVals::setLayerName);
+                layerNameLabel, layer.getName(), DialogVals::setLayerName),
+                lookBackTextbox = makeDialogNumericalDynamicTextbox(
+                        lookBackLabel, Layout::contentPositionAfterLabel,
+                        "", OnionSkin.getDLookBack(), "",
+                        lb -> lb >= OnionSkin.MIN_LOOK && lb <= OnionSkin.MAX_LOOK,
+                        OnionSkin::setDLookBack, OnionSkin::getDLookBack, 1),
+                lookForwardTextbox = makeDialogNumericalDynamicTextbox(
+                        lookForwardLabel, Layout::contentPositionAfterLabel,
+                        "", OnionSkin.getDLookForward(), "",
+                        lb -> lb >= OnionSkin.MIN_LOOK && lb <= OnionSkin.MAX_LOOK,
+                        OnionSkin::setDLookForward, OnionSkin::getDLookForward, 1);
+
+        mb.addAll(layerNameTextbox, lookBackTextbox, lookForwardTextbox);
+
+        // fade factor
+        final int PERCENT = 100;
+        final double delta = 1 / (double) PERCENT;
+        final Consumer<Boolean> tickFadeBack = up -> {
+            final double was = OnionSkin.getDFadeFactorBack();
+            OnionSkin.setDFadeFactorBack(was + (up ? delta : -delta));
+        }, tickFadeForward = up -> {
+            final double was = OnionSkin.getDFadeFactorForward();
+            OnionSkin.setdFadeFactorForward(was + (up ? delta : -delta));
+        };
+        final IncrementalRangeElements<Double> fadeFactorBackUI =
+                IncrementalRangeElements.makeForDouble(fadeFactorBackLabel,
+                        fadeFactorBackLabel.getY() +
+                                DIALOG_CONTENT_COMP_OFFSET_Y,
+                        fadeFactorBackLabel.getY(),
+                        () -> tickFadeBack.accept(false),
+                        () -> tickFadeBack.accept(true),
+                        OnionSkin.MIN_FADE, OnionSkin.MAX_FADE,
+                        OnionSkin::setDFadeFactorBack,
+                        OnionSkin::getDFadeFactorBack,
+                        o -> (int)(o * PERCENT),
+                        sv -> sv / (double) PERCENT,
+                        o -> (int) (o * PERCENT) + "%", "XXX%"),
+                fadeFactorForwardUI = IncrementalRangeElements.makeForDouble(
+                        fadeFactorForwardLabel,
+                        fadeFactorForwardLabel.getY() + DIALOG_CONTENT_COMP_OFFSET_Y,
+                        fadeFactorBackLabel.getY(),
+                        () -> tickFadeForward.accept(false),
+                        () -> tickFadeForward.accept(true),
+                        OnionSkin.MIN_FADE, OnionSkin.MAX_FADE,
+                        OnionSkin::setdFadeFactorForward,
+                        OnionSkin::getDFadeFactorForward,
+                        o -> (int)(o * PERCENT),
+                        sv -> sv / (double) PERCENT,
+                        o -> (int) (o * PERCENT) + "%", "XXX%");
+        mb.addAll(fadeFactorBackUI.decButton, fadeFactorBackUI.incButton,
+                fadeFactorBackUI.slider, fadeFactorBackUI.value,
+                fadeFactorForwardUI.decButton, fadeFactorForwardUI.incButton,
+                fadeFactorForwardUI.slider, fadeFactorForwardUI.value);
+
+        // hues
+        final TextLabel backRef = TextLabel.make(
+                textBelowPos(skinTypeBackLabel), ""),
+                forwardRef = makeDialogRightLabel(backRef, "");
+        mb.addAll(new GatewayMenuElement(new MenuElementGrouping(
+                ColorComponent.onionSkinHue(backRef.getPosition(), true)
+                ), () -> OnionSkin.getDSkinTypeBack().hasHue()),
+                new GatewayMenuElement(new MenuElementGrouping(
+                        ColorComponent.onionSkinHue(forwardRef.getRenderPosition(), false)
+                ), () -> OnionSkin.getdSkinTypeForward().hasHue()));
 
         // opacity slider
-        final int MAX_OPACITY = 255;
+        final int MAX_OPACITY = Constants.RGBA_SCALE;
         DialogVals.setLayerOpacity(layer.getOpacity());
 
         final Runnable fDecrement = () -> {
@@ -1825,7 +1889,7 @@ public class DialogAssembly {
             DialogVals.setLayerOpacity(Math.min(Constants.OPAQUE,
                     was + (1d / (double) MAX_OPACITY)));
         };
-        final IncrementalRangeElements<Double> opacity =
+        final IncrementalRangeElements<Double> opacityUI =
                 IncrementalRangeElements.makeForDouble(opacityLabel,
                         opacityLabel.getY() +
                                 DIALOG_CONTENT_COMP_OFFSET_Y,
@@ -1836,15 +1900,56 @@ public class DialogAssembly {
                         sv -> sv / (double) MAX_OPACITY,
                         o -> String.valueOf((int) (o * MAX_OPACITY)), "XXX");
 
-        final MenuElementGrouping contents = new MenuElementGrouping(
-                layerNameLabel, opacityLabel, layerNameTextbox,
-                opacity.decButton, opacity.incButton,
-                opacity.slider, opacity.value);
+        mb.addAll(opacityUI.decButton, opacityUI.incButton,
+                opacityUI.slider, opacityUI.value);
+
+        final Dropdown skinTypeBackDropdown = Dropdown.forDialog(
+                contentPositionAfterLabel(skinTypeBackLabel),
+                EnumUtils.stream(OnionSkin.SkinType.class)
+                        .map(EnumUtils::formattedName)
+                        .toArray(String[]::new),
+                EnumUtils.stream(OnionSkin.SkinType.class)
+                        .map(os -> (Runnable) () -> OnionSkin.setDSkinTypeBack(os))
+                        .toArray(Runnable[]::new),
+                () -> OnionSkin.getDSkinTypeBack().ordinal()),
+                skinTypeForwardDropdown = Dropdown.forDialog(
+                        contentPositionAfterLabel(skinTypeForwardLabel),
+                        EnumUtils.stream(OnionSkin.SkinType.class)
+                                .map(EnumUtils::formattedName)
+                                .toArray(String[]::new),
+                        EnumUtils.stream(OnionSkin.SkinType.class)
+                                .map(os -> (Runnable)
+                                        () -> OnionSkin.setdSkinTypeForward(os))
+                                .toArray(Runnable[]::new),
+                        () -> OnionSkin.getdSkinTypeForward().ordinal());
+
+        final Checkbox underBackCheckbox = new Checkbox(
+                contentPositionAfterLabel(underBackLabel), new ConcreteProperty<>(
+                        OnionSkin::isDUnderBack, OnionSkin::setDUnderBack)),
+                underForwardCheckbox = new Checkbox(
+                        contentPositionAfterLabel(underForwardLabel),
+                        new ConcreteProperty<>(OnionSkin::isDUnderForward,
+                                OnionSkin::setdUnderForward));
+
+        mb.addAll(skinTypeBackDropdown, skinTypeForwardDropdown,
+                underBackCheckbox, underForwardCheckbox);
+
         setDialog(assembleDialog(layer.getName() + "  |  Layer Settings",
-                contents, layerNameTextbox::isValid,
+                new MenuElementGrouping(mb.build().getMenuElements()),
+                layerNameTextbox::isValid,
                 Constants.GENERIC_APPROVAL_TEXT, () -> {
-            c.changeLayerOpacity(DialogVals.getLayerOpacity(), index, true);
-            c.changeLayerName(DialogVals.getLayerName(), index);
+            final OnionSkin configured = OnionSkin.load();
+            final String name = DialogVals.getLayerName();
+            final double opacity = DialogVals.getLayerOpacity();
+
+            if (!layer.getName().equals(name))
+                c.changeLayerName(name, index);
+
+            if (layer.getOpacity() != opacity)
+                c.changeLayerOpacity(opacity, index, true);
+
+            if (!layer.getOnionSkin().equals(configured))
+                c.changeLayerOnionSkin(configured, index);
         }, true));
     }
 
@@ -1854,7 +1959,7 @@ public class DialogAssembly {
 
         DialogVals.setFrameDuration(c.getState().getFrameDurations().get(index));
 
-        final TextLabel durationLabel = makeDialogLeftLabel(0, "Frame duration:");
+        final TextLabel durationLabel = makeDialogLeftLabel(0, "Frame duration");
 
         final double STEP = 0.1, DIV = 10d,
                 MIN = Constants.MIN_FRAME_DURATION,
@@ -1966,7 +2071,7 @@ public class DialogAssembly {
         final int initialIndex = DialogVals.getScope().ordinal();
         final boolean hasSelection = c.getState().hasSelection();
 
-        final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope:"),
+        final TextLabel scopeLabel = makeDialogLeftLabel(0, "Scope"),
                 disabledLayersLabel = TextLabel.make(
                         textBelowPos(scopeLabel),
                         "Include disabled layers?"),
@@ -2009,10 +2114,11 @@ public class DialogAssembly {
             final MenuBuilder mb, final SEContext c,
             final TextLabel referenceLabel
     ) {
-        makeStitchElements(mb,
-                c.projectInfo::setFramesPerDim,
-                c.projectInfo::getFramesPerDim,
-                c.projectInfo::calculateNumFrames, referenceLabel);
+        final SaveConfig sc = c.getSaveConfig();
+
+        makeStitchElements(mb, sc::setFramesPerDim, sc::getFramesPerDim,
+                sc::setSequenceOrder, sc::getSequenceOrder,
+                () -> sc.calculateNumFrames(c), referenceLabel);
     }
 
     private static void makeStitchElements(
@@ -2020,34 +2126,39 @@ public class DialogAssembly {
             final TextLabel referenceLabel
     ) {
         makeStitchElements(mb, DialogVals::setFramesPerDim,
-                DialogVals::getFramesPerDim, fcGetter, referenceLabel);
+                DialogVals::getFramesPerDim,
+                DialogVals::setSequenceOrder, DialogVals::getSequenceOrder,
+                fcGetter, referenceLabel);
     }
 
     private static void makeStitchElements(
             final MenuBuilder mb,
             final Consumer<Integer> fpdSetter,
             final Supplier<Integer> fpdGetter,
-            final Supplier<Integer> fcGetter, final TextLabel referenceLabel
+            final Consumer<DialogVals.SequenceOrder> soSetter,
+            final Supplier<DialogVals.SequenceOrder> soGetter,
+            final Supplier<Integer> fcGetter,
+            final TextLabel referenceLabel
     ) {
         // pre-processing
         fpdSetter.accept(fcGetter.get());
 
         // sequence order
-        makeSequenceOrderElements(mb, referenceLabel);
+        makeSequenceOrderElements(mb, soGetter, soSetter, referenceLabel);
 
         // frames per [dim]
-        final String FPD_PREFIX = "Frames per ", FPD_SUFFIX = ":";
+        final String FPD_PREFIX = "Frames per ";
         final DynamicLabel framesPerDimLabel = makeDynamicLabel(
                 textBelowPos(referenceLabel, 2), () -> FPD_PREFIX +
-                        DialogVals.getSequenceOrder().dimName() + FPD_SUFFIX,
-                FPD_PREFIX + "column" + FPD_SUFFIX);
-        final DynamicTextbox framesPerDimTextbox = makeDialogNumericalDynamicTextbox(
-                framesPerDimLabel,
-                Layout::contentPositionAfterLabel,
-                "", fcGetter.get(), "",
-                tbv -> tbv >= 1 && tbv <= Constants.MAX_NUM_FRAMES,
-                fpdSetter, fpdGetter,
-                String.valueOf(Constants.MAX_NUM_FRAMES).length());
+                        soGetter.get().dimName(), FPD_PREFIX + "column");
+        final DynamicTextbox framesPerDimTextbox =
+                makeDialogNumericalDynamicTextbox(
+                        framesPerDimLabel,
+                        Layout::contentPositionAfterLabel,
+                        "", fcGetter.get(), "",
+                        tbv -> tbv >= 1 && tbv <= Constants.MAX_NUM_FRAMES,
+                        fpdSetter, fpdGetter,
+                        String.valueOf(Constants.MAX_NUM_FRAMES).length());
         mb.addAll(framesPerDimLabel, framesPerDimTextbox);
 
         // frames per complementary dim
@@ -2061,8 +2172,7 @@ public class DialogAssembly {
 
                     return FPCD_PREFIX + comp + (
                             comp == 1 ? FPCD_INFIX_SING : FPCD_INFIX
-                    ) + DialogVals.getSequenceOrder()
-                            .complement().dimName();
+                    ) + soGetter.get().complement().dimName();
                 }, FPCD_PREFIX +
                         Constants.MAX_NUM_FRAMES + FPCD_INFIX + "column");
         mb.add(framesPerCompDim);
@@ -2120,11 +2230,12 @@ public class DialogAssembly {
         rowSetter.accept(initialRows);
 
         // sequence order
-        makeSequenceOrderElements(mb, referenceLabel);
+        makeSequenceOrderElements(mb, DialogVals::getSequenceOrder,
+                DialogVals::setSequenceOrder, referenceLabel);
 
         // columns
         final TextLabel columnsLabel = TextLabel.make(
-                textBelowPos(referenceLabel, 2), "Columns:");
+                textBelowPos(referenceLabel, 2), "Columns");
         final DynamicTextbox columnsTextbox = makeDialogDynamicTextbox(
                 columnsLabel, Layout::contentPositionAfterLabel,
                 1, initialColumns, Constants.MAX_NUM_FRAMES, "",
@@ -2134,7 +2245,7 @@ public class DialogAssembly {
 
         // rows
         final TextLabel yDivsLabel = makeDialogRightLabel(
-                columnsLabel, "Rows:");
+                columnsLabel, "Rows");
         final DynamicTextbox yDivsTextbox = makeDialogDynamicTextbox(
                 yDivsLabel, Layout::contentPositionAfterLabel,
                 1, initialRows, Constants.MAX_NUM_FRAMES, "",
@@ -2144,7 +2255,7 @@ public class DialogAssembly {
 
         // frame width
         final TextLabel frameWidthLabel = TextLabel.make(
-                textBelowPos(columnsLabel), "Frame width:");
+                textBelowPos(columnsLabel), "Frame width");
         final DynamicTextbox frameWidthTextbox =
                 makeDialogPixelDynamicTextbox(frameWidthLabel,
                         Layout::contentPositionAfterLabel,
@@ -2155,7 +2266,7 @@ public class DialogAssembly {
 
         // frame height
         final TextLabel frameHeightLabel = makeDialogRightLabel(
-                frameWidthLabel, "Frame height:");
+                frameWidthLabel, "Frame height");
         final DynamicTextbox frameHeightTextbox =
                 makeDialogPixelDynamicTextbox(frameHeightLabel,
                         Layout::contentPositionAfterLabel,
@@ -2169,7 +2280,7 @@ public class DialogAssembly {
 
         // X-axis remainder
         final TextLabel xRemainderLabel = TextLabel.make(
-                textBelowPos(frameWidthLabel), "X-axis remainder:");
+                textBelowPos(frameWidthLabel), "X-axis remainder");
         final Dropdown xRemainderDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(xRemainderLabel),
                 remainderLabels, new Runnable[] {
@@ -2183,7 +2294,7 @@ public class DialogAssembly {
 
         // Y-axis remainder
         final TextLabel yRemainderLabel = makeDialogRightLabel(
-                xRemainderLabel, "Y-axis remainder:");
+                xRemainderLabel, "Y-axis remainder");
         final Dropdown yRemainderDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(yRemainderLabel),
                 remainderLabels, new Runnable[] {
@@ -2197,19 +2308,21 @@ public class DialogAssembly {
     }
 
     private static void makeSequenceOrderElements(
-            final MenuBuilder mb, final TextLabel referenceLabel
+            final MenuBuilder mb,
+            final Supplier<DialogVals.SequenceOrder> soGetter,
+            final Consumer<DialogVals.SequenceOrder> soSetter,
+            final TextLabel referenceLabel
     ) {
         final TextLabel sequenceLabel = TextLabel.make(
-                textBelowPos(referenceLabel, 1),
-                "Sequence order:");
+                textBelowPos(referenceLabel, 1), "Sequence order");
         final Dropdown sequenceDropdown = Dropdown.forDialog(
                 contentPositionAfterLabel(sequenceLabel),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
                         .map(EnumUtils::formattedName).toArray(String[]::new),
                 EnumUtils.stream(DialogVals.SequenceOrder.class)
-                        .map(so -> (Runnable) () -> DialogVals.setSequenceOrder(so))
+                        .map(so -> (Runnable) () -> soSetter.accept(so))
                         .toArray(Runnable[]::new),
-                () -> DialogVals.getSequenceOrder().ordinal());
+                () -> soGetter.get().ordinal());
         mb.addAll(sequenceLabel, sequenceDropdown);
     }
 
@@ -2229,13 +2342,12 @@ public class DialogAssembly {
 
                     final Path folder = opened.get().toPath();
                     setter.accept(folder);
-                    // c.projectInfo.setFolder(folder);
                 },
                 () -> {
                     final StringBuilder folderPathName = new StringBuilder();
                     final String ELLIPSE = "...";
 
-                    Path folder = getter.get(); // c.projectInfo.getFolder();
+                    Path folder = getter.get();
                     int placements = 0;
 
                     if (folder == null)
@@ -2473,29 +2585,29 @@ public class DialogAssembly {
             case DEFAULTS -> {
                 // text labels
                 final TextLabel fullscreenLabel = makeDialogLeftLabel(
-                        initialYIndex, "Fullscreen on startup:"),
+                        initialYIndex, "Fullscreen on startup"),
                         pixelGridDefaultLabel = TextLabel.make(
                                 textBelowPos(fullscreenLabel, 1),
-                                "Pixel grid on by default:"),
+                                "Pixel grid on by default"),
                         defaultNewProjectSizeLabel = TextLabel.make(
                                 textBelowPos(pixelGridDefaultLabel, 1),
                                 "Default canvas size for new projects"),
                         newProjectWidthLabel = TextLabel.make(
                                 textBelowPos(defaultNewProjectSizeLabel),
-                                "Width:"),
+                                "Width"),
                         newProjectHeightLabel = makeDialogRightLabel(
-                                newProjectWidthLabel, "Height:"),
+                                newProjectWidthLabel, "Height"),
                         defaultToolBreadthLabel = TextLabel.make(
                                 textBelowPos(newProjectWidthLabel, 1),
-                                "Default tool breadth:"),
+                                "Default tool breadth"),
                         frameAffixLabel = TextLabel.make(
                                 textBelowPos(defaultToolBreadthLabel, 1),
                                 "Default separate PNGs frame affixes"),
                         prefixLabel = TextLabel.make(
                                 textBelowPos(frameAffixLabel),
-                                "Prefix:"),
+                                "Prefix"),
                         suffixLabel = makeDialogRightLabel(prefixLabel,
-                                "Suffix:");
+                                "Suffix");
 
                 final Checkbox fullscreenCheckbox = new Checkbox(
                         contentPositionAfterLabel(fullscreenLabel),
@@ -2600,20 +2712,36 @@ public class DialogAssembly {
 
                 yield invertFontSizeLabel;
             }
+            case TOOLS -> {
+                // text labels
+                final TextLabel propagateBreadthLabel =
+                        makeDialogLeftLabel(initialYIndex,
+                        "Propagate breadth tool property changes to all tools?");
+
+                final Checkbox propagateBreadthCheckbox = new Checkbox(
+                        contentPositionAfterLabel(propagateBreadthLabel),
+                        new ConcreteProperty<>(
+                                Settings::checkIsPropagateBreadth,
+                                Settings::setPropagateBreadth));
+
+                mb.addAll(propagateBreadthLabel, propagateBreadthCheckbox);
+
+                yield propagateBreadthLabel;
+            }
             case VISUAL -> {
                 // text labels
                 final TextLabel fontLabel = makeDialogLeftLabel(
-                        initialYIndex, "Program font:"),
+                        initialYIndex, "Program font"),
                         themeLabel = makeDialogRightLabel(fontLabel,
-                                "Theme:"),
+                                "Theme"),
                         windowedSizeLabel = TextLabel.make(
                                 textBelowPos(fontLabel, 1),
                                 "Windowed program size"),
                         windowedWidthLabel = TextLabel.make(
                                 textBelowPos(windowedSizeLabel),
-                                "Window width:"),
+                                "Window width"),
                         windowedHeightLabel = makeDialogRightLabel(
-                                windowedWidthLabel, "Window height:"),
+                                windowedWidthLabel, "Window height"),
                         windowedContext = TextLabel.make(
                                 textBelowPos(windowedWidthLabel),
                                 "On this device, the windowed program can range from "),
@@ -2626,9 +2754,9 @@ public class DialogAssembly {
                                 "Checkerboard size"),
                         checkerboardWidthLabel = TextLabel.make(
                                 textBelowPos(checkerboardLabel),
-                                "Cell width:"),
+                                "Cell width"),
                         checkerboardHeightLabel = makeDialogRightLabel(
-                                checkerboardWidthLabel, "Cell height:"),
+                                checkerboardWidthLabel, "Cell height"),
                         checkerboardContext = TextLabel.make(
                                 textBelowPos(checkerboardWidthLabel),
                                 "Valid checkerboard size values range from " +
@@ -2639,9 +2767,9 @@ public class DialogAssembly {
                                 "Pixel grid"),
                         pixelGridXLabel = TextLabel.make(
                                 textBelowPos(pixelGridLabel),
-                                "X-axis increment:"),
+                                "X-axis increment"),
                         pixelGridYLabel = makeDialogRightLabel(
-                                pixelGridXLabel, "Y-axis increment:"),
+                                pixelGridXLabel, "Y-axis increment"),
                         pixelGridContext = TextLabel.make(
                                 textBelowPos(pixelGridXLabel),
                                 "Valid pixel grid size values range from " +
@@ -2653,7 +2781,10 @@ public class DialogAssembly {
                                         " pixel grid lines (X + Y) on"),
                         pixelGridLimits2 = TextLabel.make(
                                 textBelowPos(pixelGridLimits1),
-                                "the canvas due to performance constraints.");
+                                "the canvas due to performance constraints."),
+                        separatedPreview = TextLabel.make(
+                                textBelowPos(pixelGridLimits2, 1),
+                                "Open preview panel in a separate window?");
 
                 final Dropdown fontDropdown = Dropdown.forDialog(
                         contentPositionAfterLabel(fontLabel),
@@ -2714,6 +2845,12 @@ public class DialogAssembly {
                                 Settings::setPixelGridYPixels,
                                 Settings::checkPixelGridYPixels, 3);
 
+                final Checkbox separatedPreviewCheckbox = new Checkbox(
+                        contentPositionAfterLabel(separatedPreview),
+                        new ConcreteProperty<>(
+                                Settings::checkIsSeparatedPreview,
+                                Settings::setSeparatedPreview));
+
                 mb.addAll(fontLabel, fontDropdown, themeLabel, themeDropdown,
                         windowedSizeLabel,
                         windowedWidthLabel, windowedWidthTextbox,
@@ -2725,10 +2862,11 @@ public class DialogAssembly {
                         checkerboardContext, pixelGridLabel,
                         pixelGridXLabel, pixelGridXTextbox,
                         pixelGridYLabel, pixelGridYTextbox,
-                        pixelGridContext, pixelGridLimits1, pixelGridLimits2);
+                        pixelGridContext, pixelGridLimits1, pixelGridLimits2,
+                        separatedPreview, separatedPreviewCheckbox);
 
                 // update as new settings are added to category
-                yield pixelGridLimits2;
+                yield separatedPreview;
             }
         };
 
@@ -2925,24 +3063,18 @@ public class DialogAssembly {
                 contentStart.displace(indent, bottomY + TEXT_Y_OFFSET),
                 "Donate on the store page: "),
                 sponsorLabel = TextLabel.make(textBelowPos(storePageLabel),
-                "Sponsor me on GitHub: "),
-                patreonLabel = TextLabel.make(textBelowPos(sponsorLabel),
-                        "Become a patron on Patreon: ");
+                "Sponsor me on GitHub: ");
         final StaticTextButton storePageButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(storePageLabel),
-                        () -> visitSite(Constants.DONATE_LINK)),
+                        WebUtils::storePage),
                 sponsorButton = GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(sponsorLabel),
-                        () -> visitSite(Constants.SPONSOR_LINK)),
-                patreonButton = GraphicsUtils.makeStandardTextButton("Go",
-                        contentPositionAfterLabel(patreonLabel),
-                        () -> visitSite(Constants.PATREON_LINK));
-        contentAssembler.addAll(Set.of(
-                storePageLabel, sponsorLabel, patreonLabel,
-                storePageButton, sponsorButton, patreonButton));
+                        WebUtils::sponsorPage);
+        contentAssembler.addAll(Set.of(storePageLabel, sponsorLabel,
+                storePageButton, sponsorButton));
 
-        bottomY += DIALOG_CONTENT_INC_Y * 4;
+        bottomY += DIALOG_CONTENT_INC_Y * 3;
 
         return bottomY - initialBottomY;
     }
@@ -2959,14 +3091,21 @@ public class DialogAssembly {
 
         final TextLabel scriptLabel = TextLabel.make(
                 contentStart.displace(indent, bottomY + TEXT_Y_OFFSET),
-                "For a more thorough breakdown of scripting and the scripting API: ");
+                "For a more thorough breakdown of scripting and the scripting API: "),
+                vsCodeLabel = TextLabel.make(
+                        textBelowPos(scriptLabel),
+                        "VS Code extension for Stipple Effect script syntax highlighting: ");
         final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(scriptLabel),
-                        () -> visitSite(Constants.SCRIPT_WIKI_LINK));
-        contentAssembler.addAll(Set.of(scriptLabel, scriptButton));
+                        WebUtils::scriptingAPI),
+                vsCodeButton = GraphicsUtils.makeStandardTextButton("Go",
+                        contentPositionAfterLabel(vsCodeLabel),
+                        WebUtils::vsCodeExt);
+        contentAssembler.addAll(
+                Set.of(scriptLabel, scriptButton, vsCodeLabel, vsCodeButton));
 
-        bottomY += DIALOG_CONTENT_INC_Y * 2;
+        bottomY += DIALOG_CONTENT_INC_Y * 3;
 
         return bottomY - initialBottomY;
     }
@@ -3060,10 +3199,6 @@ public class DialogAssembly {
                         ResourceCodes.LAYER_ENABLED,
                         ResourceCodes.LAYER_DISABLED,
                         ResourceCodes.ONION_SKIN,
-                        ResourceCodes.ONION_SKIN_NONE,
-                        ResourceCodes.ONION_SKIN_PREVIOUS,
-                        ResourceCodes.ONION_SKIN_NEXT,
-                        ResourceCodes.ONION_SKIN_BOTH,
                         ResourceCodes.FRAME_LOCKING,
                         ResourceCodes.FRAMES_LINKED,
                         ResourceCodes.FRAMES_UNLINKED,
@@ -3080,14 +3215,10 @@ public class DialogAssembly {
                         "Layer visibility controls",
                         "Layer is visible/enabled",
                         "Layer is invisible/disabled",
-                        "Onion skin modes",
-                        "Disabled",
-                        "Previous frame",
-                        "Next frame",
-                        "Previous and next frame",
-                        "Layer frame status",
-                        "Frames are linked / layer is static",
-                        "Frames are free / layer is dynamic",
+                        "Onion skin",
+                        "Cel linking",
+                        "This layer's cels are linked",
+                        "This layer's cels are not linked",
                         "Layer settings"
                 }, contentAssembler, contentStart, initialBottomY
         );
@@ -3282,13 +3413,5 @@ public class DialogAssembly {
         mb.add(border);
 
         return mb.build();
-    }
-
-    private static void visitSite(final String link) {
-        try {
-            Desktop.getDesktop().browse(new URI(link));
-        } catch (Exception e) {
-            StatusUpdates.invalidLink(link);
-        }
     }
 }

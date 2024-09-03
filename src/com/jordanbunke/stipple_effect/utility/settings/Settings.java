@@ -1,8 +1,10 @@
 package com.jordanbunke.stipple_effect.utility.settings;
 
+import com.jordanbunke.delta_time.error.GameError;
 import com.jordanbunke.delta_time.io.FileIO;
 import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.project.SEContext;
+import com.jordanbunke.stipple_effect.tools.ToolWithBreadth;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.OSUtils;
@@ -17,6 +19,8 @@ import com.jordanbunke.stipple_effect.visual.SEFonts;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Settings {
@@ -26,6 +30,11 @@ public class Settings {
         // boolean settings
         FULLSCREEN_ON_STARTUP(new Setting<>(BooleanSettingType.get(), false)),
         PIXEL_GRID_ON_BY_DEFAULT(new Setting<>(BooleanSettingType.get(), false)),
+        SEPARATED_PREVIEW(new Setting<>(BooleanSettingType.get(), false)),
+        PROPAGATE_BREADTH(new Setting<>(BooleanSettingType.get(), false,
+                b -> {
+            if (b) ToolWithBreadth.resetAll();
+        })),
         INVERT_ZOOM_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_BREADTH_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
         INVERT_TOLERANCE_DIRECTION(new Setting<>(BooleanSettingType.get(), false)),
@@ -81,12 +90,12 @@ public class Settings {
         DEFAULT_INDEX_PREFIX(new Setting<>(
                 StringSettingType.get(), "", prefix -> {
                     StippleEffect.get().getContexts().forEach(
-                            c -> c.projectInfo.setIndexPrefix(prefix));
+                            c -> c.getSaveConfig().setIndexPrefix(prefix));
                 })),
         DEFAULT_INDEX_SUFFIX(new Setting<>(
                 StringSettingType.get(), "", suffix -> {
                     StippleEffect.get().getContexts().forEach(
-                            c -> c.projectInfo.setIndexSuffix(suffix));
+                            c -> c.getSaveConfig().setIndexSuffix(suffix));
                 })),
 
         // enum settings
@@ -172,7 +181,22 @@ public class Settings {
     }
 
     public static void write() {
-        FileIO.safeMakeDirectory(SETTINGS_FILE.getParent());
+        final Path settingsFolder = SETTINGS_FILE.getParent();
+
+        if (!settingsFolder.toFile().exists())
+            FileIO.safeMakeDirectory(settingsFolder);
+        else if (!settingsFolder.toFile().isDirectory()) {
+            try {
+                Files.delete(settingsFolder);
+                FileIO.safeMakeDirectory(settingsFolder);
+            } catch (IOException ioe) {
+                GameError.send("Couldn't delete file at " + settingsFolder +
+                        " needed to clear space for the settings folder. " +
+                        "Could not write " + StippleEffect.PROGRAM_NAME +
+                        " settings.");
+                return;
+            }
+        }
 
         final StringBuilder sb = new StringBuilder();
 
@@ -204,6 +228,14 @@ public class Settings {
 
     public static void setPixelGridOnByDefault(final boolean pixelGridOnByDefault) {
         Code.PIXEL_GRID_ON_BY_DEFAULT.set(pixelGridOnByDefault);
+    }
+
+    public static void setSeparatedPreview(final boolean separatedPreview) {
+        Code.SEPARATED_PREVIEW.set(separatedPreview);
+    }
+
+    public static void setPropagateBreadth(final boolean propagateBreadth) {
+        Code.PROPAGATE_BREADTH.set(propagateBreadth);
     }
 
     public static void setInvertZoomDirection(final boolean invertZoomDirection) {
@@ -305,6 +337,14 @@ public class Settings {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.check();
     }
 
+    public static boolean checkIsSeparatedPreview() {
+        return (boolean) Code.SEPARATED_PREVIEW.setting.check();
+    }
+
+    public static boolean checkIsPropagateBreadth() {
+        return (boolean) Code.PROPAGATE_BREADTH.setting.check();
+    }
+
     public static boolean checkIsInvertZoomDirection() {
         return (boolean) Code.INVERT_ZOOM_DIRECTION.setting.check();
      }
@@ -380,6 +420,14 @@ public class Settings {
 
     public static boolean isPixelGridOnByDefault() {
         return (boolean) Code.PIXEL_GRID_ON_BY_DEFAULT.setting.get();
+    }
+
+    public static boolean isSeparatedPreview() {
+        return (boolean) Code.SEPARATED_PREVIEW.setting.get();
+    }
+
+    public static boolean isPropagateBreadth() {
+        return (boolean) Code.PROPAGATE_BREADTH.setting.get();
     }
 
     public static int getWindowedWidth() {

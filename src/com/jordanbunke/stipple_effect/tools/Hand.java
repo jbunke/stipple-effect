@@ -9,7 +9,7 @@ public final class Hand extends Tool {
     private static final Hand INSTANCE;
 
     private boolean panning;
-    private Coord2D startMousePosition, startAnchor;
+    private Coord2D startMousePos, startAnchor;
 
     static {
         INSTANCE = new Hand();
@@ -17,7 +17,7 @@ public final class Hand extends Tool {
 
     private Hand() {
         panning = false;
-        startMousePosition = new Coord2D();
+        startMousePos = new Coord2D();
         startAnchor = new Coord2D();
     }
 
@@ -40,7 +40,7 @@ public final class Hand extends Tool {
             final SEContext context, final GameMouseEvent me
     ) {
         panning = true;
-        startMousePosition = me.mousePosition;
+        startMousePos = me.mousePosition;
         startAnchor = context.renderInfo.getAnchor();
     }
 
@@ -49,12 +49,12 @@ public final class Hand extends Tool {
             final SEContext context, final Coord2D mousePosition
     ) {
         if (panning) {
-            final float zoomFactor = context.renderInfo.getZoomFactor();
+            final float z = context.renderInfo.getZoomFactor();
 
             final Coord2D shift = new Coord2D(
-                    (int)((startMousePosition.x - mousePosition.x) / zoomFactor),
-                    (int)((startMousePosition.y - mousePosition.y) / zoomFactor)
-            );
+                    (int)((startMousePos.x - mousePosition.x) / z),
+                    (int)((startMousePos.y - mousePosition.y) / z));
+
             context.renderInfo.setAnchor(new Coord2D(
                     startAnchor.x + shift.x, startAnchor.y + shift.y));
         }

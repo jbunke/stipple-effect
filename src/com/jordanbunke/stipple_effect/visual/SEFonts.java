@@ -7,7 +7,7 @@ import com.jordanbunke.delta_time.io.GameImageIO;
 import com.jordanbunke.delta_time.text.Text;
 import com.jordanbunke.delta_time.text.TextBuilder;
 import com.jordanbunke.stipple_effect.StippleEffect;
-import com.jordanbunke.stipple_effect.project.ProjectInfo;
+import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.utility.DialogVals;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.action.ResourceCodes;
@@ -71,7 +71,7 @@ public class SEFonts {
             final Runnable failed,
             final Consumer<GameImage> passed
     ) {
-        final String suffix = ProjectInfo.SaveType.PNG_STITCHED.getFileSuffix();
+        final String suffix = SaveConfig.SaveType.PNG_SHEET.getFileSuffix();
 
         FileIO.setDialogToFilesOnly();
         final Optional<File> opened = FileIO.openFileFromSystem(
