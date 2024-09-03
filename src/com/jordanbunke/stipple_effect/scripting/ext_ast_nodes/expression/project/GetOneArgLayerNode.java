@@ -44,13 +44,13 @@ public final class GetOneArgLayerNode extends GetLayerNode {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
                     arg.getPosition(),
                     "No layer matching the name \"" + name + "\" was found");
-            return null;
         } else {
             ScriptErrorLog.fireError(ScriptErrorLog.Message.ARG_NOT_TYPE,
                     arg.getPosition(), callName(),
                     TypeNode.getString() + " or " + TypeNode.getInt(),
                     arg.getType(symbolTable).toString());
-            return null;
         }
+
+        return null;
     }
 }

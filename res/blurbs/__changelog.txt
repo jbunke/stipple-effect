@@ -1,4 +1,4 @@
-{1.2.0} - 2024-09-02
+{1.2.0} - 2024-09-03
 
 Added:
 > Layer visibility actions to navbar under "Layer" -> "Visibility status"
