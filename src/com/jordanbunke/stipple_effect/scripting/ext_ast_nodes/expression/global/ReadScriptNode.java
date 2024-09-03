@@ -41,7 +41,10 @@ public final class ReadScriptNode extends GlobalExpressionNode {
                 SEInterpreter.get().build(FileIO.readFile(scriptPath));
         script.semanticErrorCheck(SymbolTable.root(script));
 
-        return script;
+        if (ScriptErrorLog.hasNoErrors())
+            return script;
+
+        return null;
     }
 
     @Override

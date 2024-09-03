@@ -7,3 +7,5 @@ subject to change.
 {Q4 2024}
 > Lossless video exporting
 > Improved dialog menus
+> CLI tool
+  > Test and debug scripts

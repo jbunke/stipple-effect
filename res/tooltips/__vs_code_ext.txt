@@ -1,1 +1,1 @@
-VS Code extension for Stipple Effect scripting
+VS Code extension

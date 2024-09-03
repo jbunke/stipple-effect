@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.ast.symbol_table.SymbolTable;
+import com.jordanbunke.delta_time.scripting.util.ScriptErrorLog;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.math.ColorMath;
@@ -41,7 +42,28 @@ public final class HSVNode extends GlobalExpressionNode {
                 s = (double) vs[1], v = (double) vs[2];
         final int a = vs.length == 4 ? (int) vs[3] : Constants.RGBA_SCALE;
 
-        return ColorMath.fromHSV(h, s, v, a);
+        if (h < 0d || h > 1d)
+            fireError("hue", 0, String.valueOf(h));
+        if (s < 0d || s > 1d)
+            fireError("saturation", 1, String.valueOf(s));
+        if (v < 0d || v > 1d)
+            fireError("value", 2, String.valueOf(v));
+        if (a < 0 || a > Constants.RGBA_SCALE)
+            fireError("alpha (opacity)", 3, String.valueOf(a));
+
+        if (ScriptErrorLog.hasNoErrors())
+            return ColorMath.fromHSV(h, s, v, a);
+
+        return null;
+    }
+
+    private void fireError(
+            final String component, final int argIndex, String value
+    ) {
+        ScriptErrorLog.fireError(ScriptErrorLog.Message.CUSTOM_RT,
+                arguments.args()[argIndex].getPosition(),
+                "The value for the color's \"" + component +
+                        "\" was out of bounds (" + value + ")");
     }
 
     @Override

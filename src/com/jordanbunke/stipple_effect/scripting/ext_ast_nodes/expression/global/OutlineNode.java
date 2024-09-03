@@ -33,8 +33,7 @@ public final class OutlineNode extends GlobalExpressionNode {
         final int[] sideMask = ((ScriptArray) vs[1]).stream()
                 .mapToInt(s -> (int) s).toArray();
 
-        if (ScriptUtils.invalidSideMask(
-                sideMask, arguments.args()[1]))
+        if (ScriptUtils.invalidSideMask(sideMask, arguments.args()[1]))
             return null;
 
         final Selection outlined = Outliner.outline(selection, sideMask);

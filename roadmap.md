@@ -8,3 +8,5 @@ This is a rough outline of planned features and when to expect them. Everything 
 ## Q4 2024
 * Lossless video exporting
 * Improved dialog menus
+* CLI tool 
+  * Test and debug scripts

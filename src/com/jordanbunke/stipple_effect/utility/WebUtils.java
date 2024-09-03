@@ -7,7 +7,8 @@ public class WebUtils {
     private static final String
             ITCH_LINK = "https://flinkerflitzer.itch.io/stipple-effect",
             SPONSOR_LINK = "https://github.com/sponsors/jbunke",
-            SCRIPT_WIKI_LINK = "https://github.com/jbunke/se-api",
+            DOCS_LINK = "https://github.com/jbunke/se-docs",
+            API_LINK = "https://github.com/jbunke/se-api",
             BUG_LINK = "https://github.com/jbunke/stipple-effect/issues/new/choose",
             VS_CODE_EXT_LINK = "https://marketplace.visualstudio.com/items?itemName=jordanbunke.deltascript-for-stipple-effect";
 
@@ -23,8 +24,12 @@ public class WebUtils {
         visitSite(SPONSOR_LINK);
     }
 
+    public static void documentation() {
+        visitSite(DOCS_LINK);
+    }
+
     public static void scriptingAPI() {
-        visitSite(SCRIPT_WIKI_LINK);
+        visitSite(API_LINK);
     }
 
     public static void vsCodeExt() {

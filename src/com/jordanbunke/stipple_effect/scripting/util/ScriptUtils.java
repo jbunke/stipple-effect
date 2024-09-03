@@ -165,11 +165,15 @@ public class ScriptUtils {
     }
 
     private static Selection convertSelection(
-            final ScriptSet input, BiPredicate<Integer, Integer> coordCondition
+            final ScriptSet input,
+            final BiPredicate<Integer, Integer> coordCondition
     ) {
         final Set<Coord2D> pixels = new HashSet<>();
 
         input.stream().map(px -> (ScriptArray) px).forEach(a -> {
+            if (a.size() != 2)
+                return;
+
             final int x = (int) a.get(0), y = (int) a.get(1);
 
             if (coordCondition.test(x, y))
