@@ -140,7 +140,22 @@ public class Settings {
         }
 
         private void read(final String value) {
-            setting.setFromRead(value);
+            switch (this) {
+                case WINDOWED_W -> readWindowDim(value, Layout.MIN_WINDOW_W);
+                case WINDOWED_H -> readWindowDim(value, Layout.MIN_WINDOW_H);
+                default -> setting.setFromRead(value);
+            }
+        }
+
+        private void readWindowDim(final String value, final int minimum) {
+            try {
+                final int dim = Integer.parseInt(value);
+
+                if (dim >= minimum)
+                    setting.setFromRead(value);
+            } catch (NumberFormatException ignored) {
+
+            }
         }
     }
 
