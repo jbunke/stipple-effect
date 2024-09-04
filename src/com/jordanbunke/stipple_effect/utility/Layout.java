@@ -25,10 +25,11 @@ public final class Layout {
     public static final int
             COLLAPSED_PROJECTS_H = 27, BOTTOM_BAR_H = 24, TOOL_OPTIONS_BAR_H = 30,
             COLOR_COMP_W_ALLOWANCE = RIGHT_PANEL_W, SCREEN_H_BUFFER = 120,
-            MAX_WINDOW_H = Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER,
             MIN_WINDOW_H = 788,
-            MAX_WINDOW_W = (int)(MAX_WINDOW_H * (16 / 9.)),
+            MAX_WINDOW_H = Math.max(MIN_WINDOW_H,
+                    Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_H_BUFFER),
             MIN_WINDOW_W = (int)(MIN_WINDOW_H * (16 / 9.)),
+            MAX_WINDOW_W = Math.max(MIN_WINDOW_W, (int)(MAX_WINDOW_H * (16 / 9.))),
             TEXT_Y_OFFSET = -4, TOOL_TIP_OFFSET = 8,
             TEXT_CARET_W = 1, TEXT_CARET_H = 23,
             TEXT_CARET_Y_OFFSET = -11, TEXT_LINE_PX_H = TEXT_CARET_H + 2,

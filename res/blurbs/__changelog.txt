@@ -2,6 +2,7 @@
 
 Fixed:
 > Bug: Attempting to validate a script with no return type crashes the program
+> Now enforces minimum sizing; addresses crashes due to impossible layout/sizing logic
 
 {1.2.0} - 2024-09-03
 
