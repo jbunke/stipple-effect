@@ -141,13 +141,17 @@ public class Settings {
 
         private void read(final String value) {
             switch (this) {
-                case WINDOWED_W -> readWindowDim(value, Layout.MIN_WINDOW_W);
-                case WINDOWED_H -> readWindowDim(value, Layout.MIN_WINDOW_H);
+                case WINDOWED_W -> readWithMinimum(value, Layout.MIN_WINDOW_W);
+                case WINDOWED_H -> readWithMinimum(value, Layout.MIN_WINDOW_H);
+                case DEFAULT_CANVAS_W_PX, DEFAULT_CANVAS_H_PX,
+                        CHECKERBOARD_W_PX, CHECKERBOARD_H_PX,
+                        PIXEL_GRID_X_PX, PIXEL_GRID_Y_PX,
+                        DEFAULT_TOOL_BREADTH -> readWithMinimum(value, 1);
                 default -> setting.setFromRead(value);
             }
         }
 
-        private void readWindowDim(final String value, final int minimum) {
+        private void readWithMinimum(final String value, final int minimum) {
             try {
                 final int dim = Integer.parseInt(value);
 
