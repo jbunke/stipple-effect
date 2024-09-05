@@ -642,11 +642,14 @@ public class MenuAssembly {
         samplerContentMap.put(SamplerMode.SV_MATRIX,
                 new MenuElementGrouping(matrix, mHue, mAlpha));
 
-        // color wheel
+        // color wheels
         final int wheelWidth = contentWidthAllowance(
                 panelPos.x, pw, samplerStartingPos.x);
         final ColorWheel wheel = new ColorWheel(samplerStartingPos,
                 new Bounds2D(wheelWidth, biggestIncY * 3));
+        final NormalMapSampler normalMap =
+                new NormalMapSampler(samplerStartingPos,
+                        new Bounds2D(wheelWidth, biggestIncY * 3));
 
         final Coord2D wValuePos = samplerStartingPos.displace(
                 0, wheel.getHeight()),
@@ -656,6 +659,8 @@ public class MenuAssembly {
 
         samplerContentMap.put(SamplerMode.COLOR_WHEEL,
                 new MenuElementGrouping(wheel, wValue, wAlpha));
+        samplerContentMap.put(SamplerMode.NORMAL,
+                new MenuElementGrouping(normalMap, wValue, wAlpha));
 
 
         // sampler manager
