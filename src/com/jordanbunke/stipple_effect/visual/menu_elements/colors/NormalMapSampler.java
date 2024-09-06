@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import java.awt.*;
 
 public final class NormalMapSampler extends AbstractColorMap {
-    public static final int NONE = 1, MAX = 50;
+    public static final int NONE = 1, MAX = 85, MIN_BLUE = 128;
 
     private static int quantization = NONE;
 
@@ -32,7 +32,7 @@ public final class NormalMapSampler extends AbstractColorMap {
 
         if (notQuantized()) {
             final double z = Math.sqrt(1d - ((x * x) + (y * y)));
-            return new Color(r, g, channel(z), Constants.RGBA_SCALE);
+            return new Color(r, g, blue(z), Constants.RGBA_SCALE);
         }
 
         // determines x and y from quantized red and green values
@@ -46,7 +46,7 @@ public final class NormalMapSampler extends AbstractColorMap {
         }
 
         final double z = Math.sqrt(1d - ((x * x) + (y * y)));
-        return new Color(r, g, channel(z), Constants.RGBA_SCALE);
+        return new Color(r, g, blue(z), Constants.RGBA_SCALE);
     }
 
     @Override
@@ -87,6 +87,16 @@ public final class NormalMapSampler extends AbstractColorMap {
     private int channel(final double vectorDim) {
         final double adjusted = (vectorDim + 1d) / 2d;
         return quantize((int) Math.round(Constants.RGBA_SCALE * adjusted));
+    }
+
+    private int blue(double z) {
+        if (Double.isNaN(z))
+            z = 0d;
+
+        final double adjusted = (z + 1d) / 2d;
+        int blue = quantize((int) Math.round(Constants.RGBA_SCALE * adjusted));
+
+        return Math.max(MIN_BLUE, blue);
     }
 
     private int quantize(final int input) {

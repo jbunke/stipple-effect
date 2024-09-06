@@ -664,8 +664,8 @@ public class MenuAssembly {
                 wValuePos.displace(0, DIALOG_CONTENT_INC_Y / 2), "Quantize");
         final IncrementalRangeElements<Integer> q =
                 IncrementalRangeElements.makeForInt(quantLabel,
-                        quantLabel.getY() + ICON_BUTTON_OFFSET_Y,
-                        quantLabel.getY() + TEXT_Y_OFFSET, 1,
+                        quantLabel.getY() + DIALOG_CONTENT_COMP_OFFSET_Y,
+                        quantLabel.getY(), 1,
                         NormalMapSampler.NONE, NormalMapSampler.MAX,
                         normalMap::setQuantization, normalMap::getQuantization,
                         i -> i, i -> i, i -> "", "");
