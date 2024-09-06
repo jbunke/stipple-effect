@@ -5,3 +5,8 @@ pixel that was clicked.
 
 Assign to primary: {Left Click}
 Assign to secondary: {Right Click}
+
+Hold {Shift} to search layer by layer for the highest non-transparent color at the specified pixel;
+does nothing if no such pixel is found.
+
+Hold {Ctrl} to sample the pixel from the flattened project.
