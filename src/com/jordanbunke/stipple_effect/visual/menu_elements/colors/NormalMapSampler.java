@@ -12,7 +12,7 @@ import java.awt.*;
 public final class NormalMapSampler extends AbstractColorMap {
     public static final int NONE = 1, MAX = 50;
 
-    private static int quantization = MAX;
+    private static int quantization = NONE;
 
     public NormalMapSampler(final Coord2D position, final Bounds2D dimensions) {
         super(position, dimensions);
@@ -100,6 +100,20 @@ public final class NormalMapSampler extends AbstractColorMap {
 
     private boolean notQuantized() {
         return quantization == NONE;
+    }
+
+    public void setQuantization(final int quantization) {
+        NormalMapSampler.quantization =
+                MathPlus.bounded(NONE, quantization, MAX);
+
+        final Color c = StippleEffect.get().getSelectedColor(),
+                input = getPixelColor(c, getNodePos(c));
+
+        updateAssets(input);
+    }
+
+    public int getQuantization() {
+        return quantization;
     }
 
     private double vectorDim(final int channel) {

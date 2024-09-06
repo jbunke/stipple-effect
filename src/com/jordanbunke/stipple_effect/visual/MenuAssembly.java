@@ -659,8 +659,20 @@ public class MenuAssembly {
 
         samplerContentMap.put(SamplerMode.COLOR_WHEEL,
                 new MenuElementGrouping(wheel, wValue, wAlpha));
+
+        final TextLabel quantLabel = TextLabel.make(
+                wValuePos.displace(0, DIALOG_CONTENT_INC_Y / 2), "Quantize");
+        final IncrementalRangeElements<Integer> q =
+                IncrementalRangeElements.makeForInt(quantLabel,
+                        quantLabel.getY() + ICON_BUTTON_OFFSET_Y,
+                        quantLabel.getY() + TEXT_Y_OFFSET, 1,
+                        NormalMapSampler.NONE, NormalMapSampler.MAX,
+                        normalMap::setQuantization, normalMap::getQuantization,
+                        i -> i, i -> i, i -> "", "");
+
         samplerContentMap.put(SamplerMode.NORMAL,
-                new MenuElementGrouping(normalMap, wValue, wAlpha));
+                new MenuElementGrouping(normalMap, quantLabel,
+                        q.decButton, q.incButton, q.slider, q.value, wAlpha));
 
 
         // sampler manager
