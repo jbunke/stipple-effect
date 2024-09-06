@@ -33,6 +33,16 @@ public final class ColorWheel extends AbstractColorMap {
         return Geometry.projectPoint(middle, angle, distance);
     }
 
+    @Override
+    void updateColor(final Coord2D localMP) {
+        final double hue = getHue(localMP), sat = getSat(localMP);
+        final Color c = StippleEffect.get().getSelectedColor();
+
+        StippleEffect.get().setSelectedColor(
+                ColorMath.fromColorWheel(hue, sat, c),
+                ColorMath.LastHSVEdit.WHEEL);
+    }
+
     private double getHue(final Coord2D localMP) {
         final double angle = Geometry.normalizeAngle(
                 Geometry.calculateAngleInRad(localMP, middle));
@@ -44,15 +54,5 @@ public final class ColorWheel extends AbstractColorMap {
         final double distance = Coord2D.unitDistanceBetween(middle, localMP);
 
         return MathPlus.bounded(0d, distance / (double) radius, 1d);
-    }
-
-    @Override
-    protected void updateColor(final Coord2D localMP) {
-        final double hue = getHue(localMP), sat = getSat(localMP);
-        final Color c = StippleEffect.get().getSelectedColor();
-
-        StippleEffect.get().setSelectedColor(
-                ColorMath.fromColorWheel(hue, sat, c),
-                ColorMath.LastHSVEdit.WHEEL);
     }
 }

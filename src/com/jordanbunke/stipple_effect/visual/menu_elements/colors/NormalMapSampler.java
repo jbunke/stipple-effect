@@ -25,7 +25,7 @@ public final class NormalMapSampler extends AbstractColorMap {
     }
 
     @Override
-    protected void updateColor(final Coord2D localMP) {
+    void updateColor(final Coord2D localMP) {
         // TODO
     }
 }

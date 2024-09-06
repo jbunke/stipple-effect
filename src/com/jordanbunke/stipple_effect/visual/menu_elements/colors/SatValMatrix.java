@@ -24,7 +24,7 @@ public final class SatValMatrix extends TwoDimSampler {
     }
 
     @Override
-    protected GameImage drawBackground() {
+    GameImage drawBackground() {
         final Theme t = Settings.getTheme();
         final int w = getEffectiveWidth(),
                 h = getEffectiveHeight();
@@ -46,7 +46,7 @@ public final class SatValMatrix extends TwoDimSampler {
     }
 
     @Override
-    protected void updateAssets(final Color c) {
+    void updateAssets(final Color c) {
         final int w = getWidth(), h = getHeight();
         final GameImage matrix = new GameImage(w, h);
 
@@ -58,22 +58,14 @@ public final class SatValMatrix extends TwoDimSampler {
         // checkerboard background
         matrix.draw(background, BUFFER_PX, BUFFER_PX);
 
-        final double hue = ColorMath.fetchHue(c),
-                sat = ColorMath.fetchSat(c),
-                value = ColorMath.fetchValue(c);
-
         // matrix
-        for (int x = BUFFER_PX; x < w - BUFFER_PX; x++) {
-            for (int y = BUFFER_PX; y < h - BUFFER_PX; y++) {
-                final double pVal = getVal(x), pSat = getSat(y);
-                final Color pixel = ColorMath.fromHSV(
-                        hue, pSat, pVal, c.getAlpha());
-                matrix.dot(pixel, x, y);
-            }
-        }
+        for (int x = BUFFER_PX; x < w - BUFFER_PX; x++)
+            for (int y = BUFFER_PX; y < h - BUFFER_PX; y++)
+                matrix.dot(getPixelColor(c, new Coord2D(x, y)), x, y);
 
         // pointer
-        drawNode(matrix, getLocalXForVal(value), getLocalYForSat(sat));
+        final Coord2D nodePos = getNodePos(c);
+        drawNode(matrix, nodePos.x, nodePos.y);
 
         this.matrix = matrix.submit();
     }
@@ -101,17 +93,30 @@ public final class SatValMatrix extends TwoDimSampler {
     }
 
     @Override
-    protected int getEffectiveWidth() {
+    int getEffectiveWidth() {
         return getWidth() - (2 * BUFFER_PX);
     }
 
     @Override
-    protected int getEffectiveHeight() {
+    int getEffectiveHeight() {
         return getHeight() - (2 * BUFFER_PX);
     }
 
     @Override
-    protected void updateColor(final Coord2D localMP) {
+    Color getPixelColor(final Color c, final Coord2D pixel) {
+        return ColorMath.fromHSV(ColorMath.fetchHue(c), getSat(pixel.y),
+                getVal(pixel.x), c.getAlpha());
+    }
+
+    @Override
+    Coord2D getNodePos(final Color c) {
+        return new Coord2D(
+                getLocalXForVal(ColorMath.fetchValue(c)),
+                getLocalYForSat(ColorMath.fetchSat(c)));
+    }
+
+    @Override
+    void updateColor(final Coord2D localMP) {
         final double sat = getSat(localMP.y), value = getVal(localMP.x);
         final Color c = StippleEffect.get().getSelectedColor();
 

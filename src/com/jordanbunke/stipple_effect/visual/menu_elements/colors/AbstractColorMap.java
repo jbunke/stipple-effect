@@ -37,7 +37,8 @@ public abstract class AbstractColorMap extends TwoDimSampler {
         this.wheel = wheel;
     }
 
-    protected final GameImage drawBackground() {
+    @Override
+    final GameImage drawBackground() {
         final Theme t = Settings.getTheme();
         final int w = getWidth(),
                 h = getHeight();
@@ -65,7 +66,7 @@ public abstract class AbstractColorMap extends TwoDimSampler {
     }
 
     @Override
-    protected final void updateAssets(final Color c) {
+    final void updateAssets(final Color c) {
         final int w = getWidth(), h = getHeight(),
                 ew = getEffectiveWidth(), eh = getEffectiveHeight();
         final GameImage wheel = new GameImage(w, h);
@@ -98,16 +99,13 @@ public abstract class AbstractColorMap extends TwoDimSampler {
         setWheel(wheel.submit());
     }
 
-    abstract Color getPixelColor(final Color c, final Coord2D pixel);
-    abstract Coord2D getNodePos(final Color c);
-
     @Override
-    protected final int getEffectiveWidth() {
+    final int getEffectiveWidth() {
         return radius * 2;
     }
 
     @Override
-    protected final int getEffectiveHeight() {
+    final int getEffectiveHeight() {
         return radius * 2;
     }
 
