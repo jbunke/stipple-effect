@@ -642,11 +642,14 @@ public class MenuAssembly {
         samplerContentMap.put(SamplerMode.SV_MATRIX,
                 new MenuElementGrouping(matrix, mHue, mAlpha));
 
-        // color wheel
+        // color wheels
         final int wheelWidth = contentWidthAllowance(
                 panelPos.x, pw, samplerStartingPos.x);
         final ColorWheel wheel = new ColorWheel(samplerStartingPos,
                 new Bounds2D(wheelWidth, biggestIncY * 3));
+        final NormalMapSampler normalMap =
+                new NormalMapSampler(samplerStartingPos,
+                        new Bounds2D(wheelWidth, biggestIncY * 3));
 
         final Coord2D wValuePos = samplerStartingPos.displace(
                 0, wheel.getHeight()),
@@ -656,6 +659,20 @@ public class MenuAssembly {
 
         samplerContentMap.put(SamplerMode.COLOR_WHEEL,
                 new MenuElementGrouping(wheel, wValue, wAlpha));
+
+        final TextLabel quantLabel = TextLabel.make(
+                wValuePos.displace(0, DIALOG_CONTENT_INC_Y / 2), "Quantize");
+        final IncrementalRangeElements<Integer> q =
+                IncrementalRangeElements.makeForInt(quantLabel,
+                        quantLabel.getY() + DIALOG_CONTENT_COMP_OFFSET_Y,
+                        quantLabel.getY(), 1,
+                        NormalMapSampler.NONE, NormalMapSampler.MAX,
+                        normalMap::setQuantization, normalMap::getQuantization,
+                        i -> i, i -> i, i -> "", "");
+
+        samplerContentMap.put(SamplerMode.NORMAL,
+                new MenuElementGrouping(normalMap, quantLabel,
+                        q.decButton, q.incButton, q.slider, q.value, wAlpha));
 
 
         // sampler manager

@@ -26,21 +26,25 @@ public abstract class TwoDimSampler extends MenuElement {
     private double lastHue, lastSat, lastValue;
     private boolean interacting;
 
-    public TwoDimSampler(final Coord2D position, final Bounds2D dimensions) {
+    public TwoDimSampler(
+            final Coord2D position, final Bounds2D dimensions
+    ) {
         super(position, dimensions, Anchor.LEFT_TOP, true);
 
         interacting = false;
     }
 
-    protected abstract GameImage drawBackground();
+    abstract GameImage drawBackground();
 
-    protected abstract void updateColor(final Coord2D localMP);
+    abstract void updateAssets(final Color c);
 
-    protected abstract void updateAssets(final Color c);
+    abstract int getEffectiveWidth();
 
-    protected abstract int getEffectiveWidth();
+    abstract int getEffectiveHeight();
 
-    protected abstract int getEffectiveHeight();
+    abstract Color getPixelColor(final Color c, final Coord2D pixel);
+
+    abstract Coord2D getNodePos(final Color c);
 
     protected void drawNode(final GameImage img, final int x, final int y) {
         final GameImage node = GraphicsUtils.COLOR_NODE;
@@ -120,4 +124,6 @@ public abstract class TwoDimSampler extends MenuElement {
     ) {
 
     }
+
+    abstract void updateColor(final Coord2D localMP);
 }

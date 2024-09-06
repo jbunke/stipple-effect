@@ -4,7 +4,7 @@ import com.jordanbunke.delta_time.utility.math.Coord2D;
 import com.jordanbunke.stipple_effect.visual.menu_elements.colors.ColorComponent;
 
 public enum SamplerMode {
-    RGB_SLIDERS, HSV_SLIDERS, SV_MATRIX, COLOR_WHEEL;
+    RGB_SLIDERS, HSV_SLIDERS, SV_MATRIX, COLOR_WHEEL, NORMAL;
 
     @Override
     public String toString() {
@@ -13,6 +13,7 @@ public enum SamplerMode {
             case HSV_SLIDERS -> "HSV sliders";
             case SV_MATRIX -> "SV matrix";
             case COLOR_WHEEL -> "Color wheel";
+            case NORMAL -> "Normal map";
         };
     }
 

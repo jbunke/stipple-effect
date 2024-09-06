@@ -1,3 +1,17 @@
+{1.2.1} - 2024-09-06
+
+Added:
+> Minimum values are enforced on startup for settings that could lead to crashes
+> Extended the Color Picker tool with two alternate modes
+  > Holding {Shift} searches layer by layer for the highest non-transparent color at the specified
+    pixel; does nothing if no such pixel is found
+  > Holding {Ctrl} samples the pixel from the flattened project
+> Normal map color sampler with quantization option
+
+Fixed:
+> Bug: Attempting to validate a script with no return type crashes the program
+> Bug: Crashes due to impossible layout/sizing logic
+
 {1.2.0} - 2024-09-03
 
 Added:

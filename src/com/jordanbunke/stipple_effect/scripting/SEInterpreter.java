@@ -52,7 +52,7 @@ public final class SEInterpreter extends Interpreter {
         final TypeNode COL_TYPE = TypeNode.getColor();
 
         return script.paramsMatch(new TypeNode[] { COL_TYPE }) &&
-                script.getReturnType().equals(COL_TYPE);
+                COL_TYPE.equals(script.getReturnType());
     }
 
     public static boolean validatePreviewScript(
@@ -65,8 +65,8 @@ public final class SEInterpreter extends Interpreter {
                 IMG_ARRAY_TYPE = TypeNode.arrayOf(IMG_TYPE),
                 returnType = script.getReturnType();
 
-        final boolean imgReturn = returnType.equals(IMG_TYPE),
-                arrayReturn = returnType.equals(IMG_ARRAY_TYPE),
+        final boolean imgReturn = IMG_TYPE.equals(returnType),
+                arrayReturn = IMG_ARRAY_TYPE.equals(returnType),
                 imgParam = script.paramsMatch(new TypeNode[] { IMG_TYPE }),
                 arrayParam = script.paramsMatch(new TypeNode[] { IMG_ARRAY_TYPE });
 
