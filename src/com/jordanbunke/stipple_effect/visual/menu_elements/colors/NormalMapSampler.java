@@ -10,14 +10,25 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 import java.awt.*;
 
 public final class NormalMapSampler extends AbstractColorMap {
+    public static final int NONE = 0, MAX = 20;
+
+    private static int quantization = NONE;
+
     public NormalMapSampler(final Coord2D position, final Bounds2D dimensions) {
         super(position, dimensions);
     }
 
     @Override
     Color getPixelColor(final Color c, final Coord2D pixel) {
-        final double x = x(pixel), y = y(pixel),
-                z = Math.sqrt(1d - ((x * x) + (y * y)));
+        double x = x(pixel), y = y(pixel);
+        final double hypotenuse = Math.sqrt((x * x) + (y * y));
+
+        if (hypotenuse > 1d) {
+            x /= hypotenuse;
+            y /= hypotenuse;
+        }
+
+        final double z = Math.sqrt(1d - ((x * x) + (y * y)));
 
         return new Color(channel(x), channel(y),
                 channel(z), Constants.RGBA_SCALE);
@@ -25,20 +36,22 @@ public final class NormalMapSampler extends AbstractColorMap {
 
     @Override
     Coord2D getNodePos(final Color c) {
-        // TODO
+        double x = vectorDim(c.getRed()) * radius,
+                y = -vectorDim(c.getGreen()) * radius;
 
-        final double x = vectorDim(c.getRed()),
-                y = vectorDim(c.getGreen());
+        final double hypotenuse = Math.sqrt((x * x) + (y * y));
+
+        if (hypotenuse > radius) {
+            x *= radius / hypotenuse;
+            y *= radius / hypotenuse;
+        }
 
         return middle.displace(
-                (int)Math.round(x * radius),
-                (int)Math.round(-y * radius));
+                (int)Math.round(x), (int)Math.round(y));
     }
 
     @Override
     void updateColor(final Coord2D localMP) {
-        // TODO - test
-
         final Color c = StippleEffect.get().getSelectedColor();
 
         StippleEffect.get().setSelectedColor(
