@@ -334,6 +334,9 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     }
 
     private void updateFrameData() {
+        if (INSTANCE == null)
+            return;
+
         frameCount = content.length;
         frameIndex %= frameCount;
     }

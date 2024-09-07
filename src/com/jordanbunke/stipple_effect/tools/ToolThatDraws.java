@@ -171,8 +171,7 @@ public abstract class ToolThatDraws extends Tool {
             case BLEND -> {
                 final Color primary = StippleEffect.get().getPrimary(),
                         secondary = StippleEffect.get().getSecondary();
-                yield (x, y) -> ColorMath.betweenColor(
-                        bias, secondary, primary);
+                yield (x, y) -> ColorMath.lerp(secondary, primary, bias);
             }
             case NOISE -> {
                 final Color primary = StippleEffect.get().getPrimary(),

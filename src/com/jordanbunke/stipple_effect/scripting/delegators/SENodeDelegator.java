@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.util;
+package com.jordanbunke.stipple_effect.scripting.delegators;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.IllegalExpressionNode;
@@ -28,6 +28,10 @@ import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 
+/**
+ * ASTNode delegator for constants and functions of the global namespace ($SE)
+ * and properties and functions called on expressions that evaluate to objects
+ * */
 public final class SENodeDelegator {
     public static StatementNode globalFunctionStatement(
             final TextPosition position, final String fID,
@@ -44,7 +48,7 @@ public final class SENodeDelegator {
             case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
             default -> new IllegalStatementNode(position,
-                    "Undefined function \"" + formatGlobal(fID) + "\"");
+                    "Undefined function \"" + formatGlobal(fID, true) + "\"");
         };
     }
 
@@ -86,11 +90,11 @@ public final class SENodeDelegator {
                     : TransformNode.reg(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
-                    "Undefined function \"" + formatGlobal(fID) + "\"");
+                    "Undefined function \"" + formatGlobal(fID, true) + "\"");
         };
     }
 
-    public static ExpressionNode globalProperty(
+    public static ExpressionNode globalConstant(
             final TextPosition position, final String propertyID
     ) {
         if (EnumUtils.matches(propertyID, Scope.class))
@@ -105,13 +109,16 @@ public final class SENodeDelegator {
                 case DimConstantNode.VERT -> new DimConstantNode(position, false);
                 // extend here
                 default -> new IllegalExpressionNode(position,
-                        "No property \"" + formatGlobal(propertyID) +
+                        "No constant \"" + formatGlobal(propertyID, false) +
                                 "\" exists");
             };
     }
 
-    private static String formatGlobal(final String subidentifier) {
-        return "$" + Constants.SCRIPT_GLOBAL_NAMESPACE + "." + subidentifier;
+    private static String formatGlobal(
+            final String subidentifier, final boolean function
+    ) {
+        return "$" + Constants.SCRIPT_GLOBAL_NAMESPACE + "." +
+                subidentifier + (function ? "()" : "");
     }
 
     public static ExpressionNode scopedProperty(

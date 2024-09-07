@@ -27,14 +27,14 @@ public class StatusUpdates {
 
     public static void invalidPreviewScript(final String signature) {
         actionNotPermitted("upload script",
-                "a preview script with the type signature {" + signature +
-                        "} cannot be applied to this project");
+                "a preview script with the type signature \"" + signature +
+                        "\" cannot be applied to this project");
     }
 
     public static void invalidAutomationScript(final String signature) {
         actionNotPermitted("upload script",
-                "this script has the type signature {" + signature +
-                        "}; automation scripts must be {()}");
+                "this script has the type signature \"" + signature +
+                        "\"; automation scripts must be \"()\"");
     }
 
     public static void cannotSetCheckAndGridToBounds(

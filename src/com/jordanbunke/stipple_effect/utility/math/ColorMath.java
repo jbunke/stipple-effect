@@ -88,26 +88,26 @@ public class ColorMath {
         }
     }
 
-    public static Color betweenColor(
-            final double pos, final Color start, final Color end
+    public static Color lerp(
+            final Color a, final Color b, final double t
     ) {
-        if (pos <= 0d)
-            return start;
-        else if (pos >= 1d)
-            return end;
+        if (t <= 0d)
+            return a;
+        else if (t >= 1d)
+            return b;
 
-        final int baseR = start.getRed(), baseG = start.getGreen(),
-                baseB = start.getBlue(), baseA = start.getAlpha(),
-                deltaR = end.getRed() - start.getRed(),
-                deltaG = end.getGreen() - start.getGreen(),
-                deltaB = end.getBlue() - start.getBlue(),
-                deltaA = end.getAlpha() - start.getAlpha();
+        final int baseR = a.getRed(), baseG = a.getGreen(),
+                baseB = a.getBlue(), baseA = a.getAlpha(),
+                deltaR = b.getRed() - a.getRed(),
+                deltaG = b.getGreen() - a.getGreen(),
+                deltaB = b.getBlue() - a.getBlue(),
+                deltaA = b.getAlpha() - a.getAlpha();
 
         return new Color(
-                baseR + (int)Math.round(deltaR * pos),
-                baseG + (int)Math.round(deltaG * pos),
-                baseB + (int)Math.round(deltaB * pos),
-                baseA + (int)Math.round(deltaA * pos)
+                baseR + (int)Math.round(deltaR * t),
+                baseG + (int)Math.round(deltaG * t),
+                baseB + (int)Math.round(deltaB * t),
+                baseA + (int)Math.round(deltaA * t)
         );
     }
 
