@@ -10,7 +10,7 @@ import com.jordanbunke.stipple_effect.utility.math.Geometry;
 
 import java.awt.*;
 
-public final class ColorWheel extends AbstractColorMap {
+public final class ColorWheel extends AbstractColorWheel {
 
     public ColorWheel(final Coord2D position, final Bounds2D dimensions) {
         super(position, dimensions);

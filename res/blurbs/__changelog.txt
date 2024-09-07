@@ -2,6 +2,16 @@
 
 TODO
 
+Added:
+
+Changed:
+
+Fixed:
+
+API Changes:
+  Added:
+  > {$Math} and {$Graphics} namespaces
+
 {1.2.1} - 2024-09-06
 
 Added:
