@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.IllegalExpressionNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.math.MathFloatToFloatNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.math.PiNode;
 import com.jordanbunke.stipple_effect.utility.Constants;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 
@@ -21,5 +22,16 @@ public final class MathNodeDelegator {
         return new IllegalExpressionNode(position, "$" +
                 Constants.MATH_NAMESPACE + " does not define a function \"" +
                 fID + "()\"");
+    }
+
+    public static ExpressionNode constant(
+            final TextPosition position, final String constID
+    ) {
+        if (constID.equals(PiNode.PI))
+            return new PiNode(position);
+
+        return new IllegalExpressionNode(position,
+                "No constant \"$" + Constants.MATH_NAMESPACE +
+                        "." + constID + "\" exists");
     }
 }

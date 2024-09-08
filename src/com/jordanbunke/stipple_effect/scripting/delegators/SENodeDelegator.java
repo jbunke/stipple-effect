@@ -95,21 +95,21 @@ public final class SENodeDelegator {
     }
 
     public static ExpressionNode globalConstant(
-            final TextPosition position, final String propertyID
+            final TextPosition position, final String constID
     ) {
-        if (EnumUtils.matches(propertyID, Scope.class))
+        if (EnumUtils.matches(constID, Scope.class))
             return new ScopeConstantNode(position,
-                    Scope.valueOf(propertyID));
-        else if (EnumUtils.matches(propertyID, SaveConfig.SaveType.class))
+                    Scope.valueOf(constID));
+        else if (EnumUtils.matches(constID, SaveConfig.SaveType.class))
             return new SaveTypeConstantNode(position,
-                    SaveConfig.SaveType.valueOf(propertyID));
+                    SaveConfig.SaveType.valueOf(constID));
         else
-            return switch (propertyID) {
+            return switch (constID) {
                 case DimConstantNode.HORZ -> new DimConstantNode(position, true);
                 case DimConstantNode.VERT -> new DimConstantNode(position, false);
                 // extend here
                 default -> new IllegalExpressionNode(position,
-                        "No constant \"" + formatGlobal(propertyID, false) +
+                        "No constant \"" + formatGlobal(constID, false) +
                                 "\" exists");
             };
     }

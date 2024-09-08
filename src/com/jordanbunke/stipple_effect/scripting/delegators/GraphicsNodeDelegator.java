@@ -5,6 +5,9 @@ import com.jordanbunke.delta_time.scripting.ast.nodes.expression.IllegalExpressi
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.graphics.*;
 import com.jordanbunke.stipple_effect.utility.Constants;
+import com.jordanbunke.stipple_effect.utility.EnumUtils;
+
+import static com.jordanbunke.stipple_effect.scripting.util.LightingUtils.*;
 
 public final class GraphicsNodeDelegator {
     public static ExpressionNode expression(
@@ -15,10 +18,23 @@ public final class GraphicsNodeDelegator {
             case UVMappingNode.NAME -> new UVMappingNode(position, args);
             case GenLookupNode.NAME -> new GenLookupNode(position, args);
             case LerpColorNode.NAME -> new LerpColorNode(position, args);
-            case LightMaskNode.NAME -> new LightMaskNode(position, args);
+            case DirectionalLightNode.NAME ->
+                    new DirectionalLightNode(position, args);
             default -> new IllegalExpressionNode(position, "$" +
                     Constants.GRAPHICS_NAMESPACE + " does not define a function \"" +
                     fID + "()\"");
         };
+    }
+
+    public static ExpressionNode constant(
+            final TextPosition position, final String constID
+    ) {
+        if (EnumUtils.matches(constID, LightDirection.class))
+            return new DirLightConstantNode(position,
+                    LightDirection.valueOf(constID));
+
+        return new IllegalExpressionNode(position,
+                "No constant \"$" + Constants.GRAPHICS_NAMESPACE +
+                        "." + constID + "\" exists");
     }
 }

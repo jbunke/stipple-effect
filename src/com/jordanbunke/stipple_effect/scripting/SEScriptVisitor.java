@@ -42,16 +42,21 @@ public final class SEScriptVisitor extends ScriptVisitor {
             final ScriptParser.ExtPropertyExpressionContext ctx
     ) {
         final String namespace = ctx.namespace().ident().getText(),
-                propertyID = ctx.namespace().subident().getText()
+                constID = ctx.namespace().subident().getText()
                         .substring(SCOPE_SEP.length());
 
         final TextPosition position = TextPosition.fromToken(ctx.start);
 
-        if (namespace.equals(Constants.SCRIPT_GLOBAL_NAMESPACE))
-            return SENodeDelegator.globalConstant(position, propertyID);
-
-        return new IllegalExpressionNode(position,
-                "\"" + namespace + "\" is an illegal namespace");
+        return switch (namespace) {
+            case Constants.SCRIPT_GLOBAL_NAMESPACE ->
+                    SENodeDelegator.globalConstant(position, constID);
+            case Constants.GRAPHICS_NAMESPACE ->
+                    GraphicsNodeDelegator.constant(position, constID);
+            case Constants.MATH_NAMESPACE ->
+                    MathNodeDelegator.constant(position, constID);
+            default -> new IllegalExpressionNode(position,
+                    "\"" + namespace + "\" is an illegal namespace");
+        };
     }
 
     @Override

@@ -314,11 +314,26 @@ public class ColorMath {
         return MathPlus.min(rgb);
     }
 
-    private static double[] rgbAsArray(final Color c) {
+    public static double[] rgbAsArray(final Color c) {
         return new double[] {
                 c.getRed() / (double) Constants.RGBA_SCALE,
                 c.getGreen() / (double) Constants.RGBA_SCALE,
                 c.getBlue() / (double) Constants.RGBA_SCALE
         };
+    }
+
+    public static Color arrayAsColor(final double[] rgb) {
+        final int R = 0, G = 1, B = 2, CHANNELS = 3;
+
+        if (rgb.length != CHANNELS)
+            return null;
+
+        return new Color(
+                MathPlus.bounded(0, (int)Math.round(rgb[R] *
+                        Constants.RGBA_SCALE), Constants.RGBA_SCALE),
+                MathPlus.bounded(0, (int)Math.round(rgb[G] *
+                        Constants.RGBA_SCALE), Constants.RGBA_SCALE),
+                MathPlus.bounded(0, (int)Math.round(rgb[B] *
+                        Constants.RGBA_SCALE), Constants.RGBA_SCALE));
     }
 }
