@@ -1,6 +1,7 @@
 package com.jordanbunke.stipple_effect.scripting.util;
 
 import com.jordanbunke.delta_time.image.GameImage;
+import com.jordanbunke.delta_time.utility.math.Coord2D;
 
 import java.awt.*;
 
@@ -42,11 +43,13 @@ public class LightingUtils {
         return vector;
     }
 
+    private static double length(final double[] vector) {
+        return Math.sqrt((vector[NX] * vector[NX]) +
+                (vector[NY] * vector[NY]) + (vector[NZ] * vector[NZ]));
+    }
+
     private static void normalizeVector(final double[] vector) {
-        final double length = Math.sqrt(
-                (vector[NX] * vector[NX]) +
-                        (vector[NY] * vector[NY]) +
-                        (vector[NZ] * vector[NZ]));
+        final double length = length(vector);
 
         if (length != 0d)
             for (int dim = 0; dim < N_DIMS; dim++)
@@ -86,7 +89,8 @@ public class LightingUtils {
             final Color lightC, final double luminosity, final double[] lightDir
     ) {
         if (texture.getWidth() != normalMap.getWidth() ||
-                texture.getHeight() != normalMap.getHeight())
+                texture.getHeight() != normalMap.getHeight() ||
+                luminosity <= 0d)
             return texture;
 
         final int w = texture.getWidth(), h = texture.getHeight();
@@ -105,5 +109,53 @@ public class LightingUtils {
         }
 
         return lit.submit();
+    }
+
+    public static GameImage pointLight(
+            final GameImage texture, final GameImage normalMap,
+            final Color lightC, final Coord2D lightSource, final double z,
+            final double lumAtSource, final double radius
+    ) {
+        if (texture.getWidth() != normalMap.getWidth() ||
+                texture.getHeight() != normalMap.getHeight() ||
+                radius <= 0d || lumAtSource <= 0d)
+            return texture;
+
+        final int w = texture.getWidth(), h = texture.getHeight();
+        final GameImage lit = new GameImage(w, h);
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                final Color textureC = texture.getColorAt(x, y);
+
+                if (textureC.getAlpha() == 0)
+                    continue;
+
+                final double distance = Coord2D.unitDistanceBetween(
+                        lightSource, new Coord2D(x, y)),
+                        effect = 1d - (distance / radius),
+                        luminosity = effect * lumAtSource;
+                final double[] lightDir = getLightDir(lightSource, x, y, z);
+
+                lit.dot(lightPixel(textureC, normalMap.getColorAt(x, y),
+                        lightC, luminosity, lightDir), x, y);
+            }
+        }
+
+        return lit.submit();
+    }
+
+    private static double[] getLightDir(
+            final Coord2D lightSource, final int x, final int y, final double z
+    ) {
+        final double[] lightDir = new double[] {
+                (double)(lightSource.x - x),
+                (double)(y - lightSource.y),
+                z
+        };
+
+        normalizeVector(lightDir);
+
+        return lightDir;
     }
 }

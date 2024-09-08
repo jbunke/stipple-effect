@@ -20,6 +20,7 @@ public final class GraphicsNodeDelegator {
             case LerpColorNode.NAME -> new LerpColorNode(position, args);
             case DirectionalLightNode.NAME ->
                     new DirectionalLightNode(position, args);
+            case PointLightNode.NAME -> new PointLightNode(position, args);
             default -> new IllegalExpressionNode(position, "$" +
                     Constants.GRAPHICS_NAMESPACE + " does not define a function \"" +
                     fID + "()\"");
