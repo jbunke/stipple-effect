@@ -143,9 +143,13 @@ public abstract class ToolThatDraws extends Tool {
         if (line.isSinglePoint())
             return;
 
-        final double distance = line.distance();
+        final int maxDim = Math.max(Math.abs(from.x - to.x),
+                Math.abs(from.y - to.y));
 
-        for (int step = 0; step < distance; step++) {
+        final double distance = line.distance(),
+                inc = distance / (double) maxDim;
+
+        for (double step = 0; step < distance; step += inc) {
             final Coord2D here = line.pointAlongLineD(step)
                     .displace(from.scale(-1));
             action.accept(here.x, here.y);
