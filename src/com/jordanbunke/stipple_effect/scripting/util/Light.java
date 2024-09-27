@@ -45,6 +45,30 @@ public final class Light {
                 position, color, new double[0]);
     }
 
+    public void setLuminosity(final double luminosity) {
+        this.luminosity = luminosity;
+    }
+
+    public void setColor(final Color color) {
+        this.color = color;
+    }
+
+    public void setDirection(final double[] direction) {
+        this.direction = direction;
+    }
+
+    public void setPosition(final Coord2D position) {
+        this.position = position;
+    }
+
+    public void setRadius(final double radius) {
+        this.radius = radius;
+    }
+
+    public void setZ(final double z) {
+        this.z = z;
+    }
+
     public double getLuminosity() {
         return luminosity;
     }

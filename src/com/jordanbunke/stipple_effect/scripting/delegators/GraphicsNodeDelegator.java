@@ -19,8 +19,9 @@ public final class GraphicsNodeDelegator {
             case GenLookupNode.NAME -> new GenLookupNode(position, args);
             case LerpColorNode.NAME -> new LerpColorNode(position, args);
             case DirectionalLightNode.NAME ->
-                    new DirectionalLightNode(position, args);
+                    new DirectionalLightNode(position, args); // TODO
             case PointLightNode.NAME -> new PointLightNode(position, args);
+            case DirLightNode.NAME -> new DirLightNode(position, args);
             default -> new IllegalExpressionNode(position, "$" +
                     Constants.GRAPHICS_NAMESPACE + " does not define a function \"" +
                     fID + "()\"");
