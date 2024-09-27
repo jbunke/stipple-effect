@@ -19,6 +19,10 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.N
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewProjectStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.SetSideMaskNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.LightFloatSetterNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.SetLightColorNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.SetLightDirectionNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.SetLightPositionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.save_config.*;
@@ -335,6 +339,18 @@ public final class SENodeDelegator {
             case SetFolderNode.NAME -> new SetFolderNode(position, scope, args);
             case ScriptRunStatementNode.NAME ->
                     new ScriptRunStatementNode(position, scope, args);
+            case LightFloatSetterNode.SET_LUMINOSITY ->
+                    LightFloatSetterNode.luminosity(position, scope, args);
+            case LightFloatSetterNode.SET_RADIUS ->
+                    LightFloatSetterNode.radius(position, scope, args);
+            case LightFloatSetterNode.SET_Z ->
+                    LightFloatSetterNode.z(position, scope, args);
+            case SetLightColorNode.NAME ->
+                    new SetLightColorNode(position, scope, args);
+            case SetLightDirectionNode.NAME ->
+                    new SetLightDirectionNode(position, scope, args);
+            case SetLightPositionNode.NAME ->
+                    new SetLightPositionNode(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +

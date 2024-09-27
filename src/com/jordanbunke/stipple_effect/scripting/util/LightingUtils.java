@@ -84,7 +84,14 @@ public class LightingUtils {
         return arrayAsColor(rgbApplied);
     }
 
-    // TODO
+    public static GameImage processLighting(
+            final GameImage texture, final GameImage normalMap,
+            final Light[] lights
+    ) {
+        // TODO
+        return texture;
+    }
+
     public static GameImage directionalLight(
             final GameImage texture, final GameImage normalMap,
             final Color lightC, final double luminosity, final double[] lightDir
