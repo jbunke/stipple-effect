@@ -95,6 +95,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
         frameIndex = 0;
         updateContent();
+        frameCount = content.length;
 
         initialPos = position;
         componentsPositions = new HashMap<>();
