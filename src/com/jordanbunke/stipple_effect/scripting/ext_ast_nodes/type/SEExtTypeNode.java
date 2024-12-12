@@ -1,5 +1,6 @@
 package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.type;
 
+import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.TypeNode;
 import com.jordanbunke.delta_time.scripting.util.TextPosition;
 
@@ -17,7 +18,8 @@ public abstract class SEExtTypeNode extends TypeNode {
 
     @Override
     public final boolean equals(final Object o) {
-        return getClass().equals(o.getClass());
+        return getClass().equals(o.getClass()) ||
+                (o instanceof BaseTypeNode t && t.isWildcard());
     }
 
     @Override

@@ -65,7 +65,7 @@ public class LightingUtils {
         return Math.max(dp, 0d);
     }
 
-    public static Color lightPixel(
+    public static double[] lightPixel(
             final Color textureC, final Color normalMapC, final Color lightC,
             final double luminosity, final double[] lightDir
     ) {
@@ -81,24 +81,15 @@ public class LightingUtils {
         for (int dim = 0; dim < N_DIMS; dim++)
             rgbApplied[dim] = rgbTexture[dim] * rgbLight[dim] * intensity;
 
-        return arrayAsColor(rgbApplied);
+        return rgbApplied;
     }
 
     public static GameImage processLighting(
             final GameImage texture, final GameImage normalMap,
             final Light[] lights
     ) {
-        // TODO
-        return texture;
-    }
-
-    public static GameImage directionalLight(
-            final GameImage texture, final GameImage normalMap,
-            final Color lightC, final double luminosity, final double[] lightDir
-    ) {
         if (texture.getWidth() != normalMap.getWidth() ||
-                texture.getHeight() != normalMap.getHeight() ||
-                luminosity <= 0d)
+                texture.getHeight() != normalMap.getHeight())
             return texture;
 
         final int w = texture.getWidth(), h = texture.getHeight();
@@ -106,47 +97,39 @@ public class LightingUtils {
 
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                final Color textureC = texture.getColorAt(x, y);
+                final Color textureC = texture.getColorAt(x, y),
+                        normalMapC = normalMap.getColorAt(x, y);
 
                 if (textureC.getAlpha() == 0)
                     continue;
 
-                lit.dot(lightPixel(textureC, normalMap.getColorAt(x, y),
-                        lightC, luminosity, lightDir), x, y);
-            }
-        }
+                final double[] accum = new double[N_DIMS];
 
-        return lit.submit();
-    }
+                for (Light light : lights) {
+                    final double luminosity;
+                    final double[] lightDir;
 
-    public static GameImage pointLight(
-            final GameImage texture, final GameImage normalMap,
-            final Color lightC, final Coord2D lightSource, final double z,
-            final double lumAtSource, final double radius
-    ) {
-        if (texture.getWidth() != normalMap.getWidth() ||
-                texture.getHeight() != normalMap.getHeight() ||
-                radius <= 0d || lumAtSource <= 0d)
-            return texture;
+                    if (light.point) {
+                        final Coord2D lightSource = light.getPosition();
+                        final double distance = Coord2D.unitDistanceBetween(
+                                lightSource, new Coord2D(x, y)),
+                                effect = 1d - (distance / light.getRadius());
 
-        final int w = texture.getWidth(), h = texture.getHeight();
-        final GameImage lit = new GameImage(w, h);
+                        luminosity = effect * light.getLuminosity();
+                        lightDir = getLightDir(lightSource, x, y, light.getZ());
+                    } else {
+                        luminosity = light.getLuminosity();
+                        lightDir = light.getDirection();
+                    }
 
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                final Color textureC = texture.getColorAt(x, y);
+                    final double[] litPixel = lightPixel(textureC,
+                            normalMapC, light.getColor(), luminosity, lightDir);
 
-                if (textureC.getAlpha() == 0)
-                    continue;
+                    for (int dim = 0; dim < N_DIMS; dim++)
+                        accum[dim] = accum[dim] + litPixel[dim];
+                }
 
-                final double distance = Coord2D.unitDistanceBetween(
-                        lightSource, new Coord2D(x, y)),
-                        effect = 1d - (distance / radius),
-                        luminosity = effect * lumAtSource;
-                final double[] lightDir = getLightDir(lightSource, x, y, z);
-
-                lit.dot(lightPixel(textureC, normalMap.getColorAt(x, y),
-                        lightC, luminosity, lightDir), x, y);
+                lit.dot(arrayAsColor(accum), x, y);
             }
         }
 
