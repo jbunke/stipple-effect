@@ -21,7 +21,7 @@ public final class LightingNode extends GraphicsExpressionNode {
     }
 
     @Override
-    public Object evaluate(final SymbolTable symbolTable) {
+    public GameImage evaluate(final SymbolTable symbolTable) {
         final Object[] vs = arguments.getValues(symbolTable);
 
         final GameImage texture = (GameImage) vs[0], normal = (GameImage) vs[1];
