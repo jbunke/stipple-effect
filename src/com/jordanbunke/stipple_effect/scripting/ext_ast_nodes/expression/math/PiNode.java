@@ -8,7 +8,7 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.ExtExpr
 import com.jordanbunke.stipple_effect.scripting.util.Arguments;
 import com.jordanbunke.stipple_effect.utility.Constants;
 
-public class PiNode extends ExtExpressionNode {
+public final class PiNode extends ExtExpressionNode {
     public static final String PI = "PI";
 
     public PiNode(
