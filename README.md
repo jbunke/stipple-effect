@@ -1,10 +1,9 @@
 # ![Stipple Effect](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/logo-anim.gif)
 
-[![Buy on Itch.io](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/itch.png)](https://flinkerflitzer.itch.io/stipple-effect)
-[![Changelog](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/documentation.png)](https://github.com/jbunke/se-docs)
-[![Changelog](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/api.png)](https://github.com/jbunke/se-api)
+[![Website](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/website.png)](https://jbunke.github.io/se)
 [![Changelog](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/changelog.png)](changelog.md)
 [![Roadmap](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/roadmap.png)](roadmap.md)
+[![Buy on Itch.io](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/buttons/itch.png)](https://flinkerflitzer.itch.io/stipple-effect)
 
 ## About
 *Stipple Effect* is a pixel art editor that supports animation and scripting. It is designed to facilitate a variety of workflows and to encourage rapid, iterative creation of video game art assets and other types of artwork.
