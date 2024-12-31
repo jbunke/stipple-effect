@@ -95,6 +95,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
         frameIndex = 0;
         updateContent();
+        frameCount = content.length;
 
         initialPos = position;
         componentsPositions = new HashMap<>();
@@ -334,6 +335,9 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
     }
 
     private void updateFrameData() {
+        if (INSTANCE == null)
+            return;
+
         frameCount = content.length;
         frameIndex %= frameCount;
     }

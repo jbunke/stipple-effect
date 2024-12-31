@@ -88,26 +88,26 @@ public class ColorMath {
         }
     }
 
-    public static Color betweenColor(
-            final double pos, final Color start, final Color end
+    public static Color lerp(
+            final Color a, final Color b, final double t
     ) {
-        if (pos <= 0d)
-            return start;
-        else if (pos >= 1d)
-            return end;
+        if (t <= 0d)
+            return a;
+        else if (t >= 1d)
+            return b;
 
-        final int baseR = start.getRed(), baseG = start.getGreen(),
-                baseB = start.getBlue(), baseA = start.getAlpha(),
-                deltaR = end.getRed() - start.getRed(),
-                deltaG = end.getGreen() - start.getGreen(),
-                deltaB = end.getBlue() - start.getBlue(),
-                deltaA = end.getAlpha() - start.getAlpha();
+        final int baseR = a.getRed(), baseG = a.getGreen(),
+                baseB = a.getBlue(), baseA = a.getAlpha(),
+                deltaR = b.getRed() - a.getRed(),
+                deltaG = b.getGreen() - a.getGreen(),
+                deltaB = b.getBlue() - a.getBlue(),
+                deltaA = b.getAlpha() - a.getAlpha();
 
         return new Color(
-                baseR + (int)Math.round(deltaR * pos),
-                baseG + (int)Math.round(deltaG * pos),
-                baseB + (int)Math.round(deltaB * pos),
-                baseA + (int)Math.round(deltaA * pos)
+                baseR + (int)Math.round(deltaR * t),
+                baseG + (int)Math.round(deltaG * t),
+                baseB + (int)Math.round(deltaB * t),
+                baseA + (int)Math.round(deltaA * t)
         );
     }
 
@@ -314,11 +314,26 @@ public class ColorMath {
         return MathPlus.min(rgb);
     }
 
-    private static double[] rgbAsArray(final Color c) {
+    public static double[] rgbAsArray(final Color c) {
         return new double[] {
                 c.getRed() / (double) Constants.RGBA_SCALE,
                 c.getGreen() / (double) Constants.RGBA_SCALE,
                 c.getBlue() / (double) Constants.RGBA_SCALE
         };
+    }
+
+    public static Color arrayAsColor(final double[] rgb) {
+        final int R = 0, G = 1, B = 2, CHANNELS = 3;
+
+        if (rgb.length != CHANNELS)
+            return null;
+
+        return new Color(
+                MathPlus.bounded(0, (int)Math.round(rgb[R] *
+                        Constants.RGBA_SCALE), Constants.RGBA_SCALE),
+                MathPlus.bounded(0, (int)Math.round(rgb[G] *
+                        Constants.RGBA_SCALE), Constants.RGBA_SCALE),
+                MathPlus.bounded(0, (int)Math.round(rgb[B] *
+                        Constants.RGBA_SCALE), Constants.RGBA_SCALE));
     }
 }

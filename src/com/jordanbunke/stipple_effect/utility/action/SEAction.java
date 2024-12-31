@@ -80,7 +80,7 @@ public enum SEAction {
     CLEAR_DIALOG(ResourceCodes.NONE, fromSE(StippleEffect::clearDialog),
             KeyShortcut.single(ESCAPE)),
     DOCUMENTATION(ResourceCodes.DOCUMENTATION, plain(WebUtils::documentation), null),
-    SCRIPTING_API(ResourceCodes.SCRIPTING_API, plain(WebUtils::scriptingAPI), null),
+    SCRIPTING_API(ResourceCodes.SCRIPTING_API, plain(WebUtils::apiSpec), null),
     REPORT_BUG(ResourceCodes.REPORT_BUG, plain(WebUtils::reportBug), null),
     VS_CODE_EXT(ResourceCodes.VS_CODE_EXT, plain(WebUtils::vsCodeExt), null),
 

@@ -334,7 +334,7 @@ public final class GradientTool extends ToolWithBreadth
         final Color p = StippleEffect.get().getPrimary(),
                 s = StippleEffect.get().getSecondary();
 
-        return ColorMath.betweenColor(backwards ? 1 - c : c, p, s);
+        return ColorMath.lerp(p, s, backwards ? 1 - c : c);
     }
 
     private Color getDitherColor(

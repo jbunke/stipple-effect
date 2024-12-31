@@ -4,6 +4,7 @@ import com.jordanbunke.delta_time.error.GameError;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class EnumUtils {
@@ -42,10 +43,17 @@ public class EnumUtils {
     }
 
     public static <T extends Enum<T>> boolean matches(
-            final String name, final Class<T> enumClass
+            final String name, final Class<T> enumClass,
+            final Function<T, String> f
     ) {
         return stream(enumClass)
-                .map(e -> e.name().equals(name))
+                .map(e -> f.apply(e).equals(name))
                 .reduce(false, Boolean::logicalOr);
+    }
+
+    public static <T extends Enum<T>> boolean matches(
+            final String name, final Class<T> enumClass
+    ) {
+        return matches(name, enumClass, T::name);
     }
 }

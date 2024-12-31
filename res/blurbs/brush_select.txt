@@ -2,7 +2,7 @@ Shortcut: {sc:SET_TOOL_BRUSH_SELECT}
 
 Behaves like the brush, but for selection.
 
-Simple selection: {Click}
+Simple selection: {Click & Drag}
 
 Additive selection: {Ctrl + Click & Drag}
 Adds the result of the operation to the existing selection.

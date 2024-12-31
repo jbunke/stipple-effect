@@ -41,6 +41,7 @@ public class Constants {
             UNTITLED_PROJECT_NAME = "[ Untitled ]", NO_FOLDER_SELECTED = "[ No folder selected ]",
             NATIVE_FILE_SUFFIX = "stip", PALETTE_FILE_SUFFIX = "stippal",
             SCRIPT_FILE_SUFFIX = "ses", SCRIPT_GLOBAL_NAMESPACE = "SE",
+            MATH_NAMESPACE = "Math", GRAPHICS_NAMESPACE = "Graphics",
             ASCII_TEMPLATE = "ascii", LATIN_EXTENDED_TEMPLATE = "latin-extended",
             COLOR_TOOL_TIP_PREFIX = "color:", SHORTCUT_PREFIX = "sc:",
             OPEN_HIGHLIGHT = "{", CLOSE_HIGHLIGHT = "}",

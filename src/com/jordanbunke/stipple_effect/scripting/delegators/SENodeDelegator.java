@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.util;
+package com.jordanbunke.stipple_effect.scripting.delegators;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.IllegalExpressionNode;
@@ -10,6 +10,7 @@ import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.ColorPropertyGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.light.LightGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.script.ScriptRunExpressionNode;
@@ -18,6 +19,10 @@ import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.N
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.NewProjectStatementNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.global.SetSideMaskNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.layer.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.LightFloatSetterNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.SetLightColorNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.SetLightDirectionNode;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.light.SetLightPositionNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.palette.PaletteColorOpNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.project.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.statement.save_config.*;
@@ -28,6 +33,10 @@ import com.jordanbunke.stipple_effect.utility.DialogVals.Scope;
 import com.jordanbunke.stipple_effect.utility.EnumUtils;
 import com.jordanbunke.stipple_effect.utility.action.SEAction;
 
+/**
+ * ASTNode delegator for constants and functions of the global namespace ($SE)
+ * and properties and functions called on expressions that evaluate to objects
+ * */
 public final class SENodeDelegator {
     public static StatementNode globalFunctionStatement(
             final TextPosition position, final String fID,
@@ -44,7 +53,7 @@ public final class SENodeDelegator {
             case SetSideMaskNode.NAME -> new SetSideMaskNode(position, args);
             // extend here
             default -> new IllegalStatementNode(position,
-                    "Undefined function \"" + formatGlobal(fID) + "\"");
+                    "Undefined function \"" + formatGlobal(fID, true) + "\"");
         };
     }
 
@@ -86,32 +95,35 @@ public final class SENodeDelegator {
                     : TransformNode.reg(position, args);
             // extend here
             default -> new IllegalExpressionNode(position,
-                    "Undefined function \"" + formatGlobal(fID) + "\"");
+                    "Undefined function \"" + formatGlobal(fID, true) + "\"");
         };
     }
 
-    public static ExpressionNode globalProperty(
-            final TextPosition position, final String propertyID
+    public static ExpressionNode globalConstant(
+            final TextPosition position, final String constID
     ) {
-        if (EnumUtils.matches(propertyID, Scope.class))
+        if (EnumUtils.matches(constID, Scope.class))
             return new ScopeConstantNode(position,
-                    Scope.valueOf(propertyID));
-        else if (EnumUtils.matches(propertyID, SaveConfig.SaveType.class))
+                    Scope.valueOf(constID));
+        else if (EnumUtils.matches(constID, SaveConfig.SaveType.class))
             return new SaveTypeConstantNode(position,
-                    SaveConfig.SaveType.valueOf(propertyID));
+                    SaveConfig.SaveType.valueOf(constID));
         else
-            return switch (propertyID) {
+            return switch (constID) {
                 case DimConstantNode.HORZ -> new DimConstantNode(position, true);
                 case DimConstantNode.VERT -> new DimConstantNode(position, false);
                 // extend here
                 default -> new IllegalExpressionNode(position,
-                        "No property \"" + formatGlobal(propertyID) +
+                        "No constant \"" + formatGlobal(constID, false) +
                                 "\" exists");
             };
     }
 
-    private static String formatGlobal(final String subidentifier) {
-        return "$" + Constants.SCRIPT_GLOBAL_NAMESPACE + "." + subidentifier;
+    private static String formatGlobal(
+            final String subidentifier, final boolean function
+    ) {
+        return "$" + Constants.SCRIPT_GLOBAL_NAMESPACE + "." +
+                subidentifier + (function ? "()" : "");
     }
 
     public static ExpressionNode scopedProperty(
@@ -191,6 +203,20 @@ public final class SENodeDelegator {
                     new GetSaveConfigNode(position, scope, args);
             case ScriptRunExpressionNode.NAME ->
                     new ScriptRunExpressionNode(position, scope, args);
+            case LightGetterNode.IS_POINT ->
+                    LightGetterNode.point(position, scope, args);
+            case LightGetterNode.GET_LUMINOSITY ->
+                    LightGetterNode.luminosity(position, scope, args);
+            case LightGetterNode.GET_COLOR ->
+                    LightGetterNode.color(position, scope, args);
+            case LightGetterNode.GET_DIRECTION ->
+                    LightGetterNode.direction(position, scope, args);
+            case LightGetterNode.GET_POSITION ->
+                    LightGetterNode.position(position, scope, args);
+            case LightGetterNode.GET_RADIUS ->
+                    LightGetterNode.radius(position, scope, args);
+            case LightGetterNode.GET_Z ->
+                    LightGetterNode.z(position, scope, args);
             // extend here
             default -> new IllegalExpressionNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -313,6 +339,18 @@ public final class SENodeDelegator {
             case SetFolderNode.NAME -> new SetFolderNode(position, scope, args);
             case ScriptRunStatementNode.NAME ->
                     new ScriptRunStatementNode(position, scope, args);
+            case LightFloatSetterNode.SET_LUMINOSITY ->
+                    LightFloatSetterNode.luminosity(position, scope, args);
+            case LightFloatSetterNode.SET_RADIUS ->
+                    LightFloatSetterNode.radius(position, scope, args);
+            case LightFloatSetterNode.SET_Z ->
+                    LightFloatSetterNode.z(position, scope, args);
+            case SetLightColorNode.NAME ->
+                    new SetLightColorNode(position, scope, args);
+            case SetLightDirectionNode.NAME ->
+                    new SetLightDirectionNode(position, scope, args);
+            case SetLightPositionNode.NAME ->
+                    new SetLightPositionNode(position, scope, args);
             // extend here
             default -> new IllegalStatementNode(position,
                     "No scoped function \"" + fID + "\" with " +
@@ -329,6 +367,7 @@ public final class SENodeDelegator {
             case PaletteTypeNode.NAME -> new PaletteTypeNode(position);
             case ScriptTypeNode.NAME -> new ScriptTypeNode(position);
             case SaveConfigTypeNode.NAME -> new SaveConfigTypeNode(position);
+            case LightTypeNode.NAME -> new LightTypeNode(position);
             default -> null;
         };
 

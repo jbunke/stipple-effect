@@ -9,7 +9,7 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 
 import java.awt.*;
 
-public final class NormalMapSampler extends AbstractColorMap {
+public final class NormalMapSampler extends AbstractColorWheel {
     public static final int NONE = 1, MAX = 85, MIN_BLUE = 128;
 
     private static int quantization = NONE;

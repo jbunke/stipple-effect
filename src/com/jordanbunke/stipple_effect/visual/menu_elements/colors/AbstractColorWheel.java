@@ -11,14 +11,14 @@ import com.jordanbunke.stipple_effect.visual.theme.Theme;
 
 import java.awt.*;
 
-public abstract class AbstractColorMap extends TwoDimSampler {
+public abstract class AbstractColorWheel extends TwoDimSampler {
     private GameImage wheel;
     final GameImage background;
 
     final int radius;
     final Coord2D localOffset, middle;
 
-    AbstractColorMap(final Coord2D position, final Bounds2D dimensions) {
+    AbstractColorWheel(final Coord2D position, final Bounds2D dimensions) {
         super(position, dimensions);
 
         final int w = dimensions.width(), h = dimensions.height(),
