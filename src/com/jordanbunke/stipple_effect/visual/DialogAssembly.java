@@ -2049,7 +2049,7 @@ public class DialogAssembly {
         // subtitle
         final GameImage subtitle = GraphicsUtils.uiText(t.splashText)
                 .addText(t.subtitle).addLineBreak()
-                .addText("Copyright (c) 2023-2024 Jordan Bunke")
+                .addText("Copyright (c) 2023-present Jordan Bunke")
                 .build().draw();
 
         mb.add(new StaticMenuElement(new Coord2D(w / 2, h - (version.getHeight() * 2)),
@@ -3091,14 +3091,14 @@ public class DialogAssembly {
 
         final TextLabel scriptLabel = TextLabel.make(
                 contentStart.displace(indent, bottomY + TEXT_Y_OFFSET),
-                "For a more thorough breakdown of scripting and the scripting API: "),
+                "Read the scripting API specification: "),
                 vsCodeLabel = TextLabel.make(
                         textBelowPos(scriptLabel),
                         "VS Code extension for Stipple Effect script syntax highlighting: ");
         final StaticTextButton scriptButton =
                 GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(scriptLabel),
-                        WebUtils::scriptingAPI),
+                        WebUtils::apiSpec),
                 vsCodeButton = GraphicsUtils.makeStandardTextButton("Go",
                         contentPositionAfterLabel(vsCodeLabel),
                         WebUtils::vsCodeExt);

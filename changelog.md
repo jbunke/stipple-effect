@@ -1,5 +1,23 @@
 # Changelog
 
+## **1.2.2** - 2024-12-31
+
+### Added:
+* Comprehensive [program documentation](https://jbunke.github.io/se/docs/) and [scripting API specification](https://jbunke.github.io/se/api/)
+
+### Changed:
+* Updated *Stipple Effect -> Resources* links with the new website
+
+### Fixed:
+* Bug: Line tool produces doubles at oblique angles when line breadth is 1
+
+### API Changes:
+* Added:
+  * `light` type
+  * New namespaces and associated functions and constants
+    * `$Graphics`
+    * `$Math`
+
 ## **1.2.1** - 2024-09-06
 
 ### Added:

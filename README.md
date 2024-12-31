@@ -16,38 +16,37 @@
 <div align="center">A preview script in action</div>
 
 ## Features
-* Symbiotic relationship between layers and frames
-    * [Linked and unlinked layers](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/linked-layers.gif)
-* [Two-color system: Stipple Effect's brush, pencil, and gradient tool allow for interesting combinations of the primary and secondary colors](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/combination-modes.gif)
-    * Dither mode
-    * Blend mode
-    * Noise mode
-* State management
-    * [Granular undo and redo](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/granular-undo-redo.gif)
-* Animation playback
-    * [Onion skinning](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/onion-skin.gif)
+* Symbiotic relationship between [layers](https://jbunke.github.io/se/docs/layer) and [frames](https://jbunke.github.io/se/docs/frame)
+    * Linked-cel layers (contents persist across frames)
+* Two-color system: *Stipple Effect*'s brush, pencil, and gradient tool allow for interesting [combinations](https://jbunke.github.io/se/docs/color#combination-modes) of the [primary and secondary colors](https://jbunke.github.io/se/docs/interface#system-colors)
+* Project [state control](https://jbunke.github.io/se/docs/state-control)
+    * [Granular undo and redo](https://jbunke.github.io/se/docs/state-control#granularity)
+    * History
+    * Generate time lapses
+* Animation
+    * [Onion skinning](https://jbunke.github.io/se/docs/layer#onion-skin)
     * Edit during playback
-* [Split/stitch](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/split-stitch.gif)
-    * Split a project into frames
-    * Stitch frames together into a sprite sheet
+* Split/stitch
+    * [Split a sprite sheet into frames](https://jbunke.github.io/se/docs/sizing#split-a-sprite-sheet-into-frames)
+    * [Stitch an animation into a sprite sheet](https://jbunke.github.io/se/docs/sizing#stitch-an-animation-into-a-sprite-sheet)
 * Palettes
     * Import and export palettes
-    * [Palettization](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/palettization.gif)
-    * [Extract colors in a project to a palette](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/extract-colors.gif)
-* Selection
-    * [Family of selection tools designed for pixel-perfect selection](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/selection-tools.gif)
-    * [Intuitive and powerful outlining utilities](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/outline.gif)
-* [Pixel grid](https://raw.githubusercontent.com/jbunke/se-docs/master/assets/graphics/pixel-grid.gif)
-    * Easily enable/disable and modify the size of the pixel grid cells
+    * [Palettization](https://jbunke.github.io/se/docs/color-actions#palettization)
+    * [Extract colors in a project to a palette](https://jbunke.github.io/se/docs/color-actions#extract-canvas-colors-to-palette)
+* [Selection](https://jbunke.github.io/se/docs/selection)
+    * [Family of selection tools](https://jbunke.github.io/se/docs/sel-area-tools) designed for pixel-perfect selection
+    * Intuitive and powerful [outlining utilities](https://jbunke.github.io/se/docs/outline)
+* [Pixel grid](https://jbunke.github.io/se/docs/pixel-grid)
+    * Easily enable/disable and modify the size of the pixel grid's cells
     * The box select tool can snap to the grid
 * And much more!
 
-Find out more about the program by reading [the documentation](https://github.com/jbunke/se-docs).
+Find out more about the program by reading [the documentation](https://jbunke.github.io/se/docs/).
 
 ## Scripting
-_Stipple Effect_ supports scripts have three main uses: **automation**, **custom previews** and **color transformation**. It is highly recommended for users that want to get the most out of the program to read the API and familiarize themselves with its potential applications.
-* [Scripting overview](https://github.com/jbunke/se-docs/blob/master/scripting.md)
-* [API](https://github.com/jbunke/se-api)
+*Stipple Effect* scripts have three main uses: [**automation**](https://jbunke.github.io/se/docs/automation-scripts), [**custom previews**](https://jbunke.github.io/se/docs/preview-scripts) and [**color transformations**](https://jbunke.github.io/se/docs/color-scripts). It is highly recommended for users that want to get the most out of the program to read the API specification and familiarize themselves with its potential applications.
+* [Scripting overview](https://jbunke.github.io/se/docs/scripting)
+* [API specification](https://jbunke.github.io/se/api/)
 * [Example scripts](https://github.com/jbunke/se-script-examples)
 
 I have created [a VS Code extension](https://marketplace.visualstudio.com/items?itemName=jordanbunke.deltascript-for-stipple-effect) that provides syntax highlighting for *Stipple Effect* scripts.

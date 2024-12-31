@@ -1,6 +1,6 @@
 Shortcut: {sc:SET_TOOL_POLYGON_SELECT}
 
-Define a polygonal selection area by placing vertices. Adjacent vertices form edges that define
+Define a polygonal selection area by placing vertices. Successive vertices form edges that define
 the bounds of the selection. To close the polygon, place a vertex down on the same pixel where
 the shape began.
 

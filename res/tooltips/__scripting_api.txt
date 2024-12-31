@@ -1,1 +1,1 @@
-Scripting API
+Scripting API specification

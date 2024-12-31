@@ -396,7 +396,7 @@ public class ProjectState {
     public Selection getSelection() {
         return switch (selectionMode) {
             case BOUNDS -> selection;
-            case CONTENTS -> selectionContents.getSelection();
+            case CONTENTS -> selectionContents.getSelection(); // TODO: investigate crash - NullPointerException
         };
     }
 
