@@ -3,7 +3,7 @@
 ## **1.2.2** - 2024-12-31
 
 ### Added:
-* Comprehensive [program documentation](https://jbunke.github.io/se/docs/) and [scripting API specification](https://jbunke.github.io/se/api/)
+* Comprehensive [program documentation](https://stipple-effect.github.io/docs/) and [scripting API specification](https://stipple-effect.github.io/api/)
 
 ### Changed:
 * Updated *Stipple Effect -> Resources* links with the new website
