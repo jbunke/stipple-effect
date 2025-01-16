@@ -1,3 +1,22 @@
+{1.2.3} - 2025-01-1?
+
+TODO:
+To add:
+> Here
+
+To change:
+> Here
+
+To fix:
+> Pixel grid
+
+Changed:
+> Updated {Stipple Effect -> Resources} links with new repository and website URLs
+> Updated {DeltaScript} interpreter
+
+Fixed:
+> Bug: Arithmetic operators have a higher precedence than multiplicative operators in {DeltaScript}
+
 {1.2.2} - 2024-12-31
 
 Added:
