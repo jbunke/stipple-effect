@@ -947,7 +947,6 @@ public class StippleEffect implements ProgramContext {
         if (contexts.size() == 1 && !contexts.get(0).getSaveConfig()
                 .hasUnsavedChanges() &&
                 !contexts.get(0).getSaveConfig().hasSaveAssociation()) {
-            contexts.get(0).releasePixelGrid();
             contexts.remove(0);
         }
 
@@ -961,7 +960,6 @@ public class StippleEffect implements ProgramContext {
 
     public void removeContext(final int index) {
         if (index >= 0 && index < contexts.size()) {
-            contexts.get(index).releasePixelGrid();
             contexts.remove(index);
 
             if (contextIndex >= contexts.size())
@@ -1085,10 +1083,6 @@ public class StippleEffect implements ProgramContext {
 
     public void setContextIndex(final int contextIndex) {
         if (contextIndex >= 0 && contextIndex < contexts.size()) {
-            // release resources
-            if (this.contextIndex < contexts.size())
-                getContext().releasePixelGrid();
-
             // assign
             this.contextIndex = contextIndex;
 
@@ -1096,7 +1090,7 @@ public class StippleEffect implements ProgramContext {
             DeltaTimeGlobal.setStatus(Constants.CEL_SELECTION, false);
             rebuildAllMenus();
             ToolWithBreadth.redrawToolOverlays();
-            getContext().redrawCanvasAuxiliaries();
+            getContext().redrawCheckerboard();
         }
     }
 
