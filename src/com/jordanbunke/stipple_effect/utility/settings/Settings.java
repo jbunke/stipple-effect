@@ -16,6 +16,7 @@ import com.jordanbunke.stipple_effect.utility.settings.types.StringSettingType;
 import com.jordanbunke.stipple_effect.visual.DialogAssembly;
 import com.jordanbunke.stipple_effect.visual.GraphicsUtils;
 import com.jordanbunke.stipple_effect.visual.SEFonts;
+import com.jordanbunke.stipple_effect.visual.pixel_grid.PixelGrid;
 import com.jordanbunke.stipple_effect.visual.theme.Theme;
 import com.jordanbunke.stipple_effect.visual.theme.Themes;
 
@@ -67,17 +68,13 @@ public class Settings {
                 IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgx -> {
                     final SEContext c = StippleEffect.get().getContext();
                     c.renderInfo.setPixelGrid(true);
-
-                    StippleEffect.get().getContexts()
-                            .forEach(SEContext::redrawPixelGrid);
+                    PixelGrid.redraw();
                 })),
         PIXEL_GRID_Y_PX(new Setting<>(
                 IntSettingType.get(), Layout.DEFAULT_PIXEL_GRID_DIM, pgy -> {
                     final SEContext c = StippleEffect.get().getContext();
                     c.renderInfo.setPixelGrid(true);
-
-                    StippleEffect.get().getContexts()
-                            .forEach(SEContext::redrawPixelGrid);
+                    PixelGrid.redraw();
                 })),
         DEFAULT_CANVAS_W_PX(new Setting<>(
                 IntSettingType.get(), Constants.DEFAULT_CANVAS_W)),
