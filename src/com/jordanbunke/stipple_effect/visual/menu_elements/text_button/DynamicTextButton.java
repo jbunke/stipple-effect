@@ -1,6 +1,8 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.text_button;
 
+import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 
 import java.util.function.Supplier;
 
@@ -18,6 +20,14 @@ public class DynamicTextButton extends AbstractTextButton {
         text = getter.get();
 
         updateAssets();
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
+        super.process(eventLogger);
+
+        if (isHighlighted())
+            SECursor.clickableElement();
     }
 
     @Override

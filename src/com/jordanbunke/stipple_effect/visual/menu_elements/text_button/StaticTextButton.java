@@ -1,6 +1,8 @@
 package com.jordanbunke.stipple_effect.visual.menu_elements.text_button;
 
+import com.jordanbunke.delta_time.io.InputEventLogger;
 import com.jordanbunke.delta_time.utility.math.Coord2D;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 
 public final class StaticTextButton extends AbstractTextButton {
     private final String label;
@@ -14,6 +16,14 @@ public final class StaticTextButton extends AbstractTextButton {
 
         this.label = label;
         populateMatrix();
+    }
+
+    @Override
+    public void process(final InputEventLogger eventLogger) {
+        super.process(eventLogger);
+
+        if (isHighlighted())
+            SECursor.clickableElement();
     }
 
     @Override

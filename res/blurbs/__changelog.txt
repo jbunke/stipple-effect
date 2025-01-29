@@ -9,6 +9,7 @@ To change:
 
 Added:
 > {Reload script} button when running a script in the preview window: reload from file with changes
+> Pointer finger cursor to select dialog buttons and navbar submenu terminal buttons
 
 Changed:
 > Updated {Stipple Effect -> Resources} links with new repository and website URLs
