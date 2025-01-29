@@ -40,6 +40,8 @@ import static com.jordanbunke.stipple_effect.utility.Layout.*;
 public abstract class Preview extends MenuElement implements PreviewPlayback {
     private static Preview INSTANCE;
 
+    private static Path lastScriptPath;
+
     public final SEContext c;
     private HeadFuncNode script;
 
@@ -58,6 +60,7 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
     static {
         INSTANCE = null;
+        lastScriptPath = null;
     }
 
     public static void set(final SEContext c) {
@@ -121,13 +124,17 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
 
         final MenuElement removeButton = IconButton.make(
                 ResourceCodes.REMOVE_SCRIPT, initial, this::removeScript),
+                reloadButton = IconButton.make(
+                        ResourceCodes.RELOAD_SCRIPT,
+                        initial.displace(BUTTON_INC, 0),
+                        () -> validatePreviewScript(lastScriptPath)),
                 importButton = IconButton.make(
                         ResourceCodes.IMPORT_PREVIEW,
-                        initial.displace(BUTTON_INC, 0),
+                        initial.displace(BUTTON_INC * 2, 0),
                         this::importPreview),
                 perLayerButton = IconButton.make(
                         ResourceCodes.IMPORT_PER_LAYER,
-                        initial.displace(BUTTON_INC * 2, 0),
+                        initial.displace(BUTTON_INC * 3, 0),
                         this::importPerLayer),
                 scriptText = labelAfterLastButton(
                         perLayerButton, () -> script, script),
@@ -136,12 +143,13 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
                         initial, this::openPreviewScript),
                 noScriptText = labelAfterLastButton(
                         uploadButton, () -> noScript, noScript);
-        addMenuComponents(uploadButton, removeButton, importButton,
-                perLayerButton, scriptText, noScriptText);
+        addMenuComponents(uploadButton, removeButton, reloadButton,
+                importButton, perLayerButton, scriptText, noScriptText);
 
-        final MenuElement smartScriptElement = new ThinkingMenuElement(() ->
-                this.script != null ? new MenuElementGrouping(
-                        removeButton, importButton, perLayerButton, scriptText)
+        final MenuElement smartScriptElement = new ThinkingMenuElement(
+                () -> this.script != null
+                        ? new MenuElementGrouping(removeButton, reloadButton,
+                        importButton, perLayerButton, scriptText)
                         : new MenuElementGrouping(uploadButton, noScriptText));
         mb.add(smartScriptElement);
 
@@ -346,9 +354,13 @@ public abstract class Preview extends MenuElement implements PreviewPlayback {
         final Path filepath = StippleEffect.get().openScript();
         executeOnFileDialogOpen();
 
-        if (filepath == null)
-            return;
+        if (filepath != null) {
+            lastScriptPath = filepath;
+            validatePreviewScript(filepath);
+        }
+    }
 
+    private void validatePreviewScript(final Path filepath) {
         final HeadFuncNode script =
                 SEInterpreter.get().build(FileIO.readFile(filepath));
 

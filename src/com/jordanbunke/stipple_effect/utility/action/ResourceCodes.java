@@ -85,6 +85,7 @@ public final class ResourceCodes {
             AUTOMATION_SCRIPT = "automation_script",
             IMPORT_SCRIPT = "import_script",
             REMOVE_SCRIPT = "remove_script",
+            RELOAD_SCRIPT = "reload_script",
             IMPORT_PREVIEW = "import_preview",
             IMPORT_PER_LAYER = "import_per_layer",
             SELECTION_REPRESENTATION = "sel_rep",
