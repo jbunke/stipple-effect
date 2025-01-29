@@ -1,11 +1,4 @@
-{1.2.3} - 2025-01-2?
-
-TODO:
-To add:
-> Here
-
-To change:
-> Here
+{1.2.3} - 2025-01-30
 
 Added:
 > {Reload script} button when running a script in the preview window: reload from file with changes
@@ -16,8 +9,12 @@ Changed:
 > Updated {DeltaScript} interpreter
 
 Fixed:
-> Bug: Arithmetic operators have a higher precedence than multiplicative operators in {DeltaScript}
+> Bug: Additive operators have a higher precedence than multiplicative operators in {DeltaScript}
 > Bug: Rendering the pixel grid can cause the program to crash
+
+API Changes:
+  Changed:
+  > Refactored {$SE.hsv(...)} to {$Graphics.hsv(...)}
 
 {1.2.2} - 2024-12-31
 

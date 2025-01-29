@@ -21,6 +21,9 @@ public final class GraphicsNodeDelegator {
             case LightingNode.NAME -> new LightingNode(position, args);
             case PointLightNode.NAME -> new PointLightNode(position, args);
             case DirLightNode.NAME -> new DirLightNode(position, args);
+            case HSVNode.NAME -> args.length == 4
+                    ? HSVNode.withAlpha(position, args)
+                    : HSVNode.newHSV(position, args);
             default -> new IllegalExpressionNode(position, "$" +
                     Constants.GRAPHICS_NAMESPACE + " does not define a function \"" +
                     fID + "()\"");

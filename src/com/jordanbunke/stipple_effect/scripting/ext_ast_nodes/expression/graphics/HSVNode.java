@@ -1,4 +1,4 @@
-package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global;
+package com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.graphics;
 
 import com.jordanbunke.delta_time.scripting.ast.nodes.expression.ExpressionNode;
 import com.jordanbunke.delta_time.scripting.ast.nodes.types.BaseTypeNode;
@@ -11,7 +11,7 @@ import com.jordanbunke.stipple_effect.utility.math.ColorMath;
 
 import java.awt.*;
 
-public final class HSVNode extends GlobalExpressionNode {
+public final class HSVNode extends GraphicsExpressionNode {
     public static final String NAME = "hsv";
 
     private HSVNode(

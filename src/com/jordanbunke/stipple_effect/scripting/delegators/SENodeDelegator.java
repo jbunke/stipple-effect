@@ -9,6 +9,7 @@ import com.jordanbunke.delta_time.scripting.util.TextPosition;
 import com.jordanbunke.stipple_effect.project.SaveConfig;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.ColorPropertyGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.global.*;
+import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.graphics.HSVNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.layer.*;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.light.LightGetterNode;
 import com.jordanbunke.stipple_effect.scripting.ext_ast_nodes.expression.palette.PaletteColorSetGetterNode;
@@ -81,9 +82,6 @@ public final class SENodeDelegator {
                     : FillSelectionNode.custom(position, args);
             case FillNode.NAME -> new FillNode(position, args);
             case WandNode.NAME -> new WandNode(position, args);
-            case HSVNode.NAME -> args.length == 4
-                    ? HSVNode.withAlpha(position, args)
-                    : HSVNode.newHSV(position, args);
             case OutlineNode.NAME -> new OutlineNode(position, args);
             case PresetOutlineNode.SINGLE -> PresetOutlineNode.sng(position, args);
             case PresetOutlineNode.DOUBLE -> PresetOutlineNode.dbl(position, args);
@@ -94,6 +92,10 @@ public final class SENodeDelegator {
                     ? TransformNode.shortened(position, args)
                     : TransformNode.reg(position, args);
             // extend here
+            // Deprecated - $Graphics.hsv(...) used to be $SE.hsv(...)
+            case HSVNode.NAME -> args.length == 4
+                    ? HSVNode.withAlpha(position, args)
+                    : HSVNode.newHSV(position, args);
             default -> new IllegalExpressionNode(position,
                     "Undefined function \"" + formatGlobal(fID, true) + "\"");
         };
