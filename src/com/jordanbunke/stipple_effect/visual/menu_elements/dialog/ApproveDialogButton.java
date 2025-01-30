@@ -67,7 +67,7 @@ public class ApproveDialogButton extends MenuButtonStub {
     public void process(final InputEventLogger eventLogger) {
         super.process(eventLogger);
 
-        if (isHighlighted())
+        if (met && isHighlighted())
             SECursor.clickableElement();
 
         if (Permissions.isTyping())
