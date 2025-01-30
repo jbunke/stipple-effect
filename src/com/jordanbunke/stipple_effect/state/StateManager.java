@@ -105,7 +105,7 @@ public class StateManager {
         boolean edited = false,
                 redrawSelectionOverlay = false,
                 updateOverlayOffset = false,
-                redrawCanvasAuxiliaries = false;
+                redrawCheckerboard = false;
 
         final Set<ActionType> triggeredActions = new HashSet<>();
 
@@ -118,7 +118,7 @@ public class StateManager {
                     .triggersSelectionOverlayRedraw();
             updateOverlayOffset |= s.getOperation()
                     .triggersOverlayOffsetUpdate();
-            redrawCanvasAuxiliaries |= s.getOperation()
+            redrawCheckerboard |= s.getOperation()
                     .triggersCanvasAuxiliaryRedraw();
 
             triggeredActions.add(s.getOperation().getActionType());
@@ -134,8 +134,8 @@ public class StateManager {
         else if (updateOverlayOffset)
             c.updateOverlayOffset();
 
-        if (redrawCanvasAuxiliaries)
-            c.redrawCanvasAuxiliaries();
+        if (redrawCheckerboard)
+            c.redrawCheckerboard();
 
         for (ActionType actionType : triggeredActions)
             actionType.consequence();
@@ -144,7 +144,7 @@ public class StateManager {
     private void updateStateMetadataAndAssets(final ProjectState state) {
         markAsEditedIfEdited(state);
         redrawSelectionOverlayIfTriggered(state);
-        redrawCanvasAuxiliariesIfTriggered(state);
+        redrawCheckerboardIfTriggered(state);
 
         if (state.isCheckpoint())
             state.getOperation().getActionType().consequence();
@@ -162,9 +162,9 @@ public class StateManager {
             StippleEffect.get().getContext().updateOverlayOffset();
     }
 
-    private void redrawCanvasAuxiliariesIfTriggered(final ProjectState state) {
+    private void redrawCheckerboardIfTriggered(final ProjectState state) {
         if (state.getOperation().triggersCanvasAuxiliaryRedraw())
-            StippleEffect.get().getContext().redrawCanvasAuxiliaries();
+            StippleEffect.get().getContext().redrawCheckerboard();
     }
 
     public ProjectState getState() {
@@ -180,7 +180,7 @@ public class StateManager {
 
         c.getSaveConfig().markAsEdited();
         c.redrawSelectionOverlay();
-        c.redrawCanvasAuxiliaries();
+        c.redrawCheckerboard();
 
         ActionType.MAJOR.consequence();
     }

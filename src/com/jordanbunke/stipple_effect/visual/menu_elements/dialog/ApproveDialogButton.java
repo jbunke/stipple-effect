@@ -12,6 +12,7 @@ import com.jordanbunke.stipple_effect.StippleEffect;
 import com.jordanbunke.stipple_effect.utility.Layout;
 import com.jordanbunke.stipple_effect.utility.Permissions;
 import com.jordanbunke.stipple_effect.utility.settings.Settings;
+import com.jordanbunke.stipple_effect.visual.SECursor;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.Alignment;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.ButtonType;
 import com.jordanbunke.stipple_effect.visual.menu_elements.text_button.TextButton;
@@ -65,6 +66,9 @@ public class ApproveDialogButton extends MenuButtonStub {
     @Override
     public void process(final InputEventLogger eventLogger) {
         super.process(eventLogger);
+
+        if (met && isHighlighted())
+            SECursor.clickableElement();
 
         if (Permissions.isTyping())
             return;

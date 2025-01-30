@@ -129,11 +129,8 @@ public class RenderInfo {
     }
 
     public void setPixelGrid(final boolean pixelGridOn) {
-        if (pixelGridApplicable) {
+        if (pixelGridApplicable)
             this.pixelGridOn = pixelGridOn;
-
-            StippleEffect.get().getContext().redrawPixelGrid();
-        }
     }
 
     public String getZoomText() {

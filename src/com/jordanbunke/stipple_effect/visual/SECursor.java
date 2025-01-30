@@ -15,7 +15,7 @@ public class SECursor {
 
     public static final String MAIN_CURSOR = "main", NONE = "none",
             RETICLE = "reticle", NO_SCRIPT = "no_script",
-            HAND_OPEN = "hand_open", HAND_GRAB = "hand_grab",
+            HAND_OPEN = "hand_open", HAND_GRAB = "hand_grab", POINTER = "pointer",
             SLIDE_VERT = "slide_vert", SLIDE_HORZ = "slide_horz";
     private static final String
             BRUSH = "brush", ERASER = "eraser",
@@ -66,7 +66,7 @@ public class SECursor {
             ZOOM = "zoom";
 
     private static final Set<String> CURSOR_CODES = Set.of(
-            MAIN_CURSOR, RETICLE, NO_SCRIPT, HAND_GRAB, HAND_OPEN,
+            MAIN_CURSOR, RETICLE, NO_SCRIPT, HAND_GRAB, HAND_OPEN, POINTER,
             SLIDE_VERT, SLIDE_HORZ,
             BRUSH, ERASER, PENCIL, STIPPLE_PENCIL,
             COLOR_PICKER, LINE_TOOL, TEXT_TOOL, TEXT_TOOL_TYPING,
@@ -106,6 +106,10 @@ public class SECursor {
     public static String systemCursorCode() {
         return (String) DeltaTimeGlobal.getStatusOf(DT_CURSOR_CODE)
                 .orElse(SECursor.MAIN_CURSOR);
+    }
+
+    public static void clickableElement() {
+        setCursorCode(POINTER);
     }
 
     public static void setCursorCode(final String code) {

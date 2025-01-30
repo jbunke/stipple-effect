@@ -1,5 +1,25 @@
 # Changelog
 
+## **1.2.3** - 2025-01-30
+
+### Added:
+* *Reload script* button when running a script in the preview window: reload from file with changes
+* Pointer finger cursor to select dialog buttons and navbar submenu terminal buttons
+
+### Changed:
+* Updated *Stipple Effect -> Resources* links with new repository and website URLs
+* Updated *DeltaScript* interpreter
+
+### Fixed:
+* Bug: Additive operators have a higher precedence than multiplicative operators in {DeltaScript}
+* Bug: Rendering the pixel grid can cause the program to crash
+
+### API Changes:
+* Changed:
+  * Refactored `hsv` color generation functions from `$SE` to `$Graphics`
+    * `$SE.hsv(float h, float s, float v, int a) -> color` to `$Graphics.hsv(float h, float s, float v, int a) -> color`
+    * `$SE.hsv(float h, float s, float v) -> color` to `$Graphics.hsv(float h, float s, float v) -> color`
+
 ## **1.2.2** - 2024-12-31
 
 ### Added:
